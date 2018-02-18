@@ -6006,7 +6006,7 @@ namespace SurfaceGeometry {
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
-		
+
 		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfLocalEnv;
@@ -6117,7 +6117,7 @@ namespace SurfaceGeometry {
 		}
 		// Link surface properties to surface object
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
-			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {			
+			for ( Loop = 1; Loop <= TotSurfLocalEnv; ++Loop ) {
 				if ( SurfLocalEnvironment( Loop ).SurfPtr == SurfLoop ) {
 					if ( SurfLocalEnvironment( Loop ).OutdoorAirNodePtr != 0 ) {
 						Surface( SurfLoop ).HasLinkedOutAirNode = true;
@@ -7974,7 +7974,11 @@ namespace SurfaceGeometry {
 				} else if ( SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
 					int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex( Surface( SurfNum ).ZoneName );
-					if( controlledZoneNum > 0 ) DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+					if( controlledZoneNum > 0 ) {
+						DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+						DataHeatBalance::Zone( Surface( SurfNum ).Zone ).HasAirFlowWindowReturn = true;
+					}
+					
 					// Set return air node number
 					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = 0;
 					std::string retNodeName = "";
@@ -8104,8 +8108,10 @@ namespace SurfaceGeometry {
 			if ( !lAlphaFieldBlanks( alpF ) ) {
 				if (SameString(cAlphaArgs( alpF ), "Hourly")) {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
+					kivaManager.timestep = 3600.; // seconds
 				} else /* if (SameString(cAlphaArgs( alpF ), "Timestep")) */ {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
+					kivaManager.timestep = DataGlobals::MinutesPerTimeStep*60.;
 				}
 			} alpF++;
 

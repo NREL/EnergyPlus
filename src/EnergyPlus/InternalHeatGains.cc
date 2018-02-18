@@ -48,6 +48,7 @@
 // C++ Headers
 #include <cmath>
 #include <string>
+#include <map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -212,6 +213,8 @@ namespace InternalHeatGains {
 		InitInternalHeatGains();
 
 		ReportInternalHeatGains();
+
+		CheckReturnAirHeatGain();
 
 		//for the load component report, gather the load components for each timestep but not when doing pulse
 		if ( ZoneSizingCalc ) GatherComponentLoadsIntGain();
@@ -1199,6 +1202,8 @@ namespace InternalHeatGains {
 					}
 					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, returnNodeNum );
 
+
+					if ( Lights( Loop ).FractionReturnAir > 0 ) Zone( Lights( Loop ).ZonePtr ).HasLtsRetAirGain = true;
 					// send values to predefined lighting summary report
 					liteName = Lights( Loop ).Name;
 					zonePt = Lights( Loop ).ZonePtr;
@@ -2325,7 +2330,7 @@ namespace InternalHeatGains {
 		// Note that this object type does not support ZoneList due to node names in input fields
 		ZoneITEq.allocate( NumZoneITEqStatements );
 
-		if ( NumZoneITEqStatements > 0 ) {
+ 		if ( NumZoneITEqStatements > 0 ) {
 			Loop = 0;
 			for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
 				AlphaName = BlankString;
@@ -2337,7 +2342,23 @@ namespace InternalHeatGains {
 				ZoneITEq( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone );
 
 				// IT equipment design level calculation method.
-				{ auto const equipmentLevel( AlphaName( 3 ) );
+				if ( lAlphaFieldBlanks( 3 ) ) {
+					ZoneITEq( Loop ).FlowControlWithApproachTemps = false;
+				} else {
+					if ( SameString( AlphaName( 3 ), "FlowFromSystem" ) ) {
+						ZoneITEq( Loop ).FlowControlWithApproachTemps = false;
+					}
+					else if ( SameString( AlphaName( 3 ), "FlowControlWithApproachTemperatures" ) ) {
+						ZoneITEq( Loop ).FlowControlWithApproachTemps = true;
+						Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE = true;
+						Zone( ZoneITEq( Loop ).ZonePtr ).NoHeatToReturnAir = false;
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method: " + AlphaName( 3 ) );
+						ErrorsFound = true;
+					}
+				}
+				
+				{ auto const equipmentLevel( AlphaName( 4 ) );
 				if ( equipmentLevel == "WATTS/UNIT" ) {
 					ZoneITEq( Loop ).DesignTotalPower = IHGNumbers( 1 ) * IHGNumbers( 2 );
 					if ( lNumericFieldBlanks( 1 ) ) {
@@ -2364,51 +2385,24 @@ namespace InternalHeatGains {
 					}
 
 				} else {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + ", value  =" + AlphaName( 3 ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + ", value  =" + AlphaName( 4 ) );
 					ShowContinueError( "...Valid values are \"Watts/Unit\" or \"Watts/Area\"." );
 					ErrorsFound = true;
 				}}
 
-				if ( lAlphaFieldBlanks( 4 ) ) {
+				if ( lAlphaFieldBlanks( 5 ) ) {
 					ZoneITEq( Loop ).OperSchedPtr = ScheduleAlwaysOn;
 				} else {
-					ZoneITEq( Loop ).OperSchedPtr = GetScheduleIndex( AlphaName( 4 ) );
+					ZoneITEq( Loop ).OperSchedPtr = GetScheduleIndex( AlphaName( 5 ) );
 				}
 				SchMin = 0.0;
 				SchMax = 0.0;
 				if ( ZoneITEq( Loop ).OperSchedPtr == 0 ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + " entered=" + AlphaName( 4 ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 5 ) + " entered=" + AlphaName( 5 ) );
 					ErrorsFound = true;
 				} else { // check min/max on schedule
 					SchMin = GetScheduleMinValue( ZoneITEq( Loop ).OperSchedPtr );
 					SchMax = GetScheduleMaxValue( ZoneITEq( Loop ).OperSchedPtr );
-					if ( SchMin < 0.0 || SchMax < 0.0 ) {
-						if ( SchMin < 0.0 ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 4 ) + ", minimum is < 0.0" );
-							ShowContinueError( "Schedule=\"" + AlphaName( 4 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
-							ErrorsFound = true;
-						}
-						if ( SchMax < 0.0 ) {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 4 ) + ", maximum is < 0.0" );
-							ShowContinueError( "Schedule=\"" + AlphaName( 4 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
-							ErrorsFound = true;
-						}
-					}
-				}
-
-				if ( lAlphaFieldBlanks( 5 ) ) {
-					ZoneITEq( Loop ).CPULoadSchedPtr = ScheduleAlwaysOn;
-				} else {
-					ZoneITEq( Loop ).CPULoadSchedPtr = GetScheduleIndex( AlphaName( 5 ) );
-				}
-				SchMin = 0.0;
-				SchMax = 0.0;
-				if ( ZoneITEq( Loop ).CPULoadSchedPtr == 0 ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 5 ) + " entered=" + AlphaName( 5 ) );
-					ErrorsFound = true;
-				} else { // check min/max on schedule
-					SchMin = GetScheduleMinValue( ZoneITEq( Loop ).CPULoadSchedPtr );
-					SchMax = GetScheduleMaxValue( ZoneITEq( Loop ).CPULoadSchedPtr );
 					if ( SchMin < 0.0 || SchMax < 0.0 ) {
 						if ( SchMin < 0.0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 5 ) + ", minimum is < 0.0" );
@@ -2418,6 +2412,33 @@ namespace InternalHeatGains {
 						if ( SchMax < 0.0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 5 ) + ", maximum is < 0.0" );
 							ShowContinueError( "Schedule=\"" + AlphaName( 5 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
+							ErrorsFound = true;
+						}
+					}
+				}
+
+				if ( lAlphaFieldBlanks( 6 ) ) {
+					ZoneITEq( Loop ).CPULoadSchedPtr = ScheduleAlwaysOn;
+				} else {
+					ZoneITEq( Loop ).CPULoadSchedPtr = GetScheduleIndex( AlphaName( 6 ) );
+				}
+				SchMin = 0.0;
+				SchMax = 0.0;
+				if ( ZoneITEq( Loop ).CPULoadSchedPtr == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 6 ) + " entered=" + AlphaName( 6 ) );
+					ErrorsFound = true;
+				} else { // check min/max on schedule
+					SchMin = GetScheduleMinValue( ZoneITEq( Loop ).CPULoadSchedPtr );
+					SchMax = GetScheduleMaxValue( ZoneITEq( Loop ).CPULoadSchedPtr );
+					if ( SchMin < 0.0 || SchMax < 0.0 ) {
+						if ( SchMin < 0.0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 6 ) + ", minimum is < 0.0" );
+							ShowContinueError( "Schedule=\"" + AlphaName( 6 ) + "\". Minimum is [" + RoundSigDigits( SchMin, 1 ) + "]. Values must be >= 0.0." );
+							ErrorsFound = true;
+						}
+						if ( SchMax < 0.0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 6 ) + ", maximum is < 0.0" );
+							ShowContinueError( "Schedule=\"" + AlphaName( 6 ) + "\". Maximum is [" + RoundSigDigits( SchMax, 1 ) + "]. Values must be >= 0.0." );
 							ErrorsFound = true;
 						}
 					}
@@ -2435,110 +2456,149 @@ namespace InternalHeatGains {
 				ZoneITEq( Loop ).DesignRecircFrac = IHGNumbers( 7 );
 				ZoneITEq( Loop ).DesignUPSEfficiency = IHGNumbers( 8 );
 				ZoneITEq( Loop ).UPSLossToZoneFrac = IHGNumbers( 9 );
+				ZoneITEq( Loop ).SupplyApproachTemp = IHGNumbers( 10 );
+				ZoneITEq( Loop ).ReturnApproachTemp = IHGNumbers( 11 );
+
+				bool hasSupplyApproachTemp = !lNumericFieldBlanks( 10 );
+				bool hasReturnApproachTemp = !lNumericFieldBlanks( 11 );
 
 				// Performance curves
-				ZoneITEq( Loop ).CPUPowerFLTCurve = GetCurveIndex( AlphaName( 6 ) );
+				ZoneITEq( Loop ).CPUPowerFLTCurve = GetCurveIndex( AlphaName( 7 ) );
 				if ( ZoneITEq( Loop ).CPUPowerFLTCurve == 0 ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
-					ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + AlphaName( 6 ) );
-					ErrorsFound = true;
-				}
-
-				ZoneITEq( Loop ).AirFlowFLTCurve = GetCurveIndex( AlphaName( 7 ) );
-				if ( ZoneITEq( Loop ).AirFlowFLTCurve == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) );
 					ErrorsFound = true;
 				}
 
-				ZoneITEq( Loop ).FanPowerFFCurve = GetCurveIndex( AlphaName( 8 ) );
-				if ( ZoneITEq( Loop ).FanPowerFFCurve == 0 ) {
+
+				ZoneITEq( Loop ).AirFlowFLTCurve = GetCurveIndex( AlphaName( 8 ) );
+				if ( ZoneITEq( Loop ).AirFlowFLTCurve == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + AlphaName( 8 ) );
 					ErrorsFound = true;
 				}
 
-				ZoneITEq( Loop ).RecircFLTCurve = GetCurveIndex( AlphaName( 14 ) );
-				if ( ZoneITEq( Loop ).RecircFLTCurve == 0 ) {
+				ZoneITEq( Loop ).FanPowerFFCurve = GetCurveIndex( AlphaName( 9 ) );
+				if ( ZoneITEq( Loop ).FanPowerFFCurve == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
-					ShowContinueError( "Invalid " + cAlphaFieldNames( 14 ) + '=' + AlphaName( 14 ) );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphaName( 9 ) );
 					ErrorsFound = true;
 				}
 
-				ZoneITEq( Loop ).UPSEfficFPLRCurve = GetCurveIndex( AlphaName( 15 ) );
-				if ( ZoneITEq( Loop ).UPSEfficFPLRCurve == 0 ) {
+				ZoneITEq( Loop ).RecircFLTCurve = GetCurveIndex( AlphaName( 15 ) );
+				if ( ZoneITEq( Loop ).RecircFLTCurve == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + '=' + AlphaName( 15 ) );
 					ErrorsFound = true;
 				}
 
+				ZoneITEq( Loop ).UPSEfficFPLRCurve = GetCurveIndex( AlphaName( 16 ) );
+				if ( ZoneITEq( Loop ).UPSEfficFPLRCurve == 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 16 ) + '=' + AlphaName( 16 ) );
+					ErrorsFound = true;
+				}
+
 				// Environmental class
-				if ( SameString( AlphaName( 9 ), "None" ) ) {
+				if ( SameString( AlphaName( 10 ), "None" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassNone;
-				} else if ( SameString( AlphaName( 9 ), "A1" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "A1" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA1;
-				} else if ( SameString( AlphaName( 9 ), "A2" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "A2" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA2;
-				} else if ( SameString( AlphaName( 9 ), "A3" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "A3" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA3;
-				} else if ( SameString( AlphaName( 9 ), "A4" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "A4" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA4;
-				} else if ( SameString( AlphaName( 9 ), "B" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "B" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassB;
-				} else if ( SameString( AlphaName( 9 ), "C" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "C" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassC;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
-					ShowContinueError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphaName( 9 ) );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + AlphaName( 10 ) );
 					ShowContinueError( "Valid entries are None, A1, A2, A3, A4, B or C." );
 					ErrorsFound = true;
 				}
 
 				// Air and supply inlet connections
-				if ( SameString( AlphaName( 10 ), "AdjustedSupply" ) ) {
+				if ( SameString( AlphaName( 11 ), "AdjustedSupply" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletAdjustedSupply;
-				} else if ( SameString( AlphaName( 10 ), "ZoneAirNode" ) ) {
+				} else if ( SameString( AlphaName( 11 ), "ZoneAirNode" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
-				} else if ( SameString( AlphaName( 10 ), "RoomAirModel" ) ) {
+				} else if ( SameString( AlphaName( 11 ), "RoomAirModel" ) ) {
 					// ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode" );
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
-					ShowContinueError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + AlphaName( 10 ) );
+					ShowContinueError( "Invalid " + cAlphaFieldNames( 11 ) + '=' + AlphaName( 11 ) );
 					ShowContinueError( "Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel." );
 					ErrorsFound = true;
 				}
-				if ( lAlphaFieldBlanks( 13 ) ) {
+				if ( lAlphaFieldBlanks( 14 ) ) {
 					if ( ZoneITEq( Loop ).AirConnectionType == ITEInletAdjustedSupply ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
-						ShowContinueError( "For " + cAlphaFieldNames( 10 ) + "= AdjustedSupply, " + cAlphaFieldNames( 13 ) + " is required, but this field is blank." );
+						ShowContinueError( "For " + cAlphaFieldNames( 11 ) + "= AdjustedSupply, " + cAlphaFieldNames( 14 ) + " is required, but this field is blank." );
+						ErrorsFound = true;
+					} else if ( ZoneITEq( Loop ).FlowControlWithApproachTemps ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
+						ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, " + cAlphaFieldNames( 14 ) + " is required, but this field is blank." );
 						ErrorsFound = true;
 					} else {
 						ZoneITEq( Loop ).SupplyAirNodeNum = 0;
 					}
 				} else {
-					ZoneITEq( Loop ).SupplyAirNodeNum = GetOnlySingleNode( AlphaName( 13 ), ErrorsFound, CurrentModuleObject, AlphaName( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+					ZoneITEq( Loop ).SupplyAirNodeNum = GetOnlySingleNode( AlphaName( 14 ), ErrorsFound, CurrentModuleObject, AlphaName( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 				}
 
 				// End-Use subcategories
-				if ( NumAlpha > 15 ) {
-					ZoneITEq( Loop ).EndUseSubcategoryCPU = AlphaName( 16 );
+				if ( NumAlpha > 16 ) {
+					ZoneITEq( Loop ).EndUseSubcategoryCPU = AlphaName( 17 );
 				} else {
 					ZoneITEq( Loop ).EndUseSubcategoryCPU = "ITE-CPU";
 				}
 
-				if ( NumAlpha > 16 ) {
-					ZoneITEq( Loop ).EndUseSubcategoryFan = AlphaName( 17 );
+				if ( NumAlpha > 17 ) {
+					ZoneITEq( Loop ).EndUseSubcategoryFan = AlphaName( 18 );
 				} else {
 					ZoneITEq( Loop ).EndUseSubcategoryFan = "ITE-Fans";
 				}
 				if ( ZoneITEq( Loop ).ZonePtr <= 0 ) continue; // Error, will be caught and terminated later
 
-				if ( NumAlpha > 17 ) {
-					ZoneITEq( Loop ).EndUseSubcategoryUPS = AlphaName( 18 );
+				if ( NumAlpha > 18 ) {
+					ZoneITEq( Loop ).EndUseSubcategoryUPS = AlphaName( 19 );
 				} else {
 					ZoneITEq( Loop ).EndUseSubcategoryUPS = "ITE-UPS";
+				}
+				if ( ZoneITEq( Loop ).FlowControlWithApproachTemps ) {
+					if ( !lAlphaFieldBlanks( 20 ) ) {
+						ZoneITEq( Loop ).SupplyApproachTempSch = GetScheduleIndex( AlphaName( 20 ) );
+						if ( ZoneITEq( Loop ).SupplyApproachTempSch == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 20 ) + " entered=" + AlphaName( 20 ) );
+							ErrorsFound = true;
+						}						
+					} else {
+						if ( !hasSupplyApproachTemp ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 10 ) + " or " + cAlphaFieldNames( 20 ) + " is required, but both are left blank." );
+							ErrorsFound = true;
+						}
+					}
+
+					if ( !lAlphaFieldBlanks( 21 ) ) {
+						ZoneITEq( Loop ).ReturnApproachTempSch = GetScheduleIndex( AlphaName( 21 ) );
+						if ( ZoneITEq( Loop ).ReturnApproachTempSch == 0 ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 20 ) + " entered=" + AlphaName( 20 ) );
+							ErrorsFound = true;
+						}	
+					} else {
+						if ( !hasReturnApproachTemp ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+							ShowContinueError( "For " + cAlphaFieldNames( 3 ) + "= FlowControlWithApproachTemperatures, either " + cNumericFieldNames( 11 ) + " or " + cAlphaFieldNames( 21 ) + " is required, but both are left blank." );
+							ErrorsFound = true;
+						}
+					}
 				}
 
 				// Object report variables
@@ -2592,6 +2652,7 @@ namespace InternalHeatGains {
 					SetupOutputVariable( "Zone ITE Fan Electric Power at Design Inlet Conditions", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanPowerAtDesign, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone ITE UPS Heat Gain to Zone Rate", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqUPSGainRateToZone, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone ITE Total Heat Gain to Zone Rate", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqConGainRateToZone, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone ITE Adjusted Return Air Temperature", OutputProcessor::Unit::W, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEAdjReturnTemp, "Zone", "Average", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 
 					SetupOutputVariable( "Zone ITE CPU Electric Energy", OutputProcessor::Unit::J, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqCPUConsumption, "Zone", "Sum", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone ITE Fan Electric Energy", OutputProcessor::Unit::J, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanConsumption, "Zone", "Sum", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
@@ -2613,6 +2674,9 @@ namespace InternalHeatGains {
 					SetupOutputVariable( "Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time", OutputProcessor::Unit::hr, ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeBelowRH, "Zone", "Sum", Zone( ZoneITEq( Loop ).ZonePtr ).Name );
 				}
 
+				
+				
+
 				// MJW - EMS Not in place yet
 				// if ( AnyEnergyManagementSystemInModel ) {
 				// SetupEMSActuator( "ElectricEquipment", ZoneITEq( Loop ).Name, "Electric Power Level", "[W]", ZoneITEq( Loop ).EMSZoneEquipOverrideOn, ZoneITEq( Loop ).EMSEquipPower );
@@ -2622,6 +2686,13 @@ namespace InternalHeatGains {
 				if ( !ErrorsFound ) SetupZoneInternalGain( ZoneITEq( Loop ).ZonePtr, "ElectricEquipment:ITE:AirCooled", ZoneITEq( Loop ).Name, IntGainTypeOf_ElectricEquipmentITEAirCooled, ZoneITEq( Loop ).ConGainRateToZone );
 
 			} // Item - Number of ZoneITEq objects
+			for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
+				if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE && ( !ZoneITEq( Loop ).FlowControlWithApproachTemps ) ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\": invalid calculation method " + AlphaName( 3 ) + " for Zone: " + AlphaName( 2 ) );
+					ShowContinueError( "...Multiple flow control methods apply to one zone. " );
+					ErrorsFound = true;
+				}
+			}
 		} // Check on number of ZoneITEq
 
 		RepVarSet = true;
@@ -3739,6 +3810,31 @@ namespace InternalHeatGains {
 	}
 
 	void
+	CheckReturnAirHeatGain()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Xuan Luo
+		//       DATE WRITTEN   Jan 2018
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine currently creates the values for standard "zone loads" reporting
+		// from the heat balance module.
+
+		// Using/Aliasing
+		using DataHeatBalance::Zone;
+		using DataZoneEquipment::ZoneEquipConfig;
+
+		for ( int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( Zone( ZoneNum ).HasAdjustedReturnTempByITE && Zone( ZoneNum ).HasLtsRetAirGain ) {
+				ShowFatalError( "Return air heat gains from lights are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures in zones with ITE objects." );
+			}
+			if ( Zone( ZoneNum ).HasAdjustedReturnTempByITE && Zone( ZoneNum ).HasAirFlowWindowReturn ) {
+				ShowFatalError( "Return air heat gains from windows are not allowed when Air Flow Calculation Method = FlowControlWithApproachTemperatures in zones with ITE objects." );
+			}
+		}
+	}
+
+	void
 	CalcZoneITEq()
 	{
 
@@ -3772,6 +3868,7 @@ namespace InternalHeatGains {
 		using CurveManager::CurveValue;
 		using DataHVACGlobals::SmallAirVolFlow;
 		using DataHVACGlobals::SmallTempDiff;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3826,6 +3923,7 @@ namespace InternalHeatGains {
 		Array1D< Real64 > ZoneSumTinMinusTSup( NumOfZones ); // Numerator for zone-level sensible heat index (SHI)
 		Array1D< Real64 > ZoneSumToutMinusTSup( NumOfZones ); // Denominator for zone-level sensible heat index (SHI)
 
+		std::map< int, std::vector< int > > ZoneITEMap;
 
 		//  Zero out time step variables
 		// Object report variables
@@ -3879,6 +3977,7 @@ namespace InternalHeatGains {
 			ZnRpt( Loop ).ITEqUPSGainRateToZone = 0.0;
 			ZnRpt( Loop ).ITEqConGainRateToZone = 0.0;
 
+			ZnRpt( Loop ).ITEAdjReturnTemp = 0.0;
 			ZnRpt( Loop ).ITEqCPUConsumption = 0.0;
 			ZnRpt( Loop ).ITEqFanConsumption = 0.0;
 			ZnRpt( Loop ).ITEqUPSConsumption = 0.0;
@@ -3912,30 +4011,49 @@ namespace InternalHeatGains {
 			AirConnection = ZoneITEq( Loop ).AirConnectionType;
 			RecircFrac = 0.0;
 			SupplyNodeNum = ZoneITEq( Loop ).SupplyAirNodeNum;
-			if ( AirConnection == ITEInletAdjustedSupply ) {
+			if ( ZoneITEq( Loop ).FlowControlWithApproachTemps ) {
 				if ( SupplyNodeNum != 0 ) {
 					TSupply = Node( SupplyNodeNum ).Temp;
 					WSupply = Node( SupplyNodeNum ).HumRat;
 				} else {
-					ShowFatalError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
+					ShowSevereError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
 					ShowContinueError( "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified." );
+					ShowFatalError( "Program terminates due to above conditions." );
 				}
-				if ( ZoneITEq( Loop ).RecircFLTCurve != 0 ) {
-					RecircFrac = ZoneITEq( Loop ).DesignRecircFrac * CurveValue( ZoneITEq( Loop ).RecircFLTCurve, CPULoadSchedFrac, TSupply );
-				} else {
-					RecircFrac = ZoneITEq( Loop ).DesignRecircFrac;
+				if ( ZoneITEq( Loop ).SupplyApproachTempSch != 0) {
+					TAirIn = TSupply + GetCurrentScheduleValue( ZoneITEq( Loop ).SupplyApproachTempSch );
 				}
-				TRecirc = MAT( NZ );
-				WRecirc = ZoneAirHumRat( NZ );
-				TAirIn = TRecirc * RecircFrac + TSupply * ( 1.0 - RecircFrac );
-				WAirIn = WRecirc * RecircFrac + WSupply * ( 1.0 - RecircFrac );
-			} else if ( AirConnection == ITEInletRoomAirModel ) {
-				// Room air model option not implemented yet
-				TAirIn = MAT( NZ );
-				WAirIn = ZoneAirHumRat( NZ );
-			} else { // Default to ITEInletZoneAirNode
-				TAirIn = MAT( NZ );
-				WAirIn = ZoneAirHumRat( NZ );
+				else {
+					TAirIn = TSupply + ZoneITEq( Loop ).SupplyApproachTemp;
+				}
+				WAirIn = Node( SupplyNodeNum ).HumRat;
+			} else {
+				if ( AirConnection == ITEInletAdjustedSupply ) {
+					if ( SupplyNodeNum != 0 ) {
+						TSupply = Node( SupplyNodeNum ).Temp;
+						WSupply = Node( SupplyNodeNum ).HumRat;
+					} else {
+						ShowSevereError( RoutineName + ": ElectricEquipment:ITE:AirCooled " + ZoneITEq( Loop ).Name );
+						ShowContinueError( "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified." );
+						ShowFatalError( "Program terminates due to above conditions." );
+					}
+					if ( ZoneITEq( Loop ).RecircFLTCurve != 0 ) {
+						RecircFrac = ZoneITEq( Loop ).DesignRecircFrac * CurveValue( ZoneITEq( Loop ).RecircFLTCurve, CPULoadSchedFrac, TSupply );
+					} else {
+						RecircFrac = ZoneITEq( Loop ).DesignRecircFrac;
+					}
+					TRecirc = MAT( NZ );
+					WRecirc = ZoneAirHumRat( NZ );
+					TAirIn = TRecirc * RecircFrac + TSupply * ( 1.0 - RecircFrac );
+					WAirIn = WRecirc * RecircFrac + WSupply * ( 1.0 - RecircFrac );
+				} else if ( AirConnection == ITEInletRoomAirModel ) {
+					// Room air model option not implemented yet
+					TAirIn = MAT( NZ );
+					WAirIn = ZoneAirHumRat( NZ );
+				} else { // Default to ITEInletZoneAirNode
+					TAirIn = MAT( NZ );
+					WAirIn = ZoneAirHumRat( NZ );
+				}
 			}
 			TDPAirIn = PsyTdpFnWPb( WAirIn, StdBaroPress, RoutineName );
 			RHAirIn = PsyRhFnTdbWPb( TAirIn, WAirIn, StdBaroPress, RoutineName );
@@ -3978,6 +4096,8 @@ namespace InternalHeatGains {
 				TAirOut = TSupply;
 			}
 
+
+
 			if ( ( SupplyNodeNum != 0 ) && ( TAirOut != TSupply ) ) {
 				SupplyHeatIndex = ( TAirIn - TSupply ) / ( TAirOut - TSupply );
 			} else {
@@ -3992,6 +4112,9 @@ namespace InternalHeatGains {
 				// If a room air model, then the only convective heat gain to the zone heat balance is the UPS heat gain
 				ZoneITEq( Loop ).ConGainRateToZone = UPSHeatGain;
 			}
+			if ( Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE) {
+				ZoneITEMap[ ZoneITEq( Loop ).ZonePtr ].push_back( Loop );
+			}			
 
 			// Object report variables
 			ZoneITEq( Loop ).CPUPower = CPUPower;
@@ -4096,6 +4219,31 @@ namespace InternalHeatGains {
 			}
 		}
 
+		std::map< int, std::vector< int > >::iterator it = ZoneITEMap.begin();
+		Real64 totalGain;
+		Real64 totalRate;
+		Real64 TAirReturn;
+		while ( it != ZoneITEMap.end() ) {
+			if ( Zone( it->first ).HasAdjustedReturnTempByITE ) {
+				totalGain = 0;
+				totalRate = 0;
+				for ( int i : it->second ) {
+					if ( ZoneITEq( i ).ReturnApproachTempSch != 0 ) {
+						TAirReturn = ZoneITEq( i ).AirOutletDryBulbT + GetCurrentScheduleValue( ZoneITEq( i ).ReturnApproachTempSch );
+					}
+					else {
+						TAirReturn = ZoneITEq( i ).AirOutletDryBulbT + ZoneITEq( i ).ReturnApproachTemp;
+					}
+					totalRate += ZoneITEq( i ).AirMassFlow;
+					totalGain += ZoneITEq( i ).AirMassFlow * TAirReturn;
+				}
+				if ( totalRate != 0 ) {
+					Zone( it->first ).AdjustedReturnTempByITE = totalGain / totalRate;
+					ZnRpt( it->first ).ITEAdjReturnTemp = Zone( it->first ).AdjustedReturnTempByITE;
+				}
+			}
+			it++;
+		}
 	} // End CalcZoneITEq
 
 	void

@@ -178,7 +178,7 @@ namespace HVACDXSystem {
 		// DOAS DX Cooling coil
 		bool ISHundredPercentDOASDXCoil; // logical determines if this system will run as 100% DOAS
 		// DX Coil, false is regular DX coil
-		Real64 DOASDXCoolingCoilMinTout; // DOAS DX Cooling coil outlet air minimum temperature
+		Real64 DesignMinOutletTemp; // DOAS DX Cooling coil outlet air minimum temperature
 		int FrostControlStatus; // DOAS coil system frost control status
 		// variable-speed coil
 		int SpeedNum; // select speed number for variable-speed coil
@@ -249,7 +249,7 @@ namespace HVACDXSystem {
 			MModeLatPLRIterIndex2( 0 ),
 			OAUnitSetTemp( 0.0 ),
 			ISHundredPercentDOASDXCoil( false ),
-			DOASDXCoolingCoilMinTout( 0.0 ),
+			DesignMinOutletTemp( 0.0 ),
 			FrostControlStatus( 0 ),
 			SpeedNum( 0 ),
 			TESOpMode( 0 ),

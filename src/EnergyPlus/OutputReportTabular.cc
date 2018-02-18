@@ -207,9 +207,6 @@ namespace OutputReportTabular {
 	int const unitsStyleInchPound( 4 );
 	int const unitsStyleNotFound( 5 );
 
-	int const isAverage( 1 );
-	int const isSum( 2 );
-
 	int const stepTypeZone( ZoneTSReporting );
 	int const stepTypeHVAC( HVACTSReporting );
 
@@ -1095,7 +1092,7 @@ namespace OutputReportTabular {
 		int colNum; // loop index for columns
 		int KeyCount;
 		int TypeVar;
-		int AvgSumVar;
+		OutputProcessor::StoreType AvgSumVar;
 		int StepTypeVar;
 		OutputProcessor::Unit UnitsVar( OutputProcessor::Unit::None); // Units enum
 		//CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
@@ -1237,7 +1234,7 @@ namespace OutputReportTabular {
 			e.varName.clear();
 			e.varNum = 0;
 			e.typeOfVar = 0;
-			e.avgSum = 0;
+			e.avgSum = OutputProcessor::StoreType::Averaged;
 			e.stepType = 0;
 			e.units = OutputProcessor::Unit::None;
 			e.aggType = 0;
@@ -1446,7 +1443,7 @@ namespace OutputReportTabular {
 						MonthlyColumns( mColumn ).varName = curVariMeter;
 						MonthlyColumns( mColumn ).varNum = 0;
 						MonthlyColumns( mColumn ).typeOfVar = 0;
-						MonthlyColumns( mColumn ).avgSum = 0;
+						MonthlyColumns( mColumn ).avgSum = OutputProcessor::StoreType::Averaged;
 						MonthlyColumns( mColumn ).stepType = 0;
 						MonthlyColumns( mColumn ).units = OutputProcessor::Unit::None;
 						MonthlyColumns( mColumn ).aggType = aggTypeSumOrAvg;
@@ -3910,7 +3907,7 @@ namespace OutputReportTabular {
 						} else {
 							elapsedTime = TimeStepZone;
 						}
-						if ( OutputTableBinned( iInObj ).avgSum == isSum ) { // if it is a summed variable
+						if ( OutputTableBinned( iInObj ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 							curValue /= ( elapsedTime * SecInHour );
 						}
 						// round the value to the number of signficant digits used in the final output report
@@ -4088,7 +4085,7 @@ namespace OutputReportTabular {
 					// use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
 					{ auto const SELECT_CASE_var( MonthlyColumnsAggType( curCol ) );
 					if ( SELECT_CASE_var == aggTypeSumOrAvg ) {
-						if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
+						if ( MonthlyColumns( curCol ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 							newResultValue = oldResultValue + curValue;
 						} else {
 							newResultValue = oldResultValue + curValue * elapsedTime; //for averaging - weight by elapsed time
@@ -4097,7 +4094,7 @@ namespace OutputReportTabular {
 						activeNewValue = true;
 					} else if ( SELECT_CASE_var == aggTypeMaximum ) {
 						// per MJW when a summed variable is used divide it by the length of the time step
-						if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
+						if ( MonthlyColumns( curCol ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 							if ( IndexTypeKey == HVACTSReporting ) {
 								curValue /= ( TimeStepSys * SecInHour );
 							} else {
@@ -4114,7 +4111,7 @@ namespace OutputReportTabular {
 						}
 					} else if ( SELECT_CASE_var == aggTypeMinimum ) {
 						// per MJW when a summed variable is used divide it by the length of the time step
-						if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
+						if ( MonthlyColumns( curCol ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 							if ( IndexTypeKey == HVACTSReporting ) {
 								curValue /= ( TimeStepSys * SecInHour );
 							} else {
@@ -4209,7 +4206,7 @@ namespace OutputReportTabular {
 								scanVarNum = MonthlyColumns( scanColumn ).varNum;
 								scanValue = GetInternalVariableValue( scanTypeOfVar, scanVarNum );
 								// When a summed variable is used divide it by the length of the time step
-								if ( MonthlyColumns( scanColumn ).avgSum == isSum ) { // if it is a summed variable
+								if ( MonthlyColumns( scanColumn ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
@@ -4243,7 +4240,7 @@ namespace OutputReportTabular {
 								break; //do
 							} else if ( SELECT_CASE_var == aggTypeSumOrAverageHoursShown ) {
 								// this case is when the value should be set
-								if ( MonthlyColumns( scanColumn ).avgSum == isSum ) { // if it is a summed variable
+								if ( MonthlyColumns( scanColumn ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									MonthlyColumns( scanColumn ).reslt( Month ) = oldScanValue + scanValue;
 								} else {
 									//for averaging - weight by elapsed time
@@ -4251,7 +4248,7 @@ namespace OutputReportTabular {
 								}
 								MonthlyColumns( scanColumn ).duration( Month ) += elapsedTime;
 							} else if ( SELECT_CASE_var == aggTypeMaximumDuringHoursShown ) {
-								if ( MonthlyColumns( scanColumn ).avgSum == isSum ) { // if it is a summed variable
+								if ( MonthlyColumns( scanColumn ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
@@ -4263,7 +4260,7 @@ namespace OutputReportTabular {
 									MonthlyColumns( scanColumn ).timeStamp( Month ) = timestepTimeStamp;
 								}
 							} else if ( SELECT_CASE_var == aggTypeMinimumDuringHoursShown ) {
-								if ( MonthlyColumns( scanColumn ).avgSum == isSum ) { // if it is a summed variable
+								if ( MonthlyColumns( scanColumn ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
@@ -6605,7 +6602,7 @@ namespace OutputReportTabular {
 						minVal = storedMaxVal;
 						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
-							if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
+							if ( MonthlyColumns( curCol ).avgSum == OutputProcessor::StoreType::Averaged ) { // if it is a average variable divide by duration
 								if ( MonthlyColumns( curCol ).duration( lMonth ) != 0 ) {
 									curVal = ( ( MonthlyColumns( curCol ).reslt( lMonth ) / MonthlyColumns( curCol ).duration( lMonth ) ) * curConversionFactor ) + curConversionOffset;
 								} else {
@@ -6626,7 +6623,7 @@ namespace OutputReportTabular {
 							}
 						} //lMonth
 						// add the summary to bottom
-						if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
+						if ( MonthlyColumns( curCol ).avgSum == OutputProcessor::StoreType::Averaged ) { // if it is a average variable divide by duration
 							if ( sumDuration > 0 ) {
 								tableBody( columnRecount, 14 ) = RealToStr( sumVal / sumDuration, digitsShown );
 							} else {
@@ -6670,7 +6667,7 @@ namespace OutputReportTabular {
 						}
 					} else if ( SELECT_CASE_var == aggTypeValueWhenMaxMin ) {
 						++columnRecount;
-						if ( MonthlyColumns( curCol ).avgSum == isSum ) {
+						if ( MonthlyColumns( curCol ).avgSum == OutputProcessor::StoreType::Summed ) {
 							curUnits += "/s";
 						}
 						if ( SameString( curUnits, "J/s" ) ) {
@@ -6724,7 +6721,7 @@ namespace OutputReportTabular {
 					} else if ( ( SELECT_CASE_var == aggTypeMaximum ) || ( SELECT_CASE_var == aggTypeMinimum ) || ( SELECT_CASE_var == aggTypeMaximumDuringHoursShown ) || ( SELECT_CASE_var == aggTypeMinimumDuringHoursShown ) ) {
 						columnRecount += 2;
 						// put in the name of the variable for the column
-						if ( MonthlyColumns( curCol ).avgSum == isSum ) { // if it is a summed variable
+						if ( MonthlyColumns( curCol ).avgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 							curUnits += "/s";
 						}
 						if ( SameString( curUnits, "J/s" ) ) {
@@ -6798,7 +6795,7 @@ namespace OutputReportTabular {
 						}
 					}}
 				} //KColumn
-				WriteReportHeaders( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, isAverage );
+				WriteReportHeaders( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, OutputProcessor::StoreType::Averaged );
 				WriteSubtitle( "Custom Monthly Report" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose monthly XML tables.
 				if ( sqlite ) {
@@ -7177,7 +7174,7 @@ namespace OutputReportTabular {
 		if ( displayTabularBEPS || displayLEEDSummary ) {
 			// show the headers of the report
 			if ( displayTabularBEPS ) {
-				WriteReportHeaders( "Annual Building Utility Performance Summary", "Entire Facility", isAverage );
+				WriteReportHeaders( "Annual Building Utility Performance Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 				// show the number of hours that the table applies to
 				WriteTextLine( "Values gathered over " + RealToStr( gatherElapsedTimeBEPS, 2 ) + " hours", true );
 				if ( gatherElapsedTimeBEPS < 8759.0 ) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
@@ -8482,7 +8479,7 @@ namespace OutputReportTabular {
 
 		if ( displaySourceEnergyEndUseSummary ) {
 			// show the headers of the report
-			WriteReportHeaders( "Source Energy End Use Components Summary", "Entire Facility", isAverage );
+			WriteReportHeaders( "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 			// show the number of hours that the table applies to
 			WriteTextLine( "Values gathered over " + RealToStr( gatherElapsedTimeBEPS, 2 ) + " hours", true );
 			if ( gatherElapsedTimeBEPS < 8759.0 ) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
@@ -8753,7 +8750,7 @@ namespace OutputReportTabular {
 
 		if ( displayDemandEndUse ) {
 			// show the headers of the report
-			WriteReportHeaders( "Demand End Use Components Summary", "Entire Facility", isAverage );
+			WriteReportHeaders( "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 			// totals - select which additional fuel to display and which other district heating
 			collapsedTotal = 0.0;
 			collapsedTotal( 1 ) = gatherDemandTotal( 1 ); //electricity
@@ -9248,7 +9245,7 @@ namespace OutputReportTabular {
 
 		if ( ! DoCostEstimate ) return;
 
-		WriteReportHeaders( "Component Cost Economics Summary", "Entire Facility", isAverage );
+		WriteReportHeaders( "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 
 		// compute floor area if no ABUPS
 		if ( buildingConditionedFloorArea == 0.0 ) {
@@ -9627,7 +9624,7 @@ namespace OutputReportTabular {
 		// all arrays are in the format: (row, columnm)
 		if ( displayTabularVeriSum ) {
 			// show the headers of the report
-			WriteReportHeaders( "Input Verification and Results Summary", "Entire Facility", isAverage );
+			WriteReportHeaders( "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 
 			// do unit conversions if necessary
 			if ( unitsStyle == unitsStyleInchPound ) {
@@ -10296,7 +10293,7 @@ namespace OutputReportTabular {
 			rowHead.allocate( numPeopleAdaptive );
 			tableBody.allocate( 5, numPeopleAdaptive );
 
-			WriteReportHeaders( "Adaptive Comfort Summary", "Entire Facility", 0 );
+			WriteReportHeaders( "Adaptive Comfort Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 			WriteSubtitle( "Time Not Meeting the Adaptive Comfort Models during Occupied Hours" );
 
 			columnWidth.allocate( 5 );
@@ -10440,7 +10437,7 @@ namespace OutputReportTabular {
 		// loop through all reports and include those that have been flagged as 'show'
 		for ( iReportName = 1; iReportName <= numReportName; ++iReportName ) {
 			if ( reportName( iReportName ).show ) {
-				WriteReportHeaders( reportName( iReportName ).namewithspaces, "Entire Facility", isAverage );
+				WriteReportHeaders( reportName( iReportName ).namewithspaces, "Entire Facility", OutputProcessor::StoreType::Averaged );
 				// loop through the subtables and include those that are associated with this report
 				for ( int jSubTable = 1, jSubTable_end = numSubTable; jSubTable <= jSubTable_end; ++jSubTable ) {
 					if ( subTable( jSubTable ).indexReportName == iReportName ) {
@@ -10629,7 +10626,7 @@ namespace OutputReportTabular {
 		static Real64 curValue( 0.0 );
 
 		if ( displayComponentSizing ) {
-			WriteReportHeaders( "Component Sizing Summary", "Entire Facility", isAverage );
+			WriteReportHeaders( "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 			//The arrays that look for unique headers are dimensioned in the
 			//running program since the size of the number of entries is
 			//not previouslly known. Use the size of all entries since that
@@ -10870,7 +10867,7 @@ namespace OutputReportTabular {
 			}
 			assert( numreceivingfields == numShadowRelate );
 
-			WriteReportHeaders( "Surface Shadowing Summary", "Entire Facility", isAverage );
+			WriteReportHeaders( "Surface Shadowing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 			unique.allocate( numShadowRelate );
 			// do entire process twice, once with surfaces receiving, once with subsurfaces receiving
 			for ( iKindRec = recKindSurface; iKindRec <= recKindSubsurface; ++iKindRec ) {
@@ -10940,7 +10937,7 @@ namespace OutputReportTabular {
 			Array1D_int colUnitConv;
 
 			// setting up  report header
-			WriteReportHeaders( "Initialization Summary", "Entire Facility", isAverage );
+			WriteReportHeaders( "Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged );
 
 			// since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
 			gio::close( OutputFileInits );
@@ -12926,7 +12923,7 @@ namespace OutputReportTabular {
 			writeOutput = false;
 		}
 		if ( writeOutput ) {
-			WriteReportHeaders( reportName, zoneAirLoopFacilityName, isAverage );
+			WriteReportHeaders( reportName, zoneAirLoopFacilityName, OutputProcessor::StoreType::Averaged );
 			std::string peakLoadCompName;
 			std::string peakCondName;
 			std::string zonesIncludedName;
@@ -13184,7 +13181,7 @@ namespace OutputReportTabular {
 	WriteReportHeaders(
 		std::string const & reportName,
 		std::string const & objectName,
-		int const averageOrSum
+		OutputProcessor::StoreType const averageOrSum
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -13213,7 +13210,7 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		std::string const modifiedReportName( reportName + ( averageOrSum == isSum ? " per second" : "" ) );
+		std::string const modifiedReportName( reportName + ( averageOrSum == OutputProcessor::StoreType::Summed ? " per second" : "" ) );
 
 		for ( int iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			std::ostream & tbl_stream( *TabularOutputFile( iStyle ) );

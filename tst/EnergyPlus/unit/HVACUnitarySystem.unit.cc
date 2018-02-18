@@ -1922,7 +1922,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	UnitarySystem( UnitarySysNum ).IdleMassFlowRate = 0.2;
 	UnitarySystem( UnitarySysNum ).IdleSpeedRatio = 0.2;
 	UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = ScheduleAlwaysOn;
-	UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum = 1;
+	UnitarySystem( UnitarySysNum ).AirInNode = 1;
 
 	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 ) = 0.25;
 	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 ) = 0.25;
@@ -2163,7 +2163,7 @@ TEST_F( EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTes
 	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
 	UnitarySystem.allocate( HVACUnitarySystem::NumUnitarySystem );
-	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";
+	UnitarySystem( UnitarySysNum ).UnitType = "AirLoopHVAC:UnitarySystem";
 	UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
 	UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
@@ -2379,7 +2379,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_CalcUnitaryHeatingSystem ) {
 	UnitarySystem( UnitarySysNum ).IdleMassFlowRate = 0.2;
 	UnitarySystem( UnitarySysNum ).IdleSpeedRatio = 0.2;
 	UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = ScheduleAlwaysOn;
-	UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum = 1;
+	UnitarySystem( UnitarySysNum ).AirInNode = 1;
 	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 ) = 0.25;
 	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 ) = 0.25;
 	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 2 ) = 0.5;
@@ -2522,7 +2522,7 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_CalcUnitaryCoolingSystem ) {
 	UnitarySystem( UnitarySysNum ).IdleMassFlowRate = 0.2;
 	UnitarySystem( UnitarySysNum ).IdleSpeedRatio = 0.2;
 	UnitarySystem( UnitarySysNum ).FanAvailSchedPtr = ScheduleAlwaysOn;
-	UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum = 1;
+	UnitarySystem( UnitarySysNum ).AirInNode = 1;
 	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 ) = 0.25;
 	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 ) = 0.25;
 	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 2 ) = 0.5;
@@ -2868,12 +2868,12 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
 
 	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
-	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
+	EXPECT_EQ( UnitarySystem( 1 ).UnitType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
 
 	DataGlobals::SysSizingCalc = true; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
 
-	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
-	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	InletNode = UnitarySystem( 1 ).AirInNode;
+	OutletNode = UnitarySystem( 1 ).AirOutNode;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
 	// set up unitary system inlet condtions
@@ -3678,12 +3678,12 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
 
 	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
-	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
+	EXPECT_EQ( UnitarySystem( 1 ).UnitType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
 
 	DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
 
-	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
-	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	InletNode = UnitarySystem( 1 ).AirInNode;
+	OutletNode = UnitarySystem( 1 ).AirOutNode;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
 	// set up unitary system inlet condtions
@@ -4379,10 +4379,10 @@ TEST_F( EnergyPlusFixture, HVACUnitarySystem_ReportingTest ) {
 	GetUnitarySystemInput(); // get input
 
 	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
-	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
+	EXPECT_EQ( UnitarySystem( 1 ).UnitType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
 
-	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
-	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	InletNode = UnitarySystem( 1 ).AirInNode;
+	OutletNode = UnitarySystem( 1 ).AirOutNode;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
 	AirLoopNum = 0;
@@ -5928,8 +5928,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
 
-	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
-	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	InletNode = UnitarySystem( 1 ).AirInNode;
+	OutletNode = UnitarySystem( 1 ).AirOutNode;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
 	// set up unitary system inlet condtions
@@ -7238,12 +7238,12 @@ TEST_F( EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump ) {
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
 	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
-	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
+	EXPECT_EQ( UnitarySystem( 1 ).UnitType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
 
 	DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
 
-	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
-	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	InletNode = UnitarySystem( 1 ).AirInNode;
+	OutletNode = UnitarySystem( 1 ).AirOutNode;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
 	// set up unitary system inlet condtions
@@ -7540,12 +7540,12 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
 	ASSERT_EQ( 1, NumUnitarySystem ); // only 1 unitary system above so expect 1 as number of unitary system objects
-	EXPECT_EQ( UnitarySystem( 1 ).UnitarySystemType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
+	EXPECT_EQ( UnitarySystem( 1 ).UnitType, cFurnaceTypes( UnitarySystem( 1 ).UnitarySystemType_Num ) ); // compare UnitarySystem type string to valid type
 
 	DataGlobals::SysSizingCalc = false; // DISABLE SIZING - don't call HVACUnitarySystem::SizeUnitarySystem, much more work needed to set up sizing arrays
 
-	InletNode = UnitarySystem( 1 ).UnitarySystemInletNodeNum;
-	OutletNode = UnitarySystem( 1 ).UnitarySystemOutletNodeNum;
+	InletNode = UnitarySystem( 1 ).AirInNode;
+	OutletNode = UnitarySystem( 1 ).AirOutNode;
 	ControlZoneNum = UnitarySystem( 1 ).NodeNumOfControlledZone;
 
 	// set up unitary system inlet condtions
@@ -7747,7 +7747,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.103, 0.001 ); // cooling coil water flow ratio, cooling coil is on
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, UnitarySystem( 1 ).MaxNoCoolHeatAirMassFlow / UnitarySystem( 1 ).MaxCoolAirMassFlow, 0.0001 ); // fan PLR at minimum speed
-	EXPECT_GT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature is not below min limit
+	EXPECT_GT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp ); // outlet temperature is not below min limit
 
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -9000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -9000.0;
@@ -7773,7 +7773,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.392, 0.001 ); // cooling coil water flow ratio, cooling coil is on
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 0.5117, 0.0001 ); // fan PLR above minimum speed
-	EXPECT_NEAR( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout, 0.01 ); // outlet temperature modulated to meet max limit
+	EXPECT_NEAR( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp, 0.01 ); // outlet temperature modulated to meet max limit
 
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -18000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -18000.0;
@@ -7798,7 +7798,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.795, 0.001 ); // cooling coil water flow ratio, cooling coil is on
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 1.0, 0.0001 ); // fan PLR at maximum speed
-	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature below minimum temperature limit
+	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp ); // outlet temperature below minimum temperature limit
 
 	ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired = -22000.0; // cooling load
 	ZoneSysEnergyDemand( ControlZoneNum ).OutputRequiredToCoolingSP = -22000.0;
@@ -7824,7 +7824,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils ) {
 	EXPECT_NEAR( UnitarySystem( 1 ).HeatCoilWaterFlowRatio, 0.0, 0.0001 ); // heating coil water flow ratio, heating coil is off
 	EXPECT_NEAR( UnitarySystem( 1 ).CoolCoilWaterFlowRatio, 0.0, 0.001 ); // cooling coil water flow ratio not set, cooling coil is on since function returned when load exceeded capacity
 	EXPECT_NEAR( UnitarySystem( 1 ).FanPartLoadRatio, 1.0, 0.0001 ); // fan PLR at maximum speed
-	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DOASDXCoolingCoilMinTout ); // outlet temperature below minimum temperature limit
+	EXPECT_LT( Node( OutletNode ).Temp, UnitarySystem( 1 ).DesignMinOutletTemp ); // outlet temperature below minimum temperature limit
 
 }
 
@@ -8496,7 +8496,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_SizingWithFans ) {
 	DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
 	UnitarySystem.allocate( HVACUnitarySystem::NumUnitarySystem );
-	UnitarySystem( UnitarySysNum ).UnitarySystemType = "AirLoopHVAC:UnitarySystem";
+	UnitarySystem( UnitarySysNum ).UnitType = "AirLoopHVAC:UnitarySystem";
 	UnitarySystem( UnitarySysNum ).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
 	UnitarySystem( UnitarySysNum ).RequestAutoSize = true;
 
