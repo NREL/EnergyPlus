@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,16 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
-
 
 // C++ Headers
 #include <string>
@@ -124,8 +112,6 @@ CoilSelectionData::CoilSelectionData(  //constructor
 	coilSizingMethodConcurrence( -999 ),
 	coilSizingMethodCapacity( -999 ),
 	coilSizingMethodAirFlow( -999 ),
-	//coilDesCapUser( -999.0 ),
-	//coilVolFlowUser( -999.0 ),
 	capIsAutosized( false ),
 	volFlowIsAutosized( false ),
 	coilWaterFlowUser( -999.0 ),
@@ -177,9 +163,9 @@ CoilSelectionData::CoilSelectionData(  //constructor
 	rhoStandAir( -999.0 ),
 	rhoFluid( -999.0 ),
 	cpFluid( -999.0 ),
+	coilCapFTIdealPeak( 1.0 ),
 	coilRatedTotCap( -999.0 ),
 	coilRatedSensCap( -999.0 ),
-	coilCapFTIdealPeak( 1.0 ), // = 1
 	ratedAirMassFlow( -999.0 ),
 	ratedCoilInDb( -999.0 ),
 	ratedCoilInWb( -999.0 ),
@@ -260,7 +246,7 @@ ReportCoilSelection::writeCoilSelectionOutput()
 		} else if ( c->zoneName.size() > 1 ) {
 				//make list of zone names
 			std::string tmpZoneList;
-			for ( int vecLoop = 0; vecLoop < c->zoneName.size(); ++vecLoop ) {
+			for ( std::size_t vecLoop = 0; vecLoop < c->zoneName.size(); ++vecLoop ) {
 				tmpZoneList += c->zoneName[ vecLoop ] + "; " ;
 			}
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchCoilZoneName, c->coilName_, tmpZoneList );
@@ -1688,7 +1674,7 @@ ReportCoilSelection::setZoneLatentLoadCoolingIdealPeak(
 	for ( auto & c : coilSelectionDataObjs ) {
 
 		if ( c->isCooling ) {
-			for ( int zoneInd = 0; zoneInd < c->zoneNum.size(); ++zoneInd) {
+			for ( std::size_t zoneInd = 0; zoneInd < c->zoneNum.size(); ++zoneInd) {
 				if ( zoneIndex == c->zoneNum[ zoneInd ] ) {
 					c->rmLatentAtPeak += zoneCoolingLatentLoad;
 					break;
@@ -1708,7 +1694,7 @@ ReportCoilSelection::setZoneLatentLoadHeatingIdealPeak(
 	for ( auto & c : coilSelectionDataObjs ) {
 
 		if ( c->isHeating ) {
-			for ( int zoneInd = 0; zoneInd < c->zoneNum.size(); ++zoneInd) {
+			for ( std::size_t zoneInd = 0; zoneInd < c->zoneNum.size(); ++zoneInd) {
 				if ( zoneIndex == c->zoneNum[ zoneInd ] ) {
 					c->rmLatentAtPeak += zoneHeatingLatentLoad;
 					break;
