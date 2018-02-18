@@ -54,6 +54,7 @@
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -80,7 +81,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_Interpolate )
 	thisGLHE.LNTTS( 2 ) = 5.0;
 	thisGLHE.GFNC( 1 ) = 0.0;
 	thisGLHE.GFNC( 2 ) = 5.0;
-	
+
 	// Case when extrapolating beyond lower bound
 	thisLNTTS = -1.0;
 	thisGFunc = thisGLHE.interpGFunc( thisLNTTS );
@@ -104,7 +105,7 @@ TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_GetGFunc )
 	GLHESlinky thisGLHE;
 	Real64 thisGFunc;
 	Real64 time;
-	
+
 	thisGLHE.NPairs = 2;
 
 	thisGLHE.LNTTS.allocate( thisGLHE.NPairs );
@@ -129,7 +130,7 @@ TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_GetGFunc )
 	GLHEVert thisGLHE;
 	Real64 thisGFunc;
 	Real64 time;
-	
+
 	thisGLHE.NPairs = 2;
 
 	thisGLHE.LNTTS.allocate( thisGLHE.NPairs );
@@ -167,7 +168,7 @@ TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcHXResistance )
 
 	PlantLoop( thisGLHE.loopNum ).FluidName = "WATER";
 	PlantLoop( thisGLHE.loopNum ).FluidIndex = 1;
-	
+
 	thisGLHE.inletTemp = 5.0;
 	thisGLHE.massFlowRate = 0.01;
 	thisGLHE.numTrenches = 1;
@@ -206,7 +207,7 @@ TEST_F( EnergyPlusFixture, VerticalGroundHeatExchangerTest_CalcHXResistance )
 
 	PlantLoop( thisGLHE.loopNum ).FluidName = "WATER";
 	PlantLoop( thisGLHE.loopNum ).FluidIndex = 1;
-	
+
 	thisGLHE.inletTemp = 5.0;
 	thisGLHE.massFlowRate = 0.01;
 	thisGLHE.numBoreholes = 1;
@@ -276,7 +277,7 @@ TEST_F( EnergyPlusFixture, SlinkyGroundHeatExchangerTest_CalcGroundHeatExchanger
 
 }
 
-TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 ) 
+TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 )
 {
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",
@@ -335,7 +336,8 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_1 )
 
 	EXPECT_TRUE( process_idf( idf_objects, false ) );
 
-	EXPECT_ANY_THROW( GetGroundHeatExchangerInput() );
+	// This should not throw since number of data pairs will now automatically be set to the actual number of gfunctions if they don't match.
+	EXPECT_NO_THROW( ( EnergyPlus::inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( "Vertical GHE JL2015" ) ) );
 
 }
 
@@ -399,6 +401,6 @@ TEST_F( EnergyPlusFixture, VerticalGLHEBadIDF_2 )
 
 	EXPECT_TRUE( process_idf( idf_objects, false ) );
 
-	EXPECT_ANY_THROW( GetGroundHeatExchangerInput() );
+	EXPECT_ANY_THROW( ( EnergyPlus::inputProcessor->objectFactory< GroundHeatExchangers::GLHEVert >( "Vertical GHE JL2015" ) ) );
 
 }

@@ -285,8 +285,8 @@ namespace EnergyPlus {
 		ASSERT_EQ( 2, NumSchSetPtMgrs ); // 2 schedule set point managers
 		ASSERT_EQ( 2, NumAllSetPtMgrs );  // 2 all set point managers
 		// check specified control variable types
-		ASSERT_EQ( iTemperature, AllSetPtMgr( 1 ).CtrlTypeMode ); // is "Temperature"
-		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 2 ).CtrlTypeMode ); // is "MaximumHumidityRatio"
+		ASSERT_EQ( iTemperature, AllSetPtMgr( 2 ).CtrlTypeMode ); // is "Temperature"
+		ASSERT_EQ( iCtrlVarType_MaxHumRat, AllSetPtMgr( 1 ).CtrlTypeMode ); // is "MaximumHumidityRatio"
 
 		GetControllerInput();
 		// check ControllerProps control variable is set to "MaximumHumidityRatio"

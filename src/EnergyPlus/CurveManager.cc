@@ -58,6 +58,7 @@
 // EnergyPlus Headers
 #include <CurveManager.hh>
 #include <DataBranchAirLoopPlant.hh>
+#include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -65,7 +66,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 
@@ -473,30 +474,30 @@ namespace CurveManager {
 
 		// Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
-		NumBiQuad = InputProcessor::GetNumObjectsFound( "Curve:Biquadratic" );
-		NumCubic = InputProcessor::GetNumObjectsFound( "Curve:Cubic" );
-		NumQuartic = InputProcessor::GetNumObjectsFound( "Curve:Quartic" );
-		NumQuad = InputProcessor::GetNumObjectsFound( "Curve:Quadratic" );
-		NumQLinear = InputProcessor::GetNumObjectsFound( "Curve:QuadLinear" );
-		NumQuadLinear = InputProcessor::GetNumObjectsFound( "Curve:QuadraticLinear" );
-		NumCubicLinear = InputProcessor::GetNumObjectsFound( "Curve:CubicLinear" );
-		NumLinear = InputProcessor::GetNumObjectsFound( "Curve:Linear" );
-		NumBicubic = InputProcessor::GetNumObjectsFound( "Curve:Bicubic" );
-		NumTriQuad = InputProcessor::GetNumObjectsFound( "Curve:Triquadratic" );
-		NumExponent = InputProcessor::GetNumObjectsFound( "Curve:Exponent" );
-		NumMultVarLookup = InputProcessor::GetNumObjectsFound( "Table:MultiVariableLookup" );
-		NumFanPressRise = InputProcessor::GetNumObjectsFound( "Curve:FanPressureRise" ); //cpw22Aug2010
-		NumExpSkewNorm = InputProcessor::GetNumObjectsFound( "Curve:ExponentialSkewNormal" ); //cpw22Aug2010
-		NumSigmoid = InputProcessor::GetNumObjectsFound( "Curve:Sigmoid" ); //cpw22Aug2010
-		NumRectHyper1 = InputProcessor::GetNumObjectsFound( "Curve:RectangularHyperbola1" ); //cpw22Aug2010
-		NumRectHyper2 = InputProcessor::GetNumObjectsFound( "Curve:RectangularHyperbola2" ); //cpw22Aug2010
-		NumExpDecay = InputProcessor::GetNumObjectsFound( "Curve:ExponentialDecay" ); //cpw22Aug2010
-		NumDoubleExpDecay = InputProcessor::GetNumObjectsFound( "Curve:DoubleExponentialDecay" ); //ykt July 2011
-		NumChillerPartLoadWithLift = InputProcessor::GetNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
+		NumBiQuad = inputProcessor->getNumObjectsFound( "Curve:Biquadratic" );
+		NumCubic = inputProcessor->getNumObjectsFound( "Curve:Cubic" );
+		NumQuartic = inputProcessor->getNumObjectsFound( "Curve:Quartic" );
+		NumQuad = inputProcessor->getNumObjectsFound( "Curve:Quadratic" );
+		NumQLinear = inputProcessor->getNumObjectsFound( "Curve:QuadLinear" );
+		NumQuadLinear = inputProcessor->getNumObjectsFound( "Curve:QuadraticLinear" );
+		NumCubicLinear = inputProcessor->getNumObjectsFound( "Curve:CubicLinear" );
+		NumLinear = inputProcessor->getNumObjectsFound( "Curve:Linear" );
+		NumBicubic = inputProcessor->getNumObjectsFound( "Curve:Bicubic" );
+		NumTriQuad = inputProcessor->getNumObjectsFound( "Curve:Triquadratic" );
+		NumExponent = inputProcessor->getNumObjectsFound( "Curve:Exponent" );
+		NumMultVarLookup = inputProcessor->getNumObjectsFound( "Table:MultiVariableLookup" );
+		NumFanPressRise = inputProcessor->getNumObjectsFound( "Curve:FanPressureRise" ); //cpw22Aug2010
+		NumExpSkewNorm = inputProcessor->getNumObjectsFound( "Curve:ExponentialSkewNormal" ); //cpw22Aug2010
+		NumSigmoid = inputProcessor->getNumObjectsFound( "Curve:Sigmoid" ); //cpw22Aug2010
+		NumRectHyper1 = inputProcessor->getNumObjectsFound( "Curve:RectangularHyperbola1" ); //cpw22Aug2010
+		NumRectHyper2 = inputProcessor->getNumObjectsFound( "Curve:RectangularHyperbola2" ); //cpw22Aug2010
+		NumExpDecay = inputProcessor->getNumObjectsFound( "Curve:ExponentialDecay" ); //cpw22Aug2010
+		NumDoubleExpDecay = inputProcessor->getNumObjectsFound( "Curve:DoubleExponentialDecay" ); //ykt July 2011
+		NumChillerPartLoadWithLift = inputProcessor->getNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
 
-		NumOneVarTab = InputProcessor::GetNumObjectsFound( "Table:OneIndependentVariable" );
-		NumWPCValTab = InputProcessor::GetNumObjectsFound( "AirflowNetwork:MultiZone:WindPressureCoefficientValues" );
-		NumTwoVarTab = InputProcessor::GetNumObjectsFound( "Table:TwoIndependentVariables" );
+		NumOneVarTab = inputProcessor->getNumObjectsFound( "Table:OneIndependentVariable" );
+		NumWPCValTab = inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:WindPressureCoefficientValues" );
+		NumTwoVarTab = inputProcessor->getNumObjectsFound( "Table:TwoIndependentVariables" );
 
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
 					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
@@ -509,17 +510,17 @@ namespace CurveManager {
 		if ( NumLookupTables > 0 ) TableLookup.allocate( NumLookupTables );
 
 		if ( NumOneVarTab > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "Table:OneIndependentVariable", TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "Table:OneIndependentVariable", TotalArgs, NumAlphas, NumNumbers );
 			MaxTableNums = max( MaxTableNums, NumNumbers );
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
 		if (NumWPCValTab > 0) {
-			InputProcessor::GetObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "AirflowNetwork:MultiZone:WindPressureCoefficientValues", TotalArgs, NumAlphas, NumNumbers );
 			MaxTableNums = max( MaxTableNums, NumNumbers );
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
 		if ( NumTwoVarTab > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "Table:TwoIndependentVariables", TotalArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( "Table:TwoIndependentVariables", TotalArgs, NumAlphas, NumNumbers );
 			MaxTableNums = max( MaxTableNums, NumNumbers );
 			MaxTableData = max( MaxTableData, MaxTableNums );
 		}
@@ -537,7 +538,7 @@ namespace CurveManager {
 		// Loop over biquadratic curves and load data
 		CurrentModuleObject = "Curve:Biquadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumBiQuad; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 
@@ -596,7 +597,7 @@ namespace CurveManager {
 		// Loop over ChillerPartLoadWithLift curves and load data //zrp_Aug2014
 		CurrentModuleObject = "Curve:ChillerPartLoadWithLift";
 		for ( CurveIndex = 1; CurveIndex <= NumChillerPartLoadWithLift; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -660,7 +661,7 @@ namespace CurveManager {
 		// Loop over cubic curves and load data
 		CurrentModuleObject = "Curve:Cubic";
 		for ( CurveIndex = 1; CurveIndex <= NumCubic; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -703,7 +704,7 @@ namespace CurveManager {
 		// Loop over quadrinomial curves and load data
 		CurrentModuleObject = "Curve:Quartic";
 		for ( CurveIndex = 1; CurveIndex <= NumQuartic; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -747,7 +748,7 @@ namespace CurveManager {
 		// Loop over quadratic curves and load data
 		CurrentModuleObject = "Curve:Quadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumQuad; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -789,7 +790,7 @@ namespace CurveManager {
 		// Loop over quadratic-linear curves and load data
 		CurrentModuleObject = "Curve:QuadraticLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumQuadLinear; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -845,7 +846,7 @@ namespace CurveManager {
 		// Loop over cubic-linear curves and load data
 		CurrentModuleObject = "Curve:CubicLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -901,7 +902,7 @@ namespace CurveManager {
 		// Loop over linear curves and load data
 		CurrentModuleObject = "Curve:Linear";
 		for ( CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -941,7 +942,7 @@ namespace CurveManager {
 		// Loop over bicubic curves and load data
 		CurrentModuleObject = "Curve:Bicubic";
 		for ( CurveIndex = 1; CurveIndex <= NumBicubic; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1001,7 +1002,7 @@ namespace CurveManager {
 		// Loop over Triquadratic curves and load data
 		CurrentModuleObject = "Curve:Triquadratic";
 		for ( CurveIndex = 1; CurveIndex <= NumTriQuad; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1094,7 +1095,7 @@ namespace CurveManager {
 		// Loop over quad linear curves and load data
 		CurrentModuleObject = "Curve:QuadLinear";
 		for ( CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1175,7 +1176,7 @@ namespace CurveManager {
 		// Loop over Exponent curves and load data
 		CurrentModuleObject = "Curve:Exponent";
 		for ( CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1211,7 +1212,7 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
 		CurrentModuleObject = "Curve:FanPressureRise";
 		for ( CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1252,7 +1253,7 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Exponential Skew Normal curves and load data
 		CurrentModuleObject = "Curve:ExponentialSkewNormal";
 		for ( CurveIndex = 1; CurveIndex <= NumExpSkewNorm; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1296,7 +1297,7 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Sigmoid curves and load data
 		CurrentModuleObject = "Curve:Sigmoid";
 		for ( CurveIndex = 1; CurveIndex <= NumSigmoid; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1341,7 +1342,7 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Rectangular Hyperbola Type 1 curves and load data
 		CurrentModuleObject = "Curve:RectangularHyperbola1";
 		for ( CurveIndex = 1; CurveIndex <= NumRectHyper1; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1384,7 +1385,7 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Rectangular Hyperbola Type 2 curves and load data
 		CurrentModuleObject = "Curve:RectangularHyperbola2";
 		for ( CurveIndex = 1; CurveIndex <= NumRectHyper2; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1427,7 +1428,7 @@ namespace CurveManager {
 		// cpw22Aug2010 Loop over Exponential Decay curves and load data
 		CurrentModuleObject = "Curve:ExponentialDecay";
 		for ( CurveIndex = 1; CurveIndex <= NumExpDecay; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1470,7 +1471,7 @@ namespace CurveManager {
 		// ykt July,2011 Loop over DoubleExponential Decay curves and load data
 		CurrentModuleObject = "Curve:DoubleExponentialDecay";
 		for ( CurveIndex = 1; CurveIndex <= NumDoubleExpDecay; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
@@ -1517,7 +1518,7 @@ namespace CurveManager {
 		// Loop over one variable tables and load data
 		CurrentModuleObject = "Table:OneIndependentVariable";
 		for ( CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			++TableNum;
 			NumTableEntries = ( NumNumbers - 5 ) / 2;
@@ -1728,14 +1729,14 @@ namespace CurveManager {
 		if ( NumWPCValTab > 0 ) {
 			// Get the angle values
 			CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientArray";
-			int numOfCPArray = InputProcessor::GetNumObjectsFound(CurrentModuleObject);
+			int numOfCPArray = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
 			if ( numOfCPArray != 1 ) {
 				ShowSevereError( "GetCurveInput: Currently exactly one (\"1\") " + CurrentModuleObject
 					+ " object per simulation is required when using the AirflowNetwork model." );
 				ErrorsFound = true;
 			} else if ( numOfCPArray == 1 ) {
-				InputProcessor::GetObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+				inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
 
 				std::string wpcName = Alphas( 1 ); // Name of CP array
 				int numWindDir = NumNumbers;
@@ -1768,7 +1769,7 @@ namespace CurveManager {
 				// Now that we have the directions, we can read the tables themselves
 				CurrentModuleObject = "AirflowNetwork:MultiZone:WindPressureCoefficientValues";
 				for ( int index = 1; index <= NumWPCValTab; ++index ) {
-					InputProcessor::GetObjectItem(CurrentModuleObject, index, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+					inputProcessor->getObjectItem(CurrentModuleObject, index, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
 					++CurveNum;
 					++TableNum;
 					NumTableEntries = NumNumbers;
@@ -1777,7 +1778,7 @@ namespace CurveManager {
 					GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 					// Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
-					if ( !InputProcessor::SameString( Alphas(2), wpcName ) ) {
+					if ( !UtilityRoutines::SameString( Alphas(2), wpcName ) ) {
 						ShowSevereError( "GetCurveInput: Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) + " in " + CurrentModuleObject + " = " + Alphas( 1 ) );
 						ShowContinueError( "The valid name is " + wpcName );
 						ErrorsFound = true;
@@ -1861,7 +1862,7 @@ namespace CurveManager {
 		}
 		/*
 		for (CurveIndex = 1; CurveIndex <= NumOneVarTab; ++CurveIndex) {
-			InputProcessor::GetObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
+			inputProcessor->getObjectItem(CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames);
 			++CurveNum;
 			++TableNum;
 			NumTableEntries = (NumNumbers - 5) / 2;
@@ -1876,7 +1877,7 @@ namespace CurveManager {
 			}
 			// Need to verify that this name isn't used in Pressure Curves as well.
 			if (NumPressureCurves > 0) {
-				CurveFound = InputProcessor::FindItemInList(Alphas(1), PressureCurve);
+				CurveFound = UtilityRoutines::FindItemInList(Alphas(1), PressureCurve);
 				if (CurveFound != 0) {
 					ShowSevereError("GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas(1) + "\", duplicate curve name.");
 					ShowContinueError("...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves.");
@@ -2102,13 +2103,15 @@ namespace CurveManager {
 		// Loop over two variable tables and load data
 		CurrentModuleObject = "Table:TwoIndependentVariables";
 		for ( CurveIndex = 1; CurveIndex <= NumTwoVarTab; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++CurveNum;
 			++TableNum;
-			NumTableEntries = ( NumNumbers - 7 ) / 3;
-			TableData( TableNum ).X1.allocate( NumTableEntries );
-			TableData( TableNum ).X2.allocate( NumTableEntries );
-			TableData( TableNum ).Y.allocate( NumTableEntries );
+			if ( lAlphaFieldBlanks( 7 ) ) {
+				NumTableEntries = ( NumNumbers - 7 ) / 3;
+				TableData( TableNum ).X1.allocate( NumTableEntries );
+				TableData( TableNum ).X2.allocate( NumTableEntries );
+				TableData( TableNum ).Y.allocate( NumTableEntries );
+			}
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).ObjectType = CurveType_TableTwoIV;
@@ -2198,6 +2201,22 @@ namespace CurveManager {
 				}
 			}
 
+			if ( UtilityRoutines::SameString( Alphas( 4 ), "WAVELENGTH" ) ) {
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
+				ShowContinueError( cAlphaFieldNames( 4 ) + " = WAVELENGTH, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
+				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
+				ErrorsFound = true;
+			}
+			if ( UtilityRoutines::SameString( Alphas( 4 ), "ANGLE" ) && !UtilityRoutines::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) + ": " );
+				ShowContinueError( cAlphaFieldNames( 4 ) + " = ANGLE, and " + cAlphaFieldNames( 5 ) + " = " + Alphas( 5 ) );
+				ShowContinueError( "In order to input correct variable type for optical properties, " + cAlphaFieldNames( 4 ) + " should be ANGLE, and " + cAlphaFieldNames( 5 ) + " should be WAVELENGTH " );
+				ErrorsFound = true;
+			}
+			if ( UtilityRoutines::SameString( Alphas( 4 ), "ANGLE" ) && UtilityRoutines::SameString( Alphas( 5 ), "WAVELENGTH" ) ) {
+				PerfCurve( CurveNum ).OpticalProperty = true;
+			}
+
 			if ( ! lNumericFieldBlanks( 7 ) ) {
 				TableData( TableNum ).NormalPoint = Numbers( 7 );
 				if ( Numbers( 7 ) == 0.0 ) {
@@ -2219,19 +2238,51 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).CurveMaxPresent = true;
 			}
 
-			MaxTableNums = ( NumNumbers - 7 ) / 3;
-			if ( mod( ( NumNumbers - 7 ), 3 ) != 0 ) {
-				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
-				ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
-				ErrorsFound = true;
-				TableData( TableNum ).X1 = 0.;
-				TableData( TableNum ).X2 = 0.;
-				TableData( TableNum ).Y = 0.;
+			if ( !lAlphaFieldBlanks( 7 ) ) {
+				ReadFromFile = true;
+				FileName = Alphas( 7 );
+				ReadTwoVarTableDataFromFile( CurveNum, FileName, MaxTableNums );
 			} else {
-				for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
-					TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 1 );
-					TableData( TableNum ).X2( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 2 );
-					TableData( TableNum ).Y( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) / TableData( TableNum ).NormalPoint;
+				ReadFromFile = false;
+				FileName = "";
+
+				MaxTableNums = ( NumNumbers - 7 ) / 3;
+				if ( MaxTableNums < 4 ) {
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "When data is read from input, the minimum number of data entries must be equal or greater than 12. The current input number is " + RoundSigDigits( NumNumbers - 7 ) );
+					ErrorsFound = true;
+				} else {
+					for ( TableDataIndex = 1; TableDataIndex <= 4; ++TableDataIndex ) {
+						if ( lNumericFieldBlanks( ( TableDataIndex - 1 ) * 3 + 7 + 1 ) ) {
+							ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+							ShowContinueError( "When data is read from input, this field is required and cannot be blank: " + cNumericFieldNames( ( TableDataIndex - 1 ) * 3 + 7 + 1 ) );
+							ErrorsFound = true;
+						}
+						if ( lNumericFieldBlanks( ( TableDataIndex - 1 ) * 3 + 7 + 2 ) ) {
+							ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+							ShowContinueError( "When data is read from input, this field is required and cannot be blank: " + cNumericFieldNames( ( TableDataIndex - 1 ) * 3 + 7 + 2 ) );
+							ErrorsFound = true;
+						}
+						if ( lNumericFieldBlanks( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) ) {
+							ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+							ShowContinueError( "When data is read from input, this field is required and cannot be blank: " + cNumericFieldNames( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) );
+							ErrorsFound = true;
+						}
+					}
+				}
+				if ( mod( ( NumNumbers - 7 ), 3 ) != 0 ) {
+					ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+					ShowContinueError( "The number of data entries must be evenly divisable by 3. Number of data entries = " + RoundSigDigits( NumNumbers - 7 ) );
+					ErrorsFound = true;
+					TableData( TableNum ).X1 = 0.;
+					TableData( TableNum ).X2 = 0.;
+					TableData( TableNum ).Y = 0.;
+				} else {
+					for ( TableDataIndex = 1; TableDataIndex <= MaxTableNums; ++TableDataIndex ) {
+						TableData( TableNum ).X1( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 1 );
+						TableData( TableNum ).X2( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 2 );
+						TableData( TableNum ).Y( TableDataIndex ) = Numbers( ( TableDataIndex - 1 ) * 3 + 7 + 3 ) / TableData( TableNum ).NormalPoint;
+					}
 				}
 			}
 
@@ -2433,7 +2484,7 @@ namespace CurveManager {
 		CurrentModuleObject = "Table:MultiVariableLookup";
 		TableNum = NumTables;
 		for ( CurveIndex = 1; CurveIndex <= NumMultVarLookup; ++CurveIndex ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			++CurveNum;
 			++TableNum;
@@ -5041,22 +5092,26 @@ Label999: ;
 		bool IsCurveInputTypeValid;
 
 		if ( len( InInputType ) > 0 ) {
-			if ( InputProcessor::SameString( InInputType, "DIMENSIONLESS" ) ) {
+			if ( UtilityRoutines::SameString( InInputType, "DIMENSIONLESS" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "TEMPERATURE" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "TEMPERATURE" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "PRESSURE" ) ) { //cpw22Aug2010
+			} else if ( UtilityRoutines::SameString( InInputType, "PRESSURE" ) ) { //cpw22Aug2010
 				IsCurveInputTypeValid = true; //cpw22Aug2010
 				// CR8124 Glazer - Need to use volumetricflow and massflow not just flow
-				//  ELSEIF (InputProcessor::SameString(InInputType,'FLOW')) THEN
+				//  ELSEIF (UtilityRoutines::SameString(InInputType,'FLOW')) THEN
 				//    IsCurveInputTypeValid = .TRUE.
-			} else if ( InputProcessor::SameString( InInputType, "VOLUMETRICFLOW" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "VOLUMETRICFLOW" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "MASSFLOW" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "MASSFLOW" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "POWER" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "POWER" ) ) {
 				IsCurveInputTypeValid = true;
-			} else if ( InputProcessor::SameString( InInputType, "DISTANCE" ) ) {
+			} else if ( UtilityRoutines::SameString( InInputType, "DISTANCE" ) ) {
+				IsCurveInputTypeValid = true;
+			} else if ( UtilityRoutines::SameString( InInputType, "WAVELENGTH" ) ) {
+				IsCurveInputTypeValid = true;
+			} else if ( UtilityRoutines::SameString( InInputType, "ANGLE" ) ) {
 				IsCurveInputTypeValid = true;
 			} else {
 				IsCurveInputTypeValid = false;
@@ -5082,15 +5137,15 @@ Label999: ;
 		// Return value
 		bool IsCurveOutputTypeValid;
 
-		if ( InputProcessor::SameString( InOutputType, "DIMENSIONLESS" ) ) {
+		if ( UtilityRoutines::SameString( InOutputType, "DIMENSIONLESS" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( InputProcessor::SameString( InOutputType, "PRESSURE" ) ) { //cpw22Aug2010
+		} else if ( UtilityRoutines::SameString( InOutputType, "PRESSURE" ) ) { //cpw22Aug2010
 			IsCurveOutputTypeValid = true; //cpw22Aug2010
-		} else if ( InputProcessor::SameString( InOutputType, "TEMPERATURE" ) ) {
+		} else if ( UtilityRoutines::SameString( InOutputType, "TEMPERATURE" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( InputProcessor::SameString( InOutputType, "CAPACITY" ) ) {
+		} else if ( UtilityRoutines::SameString( InOutputType, "CAPACITY" ) ) {
 			IsCurveOutputTypeValid = true;
-		} else if ( InputProcessor::SameString( InOutputType, "POWER" ) ) {
+		} else if ( UtilityRoutines::SameString( InOutputType, "POWER" ) ) {
 			IsCurveOutputTypeValid = true;
 		} else {
 			IsCurveOutputTypeValid = false;
@@ -5249,7 +5304,7 @@ Label999: ;
 		// Given a curve name, returns the curve index
 
 		// METHODOLOGY EMPLOYED:
-		// uses InputProcessor::FindItemInList( to search the curve array for the curve name
+		// uses UtilityRoutines::FindItemInList( to search the curve array for the curve name
 
 		// Return value
 		int GetCurveIndex;
@@ -5262,7 +5317,7 @@ Label999: ;
 		}
 
 		if ( NumCurves > 0 ) {
-			GetCurveIndex = InputProcessor::FindItemInList( CurveName, PerfCurve );
+			GetCurveIndex = UtilityRoutines::FindItemInList( CurveName, PerfCurve );
 		} else {
 			GetCurveIndex = 0;
 		}
@@ -5475,10 +5530,10 @@ Label999: ;
 		static bool ErrsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int CurveNum;
 
-		NumPressure = InputProcessor::GetNumObjectsFound( CurveObjectName );
+		NumPressure = inputProcessor->getNumObjectsFound( CurveObjectName );
 		PressureCurve.allocate( NumPressure );
 		for ( CurveNum = 1; CurveNum <= NumPressure; ++CurveNum ) {
-			InputProcessor::GetObjectItem( CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurveObjectName, CurveNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( UniqueCurveNames, Alphas( 1 ), CurveObjectName, cAlphaFieldNames( 1 ), ErrsFound );
 			PressureCurve( CurveNum ).Name = Alphas( 1 );
 			PressureCurve( CurveNum ).EquivDiameter = Numbers( 1 );
@@ -5573,7 +5628,7 @@ Label999: ;
 		//Then try to retrieve a pressure curve object
 		if ( allocated( PressureCurve ) ) {
 			if ( size( PressureCurve ) > 0 ) {
-				TempCurveIndex = InputProcessor::FindItemInList( PressureCurveName, PressureCurve );
+				TempCurveIndex = UtilityRoutines::FindItemInList( PressureCurveName, PressureCurve );
 			} else {
 				TempCurveIndex = 0;
 			}
@@ -5834,7 +5889,7 @@ Label999: ;
 	}
 
 	void
-	checkCurveIsNormalizedToOne( 
+	checkCurveIsNormalizedToOne(
 		std::string const callingRoutineObj, // calling routine with object type
 		std::string const objectName,        // parent object where curve is used
 		int const curveIndex,                // index to curve object
@@ -5869,6 +5924,443 @@ Label999: ;
 
 	}
 
+	int
+	GetCurveInterpolationMethodNum( int const CurveIndex ) // index of curve in curve array
+	{
+
+		// PURPOSE OF THIS FUNCTION:
+		// get the interpolation type integer identifier for tables
+
+		// Return value
+		int TableInterpolationMethodNum;
+
+		if ( CurveIndex > 0 ) {
+			TableInterpolationMethodNum = PerfCurve( CurveIndex ).InterpolationType;
+		} else {
+			TableInterpolationMethodNum = 0;
+		}
+
+		return TableInterpolationMethodNum;
+	}
+
+	void
+	ReadTwoVarTableDataFromFile(
+		int const CurveNum,
+		std::string & FileName,
+		int & lineNum
+	)
+	{
+
+		// PURPOSE OF THIS FUNCTION:
+		// get data from an external file used to retrieve optical properties
+
+		// METHODOLOGY EMPLOYED:
+		// Recommended by NREL to read data
+
+		// Using/Aliasing
+		using DataSystemVariables::CheckForActualFileName;
+		using DataSystemVariables::TempFullFileName;
+		using General::splitString;
+
+		int TableNum;
+		bool FileExists;
+		std::string line;
+
+		CheckForActualFileName( FileName, FileExists, TempFullFileName );
+		if ( !FileExists ) {
+			ShowSevereError( "CurveManager::ReadTwoVarTableDataFromFile: Could not open Table Data File, expecting it as file name = " + FileName );
+			ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
+			ShowContinueError( "Try again with putting full path and file name in the field." );
+			ShowFatalError( "Program terminates due to these conditions." );
+		}
+
+		TableNum = PerfCurve( CurveNum ).TableIndex;
+		std::ifstream infile( TempFullFileName );
+		TableData( TableNum ).X1.allocate( 0 );
+		TableData( TableNum ).X2.allocate( 0 );
+		TableData( TableNum ).Y.allocate( 0 );
+		lineNum = 0;
+		while (std::getline( infile, line )) {
+			std::vector<std::string> strings = splitString( line, ',' );
+			lineNum++;
+			if (strings.size() > 2) {
+				TableData( TableNum ).X1.push_back( std::stod( strings[0] ) );
+				TableData( TableNum ).X2.push_back( std::stod( strings[1] ) );
+				TableData( TableNum ).Y.push_back( std::stod( strings[2] ) );
+			}
+		}
+		if ( lineNum == 0 ) {
+			ShowSevereError( "CurveManager::ReadTwoVarTableDataFromFile: The data file is empty as file name = " + FileName );
+			ShowFatalError( "Program terminates due to these conditions." );
+		}
+
+	}
+
+	void
+	SetSameIndeVariableValues(
+		int const TransCurveIndex,
+		int const FRefleCurveIndex,
+		int const BRefleCurveIndex
+	)
+	{
+
+		// PURPOSE OF THIS FUNCTION:
+		// Set up indenpendent varilable values the same in 3 table data
+
+		// Using/Aliasing
+		int X1TableNum;
+		int X2TableNum;
+		Array1D< Real64 > XX1;
+		Array1D< Real64 > XX2;
+		int i;
+		int j;
+		int k;
+		int l;
+		int m;
+		Real64 XX;
+		Real64 X1;
+		Real64 X2;
+		Real64 YY;
+		Array1D< int > Tables;
+		int TableNum;
+
+		Tables.allocate( 3 );
+		const Real64 tol = 1.0e-5;
+		bool found;
+
+		Tables( 1 ) = PerfCurve( TransCurveIndex ).TableIndex;
+		Tables( 2 ) = PerfCurve( FRefleCurveIndex ).TableIndex;
+		Tables( 3 ) = PerfCurve( BRefleCurveIndex ).TableIndex;
+
+		// Set up independent variable size to cover all independent variable values in 3 tables
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
+			if ( TableNum == 1 ) {
+				X1TableNum = TableLookup( Tables( TableNum ) ).NumX1Vars;
+				X2TableNum = TableLookup( Tables( TableNum ) ).NumX2Vars;
+
+				XX1.allocate( X1TableNum );
+				XX2.allocate( X2TableNum );
+
+				for ( i = 1; i <= X1TableNum; i++ ) {
+					XX1( i ) = TableLookup( Tables( TableNum ) ).X1Var( i );
+				}
+				for ( i = 1; i <= X2TableNum; i++ ) {
+					XX2( i ) = TableLookup( Tables( TableNum ) ).X2Var( i );
+				}
+
+			} else {
+				// Add common wavelengths and angles
+				X1TableNum = TableLookup( Tables( TableNum ) ).NumX1Vars;
+				X2TableNum = TableLookup( Tables( TableNum ) ).NumX2Vars;
+				for ( i = 1; i <= X1TableNum; i++ ) {
+					XX = TableLookup( Tables( TableNum ) ).X1Var( i );
+					found = false;
+					for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
+						if ( fabs( XX1( j ) - XX ) < tol ) {
+							found = true;
+						}
+					}
+					if ( !found ) {
+						XX1.push_back( XX );
+					}
+				}
+				for ( i = 1; i <= X2TableNum; i++ ) {
+					XX = TableLookup( Tables( TableNum ) ).X2Var( i );
+					found = false;
+					for ( j = 1; j <= int( XX2.size( ) ); j++ ) {
+						if ( fabs( XX2( j ) - XX ) < tol ) {
+							found = true;
+						}
+					}
+					if ( !found ) {
+						XX2.push_back( XX );
+					}
+				}
+			}
+		}
+
+		// ascend sort
+		std::sort( XX1.begin( ), XX1.end( ) );
+		std::sort( XX2.begin( ), XX2.end( ) );
+
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
+			if ( int( XX2.size( ) ) > TableLookup( Tables( TableNum ) ).NumX2Vars ) {
+				l = 0;
+				for ( i = 1; i <= int( XX2.size( ) ); i++ ) {
+					if ( fabs( XX2( i ) - TableLookup( Tables( TableNum ) ).X2Var( i - l ) ) > tol ) {
+						for ( j = 2; j <= int( TableData( Tables( TableNum ) ).X2.size( ) ); j++ ) {
+							if ( TableData( Tables( TableNum ) ).X2( j - 1 ) < XX2( i ) && TableData( Tables( TableNum ) ).X2( j ) > XX2( i ) ) {
+								TableData( Tables( TableNum ) ).X1.push_back( TableData( Tables( TableNum ) ).X1( j ) );
+								TableData( Tables( TableNum ) ).X2.push_back( XX2( i ) );
+								YY = TableData( Tables( TableNum ) ).Y( j - 1 ) + ( XX2( i ) - TableData( Tables( TableNum ) ).X2( j - 1 ) ) / ( TableData( Tables( TableNum ) ).X2( j ) - TableData( Tables( TableNum ) ).X2( j - 1 ) ) * ( TableData( Tables( TableNum ) ).Y( j ) - TableData( Tables( TableNum ) ).Y( j - 1 ) );
+								TableData( Tables( TableNum ) ).Y.push_back( YY );
+								X1 = TableData( Tables( TableNum ) ).X1( int( TableData( Tables( TableNum ) ).X2.size( ) ) );
+								X2 = TableData( Tables( TableNum ) ).X2( int( TableData( Tables( TableNum ) ).X2.size( ) ) );
+								YY = TableData( Tables( TableNum ) ).Y( int( TableData( Tables( TableNum ) ).X2.size( ) ) );
+								for ( k = int( TableData( Tables( TableNum ) ).X2.size( ) ) - 1; k >= j; k-- ) {
+									TableData( Tables( TableNum ) ).X1( k + 1 ) = TableData( Tables( TableNum ) ).X1( k );
+									TableData( Tables( TableNum ) ).X2( k + 1 ) = TableData( Tables( TableNum ) ).X2( k );
+									TableData( Tables( TableNum ) ).Y( k + 1 ) = TableData( Tables( TableNum ) ).Y( k );
+								}
+								TableData( Tables( TableNum ) ).X1( j ) = X1;
+								TableData( Tables( TableNum ) ).X2( j ) = X2;
+								TableData( Tables( TableNum ) ).Y( j ) = YY;
+							}
+						}
+						l++;
+					}
+				}
+			}
+
+			if ( int( XX1.size( ) ) > TableLookup( Tables( TableNum ) ).NumX1Vars ) {
+				l = 0;
+				for ( i = 1; i <= int( XX1.size( ) ); i++ ) {
+					if ( fabs( XX1( i ) - TableLookup( Tables( TableNum ) ).X1Var( i - l ) ) > tol ) {
+						m = int( TableData( Tables( TableNum ) ).X1.size( ) );
+						for ( k = 1; k <= int( XX2.size( ) ); k++ ) {
+							TableData( Tables( TableNum ) ).X1.push_back( TableData( Tables( TableNum ) ).X1( m - int( XX2.size( ) ) + 1 ) );
+							TableData( Tables( TableNum ) ).X2.push_back( TableData( Tables( TableNum ) ).X2( m - int( XX2.size( ) ) + 1 ) );
+							TableData( Tables( TableNum ) ).Y.push_back( TableData( Tables( TableNum ) ).Y( m - int( XX2.size( ) ) + 1 ) );
+						}
+						for ( j = m / int( XX2.size( ) ); j >= i; j-- ) {
+							for ( k = 1; k <= int( XX2.size( ) ); k++ ) {
+								TableData( Tables( TableNum ) ).X1( j * int( XX2.size( ) ) + k ) = TableData( Tables( TableNum ) ).X1( ( j - 1 ) * int( XX2.size( ) ) + k );
+								TableData( Tables( TableNum ) ).X2( j * int( XX2.size( ) + k ) ) = TableData( Tables( TableNum ) ).X2( ( j - 1 ) * int( XX2.size( ) ) + k );
+								TableData( Tables( TableNum ) ).Y( j * int( XX2.size( ) ) + k ) = TableData( Tables( TableNum ) ).Y( ( j - 1 ) * int( XX2.size( ) ) + k );
+							}
+						}
+						YY = ( XX1( i ) - TableLookup( Tables( TableNum ) ).X1Var( i - l - 1 ) ) / ( TableLookup( Tables( TableNum ) ).X1Var( i - l ) - TableLookup( Tables( TableNum ) ).X1Var( i - l - 1 ) );
+						for ( k = 1; k <= int( XX2.size( ) ); k++ ) {
+							TableData( Tables( TableNum ) ).X1( ( i - 1 )* int( XX2.size( ) ) + k ) = XX1( i );
+							TableData( Tables( TableNum ) ).X2( ( i - 1 )* int( XX2.size( ) ) + k ) = XX2( k );
+							TableData( Tables( TableNum ) ).Y( ( i - 1 )* int( XX2.size( ) ) + k ) = TableData( Tables( TableNum ) ).Y( ( i - 2 )* int( XX2.size( ) ) + k ) + YY * ( TableData( Tables( TableNum ) ).Y( i * int( XX2.size( ) ) + k ) - TableData( Tables( TableNum ) ).Y( ( i - 2 )* int( XX2.size( ) ) + k ) );
+						}
+						l++;
+					}
+				}
+			}
+		}
+
+		// Re-organize performance curve table data structure
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
+			PerfCurveTableData( Tables( TableNum ) ).X1.allocate( int( XX1.size( ) ) );
+			PerfCurveTableData( Tables( TableNum ) ).X2.allocate( int( XX2.size( ) ) );
+			PerfCurveTableData( Tables( TableNum ) ).Y.allocate( int( XX2.size( ) ), int( XX1.size( ) ) );
+			PerfCurveTableData( Tables( TableNum ) ).X1 = -9999999.0;
+			PerfCurveTableData( Tables( TableNum ) ).X2 = -9999999.0;
+			PerfCurveTableData( Tables( TableNum ) ).Y = -9999999.0;
+			for ( i = 1; i <= int( XX1.size( ) ); ++i ) {
+				PerfCurveTableData( Tables( TableNum ) ).X1( i ) = XX1( i );
+				for ( j = 1; j <= int( XX2.size( ) ); ++j ) {
+					PerfCurveTableData( Tables( TableNum ) ).X2( j ) = XX2( j );
+					for ( k = 1; k <= int( XX1.size( ) ) * int( XX2.size( ) ); ++k ) {
+						if ( ( TableData( Tables( TableNum ) ).X1( k ) == PerfCurveTableData( Tables( TableNum ) ).X1( i ) ) && ( TableData( Tables( TableNum ) ).X2( k ) == PerfCurveTableData( Tables( TableNum ) ).X2( j ) ) ) {
+							PerfCurveTableData( Tables( TableNum ) ).Y( j, i ) = TableData( Tables( TableNum ) ).Y( k );
+						}
+					}
+				}
+			}
+		}
+
+		// Re-organize TableLookup data structure
+		for ( TableNum = 1; TableNum <= int( Tables.size( ) ); TableNum++ ) {
+			TableLookup( Tables( TableNum ) ).NumIndependentVars = 2;
+			TableLookup( Tables( TableNum ) ).NumX1Vars = size( PerfCurveTableData( Tables( TableNum ) ).X1 );
+			TableLookup( Tables( TableNum ) ).NumX2Vars = size( PerfCurveTableData( Tables( TableNum ) ).X2 );
+			TableLookup( Tables( TableNum ) ).X1Var.allocate( TableLookup( Tables( TableNum ) ).NumX1Vars );
+			TableLookup( Tables( TableNum ) ).X2Var.allocate( TableLookup( Tables( TableNum ) ).NumX2Vars );
+			TableLookup( Tables( TableNum ) ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( Tables( TableNum ) ).Y( _, 1 ) ), size( PerfCurveTableData( Tables( TableNum ) ).Y( 1, _ ) ) );
+			TableLookup( Tables( TableNum ) ).X1Var = PerfCurveTableData( Tables( TableNum ) ).X1;
+			TableLookup( Tables( TableNum ) ).X2Var = PerfCurveTableData( Tables( TableNum ) ).X2;
+			TableLookup( Tables( TableNum ) ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( Tables( TableNum ) ).Y( _, _ );
+		}
+
+		XX1.deallocate( );
+		XX2.deallocate( );
+
+	}
+
+	void
+	SetCommonIncidentAngles(
+		int const ConstrNum,
+		int const NGlass,
+		int & TotalIPhi,
+		Array1A_int Tables
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Lixing Gu, FSEC
+		//       DATE WRITTEN   Feb. 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Set up common incident angle values in all materials with spectral and angular data in the same construction
+
+		// Using/Aliasing``
+		using DataHeatBalance::Material;
+		using DataHeatBalance::Construct;
+
+		int X1Num;
+		Real64 XX;
+		Real64 YY;
+		int i;
+		int j;
+		int k;
+		int l;
+		int m;
+		int TabNum;
+		int TabOpt;
+		int waveSize;
+		Array1D< Real64 > XX1;
+		const Real64 tol = 1.0e-5;
+		bool found;
+		bool Anglefound;
+		int TableNum;
+
+		Tables.dimension( NGlass );
+
+		Anglefound = false;
+
+		j = 0;
+		for ( i = 1; i <= NGlass; i++ ) {
+			if ( Tables( i ) > 0 ) j++;
+		}
+		if ( j == 0 ) return;
+
+		if ( TotalIPhi < 10 ) {
+			XX1.allocate( 10 );
+			for ( k = 1; k <= 10; k++ ) {
+				XX1( k ) = ( k - 1 )*10.0;
+			}
+		}
+
+		for ( i = 1; i <= NGlass; i++ ) {
+			if ( Tables( i ) > 0  ) {
+				if ( !XX1.allocated( ) ) {
+					TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( i ) ) ).GlassSpecAngTransDataPtr;
+					X1Num = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars;
+					XX1.allocate( X1Num );
+					for ( j = 1; j <= int( XX1.size( ) ); j++ ) {
+						XX1( j ) = TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( j );
+					}
+				} else {
+					TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( i ) ) ).GlassSpecAngTransDataPtr;
+					X1Num = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars;
+					if ( int( XX1.size( ) ) != X1Num ) Anglefound = true;
+					for ( j = 1; j <= X1Num; j++ ) {
+						XX = TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( j );
+						found = false;
+						for ( k = 1; k <= int( XX1.size( ) ); k++ ) {
+							if ( fabs( XX1( k ) - XX ) < tol ) {
+								found = true;
+							}
+						}
+						if ( !found ) {
+							XX1.push_back( XX );
+							Anglefound = true;
+						}
+					}
+				}
+			}
+		}
+
+		if ( !Anglefound ) return;
+
+		// ascend sort
+		std::sort( XX1.begin( ), XX1.end( ) );
+
+		for ( TabNum = 1; TabNum <= int( Tables.size( ) ); TabNum++ ) {
+			if ( Tables( TabNum ) == 0 ) continue;
+			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
+				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
+				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
+				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
+				waveSize = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars;
+				if ( int( XX1.size( ) ) > TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) {
+					l = 0;
+					for ( i = 1; i <= int( XX1.size( ) ); i++ ) {
+						if ( fabs( XX1( i ) - TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l ) ) > tol ) {
+							m = int( TableData( PerfCurve( TableNum ).TableIndex ).X1.size( ) );
+							for ( k = 1; k <= waveSize; k++ ) {
+								TableData( PerfCurve( TableNum ).TableIndex ).X1.push_back( TableData( PerfCurve( TableNum ).TableIndex ).X1( m - waveSize + 1 ) );
+								TableData( PerfCurve( TableNum ).TableIndex ).X2.push_back( TableData( PerfCurve( TableNum ).TableIndex ).X2( m - waveSize + 1 ) );
+								TableData( PerfCurve( TableNum ).TableIndex ).Y.push_back( TableData( PerfCurve( TableNum ).TableIndex ).Y( m - waveSize + 1 ) );
+							}
+							for ( j = m / waveSize; j >= i; j-- ) {
+								for ( k = 1; k <= waveSize; k++ ) {
+									TableData( PerfCurve( TableNum ).TableIndex ).X1( j * waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).X1( ( j - 1 ) * waveSize + k );
+									TableData( PerfCurve( TableNum ).TableIndex ).X2( j * waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).X2( ( j - 1 ) * waveSize + k );
+									TableData( PerfCurve( TableNum ).TableIndex ).Y( j * waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).Y( ( j - 1 ) * waveSize + k );
+								}
+							}
+							YY = ( XX1( i ) - TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l - 1 ) ) / ( TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l ) - TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var( i - l - 1 ) );
+							for ( k = 1; k <= waveSize; k++ ) {
+								TableData( PerfCurve( TableNum ).TableIndex ).X1( ( i - 1 )* waveSize + k ) = XX1( i );
+								TableData( PerfCurve( TableNum ).TableIndex ).Y( ( i - 1 )* waveSize + k ) = TableData( PerfCurve( TableNum ).TableIndex ).Y( ( i - 2 )* waveSize + k ) + YY * ( TableData( PerfCurve( TableNum ).TableIndex ).Y( i * waveSize + k ) - TableData( PerfCurve( TableNum ).TableIndex ).Y( ( i - 2 )* waveSize + k ) );
+							}
+							l++;
+						}
+					}
+				}
+			}
+		}
+
+		// Re-organize performance curve table data structure
+		for ( TabNum = 1; TabNum <= int( Tables.size( ) ); TabNum++ ) {
+			if ( Tables( TabNum ) == 0 ) continue;
+			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
+				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
+				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
+				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
+				if ( int( XX1.size( ) ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
+				waveSize = TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars;
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1.allocate( int( XX1.size( ) ) );
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y.allocate( waveSize, int( XX1.size( ) ) );
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1 = -9999999.0;
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 = -9999999.0;
+				PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y = -9999999.0;
+				for ( i = 1; i <= int( XX1.size( ) ); ++i ) {
+					PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1( i ) = XX1( i );
+					for ( j = 1; j <= waveSize; ++j ) {
+						for ( k = 1; k <= int( XX1.size( ) ) * waveSize; ++k ) {
+							if ( ( TableData( PerfCurve( TableNum ).TableIndex ).X1( k ) == PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1( i ) ) && ( TableData( PerfCurve( TableNum ).TableIndex ).X2( k ) == PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2( j ) ) ) {
+								PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( j, i ) = TableData( PerfCurve( TableNum ).TableIndex ).Y( k );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Re-organize TableLookup data structure
+		for ( TabNum = 1; TabNum <= int( Tables.size( ) ); TabNum++ ) {
+			if ( Tables( TabNum ) == 0 ) continue;
+			for ( TabOpt = 1; TabOpt <= 3; TabOpt++ ) {
+				if ( TabOpt == 1 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngTransDataPtr;
+				if ( TabOpt == 2 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngFRefleDataPtr;
+				if ( TabOpt == 3 ) TableNum = Material( Construct( ConstrNum ).LayerPoint( Tables( TabNum ) ) ).GlassSpecAngBRefleDataPtr;
+				if ( int( XX1.size( ) ) == TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars ) continue;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).NumIndependentVars = 2;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1 );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars = size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2 );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX1Vars );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var.allocate( TableLookup( PerfCurve( TableNum ).TableIndex ).NumX2Vars );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, 1 ) ), size( PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( 1, _ ) ) );
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X1Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X1;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).X2Var = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).X2;
+				TableLookup( PerfCurve( TableNum ).TableIndex ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( PerfCurve( TableNum ).TableIndex ).Y( _, _ );
+			}
+		}
+
+		if ( TotalIPhi != int( XX1.size( ) ) ) {
+			TotalIPhi = int( XX1.size( ) );
+		}
+
+		XX1.deallocate( );
+
+	}
 	//=================================================================================================!
 
 } // CurveManager

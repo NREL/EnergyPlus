@@ -63,7 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
@@ -397,10 +397,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Tariff";
-		numTariff = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numTariff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		tariff.allocate( numTariff );
 		for ( iInObj = 1; iInObj <= numTariff; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				//  args are always turned to upper case but this is okay...
@@ -449,35 +449,35 @@ namespace EconomicTariff {
 				IndexesForKeyVar.deallocate();
 			}
 			//conversion factor
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "USERDEFINED" ) ) {
 				tariff( iInObj ).convChoice = conversionUSERDEF;
 				tariff( iInObj ).energyConv = rNumericArgs( 1 ); //energy conversion factor
 				tariff( iInObj ).demandConv = rNumericArgs( 2 ); //demand conversion factor
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "KWH" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KWH" ) ) {
 				tariff( iInObj ).convChoice = conversionKWH;
 				tariff( iInObj ).energyConv = 0.0000002778;
 				tariff( iInObj ).demandConv = 0.001;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "THERM" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "THERM" ) ) {
 				tariff( iInObj ).convChoice = conversionTHERM;
 				tariff( iInObj ).energyConv = 9.4781712e-9;
 				tariff( iInObj ).demandConv = 0.00003412;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MMBTU" ) ) {
 				tariff( iInObj ).convChoice = conversionMMBTU;
 				tariff( iInObj ).energyConv = 9.4781712e-10;
 				tariff( iInObj ).demandConv = 0.000003412;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "MJ" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MJ" ) ) {
 				tariff( iInObj ).convChoice = conversionMJ;
 				tariff( iInObj ).energyConv = 0.000001;
 				tariff( iInObj ).demandConv = 0.0036;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "KBTU" ) ) {
 				tariff( iInObj ).convChoice = conversionKBTU;
 				tariff( iInObj ).energyConv = 9.4781712e-7;
 				tariff( iInObj ).demandConv = 0.003412;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "MCF" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "MCF" ) ) {
 				tariff( iInObj ).convChoice = conversionMCF;
 				tariff( iInObj ).energyConv = 9.4781712e-10;
 				tariff( iInObj ).demandConv = 0.000003412;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "CCF" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "CCF" ) ) {
 				tariff( iInObj ).convChoice = conversionCCF;
 				tariff( iInObj ).energyConv = 9.4781712e-9;
 				tariff( iInObj ).demandConv = 0.00003412;
@@ -526,7 +526,7 @@ namespace EconomicTariff {
 				tariff( iInObj ).monthSchIndex = 0; //flag value for no schedule used
 			}
 			//type of demand window
-			if ( InputProcessor::SameString( cAlphaArgs( 7 ), "QuarterHour" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "QuarterHour" ) ) {
 				// check to make sure that the demand window and the TIMESTEP IN HOUR are consistant.
 				{ auto const SELECT_CASE_var( NumOfTimeStepInHour );
 				if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 15 ) ) {
@@ -545,7 +545,7 @@ namespace EconomicTariff {
 					tariff( iInObj ).demandWindow = demandWindowQuarter;
 					tariff( iInObj ).demWinTime = 0.25;
 				}}
-			} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "HalfHour" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "HalfHour" ) ) {
 				{ auto const SELECT_CASE_var( NumOfTimeStepInHour );
 				if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 15 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHour;
@@ -557,13 +557,13 @@ namespace EconomicTariff {
 					tariff( iInObj ).demandWindow = demandWindowHalf;
 					tariff( iInObj ).demWinTime = 0.50;
 				}}
-			} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "FullHour" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "FullHour" ) ) {
 				tariff( iInObj ).demandWindow = demandWindowHour;
 				tariff( iInObj ).demWinTime = 1.00;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "Day" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Day" ) ) {
 				tariff( iInObj ).demandWindow = demandWindowDay;
 				tariff( iInObj ).demWinTime = 24.00;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "Week" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Week" ) ) {
 				tariff( iInObj ).demandWindow = demandWindowWeek;
 				tariff( iInObj ).demWinTime = 24.0 * 7.0;
 			} else {
@@ -581,11 +581,11 @@ namespace EconomicTariff {
 				}}
 			}
 			//monthly charge
-			tariff( iInObj ).monthChgVal = InputProcessor::ProcessNumber( cAlphaArgs( 8 ), isNotNumeric );
+			tariff( iInObj ).monthChgVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 8 ), isNotNumeric );
 			tariff( iInObj ).monthChgPt = AssignVariablePt( cAlphaArgs( 8 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, iInObj );
 			//minimum monthly charge
 			if ( len( cAlphaArgs( 9 ) ) > 0 ) {
-				tariff( iInObj ).minMonthChgVal = InputProcessor::ProcessNumber( cAlphaArgs( 9 ), isNotNumeric );
+				tariff( iInObj ).minMonthChgVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 9 ), isNotNumeric );
 			} else {
 				tariff( iInObj ).minMonthChgVal = -huge( -1.0 ); //set to a very negative value
 			}
@@ -598,22 +598,22 @@ namespace EconomicTariff {
 			//group name for separate distribution and transmission rates
 			tariff( iInObj ).groupName = cAlphaArgs( 12 );
 			//buy or sell option
-			if ( InputProcessor::SameString( cAlphaArgs( 13 ), "BuyFromUtility" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 13 ), "BuyFromUtility" ) ) {
 				tariff( iInObj ).buyOrSell = buyFromUtility;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 13 ), "SellToUtility" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 13 ), "SellToUtility" ) ) {
 				tariff( iInObj ).buyOrSell = sellToUtility;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 13 ), "NetMetering" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 13 ), "NetMetering" ) ) {
 				tariff( iInObj ).buyOrSell = netMetering;
 			} else {
 				tariff( iInObj ).buyOrSell = buyFromUtility;
 			}
 			// check if meter is consistent with buy or sell option
-			if ( ( tariff( iInObj ).buyOrSell == sellToUtility ) && ( ! InputProcessor::SameString( tariff( iInObj ).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY" ) ) ) {
+			if ( ( tariff( iInObj ).buyOrSell == sellToUtility ) && ( ! UtilityRoutines::SameString( tariff( iInObj ).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY" ) ) ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
 				ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + "\" is not typically used with the sellToUtility option." );
 				ShowContinueError( "Usually the ElectricitySurplusSold:Facility meter is selected when the sellToUtility option is used." );
 			}
-			if ( ( tariff( iInObj ).buyOrSell == netMetering ) && ( ! InputProcessor::SameString( tariff( iInObj ).reportMeter, "ELECTRICITYNET:FACILITY" ) ) ) {
+			if ( ( tariff( iInObj ).buyOrSell == netMetering ) && ( ! UtilityRoutines::SameString( tariff( iInObj ).reportMeter, "ELECTRICITYNET:FACILITY" ) ) ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
 				ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the netMetering option." );
 				ShowContinueError( "Usually the ElectricityNet:Facility meter is selected when the netMetering option is used." );
@@ -621,7 +621,7 @@ namespace EconomicTariff {
 			//also test the buy option for electricity
 			if ( tariff( iInObj ).buyOrSell == buyFromUtility ) {
 				if ( hasi( tariff( iInObj ).reportMeter, "Elec" ) ) { //test if electric meter
-					if ( ! ( InputProcessor::SameString( tariff( iInObj ).reportMeter, "Electricity:Facility" ) || InputProcessor::SameString( tariff( iInObj ).reportMeter, "ElectricityPurchased:Facility" ) ) ) {
+					if ( ! ( UtilityRoutines::SameString( tariff( iInObj ).reportMeter, "Electricity:Facility" ) || UtilityRoutines::SameString( tariff( iInObj ).reportMeter, "ElectricityPurchased:Facility" ) ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
 						ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the buyFromUtility option." );
 						ShowContinueError( "Usually the Electricity:Facility meter or the ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
@@ -670,10 +670,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Qualify";
-		numQualify = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numQualify = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		qualify.allocate( numQualify );
 		for ( iInObj = 1; iInObj <= numQualify; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -688,9 +688,9 @@ namespace EconomicTariff {
 			//index of the variable in the variable array
 			qualify( iInObj ).sourcePt = AssignVariablePt( cAlphaArgs( 3 ), true, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify( iInObj ).tariffIndx );
 			//indicator if maximum test otherwise minimum
-			if ( InputProcessor::SameString( cAlphaArgs( 4 ), "Minimum" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Minimum" ) ) {
 				qualify( iInObj ).isMaximum = false;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 4 ), "Maximum" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Maximum" ) ) {
 				qualify( iInObj ).isMaximum = true;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
@@ -699,14 +699,14 @@ namespace EconomicTariff {
 				qualify( iInObj ).isMaximum = true;
 			}
 			//value of the threshold
-			qualify( iInObj ).thresholdVal = InputProcessor::ProcessNumber( cAlphaArgs( 5 ), isNotNumeric );
+			qualify( iInObj ).thresholdVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 5 ), isNotNumeric );
 			qualify( iInObj ).thresholdPt = AssignVariablePt( cAlphaArgs( 5 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify( iInObj ).tariffIndx );
 			//enumerated list of the kind of season
 			qualify( iInObj ).season = LookUpSeason( cAlphaArgs( 6 ), cAlphaArgs( 1 ) );
 			//indicator if consecutive months otherwise count
-			if ( InputProcessor::SameString( cAlphaArgs( 7 ), "Count" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Count" ) ) {
 				qualify( iInObj ).isConsecutive = false;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 7 ), "Consecutive" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Consecutive" ) ) {
 				qualify( iInObj ).isConsecutive = true;
 			} else {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
@@ -741,10 +741,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Charge:Simple";
-		numChargeSimple = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numChargeSimple = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		chargeSimple.allocate( numChargeSimple );
 		for ( iInObj = 1; iInObj <= numChargeSimple; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -773,7 +773,7 @@ namespace EconomicTariff {
 			//index of the category in the variable array
 			chargeSimple( iInObj ).categoryPt = AssignVariablePt( cAlphaArgs( 5 ), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeSimple( iInObj ).tariffIndx );
 			//cost per unit value or variable
-			chargeSimple( iInObj ).costPerVal = InputProcessor::ProcessNumber( cAlphaArgs( 6 ), isNotNumeric );
+			chargeSimple( iInObj ).costPerVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 6 ), isNotNumeric );
 			chargeSimple( iInObj ).costPerPt = AssignVariablePt( cAlphaArgs( 6 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeSimple( iInObj ).tariffIndx );
 		}
 	}
@@ -804,10 +804,10 @@ namespace EconomicTariff {
 
 		CurrentModuleObject = "UtilityCost:Charge:Block";
 		hugeNumber = huge( hugeNumber );
-		numChargeBlock = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numChargeBlock = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		chargeBlock.allocate( numChargeBlock );
 		for ( iInObj = 1; iInObj <= numChargeBlock; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -842,7 +842,7 @@ namespace EconomicTariff {
 				chargeBlock( iInObj ).blkSzMultVal = 1.0; //default is 1 if left blank
 				chargeBlock( iInObj ).blkSzMultPt = 0;
 			} else {
-				chargeBlock( iInObj ).blkSzMultVal = InputProcessor::ProcessNumber( cAlphaArgs( 7 ), isNotNumeric );
+				chargeBlock( iInObj ).blkSzMultVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 7 ), isNotNumeric );
 				chargeBlock( iInObj ).blkSzMultPt = AssignVariablePt( cAlphaArgs( 7 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock( iInObj ).tariffIndx );
 			}
 			//number of blocks used
@@ -850,17 +850,17 @@ namespace EconomicTariff {
 			for ( jBlk = 1; jBlk <= chargeBlock( iInObj ).numBlk; ++jBlk ) {
 				alphaOffset = 7 + ( jBlk - 1 ) * 2;
 				//catch the "remaining" code word for the block size
-				if ( InputProcessor::SameString( cAlphaArgs( alphaOffset + 1 ), "REMAINING" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( alphaOffset + 1 ), "REMAINING" ) ) {
 					chargeBlock( iInObj ).blkSzVal( jBlk ) = hugeNumber / 1000000; //using small portion of largest possible value to prevent overflow
 					chargeBlock( iInObj ).blkSzPt( jBlk ) = 0;
 				} else {
 					//array of block size
-					chargeBlock( iInObj ).blkSzVal( jBlk ) = InputProcessor::ProcessNumber( cAlphaArgs( alphaOffset + 1 ), isNotNumeric );
+					chargeBlock( iInObj ).blkSzVal( jBlk ) = UtilityRoutines::ProcessNumber( cAlphaArgs( alphaOffset + 1 ), isNotNumeric );
 
 					chargeBlock( iInObj ).blkSzPt( jBlk ) = AssignVariablePt( cAlphaArgs( alphaOffset + 1 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock( iInObj ).tariffIndx );
 				}
 				//array of block cost
-				chargeBlock( iInObj ).blkCostVal( jBlk ) = InputProcessor::ProcessNumber( cAlphaArgs( alphaOffset + 2 ), isNotNumeric );
+				chargeBlock( iInObj ).blkCostVal( jBlk ) = UtilityRoutines::ProcessNumber( cAlphaArgs( alphaOffset + 2 ), isNotNumeric );
 				chargeBlock( iInObj ).blkCostPt( jBlk ) = AssignVariablePt( cAlphaArgs( alphaOffset + 2 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock( iInObj ).tariffIndx );
 			}
 		}
@@ -888,10 +888,10 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Ratchet";
-		numRatchet = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numRatchet = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ratchet.allocate( numRatchet );
 		for ( iInObj = 1; iInObj <= numRatchet; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -911,10 +911,10 @@ namespace EconomicTariff {
 			ratchet( iInObj ).seasonFrom = LookUpSeason( cAlphaArgs( 5 ), cAlphaArgs( 1 ) );
 			ratchet( iInObj ).seasonTo = LookUpSeason( cAlphaArgs( 6 ), cAlphaArgs( 1 ) );
 			//ratchet multiplier
-			ratchet( iInObj ).multiplierVal = InputProcessor::ProcessNumber( cAlphaArgs( 7 ), isNotNumeric );
+			ratchet( iInObj ).multiplierVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 7 ), isNotNumeric );
 			ratchet( iInObj ).multiplierPt = AssignVariablePt( cAlphaArgs( 7 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet( iInObj ).tariffIndx );
 			//ratchet offset
-			ratchet( iInObj ).offsetVal = InputProcessor::ProcessNumber( cAlphaArgs( 8 ), isNotNumeric );
+			ratchet( iInObj ).offsetVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 8 ), isNotNumeric );
 			ratchet( iInObj ).offsetPt = AssignVariablePt( cAlphaArgs( 8 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet( iInObj ).tariffIndx );
 		}
 	}
@@ -945,9 +945,9 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Variable";
-		numEconVarObj = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numEconVarObj = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( iInObj = 1; iInObj <= numEconVarObj; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -959,13 +959,13 @@ namespace EconomicTariff {
 			variablePt = AssignVariablePt( cAlphaArgs( 1 ), true, varIsArgument, varUserDefined, kindVariable, iInObj, tariffPt );
 			warnIfNativeVarname( cAlphaArgs( 1 ), tariffPt, ErrorsFound, CurrentModuleObject );
 			//validate the kind of variable - not used internally except for validation
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "ENERGY" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "ENERGY" ) ) {
 				econVar( variablePt ).varUnitType = varUnitTypeEnergy;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "DEMAND" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DEMAND" ) ) {
 				econVar( variablePt ).varUnitType = varUnitTypeDemand;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "DIMENSIONLESS" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DIMENSIONLESS" ) ) {
 				econVar( variablePt ).varUnitType = varUnitTypeDimensionless;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "CURRENCY" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "CURRENCY" ) ) {
 				econVar( variablePt ).varUnitType = varUnitTypeCurrency;
 			} else {
 				econVar( variablePt ).varUnitType = varUnitTypeDimensionless;
@@ -1011,7 +1011,7 @@ namespace EconomicTariff {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "UtilityCost:Computation";
-		numComputation = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		numComputation = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		computation.allocate( numTariff ); //not the number of Computations but the number of tariffs
 		//set default values for computation
 		for ( auto & e : computation ) {
@@ -1021,7 +1021,7 @@ namespace EconomicTariff {
 			e.isUserDef = false;
 		}
 		for ( iInObj = 1; iInObj <= numComputation; ++iInObj ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -1083,15 +1083,15 @@ namespace EconomicTariff {
 		int i;
 
 		initializeMonetaryUnit();
-		NumCurrencyType = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCurrencyType = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		selectedMonetaryUnit = 0; // invalid
 		if ( NumCurrencyType == 0 ) {
 			selectedMonetaryUnit = 1; //USD - U.S. Dollar
 		} else if ( NumCurrencyType == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Monetary Unit
 			for ( i = 1; i <= numMonetaryUnit; ++i ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 1 ), monetaryUnit( i ).code ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), monetaryUnit( i ).code ) ) {
 					selectedMonetaryUnit = i;
 					break;
 				}
@@ -1601,15 +1601,15 @@ namespace EconomicTariff {
 
 		int LookUpSeason;
 
-		if ( InputProcessor::SameString( nameOfSeason, "Summer" ) ) {
+		if ( UtilityRoutines::SameString( nameOfSeason, "Summer" ) ) {
 			LookUpSeason = seasonSummer;
-		} else if ( InputProcessor::SameString( nameOfSeason, "Winter" ) ) {
+		} else if ( UtilityRoutines::SameString( nameOfSeason, "Winter" ) ) {
 			LookUpSeason = seasonWinter;
-		} else if ( InputProcessor::SameString( nameOfSeason, "Spring" ) ) {
+		} else if ( UtilityRoutines::SameString( nameOfSeason, "Spring" ) ) {
 			LookUpSeason = seasonSpring;
-		} else if ( InputProcessor::SameString( nameOfSeason, "Fall" ) ) {
+		} else if ( UtilityRoutines::SameString( nameOfSeason, "Fall" ) ) {
 			LookUpSeason = seasonFall;
-		} else if ( InputProcessor::SameString( nameOfSeason, "Annual" ) ) {
+		} else if ( UtilityRoutines::SameString( nameOfSeason, "Annual" ) ) {
 			LookUpSeason = seasonAnnual;
 		} else {
 			ShowWarningError( "UtilityCost: Invalid season name " + nameOfSeason + " in: " + nameOfReferingObj );
@@ -1639,7 +1639,7 @@ namespace EconomicTariff {
 
 		found = 0;
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-			if ( InputProcessor::SameString( nameOfTariff, tariff( iTariff ).tariffName ) ) {
+			if ( UtilityRoutines::SameString( nameOfTariff, tariff( iTariff ).tariffName ) ) {
 				found = iTariff;
 				break;
 			}
@@ -1672,52 +1672,52 @@ namespace EconomicTariff {
 		bool throwError;
 
 		throwError = false;
-		if ( InputProcessor::SameString( objName, "TotalEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "TotalDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "ShoulderEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "ShoulderDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "OffPeakEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "OffPeakDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "MidPeakEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "MidPeakDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakExceedsOffPeak" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "OffPeakExceedsPeak" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakExceedsMidPeak" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "MidPeakExceedsPeak" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakExceedsShoulder" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "ShoulderExceedsPeak" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsWinter" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsNotWinter" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsSpring" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsNotSpring" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsSummer" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsNotSummer" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsAutumn" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "IsNotAutumn" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakAndShoulderEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakAndShoulderDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakAndMidPeakEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakAndMidPeakDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "ShoulderAndOffPeakEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "ShoulderAndOffPeakDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakAndOffPeakEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "PeakAndOffPeakDemand" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "RealTimePriceCosts" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "AboveCustomerBaseCosts" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "BelowCustomerBaseCosts" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "AboveCustomerBaseEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "BelowCustomerBaseEnergy" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "EnergyCharges" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "DemandCharges" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "ServiceCharges" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "Basis" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "Surcharges" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "Adjustments" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "Subtotal" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "Taxes" ) ) throwError = true;
-		if ( InputProcessor::SameString( objName, "Total" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "TotalEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "TotalDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "ShoulderEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "ShoulderDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "OffPeakEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "OffPeakDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "MidPeakEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "MidPeakDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakExceedsOffPeak" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "OffPeakExceedsPeak" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakExceedsMidPeak" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "MidPeakExceedsPeak" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakExceedsShoulder" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "ShoulderExceedsPeak" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsWinter" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsNotWinter" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsSpring" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsNotSpring" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsSummer" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsNotSummer" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsAutumn" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "IsNotAutumn" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakAndShoulderEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakAndShoulderDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakAndMidPeakEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakAndMidPeakDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "ShoulderAndOffPeakEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "ShoulderAndOffPeakDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakAndOffPeakEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "PeakAndOffPeakDemand" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "RealTimePriceCosts" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "AboveCustomerBaseCosts" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "BelowCustomerBaseCosts" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "AboveCustomerBaseEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "BelowCustomerBaseEnergy" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "EnergyCharges" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "DemandCharges" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "ServiceCharges" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "Basis" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "Surcharges" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "Adjustments" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "Subtotal" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "Taxes" ) ) throwError = true;
+		if ( UtilityRoutines::SameString( objName, "Total" ) ) throwError = true;
 		if ( throwError ) {
 			ErrorsFound = true;
 			if ( curTariffIndex >= 1 && curTariffIndex <= numTariff ) {
@@ -1760,7 +1760,7 @@ namespace EconomicTariff {
 			if ( allocated( econVar ) ) {
 				for ( iVar = 1; iVar <= numEconVar; ++iVar ) {
 					if ( econVar( iVar ).tariffIndx == tariffPt ) {
-						if ( InputProcessor::SameString( econVar( iVar ).name, inNoSpaces ) ) {
+						if ( UtilityRoutines::SameString( econVar( iVar ).name, inNoSpaces ) ) {
 							found = iVar;
 							break;
 						}
@@ -1967,109 +1967,109 @@ namespace EconomicTariff {
 
 		int lookupOperator;
 
-		if ( InputProcessor::SameString( opString, "Sum" ) ) {
+		if ( UtilityRoutines::SameString( opString, "Sum" ) ) {
 			lookupOperator = opSUM;
-		} else if ( InputProcessor::SameString( opString, "MULTIPLY" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "MULTIPLY" ) ) {
 			lookupOperator = opMULTIPLY;
-		} else if ( InputProcessor::SameString( opString, "MULT" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "MULT" ) ) {
 			lookupOperator = opMULTIPLY;
-		} else if ( InputProcessor::SameString( opString, "SUBTRACT" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "SUBTRACT" ) ) {
 			lookupOperator = opSUBTRACT;
-		} else if ( InputProcessor::SameString( opString, "SUBT" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "SUBT" ) ) {
 			lookupOperator = opSUBTRACT;
-		} else if ( InputProcessor::SameString( opString, "DIVIDE" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "DIVIDE" ) ) {
 			lookupOperator = opDIVIDE;
-		} else if ( InputProcessor::SameString( opString, "DIV" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "DIV" ) ) {
 			lookupOperator = opDIVIDE;
-		} else if ( InputProcessor::SameString( opString, "ABSOLUTE" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ABSOLUTE" ) ) {
 			lookupOperator = opABSOLUTE;
-		} else if ( InputProcessor::SameString( opString, "ABS" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ABS" ) ) {
 			lookupOperator = opABSOLUTE;
-		} else if ( InputProcessor::SameString( opString, "INTEGER" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "INTEGER" ) ) {
 			lookupOperator = opINTEGER;
-		} else if ( InputProcessor::SameString( opString, "INT" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "INT" ) ) {
 			lookupOperator = opINTEGER;
-		} else if ( InputProcessor::SameString( opString, "SIGN" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "SIGN" ) ) {
 			lookupOperator = opSIGN;
-		} else if ( InputProcessor::SameString( opString, "ROUND" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ROUND" ) ) {
 			lookupOperator = opROUND;
-		} else if ( InputProcessor::SameString( opString, "Maximum" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "Maximum" ) ) {
 			lookupOperator = opMAXIMUM;
-		} else if ( InputProcessor::SameString( opString, "MAX" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "MAX" ) ) {
 			lookupOperator = opMAXIMUM;
-		} else if ( InputProcessor::SameString( opString, "MINIMUM" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "MINIMUM" ) ) {
 			lookupOperator = opMINIMUM;
-		} else if ( InputProcessor::SameString( opString, "MIN" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "MIN" ) ) {
 			lookupOperator = opMINIMUM;
-		} else if ( InputProcessor::SameString( opString, "EXCEEDS" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "EXCEEDS" ) ) {
 			lookupOperator = opEXCEEDS;
-		} else if ( InputProcessor::SameString( opString, "ANNUALMINIMUM" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALMINIMUM" ) ) {
 			lookupOperator = opANNUALMINIMUM;
-		} else if ( InputProcessor::SameString( opString, "ANMIN" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANMIN" ) ) {
 			lookupOperator = opANNUALMINIMUM;
-		} else if ( InputProcessor::SameString( opString, "ANNUALMAXIMUM" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALMAXIMUM" ) ) {
 			lookupOperator = opANNUALMAXIMUM;
-		} else if ( InputProcessor::SameString( opString, "ANMAX" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANMAX" ) ) {
 			lookupOperator = opANNUALMAXIMUM;
-		} else if ( InputProcessor::SameString( opString, "ANNUALSUM" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALSUM" ) ) {
 			lookupOperator = opANNUALSUM;
-		} else if ( InputProcessor::SameString( opString, "ANSUM" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANSUM" ) ) {
 			lookupOperator = opANNUALSUM;
-		} else if ( InputProcessor::SameString( opString, "ANNUALAVERAGE" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALAVERAGE" ) ) {
 			lookupOperator = opANNUALAVERAGE;
-		} else if ( InputProcessor::SameString( opString, "ANAVG" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANAVG" ) ) {
 			lookupOperator = opANNUALAVERAGE;
-		} else if ( InputProcessor::SameString( opString, "ANNUALOR" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALOR" ) ) {
 			lookupOperator = opANNUALOR;
-		} else if ( InputProcessor::SameString( opString, "ANOR" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANOR" ) ) {
 			lookupOperator = opANNUALOR;
-		} else if ( InputProcessor::SameString( opString, "ANNUALAND" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALAND" ) ) {
 			lookupOperator = opANNUALAND;
-		} else if ( InputProcessor::SameString( opString, "ANAND" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANAND" ) ) {
 			lookupOperator = opANNUALAND;
-		} else if ( InputProcessor::SameString( opString, "ANNUALMAXIMUMZERO" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALMAXIMUMZERO" ) ) {
 			lookupOperator = opANNUALMAXIMUMZERO;
-		} else if ( InputProcessor::SameString( opString, "ANMAXZ" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANMAXZ" ) ) {
 			lookupOperator = opANNUALMAXIMUMZERO;
-		} else if ( InputProcessor::SameString( opString, "ANNUALMINIMUMZERO" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANNUALMINIMUMZERO" ) ) {
 			lookupOperator = opANNUALMINIMUMZERO;
-		} else if ( InputProcessor::SameString( opString, "ANMINZ" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ANMINZ" ) ) {
 			lookupOperator = opANNUALMINIMUMZERO;
-		} else if ( InputProcessor::SameString( opString, "IF" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "IF" ) ) {
 			lookupOperator = opIF;
-		} else if ( InputProcessor::SameString( opString, "GREATERTHAN" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "GREATERTHAN" ) ) {
 			lookupOperator = opGREATERTHAN;
-		} else if ( InputProcessor::SameString( opString, "GT" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "GT" ) ) {
 			lookupOperator = opGREATERTHAN;
-		} else if ( InputProcessor::SameString( opString, "GREATEREQUAL" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "GREATEREQUAL" ) ) {
 			lookupOperator = opGREATEREQUAL;
-		} else if ( InputProcessor::SameString( opString, "GE" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "GE" ) ) {
 			lookupOperator = opGREATEREQUAL;
-		} else if ( InputProcessor::SameString( opString, "LESSTHAN" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "LESSTHAN" ) ) {
 			lookupOperator = opLESSTHAN;
-		} else if ( InputProcessor::SameString( opString, "LT" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "LT" ) ) {
 			lookupOperator = opLESSTHAN;
-		} else if ( InputProcessor::SameString( opString, "LESSEQUAL" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "LESSEQUAL" ) ) {
 			lookupOperator = opLESSEQUAL;
-		} else if ( InputProcessor::SameString( opString, "LE" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "LE" ) ) {
 			lookupOperator = opLESSEQUAL;
-		} else if ( InputProcessor::SameString( opString, "EQUAL" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "EQUAL" ) ) {
 			lookupOperator = opEQUAL;
-		} else if ( InputProcessor::SameString( opString, "EQ" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "EQ" ) ) {
 			lookupOperator = opEQUAL;
-		} else if ( InputProcessor::SameString( opString, "NOTEQUAL" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "NOTEQUAL" ) ) {
 			lookupOperator = opNOTEQUAL;
-		} else if ( InputProcessor::SameString( opString, "NE" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "NE" ) ) {
 			lookupOperator = opNOTEQUAL;
-		} else if ( InputProcessor::SameString( opString, "AND" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "AND" ) ) {
 			lookupOperator = opAND;
-		} else if ( InputProcessor::SameString( opString, "OR" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "OR" ) ) {
 			lookupOperator = opOR;
-		} else if ( InputProcessor::SameString( opString, "NOT" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "NOT" ) ) {
 			lookupOperator = opNOT;
-		} else if ( InputProcessor::SameString( opString, "FROM" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "FROM" ) ) {
 			lookupOperator = opNOOP;
-		} else if ( InputProcessor::SameString( opString, "ADD" ) ) {
+		} else if ( UtilityRoutines::SameString( opString, "ADD" ) ) {
 			lookupOperator = opADD;
 		} else {
 			lookupOperator = 0;
@@ -4597,7 +4597,7 @@ namespace EconomicTariff {
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 			//determine if this is meter related to electricity
 			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
-				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( EnergyMeters( tariff( iTariff ).reportMeterIndx ).ResourceType ) );
 				if ( SELECT_CASE_var == "ELECTRICITY" ) {
 					tariff( iTariff ).kindElectricMtr = kindMeterElecSimple;
 				} else if ( SELECT_CASE_var == "ELECTRICITYPRODUCED" ) {
@@ -4632,7 +4632,7 @@ namespace EconomicTariff {
 				groupIndex( iTariff ) = groupCount;
 				//set all remaining matching items to the same index
 				for ( kTariff = iTariff + 1; kTariff <= numTariff; ++kTariff ) {
-					if ( InputProcessor::SameString( tariff( kTariff ).groupName, tariff( iTariff ).groupName ) ) {
+					if ( UtilityRoutines::SameString( tariff( kTariff ).groupName, tariff( iTariff ).groupName ) ) {
 						groupIndex( kTariff ) = groupCount;
 					}
 				}

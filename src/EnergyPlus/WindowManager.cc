@@ -59,6 +59,7 @@
 #include <CommandLineInterface.hh>
 #include <WindowManager.hh>
 #include <ConvectionCoefficients.hh>
+#include <CurveManager.hh>
 #include <DataBSDFWindow.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
@@ -71,7 +72,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -215,6 +216,8 @@ namespace WindowManager {
 	Real64 A45;
 	Real64 A67;
 
+	int const MaxNumOfIncidentAngles = 20;
+
 	Array2D< Real64 > wlt( 5, MaxSpectralDataElements, 0.0 ); // Spectral data wavelengths for each glass layer in a glazing system
 	// Following data, Spectral data for each layer for each wavelength in wlt
 	Array2D< Real64 > t( 5, MaxSpectralDataElements, 0.0 ); // normal transmittance
@@ -236,19 +239,22 @@ namespace WindowManager {
 	Array2D< Real64 > top( 5, 5, 0.0 ); // Transmittance matrix for subr. op
 	Array2D< Real64 > rfop( 5, 5, 0.0 ); // Front reflectance matrix for subr. op
 	Array2D< Real64 > rbop( 5, 5, 0.0 ); // Back transmittance matrix for subr. op
-	Array1D< Real64 > IndepVarCurveFit( 10, 0.0 ); // Values of independent variable (cos of inc. angle) for curve fit
-	Array1D< Real64 > DepVarCurveFit( 10, 0.0 ); // Values of dependent variable corresponding to IndepVarCurveFit values
+	Array1D< Real64 > IndepVarCurveFit( MaxNumOfIncidentAngles, 0.0 ); // Values of independent variable (cos of inc. angle) for curve fit
+	Array1D< Real64 > DepVarCurveFit( MaxNumOfIncidentAngles, 0.0 ); // Values of dependent variable corresponding to IndepVarCurveFit values
 	Array1D< Real64 > CoeffsCurveFit( 6, 0.0 ); // Polynomial coefficients from curve fit
-	Array1D< Real64 > tsolPhi( 10, 0.0 ); // Glazing system solar transmittance for each angle of incidence
-	Array1D< Real64 > rfsolPhi( 10, 0.0 ); // Glazing system solar front reflectance for each angle of incidence
-	Array1D< Real64 > rbsolPhi( 10, 0.0 ); // Glazing system solar back reflectance for each angle of incidence
-	Array2D< Real64 > solabsPhi( 5, 10, 0.0 ); // Glazing system solar absorptance for each angle of incidence
-	Array2D< Real64 > solabsBackPhi( 5, 10, 0.0 ); // Glazing system back solar absorptance for each angle of incidence
-	Array1D< Real64 > solabsShadePhi( 10, 0.0 ); // Glazing system interior shade solar absorptance for each angle of incidence
-	Array1D< Real64 > tvisPhi( 10, 0.0 ); // Glazing system visible transmittance for each angle of incidence
-	Array1D< Real64 > rfvisPhi( 10, 0.0 ); // Glazing system visible front reflectance for each angle of incidence
-	Array1D< Real64 > rbvisPhi( 10, 0.0 ); // Glazing system visible back reflectance for each angle of incidence
-	Array1D< Real64 > CosPhiIndepVar( 10, 0.0 ); // Cos of incidence angles at 10-deg increments for curve fits
+	Array1D< Real64 > tsolPhi( MaxNumOfIncidentAngles, 0.0 ); // Glazing system solar transmittance for each angle of incidence
+	Array1D< Real64 > rfsolPhi( MaxNumOfIncidentAngles, 0.0 ); // Glazing system solar front reflectance for each angle of incidence
+	Array1D< Real64 > rbsolPhi( MaxNumOfIncidentAngles, 0.0 ); // Glazing system solar back reflectance for each angle of incidence
+	Array2D< Real64 > solabsPhi( 5, MaxNumOfIncidentAngles, 0.0 ); // Glazing system solar absorptance for each angle of incidence
+	Array2D< Real64 > solabsBackPhi( 5, MaxNumOfIncidentAngles, 0.0 ); // Glazing system back solar absorptance for each angle of incidence
+	Array1D< Real64 > solabsShadePhi( MaxNumOfIncidentAngles, 0.0 ); // Glazing system interior shade solar absorptance for each angle of incidence
+	Array1D< Real64 > tvisPhi( MaxNumOfIncidentAngles, 0.0 ); // Glazing system visible transmittance for each angle of incidence
+	Array1D< Real64 > rfvisPhi( MaxNumOfIncidentAngles, 0.0 ); // Glazing system visible front reflectance for each angle of incidence
+	Array1D< Real64 > rbvisPhi( MaxNumOfIncidentAngles, 0.0 ); // Glazing system visible back reflectance for each angle of incidence
+	Array1D< Real64 > CosPhiIndepVar( MaxNumOfIncidentAngles, 0.0 ); // Cos of incidence angles at 10-deg increments for curve fits
+
+	Array1D< int > LayerNum( 5, 0 ); // Glass layer number
+	Array1D< int > AngleNum( 5, 0 ); // Glass layer number for spectral and angular data only
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowManager:
 	//   Optical Calculation Routines
@@ -341,16 +347,16 @@ namespace WindowManager {
 		IndepVarCurveFit = Array1D< Real64 >( 10, 0.0 );
 		DepVarCurveFit = Array1D< Real64 >( 10, 0.0 );
 		CoeffsCurveFit = Array1D< Real64 >( 6, 0.0 );
-		tsolPhi = Array1D< Real64 >( 10, 0.0 );
-		rfsolPhi = Array1D< Real64 >( 10, 0.0 );
-		rbsolPhi = Array1D< Real64 >( 10, 0.0 );
-		solabsPhi = Array2D< Real64 >( 5, 10, 0.0 );
-		solabsBackPhi = Array2D< Real64 >( 5, 10, 0.0 );
-		solabsShadePhi = Array1D< Real64 >( 10, 0.0 );
-		tvisPhi = Array1D< Real64 >( 10, 0.0 );
-		rfvisPhi = Array1D< Real64 >( 10, 0.0 );
-		rbvisPhi = Array1D< Real64 >( 10, 0.0 );
-		CosPhiIndepVar = Array1D< Real64 >( 10, 0.0 );
+		tsolPhi = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
+		rfsolPhi = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
+		rbsolPhi = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
+		solabsPhi = Array2D< Real64 >( 5, MaxNumOfIncidentAngles, 0.0 );
+		solabsBackPhi = Array2D< Real64 >( 5, MaxNumOfIncidentAngles, 0.0 );
+		solabsShadePhi = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
+		tvisPhi = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
+		rfvisPhi = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
+		rbvisPhi = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
+		CosPhiIndepVar = Array1D< Real64 >( MaxNumOfIncidentAngles, 0.0 );
 	}
 
 	void
@@ -382,6 +388,10 @@ namespace WindowManager {
 		using namespace Vectors;
 		using General::TrimSigDigits;
 		using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
+		using CurveManager::TableData;
+		using CurveManager::TableLookup;
+		using CurveManager::PerfCurve;
+		using CurveManager::SetCommonIncidentAngles;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -423,24 +433,24 @@ namespace WindowManager {
 		//  and angle of incidence, for each wavelength
 		//   glass layer for an angle of incidence, for each wavelength
 		Array1D< Real64 > solabsDiff( 5 ); // Glazing system layer solar absorptance for each glass layer
-		Array1D< Real64 > solabsPhiLay( 10 ); // Glazing system solar absorptance for a layer at each incidence angle
-		Array1D< Real64 > tsolPhiFit( 10 ); // Glazing system solar transmittance from fit at each incidence angle
-		Array1D< Real64 > tvisPhiFit( 10 ); // Glazing system visible transmittance from fit at each incidence angle
-		Array2D< Real64 > tBareSolPhi( 5, 10 ); // Isolated glass solar transmittance for each incidence angle
+		Array1D< Real64 > solabsPhiLay( MaxNumOfIncidentAngles ); // Glazing system solar absorptance for a layer at each incidence angle
+		Array1D< Real64 > tsolPhiFit( MaxNumOfIncidentAngles ); // Glazing system solar transmittance from fit at each incidence angle
+		Array1D< Real64 > tvisPhiFit( MaxNumOfIncidentAngles ); // Glazing system visible transmittance from fit at each incidence angle
+		Array2D< Real64 > tBareSolPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass solar transmittance for each incidence angle
 		Real64 t1; // = tBareSolPhi(,1)(,2)
 		Real64 t2;
-		Array2D< Real64 > tBareVisPhi( 5, 10 ); // Isolated glass visible transmittance for each incidence angle
+		Array2D< Real64 > tBareVisPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass visible transmittance for each incidence angle
 		Real64 t1v; // = tBareVisPhi(,1)(,2)
 		Real64 t2v;
-		Array2D< Real64 > rfBareSolPhi( 5, 10 ); // Isolated glass front solar reflectance for each incidence angle
-		Array2D< Real64 > rfBareVisPhi( 5, 10 ); // Isolated glass front visible reflectance for each incidence angle
-		Array2D< Real64 > rbBareSolPhi( 5, 10 ); // Isolated glass back solar reflectance for each incidence angle
-		Array2D< Real64 > rbBareVisPhi( 5, 10 ); // Isolated glass back visible reflectance for each incidence angle
-		Array2D< Real64 > afBareSolPhi( 5, 10 ); // Isolated glass front solar absorptance for each incidence angle
+		Array2D< Real64 > rfBareSolPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass front solar reflectance for each incidence angle
+		Array2D< Real64 > rfBareVisPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass front visible reflectance for each incidence angle
+		Array2D< Real64 > rbBareSolPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass back solar reflectance for each incidence angle
+		Array2D< Real64 > rbBareVisPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass back visible reflectance for each incidence angle
+		Array2D< Real64 > afBareSolPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass front solar absorptance for each incidence angle
 		Real64 af1; // = afBareSolPhi(,1)(,2)
 		Real64 af2;
 		Real64 rbmf2; // Isolated glass #2 front beam reflectance
-		Array2D< Real64 > abBareSolPhi( 5, 10 ); // Isolated glass back solar absorptance for each incidence angle
+		Array2D< Real64 > abBareSolPhi( 5, MaxNumOfIncidentAngles ); // Isolated glass back solar absorptance for each incidence angle
 		Real64 ab1; // = abBareSolPhi(,1)(,2)
 		Real64 ab2;
 		Real64 td1; // Isolated glass diffuse solar transmittance
@@ -569,10 +579,18 @@ namespace WindowManager {
 			if ( Construct( ConstrNum ).WindowTypeEQL ) continue; //skip Equivalent Layer Fenestration
 			//handling of optical properties
 
+			for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
+			}
+
 			TotLay = Construct( ConstrNum ).TotLayers;
 
 			// First layer must be glass, shade, screen or blind to be a glazing construction
-			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind && Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
+			if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowGlass &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Shade &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != Screen &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowBlind &&
+			   Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group != WindowSimpleGlazing ) continue;
 
 			ShadeLayNum = 0;
 			ExtShade = false;
@@ -689,6 +707,9 @@ namespace WindowManager {
 
 			lquasi = false;
 			AllGlassIsSpectralAverage = true;
+			int TotalIPhi = 10;
+			LayerNum = 0;
+			AngleNum = 0;
 
 			// Loop over glass layers in the construction
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
@@ -704,6 +725,7 @@ namespace WindowManager {
 					}
 				}
 
+				LayerNum( IGlass ) = LayNum;
 				LayPtr = Construct( ConstrNum ).LayerPoint( LayNum );
 				SpecDataNum = Material( LayPtr ).GlassSpectralDataPtr;
 				if ( SpecDataNum != 0 ) {
@@ -756,7 +778,7 @@ namespace WindowManager {
 					}
 				}
 
-				if ( SpecDataNum == 0 ) { // No spectral data for this layer; use spectral average values
+				if ( SpecDataNum == 0 && !Material( LayPtr ).GlassSpectralAndAngle ) { // No spectral data for this layer; use spectral average values
 					lquasi = true;
 					numpt( IGlass ) = 2;
 					t( IGlass, 1 ) = Material( LayPtr ).Trans;
@@ -768,25 +790,110 @@ namespace WindowManager {
 					rff( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamFront;
 					rbb( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamBack;
 				}
+				if ( Material( LayPtr ).GlassSpectralAndAngle ) {
+					if ( !BGFlag ) AllGlassIsSpectralAverage = false;
+					numptDAT = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).NumX2Vars;
+					numpt( IGlass ) = numptDAT;
+					TotalIPhi = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).NumX1Vars;
+					if ( BGFlag ) {
+						// 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
+						ShowWarningError( "Window glazing material \"" + Material( LayPtr ).Name + "\" was defined with full spectral and angular data and has been converted to average spectral data" );
+						ShowContinueError( "due to its use with between-glass shades or blinds of the window construction \"" + Construct( ConstrNum ).Name + "\"." );
+						ShowContinueError( "All occurrences of this glazing material will be modeled as SpectralAverage." );
+						ShowContinueError( "If this material is also used in other window constructions  without between-glass shades or blinds," );
+						ShowContinueError( "then make a duplicate material (with new name) if you want to model those windows  (and reference the new material) using the full spectral data." );
+						// calc Trans, TransVis, ReflectSolBeamFront, ReflectSolBeamBack, ReflectVisBeamFront, ReflectVisBeamBack
+						//  assuming wlt same as wle
+						int NumX2 = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).NumX2Vars;
+						for ( ILam = 1; ILam <= NumX2; ++ILam ) {
+							wlt( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X2( ILam );
+							t( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).Y( ILam );
+							rff( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngFRefleDataPtr ).TableIndex ).Y( ILam );
+							rbb( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngBRefleDataPtr ).TableIndex ).Y( ILam );
+						}
+						SolarSprectrumAverage( t, tmpTrans );
+						SolarSprectrumAverage( rff, tmpReflectSolBeamFront );
+						SolarSprectrumAverage( rbb, tmpReflectSolBeamBack );
+
+						// visible properties
+						VisibleSprectrumAverage( t, tmpTransVis );
+						VisibleSprectrumAverage( rff, tmpReflectVisBeamFront );
+						VisibleSprectrumAverage( rbb, tmpReflectVisBeamBack );
+
+						// set this material to average spectral data
+						Material( LayPtr ).GlassSpectralAndAngle = false;
+						Material( LayPtr ).Trans = tmpTrans;
+						Material( LayPtr ).TransVis = tmpTransVis;
+						Material( LayPtr ).ReflectSolBeamFront = tmpReflectSolBeamFront;
+						Material( LayPtr ).ReflectSolBeamBack = tmpReflectSolBeamBack;
+						Material( LayPtr ).ReflectVisBeamFront = tmpReflectVisBeamFront;
+						Material( LayPtr ).ReflectVisBeamBack = tmpReflectVisBeamBack;
+						SpecDataNum = 0;
+					}
+				}
 			} // End of loop over glass layers in the construction for front calculation
+
+			// Perform do loop to find common incident angles if multiple SpectralAngular layers are specified
+			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
+				LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
+				if ( Material( LayPtr ).GlassSpectralAndAngle ) {
+					AngleNum( IGlass ) = LayerNum( IGlass );
+				}
+			}
+			SetCommonIncidentAngles( ConstrNum, NGlass, TotalIPhi, AngleNum );
+			if ( TotalIPhi > MaxNumOfIncidentAngles ) {
+				ShowSevereError( "WindowManage::InitGlassOpticalCalculations = " + Construct( ConstrNum ).Name + ", Invalid maximum value of common incidet angles = " + TrimSigDigits( TotalIPhi ) + "." );
+				ShowContinueError( "The maximum number of incident angles for each construct is " + TrimSigDigits( MaxNumOfIncidentAngles ) + ". Please rearrange the dataset." );
+				ShowFatalError( "Errors found getting inputs. Previous error(s) cause program termination." );
+			}
+
+			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
+				LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
+				if ( Material( LayPtr ).GlassSpectralAndAngle ) {
+					CosPhiIndepVar = 0.0;
+					for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
+						Phi = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X1Var( IPhi );
+						CosPhiIndepVar( IPhi ) = std::cos( Phi * DegToRadians );
+					}
+					break;
+				}
+			}
 
 			// Loop over incidence angle from 0 to 90 deg in 10 deg increments.
 			// Get glass layer properties, then glazing system properties (which include the
 			// effect of inter-reflection among glass layers) at each incidence angle.
 
-			for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
+				// 10 degree increment for incident angle is only value for a construction without a layer = SpectralAndAngle
 				Phi = double( IPhi - 1 ) * 10.0;
+				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
+					// Override 10 degeee icrement for incident angle for a construction with a layer = SpectralAndAngle
+					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
+					if ( Material( LayPtr ).GlassSpectralAndAngle ) {
+						Phi = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X1Var( IPhi );
+						break;
+					}
+				}
 				CosPhi = std::cos( Phi * DegToRadians );
 				if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
 
 				// For each wavelength, get glass layer properties at this angle of incidence
 				// from properties at normal incidence
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-					for ( ILam = 1; ILam <= numpt( IGlass ); ++ILam ) {
-
-						TransAndReflAtPhi( CosPhi, t( IGlass, ILam ), rff( IGlass, ILam ), rbb( IGlass, ILam ), tPhi( IGlass, ILam ), rfPhi( IGlass, ILam ), rbPhi( IGlass, ILam ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
+					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
+					if ( ! Material( LayPtr ).GlassSpectralAndAngle ) {
+						for ( ILam = 1; ILam <= numpt( IGlass ); ++ILam ) {
+							TransAndReflAtPhi( CosPhi, t( IGlass, ILam ), rff( IGlass, ILam ), rbb( IGlass, ILam ), tPhi( IGlass, ILam ), rfPhi( IGlass, ILam ), rbPhi( IGlass, ILam ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
+						}
+					} else {
+						int NumX2 = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).NumX2Vars;
+						for ( ILam = 1; ILam <= NumX2; ++ILam ) {
+							wlt( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X2( ( IPhi - 1 ) * NumX2 + ILam );
+							tPhi( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).Y( ( IPhi - 1 ) * NumX2 + ILam );
+							rfPhi( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngFRefleDataPtr ).TableIndex ).Y( ( IPhi - 1 ) * NumX2 + ILam );
+							rbPhi( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngBRefleDataPtr ).TableIndex ).Y( ( IPhi - 1 ) * NumX2 + ILam );
+						}
 					}
-
 					// For use with between-glass shade/blind, save angular properties of isolated glass
 					// for case that all glass layers were input with spectral-average properties
 					//  only used by between-glass shades or blinds
@@ -838,14 +945,14 @@ namespace WindowManager {
 			//  only used by between-glass shades or blinds
 			if ( AllGlassIsSpectralAverage ) {
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-					W5LsqFit( CosPhiIndepVar, tBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).tBareSolCoef( _, IGlass ) );
-					W5LsqFit( CosPhiIndepVar, tBareVisPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).tBareVisCoef( _, IGlass ) );
-					W5LsqFit( CosPhiIndepVar, rfBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rfBareSolCoef( _, IGlass ) );
-					W5LsqFit( CosPhiIndepVar, rfBareVisPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rfBareVisCoef( _, IGlass ) );
-					W5LsqFit( CosPhiIndepVar, rbBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rbBareSolCoef( _, IGlass ) );
-					W5LsqFit( CosPhiIndepVar, rbBareVisPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rbBareVisCoef( _, IGlass ) );
-					W5LsqFit( CosPhiIndepVar, afBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).afBareSolCoef( _, IGlass ) );
-					W5LsqFit( CosPhiIndepVar, abBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).abBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, tBareSolPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).tBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, tBareVisPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).tBareVisCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rfBareSolPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).rfBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rfBareVisPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).rfBareVisCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rbBareSolPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).rbBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rbBareVisPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).rbBareVisCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, afBareSolPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).afBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, abBareSolPhi( IGlass, _ ), 6, 1, TotalIPhi, Construct( ConstrNum ).abBareSolCoef( _, IGlass ) );
 				}
 			}
 
@@ -859,7 +966,7 @@ namespace WindowManager {
 			Construct( ConstrNum ).TransDiff = tsolDiff;
 			Construct( ConstrNum ).TransDiffVis = tvisDiff;
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-				solabsPhiLay( {1,10} ) = solabsPhi( IGlass, {1,10} );
+				solabsPhiLay( {1,TotalIPhi } ) = solabsPhi( IGlass, {1,TotalIPhi } );
 				solabsDiff( IGlass ) = DiffuseAverage( solabsPhiLay );
 				Construct( ConstrNum ).AbsDiff( IGlass ) = solabsDiff( IGlass );
 
@@ -867,12 +974,12 @@ namespace WindowManager {
 				// all glass layers were input with spectral-average properties
 				//  only used by between-glass shades or blinds
 				if ( AllGlassIsSpectralAverage ) {
-					Construct( ConstrNum ).tBareSolDiff( IGlass ) = DiffuseAverage( tBareSolPhi( IGlass, {1,10} ) );
-					Construct( ConstrNum ).tBareVisDiff( IGlass ) = DiffuseAverage( tBareVisPhi( IGlass, {1,10} ) );
-					Construct( ConstrNum ).rfBareSolDiff( IGlass ) = DiffuseAverage( rfBareSolPhi( IGlass, {1,10} ) );
-					Construct( ConstrNum ).rfBareVisDiff( IGlass ) = DiffuseAverage( rfBareVisPhi( IGlass, {1,10} ) );
-					Construct( ConstrNum ).rbBareSolDiff( IGlass ) = DiffuseAverage( rbBareSolPhi( IGlass, {1,10} ) );
-					Construct( ConstrNum ).rbBareVisDiff( IGlass ) = DiffuseAverage( rbBareVisPhi( IGlass, {1,10} ) );
+					Construct( ConstrNum ).tBareSolDiff( IGlass ) = DiffuseAverage( tBareSolPhi( IGlass, {1,TotalIPhi } ) );
+					Construct( ConstrNum ).tBareVisDiff( IGlass ) = DiffuseAverage( tBareVisPhi( IGlass, {1,TotalIPhi } ) );
+					Construct( ConstrNum ).rfBareSolDiff( IGlass ) = DiffuseAverage( rfBareSolPhi( IGlass, {1,TotalIPhi } ) );
+					Construct( ConstrNum ).rfBareVisDiff( IGlass ) = DiffuseAverage( rfBareVisPhi( IGlass, {1,TotalIPhi } ) );
+					Construct( ConstrNum ).rbBareSolDiff( IGlass ) = DiffuseAverage( rbBareSolPhi( IGlass, {1,TotalIPhi } ) );
+					Construct( ConstrNum ).rbBareVisDiff( IGlass ) = DiffuseAverage( rbBareVisPhi( IGlass, {1,TotalIPhi } ) );
 					Construct( ConstrNum ).afBareSolDiff( IGlass ) = max( 0.0, 1.0 - ( Construct( ConstrNum ).tBareSolDiff( IGlass ) + Construct( ConstrNum ).rfBareSolDiff( IGlass ) ) );
 					Construct( ConstrNum ).abBareSolDiff( IGlass ) = max( 0.0, 1.0 - ( Construct( ConstrNum ).tBareSolDiff( IGlass ) + Construct( ConstrNum ).rbBareSolDiff( IGlass ) ) );
 				}
@@ -883,6 +990,7 @@ namespace WindowManager {
 			//------------------------------------------------------------------------------------------
 
 			lquasi = false;
+			LayerNum = 0;
 
 			// Loop over glass layers in the construction.
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
@@ -898,6 +1006,7 @@ namespace WindowManager {
 						if ( IGlass == 3 ) LayNum = 1;
 					}
 				}
+				LayerNum( IGlass ) = LayNum;
 				LayPtr = Construct( ConstrNum ).LayerPoint( LayNum );
 
 				SpecDataNum = Material( LayPtr ).GlassSpectralDataPtr;
@@ -920,16 +1029,22 @@ namespace WindowManager {
 					}
 
 				} else { // No spectral data for this layer; use spectral average values
-					lquasi = true;
-					numpt( IGlass ) = 2;
-					t( IGlass, 1 ) = Material( LayPtr ).Trans;
-					if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( IGlass, 1 ) *= Material( LayPtr ).GlassTransDirtFactor;
-					t( IGlass, 2 ) = Material( LayPtr ).TransVis;
-					if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( IGlass, 2 ) *= Material( LayPtr ).GlassTransDirtFactor;
-					rff( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamBack;
-					rbb( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamFront;
-					rff( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamBack;
-					rbb( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamFront;
+					if ( !Material( LayPtr ).GlassSpectralAndAngle ) {
+						lquasi = true;
+						numpt( IGlass ) = 2;
+						t( IGlass, 1 ) = Material( LayPtr ).Trans;
+						if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( IGlass, 1 ) *= Material( LayPtr ).GlassTransDirtFactor;
+						t( IGlass, 2 ) = Material( LayPtr ).TransVis;
+						if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( IGlass, 2 ) *= Material( LayPtr ).GlassTransDirtFactor;
+						rff( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamBack;
+						rbb( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamFront;
+						rff( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamBack;
+						rbb( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamFront;
+					}
+				}
+				if ( Material( LayPtr ).GlassSpectralAndAngle ) {
+					numptDAT = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).NumX2Vars;
+					numpt( IGlass ) = numptDAT;
 				}
 			} // End of loop over glass layers in the construction for back calculation
 
@@ -937,17 +1052,36 @@ namespace WindowManager {
 			// Get bare glass layer properties, then glazing system properties at each incidence angle.
 			// The glazing system properties include the effect of inter-reflection among glass layers,
 			// but exclude the effect of a shade or blind if present in the construction.
-			for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+			// When a construction has a layer = SpectralAndAngle, the 10 degree increment will be overridden.
+			for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
 				Phi = double( IPhi - 1 ) * 10.0;
+				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
+					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
+					if ( Material( LayPtr ).GlassSpecAngTransDataPtr ) {
+						Phi = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X1Var( IPhi );
+						break;
+					}
+				}
 				CosPhi = std::cos( Phi * DegToRadians );
 				if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
 
 				// For each wavelength, get glass layer properties at this angle of incidence
 				// from properties at normal incidence
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-					for ( ILam = 1; ILam <= numpt( IGlass ); ++ILam ) {
+					LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
+					if ( !Material( LayPtr ).GlassSpectralAndAngle ) {
+						for ( ILam = 1; ILam <= numpt( IGlass ); ++ILam ) {
 
-						TransAndReflAtPhi( CosPhi, t( IGlass, ILam ), rff( IGlass, ILam ), rbb( IGlass, ILam ), tPhi( IGlass, ILam ), rfPhi( IGlass, ILam ), rbPhi( IGlass, ILam ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
+							TransAndReflAtPhi( CosPhi, t( IGlass, ILam ), rff( IGlass, ILam ), rbb( IGlass, ILam ), tPhi( IGlass, ILam ), rfPhi( IGlass, ILam ), rbPhi( IGlass, ILam ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
+						}
+					} else {
+						int NumX2 = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).NumX2Vars;
+						for ( ILam = 1; ILam <= NumX2; ++ILam ) {
+							wlt( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X2( ( IPhi - 1 ) * NumX2 + ILam );
+							tPhi( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).Y( ( IPhi - 1 ) * NumX2 + ILam );
+							rfPhi( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngFRefleDataPtr ).TableIndex ).Y( ( IPhi - 1 ) * NumX2 + ILam );
+							rbPhi( IGlass, ILam ) = TableData( PerfCurve( Material( LayPtr ).GlassSpecAngBRefleDataPtr ).TableIndex ).Y( ( IPhi - 1 ) * NumX2 + ILam );
+						}
 					}
 				}
 
@@ -1397,29 +1531,37 @@ namespace WindowManager {
 			// visible transmittance as polynomials in cosine of incidence angle
 
 			if ( ! BlindOn && ! ScreenOn ) { // Bare glass or shade on
-				W5LsqFit( CosPhiIndepVar, tsolPhi, 6, 1, 10, Construct( ConstrNum ).TransSolBeamCoef );
-				W5LsqFit( CosPhiIndepVar, rfsolPhi, 6, 1, 10, Construct( ConstrNum ).ReflSolBeamFrontCoef );
-				W5LsqFit( CosPhiIndepVar, rbsolPhi, 6, 1, 10, Construct( ConstrNum ).ReflSolBeamBackCoef( {1,6} ) );
-				W5LsqFit( CosPhiIndepVar, tvisPhi, 6, 1, 10, Construct( ConstrNum ).TransVisBeamCoef );
+				W5LsqFit( CosPhiIndepVar, tsolPhi, 6, 1, TotalIPhi, Construct( ConstrNum ).TransSolBeamCoef );
+				W5LsqFit( CosPhiIndepVar, rfsolPhi, 6, 1, TotalIPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
+				W5LsqFit( CosPhiIndepVar, rbsolPhi, 6, 1, TotalIPhi, Construct( ConstrNum ).ReflSolBeamBackCoef( {1, 6 } ) );
+				W5LsqFit( CosPhiIndepVar, tvisPhi, 6, 1, TotalIPhi, Construct( ConstrNum ).TransVisBeamCoef );
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					// Front absorptance coefficients for glass layers
-					DepVarCurveFit( {1,10} ) = solabsPhi( IGlass, {1,10} );
-					W5LsqFit( CosPhiIndepVar, DepVarCurveFit, 6, 1, 10, CoeffsCurveFit );
-					Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) = CoeffsCurveFit;
+					DepVarCurveFit( {1,TotalIPhi } ) = solabsPhi( IGlass, {1,TotalIPhi } );
+					W5LsqFit( CosPhiIndepVar, DepVarCurveFit, 6, 1, TotalIPhi, CoeffsCurveFit );
+					Construct( ConstrNum ).AbsBeamCoef( {1,6 }, IGlass ) = CoeffsCurveFit;
 					// Back absorptance coefficients for glass layers
 					IGlassBack = NGlass - IGlass + 1;
-					DepVarCurveFit( {1,10} ) = solabsBackPhi( IGlassBack, {1,10} );
-					W5LsqFit( CosPhiIndepVar, DepVarCurveFit, 6, 1, 10, CoeffsCurveFit );
-					Construct( ConstrNum ).AbsBeamBackCoef( {1,6}, IGlass ) = CoeffsCurveFit;
+					DepVarCurveFit( {1,TotalIPhi } ) = solabsBackPhi( IGlassBack, {1,TotalIPhi } );
+					W5LsqFit( CosPhiIndepVar, DepVarCurveFit, 6, 1, TotalIPhi, CoeffsCurveFit );
+					Construct( ConstrNum ).AbsBeamBackCoef( {1,6 }, IGlass ) = CoeffsCurveFit;
 				}
 
 				// To check goodness of fit //Tuned
 				auto const & solBeamCoef( Construct( ConstrNum ).TransSolBeamCoef );
 				auto const & visBeamCoef( Construct( ConstrNum ).TransVisBeamCoef );
-				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				for ( IPhi = 1; IPhi <= TotalIPhi; ++IPhi ) {
 					tsolPhiFit( IPhi ) = 0.0;
 					tvisPhiFit( IPhi ) = 0.0;
+
 					Phi = double( IPhi - 1 ) * 10.0;
+					for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
+						LayPtr = Construct( ConstrNum ).LayerPoint( LayerNum( IGlass ) );
+						if ( Material( LayPtr ).GlassSpecAngTransDataPtr ) {
+							Phi = TableLookup( PerfCurve( Material( LayPtr ).GlassSpecAngTransDataPtr ).TableIndex ).X1Var( IPhi );
+							break;
+						}
+					}
 					CosPhi = std::cos( Phi * DegToRadians );
 					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
 					Real64 cos_pow( 1.0 );
@@ -1431,7 +1573,7 @@ namespace WindowManager {
 				}
 			}
 
-			if ( ShadeOn ) W5LsqFit( CosPhiIndepVar, solabsShadePhi, 6, 1, 10, Construct( ConstrNum ).AbsBeamShadeCoef );
+			if ( ShadeOn ) W5LsqFit( CosPhiIndepVar, solabsShadePhi, 6, 1, TotalIPhi, Construct( ConstrNum ).AbsBeamShadeCoef );
 
 		} // End of loop over constructions
 
@@ -2156,9 +2298,11 @@ namespace WindowManager {
 		using DataHeatBalSurface::QRadOutReport;
 		using DataHeatBalSurface::QdotRadOutRep;
 		using DataHeatBalSurface::QdotRadOutRepPerArea;
+		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		//unused0909  USE DataEnvironment, ONLY: CurMnDyHr
 		using WindowComplexManager::CalcComplexWindowThermal;
 		using WindowEquivalentLayer::EQLWindowSurfaceHeatBalance;
+		using ScheduleManager::GetCurrentScheduleValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2215,6 +2359,11 @@ namespace WindowManager {
 		Real64 NodeTemp;
 		Real64 CpAir;
 		Real64 RefAirTemp; // reference air temperatures
+
+		int SrdSurfsNum; // Surrounding surfaces list number
+		int SrdSurfNum; // Surrounding surface number DO loop counter
+		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+		Real64 SrdSurfViewFac; // View factor of a surrounding surface
 
 		// New variables for thermochromic windows calc
 		Real64 locTCSpecTemp; // The temperature corresponding to the specified optical properties of the TC layer
@@ -2603,8 +2752,26 @@ namespace WindowManager {
 
 				Outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
-			} else { // Exterior window (ExtBoundCond = 0)
-
+			} else { // Exterior window (Ext BoundCond = 0)
+				// Calculate LWR from surrounding surfaces if defined for an exterior window
+				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				if ( AnyLocalEnvironmentsInModel ) {
+					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+						// Real64 test = surface.ViewFactorSkyIR;
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							surface.ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						}
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							surface.ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+						}					
+						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+							QRadLWOutSrdSurfs( SurfNum ) += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+						}
+					}
+				}
 				if ( surface.ExtWind ) { // Window is exposed to wind (and possibly rain)
 					if ( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
 						tout = surface.OutWetBulbTemp + TKelvin;
@@ -2615,7 +2782,7 @@ namespace WindowManager {
 					tout = surface.OutDryBulbTemp + TKelvin;
 				}
 				Ebout = sigma * pow_4( tout );
-				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout;
+				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
 
 			}
 
@@ -2721,7 +2888,7 @@ namespace WindowManager {
 		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * TimeStepZoneSec;
 
 		Real64 const Tsout_4( pow_4( Tsout ) ); //Tuned To reduce pow calls and redundancies
-		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) ) );
+		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) + QRadLWOutSrdSurfs( SurfNum ) ) );
 		QdotRadOutRep( SurfNum ) = surface.Area * rad_out_per_area;
 		QdotRadOutRepPerArea( SurfNum ) = rad_out_per_area;
 
@@ -7202,6 +7369,7 @@ namespace WindowManager {
 		// InterpBlind ! Blind profile angle interpolation function
 		using WindowComplexManager::CalcComplexWindowThermal;
 		using WindowComplexManager::UpdateComplexWindows;
+		using CurveManager::PerfCurve;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7395,6 +7563,10 @@ namespace WindowManager {
 							if ( Material( Layer ).GlassSpectralDataPtr > 0 ) {
 								OpticalDataType = "Spectral";
 								SpectralDataName = SpectralData( Material( Layer ).GlassSpectralDataPtr ).Name;
+							}
+							if ( Material( Layer ).GlassSpectralAndAngle ) {
+								OpticalDataType = "SpectralAndAngle";
+								SpectralDataName = PerfCurve( Material( Layer ).GlassSpecAngTransDataPtr ).Name + ", " + PerfCurve( Material( Layer ).GlassSpecAngFRefleDataPtr ).Name + ", " + PerfCurve( Material( Layer ).GlassSpecAngBRefleDataPtr ).Name;
 							}
 							gio::write( OutputFileInits, Format_707 ) << Material( Layer ).Name << OpticalDataType << SpectralDataName << RoundSigDigits( Material( Layer ).Thickness, 5 ) << RoundSigDigits( Material( Layer ).Trans, 5 ) << RoundSigDigits( Material( Layer ).ReflectSolBeamFront, 5 ) << RoundSigDigits( Material( Layer ).ReflectSolBeamBack, 5 ) << RoundSigDigits( Material( Layer ).TransVis, 5 ) << RoundSigDigits( Material( Layer ).ReflectVisBeamFront, 5 ) << RoundSigDigits( Material( Layer ).ReflectVisBeamBack, 5 ) << RoundSigDigits( Material( Layer ).TransThermal, 5 ) << RoundSigDigits( Material( Layer ).AbsorpThermalFront, 5 ) << RoundSigDigits( Material( Layer ).AbsorpThermalBack, 5 ) << RoundSigDigits( Material( Layer ).Conductivity, 5 ) << RoundSigDigits( Material( Layer ).GlassTransDirtFactor, 5 ) << SolarDiffusing;
 
@@ -7744,11 +7916,11 @@ namespace WindowManager {
 					//     Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
 					SurfaceScreens( ScreenNum ).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt( Material( MatNum ).Trans );
 
-					if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
+					if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = DoNotModel;
-					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
+					} else if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDirectBeam;
-					} else if ( InputProcessor::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
+					} else if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDiffuse;
 					}
 
@@ -8848,7 +9020,7 @@ Label99999: ;
 
 		// Step 1 - check whether there is custom solar or visible spectrum
 		cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-		NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSiteSpectrum = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// no custom spectrum data, done!
 		if ( NumSiteSpectrum == 0 ) {
@@ -8862,15 +9034,15 @@ Label99999: ;
 			ErrorsFound = true;
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 			// use default spectrum data, done!
-			if ( InputProcessor::SameString( cAlphaArgs( 2 ), "Default" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Default" ) ) {
 				RunMeOnceFlag = true;
 				return;
 			}
@@ -8880,7 +9052,7 @@ Label99999: ;
 			cVisibleSpectrum = cAlphaArgs( 4 );
 
 			cCurrentModuleObject = "Site:SpectrumData";
-			NumSiteSpectrum = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+			NumSiteSpectrum = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteSpectrum == 0 ) { // throw error
 				ShowSevereError( "No " + cCurrentModuleObject + " object is found" );
 				ErrorsFound = true;
@@ -8889,7 +9061,7 @@ Label99999: ;
 			cAlphaArgs.deallocate();
 			rNumericArgs.deallocate();
 
-			InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
 			rNumericArgs.dimension( NumNumbers, 0.0 );
 
@@ -8897,8 +9069,8 @@ Label99999: ;
 			iVisibleSpectrum = 0;
 			for ( Loop = 1; Loop <= NumSiteSpectrum; ++Loop ) {
 				// Step 2 - read user-defined spectrum data
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
-				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
 					iSolarSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * nume ) {
@@ -8917,7 +9089,7 @@ Label99999: ;
 						}
 					}
 				}
-				if ( InputProcessor::SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
 					iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {

@@ -63,7 +63,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -197,7 +197,7 @@ namespace HVACDXHeatPumpSystem {
 
 		// Find the correct DXSystemNumber
 		if ( CompIndex == 0 ) {
-			DXSystemNum = InputProcessor::FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
+			DXSystemNum = UtilityRoutines::FindItemInList( DXHeatPumpSystemName, DXHeatPumpSystem );
 			if ( DXSystemNum == 0 ) {
 				ShowFatalError( "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName );
 			}
@@ -316,12 +316,12 @@ namespace HVACDXHeatPumpSystem {
 		// Flow
 
 		CurrentModuleObject = "CoilSystem:Heating:DX";
-		NumDXHeatPumpSystems = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDXHeatPumpSystems = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		DXHeatPumpSystem.allocate( NumDXHeatPumpSystems );
 		CheckEquipName.dimension( NumDXHeatPumpSystems, true );
 
-		InputProcessor::GetObjectDefMaxArgs( "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -333,8 +333,8 @@ namespace HVACDXHeatPumpSystem {
 		// Get the data for the DX Cooling System
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			DXHeatPumpSystem( DXHeatSysNum ).DXHeatPumpSystemType = CurrentModuleObject; // push Object Name into data array
 			DXHeatPumpSystem( DXHeatSysNum ).Name = Alphas( 1 );
 			if ( lAlphaBlanks( 2 ) ) {
@@ -347,13 +347,13 @@ namespace HVACDXHeatPumpSystem {
 				}
 			}
 
-			if ( InputProcessor::SameString( Alphas( 3 ), "Coil:Heating:DX:SingleSpeed" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 3 ), "Coil:Heating:DX:SingleSpeed" ) ) {
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType = Alphas( 3 );
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType_Num = CoilDX_HeatingEmpirical;
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilName = Alphas( 4 );
-			} else if ( InputProcessor::SameString( Alphas( 3 ), "Coil:Heating:DX:VariableSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 3 ), "Coil:Heating:DX:VariableSpeed" ) ) {
 
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType = Alphas( 3 );
 				DXHeatPumpSystem( DXHeatSysNum ).HeatPumpCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
@@ -558,7 +558,7 @@ namespace HVACDXHeatPumpSystem {
 		using DXCoils::SimDXCoil;
 		using DXCoils::DXCoilOutletTemp;
 		using FaultsManager::FaultsCoilSATSensor;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdpFnWPb;
@@ -681,7 +681,7 @@ namespace HVACDXHeatPumpSystem {
 							Par( 2 ) = DesOutTemp;
 							Par( 3 ) = 1.0; //OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
 							Par( 5 ) = double( FanOpMode );
-							SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par );
+							SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par );
 							if ( SolFla == -1 ) {
 								if ( ! WarmupFlag ) {
 									if ( DXHeatPumpSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {
@@ -796,7 +796,7 @@ namespace HVACDXHeatPumpSystem {
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
 								Par( 3 ) = double( SpeedNum );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par );
 
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
@@ -828,7 +828,7 @@ namespace HVACDXHeatPumpSystem {
 								Par( 1 ) = double( VSCoilIndex );
 								Par( 2 ) = DesOutTemp;
 								Par( 5 ) = double( FanOpMode );
-								SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
+								SolveRoot( Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par );
 								if ( SolFla == -1 ) {
 									if ( ! WarmupFlag ) {
 										if ( DXHeatPumpSystem( DXSystemNum ).DXCoilSensPLRIter < 1 ) {

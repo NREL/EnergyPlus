@@ -53,7 +53,6 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -531,7 +530,7 @@ namespace DataPlant {
 					for ( CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr ) {
 						auto & this_component( this_branch.Comp( CompCtr ) );
 						if ( this_component.TypeOf_Num == CompType ) {
-							if ( InputProcessor::SameString( CompName, this_component.Name ) ) {
+							if ( UtilityRoutines::SameString( CompName, this_component.Name ) ) {
 								FoundCompName = true;
 								if ( present( InletNodeNumber ) ) {
 									if ( InletNodeNumber > 0 ) {
@@ -956,7 +955,7 @@ namespace DataPlant {
 
 		if ( MyPltLoopNum > 0 ) {
 			if ( NumPltSizInput > 0 ) {
-				MyPltSizNum = InputProcessor::FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
+				MyPltSizNum = UtilityRoutines::FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 			}
 			if ( MyPltSizNum == 0 ) {
 				if ( PrintErrorFlag ) {

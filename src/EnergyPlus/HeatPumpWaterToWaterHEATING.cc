@@ -62,7 +62,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -168,7 +168,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
+			GSHPNum = UtilityRoutines::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterHEATING: Unit not found=" + GSHPName );
 			}
@@ -242,7 +242,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		static bool ErrorsFound( false );
 		bool errFlag;
 
-		NumGSHPs = InputProcessor::GetNumObjectsFound( ModuleCompName );
+		NumGSHPs = inputProcessor->getNumObjectsFound( ModuleCompName );
 
 		if ( NumGSHPs <= 0 ) {
 			ShowSevereError( ModuleCompName + ": No Equipment found" );
@@ -255,8 +255,8 @@ namespace HeatPumpWaterToWaterHEATING {
 		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			InputProcessor::GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
+			inputProcessor->getObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 

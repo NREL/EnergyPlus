@@ -78,12 +78,13 @@
 #include <GeneralRoutines.hh>
 #include <HVACSingleDuctInduc.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <OutdoorAirUnit.hh>
 #include <PlantUtilities.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>
+#include <PurchasedAirManager.hh>
 #include <ScheduleManager.hh>
 #include <SolarCollectors.hh>
 #include <SplitterComponent.hh>
@@ -265,7 +266,7 @@ ControlCompOutput(
 	if ( ControlCompTypeNum != 0 ) {
 		SimCompNum = ControlCompTypeNum;
 	} else {
-		SimCompNum = InputProcessor::FindItemInSortedList( CompType, ListOfComponents, NumComponents );
+		SimCompNum = UtilityRoutines::FindItemInSortedList( CompType, ListOfComponents, NumComponents );
 		ControlCompTypeNum = SimCompNum;
 	}
 
@@ -857,7 +858,7 @@ ValidateComponent(
 
 	IsNotOK = false;
 
-	ItemNum = InputProcessor::GetObjectItemNum( CompType, CompName );
+	ItemNum = inputProcessor->getObjectItemNum( CompType, CompName );
 
 	if ( ItemNum < 0 ) {
 		ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
@@ -905,7 +906,7 @@ ValidateComponent(
 
 		IsNotOK = false;
 
-		ItemNum = InputProcessor::GetObjectItemNum( CompType, CompValType, CompName );
+		ItemNum = inputProcessor->getObjectItemNum( CompType, CompValType, CompName );
 
 		if ( ItemNum < 0 ) {
 			ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
@@ -1559,7 +1560,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Supply Air Path Component," + ChrOut + ',' + SupplyAirPath( BCount ).ComponentType( Count ) + ',' + SupplyAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:SUPPLYPLENUM" ) {
 				for ( Count2 = 1; Count2 <= NumZoneSupplyPlenums; ++Count2 ) {
@@ -1628,12 +1629,12 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 
 	if ( NumSplitters == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
 			GetZoneSplitterInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}
@@ -1760,6 +1761,7 @@ TestReturnAirPathIntegrity(
 	using MixerComponent::NumMixers;
 	auto & GetZoneMixerInput( MixerComponent::GetMixerInput );
 	using PoweredInductionUnits::PIUnitHasMixer;
+	using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
 	using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1843,7 +1845,7 @@ TestReturnAirPathIntegrity(
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Return Air Path Component," + ChrOut + ',' + ReturnAirPath( BCount ).ComponentType( Count ) + ',' + ReturnAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			if ( InputProcessor::SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
+			if ( UtilityRoutines::SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
 				HasMixer = true;
 				MixerComp = Count;
 				++MixerCount;
@@ -1863,7 +1865,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 0 ) {
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 				for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {
@@ -1927,7 +1929,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 1 ) {
 			for ( Count3 = 1; Count3 <= NumComp - 1; ++Count3 ) {
-				{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
 
 				if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 					for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {
@@ -1977,7 +1979,22 @@ TestReturnAirPathIntegrity(
 					WAirLoop = Count2;
 					ValRetAPaths( _, WAirLoop ) = 0;
 					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
-					break;
+					for ( int RetPathNode = 1; RetPathNode <= CountNodes; ++RetPathNode ){
+						bool RetNodeFound = false;
+						for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+							for ( int ZoneOutNum = 1; ZoneOutNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++ZoneOutNum ) {
+								if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNode( ZoneOutNum ) == AllNodes( RetPathNode ) ) {
+									ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( ZoneOutNum ) = WAirLoop;
+									RetNodeFound = true;
+									break; // leave zone return node loop
+								}
+							if ( RetNodeFound ) break; // leave controlled zone loop
+							}
+						}
+
+					}
+					break; // leave air loops loop
 				}
 			} else {
 				ShowWarningError( "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo( Count2 ).AirLoopName );
@@ -1989,12 +2006,12 @@ TestReturnAirPathIntegrity(
 	AllNodes.deallocate();
 
 	if ( NumMixers == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
 			GetZoneMixerInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( InputProcessor::GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}
@@ -2018,6 +2035,7 @@ TestReturnAirPathIntegrity(
 				}
 			}
 		}
+		if ( CheckPurchasedAirForReturnPlenum( Count1 ) ) FoundReturnPlenum( Count1 ) = true;
 	}
 	FoundNames.deallocate();
 	FoundNames.allocate( NumMixers );

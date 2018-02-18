@@ -56,7 +56,6 @@
 #include <DataEnvironment.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -673,6 +672,8 @@ namespace DataHeatBalance {
 	Array1D< ZoneMassConservationData > MassConservation;
 	ZoneAirMassFlowConservation ZoneAirMassFlow;
 
+	Array1D< ZoneLocalEnvironmentData > ZoneLocalEnvironment;
+
 	// Functions
 
 	// Clears the global data in DataHeatBalance.
@@ -928,6 +929,7 @@ namespace DataHeatBalance {
 		VentilationObjects.deallocate();
 		ZnRpt.deallocate();
 		MassConservation.deallocate();
+		ZoneLocalEnvironment.deallocate();
 		ZoneAirMassFlow = ZoneAirMassFlowConservation();
 	}
 
@@ -998,6 +1000,12 @@ namespace DataHeatBalance {
 	}
 
 	void
+	ZoneData::SetWindDirAt( Real64 const fac )
+	{
+		WindDir = fac;
+	}
+
+	void
 	SetZoneOutBulbTempAt()
 	{
 		for ( auto & zone : Zone ) {
@@ -1029,6 +1037,17 @@ namespace DataHeatBalance {
 		Real64 const fac( DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
 		for ( auto & zone : Zone ) {
 			zone.SetWindSpeedAt( fac );
+		}
+	}
+
+
+	void
+	SetZoneWindDirAt()
+	{
+		// Using/Aliasing
+		Real64 const fac( DataEnvironment::WindDir );
+		for ( auto & zone : Zone ) {
+			zone.SetWindDirAt( fac );
 		}
 	}
 
@@ -1598,7 +1617,7 @@ namespace DataHeatBalance {
 
 		// maybe it's already there
 		errFlag = false;
-		Found = InputProcessor::FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
+		Found = UtilityRoutines::FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
 		if ( Found == 0 ) {
 			// Add a new blind
 			Blind.redimension( ++TotBlinds );

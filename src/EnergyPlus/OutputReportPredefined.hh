@@ -644,8 +644,12 @@ namespace OutputReportPredefined {
 	extern int pdchLeedPerfElDem;
 	extern int pdchLeedPerfGasEneUse;
 	extern int pdchLeedPerfGasDem;
-	extern int pdchLeedPerfOthEneUse;
-	extern int pdchLeedPerfOthDem;
+	extern int pdchLeedPerfAddFuelEneUse;
+	extern int pdchLeedPerfAddFuelDem;
+	extern int pdchLeedPerfDisClEneUse;
+	extern int pdchLeedPerfDisClDem;
+	extern int pdchLeedPerfDisHtEneUse;
+	extern int pdchLeedPerfDisHtDem;
 
 	extern int pdstLeedEneUseSum;
 	extern int pdchLeedEusUnt;
@@ -673,6 +677,18 @@ namespace OutputReportPredefined {
 
 	extern int pdstLeedEneUsePerc;
 	extern int pdchLeedEupPerc;
+
+	extern int pdstLeedEqFlLdHrs;
+	extern int pdchLeedEflhEflh;
+	extern int pdchLeedEflhNonZerHrs;
+
+	extern int pdstLeedSchedSetPts;
+	extern int pdChLeedSchStPtFirstObjUsed;
+	extern int pdChLeedSchStPtMonthUsed;
+	extern int pdchLeedSchStPt11amWednesday;
+	extern int pdchLeedSchStPt11amWedCnt;
+	extern int pdchLeedSchStPt11pmWednesday;
+	extern int pdchLeedSchStPt11pmWedCnt;
 
 	// Internal data structures to store information provided by calls
 

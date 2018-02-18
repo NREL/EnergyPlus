@@ -69,7 +69,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -203,7 +203,7 @@ namespace CoolingPanelSimple {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			CoolingPanelNum = InputProcessor::FindItemInList( EquipName, CoolingPanel, &CoolingPanelParams::EquipID, NumCoolingPanels );
+			CoolingPanelNum = UtilityRoutines::FindItemInList( EquipName, CoolingPanel, &CoolingPanelParams::EquipID, NumCoolingPanels );
 			if ( CoolingPanelNum == 0 ) {
 				ShowFatalError( "SimCoolingPanelSimple: Unit not found=" + EquipName );
 			}
@@ -319,7 +319,7 @@ namespace CoolingPanelSimple {
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
 
-		NumCoolingPanels = InputProcessor::GetNumObjectsFound( cCMO_CoolingPanel_Simple );
+		NumCoolingPanels = inputProcessor->getNumObjectsFound( cCMO_CoolingPanel_Simple );
 
 		// Count total number of baseboard units
 
@@ -331,8 +331,8 @@ namespace CoolingPanelSimple {
 		// Get the data from the user input related to cooling panels
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 
-			InputProcessor::GetObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			inputProcessor->getObjectItem( cCMO_CoolingPanel_Simple, CoolingPanelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
 			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames.allocate( NumNumbers );
 			CoolingPanelSysNumericFields( CoolingPanelNum ).FieldNames = "";
@@ -389,7 +389,7 @@ namespace CoolingPanelSimple {
 				CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = WaterMassFlowDefault;
 			}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 5 ), "CoolingDesignCapacity" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "CoolingDesignCapacity" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
 				if ( ! lNumericFieldBlanks( 4 ) ) {
 					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 4 );
@@ -406,7 +406,7 @@ namespace CoolingPanelSimple {
 						ErrorsFound = true;
 					}
 				}
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "CapacityPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "CapacityPerFloorArea" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::CapacityPerFloorArea;
 				if ( ! lNumericFieldBlanks( 5 ) ) {
 					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 5 );
@@ -427,7 +427,7 @@ namespace CoolingPanelSimple {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( 5 ) );
 					ErrorsFound = true;
 				}
-			} else if (InputProcessor::SameString( cAlphaArgs( 5 ), "FractionOfAutosizedCoolingCapacity" ) ) {
+			} else if (UtilityRoutines::SameString( cAlphaArgs( 5 ), "FractionOfAutosizedCoolingCapacity" ) ) {
 				CoolingPanel( CoolingPanelNum ).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
 				if ( ! lNumericFieldBlanks( 6 ) ) {
 					CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = rNumericArgs( 6 );
@@ -460,19 +460,19 @@ namespace CoolingPanelSimple {
 			}
 
 			// Process the temperature control type
-			if ( InputProcessor::SameString( cAlphaArgs( 6 ), MeanAirTemperature ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), MeanAirTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = MATControl;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), MeanRadiantTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), MeanRadiantTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = MRTControl;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), OperativeTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), OperativeTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = OperativeControl;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), OutsideAirDryBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), OutsideAirDryBulbTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ODBControl;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), OutsideAirWetBulbTemperature ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = OWBControl;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), ZoneTotalLoad ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), ZoneTotalLoad ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ZoneTotalLoadControl;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 6 ), ZoneConvectiveLoad ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), ZoneConvectiveLoad ) ) {
 				CoolingPanel( CoolingPanelNum ).ControlType = ZoneConvectiveLoadControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFieldNames( 6 ) + " =" + cAlphaArgs( 6 ) );
@@ -496,11 +496,11 @@ namespace CoolingPanelSimple {
 				ErrorsFound = true;
 			}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 8 ), Off ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), Off ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlNone;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), SimpleOff ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), SimpleOff ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlSimpleOff;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 8 ), VariableOff ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), VariableOff ) ) {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlVariedOff;
 			} else {
 				CoolingPanel( CoolingPanelNum ).CondCtrlType = CondCtrlSimpleOff;
@@ -560,7 +560,7 @@ namespace CoolingPanelSimple {
 			AllFracsSummed = CoolingPanel( CoolingPanelNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= CoolingPanel( CoolingPanelNum ).TotSurfToDistrib; ++SurfNum ) {
 				CoolingPanel( CoolingPanelNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 8 );
-				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = InputProcessor::FindItemInList( cAlphaArgs( SurfNum + 8 ), Surface );
+				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( SurfNum + 8 ), Surface );
 				CoolingPanel( CoolingPanelNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 11 );
 				if ( CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 8 ) + "=\"" + cAlphaArgs( SurfNum + 8 ) + "\" invalid - not found." );
@@ -990,31 +990,78 @@ namespace CoolingPanelSimple {
 
 		RegisterPlantCompDesignFlow( CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterVolFlowRateMax );
 
+		bool SizeCoolingPanelUASuccess;
+		SizeCoolingPanelUASuccess = SizeCoolingPanelUA( CoolingPanelNum );
+		if ( ! SizeCoolingPanelUASuccess ) ShowFatalError( "SizeCoolingPanelUA: Program terminated for previous conditions." );
+
+	}
+
+	bool
+	SizeCoolingPanelUA(
+		int const CoolingPanelNum
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   June 2017
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sizes UA value for the simple chilled ceiling panel.
+
+		// Return value
+		bool SizeCoolingPanelUA;
+
 		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
+		Real64 Cp;
 		Real64 MDot;
 		Real64 MDotXCp;
 		Real64 Qrated;
 		Real64 Tinletr;
 		Real64 Tzoner;
+		Real64 RatCapToTheoMax; // Ratio of unit capacity to theoretical maximum output based on rated parameters
+
+		SizeCoolingPanelUA = true;
 		Cp = 4120.0; // Just an approximation, don't need to get an exact number
 		MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
 		MDotXCp = Cp * MDot;
 		Qrated = CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity;
 		Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
 		Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+		if ( std::abs( Tinletr - Tzoner ) < 0.5 ) {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * 0.5 ); // Avoid a divide by zero error
+		} else {
+			RatCapToTheoMax = std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) );
+		}
+		if ( ( RatCapToTheoMax < 1.1 ) && ( RatCapToTheoMax > 0.9999 ) ) {
+			// close to unity with some graciousness given in case the approximation of Cp causes a problem
+			RatCapToTheoMax = 0.9999;
+		} else if (RatCapToTheoMax >= 1.1 ) {
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a cooling capacity that is greater than the maximum possible value." );
+			ShowContinueError( "The result of this is that a UA value is impossible to calculate." );
+			ShowContinueError( "Check the rated input for temperatures, flow, and capacity for this unit." );
+			ShowContinueError( "The ratio of the capacity to the rated theoretical maximum must be less than unity." );
+			ShowContinueError( "The most likely cause for this is probably either the capacity (whether autosized or hardwired) being too high, the rated flow being too low, rated temperatures being too close to each other, or all of those reasons." );
+			ShowContinueError( "Compare the rated capacity in your input to the product of the rated mass flow rate, Cp of water, and the difference between the rated temperatures." );
+			ShowContinueError( "If the rated capacity is higher than this product, then the cooling panel would violate the Second Law of Thermodynamics." );
+			SizeCoolingPanelUA = false;
+			CoolingPanel( CoolingPanelNum ).UA = 1.0;
+		}
 		if ( Tinletr >= Tzoner ) {
-			ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+			ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
 			ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-			ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+			SizeCoolingPanelUA = false;
 			CoolingPanel( CoolingPanelNum ).UA = 1.0;
 		} else {
-			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
+			CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - RatCapToTheoMax );
 			if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-				ShowSevereError( "SizeCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+				ShowSevereError( "SizeCoolingPanelUA: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
 				ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-				ShowFatalError( "SizeCoolingPanel: Program terminated for previous conditions." );
+				SizeCoolingPanelUA = false;
 			}
 		}
+
+		return SizeCoolingPanelUA;
 
 	}
 

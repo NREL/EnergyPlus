@@ -59,7 +59,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataWater.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -233,7 +233,7 @@ namespace CoolTower {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// Initializations and allocations
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -241,15 +241,15 @@ namespace CoolTower {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 
-		NumCoolTowers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumCoolTowers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		CoolTowerSys.allocate( NumCoolTowers );
 
 		// Obtain inputs
 		for ( CoolTowerNum = 1; CoolTowerNum <= NumCoolTowers; ++CoolTowerNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, CoolTowerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
+			inputProcessor->getObjectItem( CurrentModuleObject, CoolTowerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound );
 			CoolTowerSys( CoolTowerNum ).Name = cAlphaArgs( 1 ); // Name of cooltower
 			CoolTowerSys( CoolTowerNum ).Schedule = cAlphaArgs( 2 ); // Get schedule
 			if ( lAlphaBlanks( 2 ) ) {
@@ -264,7 +264,7 @@ namespace CoolTower {
 			}
 
 			CoolTowerSys( CoolTowerNum ).ZoneName = cAlphaArgs( 3 ); // Name of zone where cooltower is serving
-			CoolTowerSys( CoolTowerNum ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Zone );
+			CoolTowerSys( CoolTowerNum ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( CoolTowerSys( CoolTowerNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );

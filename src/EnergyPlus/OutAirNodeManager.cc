@@ -54,8 +54,9 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <ScheduleManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
 
@@ -180,6 +181,7 @@ namespace OutAirNodeManager {
 
 		// Using/Aliasing
 		using namespace NodeInputManager;
+		using ScheduleManager::GetScheduleIndex;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -217,8 +219,8 @@ namespace OutAirNodeManager {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 
-		NumOutAirInletNodeLists = InputProcessor::GetNumObjectsFound( "OutdoorAir:NodeList" );
-		NumOutsideAirNodeSingles = InputProcessor::GetNumObjectsFound( "OutdoorAir:Node" );
+		NumOutAirInletNodeLists = inputProcessor->getNumObjectsFound( "OutdoorAir:NodeList" );
+		NumOutsideAirNodeSingles = inputProcessor->getNumObjectsFound( "OutdoorAir:Node" );
 		NumOutsideAirNodes = 0;
 		ErrorsFound = false;
 		NextFluidStreamNum = 1;
@@ -227,13 +229,13 @@ namespace OutAirNodeManager {
 		CurSize = 100;
 		TmpNums.dimension( CurSize, 0 );
 
-		InputProcessor::GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 		NodeNums.dimension( NumParams, 0 );
 
-		InputProcessor::GetObjectDefMaxArgs( "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -248,7 +250,7 @@ namespace OutAirNodeManager {
 			// Loop over all outside air inlet nodes in the input and count them
 			CurrentModuleObject = "OutdoorAir:NodeList";
 			for ( OutAirInletNodeListNum = 1; OutAirInletNodeListNum <= NumOutAirInletNodeLists; ++OutAirInletNodeListNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, OutAirInletNodeListNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, OutAirInletNodeListNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				for ( AlphaNum = 1; AlphaNum <= NumAlphas; ++AlphaNum ) {
 					ErrInList = false;
@@ -283,7 +285,7 @@ namespace OutAirNodeManager {
 			// Loop over all single outside air nodes in the input
 			CurrentModuleObject = "OutdoorAir:Node";
 			for ( OutsideAirNodeSingleNum = 1; OutsideAirNodeSingleNum <= NumOutsideAirNodeSingles; ++OutsideAirNodeSingleNum ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, OutsideAirNodeSingleNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, OutsideAirNodeSingleNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				ErrInList = false;
 				//  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
@@ -303,6 +305,8 @@ namespace OutAirNodeManager {
 					continue;
 				}
 
+				
+
 				if ( ! any_eq( TmpNums, NodeNums( 1 ) ) ) {
 					++ListSize;
 					if ( ListSize > CurSize ) {
@@ -319,8 +323,29 @@ namespace OutAirNodeManager {
 				// Set additional node properties
 				if ( NumNums > 0 ) Node( NodeNums( 1 ) ).Height = Numbers( 1 );
 
-			}
+				if ( NumAlphas > 1 ) {
+					Node( NodeNums( 1 ) ).OutAirDryBulbSchedNum = GetScheduleIndex( Alphas( 2 ) );
+				}
 
+				if ( NumAlphas > 2 ) {
+					Node( NodeNums( 1 ) ).OutAirWetBulbSchedNum = GetScheduleIndex( Alphas( 3 ) );
+				}
+
+				if ( NumAlphas > 3 ) {
+					Node( NodeNums( 1 ) ).OutAirWindSpeedSchedNum = GetScheduleIndex( Alphas( 4 ) );
+				}
+
+				if ( NumAlphas > 4 ) {
+					Node( NodeNums( 1 ) ).OutAirWindDirSchedNum = GetScheduleIndex( Alphas( 5 ) );
+				}
+
+				if ( NumAlphas > 5 ) {
+					ShowSevereError( CurrentModuleObject + ", " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+					ShowContinueError( "Object Definition indicates more that 5 Alpha Objects." );
+					ErrorsFound = true;
+					continue;
+				}
+			}
 			if ( ErrorsFound ) {
 				ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input." );
 			}
@@ -354,7 +379,7 @@ namespace OutAirNodeManager {
 		// Using/Aliasing
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdbTwbPb;
-
+		using ScheduleManager::GetCurrentScheduleValue;
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -372,6 +397,7 @@ namespace OutAirNodeManager {
 		// Do the begin time step initialization
 		for ( OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum ) {
 			NodeNum = OutsideAirNodeList( OutsideAirNodeNum );
+			// Set node data to global values
 			if ( Node( NodeNum ).Height < 0.0 ) {
 				// Note -- this setting is different than the DataEnvironment "AT" settings.
 				Node( NodeNum ).OutAirDryBulb = OutDryBulbTemp;
@@ -380,19 +406,37 @@ namespace OutAirNodeManager {
 				Node( NodeNum ).OutAirDryBulb = OutDryBulbTempAt( Node( NodeNum ).Height );
 				Node( NodeNum ).OutAirWetBulb = OutWetBulbTempAt( Node( NodeNum ).Height );
 			}
+			Node( NodeNum ).OutAirWindSpeed = WindSpeed;
+			Node( NodeNum ).OutAirWindDir = WindDir;
 
-			if ( Node( NodeNum ).EMSOverrideOutAirDryBulb ) Node( NodeNum ).OutAirDryBulb = Node( NodeNum ).EMSValueForOutAirDryBulb;
-
-			if ( Node( NodeNum ).EMSOverrideOutAirWetBulb ) {
-				Node( NodeNum ).OutAirWetBulb = Node( NodeNum ).EMSValueForOutAirWetBulb;
-				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );
-				Node( NodeNum ).Enthalpy = PsyHFnTdbW( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).HumRat );
-			} else {
-				Node( NodeNum ).HumRat = OutHumRat;
-				Node( NodeNum ).Enthalpy = PsyHFnTdbW( Node( NodeNum ).OutAirDryBulb, OutHumRat );
+			// Set node data to local air node values if defined
+			if ( Node( NodeNum ).OutAirDryBulbSchedNum != 0 ) {
+				Node( NodeNum ).OutAirDryBulb = GetCurrentScheduleValue( Node( NodeNum ).OutAirDryBulbSchedNum );
+			}
+			if ( Node( NodeNum ).OutAirWetBulbSchedNum != 0 ) {
+				Node( NodeNum ).OutAirWetBulb = GetCurrentScheduleValue( Node( NodeNum ).OutAirWetBulbSchedNum );
+			}
+			if ( Node( NodeNum ).OutAirWindSpeedSchedNum != 0 ) {
+				Node( NodeNum ).OutAirWindSpeed = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindSpeedSchedNum );
+			}
+			if ( Node( NodeNum ).OutAirWindDirSchedNum != 0 ) {
+				Node( NodeNum ).OutAirWindDir = GetCurrentScheduleValue( Node( NodeNum ).OutAirWindDirSchedNum );
 			}
 
+			// Set node data to EMS overwritten values if defined
+			if ( Node( NodeNum ).EMSOverrideOutAirDryBulb ) Node( NodeNum ).OutAirDryBulb = Node( NodeNum ).EMSValueForOutAirDryBulb;
+			if ( Node( NodeNum ).EMSOverrideOutAirWetBulb ) Node( NodeNum ).OutAirWetBulb = Node( NodeNum ).EMSValueForOutAirWetBulb;
+			if ( Node( NodeNum ).EMSOverrideOutAirWindSpeed ) Node( NodeNum ).OutAirWindSpeed = Node( NodeNum ).EMSValueForOutAirWindSpeed;
+			if ( Node( NodeNum ).EMSOverrideOutAirWindDir ) Node( NodeNum ).OutAirWindDir = Node( NodeNum ).EMSValueForOutAirWindDir;
+
 			Node( NodeNum ).Temp = Node( NodeNum ).OutAirDryBulb;
+			if ( Node( NodeNum ).OutAirDryBulbSchedNum != 0 || Node( NodeNum ).OutAirWetBulbSchedNum != 0 ) {
+				Node( NodeNum ).HumRat = PsyWFnTdbTwbPb( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).OutAirWetBulb, OutBaroPress );				
+			}
+			else {
+				Node(NodeNum).HumRat = OutHumRat;
+			}
+			Node( NodeNum ).Enthalpy = PsyHFnTdbW( Node( NodeNum ).OutAirDryBulb, Node( NodeNum ).HumRat );
 			Node( NodeNum ).Press = OutBaroPress;
 			Node( NodeNum ).Quality = 0.0;
 			// Add contaminants
@@ -535,9 +579,17 @@ namespace OutAirNodeManager {
 					Node( NodeNumber ).OutAirDryBulb = OutDryBulbTempAt( Node( NodeNumber ).Height );
 					Node( NodeNumber ).OutAirWetBulb = OutWetBulbTempAt( Node( NodeNumber ).Height );
 				}
+				Node( NodeNumber ).OutAirWindSpeed = WindSpeed;
+				Node( NodeNumber ).OutAirWindDir = WindDir;
+
 				Node( NodeNumber ).Temp = Node( NodeNumber ).OutAirDryBulb;
-				Node( NodeNumber ).HumRat = OutHumRat;
-				Node( NodeNumber ).Enthalpy = PsyHFnTdbW( Node( NodeNumber ).Temp, OutHumRat );
+				if ( Node( NodeNumber ).OutAirDryBulbSchedNum != 0  || Node( NodeNumber ).OutAirWetBulbSchedNum != 0 ) {
+					Node( NodeNumber ).HumRat = PsyHFnTdbW( Node( NodeNumber ).OutAirDryBulb, Node( NodeNumber ).OutAirWetBulb );
+				}
+				else {
+					Node( NodeNumber ).HumRat = OutHumRat;
+				}
+				Node( NodeNumber ).Enthalpy = PsyHFnTdbW( Node( NodeNumber ).OutAirDryBulb, Node( NodeNumber ).HumRat );
 				Node( NodeNumber ).Press = OutBaroPress;
 				Node( NodeNumber ).Quality = 0.0;
 				// Add contaminants

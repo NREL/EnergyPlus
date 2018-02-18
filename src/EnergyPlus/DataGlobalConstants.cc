@@ -49,7 +49,7 @@
 // EnergyPlus Headers
 #include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
-#include <InputProcessor.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -300,7 +300,7 @@ namespace DataGlobalConstants {
 
 		ResourceTypeNum = 0;
 
-		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( ResourceTypeChar ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ResourceTypeChar ) );
 
 		if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) ) {
 			ResourceTypeNum = iRT_Electricity;

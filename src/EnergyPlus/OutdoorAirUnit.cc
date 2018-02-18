@@ -79,7 +79,7 @@
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HVACUnitarySystem.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -256,7 +256,7 @@ namespace OutdoorAirUnit {
 		// Find the correct Outdoor Air Unit
 
 		if ( CompIndex == 0 ) {
-			OAUnitNum = InputProcessor::FindItemInList( CompName, OutAirUnit );
+			OAUnitNum = UtilityRoutines::FindItemInList( CompName, OutAirUnit );
 			if ( OAUnitNum == 0 ) {
 				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
@@ -386,10 +386,10 @@ namespace OutdoorAirUnit {
 
 		if ( ! GetOutdoorAirUnitInputFlag ) return;
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -402,7 +402,7 @@ namespace OutdoorAirUnit {
 		cAlphaArgs.allocate( NumAlphas );
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
-		NumOfOAUnits = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfOAUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
 		SupplyFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
@@ -413,8 +413,8 @@ namespace OutdoorAirUnit {
 
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(cAlphaArgs(1),CurrentModuleObject,ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs(1),CurrentModuleObject,ErrorsFound);
 
 			//A1
 			OutAirUnit( OAUnitNum ).Name = cAlphaArgs( 1 );
@@ -433,7 +433,7 @@ namespace OutdoorAirUnit {
 
 			//A3
 			OutAirUnit( OAUnitNum ).ZoneName = cAlphaArgs( 3 );
-			OutAirUnit( OAUnitNum ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), Zone );
+			OutAirUnit( OAUnitNum ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 
 			if ( OutAirUnit( OAUnitNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
@@ -479,8 +479,8 @@ namespace OutdoorAirUnit {
 				}
 			}
 			//A6 :Fan Place
-			if ( InputProcessor::SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
-			if ( InputProcessor::SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = DrawThru;
 			if ( OutAirUnit( OAUnitNum ).FanPlace == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFields( 6 ) + " = " + cAlphaArgs( 6 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -604,9 +604,9 @@ namespace OutdoorAirUnit {
 			ComponentListName = cAlphaArgs( 16 );
 			OutAirUnit( OAUnitNum ).ComponentListName = ComponentListName;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				ListNum = InputProcessor::GetObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
+				ListNum = inputProcessor->getObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
 				if ( ListNum > 0 ) {
-					InputProcessor::GetObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					inputProcessor->getObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2; // potential problem if puts in type but not name
 					if ( mod( NumAlphas - 1, 2 ) != 0 ) ++NumInList;
 					OutAirUnit( OAUnitNum ).NumComponents = NumInList;
@@ -617,7 +617,7 @@ namespace OutdoorAirUnit {
 						OutAirUnit( OAUnitNum ).OAEquip( InListNum ).ComponentName = AlphArray( InListNum * 2 + 1 );
 						OutAirUnit( OAUnitNum ).OAEquip( InListNum ).ComponentType = AlphArray( InListNum * 2 );
 						CompNum = InListNum;
-						{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) );
+						{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) );
 						// Coil Types
 						if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_Cooling;
@@ -1232,8 +1232,8 @@ namespace OutdoorAirUnit {
 		if( OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize ) {
 			if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, true, OutAirUnit( OAUnitNum ).SFan_Index, _, false, false );
-				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );			
-			
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );
+
 			} else {
 				HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,_,_,_);
 				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
@@ -1416,7 +1416,7 @@ namespace OutdoorAirUnit {
 				} else {
 					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn,ZoneCompTurnFansOff,_);
 				}
-				
+
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 					if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {

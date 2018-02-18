@@ -106,7 +106,7 @@ namespace DataStringGlobals {
 	extern std::string outputTblXmlFileName;
 	extern std::string inputFileName;
 	extern std::string inputIddFileName;
-	extern std::string inputJddFileName;
+	extern std::string inputEpJSONSchemaFileName;
 	extern std::string inputWeatherFileName;
 	extern std::string outputAdsFileName;
 	extern std::string outputDfsFileName;
@@ -139,6 +139,7 @@ namespace DataStringGlobals {
 	extern std::string outputCsvFileName;
 	extern std::string outputMtrCsvFileName;
 	extern std::string outputRvauditFileName;
+	extern std::string outputExtShdFracFileName;
 
 	extern std::string weatherFileNameOnly;
 	extern std::string idfDirPathName;

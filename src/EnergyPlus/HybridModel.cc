@@ -55,7 +55,7 @@
 #include <DataRoomAirModel.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -122,22 +122,22 @@ namespace HybridModel {
 
 		// Read hybrid model input
 		CurrentModuleObject = "HybridModel:Zone";
-		NumOfHybridModelZones = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOfHybridModelZones = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		HybridModelZone.allocate( NumOfZones );
 
 		if ( NumOfHybridModelZones > 0 ) {
 
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				ZoneListPtr = 0;
-				ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
-				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), ZoneList );
+				ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
+				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 				if ( ZonePtr > 0 ) {
 					HybridModelZone( ZonePtr ).Name = cAlphaArgs( 1 );
-					HybridModelZone( ZonePtr ).InternalThermalMassCalc = InputProcessor::SameString( cAlphaArgs( 3 ), "Yes" );
-					HybridModelZone( ZonePtr ).InfiltrationCalc = InputProcessor::SameString( cAlphaArgs( 4 ), "Yes" );
+					HybridModelZone( ZonePtr ).InternalThermalMassCalc = UtilityRoutines::SameString( cAlphaArgs( 3 ), "Yes" );
+					HybridModelZone( ZonePtr ).InfiltrationCalc = UtilityRoutines::SameString( cAlphaArgs( 4 ), "Yes" );
 
 					// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
 					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc && HybridModelZone( ZonePtr ).InfiltrationCalc ){

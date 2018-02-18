@@ -67,7 +67,7 @@
 #include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <PlantUtilities.hh>
@@ -340,7 +340,7 @@ namespace HVACControllers {
 		}
 
 		if ( ControllerIndex == 0 ) {
-			ControlNum = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+			ControlNum = UtilityRoutines::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 			if ( ControlNum == 0 ) {
 				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 			}
@@ -579,7 +579,7 @@ namespace HVACControllers {
 		// be retrieved by name as they are needed.
 
 		CurrentModuleObject = "Controller:WaterCoil";
-		NumSimpleControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumSimpleControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumControllers = NumSimpleControllers;
 
 		// Allocate stats data structure for each air loop and controller if needed
@@ -602,7 +602,7 @@ namespace HVACControllers {
 		RootFinders.allocate( NumControllers );
 		CheckEquipName.dimension( NumControllers, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNums );
@@ -613,8 +613,8 @@ namespace HVACControllers {
 		// Now find and load all of the simple controllers.
 		if ( NumSimpleControllers > 0 ) {
 			for ( Num = 1; Num <= NumSimpleControllers; ++Num ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 				ControllerProps( Num ).ControllerName = AlphArray( 1 );
 				ControllerProps( Num ).ControllerType = CurrentModuleObject;
@@ -632,9 +632,9 @@ namespace HVACControllers {
 					ShowSevereError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio." );
 					ErrorsFound = true;
 				}}
-				if ( InputProcessor::SameString( AlphArray( 3 ), "Normal" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 3 ), "Normal" ) ) {
 					ControllerProps( Num ).Action = iNormalAction;
-				} else if ( InputProcessor::SameString( AlphArray( 3 ), "Reverse" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphArray( 3 ), "Reverse" ) ) {
 					ControllerProps( Num ).Action = iReverseAction;
 				} else if ( lAlphaBlanks( 3 ) ) {
 					ControllerProps( Num ).Action = 0;
@@ -895,7 +895,7 @@ namespace HVACControllers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   July 1998
-		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC), 
+		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC),
 		//       MODIFIED       Feb. 2006, Dimitri Curtil (LBNL), Moved first call convergence test code to ResetController()
 		//                      Jul. 2016, R. Zhang (LBNL), Applied the water coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
@@ -1162,7 +1162,7 @@ namespace HVACControllers {
 			if ( ! ControllerProps( ControlNum ).IsSetPointDefinedFlag ) {
 				ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint;
 				ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
-				
+
 				//If there is a fault of water coil SAT sensor (zrp_Jul2016)
 				if( ControllerProps( ControlNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 					//calculate the sensor offset using fault information
@@ -3380,7 +3380,7 @@ Label100: ;
 				// first see how many are water coil controllers
 				WaterCoilContrlCount = 0; //init
 				for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
-					if ( InputProcessor::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
+					if ( UtilityRoutines::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 						++WaterCoilContrlCount;
 					}
 				}
@@ -3390,9 +3390,9 @@ Label100: ;
 					ContrlSensedNodeNums = 0;
 					SensedNodeIndex = 0;
 					for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
-						if ( InputProcessor::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
+						if ( UtilityRoutines::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 							++SensedNodeIndex;
-							foundControl = InputProcessor::FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
+							foundControl = UtilityRoutines::FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
 							if ( foundControl > 0 ) {
 								ContrlSensedNodeNums( 1, SensedNodeIndex ) = ControllerProps( foundControl ).SensedNode;
 							}
@@ -3520,7 +3520,7 @@ Label100: ;
 		}
 
 		NodeNotFound = true;
-		ControlNum = InputProcessor::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		ControlNum = UtilityRoutines::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControlNum > 0 && ControlNum <= NumControllers ) {
 			WaterInletNodeNum = ControllerProps( ControlNum ).ActuatedNode;
 			NodeNotFound = false;

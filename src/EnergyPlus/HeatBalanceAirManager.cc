@@ -70,7 +70,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -472,39 +472,39 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = NumAlpha;
 		maxNumber = NumNumber;
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneMixing";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneCrossMixing";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-		InputProcessor::GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 
@@ -516,17 +516,17 @@ namespace HeatBalanceAirManager {
 		lNumericFieldBlanks.dimension( maxNumber, true );
 
 		cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-		TotZoneAirBalance = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotZoneAirBalance = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		ZoneAirBalance.allocate( TotZoneAirBalance );
 
 		for ( Loop = 1; Loop <= TotZoneAirBalance; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			ZoneAirBalance( Loop ).Name = cAlphaArgs( 1 );
 			ZoneAirBalance( Loop ).ZoneName = cAlphaArgs( 2 );
-			ZoneAirBalance( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			ZoneAirBalance( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneAirBalance( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -598,26 +598,26 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-		TotShermGrimsInfiltration = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotShermGrimsInfiltration = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-		TotAIM2Infiltration = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotAIM2Infiltration = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-		NumInfiltrationStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumInfiltrationStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		InfiltrationObjects.allocate( NumInfiltrationStatements );
 
 		TotDesignFlowInfiltration = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumInfiltrationStatements; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			InfiltrationObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( cAlphaArgs( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				InfiltrationObjects( Item ).StartPtr = TotDesignFlowInfiltration + 1;
 				++TotDesignFlowInfiltration;
@@ -653,7 +653,7 @@ namespace HeatBalanceAirManager {
 			cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
 			for ( Item = 1; Item <= NumInfiltrationStatements; ++Item ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= InfiltrationObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -805,12 +805,12 @@ namespace HeatBalanceAirManager {
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
 		InfiltCount = TotDesignFlowInfiltration;
 		for ( Loop = 1; Loop <= TotShermGrimsInfiltration; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
 			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
-			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			Infiltration( InfiltCount ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -853,12 +853,12 @@ namespace HeatBalanceAirManager {
 
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
 		for ( Loop = 1; Loop <= TotAIM2Infiltration; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
 			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
-			Infiltration( InfiltCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			Infiltration( InfiltCount ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -933,10 +933,10 @@ namespace HeatBalanceAirManager {
 		RepVarSet = true;
 
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-		NumVentilationStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumVentilationStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-		TotWindAndStackVentilation = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotWindAndStackVentilation = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		VentilationObjects.allocate( NumVentilationStatements );
 
@@ -944,15 +944,15 @@ namespace HeatBalanceAirManager {
 		errFlag = false;
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
 		for ( Item = 1; Item <= NumVentilationStatements; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			VentilationObjects( Item ).Name = cAlphaArgs( 1 );
 
-			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( cAlphaArgs( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				VentilationObjects( Item ).StartPtr = TotDesignFlowVentilation + 1;
 				++TotDesignFlowVentilation;
@@ -986,7 +986,7 @@ namespace HeatBalanceAirManager {
 			cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
 			for ( Item = 1; Item <= NumVentilationStatements; ++Item ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= VentilationObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1381,15 +1381,15 @@ namespace HeatBalanceAirManager {
 		VentiCount = TotDesignFlowVentilation;
 		for ( Loop = 1; Loop <= TotWindAndStackVentilation; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			VentiCount = TotDesignFlowVentilation + Loop;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			Ventilation( VentiCount ).Name = cAlphaArgs( 1 );
 			Ventilation( VentiCount ).ModelType = VentilationWindAndStack;
 
-			Ventilation( VentiCount ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			Ventilation( VentiCount ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Ventilation( VentiCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1629,17 +1629,17 @@ namespace HeatBalanceAirManager {
 		RepVarSet = true;
 
 		cCurrentModuleObject = "ZoneMixing";
-		TotMixing = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotMixing = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		Mixing.allocate( TotMixing );
 
 		for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			Mixing( Loop ).Name = cAlphaArgs( 1 );
 
-			Mixing( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			Mixing( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Mixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1717,7 +1717,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			Mixing( Loop ).FromZone = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Zone );
+			Mixing( Loop ).FromZone = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( Mixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cAlphaFieldNames( 5 ) + " not found=" + cAlphaArgs( 5 ) + " for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -1946,17 +1946,17 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneCrossMixing";
-		TotCrossMixing = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotCrossMixing = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		CrossMixing.allocate( TotCrossMixing );
 
 		for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			CrossMixing( Loop ).Name = cAlphaArgs( 1 );
 
-			CrossMixing( Loop ).ZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			CrossMixing( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( CrossMixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -2033,7 +2033,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			CrossMixing( Loop ).FromZone = InputProcessor::FindItemInList( cAlphaArgs( 5 ), Zone );
+			CrossMixing( Loop ).FromZone = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( CrossMixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
@@ -2202,27 +2202,27 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-		TotRefDoorMixing = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		TotRefDoorMixing = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotRefDoorMixing > 0 ) {
 			RefDoorMixing.allocate( NumOfZones );
 			for ( auto & e : RefDoorMixing ) e.NumRefDoorConnections = 0;
 
 			for ( Loop = 1; Loop <= TotRefDoorMixing; ++Loop ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				NameThisObject = cAlphaArgs( 1 );
 
 				AlphaNum = 2;
-				Zone1Num = InputProcessor::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
+				Zone1Num = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone1Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				++AlphaNum; //3
-				Zone2Num = InputProcessor::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
+				Zone2Num = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone2Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
@@ -2741,15 +2741,15 @@ namespace HeatBalanceAirManager {
 		ErrorsFound = false;
 
 		cCurrentModuleObject = "RoomAirModelType";
-		NumOfAirModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfAirModels = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumOfAirModels > NumOfZones ) {
 			ShowSevereError( "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones." );
 			ErrorsFound = true;
 		}
 
 		for ( AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = InputProcessor::FindItemInList( cAlphaArgs( 2 ), Zone );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum != 0 ) {
 				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -2821,7 +2821,7 @@ namespace HeatBalanceAirManager {
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
 					AirModel( ZoneNum ).SimAirModel = true;
-					if ( InputProcessor::GetNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
+					if ( inputProcessor->getNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
 						ShowSevereError( "In " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + cAlphaFieldNames( 3 ) + " = AIRFLOWNETWORK."  );
 						ShowContinueError( "This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage." );
 						ShowContinueError( "AirflowNetwork:SimulationControl not found." );

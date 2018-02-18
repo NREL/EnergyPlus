@@ -111,7 +111,7 @@ extern "C" {
 #include <HVACControllers.hh>
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -125,10 +125,12 @@ extern "C" {
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
 #include <ResultsSchema.hh>
+#include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SizingManager.hh>
 #include <SolarShading.hh>
 #include <SQLiteProcedures.hh>
+#include <SurfaceGeometry.hh>
 #include <SystemReports.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
@@ -136,6 +138,7 @@ extern "C" {
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
+#include <Vectors.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -288,6 +291,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
 		using OutputProcessor::ResetAccumulationWhenWarmupComplete;
+		using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 		using OutputProcessor::isFinalYear;
 
 		// Locals
@@ -306,11 +310,8 @@ namespace SimulationManager {
 		static bool TerminalError( false );
 		bool SimsDone;
 		bool ErrFound;
-		//  REAL(r64) :: t0,t1,st0,st1
-
-		//  CHARACTER(len=70) :: tdstring
-		//  CHARACTER(len=138) :: tdstringlong
-
+		bool oneTimeUnderwaterBoundaryCheck = true;
+		bool AnyUnderwaterBoundaries = false;
 		int EnvCount;
 
 		// Formats
@@ -335,7 +336,7 @@ namespace SimulationManager {
 		DoOutputReporting = false;
 		DisplayPerfSimulationFlag = false;
 		DoWeatherInitReporting = false;
-		RunPeriodsInInput = ( InputProcessor::GetNumObjectsFound( "RunPeriod" ) > 0 || InputProcessor::GetNumObjectsFound( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
+		RunPeriodsInInput = ( inputProcessor->getNumObjectsFound( "RunPeriod" ) > 0 || inputProcessor->getNumObjectsFound( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
 		AskForConnectionsReport = false; // set to false until sizing is finished
 
 		OpenOutputFiles();
@@ -448,6 +449,9 @@ namespace SimulationManager {
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
 
+		// check for variable latitude/location/etc
+		WeatherManager::ReadVariableLocationOrientation();
+
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
@@ -544,6 +548,14 @@ namespace SimulationManager {
 							SimulateGroundDomains( false );
 						}
 
+						if ( AnyUnderwaterBoundaries ) {
+						    WeatherManager::UpdateUnderwaterBoundaries();
+						}
+
+						if ( DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 || DataEnvironment::varyingOrientationSchedIndex > 0 ) {
+							WeatherManager::UpdateLocationAndOrientation();
+						}
+
 						BeginTimeStepFlag = true;
 						ExternalInterfaceExchangeVariables();
 
@@ -569,6 +581,11 @@ namespace SimulationManager {
 						ManageExteriorEnergyUse();
 
 						ManageHeatBalance();
+
+						if ( oneTimeUnderwaterBoundaryCheck ) {
+						    AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+						    oneTimeUnderwaterBoundaryCheck = false;
+						}
 
 						BeginHourFlag = false;
 						BeginDayFlag = false;
@@ -714,9 +731,9 @@ namespace SimulationManager {
 		ErrorsFound = false;
 
 		CurrentModuleObject = "Version";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			std::string::size_type const lenVer( len( MatchVersion ) );
 			if ( ( lenVer > 0 ) && ( MatchVersion[ lenVer - 1 ] == '0' ) ) {
 				Which = static_cast< int >( index( Alphas( 1 ).substr( 0, lenVer - 2 ), MatchVersion.substr( 0, lenVer - 2 ) ) );
@@ -736,10 +753,10 @@ namespace SimulationManager {
 
 		// Do Mini Gets on HB Algorithm and by-surface overrides
 		CurrentModuleObject = "HeatBalanceAlgorithm";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		CondFDAlgo = false;
 		if ( Num > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( Alphas( 1 ) );
 			if ( ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) || ( SELECT_CASE_var == "CONDFD" ) || ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED" ) || ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCESIMPLIFIED" ) ) {
 				CondFDAlgo = true;
@@ -747,10 +764,10 @@ namespace SimulationManager {
 			}}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( Alphas( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -760,10 +777,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( Alphas( 3 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -772,10 +789,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -784,10 +801,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				InputProcessor::GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -797,9 +814,9 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Timestep";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			NumOfTimeStepInHour = Number( 1 );
 			if ( NumOfTimeStepInHour <= 0 || NumOfTimeStepInHour > 60 ) {
 				Alphas( 1 ) = RoundSigDigits( NumOfTimeStepInHour );
@@ -820,16 +837,16 @@ namespace SimulationManager {
 				ShowContinueError( "..." + CurrentModuleObject + " is set to 20." );
 				NumOfTimeStepInHour = 20;
 			}
-			if ( NumOfTimeStepInHour < 4 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 ) {
+			if ( NumOfTimeStepInHour < 4 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 ) {
 				ShowWarningError( CurrentModuleObject + ": Requested number (" + RoundSigDigits( NumOfTimeStepInHour ) + ") is less than the suggested minimum of 4." );
 				ShowContinueError( "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations." );
 			}
-		} else if ( Num == 0 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 && ! CondFDAlgo ) {
+		} else if ( Num == 0 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 && ! CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4." );
 			NumOfTimeStepInHour = 4;
 		} else if ( Num == 0 && ! CondFDAlgo ) {
 			NumOfTimeStepInHour = 4;
-		} else if ( Num == 0 && InputProcessor::GetNumObjectsFound( "Zone" ) > 0 && CondFDAlgo ) {
+		} else if ( Num == 0 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 && CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20." );
 			ShowContinueError( "...Due to presence of Conduction Finite Difference Algorithm selection." );
 			NumOfTimeStepInHour = 20;
@@ -845,9 +862,9 @@ namespace SimulationManager {
 		TimeStepZoneSec = TimeStepZone * SecInHour;
 
 		CurrentModuleObject = "ConvergenceLimits";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			MinInt = int( Number( 1 ) );
 			if ( MinInt > MinutesPerTimeStep ) {
 				MinInt = MinutesPerTimeStep;
@@ -886,9 +903,9 @@ namespace SimulationManager {
 		DebugOutput = false;
 		EvenDuringWarmup = false;
 		CurrentModuleObject = "Output:DebuggingData";
-		NumDebugOut = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumDebugOut = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDebugOut > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			if ( int( Number( 1 ) ) == 1 ) {
 				DebugOutput = true;
 			}
@@ -898,53 +915,53 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Output:Diagnostics";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( Num1 = 1; Num1 <= Num; ++Num1 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			for ( NumA = 1; NumA <= NumAlpha; ++NumA ) {
-				if ( InputProcessor::SameString( Alphas( NumA ), "DisplayExtraWarnings" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayExtraWarnings" ) ) {
 					DisplayExtraWarnings = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayAdvancedReportVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayAdvancedReportVariables" ) ) {
 					DisplayAdvancedReportVariables = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayAllWarnings" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayAllWarnings" ) ) {
 					DisplayAllWarnings = true;
 					DisplayExtraWarnings = true;
 					DisplayUnusedObjects = true;
 					DisplayUnusedSchedules = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayUnusedObjects" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayUnusedObjects" ) ) {
 					DisplayUnusedObjects = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayUnusedSchedules" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayUnusedSchedules" ) ) {
 					DisplayUnusedSchedules = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayZoneAirHeatBalanceOffBalance" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayZoneAirHeatBalanceOffBalance" ) ) {
 					DisplayZoneAirHeatBalanceOffBalance = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DoNotMirrorDetachedShading" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DoNotMirrorDetachedShading" ) ) {
 					MakeMirroredDetachedShading = false;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DoNotMirrorAttachedShading" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DoNotMirrorAttachedShading" ) ) {
 					MakeMirroredAttachedShading = false;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreInteriorWindowTransmission" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreInteriorWindowTransmission" ) ) {
 					IgnoreInteriorWindowTransmission = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "ReportDuringWarmup" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDuringWarmup" ) ) {
 					ReportDuringWarmup = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DisplayWeatherMissingDataWarnings" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayWeatherMissingDataWarnings" ) ) {
 					DisplayWeatherMissingDataWarnings = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreSolarRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreSolarRadiation" ) ) {
 					IgnoreSolarRadiation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreBeamRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreBeamRadiation" ) ) {
 					IgnoreBeamRadiation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "IgnoreDiffuseRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreDiffuseRadiation" ) ) {
 					IgnoreDiffuseRadiation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "DeveloperFlag" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DeveloperFlag" ) ) {
 					DeveloperFlag = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "TimingFlag" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "TimingFlag" ) ) {
 					TimingFlag = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
 					ReportDetailedWarmupConvergence = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
 					ReportDuringHVACSizingSimulation = true;
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
 					continue;
 					//        CreateMinimalSurfaceVariables=.TRUE.
-				} else if ( InputProcessor::SameString( Alphas( NumA ), "CreateNormalSurfaceVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "CreateNormalSurfaceVariables" ) ) {
 					continue;
 					//        IF (CreateMinimalSurfaceVariables) THEN
 					//          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
@@ -958,9 +975,9 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "OutputControl:ReportingTolerances";
-		Num = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( ! lNumericFieldBlanks( 1 ) ) {
 				deviationFromSetPtThresholdHtg = -Number( 1 );
 			} else {
@@ -981,10 +998,10 @@ namespace SimulationManager {
 		DoHVACSizingSimulation = false;
 		HVACSizingSimMaxIterations = 0;
 		CurrentModuleObject = "SimulationControl";
-		NumRunControl = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumRunControl = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumRunControl > 0 ) {
 			RunControlInInput = true;
-			InputProcessor::GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( Alphas( 1 ) == "YES" ) DoZoneSizing = true;
 			if ( Alphas( 2 ) == "YES" ) DoSystemSizing = true;
 			if ( Alphas( 3 ) == "YES" ) DoPlantSizing = true;
@@ -1109,11 +1126,11 @@ namespace SimulationManager {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		NumZoneSizing = InputProcessor::GetNumObjectsFound( "Sizing:Zone" );
-		NumSystemSizing = InputProcessor::GetNumObjectsFound( "Sizing:System" );
-		NumPlantSizing = InputProcessor::GetNumObjectsFound( "Sizing:Plant" );
-		NumDesignDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" );
-		NumRunPeriodDesign = InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+		NumZoneSizing = inputProcessor->getNumObjectsFound( "Sizing:Zone" );
+		NumSystemSizing = inputProcessor->getNumObjectsFound( "Sizing:System" );
+		NumPlantSizing = inputProcessor->getNumObjectsFound( "Sizing:Plant" );
+		NumDesignDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" );
+		NumRunPeriodDesign = inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); WeatherFileAttached = flags.exists(); }
 
@@ -1201,10 +1218,10 @@ namespace SimulationManager {
 		bool ReportingRequested;
 
 		ReportingRequested = false;
-		SimPeriods = ( InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) > 0 || InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) > 0 || InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" ) > 0 || InputProcessor::GetNumObjectsFound( "RunPeriod" ) > 0 );
+		SimPeriods = ( inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) > 0 || inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) > 0 || inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" ) > 0 || inputProcessor->getNumObjectsFound( "RunPeriod" ) > 0 );
 
 		if ( ( DoDesDaySim || DoWeathSim ) && SimPeriods ) {
-			ReportingRequested = ( InputProcessor::GetNumObjectsFound( "Output:Table:SummaryReports" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Table:TimeBins" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Table:Monthly" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Variable" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:MeterFileOnly" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:Cumulative" ) > 0 || InputProcessor::GetNumObjectsFound( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
+			ReportingRequested = ( inputProcessor->getNumObjectsFound( "Output:Table:SummaryReports" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Table:TimeBins" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Table:Monthly" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Variable" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:MeterFileOnly" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:Cumulative" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
 			// Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
 			if ( ! ReportingRequested ) {
 				ShowWarningError( "No reporting elements have been requested. No simulation results produced." );
@@ -1616,6 +1633,11 @@ namespace SimulationManager {
 		}
 		mtr_stream = nullptr;
 
+		// Close the External Shading Output File
+
+		if ( OutputFileShadingFrac > 0 ) {
+			gio::close( OutputFileShadingFrac );
+		}
 	}
 
 	void
@@ -1791,12 +1813,12 @@ namespace SimulationManager {
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << " Parent Node Connection," + NodeConnections( Loop ).NodeName + ',' + NodeConnections( Loop ).ObjectType + ',' + NodeConnections( Loop ).ObjectName + ',' + NodeConnections( Loop ).ConnectionType + ',' + ChrOut;
 			// Build ParentNodeLists
-			if ( InputProcessor::SameString( NodeConnections( Loop ).ConnectionType, "Inlet" ) || InputProcessor::SameString( NodeConnections( Loop ).ConnectionType, "Outlet" ) ) {
+			if ( UtilityRoutines::SameString( NodeConnections( Loop ).ConnectionType, "Inlet" ) || UtilityRoutines::SameString( NodeConnections( Loop ).ConnectionType, "Outlet" ) ) {
 				ParentComponentFound = false;
 				for ( Loop1 = 1; Loop1 <= NumOfActualParents; ++Loop1 ) {
 					if ( ParentNodeList( Loop1 ).CType != NodeConnections( Loop ).ObjectType || ParentNodeList( Loop1 ).CName != NodeConnections( Loop ).ObjectName ) continue;
 					ParentComponentFound = true;
-					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
 					if ( SELECT_CASE_var == "INLET" ) {
 						ParentNodeList( Loop1 ).InletNodeName = NodeConnections( Loop ).NodeName;
 					} else if ( SELECT_CASE_var == "OUTLET" ) {
@@ -1807,7 +1829,7 @@ namespace SimulationManager {
 					++NumOfActualParents;
 					ParentNodeList( NumOfActualParents ).CType = NodeConnections( Loop ).ObjectType;
 					ParentNodeList( NumOfActualParents ).CName = NodeConnections( Loop ).ObjectName;
-					{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
 					if ( SELECT_CASE_var == "INLET" ) {
 						ParentNodeList( NumOfActualParents ).InletNodeName = NodeConnections( Loop ).NodeName;
 					} else if ( SELECT_CASE_var == "OUTLET" ) {
@@ -1947,7 +1969,7 @@ namespace SimulationManager {
 				ShowContinueError( "  Inlet Node : " + CompSets( Count ).InletNodeName );
 				ShowContinueError( "  Outlet Node: " + CompSets( Count ).OutletNodeName );
 				++NumNodeConnectionErrors;
-				if ( InputProcessor::SameString( CompSets( Count ).CType, "SolarCollector:UnglazedTranspired" ) ) {
+				if ( UtilityRoutines::SameString( CompSets( Count ).CType, "SolarCollector:UnglazedTranspired" ) ) {
 					ShowContinueError( "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector" );
 				}
 			}
@@ -2440,7 +2462,7 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		InputProcessor::PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
+		inputProcessor->preProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
 		if ( PreP_Fatal ) {
 			ShowFatalError( "Preprocessor condition(s) cause termination." );
@@ -2451,7 +2473,7 @@ namespace SimulationManager {
 		FluidIndex_EthyleneGlycol = FindGlycol( "EthyleneGlycol" );
 		FluidIndex_PropoleneGlycol = FindGlycol( "PropoleneGlycol" );
 
-		InputProcessor::PreScanReportingVariables();
+		inputProcessor->preScanReportingVariables();
 
 	}
 

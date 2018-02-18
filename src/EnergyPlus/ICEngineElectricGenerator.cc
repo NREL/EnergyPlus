@@ -61,7 +61,7 @@
 #include <DataPlant.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -144,7 +144,7 @@ namespace ICEngineElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = InputProcessor::FindItemInList( GeneratorName, ICEngineGenerator );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, ICEngineGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -250,7 +250,7 @@ namespace ICEngineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = InputProcessor::FindItemInList( CompName, ICEngineGenerator );
+			CompNum = UtilityRoutines::FindItemInList( CompName, ICEngineGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );
 				return;
@@ -306,7 +306,7 @@ namespace ICEngineElectricGenerator {
 
 		//FLOW
 		cCurrentModuleObject = "Generator:InternalCombustionEngine";
-		NumICEngineGenerators = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumICEngineGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumICEngineGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -321,8 +321,8 @@ namespace ICEngineElectricGenerator {
 
 		//LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			ICEngineGenerator( GeneratorNum ).Name = AlphArray( 1 );
 

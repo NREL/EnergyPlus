@@ -49,6 +49,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <General.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -2135,7 +2137,31 @@ namespace EnergyPlus {
 
 	}
 
+	Real64 ResidualFancoil(
+		Real64 const mdot,
+		Array1< Real64 > const & Par // Function parameters
+	)
+	{
+		int FanCoilNum = 1;
+		int ControlledZoneNum = 1;
+		bool FirstHVACIteration = false;
+		Real64 QUnitOut;
+		Real64 QZnReq = Par( 1 );
+		Real64 Residual;
+
+		Node( 12 ).MassFlowRate = mdot;
+
+		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
+
+		Residual = ( QUnitOut - QZnReq ) / QZnReq;
+
+		return Residual;
+	}
+
+
 	TEST_F( EnergyPlusFixture, Test_TightenWaterFlowLimits ) {
+
+		using General::SolveRoot;
 
 		int FanCoilNum( 1 );
 		bool FirstHVACIteration( false );
@@ -2327,6 +2353,27 @@ namespace EnergyPlus {
 		TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
 		EXPECT_NEAR( MinWaterFlow, 0.000000, 0.0000001 );
 		EXPECT_NEAR( MaxWaterFlow, 0.000015, 0.0000001 );
+
+		MinWaterFlow = 0.0;
+		MaxWaterFlow = 1.5;
+		Real64 ErrorToler = 0.00001;
+		int MaxIte = 4;
+		int SolFla;
+		Real64 mdot;
+		Real64 minFlow;
+		Real64 maxFlow;
+		Array1D< Real64 > Par( 2 ); // Function parameters
+		Par( 1 ) = -1000.0;
+		Par( 2 ) = 0.0;
+
+		General::SolveRoot( ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par, 2, minFlow, maxFlow );
+		EXPECT_EQ( -1, SolFla );
+		EXPECT_NEAR( minFlow, 0.0, 0.0000001 );
+		EXPECT_NEAR( maxFlow, 0.09375, 0.0000001 );
+		MaxIte = 20;
+		HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+		General::SolveRoot( ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par );
+		EXPECT_EQ( 3, SolFla );
 
 	}
 

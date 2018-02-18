@@ -81,7 +81,7 @@
 #include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
@@ -545,6 +545,8 @@ namespace SolarShading {
 		using DataSystemVariables::SutherlandHodgman;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
+		using DataSystemVariables::UseScheduledSunlitFrac;
+		using DataSystemVariables::ReportExtShadingSunlitFrac;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
@@ -559,7 +561,7 @@ namespace SolarShading {
 		cAlphaArgs( 1 ) = "";
 		cAlphaArgs( 2 ) = "";
 		cCurrentModuleObject = "ShadowCalculation";
-		NumItems = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumItems = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumItems > 1 ) {
@@ -567,7 +569,7 @@ namespace SolarShading {
 		}
 
 		if ( NumItems != 0 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ShadowingCalcFrequency = rNumericArgs( 1 );
 		}
 
@@ -587,10 +589,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 1 ) {
-			if ( InputProcessor::SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
 				DetailedSolarTimestepIntegration = false;
 				cAlphaArgs( 1 ) = "AverageOverDaysInFrequency";
-			} else if ( InputProcessor::SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
 				DetailedSolarTimestepIntegration = true;
 				cAlphaArgs( 1 ) = "TimestepFrequency";
 			} else {
@@ -605,10 +607,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 2 ) {
-			if ( InputProcessor::SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
 				SutherlandHodgman = true;
 				cAlphaArgs( 2 ) = "SutherlandHodgman";
-			} else if ( InputProcessor::SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
 				SutherlandHodgman = false;
 				cAlphaArgs( 2 ) = "ConvexWeilerAtherton";
 			} else if ( lAlphaFieldBlanks( 2 ) ) {
@@ -634,10 +636,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 3 ) {
-			if ( InputProcessor::SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = false;
 				cAlphaArgs( 3 ) = "SimpleSkyDiffuseModeling";
-			} else if ( InputProcessor::SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = true;
 				cAlphaArgs( 3 ) = "DetailedSkyDiffuseModeling";
 			} else if ( lAlphaFieldBlanks( 3 ) ) {
@@ -650,6 +652,44 @@ namespace SolarShading {
 		} else {
 			cAlphaArgs( 3 ) = "SimpleSkyDiffuseModeling";
 			DetailedSkyDiffuseAlgorithm = false;
+		}
+
+		if ( NumAlphas >= 4 ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "ScheduledShading" ) ) {
+				UseScheduledSunlitFrac = true;
+				cAlphaArgs( 4 ) = "ScheduledShading";
+			}
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
+				UseScheduledSunlitFrac = false;
+				cAlphaArgs( 4 ) = "InternalCalculation";
+			}
+			else {
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 4 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 4 ) + "\", InternalCalculation will be used." );
+			}
+		}
+		else {
+			cAlphaArgs( 4 ) = "InternalCalculation";
+			UseScheduledSunlitFrac = false;
+		}
+
+		if ( NumAlphas >= 5 ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Yes" ) ) {
+				ReportExtShadingSunlitFrac = true;
+				cAlphaArgs( 5 ) = "Yes";
+			}
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "No" ) ) {
+				ReportExtShadingSunlitFrac = false;
+				cAlphaArgs( 5 ) = "No";
+			}
+			else {
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 5 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 5 ) + "\", InternalCalculation will be used." );
+			}
+		}
+		else {
+			cAlphaArgs( 5 ) = "No";
+			ReportExtShadingSunlitFrac = false;
 		}
 
 		if ( ! DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
@@ -670,7 +710,7 @@ namespace SolarShading {
 		}
 
 		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
-		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
+		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + cAlphaArgs( 4 ) + ',' + cAlphaArgs( 5 );
 
 	}
 
@@ -925,6 +965,7 @@ namespace SolarShading {
 		DisplayString( "Initializing Surface (Shading) Report Variables" );
 		// CurrentModuleObject='Surfaces'
 		for ( SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop ) {
+			SetupOutputVariable( "Surface Outside Normal Azimuth Angle [rad]", Surface( SurfLoop ).Azimuth, "Zone", "Average", Surface( SurfLoop ).Name );
 			if ( Surface( SurfLoop ).ExtSolar ) {
 				SetupOutputVariable( "Surface Outside Face Sunlit Area [m2]", SurfSunlitArea( SurfLoop ), "Zone", "State", Surface( SurfLoop ).Name );
 				SetupOutputVariable( "Surface Outside Face Sunlit Fraction []", SurfSunlitFrac( SurfLoop ), "Zone", "State", Surface( SurfLoop ).Name );
@@ -3414,6 +3455,10 @@ namespace SolarShading {
 		using WindowComplexManager::UpdateComplexWindows;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
+		using DataSystemVariables::ReportExtShadingSunlitFrac;
+		using ScheduleManager::LookUpScheduleValue;
+		using DataEnvironment::Month;
+		using DataEnvironment::DayOfMonth;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 
@@ -3431,6 +3476,12 @@ namespace SolarShading {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int iHour; // Hour index number
 		int TS; // TimeStep Loop Counter
+		int SurfNum; // Do loop counter
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt ShdFracFmtName( "(A, A)" );
+		static gio::Fmt ShdFracFmt1( "(I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')" );
+		static gio::Fmt ShdFracFmt2( "(f6.2,',')" );
+		static gio::Fmt fmtN( "('\n')" );
 		static bool Once( true );
 
 		if ( Once ) InitComplexWindows();
@@ -3492,6 +3543,19 @@ namespace SolarShading {
 			} // Hour Loop
 		} else {
 			FigureSolarBeamAtTimestep( HourOfDay, TimeStep );
+		}
+		if ( ReportExtShadingSunlitFrac ) {
+			if ( KindOfSim == ksRunPeriodWeather ) {
+				for ( iHour = 1; iHour <= 24; ++iHour ) { // Do for all hours.
+					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, ShdFracFmt1, flags ) << Month << DayOfMonth << iHour - 1 << ( 60 / NumOfTimeStepInHour ) * ( TS - 1 ); }
+						for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, ShdFracFmt2, flags ) << SunlitFrac( TS, iHour, SurfNum ); }
+						}
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileShadingFrac, fmtN, flags ); }
+					}
+				}
+			}
 		}
 
 	}
@@ -3584,6 +3648,9 @@ namespace SolarShading {
 		// Using/Aliasing
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
+		using DataSystemVariables::UseScheduledSunlitFrac;
+		using DataSystemVariables::ReportExtShadingSunlitFrac;
+		using ScheduleManager::LookUpScheduleValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3632,26 +3699,34 @@ namespace SolarShading {
 			CosIncAng( iTimeStep, iHour, SurfNum ) = CTHETA( SurfNum );
 		}
 
-		SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
-
-		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			if ( Surface( SurfNum ).Area >= 1.e-10 ) {
-				SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
-				if ( ! DetailedSolarTimestepIntegration ) {
-					if ( iTimeStep == NumOfTimeStepInHour ) SunlitFracHR( iHour, SurfNum ) = SAREA( SurfNum ) / SurfArea;
-				} else {
-					SunlitFracHR( iHour, SurfNum ) = SAREA( SurfNum ) / SurfArea;
+		if ( UseScheduledSunlitFrac ) {
+			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+				if ( Surface( SurfNum ).SchedExternalShadingFrac ) {
+					SunlitFrac( iTimeStep, iHour, SurfNum ) = LookUpScheduleValue( Surface( SurfNum ).ExternalShadingSchInd, iHour, iTimeStep );
 				}
-				SunlitFrac( iTimeStep, iHour, SurfNum ) = SAREA( SurfNum ) / SurfArea;
-				if ( SunlitFrac( iTimeStep, iHour, SurfNum ) < 1.e-5 ) SunlitFrac( iTimeStep, iHour, SurfNum ) = 0.0;
+				else {
+					SunlitFrac( iTimeStep, iHour, SurfNum ) = 1.0;
+				}
 			}
-
-			//Added check
-			if ( SunlitFrac( iTimeStep, iHour, SurfNum ) > 1.0 ) {
-				SunlitFrac( iTimeStep, iHour, SurfNum ) = 1.0;
+		} else {
+			SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
+			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+				if ( Surface( SurfNum ).Area >= 1.e-10 ) {
+					SurfArea = Surface( SurfNum ).NetAreaShadowCalc;
+					if ( ! DetailedSolarTimestepIntegration ) {
+						if ( iTimeStep == NumOfTimeStepInHour ) SunlitFracHR( iHour, SurfNum ) = SAREA( SurfNum ) / SurfArea;
+					} else {
+						SunlitFracHR( iHour, SurfNum ) = SAREA( SurfNum ) / SurfArea;
+					}
+					SunlitFrac( iTimeStep, iHour, SurfNum ) = SAREA( SurfNum ) / SurfArea;
+					if ( SunlitFrac( iTimeStep, iHour, SurfNum ) < 1.e-5 ) SunlitFrac( iTimeStep, iHour, SurfNum ) = 0.0;
+				}
+				//Added check
+				if ( SunlitFrac( iTimeStep, iHour, SurfNum ) > 1.0 ) {
+					SunlitFrac( iTimeStep, iHour, SurfNum ) = 1.0;
+				}
 			}
 		}
-
 		//   Note -- if not the below, values are set in SkyDifSolarShading routine (constant for simulation)
 		if ( DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
 			WithShdgIsoSky = 0.;
@@ -7806,6 +7881,8 @@ namespace SolarShading {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataDaylighting::ZoneDaylight;
 		using General::POLYF;
+		using DataWindowEquivalentLayer::CFS;
+		using WindowEquivalentLayer::lscNONE;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -7862,7 +7939,16 @@ namespace SolarShading {
 			SurfaceWindow( ISurf ).ExtIntShadePrevTS = SurfaceWindow( ISurf ).ShadingFlag;
 			SurfaceWindow( ISurf ).ShadingFlag = NoShade;
 			SurfaceWindow( ISurf ).FracTimeShadingDeviceOn = 0.0;
-
+			if ( SurfaceWindow( ISurf ).WindowModelType == WindowEQLModel ) {
+				int EQLNum = Construct( Surface( ISurf ).Construction ).EQLConsPtr;
+				if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
+					if ( CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).CNTRL == lscNONE ) {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
+					} else {
+						SurfaceWindow( ISurf ).SlatAngThisTSDeg = 0.0;
+					}
+				}
+			}
 			if ( Surface( ISurf ).Class != SurfaceClass_Window ) continue;
 			if ( Surface( ISurf ).ExtBoundCond != ExternalEnvironment ) continue;
 			if ( Surface( ISurf ).WindowShadingControlPtr == 0 ) continue;
@@ -8359,6 +8445,7 @@ namespace SolarShading {
 		int SurfNum; // Surface counter
 		int IPhi; // Altitude step counter
 		int ITheta; // Azimuth step counter
+		int SrdSurfsNum; // Srd surface counter
 		Real64 DPhi; // Altitude step size
 		Real64 DTheta; // Azimuth step size
 		Real64 DThetaDPhi; // Product of DTheta and DPhi
@@ -8505,6 +8592,16 @@ namespace SolarShading {
 				Surface( SurfNum ).ViewFactorSkyIR *= DifShdgRatioIsoSkyHRTS( 1, 1, SurfNum );
 			}
 			Surface( SurfNum ).ViewFactorGroundIR = 1.0 - Surface( SurfNum ).ViewFactorSkyIR;
+
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorSkyIR *= SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+				}
+				if ( SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor != -1 ) {
+					Surface( SurfNum ).ViewFactorGroundIR *= SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+				}
+			}
 		}
 
 		//  DEALLOCATE(WithShdgIsoSky)

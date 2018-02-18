@@ -52,12 +52,15 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
 
 namespace EnergyPlus {
 
 	class InputProcessorFixture : public EnergyPlusFixture
 	{
 	protected:
+		using json = nlohmann::json;
+
 		static void SetUpTestCase() {
 			EnergyPlusFixture::SetUpTestCase();  // Sets up the base fixture
 		}
@@ -75,20 +78,20 @@ namespace EnergyPlus {
 			return EnergyPlusFixture::process_idd( idd, errors_found );
 		}
 
-		std::vector < std::string > const & validation_errors() {
-			return InputProcessor::validation_errors();
+		std::vector < std::string > const & validationErrors() {
+			return inputProcessor->validationErrors();
 		}
 
-		std::vector < std::string > const & validation_warnings() {
-			return InputProcessor::validation_warnings();
+		std::vector < std::string > const & validationWarnings() {
+			return inputProcessor->validationWarnings();
 		}
 
 		std::string encodeIDF() {
-			return InputProcessor::idf_parser.encode(InputProcessor::jdf, InputProcessor::schema);
+			return inputProcessor->idf_parser->encode(inputProcessor->epJSON, inputProcessor->schema);
 		}
 
-		json & getJDF() {
-			return InputProcessor::jdf;
+		json & getEpJSON() {
+			return inputProcessor->epJSON;
 		}
 
 		void eat_whitespace( std::string const & idf, size_t & index ) {
@@ -108,7 +111,7 @@ namespace EnergyPlus {
 
 		json parse_value( std::string const & idf, size_t & index, bool & success ) {
 			IdfParser idfParser;
-			return idfParser.parse_value( idf, index, success, InputProcessor::schema["properties"] );
+			return idfParser.parse_value( idf, index, success, inputProcessor->schema["properties"] );
 		}
 
 		json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc ) {

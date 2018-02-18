@@ -161,7 +161,7 @@ namespace DataStringGlobals {
 	std::string outputTblXmlFileName("eplustbl.xml");
 	std::string inputFileName;
 	std::string inputIddFileName;
-	std::string inputJddFileName;
+	std::string inputEpJSONSchemaFileName;
 	std::string inputWeatherFileName;
 	std::string outputAdsFileName("eplusADS.out");
 	std::string outputDfsFileName("eplusout.dfs");
@@ -194,6 +194,7 @@ namespace DataStringGlobals {
 	std::string outputCsvFileName("eplusout.csv");
 	std::string outputMtrCsvFileName("eplusmtr.csv");
 	std::string outputRvauditFileName("eplusout.rvaudit");
+	std::string outputExtShdFracFileName("eplusshading.csv");
 
 	std::string idfFileNameOnly;
 	std::string idfDirPathName;

@@ -69,7 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -143,7 +143,7 @@ namespace ChillerIndirectAbsorption {
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
 	Real64 EnergyLossToEnvironment( 0.0 ); // J - piping energy loss from generator outlet to pump inlet
 	Real64 ChillerONOFFCyclingFrac( 0.0 ); // fraction of time chiller is on
-	
+
 	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
@@ -209,7 +209,7 @@ namespace ChillerIndirectAbsorption {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			ChillNum = InputProcessor::FindItemInList( AbsorberName, IndirectAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, IndirectAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimIndirectAbsorber: Specified chiller not one of Valid Absorption Chillers=" + AbsorberName );
 			}
@@ -239,7 +239,7 @@ namespace ChillerIndirectAbsorption {
 				OptCap = 0.0;
 			}
 			if ( GetSizingFactor ) {
-				ChillNum = InputProcessor::FindItemInList( AbsorberName, IndirectAbsorber );
+				ChillNum = UtilityRoutines::FindItemInList( AbsorberName, IndirectAbsorber );
 				if ( ChillNum != 0 ) {
 					SizingFactor = IndirectAbsorber( ChillNum ).SizFac;
 				}
@@ -317,7 +317,7 @@ namespace ChillerIndirectAbsorption {
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:Absorption:Indirect";
-		NumIndirectAbsorbers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumIndirectAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumIndirectAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -335,8 +335,8 @@ namespace ChillerIndirectAbsorption {
 
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -391,10 +391,10 @@ namespace ChillerIndirectAbsorption {
 			}
 
 			if ( NumAlphas > 15 ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 16 ), "HotWater" ) || InputProcessor::SameString( cAlphaArgs( 16 ), "HotWater" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "HotWater" ) || UtilityRoutines::SameString( cAlphaArgs( 16 ), "HotWater" ) ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
 					//       Default to Steam if left blank
-				} else if ( InputProcessor::SameString( cAlphaArgs( 16 ), "Steam" ) || cAlphaArgs( 16 ).empty() ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "Steam" ) || cAlphaArgs( 16 ).empty() ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
@@ -1519,18 +1519,18 @@ namespace ChillerIndirectAbsorption {
 		LoopSideNum = IndirectAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( IndirectAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = IndirectAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( IndirectAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset ));
 			IndirectAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		if ( IndirectAbsorber( ChillNum ).CapFCondenserTempPtr > 0 ) {
@@ -1683,7 +1683,7 @@ namespace ChillerIndirectAbsorption {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( IndirectAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

@@ -62,7 +62,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -149,7 +149,7 @@ namespace PlantComponentTemperatureSources {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			SourceNum = InputProcessor::FindItemInList( SourceName, WaterSource );
+			SourceNum = UtilityRoutines::FindItemInList( SourceName, WaterSource );
 			if ( SourceNum == 0 ) {
 				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );
 			}
@@ -226,7 +226,7 @@ namespace PlantComponentTemperatureSources {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "PlantComponent:TemperatureSource";
-		NumSources = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSources = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSources <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -239,8 +239,8 @@ namespace PlantComponentTemperatureSources {
 
 		// fill arrays
 		for ( SourceNum = 1; SourceNum <= NumSources; ++SourceNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, SourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			WaterSource( SourceNum ).Name = cAlphaArgs( 1 );
 

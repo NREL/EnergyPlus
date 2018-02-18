@@ -179,7 +179,8 @@ namespace PackagedTerminalHeatPump {
 		int FanPlace; // fan placement;     1=blow through, 2=draw through
 		Real64 CoolConvergenceTol; // Convergence tolerance, fraction (ZoneLoad - Equip Output)/ZoneLoad
 		Real64 HeatConvergenceTol; // Convergence tolerance, fraction (ZoneLoad - Equip Output)/ZoneLoad
-		Real64 MinOATCompressor; // Minimum OAT for compressor operation [C]
+		Real64 MinOATCompressorCooling; // Minimum OAT for compressor operation in cooling mode [C]
+		Real64 MinOATCompressorHeating; // Minimum OAT for compressor operation in heating mode [C]
 		int IterErrIndex; // index for recurring warnings
 		std::string AvailManagerListName; // Name of an availability manager list object
 		int WaterCyclingMode; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
@@ -313,7 +314,8 @@ namespace PackagedTerminalHeatPump {
 			FanPlace( 0 ),
 			CoolConvergenceTol( 0.0 ),
 			HeatConvergenceTol( 0.0 ),
-			MinOATCompressor( 0.0 ),
+			MinOATCompressorCooling( 0.0 ),
+			MinOATCompressorHeating( 0.0 ),
 			IterErrIndex( 0 ),
 			WaterCyclingMode( 0 ),
 			PTObjectIndex( 0 ),
@@ -632,6 +634,18 @@ namespace PackagedTerminalHeatPump {
 		Real64 const QZnReq, // sensible load to be met (W) !unused1208
 		Real64 const MoistureLoad, // moisture load to be met (W)
 		Real64 & PartLoadRatio // coil part-load ratio
+	);
+
+	void
+	SetMinOATCompressor(
+		int const FurnaceNum, // index to furnace
+		std::string const FurnaceName, // name of furnace
+		std::string const cCurrentModuleObject, // type of furnace
+		std::string const CoolingCoilType, // type of cooling coil
+		std::string const CoolingCoilName, // name of cooling coil
+		std::string const HeatingCoilType, // type of heating coil
+		std::string const HeatingCoilName, // name of heating coil
+		bool & ErrorsFound // GetInput logical that errors were found
 	);
 
 } // PackagedTerminalHeatPump

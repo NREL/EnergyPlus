@@ -74,6 +74,7 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -108,6 +109,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -140,15 +142,20 @@
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
@@ -188,7 +195,6 @@
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SwimmingPool.hh>
@@ -212,34 +218,16 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 
 #include <fstream>
 #include <algorithm>
 
-json::parser_callback_t EnergyPlus::EnergyPlusFixture::call_back = [](int EP_UNUSED( depth ), json::parse_event_t event, json &parsed,
-									   unsigned line_num, unsigned line_index) -> bool {
-	EnergyPlus::InputProcessor::state.traverse(event, parsed, line_num, line_index);
-	return true;
-};
+using json = nlohmann::json;
 
 namespace EnergyPlus {
 
 	void EnergyPlusFixture::SetUpTestCase() {
-		bool errors_found = false;
-		process_idd("", errors_found);
-		if ( errors_found ) {
-			std::cout << "JSON Schema not found" << std::endl;
-			return;
-		}
-
-		const json & loc = InputProcessor::schema[ "properties" ];
-		InputProcessor::case_insensitive_object_map.reserve( loc.size() );
-		for ( auto it = loc.begin(); it != loc.end(); ++it ) {
-			std::string key = it.key();
-			for ( char & c : key ) c = toupper( c );
-			InputProcessor::case_insensitive_object_map.emplace( std::move( key ), it.key() );
-		}
+		EnergyPlus::inputProcessor = InputProcessor::factory();
 	}
 
 	void EnergyPlusFixture::SetUp() {
@@ -250,14 +238,12 @@ namespace EnergyPlus {
 		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->echo_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 		this->json_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
 
 		DataGlobals::eso_stream = this->eso_stream.get();
 		DataGlobals::eio_stream = this->eio_stream.get();
 		DataGlobals::mtr_stream = this->mtr_stream.get();
-		InputProcessor::echo_stream = this->echo_stream.get();
 		DataGlobals::err_stream = this->err_stream.get();
 		DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
 
@@ -270,8 +256,6 @@ namespace EnergyPlus {
 		UtilityRoutines::outputErrorHeader = false;
 
 		Psychrometrics::InitializePsychRoutines();
-
-		InputProcessor::state.initialize( & InputProcessor::schema );
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -293,6 +277,7 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileBNDetails, flags );
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
 			gio::close( DataGlobals::OutputDElightIn, flags );
+			gio::close( DataGlobals::OutputFileShadingFrac, flags );
 
 		}
 	}
@@ -320,6 +305,7 @@ namespace EnergyPlus {
 		DataBranchAirLoopPlant::clear_state();
 		DataAirSystems::clear_state();
 		DataBranchNodeConnections::clear_state();
+		DataContaminantBalance::clear_state();
 		DataConvergParams::clear_state();
 		DataDefineEquip::clear_state();
 		DataEnvironment::clear_state();
@@ -351,6 +337,7 @@ namespace EnergyPlus {
 		DualDuct::clear_state();
 		DXCoils::clear_state();
 		clearFacilityElectricPowerServiceObject();
+		EarthTube::clear_state();
 		EconomicLifeCycleCost::clear_state();
 		EconomicTariff::clear_state();
 		EMSManager::clear_state();
@@ -381,11 +368,12 @@ namespace EnergyPlus {
 		HVACHXAssistedCoolingCoil::clear_state();
 		HVACFan::clearHVACFanObjects();
 		HVACManager::clear_state();
+		HVACSingleDuctInduc::clear_state();
 		HVACStandAloneERV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		HybridModel::clear_state();
-		InputProcessor::clear_state();
+		EnergyPlus::inputProcessor->clear_state();
 		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
 		LowTempRadiantSystem::clear_state();
@@ -465,6 +453,17 @@ namespace EnergyPlus {
 		return compare_text.str();
 	}
 
+	std::vector< std::string > EnergyPlusFixture::read_lines_in_file( std::string const & filePath ) {
+		std::ifstream infile( filePath );
+		std::vector< std::string > lines;
+		std::string line;
+		while ( std::getline( infile, line ) )
+		{
+			lines.push_back( line );
+		}
+		return lines;
+	}
+
 	bool EnergyPlusFixture::compare_json_stream( std::string const & expected_string, bool reset_stream ) {
 		auto const stream_str = this->json_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
@@ -494,14 +493,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
 		if ( reset_stream ) this->mtr_stream->str( std::string() );
-		return are_equal;
-	}
-
-	bool EnergyPlusFixture::compare_echo_stream( std::string const & expected_string, bool reset_stream ) {
-		auto const stream_str = this->echo_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->echo_stream->str( std::string() );
 		return are_equal;
 	}
 
@@ -557,13 +548,6 @@ namespace EnergyPlus {
 		return has_output;
 	}
 
-	bool EnergyPlusFixture::has_echo_output( bool reset_stream )
-	{
-		auto const has_output = this->echo_stream->str().size() > 0;
-		if ( reset_stream ) this->echo_stream->str( std::string() );
-		return has_output;
-	}
-
 	bool EnergyPlusFixture::has_err_output( bool reset_stream )
 	{
 		auto const has_output = this->err_stream->str().size() > 0;
@@ -587,10 +571,10 @@ namespace EnergyPlus {
 
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
-		InputProcessor::jdf = InputProcessor::idf_parser.decode(idf_snippet, InputProcessor::schema);
+		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema);
 
-		if (InputProcessor::jdf.find("Building") == InputProcessor::jdf.end()) {
-			InputProcessor::jdf["Building"] = {
+		if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
+			inputProcessor->epJSON["Building"] = {
 					{
 							"Bldg",
 							{
@@ -605,8 +589,8 @@ namespace EnergyPlus {
 					}
 			};
 		}
-		if (InputProcessor::jdf.find("GlobalGeometryRules") == InputProcessor::jdf.end()) {
-			InputProcessor::jdf["GlobalGeometryRules"] = {
+		if (inputProcessor->epJSON.find("GlobalGeometryRules") == inputProcessor->epJSON.end()) {
+			inputProcessor->epJSON["GlobalGeometryRules"] = {
 					{
 							"",
 							{
@@ -623,7 +607,7 @@ namespace EnergyPlus {
 		int MaxArgs = 0;
 		int MaxAlpha = 0;
 		int MaxNumeric = 0;
-		InputProcessor::GetMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
+		inputProcessor->getMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
 
 		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlpha );
 		DataIPShortCuts::cAlphaArgs.allocate( MaxAlpha );
@@ -632,10 +616,9 @@ namespace EnergyPlus {
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
-		InputProcessor::InitializeMaps();
-		InputProcessor::InitFiles();
+		inputProcessor->initializeMaps();
 		SimulationManager::PostIPProcessing();
-		InputProcessor::state.print_errors();
+		// inputProcessor->state->printErrors();
 
 		return true;
 	}
@@ -647,18 +630,18 @@ namespace EnergyPlus {
 			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
 		} else {
 			static auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-			static auto idd_location = exeDirectory + "Energy+.jdd";
+			static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
 			static auto file_exists = FileSystem::fileExists( idd_location );
 
 			if ( ! file_exists ) {
-				// Energy+.jdd is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.jdd";
+				// Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
+				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.schema.epJSON";
 				file_exists = FileSystem::fileExists( idd_location );
 			}
 
 			if ( ! file_exists ) {
 				EXPECT_TRUE( file_exists ) <<
-					"Energy+.jdd does not exist at search location." << std::endl << "JDD search location: \"" << idd_location << "\"";
+					"Energy+.schema.epJSON does not exist at search location." << std::endl << "epJSON Schema search location: \"" << idd_location << "\"";
 				errors_found = true;
 				return errors_found;
 			}
@@ -671,7 +654,7 @@ namespace EnergyPlus {
 			return errors_found;
 		}
 
-		InputProcessor::schema = json::parse( *idd_stream );
+		inputProcessor->schema = json::parse( *idd_stream );
 
 		return errors_found;
 	}

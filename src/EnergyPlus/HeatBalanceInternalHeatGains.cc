@@ -51,7 +51,6 @@
 #include <HeatBalanceInternalHeatGains.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -70,7 +69,8 @@ SetupZoneInternalGain(
 	Optional< Real64 > LatentGainRate,
 	Optional< Real64 > ReturnAirLatentGainRate,
 	Optional< Real64 > CarbonDioxideGainRate,
-	Optional< Real64 > GenericContamGainRate
+	Optional< Real64 > GenericContamGainRate,
+	Optional< int > RetNodeNum // for return air heat gains
 )
 {
 
@@ -106,11 +106,11 @@ SetupZoneInternalGain(
 
 	FoundIntGainsType = false;
 	FoundDuplicate = false;
-	UpperCaseObjectType = InputProcessor::MakeUPPERCase( cComponentObject );
-	UpperCaseObjectName = InputProcessor::MakeUPPERCase( cComponentName );
+	UpperCaseObjectType = UtilityRoutines::MakeUPPERCase( cComponentObject );
+	UpperCaseObjectName = UtilityRoutines::MakeUPPERCase( cComponentName );
 
 	// Check if IntGainComp_TypeOfNum and cComponentObject are consistent
-	if ( ! InputProcessor::SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
+	if ( ! UtilityRoutines::SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
 		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain" );
 		ShowContinueError( "Object type character = " + cComponentObject );
 		ShowContinueError( "Type of Num object name = " + ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) );
@@ -192,6 +192,9 @@ SetupZoneInternalGain(
 		ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).PtrGenericContamGainRate >>= ZeroPointerVal;
 	}
 
+	if ( present( RetNodeNum ) ) {
+		ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).ReturnAirNodeNum = RetNodeNum;
+	}
 }
 
 } // EnergyPlus

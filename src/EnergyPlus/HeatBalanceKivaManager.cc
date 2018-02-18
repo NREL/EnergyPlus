@@ -70,7 +70,6 @@
 #include <DataZoneControls.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
@@ -486,7 +485,7 @@ void KivaManager::readWeatherData()
 		}
 		if ( Pos != std::string::npos ) Line.erase( 0, Pos + 1 );
 
-		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( Header( HdLine ) ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( Header( HdLine ) ) );
 
 		if ( SELECT_CASE_var == "DATA PERIODS" ) {
 			bool IOStatus;
@@ -512,11 +511,11 @@ void KivaManager::readWeatherData()
 				{ auto const SELECT_CASE_var1( Count );
 
 				if ( SELECT_CASE_var1 == 1 ) {
-					 int NumDataPeriods = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					 int NumDataPeriods = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 					 NumHdArgs += 4 * NumDataPeriods;
 					 // TODO: Error if more than one period? Less than full year?
 				} else if ( SELECT_CASE_var1 == 2 ) {
-					kivaWeather.intervalsPerHour = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 				}}
 				Line.erase( 0, Pos + 1 );
 				++Count;

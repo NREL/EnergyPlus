@@ -69,7 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MicroturbineElectricGenerator.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -207,7 +207,7 @@ namespace ChillerExhaustAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = InputProcessor::FindItemInList( AbsorberName, ExhaustAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, ExhaustAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimExhaustAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -336,7 +336,7 @@ namespace ChillerExhaustAbsorption {
 
 		//FLOW
 		cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
-		NumExhaustAbsorbers = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumExhaustAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumExhaustAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
@@ -354,8 +354,8 @@ namespace ChillerExhaustAbsorption {
 		//LOAD ARRAYS
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumExhaustAbsorbers; ++AbsorberNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, Get_ErrorsFound );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, Get_ErrorsFound );
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), Get_ErrorsFound, cCurrentModuleObject + " Name" );
 
 			ExhaustAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
@@ -397,7 +397,7 @@ namespace ChillerExhaustAbsorption {
 			if ( ExhaustAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
 				ExhaustAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				ExhaustAbsorber( AbsorberNum ).CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
 			} else {
 				ExhaustAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 13 );
@@ -421,9 +421,9 @@ namespace ChillerExhaustAbsorption {
 				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				Get_ErrorsFound = false;
 			}
-			if ( InputProcessor::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = false;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = true;
@@ -432,9 +432,9 @@ namespace ChillerExhaustAbsorption {
 				ShowContinueError( "resetting to ENTERING-CONDENSER, simulation continues" );
 			}
 			// Assign Other Paramters
-			if ( InputProcessor::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = false;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = true;
@@ -471,7 +471,7 @@ namespace ChillerExhaustAbsorption {
 			ExhaustAbsorber( AbsorberNum ).SizFac = rNumericArgs( 16 );
 			ExhaustAbsorber( AbsorberNum ).TypeOf = cAlphaArgs( 17 );
 
-			if ( InputProcessor::SameString( cAlphaArgs( 17 ), "Generator:MicroTurbine" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 17 ), "Generator:MicroTurbine" ) ) {
 				ExhaustAbsorber( AbsorberNum ).CompType_Num = iGeneratorMicroturbine;
 				ExhaustAbsorber( AbsorberNum ).ExhuastSourceName = cAlphaArgs( 18 );
 

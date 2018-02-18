@@ -66,7 +66,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -195,7 +195,7 @@ namespace SteamCoils {
 
 		// Find the correct SteamCoilNumber with the Coil Name
 		if ( CompIndex == 0 ) {
-			CoilNum = InputProcessor::FindItemInList( CompName, SteamCoil );
+			CoilNum = UtilityRoutines::FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + CompName );
 			}
@@ -286,14 +286,14 @@ namespace SteamCoils {
 		bool errFlag;
 
 		CurrentModuleObject = "Coil:Heating:Steam";
-		NumStmHeat = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumStmHeat = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumSteamCoils = NumStmHeat;
 		if ( NumSteamCoils > 0 ) {
 			SteamCoil.allocate( NumSteamCoils );
 			CheckEquipName.dimension( NumSteamCoils, true );
 		}
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNums );
@@ -306,8 +306,8 @@ namespace SteamCoils {
 
 			CoilNum = StmHeatNum;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
@@ -338,7 +338,7 @@ namespace SteamCoils {
 			SteamCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			SteamCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( AlphArray( 7 ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( AlphArray( 7 ) ) );
 			//TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
 			if ( SELECT_CASE_var == "TEMPERATURESETPOINTCONTROL" ) {
 				SteamCoil( CoilNum ).TypeOfCoil = TemperatureSetPointControl;
@@ -782,7 +782,11 @@ namespace SteamCoils {
 				if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
 					// if coil is part of a terminal unit just use the terminal unit value
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
-						SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurZoneEqNum ).MaxSTVolFlow;
+						if ( CurTermUnitSizingNum > 0 ) {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = TermUnitSizing( CurTermUnitSizingNum ).MaxSTVolFlow;
+						} else {
+							SteamCoil( CoilNum ).MaxSteamVolFlowRate = 0.0;
+						}
 						// if coil is part of a zonal unit, calc coil load to get hot Steam flow rate
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
@@ -936,7 +940,7 @@ namespace SteamCoils {
 			//update the TempSetPoint
 			TempSetPoint -= SteamCoil( CoilNum ).FaultyCoilSATOffset;
 		}
-		
+
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
@@ -1408,7 +1412,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilType == "COIL:HEATING:STEAM" ) {
-			IndexNum = InputProcessor::FindItemInList( CoilName, SteamCoil );
+			IndexNum = UtilityRoutines::FindItemInList( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1454,7 +1458,7 @@ namespace SteamCoils {
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = InputProcessor::FindItemInList( CompName, SteamCoil );
+			CoilNum = UtilityRoutines::FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + CompName );
 			}
@@ -1505,8 +1509,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				MaxWaterFlowRate = 0.0;
@@ -1700,8 +1704,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = InputProcessor::FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			IndexNum = UtilityRoutines::FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1787,8 +1791,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = InputProcessor::FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			IndexNum = UtilityRoutines::FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1876,8 +1880,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = InputProcessor::FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			IndexNum = UtilityRoutines::FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1925,8 +1929,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				Capacity = SteamCoil( WhichCoil ).OperatingCapacity;
@@ -2023,8 +2027,8 @@ namespace SteamCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = SteamCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -2076,8 +2080,8 @@ namespace SteamCoils {
 		WhichCoil = 0;
 		AvailSchIndex = 0;
 
-		if ( InputProcessor::SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = InputProcessor::FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = SteamCoil( WhichCoil ).SchedPtr;
 			}

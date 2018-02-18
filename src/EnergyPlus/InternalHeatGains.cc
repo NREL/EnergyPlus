@@ -74,7 +74,7 @@
 #include <FuelCellElectricGenerator.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -321,43 +321,43 @@ namespace InternalHeatGains {
 		MaxAlpha = -100;
 		MaxNumber = -100;
 		CurrentModuleObject = "People";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "Lights";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ElectricEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "GasEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "HotWaterEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SteamEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "OtherEquipment";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 
@@ -384,21 +384,21 @@ namespace InternalHeatGains {
 		// PEOPLE: Includes both information related to the heat balance and thermal comfort
 		// First, allocate and initialize the People derived type
 		CurrentModuleObject = "People";
-		NumPeopleStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumPeopleStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		PeopleObjects.allocate( NumPeopleStatements );
 
 		TotPeople = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumPeopleStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			PeopleObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				PeopleObjects( Item ).StartPtr = TotPeople + 1;
 				++TotPeople;
@@ -432,7 +432,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= PeopleObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -599,9 +599,9 @@ namespace InternalHeatGains {
 
 					// Following is an optional parameter (ASHRAE 55 warnings
 					if ( NumAlpha >= 6 ) {
-						if ( InputProcessor::SameString( AlphaName( 6 ), "Yes" ) ) {
+						if ( UtilityRoutines::SameString( AlphaName( 6 ), "Yes" ) ) {
 							People( Loop ).Show55Warning = true;
-						} else if ( ! InputProcessor::SameString( AlphaName( 6 ), "No" ) && ! lAlphaFieldBlanks( 6 ) ) {
+						} else if ( ! UtilityRoutines::SameString( AlphaName( 6 ), "No" ) && ! lAlphaFieldBlanks( 6 ) ) {
 							if ( Item1 == 1 ) {
 								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 6 ) + " field should be Yes or No" );
 								ShowContinueError( "...Field value=\"" + AlphaName( 6 ) + "\" is invalid." );
@@ -670,7 +670,7 @@ namespace InternalHeatGains {
 
 							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
-								People( Loop ).SurfacePtr = InputProcessor::FindItemInList( AlphaName( 8 ), Surface );
+								People( Loop ).SurfacePtr = UtilityRoutines::FindItemInList( AlphaName( 8 ), Surface );
 								if ( People( Loop ).SurfacePtr == 0 && ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) ) {
 									if ( Item1 == 1 ) {
 										ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) + " invalid Surface Name=" + AlphaName( 8 ) );
@@ -927,21 +927,21 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "Lights";
-		NumLightsStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumLightsStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		LightsObjects.allocate( NumLightsStatements );
 
 		TotLights = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumLightsStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			LightsObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				LightsObjects( Item ).StartPtr = TotLights + 1;
 				++TotLights;
@@ -975,7 +975,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= LightsObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1117,6 +1117,21 @@ namespace InternalHeatGains {
 						Lights( Loop ).FractionReturnAirIsCalculated = ( AlphaName( 6 ) == "YES" );
 					}
 
+					// Set return air node number
+					Lights( Loop ).ReturnNodePtr = 0;
+					std::string retNodeName = "";
+					if ( !lAlphaFieldBlanks( 7 ) ) {
+						if ( LightsObjects( Item ).ZoneListActive ) {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\": " + cAlphaFieldNames( 7 ) + " must be blank when using a ZoneList." );
+							ErrorsFound = true;
+						} else {
+							retNodeName = AlphaName( 7 );
+						}
+					}
+					if ( Lights( Loop ).ZonePtr > 0 ) {
+						Lights( Loop ).ReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Zone( Lights( Loop ).ZonePtr ).Name, retNodeName );
+					}
+
 					if ( Lights( Loop ).ZonePtr <= 0 ) continue; // Error, will be caught and terminated later
 
 					// Object report variables
@@ -1156,7 +1171,7 @@ namespace InternalHeatGains {
 						SetupEMSInternalVariable( "Lighting Power Design Level", Lights( Loop ).Name, "[W]", Lights( Loop ).DesignLevel );
 					} // EMS
 					//setup internal gains
-					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate );
+					if ( ! ErrorsFound ) SetupZoneInternalGain( Lights( Loop ).ZonePtr, "Lights", Lights( Loop ).Name, IntGainTypeOf_Lights, Lights( Loop ).ConGainRate, Lights( Loop ).RetAirGainRate, Lights( Loop ).RadGainRate, _, _, _, _, Lights(Loop).ReturnNodePtr );
 
 					// send values to predefined lighting summary report
 					liteName = Lights( Loop ).Name;
@@ -1189,21 +1204,21 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ElectricEquipment";
-		NumZoneElectricStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumZoneElectricStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneElectricObjects.allocate( NumZoneElectricStatements );
 
 		TotElecEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumZoneElectricStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			ZoneElectricObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				ZoneElectricObjects( Item ).StartPtr = TotElecEquip + 1;
 				++TotElecEquip;
@@ -1237,7 +1252,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= ZoneElectricObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1394,21 +1409,21 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "GasEquipment";
-		NumZoneGasStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumZoneGasStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneGasObjects.allocate( NumZoneGasStatements );
 
 		TotGasEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumZoneGasStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			ZoneGasObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				ZoneGasObjects( Item ).StartPtr = TotGasEquip + 1;
 				++TotGasEquip;
@@ -1442,7 +1457,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= ZoneGasObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1620,21 +1635,21 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "HotWaterEquipment";
-		NumHotWaterEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumHotWaterEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		HotWaterEqObjects.allocate( NumHotWaterEqStatements );
 
 		TotHWEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumHotWaterEqStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			HotWaterEqObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				HotWaterEqObjects( Item ).StartPtr = TotHWEquip + 1;
 				++TotHWEquip;
@@ -1668,7 +1683,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= HotWaterEqObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1825,21 +1840,21 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "SteamEquipment";
-		NumSteamEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumSteamEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		SteamEqObjects.allocate( NumSteamEqStatements );
 
 		TotStmEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumSteamEqStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			SteamEqObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( AlphaName( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				SteamEqObjects( Item ).StartPtr = TotStmEquip + 1;
 				++TotStmEquip;
@@ -1873,7 +1888,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= SteamEqObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -2030,21 +2045,21 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "OtherEquipment";
-		NumOtherEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOtherEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OtherEqObjects.allocate( NumOtherEqStatements );
 
 		TotOthEquip = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumOtherEqStatements; ++Item ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			errFlag = ErrorsFound;
 
 			OtherEqObjects( Item ).Name = AlphaName( 1 );
 
-			Item1 = InputProcessor::FindItemInList( AlphaName( 3 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( AlphaName( 3 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( AlphaName( 3 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( AlphaName( 3 ), ZoneList );
 			if ( Item1 > 0 ) {
 				OtherEqObjects( Item ).StartPtr = TotOthEquip + 1;
 				++TotOthEquip;
@@ -2078,7 +2093,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= OtherEqObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -2253,7 +2268,7 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-		NumZoneITEqStatements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumZoneITEqStatements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		errFlag = false;
 
 		// Note that this object type does not support ZoneList due to node names in input fields
@@ -2265,10 +2280,10 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				ZoneITEq( Loop ).Name = AlphaName( 1 );
-				ZoneITEq( Loop ).ZonePtr = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+				ZoneITEq( Loop ).ZonePtr = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 
 				// IT equipment design level calculation method.
 				{ auto const equipmentLevel( AlphaName( 3 ) );
@@ -2407,19 +2422,19 @@ namespace InternalHeatGains {
 				}
 
 				// Environmental class
-				if ( InputProcessor::SameString( AlphaName( 9 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( AlphaName( 9 ), "None" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassNone;
-				} else if ( InputProcessor::SameString( AlphaName( 9 ), "A1" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A1" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA1;
-				} else if ( InputProcessor::SameString( AlphaName( 9 ), "A2" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A2" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA2;
-				} else if ( InputProcessor::SameString( AlphaName( 9 ), "A3" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A3" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA3;
-				} else if ( InputProcessor::SameString( AlphaName( 9 ), "A4" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "A4" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA4;
-				} else if ( InputProcessor::SameString( AlphaName( 9 ), "B" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "B" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassB;
-				} else if ( InputProcessor::SameString( AlphaName( 9 ), "C" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 9 ), "C" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassC;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
@@ -2429,11 +2444,11 @@ namespace InternalHeatGains {
 				}
 
 				// Air and supply inlet connections
-				if ( InputProcessor::SameString( AlphaName( 10 ), "AdjustedSupply" ) ) {
+				if ( UtilityRoutines::SameString( AlphaName( 10 ), "AdjustedSupply" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletAdjustedSupply;
-				} else if ( InputProcessor::SameString( AlphaName( 10 ), "ZoneAirNode" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "ZoneAirNode" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
-				} else if ( InputProcessor::SameString( AlphaName( 10 ), "RoomAirModel" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphaName( 10 ), "RoomAirModel" ) ) {
 					// ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode" );
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
@@ -2558,18 +2573,18 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-		TotBBHeat = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotBBHeat = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneBBHeat.allocate( TotBBHeat );
 
 		for ( Loop = 1; Loop <= TotBBHeat; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 
 			ZoneBBHeat( Loop ).Name = AlphaName( 1 );
 
-			ZoneBBHeat( Loop ).ZonePtr = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			ZoneBBHeat( Loop ).ZonePtr = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneBBHeat( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -2656,18 +2671,18 @@ namespace InternalHeatGains {
 
 		RepVarSet = true;
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-		TotCO2Gen = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		TotCO2Gen = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneCO2Gen.allocate( TotCO2Gen );
 
 		for ( Loop = 1; Loop <= TotCO2Gen; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			InputProcessor::GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 
 			ZoneCO2Gen( Loop ).Name = AlphaName( 1 );
 
-			ZoneCO2Gen( Loop ).ZonePtr = InputProcessor::FindItemInList( AlphaName( 2 ), Zone );
+			ZoneCO2Gen( Loop ).ZonePtr = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneCO2Gen( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -4621,41 +4636,18 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirConvectionGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumReturnAirGainRate
+		Real64 & SumReturnAirGainRate,
+		int const ReturnNodeNum // return air node number
 	)
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   Dec. 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// worker routine for summing all the internal gain types
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 tmpSumRetAirGainRate;
 		int DeviceNum;
 
@@ -4667,7 +4659,10 @@ namespace InternalHeatGains {
 		}
 
 		for ( DeviceNum = 1; DeviceNum <= ZoneIntGain( ZoneNum ).NumberOfDevices; ++DeviceNum ) {
-			tmpSumRetAirGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirConvGainRate;
+			// If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
+			if ( ( ReturnNodeNum == 0 ) || ( ReturnNodeNum == ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirNodeNum ) ) {
+				tmpSumRetAirGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirConvGainRate;
+			}
 		}
 
 		SumReturnAirGainRate = tmpSumRetAirGainRate;
@@ -4993,7 +4988,8 @@ namespace InternalHeatGains {
 	void
 	SumAllReturnAirLatentGains(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumRetAirLatentGainRate
+		Real64 & SumRetAirLatentGainRate,
+		int const ReturnNodeNum // return air node number
 	)
 	{
 
@@ -5039,7 +5035,10 @@ namespace InternalHeatGains {
 		}
 
 		for ( DeviceNum = 1; DeviceNum <= ZoneIntGain( ZoneNum ).NumberOfDevices; ++DeviceNum ) {
-			tmpSumLatentGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirLatentGainRate;
+			// If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
+			if ( ( ReturnNodeNum == 0 ) || ( ReturnNodeNum == ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirNodeNum ) ) {
+				tmpSumLatentGainRate += ZoneIntGain( ZoneNum ).Device( DeviceNum ).ReturnAirLatentGainRate;
+			}
 		}
 
 		SumRetAirLatentGainRate = tmpSumLatentGainRate;
@@ -5382,7 +5381,7 @@ namespace InternalHeatGains {
 		}
 
 		for ( DeviceNum = 1; DeviceNum <= ZoneIntGain( ZoneNum ).NumberOfDevices; ++DeviceNum ) {
-			if ( InputProcessor::SameString( ZoneIntGain( ZoneNum ).Device( DeviceNum ).CompObjectName, IntGainName ) ) {
+			if ( UtilityRoutines::SameString( ZoneIntGain( ZoneNum ).Device( DeviceNum ).CompObjectName, IntGainName ) ) {
 				if ( ZoneIntGain( ZoneNum ).Device( DeviceNum ).CompTypeOfNum != IntGainTypeOfNum ) {
 					ErrorFound = true;
 				}

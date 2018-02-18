@@ -77,7 +77,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -297,7 +297,7 @@ namespace SwimmingPool {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-		InputProcessor::GetObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "SwimmingPool:Indoor", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -314,7 +314,7 @@ namespace SwimmingPool {
 		lNumericBlanks.allocate( MaxNumbers );
 		lNumericBlanks = true;
 
-		NumSwimmingPools = InputProcessor::GetNumObjectsFound( "SwimmingPool:Indoor" );
+		NumSwimmingPools = inputProcessor->getNumObjectsFound( "SwimmingPool:Indoor" );
 		CheckEquipName.allocate( NumSwimmingPools );
 		CheckEquipName = true;
 
@@ -326,14 +326,14 @@ namespace SwimmingPool {
 		CurrentModuleObject = "SwimmingPool:Indoor";
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 			Pool( Item ).Name = Alphas( 1 );
 
 			Pool( Item ).SurfaceName = Alphas( 2 );
 			Pool( Item ).SurfacePtr = 0;
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-				if ( InputProcessor::SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
+				if ( UtilityRoutines::SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
 					Pool( Item ).SurfacePtr = SurfNum;
 					break;
 				}
@@ -569,12 +569,8 @@ namespace SwimmingPool {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataGlobals::AnyPlantInModel;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantLoop;
-		using DataPlant::TypeOf_SwimmingPool_Indoor;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using FluidProperties::GetDensityGlycol;
@@ -600,7 +596,6 @@ namespace SwimmingPool {
 		static bool MyOneTimeFlag( true ); // Flag for one-time initializations
 		static bool MyEnvrnFlagGeneral( true );
 		static Array1D_bool MyPlantScanFlagPool;
-		bool errFlag;
 		Real64 mdot;
 		Real64 HeatGainPerPerson;
 		Real64 PeopleModifier;
@@ -615,18 +610,6 @@ namespace SwimmingPool {
 			MyPlantScanFlagPool.allocate( NumSwimmingPools );
 			MyPlantScanFlagPool = true;
 
-			if ( MyPlantScanFlagPool( PoolNum ) && allocated( PlantLoop ) ) {
-				errFlag = false;
-				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
-					ScanPlantLoopsForObject( Pool( PoolNum ).Name, TypeOf_SwimmingPool_Indoor, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum, _, _, _, Pool( PoolNum ).WaterInletNode, _, errFlag );
-					if ( errFlag ) {
-						ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
-					}
-				}
-				MyPlantScanFlagPool( PoolNum ) = false;
-			} else if ( MyPlantScanFlagPool( PoolNum ) && ! AnyPlantInModel ) {
-				MyPlantScanFlagPool( PoolNum ) = false;
-			}
 			ZeroSourceSumHATsurf.allocate( NumOfZones );
 			ZeroSourceSumHATsurf = 0.0;
 			QPoolSrcAvg.allocate( TotSurfaces );
@@ -643,6 +626,8 @@ namespace SwimmingPool {
 			LastTimeStepSys = 0.0;
 		}
 
+		InitSwimmingPoolPlantLoopIndex( PoolNum, MyPlantScanFlagPool( PoolNum ) );
+		
 		if ( BeginEnvrnFlag && MyEnvrnFlagGeneral ) {
 			ZeroSourceSumHATsurf = 0.0;
 			QPoolSrcAvg = 0.0;
@@ -777,6 +762,42 @@ namespace SwimmingPool {
 
 	}
 
+	void
+	InitSwimmingPoolPlantLoopIndex(
+		int const PoolNum, // number of the swimming pool
+		bool & MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   June 2017
+
+		// Using/Aliasing
+		using DataPlant::PlantLoop;
+		using DataPlant::TypeOf_SwimmingPool_Indoor;
+		using DataPlant::ScanPlantLoopsForObject;
+		using DataGlobals::AnyPlantInModel;
+
+		bool errFlag;
+		static std::string const RoutineName( "InitSwimmingPoolPlantLoopIndex" );
+		
+		if ( MyPlantScanFlagPool && allocated( PlantLoop ) ) {
+			errFlag = false;
+			if ( Pool( PoolNum ).WaterInletNode > 0 ) {
+				ScanPlantLoopsForObject( Pool( PoolNum ).Name, TypeOf_SwimmingPool_Indoor, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum, _, _, _, Pool( PoolNum ).WaterInletNode, _, errFlag );
+				if ( errFlag ) {
+					ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
+				}
+			}
+			MyPlantScanFlagPool = false;
+		} else if ( MyPlantScanFlagPool && ! AnyPlantInModel ) {
+			MyPlantScanFlagPool = false;
+		}
+
+	}
+	
+	
 	void
 	CalcSwimmingPool(
 		int const PoolNum // number of the swimming pool

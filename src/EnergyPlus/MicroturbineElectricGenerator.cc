@@ -63,7 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -154,7 +154,7 @@ namespace MicroturbineElectricGenerator {
 
 		// SELECT and CALL GENERATOR MODEL
 		if ( GeneratorIndex == 0 ) {
-			GenNum = InputProcessor::FindItemInList( GeneratorName, MTGenerator );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, MTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -208,7 +208,7 @@ namespace MicroturbineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = InputProcessor::FindItemInList( CompName, MTGenerator );
+			CompNum = UtilityRoutines::FindItemInList( CompName, MTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );
 				return;
@@ -287,7 +287,7 @@ namespace MicroturbineElectricGenerator {
 
 		// FLOW:
 		cCurrentModuleObject = "Generator:MicroTurbine";
-		NumMTGenerators = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumMTGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumMTGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -301,8 +301,8 @@ namespace MicroturbineElectricGenerator {
 
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			MTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			MTGenerator( GeneratorNum ).RefElecPowerOutput = NumArray( 1 );
@@ -625,11 +625,11 @@ namespace MicroturbineElectricGenerator {
 
 				MTGenerator( GeneratorNum ).RefInletWaterTemp = NumArray( 13 );
 
-				if ( InputProcessor::SameString( AlphArray( 9 ), "InternalControl" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 9 ), "InternalControl" ) ) {
 					MTGenerator( GeneratorNum ).InternalFlowControl = true; //  A9, \field Heat Recovery Water Flow Operating Mode
 					MTGenerator( GeneratorNum ).PlantFlowControl = false;
 				}
-				if ( ( ! ( InputProcessor::SameString( AlphArray( 9 ), "InternalControl" ) ) ) && ( ! ( InputProcessor::SameString( AlphArray( 9 ), "PlantControl" ) ) ) ) {
+				if ( ( ! ( UtilityRoutines::SameString( AlphArray( 9 ), "InternalControl" ) ) ) && ( ! ( UtilityRoutines::SameString( AlphArray( 9 ), "PlantControl" ) ) ) ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphArray( 9 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ShowContinueError( "Operating Mode must be INTERNAL CONTROL or PLANT CONTROL." );
@@ -1969,7 +1969,7 @@ namespace MicroturbineElectricGenerator {
 
 		ExhaustOutletNodeNum = 0;
 
-		CompNum = InputProcessor::FindItemInList( CompName, MTGenerator );
+		CompNum = UtilityRoutines::FindItemInList( CompName, MTGenerator );
 
 		if ( CompNum == 0 ) {
 			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );

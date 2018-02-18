@@ -88,6 +88,13 @@ namespace DataVectorTypes {
 	typedef  ObjexxFCL::Vector3< Real64 >  Vector;
 	typedef  ObjexxFCL::Vector2< Real64 >  Vector_2d;
 
+	struct Vector2dCount: Vector_2d {
+		int count;
+		Vector2dCount():
+			count( 0 )
+		{}
+	};
+
 //	struct Vector // This is used to specify a point in 3D space
 //	{
 //		// Members

@@ -76,11 +76,9 @@
 #include <HighTempRadiantSystem.hh>
 #include <HWBaseboardRadiator.hh>
 #include <InternalHeatGains.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <MoistureBalanceEMPDManager.hh>
 #include <OutputProcessor.hh>
@@ -391,7 +389,7 @@ namespace RoomAirModelAirflowNetwork {
 						for ( EquipLoop = 1; EquipLoop <= RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).NumHVACs; ++EquipLoop ) { //loop over all the equip for a single room air node
 							// Check zone equipment name
 							for ( I = 1; I <= ZoneEquipList( LoopZone ).NumOfEquipTypes; ++I ) { //loop over all equip types
-								if ( InputProcessor::SameString( ZoneEquipList( LoopZone ).EquipName( I ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).Name ) ) {
+								if ( UtilityRoutines::SameString( ZoneEquipList( LoopZone ).EquipName( I ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).Name ) ) {
 									if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).EquipConfigIndex == 0 )
 										RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).EquipConfigIndex = I;
 									EquipFound( I ) = true;
@@ -400,7 +398,7 @@ namespace RoomAirModelAirflowNetwork {
 								}
 							}
 							for ( IdNode = 1; IdNode <= NumOfNodes; ++IdNode ) { //loop over all nodes to find supply node ID
-								if ( InputProcessor::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupplyNodeName ) ) {
+								if ( UtilityRoutines::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupplyNodeName ) ) {
 									RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum = IdNode;
 									break;
 								}
@@ -413,12 +411,12 @@ namespace RoomAirModelAirflowNetwork {
 								}
 							}
 
-							if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum > 0 && InputProcessor::SameString( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName, "" ) ) {
+							if ( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).SupNodeNum > 0 && UtilityRoutines::SameString( RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName, "" ) ) {
 								RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName = NodeID( ZoneEquipConfig( LoopZone ).ReturnAirNode ); // Zone return node
 							}
 
 							for ( IdNode = 1; IdNode <= NumOfNodes; ++IdNode ) { //loop over all nodes to find return node ID
-								if ( InputProcessor::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName ) ) {
+								if ( UtilityRoutines::SameString( NodeID( IdNode ), RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).ReturnNodeName ) ) {
 									RoomAirflowNetworkZoneInfo( LoopZone ).Node( LoopAirNode ).HVAC( EquipLoop ).RetNodeNum = IdNode;
 									break;
 								}

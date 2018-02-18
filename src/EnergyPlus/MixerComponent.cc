@@ -55,7 +55,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -172,7 +172,7 @@ namespace MixerComponent {
 
 		// Find the correct MixerNumber
 		if ( CompIndex == 0 ) {
-			MixerNum = InputProcessor::FindItemInList( CompName, MixerCond, &MixerConditions::MixerName );
+			MixerNum = UtilityRoutines::FindItemInList( CompName, MixerCond, &MixerConditions::MixerName );
 			if ( MixerNum == 0 ) {
 				ShowFatalError( "SimAirLoopMixer: Mixer not found=" + CompName );
 			}
@@ -249,12 +249,12 @@ namespace MixerComponent {
 
 		// Flow
 		CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-		NumMixers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumMixers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumMixers > 0 ) MixerCond.allocate( NumMixers );
 		CheckEquipName.dimension( NumMixers, true );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		lAlphaBlanks.dimension( NumAlphas, true );
@@ -263,8 +263,8 @@ namespace MixerComponent {
 		NumArray.dimension( NumNums, 0.0 );
 
 		for ( MixerNum = 1; MixerNum <= NumMixers; ++MixerNum ) {
-			InputProcessor::GetObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			InputProcessor::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
 			MixerCond( MixerNum ).MixerName = AlphArray( 1 );
 
@@ -667,7 +667,7 @@ namespace MixerComponent {
 			GetZoneMixerIndexInputFlag = false;
 		}
 
-		MixerIndex = InputProcessor::FindItemInList( MixerName, MixerCond, &MixerConditions::MixerName );
+		MixerIndex = UtilityRoutines::FindItemInList( MixerName, MixerCond, &MixerConditions::MixerName );
 		if ( MixerIndex == 0 ) {
 			if ( ! ThisObjectType.empty() ) {
 				ShowSevereError( ThisObjectType + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName );

@@ -237,7 +237,7 @@ namespace StandardRatings {
 		// Using/Aliasing
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
@@ -384,7 +384,7 @@ namespace StandardRatings {
 				Par( 11 ) = OpenMotorEff;
 				CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
 				CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-				SolveRegulaFalsi( Acc, IterMax, SolFla, CondenserOutletTemp, ReformEIRChillerCondInletTempResidual, CondenserOutletTemp0, CondenserOutletTemp1, Par );
+				SolveRoot( Acc, IterMax, SolFla, CondenserOutletTemp, ReformEIRChillerCondInletTempResidual, CondenserOutletTemp0, CondenserOutletTemp1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating Reform Chiller IPLV" );
 					ShowContinueError( "Reformulated Chiller IPLV calculation failed for " + ChillerName );

@@ -56,7 +56,6 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -127,9 +126,9 @@ namespace BranchNodeConnections {
 		MakeNew = true;
 		for ( Count = 1; Count <= NumOfNodeConnections; ++Count ) {
 			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
-			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
-			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
-			if ( ! InputProcessor::SameString( NodeConnections( Count ).ConnectionType, ConnectionType ) ) continue;
+			if ( ! UtilityRoutines::SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! UtilityRoutines::SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( ! UtilityRoutines::SameString( NodeConnections( Count ).ConnectionType, ConnectionType ) ) continue;
 			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
 			if ( ( NodeConnections( Count ).ObjectIsParent && ! IsParent ) || ( ! NodeConnections( Count ).ObjectIsParent && IsParent ) ) {
 				ShowSevereError( RoutineName + "Node registered for both Parent and \"not\" Parent" );
@@ -149,7 +148,7 @@ namespace BranchNodeConnections {
 
 			NodeConnections( NumOfNodeConnections ).NodeNumber = NodeNumber;
 			NodeConnections( NumOfNodeConnections ).NodeName = NodeName;
-			NodeConnections( NumOfNodeConnections ).ObjectType = InputProcessor::MakeUPPERCase( ObjectType );
+			NodeConnections( NumOfNodeConnections ).ObjectType = UtilityRoutines::MakeUPPERCase( ObjectType );
 			NodeConnections( NumOfNodeConnections ).ObjectName = ObjectName;
 			NodeConnections( NumOfNodeConnections ).ConnectionType = ConnectionType;
 			NodeConnections( NumOfNodeConnections ).FluidStream = FluidStream;
@@ -168,7 +167,7 @@ namespace BranchNodeConnections {
 				}
 
 				// Check out AirTerminal inlet/outlet nodes
-				Found = InputProcessor::FindItemInList( NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1 );
+				Found = UtilityRoutines::FindItemInList( NodeName, AirTerminalNodeConnections, &EqNodeConnectionDef::NodeName, NumOfAirTerminalNodes - 1 );
 				if ( Found != 0 ) { // Nodename already used
 					ShowSevereError( RoutineName + ObjectType + "=\"" + ObjectName + "\" node name duplicated." );
 					ShowContinueError( "NodeName=\"" + NodeName + "\", entered as type=" + ConnectionType );
@@ -228,8 +227,8 @@ namespace BranchNodeConnections {
 		int Found = 0;
 		for ( int Count = 1; Count <= NumOfNodeConnections; ++Count ) {
 			if ( NodeConnections( Count ).NodeNumber != NodeNumber ) continue;
-			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
-			if ( ! InputProcessor::SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
+			if ( ! UtilityRoutines::SameString( NodeConnections( Count ).ObjectType, ObjectType ) ) continue;
+			if ( ! UtilityRoutines::SameString( NodeConnections( Count ).ObjectName, ObjectName ) ) continue;
 			if ( NodeConnections( Count ).FluidStream != FluidStream ) continue;
 			if ( ( NodeConnections( Count ).ObjectIsParent != IsParent )) continue;
 			Found = Count;
@@ -843,8 +842,8 @@ namespace BranchNodeConnections {
 			InletNodeName = ParentNodeList( Which ).InletNodeName;
 			OutletNodeName = ParentNodeList( Which ).OutletNodeName;
 			// Get Node Numbers
-			InletNodeNum = InputProcessor::FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
-			OutletNodeNum = InputProcessor::FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+			InletNodeNum = UtilityRoutines::FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+			OutletNodeNum = UtilityRoutines::FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
 			//    IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
 			//      CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
 			//        ', Component Name='//TRIM(ComponentName))
@@ -862,8 +861,8 @@ namespace BranchNodeConnections {
 			if ( Which != 0 ) {
 				InletNodeName = CompSets( Which ).InletNodeName;
 				OutletNodeName = CompSets( Which ).OutletNodeName;
-				InletNodeNum = InputProcessor::FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
-				OutletNodeNum = InputProcessor::FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+				InletNodeNum = UtilityRoutines::FindItemInList( InletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
+				OutletNodeNum = UtilityRoutines::FindItemInList( OutletNodeName, NodeID( {1,NumOfNodes} ), NumOfNodes );
 				//      IF (InletNodeNum == 0 .and. ComponentType /= 'ZONEHVAC:AIRDISTRIBUTIONUNIT') THEN
 				//        CALL ShowWarningError('GetParentData: Component Type='//TRIM(ComponentType)//  &
 				//          ', Component Name='//TRIM(ComponentName))
@@ -1163,8 +1162,8 @@ namespace BranchNodeConnections {
 			if ( NodeConnections( Which ).ObjectType != ComponentType || NodeConnections( Which ).ObjectName != ComponentName ) continue;
 			//    FoundObject=.TRUE.
 			if ( NodeConnections( Which ).ObjectIsParent ) IsParent = true;
-			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) ++NumInlets;
-			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) ++NumOutlets;
+			if ( UtilityRoutines::SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) ++NumInlets;
+			if ( UtilityRoutines::SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) ++NumOutlets;
 		}
 
 		InletNodeNames.allocate( NumInlets );
@@ -1190,13 +1189,13 @@ namespace BranchNodeConnections {
 
 		for ( Which = 1; Which <= NumOfNodeConnections; ++Which ) {
 			if ( NodeConnections( Which ).ObjectType != ComponentType || NodeConnections( Which ).ObjectName != ComponentName ) continue;
-			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) {
+			if ( UtilityRoutines::SameString( NodeConnections( Which ).ConnectionType, "Inlet" ) ) {
 				++NumInlets;
 				InletNodeNames( NumInlets ) = NodeConnections( Which ).NodeName;
 				InletNodeNums( NumInlets ) = NodeConnections( Which ).NodeNumber;
 				InletFluidStreams( NumInlets ) = NodeConnections( Which ).FluidStream;
 			}
-			if ( InputProcessor::SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) {
+			if ( UtilityRoutines::SameString( NodeConnections( Which ).ConnectionType, "Outlet" ) ) {
 				++NumOutlets;
 				OutletNodeNames( NumOutlets ) = NodeConnections( Which ).NodeName;
 				OutletNodeNums( NumOutlets ) = NodeConnections( Which ).NodeNumber;
@@ -1291,7 +1290,7 @@ namespace BranchNodeConnections {
 						ChildInNodeName( CountNum ) = CompSets( Loop ).InletNodeName;
 						ChildOutNodeName( CountNum ) = CompSets( Loop ).OutletNodeName;
 						// Get Node Numbers
-						ChildInNodeNum( CountNum ) = InputProcessor::FindItemInList( ChildInNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
+						ChildInNodeNum( CountNum ) = UtilityRoutines::FindItemInList( ChildInNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
 						//          IF (ChildInNodeNum(CountNum) == 0) THEN
 						//            CALL ShowSevereError('GetChildrenData: Inlet Node not previously assigned, Node='//  &
 						//                    TRIM(ChildInNodeName(CountNum)))
@@ -1299,7 +1298,7 @@ namespace BranchNodeConnections {
 						//            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
 						//            ErrInObject=.TRUE.
 						//          ENDIF
-						ChildOutNodeNum( CountNum ) = InputProcessor::FindItemInList( ChildOutNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
+						ChildOutNodeNum( CountNum ) = UtilityRoutines::FindItemInList( ChildOutNodeName( CountNum ), NodeID( {1,NumOfNodes} ), NumOfNodes );
 						//          IF (ChildOutNodeNum(CountNum) == 0) THEN
 						//            CALL ShowSevereError('GetChildrenData: Outlet Node not previously assigned, Node='//  &
 						//                    TRIM(ChildOutNodeName(CountNum)))
@@ -1424,8 +1423,8 @@ namespace BranchNodeConnections {
 
 		// Object Data
 
-		ParentTypeUC = InputProcessor::MakeUPPERCase( ParentType );
-		CompTypeUC = InputProcessor::MakeUPPERCase( CompType );
+		ParentTypeUC = UtilityRoutines::MakeUPPERCase( ParentType );
+		CompTypeUC = UtilityRoutines::MakeUPPERCase( CompType );
 		Found = 0;
 
 		// See if Component-Nodes set is already there - should be unique
@@ -1535,8 +1534,8 @@ namespace BranchNodeConnections {
 			CompSets( NumCompSets ).ParentCName = ParentName;
 			CompSets( NumCompSets ).CType = CompTypeUC;
 			CompSets( NumCompSets ).CName = CompName;
-			CompSets( NumCompSets ).InletNodeName = InletNode;
-			CompSets( NumCompSets ).OutletNodeName = OutletNode;
+			CompSets( NumCompSets ).InletNodeName = UtilityRoutines::MakeUPPERCase( InletNode ); // TODO: Fix this....
+			CompSets( NumCompSets ).OutletNodeName = UtilityRoutines::MakeUPPERCase( OutletNode ); // TODO: Fix this....
 			if ( present( Description ) ) {
 				CompSets( NumCompSets ).Description = Description;
 			} else {
@@ -1666,7 +1665,7 @@ namespace BranchNodeConnections {
 		int Found;
 		std::string CompTypeUC; // Component type in upper case
 
-		CompTypeUC = InputProcessor::MakeUPPERCase( CompType );
+		CompTypeUC = UtilityRoutines::MakeUPPERCase( CompType );
 
 		// See if Already there
 		Found = 0;
@@ -1839,7 +1838,7 @@ namespace BranchNodeConnections {
 
 		if ( NumInList > 0 ) {
 			for ( NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex ) {
-				NodeConnectType( NodeConnectIndex ) = InputProcessor::FindItemInList( NodeConnections( ListArray( NodeConnectIndex ) ).ConnectionType, ValidConnectionTypes, NumValidConnectionTypes );
+				NodeConnectType( NodeConnectIndex ) = UtilityRoutines::FindItemInList( NodeConnections( ListArray( NodeConnectIndex ) ).ConnectionType, ValidConnectionTypes, NumValidConnectionTypes );
 			}
 		} else {
 			if ( NodeNumber > 0 ) {

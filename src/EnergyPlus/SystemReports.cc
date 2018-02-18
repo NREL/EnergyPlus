@@ -78,7 +78,6 @@
 #include <FanCoilUnits.hh>
 #include <HVACStandAloneERV.hh>
 #include <HVACVariableRefrigerantFlow.hh>
-#include <InputProcessor.hh>
 #include <OutdoorAirUnit.hh>
 #include <OutputProcessor.hh>
 #include <PackagedTerminalHeatPump.hh>
@@ -333,7 +332,7 @@ namespace SystemReports {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = InputProcessor::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
 					for ( CompNum = 1; CompNum <= ZoneEquipList( ListNum ).NumOfEquipTypes; ++CompNum ) {
@@ -447,7 +446,7 @@ namespace SystemReports {
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = InputProcessor::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				//loop over the zone supply air path inlet nodes
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
@@ -3882,7 +3881,7 @@ namespace SystemReports {
 		default:
 			found = 0;
 			if ( NumCompTypes > 0 ) {
-				found = InputProcessor::FindItemInList( CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes );
+				found = UtilityRoutines::FindItemInList( CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes );
 			}
 			if ( found == 0 ) {
 				CompTypeErrors( ++NumCompTypes ).CompType = CompType;
@@ -4501,7 +4500,7 @@ namespace SystemReports {
 			for ( PassLoopNum = 1; PassLoopNum <= NumPlantLoops; ++PassLoopNum ) {
 				for ( PassBranchNum = 1; PassBranchNum <= VentRepPlantDemandSide( PassLoopNum ).TotalBranches; ++PassBranchNum ) {
 					for ( PassCompNum = 1; PassCompNum <= VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).TotalComponents; ++PassCompNum ) {
-						if ( InputProcessor::SameString( CompType, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && InputProcessor::SameString( CompName, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
+						if ( UtilityRoutines::SameString( CompType, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && UtilityRoutines::SameString( CompName, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
 							// Found a match on the plant demand side--increment the counter
 							MatchFound = true;
 							MatchLoopType = 1;
@@ -4521,7 +4520,7 @@ namespace SystemReports {
 			for ( PassLoopNum = 1; PassLoopNum <= NumCondLoops; ++PassLoopNum ) {
 				for ( PassBranchNum = 1; PassBranchNum <= VentRepCondDemandSide( PassLoopNum ).TotalBranches; ++PassBranchNum ) {
 					for ( PassCompNum = 1; PassCompNum <= VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).TotalComponents; ++PassCompNum ) {
-						if ( InputProcessor::SameString( CompType, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && InputProcessor::SameString( CompName, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
+						if ( UtilityRoutines::SameString( CompType, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && UtilityRoutines::SameString( CompName, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
 							// Found a match on the plant demand side--increment the counter
 							MatchFound = true;
 							MatchLoopType = 2;

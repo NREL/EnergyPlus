@@ -57,6 +57,7 @@
 #include <SizingManager.hh>
 #include <CostEstimateManager.hh>
 #include <DataAirLoop.hh>
+#include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
@@ -69,7 +70,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <ScheduleManager.hh>
@@ -219,6 +220,7 @@ namespace SizingManager {
 		GetOARequirements(); // get the OA requirements object
 		GetZoneAirDistribution(); // get zone air distribution objects
 		GetZoneHVACSizing(); // get zone HVAC sizing object
+		GetAirTerminalSizing(); // get air terminal sizing object
 		GetSizingParams(); // get the building level sizing paramets
 		GetZoneSizingInput(); // get the Zone Sizing input
 		GetSystemSizingInput(); // get the System Sizing input
@@ -792,8 +794,8 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:OutdoorAir";
-		NumOARequirements = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumOARequirements = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -808,8 +810,8 @@ namespace SizingManager {
 			//Start Loading the System Input
 			for ( OAIndex = 1; OAIndex <= NumOARequirements; ++OAIndex ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				OARequirements( OAIndex ).Name = Alphas( 1 );
 
@@ -889,22 +891,28 @@ namespace SizingManager {
 
 
 		if ( NumAlphas > 1 ) {
-			if ( InputProcessor::SameString( Alphas( 2 ), "Flow/Person" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 2 ), "Flow/Person" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowPPer;
-			} else if ( InputProcessor::SameString( Alphas( 2 ), "Flow/Zone" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "Flow/Zone" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlow;
-			} else if ( InputProcessor::SameString( Alphas( 2 ), "Flow/Area" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "Flow/Area" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowPerArea;
-			} else if ( InputProcessor::SameString( Alphas( 2 ), "AirChanges/Hour" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "AirChanges/Hour" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowACH;
-			} else if ( InputProcessor::SameString( Alphas( 2 ), "Sum" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "Sum" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowSum;
-			} else if ( InputProcessor::SameString( Alphas( 2 ), "Maximum" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "Maximum" ) ) {
 				OARequirements( OAIndex ).OAFlowMethod = OAFlowMax;
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "INDOORAIRQUALITYPROCEDURE" ) ) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_IAQP;
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE" ) ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_ProportionalControlSchOcc;
+			} else if ( UtilityRoutines::SameString( Alphas( 2 ), "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY" ) ) { // Proportional Control based on ASHRAE Standard 62.1-2004
+				OARequirements( OAIndex ).OAFlowMethod = ZOAM_ProportionalControlDesOcc;
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
 				ShowContinueError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"," );
-				ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum." );
+				ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, ProportionalControlBasedOnDesignOccupancy, and ProportionalControlBasedonOccupancySchedule." );
 				ErrorsFound = true;
 			}
 		} else {
@@ -919,26 +927,30 @@ namespace SizingManager {
 		}
 		// if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it
 		// being counted later #4378
-		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax ) {
+		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax &&
+			OARequirements( OAIndex ).OAFlowMethod != ZOAM_ProportionalControlSchOcc && OARequirements( OAIndex ).OAFlowMethod != ZOAM_ProportionalControlDesOcc && OARequirements( OAIndex ).OAFlowMethod != ZOAM_IAQP ) {
 			OARequirements( OAIndex ).OAFlowPerPerson = 0.0;
 		}
 		// remaining fields default to 0
 		if ( NumNumbers > 1 ) {
 			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowPerArea || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
 				OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
+			} else if ( OARequirements( OAIndex ).OAFlowMethod == ZOAM_ProportionalControlSchOcc || OARequirements( OAIndex ).OAFlowMethod == ZOAM_ProportionalControlDesOcc || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
+				OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
 			} else {
 				OARequirements( OAIndex ).OAFlowPerArea = 0.0;
 			}
 		}
 		if ( NumNumbers > 2 ) {
-			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlow || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlow || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
 				OARequirements( OAIndex ).OAFlowPerZone = Numbers( 3 );
 			} else {
 				OARequirements( OAIndex ).OAFlowPerZone = 0.0;
 			}
 		}
+
 		if ( NumNumbers > 3 ) {
-			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowACH || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowACH || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax || OARequirements( OAIndex ).OAFlowMethod == ZOAM_IAQP ) {
 				OARequirements( OAIndex ).OAFlowACH = Numbers( 4 );
 			} else {
 				OARequirements( OAIndex ).OAFlowACH = 0.0;
@@ -960,6 +972,25 @@ namespace SizingManager {
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
 					ShowContinueError( "...Not Found " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
+					ErrorsFound = true;
+				}
+			}
+		}
+
+		if ( NumAlphas > 3 ) {
+			if ( !lAlphaBlanks( 4 ) ) {
+				OARequirements( OAIndex ).OAPropCtlMinRateSchPtr = GetScheduleIndex( Alphas( 4 ) );
+				if ( OARequirements( OAIndex ).OAPropCtlMinRateSchPtr > 0 ) {
+					if ( !CheckScheduleValueMinMax( OARequirements( OAIndex ).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+						ShowContinueError( "Error found in " + cAlphaFields( 4 ) + " = " + Alphas( 4 ) );
+						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
+						ErrorsFound = true;
+					}
+				}
+				else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+					ShowContinueError( "...Not Found " + cAlphaFields( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
 			}
@@ -1012,8 +1043,8 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
-		NumZoneAirDistribution = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumZoneAirDistribution = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -1028,8 +1059,8 @@ namespace SizingManager {
 			//Start Loading the zone air distribution input
 			for ( ZADIndex = 1; ZADIndex <= NumZoneAirDistribution; ++ZADIndex ) {
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, ZADIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, ZADIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				ZoneAirDistribution( ZADIndex ).Name = Alphas( 1 );
 
@@ -1134,10 +1165,10 @@ namespace SizingManager {
 		int Temp;
 
 		cCurrentModuleObject = "Sizing:Parameters";
-		NumSizParams = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSizParams = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSizParams == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( lNumericFieldBlanks( 1 ) || rNumericArgs( 1 ) < 0.0 ) {
 				GlobalHeatSizingFactor = 1.0;
 			} else {
@@ -1166,13 +1197,13 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "OutputControl:Sizing:Style";
-		Temp = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		Temp = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( Temp == 0 ) {
 			cAlphaArgs( 1 ) = "Comma";
 			SizingFileColSep = CharComma; //comma
 		} else if ( Temp == 1 ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( cAlphaArgs( 1 ) == "COMMA" ) {
 				SizingFileColSep = CharComma; //comma
 				cAlphaArgs( 1 ) = "Comma";
@@ -1259,7 +1290,7 @@ namespace SizingManager {
 		Array1D< GlobalMiscObject > SizingZoneObjects;
 
 		cCurrentModuleObject = "Sizing:Zone";
-		NumSizingZoneStatements = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSizingZoneStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		SizingZoneObjects.allocate( NumSizingZoneStatements );
 
 		if ( NumSizingZoneStatements > 0 ) {
@@ -1271,14 +1302,14 @@ namespace SizingManager {
 		NumZoneSizingInput = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumSizingZoneStatements; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			SizingZoneObjects( Item ).Name = cAlphaArgs( 1 );
 
-			Item1 = InputProcessor::FindItemInList( cAlphaArgs( 1 ), ZoneNames, NumZones );
+			Item1 = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), ZoneNames, NumZones );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumZoneLists > 0 ) ZLItem = InputProcessor::FindItemInList( cAlphaArgs( 1 ), ZoneListNames );
+			if ( Item1 == 0 && NumZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), ZoneListNames );
 			if ( Item1 > 0 ) {
 				SizingZoneObjects( Item ).StartPtr = NumZoneSizingInput + 1;
 				++NumZoneSizingInput;
@@ -1305,7 +1336,7 @@ namespace SizingManager {
 		}
 
 		if ( NumZoneSizingInput > 0 ) {
-			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoZoneSizing || DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "Zone Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -1315,7 +1346,7 @@ namespace SizingManager {
 			ZoneSizIndex = 0;
 			for ( Item = 1; Item <= NumSizingZoneStatements; ++Item ) {
 
-				InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= SizingZoneObjects( Item ).NumOfZones; ++Item1 ) {
 					++ZoneSizIndex;
@@ -1334,7 +1365,7 @@ namespace SizingManager {
 							ZoneSizingInput( ZoneSizIndex ).ZoneName = "Invalid Zone Name";
 						}
 					}
-					bool const nameEmpty = InputProcessor::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+					bool const nameEmpty = UtilityRoutines::IsNameEmpty( cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 					if ( nameEmpty && ! SizingZoneObjects( Item ).ZoneListActive ) {
 						ShowContinueError( "Zone may have been entered in a ZoneList assignment." );
 					}
@@ -1468,7 +1499,7 @@ namespace SizingManager {
 
 					// Getting zone OA parameters from Design Specification object
 					if ( ! lAlphaFieldBlanks( 4 ) ) {
-						OAIndex = InputProcessor::FindItemInList( ZoneSizingInput( ZoneSizIndex ).DesignSpecOAObjName, OARequirements );
+						OAIndex = UtilityRoutines::FindItemInList( ZoneSizingInput( ZoneSizIndex ).DesignSpecOAObjName, OARequirements );
 						if ( OAIndex > 0 ) {
 							ZoneSizingInput( ZoneSizIndex ).OADesMethod = OARequirements( OAIndex ).OAFlowMethod;
 							ZoneSizingInput( ZoneSizIndex ).DesOAFlowPPer = OARequirements( OAIndex ).OAFlowPerPerson;
@@ -1564,17 +1595,6 @@ namespace SizingManager {
 						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlow = rNumericArgs( 11 );
 					}
 					//  N12,\field Cooling Minimum Air Flow Fraction
-					//      \note fraction of the Cooling design Air Flow Rate
-					//      \type real
-					//      \minimum 0
-					//      \default 0
-					//      \note This input is currently used in sizing the Fan minimum Flow Rate.
-					//      \note It does not currently affect other component autosizing.
-					if ( lNumericFieldBlanks( 12 ) ) {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = false;
-					} else {
-						ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowFracUsInpFlg = true;
-					}
 					if ( rNumericArgs( 12 ) < 0.0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 						ShowContinueError( "... incorrect " + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( rNumericArgs( 12 ), 2 ) + "],  value should not be negative." );
@@ -1681,7 +1701,7 @@ namespace SizingManager {
 					//  A7, \field Zone Air Distribution Object Name and add its inputs
 					if ( ! lAlphaFieldBlanks( 7 ) ) {
 						ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName = cAlphaArgs( 7 );
-						ObjIndex = InputProcessor::FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName, ZoneAirDistribution );
+						ObjIndex = UtilityRoutines::FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneAirDistEffObjName, ZoneAirDistribution );
 						if ( ObjIndex > 0 ) {
 							ZoneSizingInput( ZoneSizIndex ).ZoneADEffCooling = ZoneAirDistribution( ObjIndex ).ZoneADEffCooling;
 							ZoneSizingInput( ZoneSizIndex ).ZoneADEffHeating = ZoneAirDistribution( ObjIndex ).ZoneADEffHeating;
@@ -1804,13 +1824,13 @@ namespace SizingManager {
 
 		InErrFlag = ErrorsFound;
 		cCurrentModuleObject = "Zone";
-		NumZones = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		ZoneNames.allocate( NumZones );
 
 		for ( Item = 1; Item <= NumZones; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// validation, but no error
-			Found = InputProcessor::FindItemInList( cAlphaArgs( 1 ), ZoneNames, Item - 1 );
+			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), ZoneNames, Item - 1 );
 			if ( Found == 0 ) {
 				ZoneNames( Item ) = cAlphaArgs( 1 );
 			} else {
@@ -1819,13 +1839,13 @@ namespace SizingManager {
 		}
 
 		cCurrentModuleObject = "ZoneList";
-		NumZoneLists = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumZoneLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		ZoneListNames.allocate( NumZoneLists );
 
 		for ( Item = 1; Item <= NumZoneLists; ++Item ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// validation, but no error
-			Found = InputProcessor::FindItemInList( cAlphaArgs( 1 ), ZoneListNames, Item - 1 );
+			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), ZoneListNames, Item - 1 );
 			if ( Found == 0 ) {
 				ZoneListNames( Item ).Name = cAlphaArgs( 1 );
 			} else {
@@ -1834,7 +1854,7 @@ namespace SizingManager {
 			ZoneListNames( Item ).Zones.allocate( NumAlphas - 1 );
 			ZoneListNames( Item ).NumOfZones = NumAlphas - 1;
 			for ( Item1 = 2; Item1 <= NumAlphas; ++Item1 ) {
-				Found = InputProcessor::FindItemInList( cAlphaArgs( Item1 ), ZoneNames, NumZones );
+				Found = UtilityRoutines::FindItemInList( cAlphaArgs( Item1 ), ZoneNames, NumZones );
 				ZoneListNames( Item ).Zones( Item1 - 1 ) = Found;
 			}
 		}
@@ -1910,12 +1930,12 @@ namespace SizingManager {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int NumDesDays; // Number of design days in input
 
-		NumAirLoops = InputProcessor::GetNumObjectsFound( "AirLoopHVAC" );
+		NumAirLoops = inputProcessor->getNumObjectsFound( "AirLoopHVAC" );
 		cCurrentModuleObject = "Sizing:System";
-		NumSysSizInput = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumSysSizInput = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumSysSizInput > 0 ) {
-			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && ( DoSystemSizing || DoPlantSizing ) ) {
 				ShowSevereError( "System Sizing calculations need SizingPeriod:* input. None found." );
 				ErrorsFound = true;
@@ -1924,8 +1944,8 @@ namespace SizingManager {
 		}
 
 		for ( SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, SysSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( iNameAlphaNum ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, SysSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( iNameAlphaNum ), cCurrentModuleObject, ErrorsFound);
 
 			SysSizInput( SysSizIndex ).AirPriLoopName = cAlphaArgs( iNameAlphaNum );
 			{ auto const loadSizeType( cAlphaArgs( iLoadTypeSizeAlphaNum ) );
@@ -2191,15 +2211,16 @@ namespace SizingManager {
 			}}
 
 			// Determine SysSizInput electric Cooling design capacity sizing method
-			if ( InputProcessor::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "COOLINGDESIGNCAPACITY" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "COOLINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).CoolingCapMethod = CoolingDesignCapacity;
+				// SysSizInput( SysSizIndex ).ScaledCoolingCapacity = AutoSize can be set to autosize cooling capacity
 				SysSizInput( SysSizIndex ).ScaledCoolingCapacity = rNumericArgs( iCoolDesignCapacityNumericNum );
 				if ( SysSizInput( SysSizIndex ).ScaledCoolingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledCoolingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
 					ShowContinueError( "Illegal " + cNumericFieldNames( iCoolDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iCoolDesignCapacityNumericNum ), 7 ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "CAPACITYPERFLOORAREA" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "CAPACITYPERFLOORAREA" ) ) {
 				SysSizInput( SysSizIndex ).CoolingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericFieldBlanks( iCoolCapacityPerFloorAreaNumericNum ) ) {
 					SysSizInput( SysSizIndex ).ScaledCoolingCapacity = rNumericArgs( iCoolCapacityPerFloorAreaNumericNum );
@@ -2220,7 +2241,7 @@ namespace SizingManager {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iCoolCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "FRACTIONOFAUTOSIZEDCOOLINGCAPACITY" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "FRACTIONOFAUTOSIZEDCOOLINGCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
 				if ( !lNumericFieldBlanks( iCoolFracOfAutosizedCapacityNumericNum ) ) {
 					SysSizInput( SysSizIndex ).ScaledCoolingCapacity = rNumericArgs( iCoolFracOfAutosizedCapacityNumericNum );
@@ -2235,7 +2256,7 @@ namespace SizingManager {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iCoolFracOfAutosizedCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "NONE" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "NONE" ) ) {
 				SysSizInput( SysSizIndex ).CoolingCapMethod = None;
 				SysSizInput( SysSizIndex ).ScaledCoolingCapacity = 0.0;
 			} else {
@@ -2246,16 +2267,16 @@ namespace SizingManager {
 			}
 
 			// Determine SysSizInput electric heating design capacity sizing method
-			if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HEATINGDESIGNCAPACITY" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HEATINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).HeatingCapMethod = HeatingDesignCapacity;
-
+				// SysSizInput( SysSizIndex ).ScaledHeatingCapacity = AutoSize can be set to autosize heating capacity
 				SysSizInput( SysSizIndex ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
 				if ( SysSizInput( SysSizIndex ).ScaledHeatingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledHeatingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
 					ShowContinueError( "Illegal " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatDesignCapacityNumericNum ), 7 ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CAPACITYPERFLOORAREA" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CAPACITYPERFLOORAREA" ) ) {
 				SysSizInput( SysSizIndex ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 					SysSizInput( SysSizIndex ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
@@ -2276,7 +2297,7 @@ namespace SizingManager {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FRACTIONOFAUTOSIZEDHEATINGCAPACITY" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FRACTIONOFAUTOSIZEDHEATINGCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					SysSizInput( SysSizIndex ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
@@ -2291,7 +2312,7 @@ namespace SizingManager {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatFracOfAutosizedCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( InputProcessor::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "NONE" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "NONE" ) ) {
 				SysSizInput( SysSizIndex ).HeatingCapMethod = None;
 				SysSizInput( SysSizIndex ).ScaledHeatingCapacity = 0.0;
 			} else {
@@ -2338,10 +2359,10 @@ namespace SizingManager {
 		int NumDesDays; // Number of design days in input
 
 		cCurrentModuleObject = "Sizing:Plant";
-		NumPltSizInput = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumPltSizInput = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumPltSizInput > 0 ) {
-			NumDesDays = InputProcessor::GetNumObjectsFound( "SizingPeriod:DesignDay" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + InputProcessor::GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+			NumDesDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 			if ( NumDesDays == 0 && DoPlantSizing ) {
 				ShowSevereError( "Plant Sizing calculations need SizingPeriod:* input" );
 				ErrorsFound = true;
@@ -2361,8 +2382,8 @@ namespace SizingManager {
 		}
 
 		for ( PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, PltSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, PltSizIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			PlantSizData( PltSizIndex ).PlantLoopName = cAlphaArgs( 1 );
 			PlantSizData( PltSizIndex ).ExitTemp = rNumericArgs( 1 );
@@ -2748,8 +2769,8 @@ namespace SizingManager {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
-		NumZoneHVACSizing = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumZoneHVACSizing = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -2771,13 +2792,13 @@ namespace SizingManager {
 				lAlphaBlanks = true;
 				lNumericBlanks = true;
 
-				InputProcessor::GetObjectItem( CurrentModuleObject, zSIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				InputProcessor::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( CurrentModuleObject, zSIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 				ZoneHVACSizing( zSIndex ).Name = Alphas( 1 );
 
 				// Determine supply air flow rate sizing method for cooling mode
-				if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingSAFMethod = SupplyAirFlowRate;;
 
 					if ( !lNumericBlanks( iMaxCoolAirVolFlowNumericNum ) ) {
@@ -2794,7 +2815,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxCoolAirVolFlowNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingSAFMethod = FlowPerFloorArea;
 					if ( !lNumericBlanks( iCoolFlowPerFloorAreaNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFloorAreaNumericNum );
@@ -2819,7 +2840,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerFloorAreaNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "FractionOfAutosizedCoolingAirflow" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "FractionOfAutosizedCoolingAirflow" ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingSAFMethod = FractionOfAutosizedCoolingAirflow;
 					if ( !lNumericBlanks( iCoolFlowPerFracCoolNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxCoolAirVolFlow = Numbers( iCoolFlowPerFracCoolNumericNum );
@@ -2844,7 +2865,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerFracCoolNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "FlowPerCoolingCapacity" ) ) {
 
 					ZoneHVACSizing( zSIndex ).CoolingSAFMethod = FlowPerCoolingCapacity;
 					if ( !lNumericBlanks( iCoolFlowPerCoolCapNumericNum ) ) {
@@ -2870,7 +2891,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFlowPerCoolCapNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingSAFMethod = None;
 					ZoneHVACSizing( zSIndex ).MaxCoolAirVolFlow = 0.0;
 					// cooling supply air flow rate will not be sized, may be cooling coil does not exist
@@ -2880,7 +2901,7 @@ namespace SizingManager {
 					ErrorsFound = true;
 				}
 				// Determine supply air flow rate sizing method for heating mode
-				if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingSAFMethod = SupplyAirFlowRate;
 					if ( !lNumericBlanks( iMaxHeatAirVolFlowNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxHeatAirVolFlow = Numbers( iMaxHeatAirVolFlowNumericNum );
@@ -2897,7 +2918,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxHeatAirVolFlowNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingSAFMethod = FlowPerFloorArea;
 					if ( !lNumericBlanks( iHeatFlowPerFloorAreaNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFloorAreaNumericNum );
@@ -2922,7 +2943,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerFloorAreaNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingAirflow" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingAirflow" ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingSAFMethod = FractionOfAutosizedHeatingAirflow;
 					if ( !lNumericBlanks( iHeatFlowPerFracCoolNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerFracCoolNumericNum );
@@ -2947,7 +2968,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerFracCoolNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "FlowPerHeatingCapacity" ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingSAFMethod = FlowPerHeatingCapacity;
 					if ( !lNumericBlanks( iHeatFlowPerHeatCapNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxHeatAirVolFlow = Numbers( iHeatFlowPerHeatCapNumericNum );
@@ -2972,7 +2993,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFlowPerHeatCapNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iHeatSAFMAlphaNum ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iHeatSAFMAlphaNum ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingSAFMethod = None;
 					ZoneHVACSizing( zSIndex ).MaxHeatAirVolFlow = 0.0;
 				} else {
@@ -2982,7 +3003,7 @@ namespace SizingManager {
 				}
 
 				// Determine supply air flow rate sizing method when cooling or heating is not needed
-				if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "SupplyAirFlowRate" ) ) {
 					ZoneHVACSizing( zSIndex ).NoCoolHeatSAFMethod = SupplyAirFlowRate;
 					if ( !lNumericBlanks( iMaxNoCoolHeatAirVolFlowNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxNoCoolHeatAirVolFlow = Numbers( iMaxNoCoolHeatAirVolFlowNumericNum );
@@ -2998,7 +3019,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iMaxNoCoolHeatAirVolFlowNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FlowPerFloorArea" ) ) {
 					ZoneHVACSizing( zSIndex ).NoCoolHeatSAFMethod = FlowPerFloorArea;
 					if ( !lNumericBlanks( iNoCoolHeatFlowPerFloorAreaNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFloorAreaNumericNum );
@@ -3023,7 +3044,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFloorAreaNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedCoolingAirflow" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedCoolingAirflow" ) ) {
 					ZoneHVACSizing( zSIndex ).NoCoolHeatSAFMethod = FractionOfAutosizedCoolingAirflow;
 					if ( !lNumericBlanks( iNoCoolHeatFlowPerFracCoolNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFracCoolNumericNum );
@@ -3048,7 +3069,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFracCoolNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingAirflow" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "FractionOfAutosizedHeatingAirflow" ) ) {
 					ZoneHVACSizing( zSIndex ).NoCoolHeatSAFMethod = FractionOfAutosizedHeatingAirflow;
 					if ( !lNumericBlanks( iNoCoolHeatFlowPerFracHeatNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).MaxNoCoolHeatAirVolFlow = Numbers( iNoCoolHeatFlowPerFracHeatNumericNum );
@@ -3073,7 +3094,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iNoCoolHeatFlowPerFracHeatNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iNoCoolHeatSAFMAlphaNum ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iNoCoolHeatSAFMAlphaNum ), "None" ) || lAlphaBlanks( iNoCoolHeatSAFMAlphaNum ) ) {
 					ZoneHVACSizing( zSIndex ).NoCoolHeatSAFMethod = None;
 					ZoneHVACSizing( zSIndex ).MaxNoCoolHeatAirVolFlow = 0.0;
 				} else {
@@ -3083,7 +3104,7 @@ namespace SizingManager {
 				}
 
 				// Determine cooling design capacity of zoneHVAC equipment
-				if ( InputProcessor::SameString( Alphas( iCoolCAPMAlphaNum ), "CoolingDesignCapacity" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iCoolCAPMAlphaNum ), "CoolingDesignCapacity" ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingCapMethod = CoolingDesignCapacity;
 					if ( !lNumericBlanks( iCoolDesignCapacityNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).ScaledCoolingCapacity = Numbers( iCoolDesignCapacityNumericNum );
@@ -3099,7 +3120,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolDesignCapacityNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iCoolCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iCoolCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingCapMethod = CapacityPerFloorArea;
 					if ( !lNumericBlanks( iCoolCapacityPerFloorAreaNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).ScaledCoolingCapacity = Numbers( iCoolCapacityPerFloorAreaNumericNum );
@@ -3121,7 +3142,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolCapacityPerFloorAreaNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iCoolCAPMAlphaNum ), "FractionOfAutosizedCoolingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iCoolCAPMAlphaNum ), "FractionOfAutosizedCoolingCapacity" ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
 					if ( !lNumericBlanks( iCoolFracOfAutosizedCapacityNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).ScaledCoolingCapacity = Numbers( iCoolFracOfAutosizedCapacityNumericNum );
@@ -3137,7 +3158,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iCoolFracOfAutosizedCapacityNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iCoolCAPMAlphaNum ), "None" ) || lAlphaBlanks( iCoolCAPMAlphaNum ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iCoolCAPMAlphaNum ), "None" ) || lAlphaBlanks( iCoolCAPMAlphaNum ) ) {
 					ZoneHVACSizing( zSIndex ).CoolingCapMethod = None;
 				} else {
 					ShowSevereError( CurrentModuleObject + " = " + ZoneHVACSizing( zSIndex ).Name );
@@ -3146,7 +3167,7 @@ namespace SizingManager {
 				}
 
 				// Determine heating design capacity of zone HVAC equipment
-				if ( InputProcessor::SameString( Alphas( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingCapMethod = HeatingDesignCapacity;
 					if ( !lNumericBlanks( iHeatDesignCapacityNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).ScaledHeatingCapacity = Numbers( iHeatDesignCapacityNumericNum );
@@ -3162,7 +3183,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatDesignCapacityNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingCapMethod = CapacityPerFloorArea;
 					if ( !lNumericBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).ScaledHeatingCapacity = Numbers( iHeatCapacityPerFloorAreaNumericNum );
@@ -3184,7 +3205,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatCapacityPerFloorAreaNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 					if ( !lNumericBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 						ZoneHVACSizing( zSIndex ).ScaledHeatingCapacity = Numbers( iHeatFracOfAutosizedCapacityNumericNum );
@@ -3200,7 +3221,7 @@ namespace SizingManager {
 						ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatFracOfAutosizedCapacityNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString( Alphas( iHeatCAPMAlphaNum ), "None" ) || lAlphaBlanks( iHeatCAPMAlphaNum ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( iHeatCAPMAlphaNum ), "None" ) || lAlphaBlanks( iHeatCAPMAlphaNum ) ) {
 					ZoneHVACSizing( zSIndex ).HeatingCapMethod = None;
 				} else {
 					ShowSevereError( CurrentModuleObject + " = " + ZoneHVACSizing( zSIndex ).Name );
@@ -3224,11 +3245,63 @@ namespace SizingManager {
 
 	}
 
+	void
+	GetAirTerminalSizing()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   February 2017
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Obtains input data for the AirTerminal sizing methods object and stores it in
+		// appropriate data structure.
+
+		using namespace DataIPShortCuts;
+		using General::RoundSigDigits;
+		using General::TrimSigDigits;
+
+		static std::string const RoutineName( "GetAirTerminalSizing: " ); // include trailing blank space
+
+		int NumAlphas; // Number of Alphas for each GetObjectItem call
+		int NumNumbers; // Number of Numbers for each GetObjectItem call
+		int TotalArgs; // Total number of alpha and numeric arguments (max) for a
+		int IOStatus; // Used in GetObjectItem
+		bool ErrorsFound( false ); // If errors detected in input
+
+		cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
+		DataSizing::NumAirTerminalSizingSpec = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		if ( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+			AirTerminalSizingSpec.allocate( DataSizing::NumAirTerminalSizingSpec );
+
+			//Start Loading the System Input
+			for ( int zSIndex = 1; zSIndex <= DataSizing::NumAirTerminalSizingSpec; ++zSIndex ) {
+
+				inputProcessor->getObjectItem( cCurrentModuleObject, zSIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+				UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
+
+				auto & thisATSizing( DataSizing::AirTerminalSizingSpec( zSIndex ) );
+				thisATSizing.Name = cAlphaArgs( 1 );
+				thisATSizing.DesSensCoolingFrac = rNumericArgs( 1 );
+				thisATSizing.DesCoolSATRatio = rNumericArgs( 2 );
+				thisATSizing.DesSensHeatingFrac = rNumericArgs( 3 );
+				thisATSizing.DesHeatSATRatio = rNumericArgs( 4 );
+				thisATSizing.MinOAFrac = rNumericArgs( 5 );
+			}
+		}
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found in input.  Preceding condition(s) cause termination." );
+		}
+
+	}
 
 
 	// Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
 	void
-	UpdateFacilitySizing( 
+	UpdateFacilitySizing(
 		int const CallIndicator
 	)
 	{
@@ -3370,7 +3443,62 @@ namespace SizingManager {
 		}
 	}
 
+	void
+	UpdateTermUnitFinalZoneSizing()
+	{
+		// Move data from FinalZoneSizing to TermUnitFinalZoneSizing and apply terminal unit sizing adjustments
+		// Called once to initialize before system sizing, then called again to update after system sizing
+		// M.J. Witte, July 2017
 
+		for ( int termUnitSizingIndex = 1; termUnitSizingIndex <= DataSizing::NumAirTerminalUnits; ++termUnitSizingIndex ) {
+			auto & thisTUFZSizing( TermUnitFinalZoneSizing( termUnitSizingIndex ) );
+			auto const & thisTUSizing( TermUnitSizing( termUnitSizingIndex ) );
+			int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
+			auto const & thisFZSizing( FinalZoneSizing( ctrlZoneNum ) );
+
+			// Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
+			thisTUFZSizing = thisFZSizing;
+
+			if( DataSizing::NumAirTerminalSizingSpec > 0 ) {
+				// Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
+				// Cooling
+				Real64 coolFlowRatio = thisTUSizing.SpecDesSensCoolingFrac / thisTUSizing.SpecDesCoolSATRatio;
+				Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
+				thisTUFZSizing.DesCoolMinAirFlow = thisFZSizing.DesCoolMinAirFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlowMin = thisFZSizing.DesCoolVolFlowMin * coolFlowRatio;
+				thisTUFZSizing.DesCoolMassFlow = thisFZSizing.DesCoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio;
+				thisTUFZSizing.DesCoolMinAirFlow2 = thisFZSizing.DesCoolMinAirFlow2 * coolFlowRatio;
+				thisTUFZSizing.DesCoolVolFlow = thisFZSizing.DesCoolVolFlow * coolFlowRatio;
+				thisTUFZSizing.CoolFlowSeq = thisFZSizing.CoolFlowSeq * coolFlowRatio;
+				thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
+				thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
+				// Heating
+				Real64 heatFlowRatio = thisTUSizing.SpecDesSensHeatingFrac / thisTUSizing.SpecDesHeatSATRatio;
+				Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
+				thisTUFZSizing.DesHeatMaxAirFlow = thisFZSizing.DesHeatMaxAirFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.DesHeatVolFlow = thisFZSizing.DesHeatVolFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatVolFlowMax = thisFZSizing.DesHeatVolFlowMax * heatFlowRatio;
+				thisTUFZSizing.DesHeatMassFlow = thisFZSizing.DesHeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio;
+				thisTUFZSizing.DesHeatMaxAirFlow2 = thisFZSizing.DesHeatMaxAirFlow2 * heatFlowRatio;
+				thisTUFZSizing.HeatFlowSeq = thisFZSizing.HeatFlowSeq * heatFlowRatio;
+				thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatLoad = thisFZSizing.NonAirSysDesHeatLoad * heatLoadRatio;
+				thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
+				// Outdoor air
+				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
+				thisTUFZSizing.DesCoolOAFlowFrac = min(thisFZSizing.DesCoolOAFlowFrac * minOAFrac / coolFlowRatio, 1.0);
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+				thisTUFZSizing.DesHeatOAFlowFrac = min( thisFZSizing.DesHeatOAFlowFrac * minOAFrac / heatFlowRatio, 1.0 );
+				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+			}
+		}
+	}
 } // SizingManager
 
 } // EnergyPlus

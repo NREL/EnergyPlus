@@ -62,7 +62,7 @@
 // EnergyPlus Headers
 #include <OutputReportTabularAnnual.hh>
 #include <OutputReportTabular.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <DataGlobals.hh>
 #include <OutputReportData.hh>
 #include <DataHVACGlobals.hh>
@@ -72,6 +72,7 @@
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <DisplayRoutines.hh>
+#include <UtilityRoutines.hh>
 
 
 namespace EnergyPlus {
@@ -108,7 +109,7 @@ namespace EnergyPlus {
 			int curNumDgts( 2 );
 			AnnualFieldSet::AggregationKind curAgg( AnnualFieldSet::AggregationKind::sumOrAvg );
 
-			objCount = InputProcessor::GetNumObjectsFound( currentModuleObject );
+			objCount = inputProcessor->getNumObjectsFound( currentModuleObject );
 			if ( objCount > 0 ) {
 				// if not a run period using weather do not create reports
 				if ( !DataGlobals::DoWeathSim ) {
@@ -116,11 +117,11 @@ namespace EnergyPlus {
 					return;
 				}
 			}
-			InputProcessor::GetObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
+			inputProcessor->getObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
 			alphArray.allocate( numAlphas );
 			numArray.dimension( numNums, 0.0 );
 			for ( int tabNum = 1 ; tabNum <= objCount; ++tabNum ) {
-				InputProcessor::GetObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
+				inputProcessor->getObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
 				if ( numAlphas >= 5 ) {
 					annualTables.push_back( AnnualTable(alphArray( 1 ), alphArray( 2 ), alphArray( 3 ) ));
 					// the remaining fields are repeating in groups of three and need to be added to the data structure
@@ -265,7 +266,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017 
+		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017
 		bool
 		AnnualTable::invalidAggregationOrder( )
 		{
@@ -1111,64 +1112,64 @@ namespace EnergyPlus {
 		{
 			AnnualFieldSet::AggregationKind outAggType;
 
-			if ( InputProcessor::SameString( inString, "SumOrAverage" ) ) {
+			if ( UtilityRoutines::SameString( inString, "SumOrAverage" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::sumOrAvg;
 			}
-			else if ( InputProcessor::SameString( inString, "Maximum" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "Maximum" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::maximum;
 			}
-			else if ( InputProcessor::SameString( inString, "Minimum" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "Minimum" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::minimum;
 			}
-			else if ( InputProcessor::SameString( inString, "ValueWhenMaximumOrMinimum" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "ValueWhenMaximumOrMinimum" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::valueWhenMaxMin;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursZero" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursZero" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursZero;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNonzero" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNonzero" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNonZero;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursPositive" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursPositive" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursPositive;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNonpositive" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNonpositive" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNonPositive;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNegative" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNegative" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNegative;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNonNegative" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNonNegative" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNonNegative;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursInTenPercentBins" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursInTenPercentBins" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenPercentBins;
 			}
-			else if ( InputProcessor::SameString( inString, "HourInTenBinsMinToMax" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HourInTenBinsMinToMax" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax;
 			}
-			else if ( InputProcessor::SameString( inString, "HourInTenBinsZeroToMax" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HourInTenBinsZeroToMax" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax;
 			}
-			else if ( InputProcessor::SameString( inString, "HourInTenBinsMinToZero" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HourInTenBinsMinToZero" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursInTenBinsPlusMinusTwoStdDev" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursInTenBinsPlusMinusTwoStdDev" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursInTenBinsPlusMinusThreeStdDev" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursInTenBinsPlusMinusThreeStdDev" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev;
 			}
-			else if ( InputProcessor::SameString( inString, "NoAggregation" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "NoAggregation" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::noAggregation;
 			}
-			else if ( InputProcessor::SameString( inString, "SumOrAverageDuringHoursShown" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "SumOrAverageDuringHoursShown" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::sumOrAverageHoursShown;
 			}
-			else if ( InputProcessor::SameString( inString, "MaximumDuringHoursShown" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "MaximumDuringHoursShown" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::maximumDuringHoursShown;
 			}
-			else if ( InputProcessor::SameString( inString, "MinimumDuringHoursShown" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "MinimumDuringHoursShown" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::minimumDuringHoursShown;
 			}
 			else {

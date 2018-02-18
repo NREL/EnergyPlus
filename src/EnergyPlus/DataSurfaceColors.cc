@@ -48,7 +48,7 @@
 #include <DataSurfaceColors.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -136,7 +136,7 @@ namespace DataSurfaceColors {
 		int found;
 
 		WasSet = false;
-		found = InputProcessor::FindItem( String, colorkeys, NumColors );
+		found = UtilityRoutines::FindItem( String, colorkeys, NumColors );
 
 		if ( found != 0 ) {
 			if ( present( ColorType ) ) {
@@ -196,11 +196,11 @@ namespace DataSurfaceColors {
 
 		DXFcolorno = defaultcolorno;
 		// first see if there is a scheme name
-		numptr = InputProcessor::GetObjectItemNum( CurrentModuleObject, SchemeName );
+		numptr = inputProcessor->getObjectItemNum( CurrentModuleObject, SchemeName );
 
 		if ( numptr > 0 ) {
 
-			InputProcessor::GetObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
 
 			cAlphas.allocate( NumAlphas );
 			cAlphaFields.allocate( NumAlphas );
@@ -212,7 +212,7 @@ namespace DataSurfaceColors {
 			cAlphas( {1,NumAlphas} ) = "";
 			rNumerics( {1,numNumbers} ) = 0.0;
 
-			InputProcessor::GetObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			for ( numargs = 1; numargs <= numNumbers; ++numargs ) {
 				numptr = rNumerics( numargs ); // set to integer
 				if ( lNumericBlanks( numargs ) ) {

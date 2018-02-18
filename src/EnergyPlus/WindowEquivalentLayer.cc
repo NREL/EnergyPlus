@@ -64,10 +64,11 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <DaylightingManager.hh>
+#include <DataWindowEquivalentLayer.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
+#include <ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -314,6 +315,7 @@ namespace WindowEquivalentLayer {
 			}
 
 			if ( Material( MaterNum ).Group == BlindEquivalentLayer ) {
+				CFS( EQLNum ).VBLayerPtr = sLayer;
 				if ( Material( MaterNum ).SlatOrientation == Horizontal ) {
 					CFS( EQLNum ).L( sLayer ).LTYPE = ltyVBHOR;
 				} else if ( Material( MaterNum ).SlatOrientation == Vertical ) {
@@ -328,6 +330,7 @@ namespace WindowEquivalentLayer {
 				CFS( EQLNum ).L( sLayer ).SWP_MAT.RHOSBDD = Material( MaterNum ).ReflBackDiffDiff;
 				CFS( EQLNum ).L( sLayer ).SWP_MAT.TAUS_DD = Material( MaterNum ).TausDiffDiff;
 				CFS( EQLNum ).L( sLayer ).PHI_DEG = Material( MaterNum ).SlatAngle;
+				CFS( EQLNum ).L( sLayer ).CNTRL = Material( MaterNum ).SlatAngleType;
 				CFS( EQLNum ).L( sLayer ).S = Material( MaterNum ).SlatSeparation;
 				CFS( EQLNum ).L( sLayer ).W = Material( MaterNum ).SlatWidth;
 				CFS( EQLNum ).L( sLayer ).C = Material( MaterNum ).SlatCrown;
@@ -778,9 +781,12 @@ namespace WindowEquivalentLayer {
 		using General::InterpSlatAng;
 		using General::InterpSw;
 		using DataHeatBalSurface::HcExtSurf;
+		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		using DataGlobals::StefanBoltzmann;
 		using DataEnvironment::SkyTempKelvin;
 		using DataEnvironment::IsRain;
+		using ScheduleManager::GetCurrentScheduleValue;
+		using DataGlobals::AnyLocalEnvironmentsInModel;
 		using namespace DataHeatBalFanSys;
 
 		// Locals
@@ -842,6 +848,12 @@ namespace WindowEquivalentLayer {
 		Real64 NetIRHeatGainWindow; // net radiation gain from the window surface to the zone (W)
 		Real64 ConvHeatGainWindow; // net convection heat gain from inside surface of window to zone air (W)
 		int InSideLayerType; // interior shade type
+
+		int SrdSurfsNum; // Surrounding surfaces list number
+		int SrdSurfNum; // Surrounding surface number DO loop counter
+		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+
 		// Flow
 
 		if ( CalcCondition != noCondition ) return;
@@ -940,7 +952,24 @@ namespace WindowEquivalentLayer {
 				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QCoolingPanelSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj ) + QRadThermInAbs( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
-
+			    // Calculate LWR from surrounding surfaces if defined for an exterior window
+				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				if ( AnyLocalEnvironmentsInModel ) {
+					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						}
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+						}					
+						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+							QRadLWOutSrdSurfs( SurfNum ) += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+						}
+					}
+				}
 				if ( Surface( SurfNum ).ExtWind ) { // Window is exposed to wind (and possibly rain)
 					if ( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
 						Tout = Surface( SurfNum ).OutWetBulbTemp + KelvinConv;
@@ -953,7 +982,7 @@ namespace WindowEquivalentLayer {
 				tsky = SkyTempKelvin;
 				Ebout = StefanBoltzmann * pow_4( Tout );
 				// ASHWAT model may be slightly different
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
 			}
 		}
 		// Outdoor conditions
@@ -8191,9 +8220,9 @@ namespace WindowEquivalentLayer {
 		} else if ( L.CNTRL == lscVBNOBM ) {
 			// slatA set to just exclude beam
 			if ( OMEGA_DEG < 0.0 ) {
-				SLATA = VB_CriticalSlatAngle( L, 30.0 ); // assume 30 deg for diffuse
+				SLATA = VB_CriticalSlatAngle( 30.0 ); // assume 30 deg for diffuse
 			} else {
-				SLATA = VB_CriticalSlatAngle( L, OMEGA_DEG );
+				SLATA = VB_CriticalSlatAngle( OMEGA_DEG );
 			}
 		}
 
@@ -8206,7 +8235,6 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	VB_CriticalSlatAngle(
-		CFSLAYER const & L, // VB layer
 		Real64 const OMEGA_DEG // incident profile angle (degrees)
 	)
 	{
@@ -8240,14 +8268,14 @@ namespace WindowEquivalentLayer {
 		// DERIVED TYPE DEFINITIONS
 		// na
 
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 RAT;
-		// Flow
+		//// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		//Real64 RAT;
+		//// Flow
 
 		// TODO handle vert blind cases etc
-		RAT = L.S * std::cos( OMEGA_DEG ) / L.W;
-		// limit upward slat angle to horiz = max visibility
-		VB_CriticalSlatAngle = max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
+		// the slat normal points along the profile angle to block the beam solar
+		VB_CriticalSlatAngle = 90.0 - OMEGA_DEG; // 
+
 		return VB_CriticalSlatAngle;
 	}
 
@@ -9243,8 +9271,8 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 ProfAngHor; // Solar profile angle (radians) for horizontal blind
-		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
+		Real64 ProfAngVer; // Solar vertical profile angle (radians) for horizontal blind
+		Real64 ProfAngHor; // Solar horizontal profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
 		static Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		int Lay; // window layer index
@@ -9258,16 +9286,15 @@ namespace WindowEquivalentLayer {
 		ProfAngVer = 0.0;
 		ConstrNum = Surface( SurfNum ).Construction;
 		EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
-
 		if ( BeamDIffFlag != isDIFF ) {
 			if ( CosIncAng( TimeStep, HourOfDay, SurfNum ) <= 0.0 ) return;
 
 			for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 				if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
 					if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBHOR ) {
-						ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngHor );
+						ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngVer );
 					} else if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBVER ) {
-						ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngVer );
+						ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngHor );
 					}
 				}
 			}
@@ -9281,12 +9308,13 @@ namespace WindowEquivalentLayer {
 				for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 					if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
 						if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBHOR ) {
-							ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngHor );
+							ProfileAngle( SurfNum, SOLCOS, Horizontal, ProfAngVer );
 						} else if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyVBVER ) {
-							ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngVer );
+							ProfileAngle( SurfNum, SOLCOS, Vertical, ProfAngHor );
 						}
 					}
 				}
+				IncAng = std::acos( CosIncAng( TimeStep, HourOfDay, SurfNum ) );
 				CalcEQLWindowOpticalProperty( CFS( EQLNum ), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor );
 				CFSAbs( _, {1,CFSMAXNL + 1} ) = Abs1( _, {1,CFSMAXNL + 1} );
 				CFSDiffAbsTrans( _, {1,CFSMAXNL + 1}, EQLNum ) = Abs1( _, {1,CFSMAXNL + 1} );
@@ -9303,7 +9331,9 @@ namespace WindowEquivalentLayer {
 				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = CFSAbs( 2, {1,CFSMAXNL} );
 			}
 		}
-
+		if ( CFS( EQLNum ).VBLayerPtr > 0 ) {
+			SurfaceWindow( SurfNum ).SlatAngThisTSDeg = CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).PHI_DEG;
+		}
 	}
 
 	void

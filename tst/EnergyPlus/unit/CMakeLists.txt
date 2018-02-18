@@ -12,12 +12,14 @@ set( test_src
   Fixtures/SQLiteFixture.hh
   PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
+  AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
   BoilerHotWater.unit.cc
+  BoilerSteam.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
@@ -154,6 +156,7 @@ set( test_src
   WaterToAirHeatPumpSimple.unit.cc
   WeatherManager.unit.cc
   WindowAC.unit.cc
+  WindowEquivalentLayer.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

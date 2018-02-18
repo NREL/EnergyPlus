@@ -80,7 +80,7 @@
 #include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -337,7 +337,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// CompIndex accounting
 		if ( CompIndex == 0 ) {
-			VRFTUNum = InputProcessor::FindItemInList( CompName, VRFTU );
+			VRFTUNum = UtilityRoutines::FindItemInList( CompName, VRFTU );
 			if ( VRFTUNum == 0 ) {
 				ShowFatalError( "SimulateVRF: VRF Terminal Unit not found=" + CompName );
 			}
@@ -470,7 +470,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( InitLoopEquip ) {
-			VRFNum = InputProcessor::FindItemInList( VRFName, VRF );
+			VRFNum = UtilityRoutines::FindItemInList( VRFName, VRF );
 			if ( VRFNum != 0 ) { // if 0, fall through to next
 				{ auto const SELECT_CASE_var( VRFTypeNum );
 				if ( SELECT_CASE_var == TypeOf_HeatPumpVRF ) {
@@ -1390,39 +1390,39 @@ namespace HVACVariableRefrigerantFlow {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-		NumVRFCTU = InputProcessor::GetNumObjectsFound( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow" );
+		NumVRFCTU = inputProcessor->getNumObjectsFound( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow" );
 		if ( NumVRFCTU > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
-		NumVRFCond_SysCurve = InputProcessor::GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow" );
+		NumVRFCond_SysCurve = inputProcessor->getNumObjectsFound( "AirConditioner:VariableRefrigerantFlow" );
 		if ( NumVRFCond_SysCurve > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
-		NumVRFCond_FluidTCtrl_HP = InputProcessor::GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl" );
+		NumVRFCond_FluidTCtrl_HP = inputProcessor->getNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl" );
 		if ( NumVRFCond_FluidTCtrl_HP > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
-		NumVRFCond_FluidTCtrl_HR = InputProcessor::GetNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR" );
+		NumVRFCond_FluidTCtrl_HR = inputProcessor->getNumObjectsFound( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR" );
 		if ( NumVRFCond_FluidTCtrl_HR > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 
 		NumVRFCond = NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + NumVRFCond_FluidTCtrl_HR;
 
-		NumVRFTULists = InputProcessor::GetNumObjectsFound( "ZoneTerminalUnitList" );
+		NumVRFTULists = inputProcessor->getNumObjectsFound( "ZoneTerminalUnitList" );
 		if ( NumVRFTULists > 0 ) {
-			InputProcessor::GetObjectDefMaxArgs( "ZoneTerminalUnitList", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "ZoneTerminalUnitList", NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
@@ -1461,8 +1461,8 @@ namespace HVACVariableRefrigerantFlow {
 		// read all terminal unit list objects
 		cCurrentModuleObject = "ZoneTerminalUnitList";
 		for ( VRFNum = 1; VRFNum <= NumVRFTULists; ++VRFNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			inputProcessor->getObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			TerminalUnitList( VRFNum ).Name = cAlphaArgs( 1 );
 			TerminalUnitList( VRFNum ).NumTUInList = NumAlphas - 1;
@@ -1502,7 +1502,7 @@ namespace HVACVariableRefrigerantFlow {
 		// read all VRF condenser objects: Algorithm Type 1_system curve based model
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow";
 		for ( VRFNum = 1; VRFNum <= NumVRFCond_SysCurve; ++VRFNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
@@ -1711,9 +1711,9 @@ namespace HVACVariableRefrigerantFlow {
 				// Verify Curve Object, only legal type is biquadratic
 				{ auto const SELECT_CASE_var( GetCurveType( VRF( VRFNum ).HeatCapFT ) );
 				if ( SELECT_CASE_var == "BIQUADRATIC" ) {
-					if ( InputProcessor::SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
 						checkCurveIsNormalizedToOne( RoutineName + cCurrentModuleObject, VRF( VRFNum ).Name, VRF( VRFNum ).HeatCapFT, cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
-					} else if ( InputProcessor::SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
 						checkCurveIsNormalizedToOne( RoutineName + cCurrentModuleObject, VRF( VRFNum ).Name, VRF( VRFNum ).HeatCapFT, cAlphaFieldNames( 13 ), cAlphaArgs( 13 ), RatedInletAirTempHeat, RatedOutdoorAirTempHeat );
 					} else {
 						// do nothing, warning is issued below
@@ -1795,9 +1795,9 @@ namespace HVACVariableRefrigerantFlow {
 				}}
 			}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 19 ), "WETBULBTEMPERATURE" ) ) {
 				VRF( VRFNum ).HeatingPerformanceOATType = WetBulbIndicator;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 19 ), "DRYBULBTEMPERATURE" ) ) {
 				VRF( VRFNum ).HeatingPerformanceOATType = DryBulbIndicator;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" illegal " + cAlphaFieldNames( 19 ) + " input for this object = " + cAlphaArgs( 19 ) );
@@ -1885,24 +1885,24 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRF( VRFNum ).MinPLR = rNumericArgs( 10 );
 
-			VRF( VRFNum ).MasterZonePtr = InputProcessor::FindItemInList( cAlphaArgs( 24 ), Zone );
+			VRF( VRFNum ).MasterZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 24 ), Zone );
 
-			if ( InputProcessor::SameString( cAlphaArgs( 25 ), "LoadPriority" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 25 ), "LoadPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = LoadPriority;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 25 ), "ZonePriority" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 25 ), "ZonePriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = ZonePriority;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 25 ), "ThermostatOffsetPriority" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 25 ), "ThermostatOffsetPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = ThermostatOffsetPriority;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 25 ), "Scheduled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 25 ), "Scheduled" ) ) {
 				VRF( VRFNum ).ThermostatPriority = ScheduledPriority;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 25 ), "MasterThermostatPriority" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 25 ), "MasterThermostatPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = MasterThermostatPriority;
 				if ( VRF( VRFNum ).MasterZonePtr == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
 					ShowContinueError( cAlphaFieldNames( 24 ) + " must be entered when " + cAlphaFieldNames( 25 ) + " = " + cAlphaArgs( 25 ) );
 					ErrorsFound = true;
 				}
-				//      ELSE IF (InputProcessor::SameString(cAlphaArgs(25),'FirstOnPriority') )THEN ! strategy not used
+				//      ELSE IF (UtilityRoutines::SameString(cAlphaArgs(25),'FirstOnPriority') )THEN ! strategy not used
 				//        VRF(VRFNum)%ThermostatPriority = FirstOnPriority
 			} else {
 				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
@@ -1920,7 +1920,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			VRF( VRFNum ).ZoneTUListPtr = InputProcessor::FindItemInList( cAlphaArgs( 27 ), TerminalUnitList );
+			VRF( VRFNum ).ZoneTUListPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 27 ), TerminalUnitList );
 			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
 				ShowContinueError( cAlphaFieldNames( 27 ) + " = " + cAlphaArgs( 27 ) + " not found." );
@@ -1929,9 +1929,9 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRF( VRFNum ).HeatRecoveryUsed = false;
 			if ( ! lAlphaFieldBlanks( 28 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 28 ), "No" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 28 ), "No" ) ) {
 					VRF( VRFNum ).HeatRecoveryUsed = false;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 28 ), "Yes" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 28 ), "Yes" ) ) {
 					VRF( VRFNum ).HeatRecoveryUsed = true;
 				} else {
 					ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
@@ -1979,8 +1979,8 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).MaxOATCCHeater = rNumericArgs( 19 );
 
 			if ( ! lAlphaFieldBlanks( 31 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 31 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
-				if ( InputProcessor::SameString( cAlphaArgs( 31 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 31 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 31 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
 				if ( VRF( VRFNum ).DefrostStrategy == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 31 ) + " not found: " + cAlphaArgs( 31 ) );
 					ErrorsFound = true;
@@ -1990,8 +1990,8 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			if ( ! lAlphaFieldBlanks( 32 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 32 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
-				if ( InputProcessor::SameString( cAlphaArgs( 32 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 32 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 32 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
 				if ( VRF( VRFNum ).DefrostControl == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 32 ) + " not found: " + cAlphaArgs( 32 ) );
 					ErrorsFound = true;
@@ -2033,9 +2033,9 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).MaxOATDefrost = rNumericArgs( 22 );
 
 			if ( ! lAlphaFieldBlanks( 35 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 34 ), "AirCooled" ) ) VRF( VRFNum ).CondenserType = AirCooled;
-				if ( InputProcessor::SameString( cAlphaArgs( 34 ), "EvaporativelyCooled" ) ) VRF( VRFNum ).CondenserType = EvapCooled;
-				if ( InputProcessor::SameString( cAlphaArgs( 34 ), "WaterCooled" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 34 ), "AirCooled" ) ) VRF( VRFNum ).CondenserType = AirCooled;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 34 ), "EvaporativelyCooled" ) ) VRF( VRFNum ).CondenserType = EvapCooled;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 34 ), "WaterCooled" ) ) {
 					VRF( VRFNum ).CondenserType = WaterCooled;
 					VRF( VRFNum ).VRFPlantTypeOfNum = TypeOf_HeatPumpVRF;
 				}
@@ -2126,25 +2126,25 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).FuelType = FuelTypeElectric;
 			if ( ! lAlphaFieldBlanks( 39 ) ) {
 				//A39; \field Fuel type
-				if ( InputProcessor::SameString( cAlphaArgs( 39 ), "ELECTRICITY" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "ELECTRICITY" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeElectric;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "ELECTRIC" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "ELECTRIC" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeElectric;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "NATURALGAS" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "NATURALGAS" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeNaturalGas;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "PROPANEGAS" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "PROPANEGAS" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypePropaneGas;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "DIESEL" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "DIESEL" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeDiesel;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "GASOLINE" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "GASOLINE" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeGasoline;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "FUELOIL#1" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "FUELOIL#1" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeFuelOil1;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "FUELOIL#2" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "FUELOIL#2" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeFuelOil2;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "OtherFuel1" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "OtherFuel1" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeOtherFuel1;
-				} else if ( InputProcessor::SameString( cAlphaArgs( 39 ), "OtherFuel2" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 39 ), "OtherFuel2" ) ) {
 					VRF( VRFNum ).FuelType = FuelTypeOtherFuel2;
 				} else {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\", " + cAlphaFieldNames( 39 ) + " not found = " + cAlphaArgs( 39 ) );
@@ -2284,7 +2284,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HP)_Aug. 2015, zrp
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl";
 		for ( VRFNum = NumVRFCond_SysCurve + 1; VRFNum <= NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP; ++VRFNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
@@ -2303,7 +2303,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			VRF( VRFNum ).ZoneTUListPtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), TerminalUnitList, NumVRFTULists );
+			VRF( VRFNum ).ZoneTUListPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), TerminalUnitList, NumVRFTULists );
 			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
 				ShowContinueError( cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + " not found." );
@@ -2316,7 +2316,7 @@ namespace HVACVariableRefrigerantFlow {
 				EnergyPlus::FluidProperties::GetFluidPropertiesData();
 				EnergyPlus::FluidProperties::GetInput = false;
 			}
-			if ( InputProcessor::FindItemInList( VRF( VRFNum ).RefrigerantName, EnergyPlus::FluidProperties::RefrigData, EnergyPlus::FluidProperties::NumOfRefrigerants ) == 0 ) {
+			if ( UtilityRoutines::FindItemInList( VRF( VRFNum ).RefrigerantName, EnergyPlus::FluidProperties::RefrigData, EnergyPlus::FluidProperties::NumOfRefrigerants ) == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
 				ErrorsFound = true;
@@ -2352,9 +2352,9 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).SH = rNumericArgs( 7 );
 			VRF( VRFNum ).SC = rNumericArgs( 8 );
 
-			if( InputProcessor::SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
+			if( UtilityRoutines::SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "ConstantTemp" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "ConstantTemp" ) ) {
 				VRF(VRFNum).AlgorithmIUCtrl = 2;
 			} else {
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
@@ -2474,8 +2474,8 @@ namespace HVACVariableRefrigerantFlow {
 
 			//Defrost
 			if ( ! lAlphaFieldBlanks( 8 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 8 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
-				if ( InputProcessor::SameString( cAlphaArgs( 8 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
 				if ( VRF( VRFNum ).DefrostStrategy == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 8 ) + " not found: " + cAlphaArgs( 8 ) );
 					ErrorsFound = true;
@@ -2485,8 +2485,8 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			if ( ! lAlphaFieldBlanks( 9 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
-				if ( InputProcessor::SameString( cAlphaArgs( 9 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
 				if ( VRF( VRFNum ).DefrostControl == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 9 ) + " not found: " + cAlphaArgs( 9 ) );
 					ErrorsFound = true;
@@ -2530,15 +2530,15 @@ namespace HVACVariableRefrigerantFlow {
 
 			//@@ The control type
 			std::string ThermostatPriorityType = "LoadPriority"; // cAlphaArgs( 25 )
-			if ( InputProcessor::SameString( ThermostatPriorityType, "LoadPriority" ) ) {
+			if ( UtilityRoutines::SameString( ThermostatPriorityType, "LoadPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = LoadPriority;
-			} else if ( InputProcessor::SameString( ThermostatPriorityType, "ZonePriority" ) ) {
+			} else if ( UtilityRoutines::SameString( ThermostatPriorityType, "ZonePriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = ZonePriority;
-			} else if ( InputProcessor::SameString( ThermostatPriorityType, "ThermostatOffsetPriority" ) ) {
+			} else if ( UtilityRoutines::SameString( ThermostatPriorityType, "ThermostatOffsetPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = ThermostatOffsetPriority;
-			} else if ( InputProcessor::SameString( ThermostatPriorityType, "Scheduled" ) ) {
+			} else if ( UtilityRoutines::SameString( ThermostatPriorityType, "Scheduled" ) ) {
 				VRF( VRFNum ).ThermostatPriority = ScheduledPriority;
-			} else if ( InputProcessor::SameString( ThermostatPriorityType, "MasterThermostatPriority" ) ) {
+			} else if ( UtilityRoutines::SameString( ThermostatPriorityType, "MasterThermostatPriority" ) ) {
 				VRF( VRFNum ).ThermostatPriority = MasterThermostatPriority;
 				if ( VRF( VRFNum ).MasterZonePtr == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
@@ -2625,7 +2625,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Read all VRF condenser objects: Algorithm Type 2_physics based model (VRF-FluidTCtrl-HR)_Mar. 2016, zrp
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR";
 		for ( VRFNum = NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + 1; VRFNum <= NumVRFCond_SysCurve + NumVRFCond_FluidTCtrl_HP + NumVRFCond_FluidTCtrl_HR; ++VRFNum ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			GlobalNames::VerifyUniqueInterObjectName( VrfUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 
 			VRF( VRFNum ).Name = cAlphaArgs( 1 );
@@ -2647,7 +2647,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			}
 
-			VRF( VRFNum ).ZoneTUListPtr = InputProcessor::FindItemInList( cAlphaArgs( 3 ), TerminalUnitList, NumVRFTULists );
+			VRF( VRFNum ).ZoneTUListPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), TerminalUnitList, NumVRFTULists );
 			if ( VRF( VRFNum ).ZoneTUListPtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = \"" + VRF( VRFNum ).Name + "\"" );
 				ShowContinueError( cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + " not found." );
@@ -2660,7 +2660,7 @@ namespace HVACVariableRefrigerantFlow {
 				EnergyPlus::FluidProperties::GetFluidPropertiesData();
 				EnergyPlus::FluidProperties::GetInput = false;
 			}
-			if ( InputProcessor::FindItemInList( VRF( VRFNum ).RefrigerantName, EnergyPlus::FluidProperties::RefrigData, EnergyPlus::FluidProperties::NumOfRefrigerants ) == 0 ) {
+			if ( UtilityRoutines::FindItemInList( VRF( VRFNum ).RefrigerantName, EnergyPlus::FluidProperties::RefrigData, EnergyPlus::FluidProperties::NumOfRefrigerants ) == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = " + VRF( VRFNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
 				ErrorsFound = true;
@@ -2718,9 +2718,9 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			// IU Control Type
-			if( InputProcessor::SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
+			if( UtilityRoutines::SameString( cAlphaArgs( 5 ), "VariableTemp" ) ) {
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
-			} else if ( InputProcessor::SameString( cAlphaArgs( 5 ), "ConstantTemp" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "ConstantTemp" ) ) {
 				VRF(VRFNum).AlgorithmIUCtrl = 2;
 			} else {
 				VRF(VRFNum).AlgorithmIUCtrl = 1;
@@ -2860,8 +2860,8 @@ namespace HVACVariableRefrigerantFlow {
 
 			//Defrost
 			if ( ! lAlphaFieldBlanks( 8 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 8 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
-				if ( InputProcessor::SameString( cAlphaArgs( 8 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "ReverseCycle" ) ) VRF( VRFNum ).DefrostStrategy = ReverseCycle;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Resistive" ) ) VRF( VRFNum ).DefrostStrategy = Resistive;
 				if ( VRF( VRFNum ).DefrostStrategy == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 8 ) + " not found: " + cAlphaArgs( 8 ) );
 					ErrorsFound = true;
@@ -2871,8 +2871,8 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			if ( ! lAlphaFieldBlanks( 9 ) ) {
-				if ( InputProcessor::SameString( cAlphaArgs( 9 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
-				if ( InputProcessor::SameString( cAlphaArgs( 9 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "Timed" ) ) VRF( VRFNum ).DefrostControl = Timed;
+				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "OnDemand" ) ) VRF( VRFNum ).DefrostControl = OnDemand;
 				if ( VRF( VRFNum ).DefrostControl == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 9 ) + " not found: " + cAlphaArgs( 9 ) );
 					ErrorsFound = true;
@@ -3012,16 +3012,16 @@ namespace HVACVariableRefrigerantFlow {
 			HCoilOutletNodeNum = 0;
 			OANodeNums = 0;
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, VRFTUNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, VRFTUNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			VRFTUNumericFields( VRFTUNum ).FieldNames.allocate(NumNums);
 			VRFTUNumericFields( VRFTUNum ).FieldNames = cNumericFieldNames;
-			InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			VRFTU( VRFTUNum ).Name = cAlphaArgs( 1 );
 			ZoneTerminalUnitListNum = 0;
 			for ( NumList = 1; NumList <= NumVRFTULists; ++NumList ) {
-				ZoneTerminalUnitListNum = InputProcessor::FindItemInList( VRFTU( VRFTUNum ).Name, TerminalUnitList( NumList ).ZoneTUName, TerminalUnitList( NumList ).NumTUInList );
+				ZoneTerminalUnitListNum = UtilityRoutines::FindItemInList( VRFTU( VRFTUNum ).Name, TerminalUnitList( NumList ).ZoneTUName, TerminalUnitList( NumList ).NumTUInList );
 				if ( ZoneTerminalUnitListNum > 0 ) {
 					VRFTU( VRFTUNum ).IndexToTUInTUList = ZoneTerminalUnitListNum;
 					TerminalUnitList( NumList ).ZoneTUPtr( ZoneTerminalUnitListNum ) = VRFTUNum;
@@ -3075,8 +3075,8 @@ namespace HVACVariableRefrigerantFlow {
 				VRFTU( VRFTUNum ).OpMode = ContFanCycCoil;
 			}
 
-			if ( InputProcessor::SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) VRFTU( VRFTUNum ).FanPlace = BlowThru;
-			if ( InputProcessor::SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) VRFTU( VRFTUNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) VRFTU( VRFTUNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) VRFTU( VRFTUNum ).FanPlace = DrawThru;
 			if ( VRFTU( VRFTUNum ).FanPlace == 0 ) {
 				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
@@ -3086,7 +3086,7 @@ namespace HVACVariableRefrigerantFlow {
 			//Get fan data
 			FanType = cAlphaArgs( 7 );
 			FanName = cAlphaArgs( 8 );
-			if ( InputProcessor::SameString( FanType, "Fan:SystemModel" ) ) {
+			if ( UtilityRoutines::SameString( FanType, "Fan:SystemModel" ) ) {
 				if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
 					ErrorsFound = true;
 				} else {
@@ -3102,7 +3102,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			// Check the type of the fan is correct
-			if ( ! InputProcessor::SameString( cFanTypes( VRFTU( VRFTUNum ).fanType_Num ), FanType ) ) {
+			if ( ! UtilityRoutines::SameString( cFanTypes( VRFTU( VRFTUNum ).fanType_Num ), FanType ) ) {
 				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
 				ShowContinueError( "Fan type specified = " + cAlphaArgs( 7 ) );
 				ShowContinueError( "Based on the fan name the type of fan actually used = " + cFanTypes( VRFTU( VRFTUNum ).fanType_Num ) );
@@ -3252,7 +3252,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 					// Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
-						if ( InputProcessor::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) ) ) {
+						if ( UtilityRoutines::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Cooling ) ) ) {
 							errFlag = false;
 							if ( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 								TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
@@ -3292,7 +3292,7 @@ namespace HVACVariableRefrigerantFlow {
 					} else {
 					// Algorithm Type: VRF model based on system curve
 
-						if ( InputProcessor::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_Cooling ) ) ) {
+						if ( UtilityRoutines::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXCoolCoilType_Num ), cAllCoilTypes( CoilVRF_Cooling ) ) ) {
 							if( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 								TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).CoolingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXCoolingCoilType, cAlphaArgs( 12 ), errFlag );
 							} else {
@@ -3348,7 +3348,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl ) {
 					// Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
 
-						if ( InputProcessor::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) ) ) {
+						if ( UtilityRoutines::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_FluidTCtrl_Heating ) ) ) {
 							errFlag = false;
 							if ( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 								TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXHeatingCoilType, cAlphaArgs( 14 ), errFlag );
@@ -3405,7 +3405,7 @@ namespace HVACVariableRefrigerantFlow {
 
 					} else {
 					// Algorithm Type: VRF model based on system curve
-						if ( InputProcessor::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_Heating ) ) ) {
+						if ( UtilityRoutines::SameString( cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), cAllCoilTypes( CoilVRF_Heating ) ) ) {
 							if( VRFTU( VRFTUNum ).TUListIndex > 0 && VRFTU( VRFTUNum ).IndexToTUInTUList > 0 ) {
 								TerminalUnitList( VRFTU( VRFTUNum ).TUListIndex ).HeatingCoilAvailSchPtr( VRFTU( VRFTUNum ).IndexToTUInTUList ) = GetDXCoilAvailSchPtr( DXHeatingCoilType, cAlphaArgs( 14 ), errFlag );
 							} else {
@@ -3443,7 +3443,7 @@ namespace HVACVariableRefrigerantFlow {
 							}
 							// Check VRF DX heating coil heating capacity as a fuction of temperature performance curve. Only report here for biquadratic curve type.
 							std::string sCurveType = GetCurveType( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ) );
-							if ( VRFTU( VRFTUNum ).VRFSysNum > 0 && VRFTU( VRFTUNum ).HeatCoilIndex > 0 && InputProcessor::SameString( sCurveType, "BiQuadratic" ) ) {
+							if ( VRFTU( VRFTUNum ).VRFSysNum > 0 && VRFTU( VRFTUNum ).HeatCoilIndex > 0 && UtilityRoutines::SameString( sCurveType, "BiQuadratic" ) ) {
 								if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType == WetBulbIndicator ) {
 									checkCurveIsNormalizedToOne( "GetDXCoils: " + cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ), DXCoils::GetDXCoilName( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound, cAllCoilTypes( VRFTU( VRFTUNum ).DXHeatCoilType_Num ) ), GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ), "Heating Capacity Ratio Modifier Function of Temperature Curve Name", CurveManager::GetCurveName( GetDXCoilCapFTCurveIndex( VRFTU( VRFTUNum ).HeatCoilIndex, ErrorsFound ) ), RatedInletAirTempHeat, RatedOutdoorWetBulbTempHeat );
 								} else if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingPerformanceOATType == DryBulbIndicator ) {
@@ -3482,7 +3482,7 @@ namespace HVACVariableRefrigerantFlow {
 
 			VRFTU( VRFTUNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaFieldBlanks( 16 ) ) {
-				VRFTU( VRFTUNum ).HVACSizingIndex = InputProcessor::FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing );
+				VRFTU( VRFTUNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing );
 				if ( VRFTU( VRFTUNum ).HVACSizingIndex == 0 ) {
 					ShowSevereError( cAlphaFieldNames( 16 ) + " = " + cAlphaArgs( 16 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + VRFTU( VRFTUNum).Name );
@@ -3566,7 +3566,7 @@ namespace HVACVariableRefrigerantFlow {
 			if ( VRFTU( VRFTUNum ).OAMixerUsed ) SetUpCompSets( cCurrentModuleObject, VRFTU( VRFTUNum ).Name, "UNDEFINED", VRFTU( VRFTUNum ).OAMixerName, NodeID( OANodeNums( 1 ) ), NodeID( OANodeNums( 4 ) ) );
 
 			// Get AirTerminal mixer data
-			GetATMixer( VRFTU( VRFTUNum ).Name, VRFTU( VRFTUNum ).ATMixerName, VRFTU( VRFTUNum ).ATMixerIndex, VRFTU( VRFTUNum ).ATMixerType, VRFTU( VRFTUNum ).ATMixerPriNode, VRFTU( VRFTUNum ).ATMixerSecNode, VRFTU( VRFTUNum ).ATMixerOutNode );
+			GetATMixer( VRFTU( VRFTUNum ).Name, VRFTU( VRFTUNum ).ATMixerName, VRFTU( VRFTUNum ).ATMixerIndex, VRFTU( VRFTUNum ).ATMixerType, VRFTU( VRFTUNum ).ATMixerPriNode, VRFTU( VRFTUNum ).ATMixerSecNode, VRFTU( VRFTUNum ).ATMixerOutNode, VRFTU( VRFTUNum ).VRFTUOutletNodeNum );
 			if ( VRFTU( VRFTUNum ).ATMixerType == ATMixer_InletSide || VRFTU( VRFTUNum ).ATMixerType == ATMixer_SupplySide ) {
 				VRFTU( VRFTUNum ).ATMixerExists = true;
 			}
@@ -4102,8 +4102,8 @@ namespace HVACVariableRefrigerantFlow {
 						for ( ELLoop = 1; ELLoop <= NumOfZones; ++ELLoop ) { // NumOfZoneEquipLists
 							if ( ZoneEquipList( ELLoop ).Name == "" ) continue; // dimensioned by NumOfZones.  Only valid ones have names.
 							for ( ListLoop = 1; ListLoop <= ZoneEquipList( ELLoop ).NumOfEquipTypes; ++ListLoop ) {
-								if ( ! InputProcessor::SameString( ZoneEquipList( ELLoop ).EquipType( ListLoop ), cVRFTUTypes( VRFTU( TUIndex ).VRFTUType_Num ) ) ) continue;
-								if ( ! InputProcessor::SameString( ZoneEquipList( ELLoop ).EquipName( ListLoop ), VRFTU( TUIndex ).Name ) ) continue;
+								if ( ! UtilityRoutines::SameString( ZoneEquipList( ELLoop ).EquipType( ListLoop ), cVRFTUTypes( VRFTU( TUIndex ).VRFTUType_Num ) ) ) continue;
+								if ( ! UtilityRoutines::SameString( ZoneEquipList( ELLoop ).EquipName( ListLoop ), VRFTU( TUIndex ).Name ) ) continue;
 								VRFTU( TUIndex ).ZoneNum = ELLoop;
 								if ( VRF( VRFTU( TUIndex ).VRFSysNum ).MasterZonePtr == ELLoop ) {
 									VRF( VRFTU( TUIndex ).VRFSysNum ).MasterZoneTUIndex = TUIndex;
@@ -5952,7 +5952,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -6102,7 +6102,7 @@ namespace HVACVariableRefrigerantFlow {
 			//    Par(4) = OpMode
 			Par( 5 ) = QZnReq;
 			Par( 6 ) = OnOffAirFlowRatio;
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
+			SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
 			if ( SolFla == -1 ) {
 				//     Very low loads may not converge quickly. Tighten PLR boundary and try again.
 				TempMaxPLR = -0.1;
@@ -6138,7 +6138,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRFHeatingMode && TempOutput < QZnReq ) ContinueIter = false;
 					if ( VRFCoolingMode && TempOutput > QZnReq ) ContinueIter = false;
 				}
-				SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
+				SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						if ( VRFTU( VRFTUNum ).IterLimitExceeded == 0 ) {
@@ -7712,7 +7712,7 @@ namespace HVACVariableRefrigerantFlow {
 		if ( this->OAMixerUsed ) {
 			SimOAMixer( this->OAMixerName, false, this->OAMixerIndex );
 
-			OAMixerNum = InputProcessor::FindItemInList( this->OAMixerName, OAMixer );
+			OAMixerNum = UtilityRoutines::FindItemInList( this->OAMixerName, OAMixer );
 			OAMixNode = OAMixer( OAMixerNum ).MixNode;
 			T_coil_in = Node( OAMixNode ).Temp;
 			W_coil_in = Node( OAMixNode ).HumRat;
@@ -7788,7 +7788,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 		using General::TrimSigDigits;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using Psychrometrics::RhoH2O;
 		using DataEnvironment::EnvironmentName;
 		using DataEnvironment::CurMnDy;
@@ -8972,7 +8972,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// Using/Aliasing
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using HeatingCoils::SimulateHeatingCoilComponents;
@@ -9102,7 +9102,7 @@ namespace HVACVariableRefrigerantFlow {
 			//    Par(4) = OpMode
 			Par( 5 ) = QZnReq;
 			Par( 6 ) = OnOffAirFlowRatio;
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
+			SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par );
 			if ( SolFla == -1 ) {
 				//     Very low loads may not converge quickly. Tighten PLR boundary and try again.
 				TempMaxPLR = -0.1;
@@ -9126,7 +9126,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRFHeatingMode && TempOutput < QZnReq ) ContinueIter = false;
 					if ( VRFCoolingMode && TempOutput > QZnReq ) ContinueIter = false;
 				}
-				SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
+				SolveRoot( ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par );
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						if ( this->IterLimitExceeded == 0 ) {
@@ -9381,7 +9381,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// USE STATEMENTS:
 		using DXCoils::DXCoil;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using DataEnvironment::OutDryBulbTemp;
 
 		// Return value
@@ -9460,7 +9460,7 @@ namespace HVACVariableRefrigerantFlow {
 		Par( 7 ) = OACompOnMassFlow;
 
 		FanSpdRatioMax = 1.0;
-		SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par );
+		SolveRoot( ErrorTol, MaxIte, SolFla, FanSpdRatio, VRFTUAirFlowResidual_FluidTCtrl, FanSpdRatioMin, FanSpdRatioMax, Par );
 		if( SolFla < 0) FanSpdRatio = FanSpdRatioMax; //over capacity
 
 		AirMassFlowRate = FanSpdRatio * DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
@@ -9588,7 +9588,7 @@ namespace HVACVariableRefrigerantFlow {
 		if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
 			SimOAMixer( VRFTU( VRFTUNum ).OAMixerName, FirstHVACIteration, VRFTU( VRFTUNum ).OAMixerIndex );
 
-			OAMixerNum = InputProcessor::FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );  // this not needed, why not use VRFTU( VRFTUNum ).OAMixerIndex var
+			OAMixerNum = UtilityRoutines::FindItemInList( VRFTU( VRFTUNum ).OAMixerName, OAMixer );  // this not needed, why not use VRFTU( VRFTUNum ).OAMixerIndex var
 			OAMixNode = OAMixer( OAMixerNum ).MixNode;
 			Tin = Node( OAMixNode ).Temp;
 			Win = Node( OAMixNode ).HumRat;
@@ -10648,7 +10648,7 @@ namespace HVACVariableRefrigerantFlow {
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using FluidProperties::GetSupHeatTempRefrig;
 		using FluidProperties::RefrigData;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10664,7 +10664,7 @@ namespace HVACVariableRefrigerantFlow {
 		int NumIteTe; // counter for Te calculation iterations [-]
 		int NumTUInList; // number of terminal units is list
 		int RefrigerantIndex; // Index of the refrigerant [-]
-		int SolFla; // Slove flag for SolveRegulaFalsi [-]
+		int SolFla; // Slove flag for SolveRoot [-]
 		int TUListNum; // index to TU List
 		int TUIndex; // Index to terminal unit
 		Real64 Cap_Eva0; // Evaporating capacity calculated based on physics model, used in the iterations [W]
@@ -10783,7 +10783,7 @@ namespace HVACVariableRefrigerantFlow {
 					MinOutdoorUnitPe = max( P_discharge - this->CompMaxDeltaP, MinRefriPe );
 					MinOutdoorUnitTe = GetSatTemperatureRefrig( this->RefrigerantName, max( min( MinOutdoorUnitPe, RefPHigh ), RefPLow ), RefrigerantIndex, RoutineName );
 
-					SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par ); // SmallLoadTe is the updated Te'
+					SolveRoot( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par ); // SmallLoadTe is the updated Te'
 					if( SolFla < 0 ) SmallLoadTe = 6; //MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
 
 					//Get an updated Te corresponding to the updated Te'
@@ -10957,7 +10957,7 @@ namespace HVACVariableRefrigerantFlow {
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using FluidProperties::GetSupHeatTempRefrig;
 		using FluidProperties::RefrigData;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10971,7 +10971,7 @@ namespace HVACVariableRefrigerantFlow {
 		int NumIteCcap; // counter for Ccap calculation iterations [-]
 		int NumTUInList; // number of terminal units is list
 		int RefrigerantIndex; // Index of the refrigerant [-]
-		int SolFla; // Solve flag for SolveRegulaFalsi [-]
+		int SolFla; // Solve flag for SolveRoot [-]
 		int TUListNum; // index to TU List
 		Real64 Cap_Eva0; // Evaporating capacity calculated based on physics model, used in the iterations [W]
 		Real64 Cap_Eva1; // Evaporating capacity calculated by curves, used in the iterations [W]
@@ -11055,7 +11055,7 @@ namespace HVACVariableRefrigerantFlow {
 					Par( 2 ) = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
 					Par( 3 ) = this->OUCoolingCAPFT( CounterCompSpdTemp );
 
-					SolveRegulaFalsi( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par );
+					SolveRoot( 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par );
 					if( SolFla < 0 ) SmallLoadTe = MinOutdoorUnitTe;
 
 					T_suction = SmallLoadTe;
@@ -11158,7 +11158,7 @@ namespace HVACVariableRefrigerantFlow {
 		using FluidProperties::GetSatPressureRefrig;
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using FluidProperties::RefrigData;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::TrimSigDigits;
 
 		Array1D< Real64 > Par( 7 ); // Parameters passed to RegulaFalsi
@@ -11382,7 +11382,7 @@ namespace HVACVariableRefrigerantFlow {
 			Par( 6 ) = Q_c_TU_PL;
 			Par( 7 ) = m_air_evap_rated;
 
-			SolveRegulaFalsi( ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par );
+			SolveRoot( ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par );
 			if( SolFla < 0) Tsuction_new = Tsuction_LB;
 
 			// Update Q_c_tot_temp using updated Tsuction_new
@@ -11535,7 +11535,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DXCoils::DXCoil;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using FluidProperties::FindRefrigerant;
 		using FluidProperties::GetSupHeatDensityRefrig;
 		using FluidProperties::RefrigData;
@@ -11682,7 +11682,7 @@ namespace HVACVariableRefrigerantFlow {
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DXCoils::DXCoil;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using FluidProperties::FindRefrigerant;
 		using FluidProperties::GetSatTemperatureRefrig;
 		using FluidProperties::GetSupHeatDensityRefrig;

@@ -60,7 +60,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -380,14 +380,14 @@ namespace PlantLoadProfile {
 
 		// FLOW:
 		cCurrentModuleObject = "LoadProfile:Plant";
-		NumOfPlantProfile = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPlantProfile = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfPlantProfile > 0 ) {
 			PlantProfile.allocate( NumOfPlantProfile );
 
 			for ( ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum ) {
-				InputProcessor::GetObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
-				InputProcessor::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+				inputProcessor->getObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				PlantProfile( ProfileNum ).Name = cAlphaArgs( 1 );
 				PlantProfile( ProfileNum ).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU

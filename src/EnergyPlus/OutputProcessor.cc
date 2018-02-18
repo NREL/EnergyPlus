@@ -74,7 +74,7 @@
 #include <DataSystemVariables.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ResultsSchema.hh>
@@ -581,7 +581,7 @@ namespace OutputProcessor {
 
 		if ( NumOfReqVariables > 0 ) {
 			// Do a quick check
-			Item = InputProcessor::FindItem( VarName, ReqRepVars, &ReqReportVariables::VarName );
+			Item = UtilityRoutines::FindItem( VarName, ReqRepVars, &ReqReportVariables::VarName );
 
 			NumExtraVars = 0;
 			ReportList = 0;
@@ -599,7 +599,7 @@ namespace OutputProcessor {
 						ReqRepVars( Loop ).Used = true;
 					}
 					if ( Loop < NumOfReqVariables ) {
-						Pos = InputProcessor::FindItem( VarName, ReqRepVars( {Loop+1,NumOfReqVariables} ), &ReqReportVariables::VarName );
+						Pos = UtilityRoutines::FindItem( VarName, ReqRepVars( {Loop+1,NumOfReqVariables} ), &ReqReportVariables::VarName );
 						if ( Pos != 0 ) {
 							MinLook = min( MinLook, Loop + Pos );
 							MaxLook = max( MaxLook, Loop + Pos );
@@ -646,7 +646,7 @@ namespace OutputProcessor {
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ReqRepVars( Loop ).Key.empty() ) continue;
-			if ( ! InputProcessor::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
+			if ( ! UtilityRoutines::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
 			if ( ! DataOutputs::FindItemInVariableList( KeyedValue, VariableName ) ) continue;
 
 			//   A match.  Make sure doesn't duplicate
@@ -705,7 +705,7 @@ namespace OutputProcessor {
 
 		for ( Loop = MinIndx; Loop <= MaxIndx; ++Loop ) {
 			if ( ! ReqRepVars( Loop ).Key.empty() ) continue;
-			if ( ! InputProcessor::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
+			if ( ! UtilityRoutines::SameString( ReqRepVars( Loop ).VarName, VariableName ) ) continue;
 
 			//   A match.  Make sure doesnt duplicate
 
@@ -799,12 +799,12 @@ namespace OutputProcessor {
 		}
 
 		cCurrentModuleObject = "Output:Variable";
-		NumOfReqVariables = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumOfReqVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		ReqRepVars.allocate( NumOfReqVariables );
 
 		for ( Loop = 1; Loop <= NumOfReqVariables; ++Loop ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// Check for duplicates?
 
@@ -895,8 +895,8 @@ namespace OutputProcessor {
 
 		std::string const FreqStringTrim( FreqString.substr( 0, LenString ) );
 		for ( int Loop = -1; Loop <= 6; ++Loop ) {
-			if ( ! InputProcessor::SameString( FreqStringTrim, PossibleFreq( Loop ) ) ) continue;
-			if ( ! InputProcessor::SameString( FreqString, ExactFreqString( Loop ) ) ) {
+			if ( ! UtilityRoutines::SameString( FreqStringTrim, PossibleFreq( Loop ) ) ) continue;
+			if ( ! UtilityRoutines::SameString( FreqString, ExactFreqString( Loop ) ) ) {
 				ShowWarningError( "DetermineFrequency: Entered frequency=\"" + FreqString + "\" is not an exact match to key strings." );
 				ShowContinueError( "Frequency=" + ExactFreqString( Loop ) + " will be used." );
 			}
@@ -1092,11 +1092,11 @@ namespace OutputProcessor {
 		}
 
 		ValidateIndexType = 1;
-		Item = InputProcessor::FindItemInList( InputProcessor::MakeUPPERCase( IndexTypeKey ), ZoneIndexTypes, 3 );
+		Item = UtilityRoutines::FindItemInList( UtilityRoutines::MakeUPPERCase( IndexTypeKey ), ZoneIndexTypes, 3 );
 		if ( Item != 0 ) return ValidateIndexType;
 
 		ValidateIndexType = 2;
-		Item = InputProcessor::FindItemInList( InputProcessor::MakeUPPERCase( IndexTypeKey ), SystemIndexTypes, 3 );
+		Item = UtilityRoutines::FindItemInList( UtilityRoutines::MakeUPPERCase( IndexTypeKey ), SystemIndexTypes, 3 );
 		if ( Item != 0 ) return ValidateIndexType;
 
 		ValidateIndexType = 0;
@@ -1200,11 +1200,11 @@ namespace OutputProcessor {
 		}
 
 		ValidateVariableType = 1;
-		Item = InputProcessor::FindItemInList( InputProcessor::MakeUPPERCase( VariableTypeKey ), StateVariables, 3 );
+		Item = UtilityRoutines::FindItemInList( UtilityRoutines::MakeUPPERCase( VariableTypeKey ), StateVariables, 3 );
 		if ( Item != 0 ) return ValidateVariableType;
 
 		ValidateVariableType = 2;
-		Item = InputProcessor::FindItemInList( InputProcessor::MakeUPPERCase( VariableTypeKey ), NonStateVariables, 4 );
+		Item = UtilityRoutines::FindItemInList( UtilityRoutines::MakeUPPERCase( VariableTypeKey ), NonStateVariables, 4 );
 		if ( Item != 0 ) return ValidateVariableType;
 
 		ShowSevereError( "Invalid variable type requested=" + VariableTypeKey );
@@ -1515,19 +1515,19 @@ namespace OutputProcessor {
 		BigErrorsFound = false;
 
 		cCurrentModuleObject = "Meter:Custom";
-		NumCustomMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumCustomMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
         //make list of names for all Meter:Custom since they cannot refer to other Meter:Custom's
 		std::unordered_set< std::string > namesOfMeterCustom;
 		namesOfMeterCustom.reserve( NumCustomMeters );
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			namesOfMeterCustom.emplace( InputProcessor::MakeUPPERCase( cAlphaArgs( 1 ) ) );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			namesOfMeterCustom.emplace( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 1 ) ) );
 		}
 
 		for ( Loop = 1; Loop <= NumCustomMeters; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
@@ -1542,7 +1542,7 @@ namespace OutputProcessor {
 			// check if any fields reference another Meter:Custom
 			int found = 0;
 			for ( fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2 ) {
-				if ( namesOfMeterCustom.find( InputProcessor::MakeUPPERCase( cAlphaArgs( fldIndex ) ) ) != namesOfMeterCustom.end() ) {
+				if ( namesOfMeterCustom.find( UtilityRoutines::MakeUPPERCase( cAlphaArgs( fldIndex ) ) ) != namesOfMeterCustom.end() ) {
 					found = fldIndex;
 					break;
 				}
@@ -1581,7 +1581,7 @@ namespace OutputProcessor {
 					AddMeter( cAlphaArgs( 1 ), UnitsVar, BlankString, BlankString, BlankString, BlankString );
 					EnergyMeters( NumEnergyMeters ).TypeOfMeter = MeterType_Custom;
 					// Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-					GetStandardMeterResourceType( EnergyMeters( NumEnergyMeters ).ResourceType, InputProcessor::MakeUPPERCase( cAlphaArgs( 2 ) ), errFlag );
+					GetStandardMeterResourceType( EnergyMeters( NumEnergyMeters ).ResourceType, UtilityRoutines::MakeUPPERCase( cAlphaArgs( 2 ) ), errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 						BigErrorsFound = true;
@@ -1685,10 +1685,10 @@ namespace OutputProcessor {
 		}
 
 		cCurrentModuleObject = "Meter:CustomDecrement";
-		NumCustomDecMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		NumCustomDecMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( Loop = 1; Loop <= NumCustomDecMeters; ++Loop ) {
-			InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			lbrackPos = index( cAlphaArgs( 1 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
 			MeterCreated = false;
@@ -1703,7 +1703,7 @@ namespace OutputProcessor {
 
 			lbrackPos = index( cAlphaArgs( 3 ), '[' );
 			if ( lbrackPos != std::string::npos ) cAlphaArgs( 1 ).erase( lbrackPos );
-			WhichMeter = InputProcessor::FindItem( cAlphaArgs( 3 ), EnergyMeters );
+			WhichMeter = UtilityRoutines::FindItem( cAlphaArgs( 3 ), EnergyMeters );
 			if ( WhichMeter == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 				ErrorsFound = true;
@@ -1768,7 +1768,7 @@ namespace OutputProcessor {
 					EnergyMeters( NumEnergyMeters ).SourceMeter = WhichMeter;
 
 					// Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-					GetStandardMeterResourceType( EnergyMeters( NumEnergyMeters ).ResourceType, InputProcessor::MakeUPPERCase( cAlphaArgs( 2 ) ), errFlag );
+					GetStandardMeterResourceType( EnergyMeters( NumEnergyMeters ).ResourceType, UtilityRoutines::MakeUPPERCase( cAlphaArgs( 2 ) ), errFlag );
 					if ( errFlag ) {
 						ShowContinueError( "..on " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"." );
 						BigErrorsFound = true;
@@ -2093,7 +2093,7 @@ namespace OutputProcessor {
 		// Make sure this isn't already in the list of meter names
 		int Found;
 		if ( NumEnergyMeters > 0 ) {
-			Found = InputProcessor::FindItemInList( Name, EnergyMeters );
+			Found = UtilityRoutines::FindItemInList( Name, EnergyMeters );
 		} else {
 			Found = 0;
 		}
@@ -2209,7 +2209,7 @@ namespace OutputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( InputProcessor::SameString( Group, "Building" ) ) {
+		if ( UtilityRoutines::SameString( Group, "Building" ) ) {
 			ValidateNStandardizeMeterTitles( MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound, ZoneName );
 		} else {
 			ValidateNStandardizeMeterTitles( MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound );
@@ -2220,19 +2220,19 @@ namespace OutputProcessor {
 		VarMeterArrays( NumVarMeterArrays ).NumOnMeters = 0;
 		VarMeterArrays( NumVarMeterArrays ).RepVariable = RepVarNum;
 		VarMeterArrays( NumVarMeterArrays ).OnMeters = 0;
-		int Found = InputProcessor::FindItem( ResourceType + ":Facility", EnergyMeters );
+		int Found = UtilityRoutines::FindItem( ResourceType + ":Facility", EnergyMeters );
 		if ( Found != 0 ) {
 			++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 			VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 		}
 		if ( ! Group.empty() ) {
-			Found = InputProcessor::FindItem( ResourceType + ':' + Group, EnergyMeters );
+			Found = UtilityRoutines::FindItem( ResourceType + ':' + Group, EnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 				VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 			}
-			if ( InputProcessor::SameString( Group, "Building" ) ) { // Match to Zone
-				Found = InputProcessor::FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
+			if ( UtilityRoutines::SameString( Group, "Building" ) ) { // Match to Zone
+				Found = UtilityRoutines::FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2242,13 +2242,13 @@ namespace OutputProcessor {
 
 		//!! Following if EndUse is by ResourceType
 		if ( ! EndUse.empty() ) {
-			Found = InputProcessor::FindItem( EndUse + ':' + ResourceType, EnergyMeters );
+			Found = UtilityRoutines::FindItem( EndUse + ':' + ResourceType, EnergyMeters );
 			if ( Found != 0 ) {
 				++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 				VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 			}
-			if ( InputProcessor::SameString( Group, "Building" ) ) { // Match to Zone
-				Found = InputProcessor::FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
+			if ( UtilityRoutines::SameString( Group, "Building" ) ) { // Match to Zone
+				Found = UtilityRoutines::FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2257,15 +2257,15 @@ namespace OutputProcessor {
 
 			// End use subcategory
 			if ( ! EndUseSub.empty() ) {
-				Found = InputProcessor::FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters );
+				Found = UtilityRoutines::FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters );
 				if ( Found != 0 ) {
 					++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 					VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
 
 					AddEndUseSubcategory( ResourceType, EndUse, EndUseSub );
 				}
-				if ( InputProcessor::SameString( Group, "Building" ) ) { // Match to Zone
-					Found = InputProcessor::FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
+				if ( UtilityRoutines::SameString( Group, "Building" ) ) { // Match to Zone
+					Found = UtilityRoutines::FindItem( EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 					if ( Found != 0 ) {
 						++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 						VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2345,11 +2345,11 @@ namespace OutputProcessor {
 
 		LocalErrorsFound = false;
 		// Basic ResourceType Meters
-		GetStandardMeterResourceType( ResourceType, InputProcessor::MakeUPPERCase( ResourceType ), LocalErrorsFound );
+		GetStandardMeterResourceType( ResourceType, UtilityRoutines::MakeUPPERCase( ResourceType ), LocalErrorsFound );
 
 		if ( ! LocalErrorsFound ) {
 			if ( NumEnergyMeters > 0 ) {
-				Found = InputProcessor::FindItem( ResourceType + ":Facility", EnergyMeters );
+				Found = UtilityRoutines::FindItem( ResourceType + ":Facility", EnergyMeters );
 			} else {
 				Found = 0;
 			}
@@ -2377,10 +2377,10 @@ namespace OutputProcessor {
 		}}
 
 		if ( ! LocalErrorsFound && ! Group.empty() ) {
-			Found = InputProcessor::FindItem( ResourceType + ':' + Group, EnergyMeters );
+			Found = UtilityRoutines::FindItem( ResourceType + ':' + Group, EnergyMeters );
 			if ( Found == 0 ) AddMeter( ResourceType + ':' + Group, MtrUnits, ResourceType, "", "", Group );
 			if ( Group == "Building" ) {
-				Found = InputProcessor::FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
+				Found = UtilityRoutines::FindItem( ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found == 0 ) {
 					AddMeter( ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, "", "", "Zone" );
 				}
@@ -2557,11 +2557,11 @@ namespace OutputProcessor {
 
 		//!! Following if we do EndUse by ResourceType
 		if ( ! LocalErrorsFound && ! EndUse.empty() ) {
-			Found = InputProcessor::FindItem( EndUse + ':' + ResourceType, EnergyMeters );
+			Found = UtilityRoutines::FindItem( EndUse + ':' + ResourceType, EnergyMeters );
 			if ( Found == 0 ) AddMeter( EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "" );
 
 			if ( Group == "Building" ) { // Match to Zone
-				Found = InputProcessor::FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
+				Found = UtilityRoutines::FindItem( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, EnergyMeters );
 				if ( Found == 0 ) {
 					AddMeter( EndUse + ':' + ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, EndUse, "", "Zone" );
 				}
@@ -2573,7 +2573,7 @@ namespace OutputProcessor {
 		// End-Use Subcategories
 		if ( ! LocalErrorsFound && ! EndUseSub.empty() ) {
 			MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
-			Found = InputProcessor::FindItem( MeterName, EnergyMeters );
+			Found = UtilityRoutines::FindItem( MeterName, EnergyMeters );
 			if ( Found == 0 ) AddMeter( MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "" );
 		} else if ( LocalErrorsFound ) {
 			ErrorsFound = true;
@@ -2612,7 +2612,7 @@ namespace OutputProcessor {
 		std::string UC_ResourceType;
 
 		ErrorsFound = false;
-		UC_ResourceType = InputProcessor::MakeUPPERCase( ResourceType );
+		UC_ResourceType = UtilityRoutines::MakeUPPERCase( ResourceType );
 
 		CodeForIPUnits = RT_IPUnits_OtherJ;
 		if ( has( UC_ResourceType, "ELEC" ) ) {
@@ -2622,20 +2622,20 @@ namespace OutputProcessor {
 		} else if ( has( UC_ResourceType, "COOL" ) ) {
 			CodeForIPUnits = RT_IPUnits_Cooling;
 		}
-		if ( InputProcessor::SameString( MtrUnits, "m3" ) && has( UC_ResourceType, "WATER" ) ) {
+		if ( UtilityRoutines::SameString( MtrUnits, "m3" ) && has( UC_ResourceType, "WATER" ) ) {
 			CodeForIPUnits = RT_IPUnits_Water;
-		} else if ( InputProcessor::SameString( MtrUnits, "m3" ) ) {
+		} else if ( UtilityRoutines::SameString( MtrUnits, "m3" ) ) {
 			CodeForIPUnits = RT_IPUnits_OtherM3;
 		}
-		if ( InputProcessor::SameString( MtrUnits, "kg" ) ) {
+		if ( UtilityRoutines::SameString( MtrUnits, "kg" ) ) {
 			CodeForIPUnits = RT_IPUnits_OtherKG;
 		}
-		if ( InputProcessor::SameString( MtrUnits, "L" ) ) {
+		if ( UtilityRoutines::SameString( MtrUnits, "L" ) ) {
 			CodeForIPUnits = RT_IPUnits_OtherL;
 		}
 		//  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
 		//  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
-		if ( ! InputProcessor::SameString( MtrUnits, "kg" ) && ! InputProcessor::SameString( MtrUnits, "J" ) && ! InputProcessor::SameString( MtrUnits, "m3" ) && ! InputProcessor::SameString( MtrUnits, "L" ) ) {
+		if ( ! UtilityRoutines::SameString( MtrUnits, "kg" ) && ! UtilityRoutines::SameString( MtrUnits, "J" ) && ! UtilityRoutines::SameString( MtrUnits, "m3" ) && ! UtilityRoutines::SameString( MtrUnits, "L" ) ) {
 			ShowWarningError( "DetermineMeterIPUnits: Meter units not recognized for IP Units conversion=[" + MtrUnits + "]." );
 			ErrorsFound = true;
 		}
@@ -3711,10 +3711,10 @@ namespace OutputProcessor {
 
 		bool Found = false;
 		for ( EndUseNum = 1; EndUseNum <= NumEndUses; ++EndUseNum ) {
-			if ( InputProcessor::SameString( EndUseCategory( EndUseNum ).Name, EndUseName ) ) {
+			if ( UtilityRoutines::SameString( EndUseCategory( EndUseNum ).Name, EndUseName ) ) {
 
 				for ( EndUseSubNum = 1; EndUseSubNum <= EndUseCategory( EndUseNum ).NumSubcategories; ++EndUseSubNum ) {
-					if ( InputProcessor::SameString( EndUseCategory( EndUseNum ).SubcategoryName( EndUseSubNum ), EndUseSubName ) ) {
+					if ( UtilityRoutines::SameString( EndUseCategory( EndUseNum ).SubcategoryName( EndUseSubNum ), EndUseSubName ) ) {
 						// Subcategory already exists, no further action required
 						Found = true;
 						break;
@@ -4906,7 +4906,7 @@ SetupOutputVariable(
 		// Check name length for variable name
 		invalidUnits = false;
 		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-		if ( InputProcessor::SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
+		if ( UtilityRoutines::SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
 		if ( len( stripped( VariableName ) ) > MaxNameLength ) {
 			ShowSevereError( "Variable Name length (including units) [" + TrimSigDigits( len( stripped( VariableName ) ) ) + "] exceeds maximum=" + VariableName );
 			if ( invalidUnits ) ShowSevereError( "Variable has invalid units in call Variable=" + VariableName + ", Units=" + UnitsString );
@@ -5008,9 +5008,9 @@ SetupOutputVariable(
 		RVariableTypes( CV ).StoreType = VariableType;
 		RVariableTypes( CV ).VarName = KeyedValue + ':' + VarName;
 		RVariableTypes( CV ).VarNameOnly = VarName;
-		RVariableTypes( CV ).VarNameOnlyUC = InputProcessor::MakeUPPERCase( VarName );
-		RVariableTypes( CV ).VarNameUC = InputProcessor::MakeUPPERCase( RVariableTypes( CV ).VarName );
-		RVariableTypes( CV ).KeyNameOnlyUC = InputProcessor::MakeUPPERCase( KeyedValue );
+		RVariableTypes( CV ).VarNameOnlyUC = UtilityRoutines::MakeUPPERCase( VarName );
+		RVariableTypes( CV ).VarNameUC = UtilityRoutines::MakeUPPERCase( RVariableTypes( CV ).VarName );
+		RVariableTypes( CV ).KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase( KeyedValue );
 		RVariableTypes( CV ).UnitsString = UnitsString;
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
@@ -5144,7 +5144,7 @@ SetupOutputVariable(
 		strip( UnitsString );
 		invalidUnits = false;
 		if ( UnitsString[ 0 ] == '-' ) invalidUnits = true;
-		if ( InputProcessor::SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
+		if ( UtilityRoutines::SameString( UnitsString, "dimensionless" ) ) invalidUnits = true;
 		VarName = stripped( VariableName.substr( 0, Item ) );
 		//    VariableNamewithUnits=TRIM(VarName)//' ['//TRIM(UnitsString)//']'
 		// Check name length for variable name
@@ -5212,7 +5212,7 @@ SetupOutputVariable(
 		IVariableTypes( CV ).StoreType = VariableType;
 		IVariableTypes( CV ).VarName = KeyedValue + ':' + VarName;
 		IVariableTypes( CV ).VarNameOnly = VarName;
-		IVariableTypes( CV ).VarNameUC = InputProcessor::MakeUPPERCase( IVariableTypes( CV ).VarName );
+		IVariableTypes( CV ).VarNameUC = UtilityRoutines::MakeUPPERCase( IVariableTypes( CV ).VarName );
 		IVariableTypes( CV ).UnitsString = UnitsString;
 
 		AssignReportNumber( CurrentReportNumber );
@@ -6130,11 +6130,11 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter";
-	NumReqMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );
@@ -6147,7 +6147,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = InputProcessor::FindItem( Alphas( 1 ), EnergyMeters );
+			Meter = UtilityRoutines::FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6158,7 +6158,7 @@ UpdateMeterReporting()
 		} else { // Wildcard input
 			NeverFound = true;
 			for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
-				if ( ! InputProcessor::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
+				if ( ! UtilityRoutines::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
 				NeverFound = false;
 
 				SetInitialMeterReportingAndOutputNames( Meter, false, ReportFreq, false );
@@ -6172,10 +6172,10 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:MeterFileOnly";
-	NumReqMeterFOs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeterFOs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 	for ( Loop = 1; Loop <= NumReqMeterFOs; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );
@@ -6188,7 +6188,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = InputProcessor::FindItem( Alphas( 1 ), EnergyMeters );
+			Meter = UtilityRoutines::FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6199,7 +6199,7 @@ UpdateMeterReporting()
 		} else { // Wildcard input
 			NeverFound = true;
 			for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
-				if ( ! InputProcessor::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
+				if ( ! UtilityRoutines::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
 				NeverFound = false;
 
 				SetInitialMeterReportingAndOutputNames( Meter, true, ReportFreq, false );
@@ -6213,11 +6213,11 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:Cumulative";
-	NumReqMeters = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeters = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );
@@ -6230,7 +6230,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = InputProcessor::FindItem( Alphas( 1 ), EnergyMeters );
+			Meter = UtilityRoutines::FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6241,7 +6241,7 @@ UpdateMeterReporting()
 		} else { // Wildcard input
 			NeverFound = true;
 			for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
-				if ( ! InputProcessor::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
+				if ( ! UtilityRoutines::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
 				NeverFound = false;
 
 				SetInitialMeterReportingAndOutputNames( Meter, false, ReportFreq, true );
@@ -6255,10 +6255,10 @@ UpdateMeterReporting()
 	}
 
 	cCurrentModuleObject = "Output:Meter:Cumulative:MeterFileOnly";
-	NumReqMeterFOs = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+	NumReqMeterFOs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 	for ( Loop = 1; Loop <= NumReqMeterFOs; ++Loop ) {
 
-		InputProcessor::GetObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		inputProcessor->getObjectItem( cCurrentModuleObject, Loop, Alphas, NumAlpha, Numbers, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 		varnameLen = index( Alphas( 1 ), '[' );
 		if ( varnameLen != std::string::npos ) Alphas( 1 ).erase( varnameLen );
@@ -6271,7 +6271,7 @@ UpdateMeterReporting()
 		DetermineFrequency( Alphas( 2 ), ReportFreq );
 
 		if ( WildCard == std::string::npos ) {
-			Meter = InputProcessor::FindItem( Alphas( 1 ), EnergyMeters );
+			Meter = UtilityRoutines::FindItem( Alphas( 1 ), EnergyMeters );
 			if ( Meter == 0 ) {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\" - not found." );
 				continue;
@@ -6282,7 +6282,7 @@ UpdateMeterReporting()
 		} else { // Wildcard input
 			NeverFound = true;
 			for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
-				if ( ! InputProcessor::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
+				if ( ! UtilityRoutines::SameString( EnergyMeters( Meter ).Name.substr( 0, TestLen ), Alphas( 1 ).substr( 0, TestLen ) ) ) continue;
 				NeverFound = false;
 
 				SetInitialMeterReportingAndOutputNames( Meter, true, ReportFreq, true );
@@ -6540,14 +6540,14 @@ GetMeterIndex( std::string const & MeterName )
 		NumValidMeters = NumEnergyMeters;
 		ValidMeterNames.allocate( NumValidMeters );
 		for ( Found = 1; Found <= NumValidMeters; ++Found ) {
-			ValidMeterNames( Found ) = InputProcessor::MakeUPPERCase( EnergyMeters( Found ).Name );
+			ValidMeterNames( Found ) = UtilityRoutines::MakeUPPERCase( EnergyMeters( Found ).Name );
 		}
 		iValidMeterNames.allocate( NumValidMeters );
 		SetupAndSort( ValidMeterNames, iValidMeterNames );
 		GetMeterIndexFirstCall = false;
 	}
 
-	MeterIndex = InputProcessor::FindItemInSortedList( MeterName, ValidMeterNames, NumValidMeters );
+	MeterIndex = UtilityRoutines::FindItemInSortedList( MeterName, ValidMeterNames, NumValidMeters );
 	if ( MeterIndex != 0 ) MeterIndex = iValidMeterNames( MeterIndex );
 
 	return MeterIndex;
@@ -7132,7 +7132,7 @@ GetMeteredVariables(
 			IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
 			UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
 
-			ResourceTypes( NumVariables ) = AssignResourceTypeNum( InputProcessor::MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
+			ResourceTypes( NumVariables ) = AssignResourceTypeNum( UtilityRoutines::MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
 			if ( present( Names ) ) {
 				Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
 			}
@@ -7140,7 +7140,7 @@ GetMeteredVariables(
 				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
 					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
 					if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
-						EndUses()( NumVariables ) = InputProcessor::MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
+						EndUses()( NumVariables ) = UtilityRoutines::MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
 						break;
 					}
 				}
@@ -7149,7 +7149,7 @@ GetMeteredVariables(
 				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
 					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
 					if ( EnergyMeters( MeterPtr ).Group != "" ) {
-						Groups()( NumVariables ) = InputProcessor::MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
+						Groups()( NumVariables ) = UtilityRoutines::MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
 						break;
 					}
 				}
@@ -7248,7 +7248,7 @@ GetVariableKeyCountandType(
 		numVarNames = NumVariablesForOutput;
 		varNames.allocate( numVarNames );
 		for ( Loop = 1; Loop <= NumVariablesForOutput; ++Loop ) {
-			varNames( Loop ) = InputProcessor::MakeUPPERCase( DDVariableTypes( Loop ).VarNameOnly );
+			varNames( Loop ) = UtilityRoutines::MakeUPPERCase( DDVariableTypes( Loop ).VarNameOnly );
 		}
 		ivarNames.allocate( numVarNames );
 		SetupAndSort( varNames, ivarNames );
@@ -7259,7 +7259,7 @@ GetVariableKeyCountandType(
 		numVarNames = NumVariablesForOutput;
 		varNames.allocate( numVarNames );
 		for ( Loop = 1; Loop <= NumVariablesForOutput; ++Loop ) {
-			varNames( Loop ) = InputProcessor::MakeUPPERCase( DDVariableTypes( Loop ).VarNameOnly );
+			varNames( Loop ) = UtilityRoutines::MakeUPPERCase( DDVariableTypes( Loop ).VarNameOnly );
 		}
 		ivarNames.allocate( numVarNames );
 		SetupAndSort( varNames, ivarNames );
@@ -7276,7 +7276,7 @@ GetVariableKeyCountandType(
 	varNameUpper = varName;
 
 	// Search Variable List First
-	VFound = InputProcessor::FindItemInSortedList( varNameUpper, varNames, numVarNames );
+	VFound = UtilityRoutines::FindItemInSortedList( varNameUpper, varNames, numVarNames );
 	if ( VFound != 0 ) {
 		varType = DDVariableTypes( ivarNames( VFound ) ).VariableType;
 	}
@@ -7421,7 +7421,7 @@ GetVariableKeys(
 	Duplicate = false;
 	maxKeyNames = size( keyNames );
 	maxkeyVarIndexes = size( keyVarIndexes );
-	varNameUpper = InputProcessor::MakeUPPERCase( varName );
+	varNameUpper = UtilityRoutines::MakeUPPERCase( varName );
 
 	// Select based on variable type:  integer, real, or meter
 	if ( varType == VarType_Integer ) { // Integer
@@ -7531,13 +7531,13 @@ ReportingThisVariable( std::string const & RepVarName )
 	int Found;
 
 	BeingReported = false;
-	Found = InputProcessor::FindItem( RepVarName, ReqRepVars, &ReqReportVariables::VarName );
+	Found = UtilityRoutines::FindItem( RepVarName, ReqRepVars, &ReqReportVariables::VarName );
 	if ( Found > 0 ) {
 		BeingReported = true;
 	}
 
 	if ( ! BeingReported ) { // check meter names too
-		Found = InputProcessor::FindItem( RepVarName, EnergyMeters );
+		Found = UtilityRoutines::FindItem( RepVarName, EnergyMeters );
 		if ( Found > 0 ) {
 			if ( EnergyMeters( Found ).RptTS || EnergyMeters( Found ).RptHR || EnergyMeters( Found ).RptDY || EnergyMeters( Found ).RptMN || EnergyMeters( Found ).RptSM || EnergyMeters( Found ).RptTSFO || EnergyMeters( Found ).RptHRFO || EnergyMeters( Found ).RptDYFO || EnergyMeters( Found ).RptMNFO || EnergyMeters( Found ).RptSMFO || EnergyMeters( Found ).RptAccTS || EnergyMeters( Found ).RptAccHR || EnergyMeters( Found ).RptAccDY || EnergyMeters( Found ).RptAccMN || EnergyMeters( Found ).RptAccSM || EnergyMeters( Found ).RptAccTSFO || EnergyMeters( Found ).RptAccHRFO || EnergyMeters( Found ).RptAccDYFO || EnergyMeters( Found ).RptAccMNFO || EnergyMeters( Found ).RptAccSMFO ) {
 				BeingReported = true;
@@ -7621,7 +7621,7 @@ InitPollutionMeterReporting( std::string const & ReportFreqName )
 
 	for ( Loop = 1; Loop <= NumReqMeters; ++Loop ) {
 
-		Meter = InputProcessor::FindItem( PollutionMeters( Loop ), EnergyMeters );
+		Meter = UtilityRoutines::FindItem( PollutionMeters( Loop ), EnergyMeters );
 		if ( Meter > 0 ) { //All the active meters for this run are set, but all are still searched for.
 
 			indexGroupKey = DetermineIndexGroupKeyFromMeterName( EnergyMeters( Meter ).Name );
@@ -7738,7 +7738,7 @@ ProduceRDDMDD()
 			ProduceReportVDD = ReportVDD_IDF;
 		}
 		if ( VarOption2 != "" ) {
-			if ( InputProcessor::SameString( VarOption2, "Name" ) || InputProcessor::SameString( VarOption2, "AscendingName" ) ) {
+			if ( UtilityRoutines::SameString( VarOption2, "Name" ) || UtilityRoutines::SameString( VarOption2, "AscendingName" ) ) {
 				SortByName = true;
 			}
 		}
@@ -7901,7 +7901,7 @@ AddToOutputVariableList(
 
 	int dup = 0;// for duplicate variable name
 	if ( NumVariablesForOutput > 0 ) {
-		dup = InputProcessor::FindItemInList( VarName, DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, NumVariablesForOutput );
+		dup = UtilityRoutines::FindItemInList( VarName, DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, NumVariablesForOutput );
 	} else {
 		DDVariableTypes.allocate( LVarAllocInc );
 		MaxVariablesForOutput = LVarAllocInc;
