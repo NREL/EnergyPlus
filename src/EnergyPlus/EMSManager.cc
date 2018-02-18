@@ -285,7 +285,6 @@ namespace EMSManager {
 		using OutputProcessor::MeterType;
 		using OutputProcessor::RealVariables;
 		using OutputProcessor::RealVariableType;
-		using OutputProcessor::RVar;
 		using OutputProcessor::RVariableTypes;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1249,7 +1248,7 @@ namespace EMSManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumKeys;
 		int KeyNum;
-		int AvgOrSum;
+		OutputProcessor::StoreType AvgOrSum;
 		int StepType;
 		OutputProcessor::Unit Units( OutputProcessor::Unit::None );
 		Array1D_string KeyName;

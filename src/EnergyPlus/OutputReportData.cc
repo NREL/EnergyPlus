@@ -72,7 +72,7 @@ namespace EnergyPlus {
 	}
 
 	int
-	AnnualFieldSet::getVariableKeyCountandTypeFromFldSt( int &typeVar, int &avgSumVar, int &stepTypeVar, OutputProcessor::Unit &unitsVar )
+	AnnualFieldSet::getVariableKeyCountandTypeFromFldSt( int &typeVar, OutputProcessor::StoreType &avgSumVar, int &stepTypeVar, OutputProcessor::Unit &unitsVar )
 	{
 		int numkeys;
 		GetVariableKeyCountandType( m_variMeter, numkeys, typeVar, avgSumVar, stepTypeVar, unitsVar );  //call outputprocessor routine with member variable

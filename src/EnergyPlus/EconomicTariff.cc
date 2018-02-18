@@ -403,7 +403,7 @@ namespace EconomicTariff {
 		// variables for getting report variable/meter index
 		int KeyCount;
 		int TypeVar;
-		int AvgSumVar;
+		OutputProcessor::StoreType AvgSumVar;
 		int StepTypeVar;
 		OutputProcessor::Unit UnitsVar( OutputProcessor::Unit::None); // Units sting, may be blank
 		Array1D_string NamesOfKeys; // Specific key name
@@ -4161,7 +4161,7 @@ namespace EconomicTariff {
 				//---------------------------------
 				// Economics Results Summary Report
 				//---------------------------------
-				WriteReportHeaders( "Economics Results Summary Report", "Entire Facility", 1 );
+				WriteReportHeaders( "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged );
 				elecFacilMeter = GetMeterIndex( "ELECTRICITY:FACILITY" );
 				gasFacilMeter = GetMeterIndex( "GAS:FACILITY" );
 				//---- Annual Summary
@@ -4276,7 +4276,7 @@ namespace EconomicTariff {
 			//---------------------------------
 			if ( displayTariffReport ) {
 				for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-					WriteReportHeaders( "Tariff Report", tariff( iTariff ).tariffName, 1 );
+					WriteReportHeaders( "Tariff Report", tariff( iTariff ).tariffName, OutputProcessor::StoreType::Averaged );
 					rowHead.allocate( 7 );
 					columnHead.allocate( 1 );
 					columnWidth.allocate( 1 );

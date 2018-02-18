@@ -8123,6 +8123,8 @@ namespace Furnaces {
 			}
 		}
 
+		DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
+
 	}
 
 	void

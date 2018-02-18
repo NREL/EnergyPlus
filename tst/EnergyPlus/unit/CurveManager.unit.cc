@@ -1022,9 +1022,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( 1 ).X1Var.allocate( TableLookup( 1 ).NumX1Vars );
 	TableLookup( 1 ).X1Var( 1 ) = 0.0;
 	TableLookup( 1 ).X1Var( 2 ) = 1.0;
-	TableLookup( 1 ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( 1 ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( 1, 1.0, 0.0 );
 
@@ -1055,9 +1055,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( 2 ).X1Var( 1 ) = 0.0;
 	TableLookup( 2 ).X1Var( 2 ) = 1.0;
 	TableLookup( 2 ).X2Var( 1 ) = 1.0;
-	TableLookup( 2 ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( 2 ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( 2, 1.0, 1.0, 0.0 );
 
@@ -1092,9 +1092,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( Index ).X1Var( 2 ) = 1.0;
 	TableLookup( Index ).X2Var( 1 ) = 1.0;
 	TableLookup( Index ).X3Var( 1 ) = 1.0;
-	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( Index, 1.0, 1.0, 1.0, 0.0 );
 
@@ -1134,9 +1134,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( Index ).X2Var( 1 ) = 1.0;
 	TableLookup( Index ).X3Var( 1 ) = 1.0;
 	TableLookup( Index ).X4Var( 1 ) = 1.0;
-	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( Index, 1.0, 1.0, 1.0, 1.0, 0.0 );
 

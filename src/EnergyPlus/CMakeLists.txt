@@ -6,8 +6,12 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 # Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
 if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+<<<<<<< HEAD
   configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
   file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
+=======
+  configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
+>>>>>>> NREL/develop
 endif()
 
 SET( SRC
@@ -51,7 +55,8 @@ SET( SRC
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
   ConductionTransferFunctionCalc.hh
-  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh"
+  ConfiguredFunctions.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc"
   ConvectionCoefficients.cc
   ConvectionCoefficients.hh
   CoolTower.cc
@@ -313,6 +318,10 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  HybridUnitaryAirConditioners.cc
+  HybridUnitaryAirConditioners.hh
+  HybridEvapCoolingModel.cc
+  HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
@@ -503,6 +512,8 @@ SET( SRC
   SystemAvailabilityManager.hh
   SystemReports.cc
   SystemReports.hh
+  SZVAVModel.cc
+  SZVAVModel.hh
   TARCOGArgs.cc
   TARCOGArgs.hh
   TARCOGCommon.cc

@@ -2282,10 +2282,11 @@ namespace ThermalComfort {
 			}}
 			if ( testHeating && ( SensibleLoadPredictedNoAdj > 0 ) ) { //heating
 				if ( AirModel( iZone ).AirModelType != RoomAirModel_Mixing ) {
-					deltaT = TempTstatAir( iZone ) - ZoneThermostatSetPointLo( iZone );
+					deltaT = TempTstatAir( iZone ) - ZoneThermostatSetPointLo( iZone );					
 				} else {
 					deltaT = ZTAV( iZone ) - ZoneThermostatSetPointLo( iZone );
 				}
+
 				if ( deltaT < deviationFromSetPtThresholdHtg ) {
 					ThermalComfortSetPoint( iZone ).notMetHeating = TimeStepZone;
 					ThermalComfortSetPoint( iZone ).totalNotMetHeating += TimeStepZone;
@@ -2302,6 +2303,10 @@ namespace ThermalComfort {
 					deltaT = TempTstatAir( iZone ) - ZoneThermostatSetPointHi( iZone );
 				} else {
 					deltaT = ZTAV( iZone ) - ZoneThermostatSetPointHi( iZone );
+				}
+				
+				if ( Zone( iZone ).HasAdjustedReturnTempByITE) {
+					deltaT = TempTstatAir( iZone ) - Zone( iZone ) .AdjustedReturnTempByITE;
 				}
 				if ( deltaT > deviationFromSetPtThresholdClg ) {
 					ThermalComfortSetPoint( iZone ).notMetCooling = TimeStepZone;

@@ -93,7 +93,8 @@ namespace DataZoneEquipment {
 	extern int const OutdoorAirUnit_Num;
 	extern int const VRFTerminalUnit_Num;
 	extern int const PurchasedAir_Num;
-	extern int const ZoneEvaporativeCoolerUnit_Num; // #13, last zone equipment type to use zone availability manager. The above list must not change or NumValidSysAvailZoneComponents(13) must also change.
+	extern int const ZoneEvaporativeCoolerUnit_Num; 
+	extern int const ZoneHybridEvaporativeCooler_Num;// #14, last zone equipment type to use zone availability manager. The above list must not change or NumValidSysAvailZoneComponents(14) must also change.
 	extern int const AirDistUnit_Num;
 	extern int const DirectAir_Num;
 	extern int const BBWaterConvective_Num;

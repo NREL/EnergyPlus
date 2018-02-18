@@ -2003,7 +2003,7 @@ namespace EconomicLifeCycleCost {
 			//---------------------------------
 			// Life-Cycle Cost Verification and Results Report
 			//---------------------------------
-			WriteReportHeaders( "Life-Cycle Cost Report", "Entire Facility", 1 );
+			WriteReportHeaders( "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged );
 			//---- Life-Cycle Cost Parameters
 			rowHead.allocate( 11 );
 			columnHead.allocate( 1 );

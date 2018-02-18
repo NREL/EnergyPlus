@@ -2157,7 +2157,7 @@ namespace ExternalInterface {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
 		int numKeys( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType varAvgSum( OutputProcessor::StoreType::Averaged ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		OutputProcessor::Unit varUnits( OutputProcessor::Unit::None ); // Units sting, may be blank
 		Array1D_int keyIndexes; // Array index for

@@ -85,6 +85,7 @@
 #include <ElectricBaseboardRadiator.hh>
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
+#include <HybridUnitaryAirConditioners.hh>
 #include <FanCoilUnits.hh>
 #include <Fans.hh>
 #include <General.hh>
@@ -728,10 +729,16 @@ namespace ZoneEquipmentManager {
 						Temp = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTemp;
 						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 						DeltaTemp = Temp - Node( ZoneNode ).Temp;
+						if ( DataHeatBalance::Zone( ActualZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+							DeltaTemp = Temp - DataHeatBalance::Zone( ActualZoneNum ).AdjustedReturnTempByITE;
+						}
 						// If the user specify the design cooling supply air temperature difference, then
 					} else {
 						DeltaTemp = -std::abs( CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesTempDiff );
 						Temp = DeltaTemp + Node( ZoneNode ).Temp;
+						if ( DataHeatBalance::Zone( ActualZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+							Temp = DeltaTemp + DataHeatBalance::Zone( ActualZoneNum ).AdjustedReturnTempByITE;
+						}
 						HumRat = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).CoolDesHumRat;
 					}
 				} else { // Heating Case
@@ -3029,6 +3036,7 @@ namespace ZoneEquipmentManager {
 		using SystemAvailabilityManager::GetZoneEqAvailabilityManager;
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
+		using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners; 
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using SwimmingPool::SimSwimmingPool;
@@ -3347,7 +3355,12 @@ namespace ZoneEquipmentManager {
 				} else if ( SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num ) {
 					SimZoneEvaporativeCoolerUnit( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
-				} else {
+				}
+				else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
+					SimZoneHybridUnitaryAirConditioners(PrioritySimOrder(EquipTypeNum).EquipName, ActualZoneNum, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+
+				}
+				else {
 
 				}}
 
@@ -4634,6 +4647,11 @@ namespace ZoneEquipmentManager {
 								SysDepZoneLoads( ActualZoneNum ) += CpAir * MassFlowRA * ( TempRetAir - RetTempMin );
 							}
 						} else {
+							Node( ReturnNode ).Temp = TempRetAir;
+						}
+						// Overwrite heat-to-return from ITE objects, other return air flow from window or lights are not allowed in this situation
+						if ( Zone( ActualZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+							TempRetAir = Zone( ActualZoneNum ).AdjustedReturnTempByITE;
 							Node( ReturnNode ).Temp = TempRetAir;
 						}
 					} else { // No return air flow
