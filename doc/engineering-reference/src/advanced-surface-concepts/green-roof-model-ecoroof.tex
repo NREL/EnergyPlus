@@ -46,7 +46,7 @@ As with a traditional roof, the energy balance of an green roof is dominated by 
 
 The energy budget analysis follows the Fast All Season Soil Strength (FASST) model developed by Frankenstein and Koenig for the US Army Corps of Engineers. FASST was developed, in part, to determine the ability of soils to support manned and unmanned vehicles and personnel movement. In order to accomplish this, however, FASST tracks the energy and moisture balance (including ice and snow) within a vegetated soil. It is a one-dimensional model that draws heavily from other plant canopy models including BATS (Dickinson et al.) and SiB (Sellers et al.). We have implemented FASST here with only a few modifications to adapt it for use with a relatively thin soil layer. The sign convention used assumes all heat fluxes are positive when energy is absorbed into the layer.
 
-In the following discussion this energy budget is divided into a budget for the foliage layer (F\(_{f}\)) and a budget for the ground surface (F\(_{g}\)­). The various parameterizations for latent and sensible heat flux are described in some detail and then the equation set is reduced to the simultaneous solution of two equations involving the temperatures of the foliage and ground surface.
+In the following discussion this energy budget is divided into a budget for the foliage layer (F\(_{f}\)) and a budget for the ground surface (F\(_{g-}\)). The various parameterizations for latent and sensible heat flux are described in some detail and then the equation set is reduced to the simultaneous solution of two equations involving the temperatures of the foliage and ground surface.
 
 \subsubsection{Energy budget in the foliage layer}\label{energy-budget-in-the-foliage-layer}
 
@@ -62,7 +62,7 @@ Where $\sigma$\(_{f}\) is calculated as a function of Leaf-Area-Index (LAI):
 \sigma_f = 0.9 - 0.7 \exp{-0.75 LAI }
 \end{equation}
 
-In addition to convective and sensible heat transfer this equation accounts for both the short and longwave radiation absorbed by the vegetation, including the effects of multiple reflections. The sensible and latent heat flux terms (H\(_{f}\) and L\(_{f­}\)) are somewhat complicated and therefore discussed in some detail below.
+In addition to convective and sensible heat transfer this equation accounts for both the short and longwave radiation absorbed by the vegetation, including the effects of multiple reflections. The sensible and latent heat flux terms (H\(_{f}\) and L\(_{f-}\)) are somewhat complicated and therefore discussed in some detail below.
 
 \paragraph{Sensible heat flux in the foliage layer}\label{sensible-heat-flux-in-the-foliage-layer}
 
@@ -435,7 +435,7 @@ Z\(_{o}\)\(^{f}\)~~~~~~~~~~~~~~ = ~~~~~~~~~ foliage roughness length scale (m)
 
 \(\rho\)\(_{g}\)~~~~~~~~~~~~~ = ~~~~~~~~ density of air at ground surface temperature (kg/m\(^{3}\))
 
-\(\sigma\) ~ ~~~~~~~~~~~ = ~~~~~~~~~ the Stefan-Boltzmann constant (5.699*10\(^{8}\) W/m\(^{2}\) ºK\(^{4}\))
+\(\sigma\) ~ ~~~~~~~~~~~ = ~~~~~~~~~ the Stefan-Boltzmann constant (5.699*10\(^{8}\) W/m\(^{2}\) $^{\circ}$K\(^{4}\))
 
 \(\sigma\)\(_f\) ~~~~~~~~~~~ ~~~~~~~~~~~ = ~~~~~~~~~ fractional vegetation coverage
 
