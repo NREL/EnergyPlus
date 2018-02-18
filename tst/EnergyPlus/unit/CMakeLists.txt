@@ -119,6 +119,7 @@ set( test_src
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
+  PVWatts.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -145,6 +146,7 @@ set( test_src
   SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
+  UnitaryHybridAirConditioner.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc

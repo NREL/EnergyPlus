@@ -169,8 +169,7 @@ namespace DataSystemVariables {
 	Real64 Elapsed_Time( 0.0 ); // For showing elapsed time at end of run
 	Real64 Time_Start( 0.0 ); // Call to CPU_Time for start time of simulation
 	Real64 Time_Finish( 0.0 ); // Call to CPU_Time for end time of simulation
-	std::string cMinReportFrequency; // String for minimum reporting frequency
-	int MinReportFrequency( -2 ); // Frequency var turned into integer during get report var input.
+	std::string MinReportFrequency; // String for minimum reporting frequency
 	bool SortedIDD( true ); // after processing, use sorted IDD to obtain Defs, etc.
 	bool lMinimalShadowing( false ); // TRUE if MinimalShadowing is to override Solar Distribution flag
 	std::string TempFullFileName;
