@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -227,7 +230,6 @@ namespace ScheduleManager {
 		using DataSystemVariables::iUnicode_end;
 		using DataSystemVariables::TempFullFileName;
 		using DataSystemVariables::CheckForActualFileName;
-		using DataSystemVariables::UseImportedSunlitFrac;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:

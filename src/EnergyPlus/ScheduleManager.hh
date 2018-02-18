@@ -48,9 +48,6 @@
 #ifndef ScheduleManager_hh_INCLUDED
 #define ScheduleManager_hh_INCLUDED
 
-// C++ Headers
-#include <map>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>

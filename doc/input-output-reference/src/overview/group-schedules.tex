@@ -574,7 +574,7 @@ Output:Variable,Activity_Shopping_Sch,Schedule Value,hourly;
 
 The Schedule:File:Shading object allows shading schedules to be imported altogether from a file. The object can also be used to read in hourly schedules of the sunlit fraction of all exterior surfaces computed by other software or developed in a spreadsheet or other utility.
 
-The format for the data file can be either Comma-separated values (CSV) or JSON. The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. To map to the surface, each column should name its column header exactly the same with the surface name defined in the Surface:Detailed object. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued. The first row of data must be for January 1, hour 1. The first column with the time stamps is skipped.
+The format for the data file is Comma-separated values (CSV). The CSV file referenced is a text file with values separated by commas (or other optional delimiters) with one line per hour. Each column stores the annual shading sunlit fraction schedule data of an exterior surface. To map to the surface, each column should name its column header exactly the same with the surface name defined in the Surface:Detailed object. The file should contain values for an entire year (8760 or 8784 hours of data) or a warning message will be issued.
 
 With a Schedule:File:Shading object defined, the shading schedules for all exterior surfaces (if defined) can be imported altogether without repeatedly defining Schedule:File objects.
 
@@ -584,14 +584,9 @@ With a Schedule:File:Shading object defined, the shading schedules for all exter
 
 This field contains the name of the file that contains the data for the shading schedules. The field should include a full path with file name, for best results. The field must be \(\le\) 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
 
-\paragraph{Field: File Format}\label{field-file-format}
-
-The field indicates the format of the shading schedule to be imported. The format can either be CSV or JSON.
-
 Here is an IDF example:
 
 \begin{lstlisting}
 Schedule:File,
-  eplusshading.csv,   !- Name of File
-  CSV;                !- Column Number
+  eplusshading.csv;   !- Name of File
 \end{lstlisting}

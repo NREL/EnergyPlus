@@ -4505,17 +4505,12 @@ Schedule:Constant,
 
 Schedule:File:Shading,
        \min-fields 1
-       \memo A Schedule:File:Shading points to a text computer file that has
-       \memo hourly/sub-hourly sunlit fraction data for all exterior surfaces.
-  A1 , \field File Name
+       \memo A Schedule:File:Shading points to a CSV file that has 8760-8784
+       \memo hours of sunlit fraction data for all or some of the exterior surfaces.
+  A1 ; \field File Name
        \memo The name of the file that writes all shading data.
        \required-field
        \retaincase
-  A2 ; \field File Format
-       \type choice
-       \key CSV
-       \key JSON
-       \default CSV
 	   
 Schedule:File,
  \min-fields 5
