@@ -97,9 +97,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	InitZoneAirLoopEquipmentTimeStep(
-		int const AirDistUnitNum,
-		int const ControlledZoneNum,
-		int const ActualZoneNum
+		int const AirDistUnitNum
 	);
 
 	void

@@ -221,7 +221,7 @@ namespace ZoneAirLoopEquipmentManager {
 			}
 		}
 		DataSizing::CurTermUnitSizingNum = AirDistUnit( AirDistUnitNum ).TermUnitSizingNum;
-		InitZoneAirLoopEquipmentTimeStep( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
+		InitZoneAirLoopEquipmentTimeStep( AirDistUnitNum );
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
 
@@ -553,9 +553,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 	void
 	InitZoneAirLoopEquipmentTimeStep(
-		int const AirDistUnitNum,
-		int const ControlledZoneNum,
-		int const ActualZoneNum
+		int const AirDistUnitNum
 	)
 	{
 		// every time step
