@@ -1256,11 +1256,11 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
 				PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 			} else if ( !lAlphaBlanks( 19 ) ) {
-				if ( SameString( Alphas( 19 ), "SingleZoneVAV" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 19 ), "SingleZoneVAV" ) ) {
 					PTUnit( PTUnitNum ).ControlType = CCM_ASHRAE;
 					PTUnit( PTUnitNum ).validASHRAECoolCoil = true;
 					PTUnit( PTUnitNum ).validASHRAEHeatCoil = true;
-				} else if ( SameString( Alphas( 19 ), "None" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 19 ), "None" ) ) {
 					PTUnit( PTUnitNum ).ControlType = None;
 					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
 					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
@@ -1963,11 +1963,11 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
 				PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;
 			} else if ( !lAlphaBlanks( 17 ) ) {
-				if ( SameString( Alphas( 17 ), "SingleZoneVAV" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 17 ), "SingleZoneVAV" ) ) {
 					PTUnit( PTUnitNum ).ControlType = CCM_ASHRAE;
 					PTUnit( PTUnitNum ).validASHRAECoolCoil = true;
 					PTUnit( PTUnitNum ).validASHRAEHeatCoil = true;
-				} else if ( SameString( Alphas( 17 ), "None" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 17 ), "None" ) ) {
 					PTUnit( PTUnitNum ).ControlType = None;
 					PTUnit( PTUnitNum ).validASHRAECoolCoil = false;
 					PTUnit( PTUnitNum ).validASHRAEHeatCoil = false;

@@ -789,9 +789,6 @@ namespace OutputProcessor {
 		//       \default Hourly
 		//       \note RunPeriod and Environment are synonymous
 
-		// Using/Aliasing
-		//using InputProcessor::SameString;
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -820,8 +817,8 @@ namespace OutputProcessor {
 
 		std::string const FreqStringTrim( FreqString.substr( 0, LenString ) );
 		for ( unsigned Loop = 0; Loop < FreqValues.size() ; ++Loop ) {
-			if ( InputProcessor::SameString( FreqStringTrim, PossibleFreq[ Loop ] ) ) {
-				if ( ! InputProcessor::SameString( FreqString, ExactFreqString[ Loop ] ) ) {
+			if ( UtilityRoutines::SameString( FreqStringTrim, PossibleFreq[ Loop ] ) ) {
+				if ( ! UtilityRoutines::SameString( FreqString, ExactFreqString[ Loop ] ) ) {
 					ShowWarningError( "DetermineFrequency: Entered frequency=\"" + FreqString + "\" is not an exact match to key strings." );
 					ShowContinueError( "Frequency=" + ExactFreqString[ Loop ] + " will be used." );
 				}
@@ -1242,7 +1239,7 @@ namespace OutputProcessor {
 		static std::vector<std::string> stateVariables( { "STATE", "AVERAGE", "AVERAGED" } );
 		static Array1D_string NonStateVariables( 4 );
 		static std::vector<std::string> nonStateVariables( { "NON STATE", "NONSTATE", "SUM", "SUMMED" } );
-		std::string uppercase( InputProcessor::MakeUPPERCase( VariableTypeKey ) );
+		std::string uppercase( UtilityRoutines::MakeUPPERCase( VariableTypeKey ) );
 
 		auto iter = std::find( stateVariables.begin(), stateVariables.end(), uppercase );
 		if ( iter != stateVariables.end() ) {

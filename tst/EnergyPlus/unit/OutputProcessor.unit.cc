@@ -547,8 +547,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportYRMeters )
 		{
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -593,7 +593,7 @@ namespace EnergyPlus {
 			DataEnvironment::DayOfWeek = 2;
 			DataEnvironment::HolidayIndex = 3;
 
-			functionUsingSQLite( std::bind( OutputProcessor::ReportYRMeters, true ) );
+			OutputProcessor::ReportYRMeters( true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -702,8 +702,8 @@ namespace EnergyPlus {
 		{
 			DataGlobals::MinutesPerTimeStep = 10;
 
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteReportMeterData( 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,999.9" } ) ) );
@@ -790,8 +790,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportRealData )
 		{
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteReportRealData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
@@ -869,8 +869,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportIntegerData )
 		{
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteReportIntegerData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
@@ -948,8 +948,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_1 )
 		{
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteNumericData( 1, "1", 999 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999" } ) ) );
@@ -1169,7 +1169,7 @@ namespace EnergyPlus {
 
 			std::string const variableTypeKey = "BAD INPUT";
 
-			auto index = ValidateVariableType( variableTypeKey );
+			auto index = validateVariableType( variableTypeKey );
 
 			EXPECT_EQ( StoreType::Averaged, index );
 
@@ -1281,7 +1281,7 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
 			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
@@ -1434,7 +1434,7 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
 			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
@@ -1607,8 +1607,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData )
 		{
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
@@ -1643,8 +1643,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_2 )
 		{
-			EnergyPlus::sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			EnergyPlus::sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
 			WriteNumericData( 1, "1", 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );

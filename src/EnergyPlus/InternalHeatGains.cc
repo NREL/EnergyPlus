@@ -2304,10 +2304,10 @@ namespace InternalHeatGains {
 				if ( lAlphaFieldBlanks( 3 ) ) {
 					ZoneITEq( Loop ).FlowControlWithApproachTemps = false;
 				} else {
-					if ( SameString( AlphaName( 3 ), "FlowFromSystem" ) ) {
+					if ( UtilityRoutines::SameString( AlphaName( 3 ), "FlowFromSystem" ) ) {
 						ZoneITEq( Loop ).FlowControlWithApproachTemps = false;
 					}
-					else if ( SameString( AlphaName( 3 ), "FlowControlWithApproachTemperatures" ) ) {
+					else if ( UtilityRoutines::SameString( AlphaName( 3 ), "FlowControlWithApproachTemperatures" ) ) {
 						ZoneITEq( Loop ).FlowControlWithApproachTemps = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).HasAdjustedReturnTempByITE = true;
 						Zone( ZoneITEq( Loop ).ZonePtr ).NoHeatToReturnAir = false;

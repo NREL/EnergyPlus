@@ -417,7 +417,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 		"  Dimensionless,           !- Input Unit Type for X",
 		"  Temperature,             !- Input Unit Type for Y",
 		"  Dimensionless;           !- Output Unit Type",
-	
+
 	});
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
@@ -493,7 +493,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals) {
 	DataGlobals::TimeStep = 1;
 	OutputReportTabular::AllocateLoadComponentArrays();
 	int timeStepInDay = ( DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
-		
+
 	DataGlobals::CompLoadReportIsReq = true;
 	DataGlobals::isPulseZoneSizing = false;
 	InternalHeatGains::GatherComponentLoadsIntGain();
@@ -624,10 +624,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 		"  Dimensionless,           !- Input Unit Type for X",
 		"  Temperature,             !- Input Unit Type for Y",
 		"  Dimensionless;           !- Output Unit Type",
-	
+
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 
 	bool ErrorsFound( false );

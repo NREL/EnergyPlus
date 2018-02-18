@@ -1128,7 +1128,7 @@ namespace EnergyPlus {
 			"    OutsideAirInletNodes;    !- Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -1199,7 +1199,7 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( PTUnit( 1 ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( PTUnit( 1 ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( 1 ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -1230,7 +1230,7 @@ namespace EnergyPlus {
 
 		// initialized to false
 		ASSERT_FALSE( PackagedTerminalHeatPump::HeatingLoad );
-		// Init PTAC zoneHVAC equipment 
+		// Init PTAC zoneHVAC equipment
 		InitPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq );
 		BeginEnvrnFlag = false;
 		InitPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq );

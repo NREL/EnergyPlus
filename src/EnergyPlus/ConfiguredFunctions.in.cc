@@ -49,12 +49,12 @@
 
 namespace EnergyPlus {
 
-	inline std::string configured_source_directory()
+	std::string configured_source_directory()
 	{
 		return ("${CMAKE_SOURCE_DIR}");
 	}
 
-	inline std::string configured_build_directory()
+	std::string configured_build_directory()
 	{
 		return ("${CMAKE_BUILD_DIR}");
 	}

@@ -613,7 +613,7 @@ namespace ZoneTempPredictorCorrector {
 					}
 					if ( TempControlledZone( TempControlledZoneNum ).DeltaTCutSet > 0.0 ) {
 						for ( ControlTypeNum = 1; ControlTypeNum <= TempControlledZone( TempControlledZoneNum ).NumControlTypes; ++ControlTypeNum ) {
-							if ( SameString( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ), "ThermostatSetpoint:SingleHeatingOrCooling" ) ) {
+							if ( UtilityRoutines::SameString( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ), "ThermostatSetpoint:SingleHeatingOrCooling" ) ) {
 								ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ": The choice of Temperature Difference Between Cutout And Setpoint will not be applied to ThermostatSetpoint:SingleHeatingOrCooling." );
 							}
 						}
