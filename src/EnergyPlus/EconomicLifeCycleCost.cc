@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -900,7 +901,6 @@ namespace EconomicLifeCycleCost {
 		// na
 
 		// USE STATEMENTS:
-		// na
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1461,6 +1461,14 @@ namespace EconomicLifeCycleCost {
 				CashFlow( jCost ).yrAmount( kYear ) = annualCost;
 			}
 		}
+		// generate a warning if resource referenced was not used
+		for ( int nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc ) {
+			int curResource = UsePriceEscalation( nUsePriceEsc ).resource - ResourceTypeInitialOffset;
+			if ( !resourceCostNotZero( curResource ) && DataGlobals::DoWeathSim ) {
+				ShowWarningError( "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation( nUsePriceEsc ).name + "\" has no energy cost. " );
+				ShowContinueError( "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff." );
+			}
+		}
 	}
 
 	void
@@ -1996,7 +2004,7 @@ namespace EconomicLifeCycleCost {
 			//---------------------------------
 			// Life-Cycle Cost Verification and Results Report
 			//---------------------------------
-			WriteReportHeaders( "Life-Cycle Cost Report", "Entire Facility", 1 );
+			WriteReportHeaders( "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged );
 			//---- Life-Cycle Cost Parameters
 			rowHead.allocate( 11 );
 			columnHead.allocate( 1 );

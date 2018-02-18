@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -996,4 +997,157 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Linear_EvaluateCurveTyp
 		EXPECT_DOUBLE_EQ( 4.0, CurveManager::CurveValue( 4, 6 ) ); // Out-of-range value
 
 		EXPECT_FALSE( has_err_output() );
+}
+
+TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
+
+	int NumOfTables = 5;
+
+	PerfCurve.allocate( NumOfTables );
+	TableLookup.allocate( NumOfTables );
+
+	// Table 1 One ind variable
+	PerfCurve( 1 ).TableIndex = 1;
+	PerfCurve( 1 ).Var1Max = 20.0;
+	PerfCurve( 1 ).Var1Min = 0.0;
+	PerfCurve( 1 ).Var2Max = 0.0;
+	PerfCurve( 1 ).Var2Min = 0.0;
+	PerfCurve( 1 ).CurveType = Linear;
+	TableLookup( PerfCurve( 1 ).TableIndex ).NumIndependentVars = 1;
+	PerfCurve( 1 ).ObjectType = CurveType_TableOneIV;
+	PerfCurve( 1 ).Name = "Table 1";
+	TableLookup( 1 ).NumX1Vars = 2;
+	TableLookup( 1 ).InterpolationOrder = 2;
+	TableLookup( 1 ).NumX1Vars = 2;
+	TableLookup( 1 ).X1Var.allocate( TableLookup( 1 ).NumX1Vars );
+	TableLookup( 1 ).X1Var( 1 ) = 0.0;
+	TableLookup( 1 ).X1Var( 2 ) = 1.0;
+	TableLookup( 1 ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
+
+	TableLookupObject( 1, 1.0, 0.0 );
+
+	std::string const error_string = delimited_string( {
+		"   ** Warning ** TableLookupObject: Table:OneIndependentVariable\"Table 1\"",
+		"   **   ~~~   ** ...Excess number of independent variables (2) passed to subroutine when only 1 is required. The excess arguments are ignored.",
+	} );
+
+	EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
+	// Table 2 Two ind variable
+	PerfCurve( 2 ).TableIndex = 2;
+	PerfCurve( 2 ).Var1Max = 20.0;
+	PerfCurve( 2 ).Var1Min = 0.0;
+	PerfCurve( 2 ).Var2Max = 20.0;
+	PerfCurve( 2 ).Var2Min = 0.0;
+	PerfCurve( 2 ).Var3Max = 0.0;
+	PerfCurve( 2 ).Var3Min = 0.0;
+	PerfCurve( 2 ).CurveType = Linear;
+	TableLookup( PerfCurve( 2 ).TableIndex ).NumIndependentVars = 2;
+	PerfCurve( 2 ).ObjectType = CurveType_TableTwoIV;
+	PerfCurve( 2 ).Name = "Table 2";
+	TableLookup( 2 ).NumX1Vars = 2;
+	TableLookup( 2 ).NumX2Vars = 1;
+	TableLookup( 2 ).InterpolationOrder = 2;
+	TableLookup( 2 ).X1Var.allocate( TableLookup( 2 ).NumX1Vars );
+	TableLookup( 2 ).X2Var.allocate( TableLookup( 2 ).NumX2Vars );
+	TableLookup( 2 ).X1Var( 1 ) = 0.0;
+	TableLookup( 2 ).X1Var( 2 ) = 1.0;
+	TableLookup( 2 ).X2Var( 1 ) = 1.0;
+	TableLookup( 2 ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
+
+	TableLookupObject( 2, 1.0, 1.0, 0.0 );
+
+	std::string const error_string1 = delimited_string( {
+		"   ** Warning ** TableLookupObject: Table:TwoIndependentVariables\"Table 2\"",
+		"   **   ~~~   ** ...Excess number of independent variables (3) passed to subroutine when 2 or less are required. The excess arguments are ignored.",
+	} );
+
+	EXPECT_TRUE( compare_err_stream( error_string1, true ) );
+
+	// Table 3 Three ind variable
+	int Index = 3;
+	PerfCurve( Index ).TableIndex = 3;
+	PerfCurve( Index ).Var1Max = 20.0;
+	PerfCurve( Index ).Var1Min = 0.0;
+	PerfCurve( Index ).Var2Max = 20.0;
+	PerfCurve( Index ).Var2Min = 0.0;
+	PerfCurve( Index ).Var3Max = 0.0;
+	PerfCurve( Index ).Var3Min = 0.0;
+	PerfCurve( Index ).CurveType = Linear;
+	TableLookup( PerfCurve( Index ).TableIndex ).NumIndependentVars = 3;
+	PerfCurve( Index ).ObjectType = CurveType_TableMultiIV;
+	PerfCurve( Index ).Name = "Table 3";
+	TableLookup( Index ).NumX1Vars = 2;
+	TableLookup( Index ).NumX2Vars = 1;
+	TableLookup( Index ).NumX3Vars = 1;
+	TableLookup( Index ).InterpolationOrder = 2;
+	TableLookup( Index ).X1Var.allocate( TableLookup( Index ).NumX1Vars );
+	TableLookup( Index ).X2Var.allocate( TableLookup( Index ).NumX2Vars );
+	TableLookup( Index ).X3Var.allocate( TableLookup( Index ).NumX3Vars );
+	TableLookup( Index ).X1Var( 1 ) = 0.0;
+	TableLookup( Index ).X1Var( 2 ) = 1.0;
+	TableLookup( Index ).X2Var( 1 ) = 1.0;
+	TableLookup( Index ).X3Var( 1 ) = 1.0;
+	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
+
+	TableLookupObject( Index, 1.0, 1.0, 1.0, 0.0 );
+
+	std::string const error_string2 = delimited_string( {
+		"   ** Warning ** TableLookupObject: Table:MultiVariableLookup\"Table 3\"",
+		"   **   ~~~   ** ...Excess number of independent variables (4) passed to subroutine when 3 or less are required. The excess arguments are ignored.",
+	} );
+
+	EXPECT_TRUE( compare_err_stream( error_string2, true ) );
+
+	// Table 4 Four ind variable
+	Index = 4;
+	PerfCurve( Index ).TableIndex = Index;
+	PerfCurve( Index ).Var1Max = 20.0;
+	PerfCurve( Index ).Var1Min = 0.0;
+	PerfCurve( Index ).Var2Max = 20.0;
+	PerfCurve( Index ).Var2Min = 0.0;
+	PerfCurve( Index ).Var3Max = 20.0;
+	PerfCurve( Index ).Var3Min = 0.0;
+	PerfCurve( Index ).Var4Max = 0.0;
+	PerfCurve( Index ).Var4Min = 0.0;
+	PerfCurve( Index ).CurveType = Linear;
+	TableLookup( PerfCurve( Index ).TableIndex ).NumIndependentVars = 4;
+	PerfCurve( Index ).ObjectType = CurveType_TableMultiIV;
+	PerfCurve( Index ).Name = "Table 4";
+	TableLookup( Index ).NumX1Vars = 2;
+	TableLookup( Index ).NumX2Vars = 1;
+	TableLookup( Index ).NumX3Vars = 1;
+	TableLookup( Index ).NumX4Vars = 1;
+	TableLookup( Index ).InterpolationOrder = 2;
+	TableLookup( Index ).X1Var.allocate( TableLookup( Index ).NumX1Vars );
+	TableLookup( Index ).X2Var.allocate( TableLookup( Index ).NumX2Vars );
+	TableLookup( Index ).X3Var.allocate( TableLookup( Index ).NumX3Vars );
+	TableLookup( Index ).X4Var.allocate( TableLookup( Index ).NumX4Vars );
+	TableLookup( Index ).X1Var( 1 ) = 0.0;
+	TableLookup( Index ).X1Var( 2 ) = 1.0;
+	TableLookup( Index ).X2Var( 1 ) = 1.0;
+	TableLookup( Index ).X3Var( 1 ) = 1.0;
+	TableLookup( Index ).X4Var( 1 ) = 1.0;
+	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
+
+	TableLookupObject( Index, 1.0, 1.0, 1.0, 1.0, 0.0 );
+
+	std::string const error_string3 = delimited_string( {
+		"   ** Warning ** TableLookupObject: Table:MultiVariableLookup\"Table 4\"",
+		"   **   ~~~   ** ...Excess number of independent variables (5) passed to subroutine when 4 or less are required. The excess arguments are ignored.",
+	} );
+
+	EXPECT_TRUE( compare_err_stream( error_string3, true ) );
+
+	PerfCurve.deallocate( );
+	TableLookup.deallocate( );
+
 }

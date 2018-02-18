@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -401,15 +402,15 @@ namespace MoistureBalanceEMPDManager {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
 			EMPDReportVarsData & rvd = EMPDReportVars( SurfNum );
 			const std::string surf_name = Surface( SurfNum ).Name;
-			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m3]", rvd.rv_surface, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Moisture Content [kg/m3]", rvd.u_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Content [kg/m3]", rvd.u_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity [%]", rvd.RH_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity [%]", rvd.RH_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone [kg/m2-s]", rvd.mass_flux_zone, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Flux [kg/m2-s]", rvd.mass_flux_deep, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density", OutputProcessor::Unit::kg_m3, rvd.rv_surface, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, rvd.w_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, rvd.w_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_zone, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Flux", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_deep, "Zone", "State", surf_name );
 		}
 
 		if ( InitEnvrnFlag ) InitEnvrnFlag = false;

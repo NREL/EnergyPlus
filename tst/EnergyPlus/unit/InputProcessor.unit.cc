@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -2557,6 +2558,7 @@ namespace EnergyPlus {
 															"  ",
 															"ZoneHVAC:EquipmentList,",
 															"  Zone2Equipment,          !- Name",
+                                                            "  SequentialLoad,          !- Load distribution scheme",
 															"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
 															"  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
 															"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2615,9 +2617,9 @@ namespace EnergyPlus {
 
 		inputProcessor->getObjectItem( CurrentModuleObject, num_equipment_lists, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
-		EXPECT_EQ( 3, NumAlphas2 );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZONE2EQUIPMENT", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1" } ), Alphas2 ) );
-		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false } ), lAlphaBlanks2 ) );
+		EXPECT_EQ( 4, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks2 ) );
 
 		EXPECT_EQ( 2, NumNumbers2 );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false } ), lNumericBlanks2 ) );
@@ -2787,7 +2789,7 @@ namespace EnergyPlus {
 
 		// Container size is 4500 here!
 		EXPECT_EQ( 6, NumAlphas );
-		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FANANDCOILAVAILSCHED", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.0" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "CONTINUOUSFANSCHEDULE", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.0" } ), Alphas2 ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false } ), lAlphaBlanks2 ) );
 
 		EXPECT_EQ( 0, NumNumbers );
@@ -2896,7 +2898,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 1, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFFF", "", "" } ), Alphas ) );
@@ -2919,7 +2921,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields2( NumAlphas2 );
 		Array1D_string cNumericFields2( NumNumbers2 );
 
-		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		EXPECT_EQ( 1, NumAlphas2 );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFFF", "", "" } ), Alphas2 ) );
@@ -3204,7 +3206,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields( NumAlphas );
 		Array1D_string cNumericFields( NumNumbers );
 
-		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		EXPECT_EQ( 4, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFT", "TEMPERATURE", "TEMPERATURE",
@@ -3232,7 +3234,7 @@ namespace EnergyPlus {
 		Array1D_string cAlphaFields2( NumAlphas2 );
 		Array1D_string cNumericFields2( NumNumbers2 );
 
-		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
 
 		EXPECT_EQ( 4, NumAlphas2 );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFT", "TEMPERATURE", "TEMPERATURE",

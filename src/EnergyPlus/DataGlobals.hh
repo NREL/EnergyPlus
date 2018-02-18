@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -81,7 +82,7 @@ namespace DataGlobals {
 	extern int const ksRunPeriodWeather;
 	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
 	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
-	extern int const ksReadAllWeatherData; // a weather period for reading all weather data proir to the simulation
+	extern int const ksReadAllWeatherData; // a weather period for reading all weather data prior to the simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -94,7 +95,7 @@ namespace DataGlobals {
 	extern Real64 const DegToRadians; // Conversion for Degrees to Radians
 	extern Real64 const RadToDeg; // Conversion for Radians to Degrees
 	extern Real64 const SecInHour; // Conversion for hours to seconds
-	extern Real64 const HoursInDay; // Number of Hourse in Day
+	extern Real64 const HoursInDay; // Number of Hours in Day
 	extern Real64 const SecsInDay; // Number of seconds in Day
 	extern Real64 const BigNumber; // Max Number real used for initializations
 	extern Real64 const rTinyValue; // Tiny value to replace use of TINY(x)
@@ -201,6 +202,8 @@ namespace DataGlobals {
 	extern bool BeginTimeStepFlag; // True at the start of each time step, False after first subtime step of time step
 	extern int DayOfSim; // Counter for days (during the simulation)
 	extern std::string DayOfSimChr; // Counter for days (during the simulation) (character -- for reporting)
+	extern int CalendarYear; // Calendar year of the current day of simulation
+	extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
 	extern bool EndEnvrnFlag; // True at the end of each environment (last time step of last hour of last day of environ)
 	extern bool EndDesignDayEnvrnsFlag; // True at the end of the last design day environment
 	// (last time step of last hour of last day of environ which is a design day)

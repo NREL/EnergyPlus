@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1382,17 +1383,17 @@ namespace LowTempRadiantSystem {
 		// Set up the output variables for low temperature radiant systems
 		// ZoneHVAC:LowTemperatureRadiant:VariableFlow (HydrRadSys)
 		for ( Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item ) {
-			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", HydrRadSys( Item ).HeatPower, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate [W]", HydrRadSys( Item ).CoolPower, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, HydrRadSys( Item ).HeatPower, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, HydrRadSys( Item ).CoolPower, "System", "Average", HydrRadSys( Item ).Name );
 
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate [kg/s]", HydrRadSys( Item ).WaterMassFlowRate, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature [C]", HydrRadSys( Item ).WaterInletTemp, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature [C]", HydrRadSys( Item ).WaterOutletTemp, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time [s]", HydrRadSys( Item ).CondCausedTimeOff, "System", "Sum", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate", OutputProcessor::Unit::kg_s, HydrRadSys( Item ).WaterMassFlowRate, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature", OutputProcessor::Unit::C, HydrRadSys( Item ).WaterInletTemp, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature", OutputProcessor::Unit::C, HydrRadSys( Item ).WaterOutletTemp, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time", OutputProcessor::Unit::s, HydrRadSys( Item ).CondCausedTimeOff, "System", "Sum", HydrRadSys( Item ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Hydronic Low Temp Radiant Design Water Volume Flow Rate for Heating", HydrRadSys( Item ).Name, "[m3/s]", HydrRadSys( Item ).WaterVolFlowMaxHeat );
 				SetupEMSInternalVariable( "Hydronic Low Temp Radiant Design Water Volume Flow Rate for Cooling", HydrRadSys( Item ).Name, "[m3/s]", HydrRadSys( Item ).WaterVolFlowMaxCool );
@@ -1403,24 +1404,24 @@ namespace LowTempRadiantSystem {
 		// Set up the output variables for low temperature radiant systems
 		// ZoneHVAC:LowTemperatureRadiant:ConstantFlow (CFloRadSys)
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
-			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", CFloRadSys( Item ).HeatPower, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Heat Transfer Energy [J]", CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate [W]", CFloRadSys( Item ).CoolPower, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy [J]", CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy [J]", CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate [kg/s]", CFloRadSys( Item ).WaterMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Injection Mass Flow Rate [kg/s]", CFloRadSys( Item ).WaterInjectionRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Recirculation Mass Flow Rate [kg/s]", CFloRadSys( Item ).WaterRecircRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature [C]", CFloRadSys( Item ).WaterInletTemp, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature [C]", CFloRadSys( Item ).WaterOutletTemp, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Inlet Temperature [C]", CFloRadSys( Item ).PumpInletTemp, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Power [W]", CFloRadSys( Item ).PumpPower, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Energy [J]", CFloRadSys( Item ).PumpEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "Electric", "Pumps", _, "Plant" );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Mass Flow Rate [kg/s]", CFloRadSys( Item ).PumpMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Rate [W]", CFloRadSys( Item ).PumpHeattoFluid, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Energy [J]", CFloRadSys( Item ).PumpHeattoFluidEnergy, "System", "Sum", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time [s]", CFloRadSys( Item ).CondCausedTimeOff, "System", "Sum", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, CFloRadSys( Item ).HeatPower, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Heat Transfer Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, CFloRadSys( Item ).CoolPower, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).WaterMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Injection Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).WaterInjectionRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Recirculation Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).WaterRecircRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature", OutputProcessor::Unit::C, CFloRadSys( Item ).WaterInletTemp, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature", OutputProcessor::Unit::C, CFloRadSys( Item ).WaterOutletTemp, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Inlet Temperature", OutputProcessor::Unit::C, CFloRadSys( Item ).PumpInletTemp, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Power", OutputProcessor::Unit::W, CFloRadSys( Item ).PumpPower, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).PumpEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "Electric", "Pumps", _, "Plant" );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).PumpMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Rate", OutputProcessor::Unit::W, CFloRadSys( Item ).PumpHeattoFluid, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).PumpHeattoFluidEnergy, "System", "Sum", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time", OutputProcessor::Unit::s, CFloRadSys( Item ).CondCausedTimeOff, "System", "Sum", CFloRadSys( Item ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Constant Flow Low Temp Radiant Design Water Mass Flow Rate", CFloRadSys( Item ).Name, "[m3/s]", CFloRadSys( Item ).WaterVolFlowMax );
 				SetupEMSActuator( "Constant Flow Low Temp Radiant", CFloRadSys( Item ).Name, "Water Mass Flow Rate", "[kg/s]", CFloRadSys( Item ).EMSOverrideOnWaterMdot, CFloRadSys( Item ).EMSWaterMdotOverrideValue );
@@ -1430,10 +1431,10 @@ namespace LowTempRadiantSystem {
 		for ( Item = 1; Item <= NumOfElecLowTempRadSys; ++Item ) {
 			// Set up the output variables for low temperature radiant systems
 			// ZoneHVAC:LowTemperatureRadiant:Electric (ElecRadSys)
-			SetupOutputVariable( "Zone Radiant HVAC Electric Power [W]", ElecRadSys( Item ).ElecPower, "System", "Average", ElecRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", ElecRadSys( Item ).ElecEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", ElecRadSys( Item ).HeatPower, "System", "Average", ElecRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", ElecRadSys( Item ).HeatEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Electric Power", OutputProcessor::Unit::W, ElecRadSys( Item ).ElecPower, "System", "Average", ElecRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Electric Energy", OutputProcessor::Unit::J, ElecRadSys( Item ).ElecEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, ElecRadSys( Item ).HeatPower, "System", "Average", ElecRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, ElecRadSys( Item ).HeatEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 		}
 
 	}

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -165,6 +166,7 @@
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
@@ -180,7 +182,11 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+<<<<<<< HEAD
 #include <EnergyPlus/ResultsSchema.hh>
+=======
+#include <EnergyPlus/PVWatts.hh>
+>>>>>>> update-idd-parser
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -373,6 +379,7 @@ namespace EnergyPlus {
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		HybridModel::clear_state();
+		HysteresisPhaseChange::clear_state();
 		EnergyPlus::inputProcessor->clear_state();
 		IntegratedHeatPump::clear_state();
 		InternalHeatGains::clear_state();
@@ -405,6 +412,7 @@ namespace EnergyPlus {
 		Psychrometrics::clear_state();
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
+		PVWatts::clear_state();
 		ReturnAirPathManager::clear_state();
 		RoomAirModelAirflowNetwork::clear_state();
 		RoomAirModelManager::clear_state();
@@ -578,6 +586,7 @@ namespace EnergyPlus {
 					{
 							"Bldg",
 							{
+									{"idfOrder", 0},
 									{"north_axis", 0.0},
 									{"terrain", "Suburbs"},
 									{"loads_convergence_tolerance_value", 0.04},
@@ -594,6 +603,7 @@ namespace EnergyPlus {
 					{
 							"",
 							{
+									{"idfOrder", 0},
 									{"starting_vertex_position", "UpperLeftCorner"},
 									{"vertex_entry_direction", "Counterclockwise"},
 									{"coordinate_system", "Relative"},

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -673,17 +674,17 @@ namespace WindowAC {
 
 		for ( WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum ) {
 			// Setup Report variables for the Fan Coils
-			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Rate [W]", WindAC( WindACNum ).TotCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Energy [J]", WindAC( WindACNum ).TotCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Rate [W]", WindAC( WindACNum ).SensCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Energy [J]", WindAC( WindACNum ).SensCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Rate [W]", WindAC( WindACNum ).LatCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Energy [J]", WindAC( WindACNum ).LatCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Electric Power [W]", WindAC( WindACNum ).ElecPower, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Electric Energy [J]", WindAC( WindACNum ).ElecConsumption, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Fan Part Load Ratio []", WindAC( WindACNum ).FanPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Compressor Part Load Ratio []", WindAC( WindACNum ).CompPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Fan Availability Status []", WindAC( WindACNum ).AvailStatus, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Rate", OutputProcessor::Unit::W, WindAC( WindACNum ).TotCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).TotCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Rate", OutputProcessor::Unit::W, WindAC( WindACNum ).SensCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).SensCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Rate", OutputProcessor::Unit::W, WindAC( WindACNum ).LatCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).LatCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Electric Power", OutputProcessor::Unit::W, WindAC( WindACNum ).ElecPower, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Electric Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).ElecConsumption, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Fan Part Load Ratio", OutputProcessor::Unit::None, WindAC( WindACNum ).FanPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Compressor Part Load Ratio", OutputProcessor::Unit::None, WindAC( WindACNum ).CompPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Fan Availability Status", OutputProcessor::Unit::None, WindAC( WindACNum ).AvailStatus, "System", "Average", WindAC( WindACNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Window Air Conditioner", WindAC( WindACNum ).Name, "Part Load Ratio", "[fraction]", WindAC( WindACNum ).EMSOverridePartLoadFrac, WindAC( WindACNum ).EMSValueForPartLoadFrac );
 			}

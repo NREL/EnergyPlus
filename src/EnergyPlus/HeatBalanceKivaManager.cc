@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -635,52 +636,12 @@ bool KivaManager::setupKivaInstances()
 				}
 			}
 
-			// Get combinations of wall constructions and wall heights -- each different
-			// combination gets its own Kiva instance. Combination map points each set
-			// of construction and wall height to the associated exposed perimeter and
-			// list of wall surface numbers.
-			std::map<std::pair<int, Real64>,WallGroup> combinationMap;
-
-			if ( wallSurfaces.size() != 0 ) {
-				for ( auto& wl : wallSurfaces ) {
-
-					auto&v = Surfaces( wl ).Vertex;
-					// Enforce quadrilateralism
-					if ( v.size() != 4) {
-						ErrorsFound = true;
-						ShowSevereError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
-						ShowContinueError( "Surface=\"" + Surfaces( wl ).Name + "\", has " + General::TrimSigDigits( v.size() ) + " vertices." );
-					}
-
-					// sort vertices by Z-value
-					std::vector<int> zs = {0, 1, 2, 3};
-					sort( zs.begin(),zs.end(),[v]( int a, int b ){return v[a].z < v[b].z;} );
-
-					Real64 perimeter = distance( v[zs[0]], v[zs[1]] );
-
-					Real64 surfHeight = ( v[zs[2]].z + v[zs[2]].z )/2.0 - ( v[zs[0]].z + v[zs[1]].z )/2.0;
-					// round to avoid numerical precision differences
-					surfHeight = std::round( ( surfHeight ) * 1000.0 ) / 1000.0;
-
-					if ( combinationMap.count( {Surfaces( wl ).Construction, surfHeight}) == 0) {
-						// create new combination
-						std::vector<int> walls = {wl};
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}] = WallGroup( perimeter, walls );
-					}
-					else {
-						// add to existing combination
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}].exposedPerimeter += perimeter;
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}].wallIDs.push_back( wl );
-					}
-				}
-			}
-
 			// Calculate total exposed perimeter attributes
 			std::vector<bool> isExposedPerimeter;
 
-			bool userSetExposedPerimeter;
-			bool useDetailedExposedPerimeter;
-			Real64 exposedFraction;
+			bool userSetExposedPerimeter = false;
+			bool useDetailedExposedPerimeter = false;
+			Real64 exposedFraction = 0.0;
 
 			auto& expPerimMap = SurfaceGeometry::exposedFoundationPerimeter.surfaceMap;
 			if ( expPerimMap.count( surfNum ) == 1 ) {
@@ -694,8 +655,8 @@ bool KivaManager::setupKivaInstances()
 					exposedFraction = expPerimMap[surfNum].exposedFraction;
 				}
 			} else {
-				userSetExposedPerimeter = false;
-				useDetailedExposedPerimeter = true;
+				ErrorsFound = true;
+				ShowSevereError( "Surface=\"" + Surfaces( surfNum ).Name + "\", references a Foundation Outside Boundary Condition but there is no corresponding SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER object defined." );
 			}
 
 			Kiva::Polygon floorPolygon;
@@ -760,9 +721,48 @@ bool KivaManager::setupKivaInstances()
 			// Remaining exposed perimeter will be alloted to each instance as appropriate
 			Real64 remainingExposedPerimeter = totalExposedPerimeter;
 
+			// Get combinations of wall constructions and wall heights -- each different
+			// combination gets its own Kiva instance. Combination map points each set
+			// of construction and wall height to the associated exposed perimeter and
+			// list of wall surface numbers.
+			std::map<std::pair<int, Real64>,WallGroup> combinationMap;
+
+			if ( wallSurfaces.size() != 0 ) {
+				for ( auto& wl : wallSurfaces ) {
+
+					auto&v = Surfaces( wl ).Vertex;
+					// Enforce quadrilateralism
+					if ( v.size() != 4) {
+						ErrorsFound = true;
+						ShowSevereError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
+						ShowContinueError( "Surface=\"" + Surfaces( wl ).Name + "\", has " + General::TrimSigDigits( v.size() ) + " vertices." );
+					}
+
+					// sort vertices by Z-value
+					std::vector<int> zs = {0, 1, 2, 3};
+					sort( zs.begin(),zs.end(),[v]( int a, int b ){return v[a].z < v[b].z;} );
+
+					Real64 perimeter = distance( v[zs[0]], v[zs[1]] );
+
+					Real64 surfHeight = ( v[zs[2]].z + v[zs[2]].z )/2.0 - ( v[zs[0]].z + v[zs[1]].z )/2.0;
+					// round to avoid numerical precision differences
+					surfHeight = std::round( ( surfHeight ) * 1000.0 ) / 1000.0;
+
+					if ( combinationMap.count( {Surfaces( wl ).Construction, surfHeight}) == 0) {
+						// create new combination
+						std::vector<int> walls = {wl};
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}] = WallGroup( perimeter*exposedFraction, walls );
+					}
+					else {
+						// add to existing combination
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}].exposedPerimeter += perimeter*exposedFraction;
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}].wallIDs.push_back( wl );
+					}
+				}
+			}
+
 			// setup map to point floor surface to all related kiva instances
 			std::vector<std::pair<int, Kiva::Surface::SurfaceType>> floorSurfaceMaps;
-
 
 			// Loop through combinations and assign instances until there is no remaining exposed pereimeter
 			bool assignKivaInstances = true;
@@ -803,8 +803,8 @@ bool KivaManager::setupKivaInstances()
 				fnd.exposedFraction = exposedFraction;
 
 
-				if ( foundationInputs[surface.OSCPtr].wallConstructionIndex > 0 ) {
-					auto& c = Constructs( foundationInputs[surface.OSCPtr].wallConstructionIndex );
+				if ( constructionNum > 0 ) {
+					auto& c = Constructs( constructionNum );
 
 					// Clear layers
 					fnd.wall.layers.clear();
@@ -884,10 +884,23 @@ bool KivaManager::setupKivaInstances()
 					fnd.inputBlocks.push_back( footing );
 				}
 
+				Real64 initDeepGroundDepth = fnd.deepGroundDepth;
 				for ( auto& block : fnd.inputBlocks ) {
+					// Change temporary zero depth indicators to default foundation depth
 					if ( block.depth == 0.0 ) {
 						block.depth = fnd.foundationDepth;
 					}
+					if ( settings.deepGroundBoundary == Settings::AUTO ) {
+						// Ensure automatically set deep ground depth is at least 1 meater below lowest block
+						if ( block.z + block.depth + 1.0 > fnd.deepGroundDepth ) {
+							fnd.deepGroundDepth = block.z + block.depth + 1.0;
+						}
+					}
+				}
+
+				if ( fnd.deepGroundDepth > initDeepGroundDepth ) {
+					ShowWarningError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", the autocalculated deep ground depth (" + General::TrimSigDigits( initDeepGroundDepth, 3 ) + " m) is shallower than foundation construction elements (" + General::TrimSigDigits( fnd.deepGroundDepth - 1.0, 3 ) + " m)" );
+					ShowContinueError( "The deep ground depth will be set one meter below the lowest element (" + General::TrimSigDigits( fnd.deepGroundDepth, 3 ) + " m)" );
 				}
 
 				// polygon
@@ -966,6 +979,27 @@ bool KivaManager::setupKivaInstances()
 		surfNum++;
 	}
 
+	// Loop through Foundation surfaces and make sure they are all assigned to an instance
+	for ( std::size_t surfNum = 1; surfNum <= Surfaces.size(); ++surfNum ) {
+		if ( Surfaces( surfNum ).ExtBoundCond == DataSurfaces::KivaFoundation ) {
+			if ( surfaceMap[surfNum].size() == 0 ) {
+				ErrorsFound = true;
+				ShowSevereError( "Surface=\""+ Surfaces( surfNum ).Name + "\" has a 'Foundation' Outside Boundary Condition" );
+				ShowContinueError( "  referencing Foundation:Kiva=\"" + foundationInputs[Surfaces( surfNum ).OSCPtr].name + "\"." );
+				if ( Surfaces( surfNum ).Class == DataSurfaces::SurfaceClass_Wall ) {
+					ShowContinueError( "  You must also reference Foundation:Kiva=\"" + foundationInputs[Surfaces( surfNum ).OSCPtr].name + "\"" );
+					ShowContinueError( "  in a floor surface within the same Zone=\"" + DataHeatBalance::Zone( Surfaces( surfNum ).Zone ).Name + "\"." );
+				} else if ( Surfaces( surfNum ).Class == DataSurfaces::SurfaceClass_Floor ) {
+					ShowContinueError( "  However, this floor was never assigned to a Kiva instance." );
+					ShowContinueError( "  This should not occur for floor surfaces. Please report to EnergyPlus Development Team." );
+				} else {
+					ShowContinueError( "  Only floor and wall surfaces are allowed to reference 'Foundation' Outside Boundary Conditions." );
+					ShowContinueError( "  Surface=\"" + Surfaces( surfNum ).Name + "\", is not a floor or wall." );
+				}
+			}
+		}
+	}
+
 	gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed Perimeter, Perimeter Fraction, Wall Height, Wall Construction, Floor Surface, Wall Surface(s)";
 	std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A',',A',',A,A)";
 	for ( auto& kv : kivaInstances ) {
@@ -1032,7 +1066,7 @@ void KivaManager::calcKivaInstances()
 	for ( auto& kv : kivaInstances ) {
 		auto& grnd = kv.ground;
 		kv.setBoundaryConditions();
-		grnd.calculate( kv.bcs,DataGlobals::MinutesPerTimeStep*60. );
+		grnd.calculate( kv.bcs, timestep);
 		grnd.calculateSurfaceAverages();
 		kv.reportKivaSurfaces();
 		if ( DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1 ) {
@@ -1118,6 +1152,7 @@ Real64 KivaManager::getValue(
 	Real64 h = 0.0;
 	Real64 q = 0.0;
 	Real64 Tz = DataHeatBalFanSys::MAT( DataSurfaces::Surface( surfNum ).Zone ) + DataGlobals::KelvinConv;
+	assert(surfaceMap[surfNum].size() > 0);
 	for ( auto& i : surfaceMap[surfNum] ) {
 		auto& kI = kivaInstances[i.first];
 		auto& st = i.second;

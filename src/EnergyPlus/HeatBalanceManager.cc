@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -701,6 +702,8 @@ namespace HeatBalanceManager {
 		static gio::Fmt Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
 		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration {AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')" );
 		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_734( "('! <HVACSystemRootFindingAlgorithm>, Value {RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}')" );
+		static gio::Fmt Format_735( "(' HVACSystemRootFindingAlgorithm, ',A)" );
 
 		//Assign the values to the building data
 
@@ -1224,8 +1227,8 @@ namespace HeatBalanceManager {
 		}
 
 		// Write Solution Algorithm to the initialization output file for User Verification
-		gio::write( OutputFileInits, Format_726 );
-		gio::write( OutputFileInits, Format_727 ) << AlphaName( 1 );
+		gio::write( OutputFileInits, Format_734 );
+		gio::write( OutputFileInits, Format_735 ) << HVACSystemRootFinding.Algorithm;
 
 	}
 
@@ -1352,7 +1355,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > MaterialProps( 27 ); // Temporary array to transfer material properties
 		int RegMat; // Regular Materials -- full property definition
 		int RegRMat; // Regular Materials -- R only property definition
-		int AirMat; // Air space materias in opaque constructions
+		int AirMat; // Air space materials in opaque constructions
 		int IRTMat; // Infrared Transmitting Materials -- R only property definition
 
 		int EcoRoofMat; // Materials for ecoRoof
@@ -1371,7 +1374,7 @@ namespace HeatBalanceManager {
 		Real64 TransmittivityVis; // Glass transmittivity, visible
 		static bool DoReport( false );
 		Real64 DenomRGas; // Denominator for WindowGas calculations of NominalR
-		Real64 Openness; // insect screen oppenness fraction = (1-d/s)^2
+		Real64 Openness; // insect screen openness fraction = (1-d/s)^2
 		Real64 minAngValue; // minimum value of angle
 		Real64 maxAngValue; // maximum value of angle
 		Real64 minLamValue; // minimum value of wavelength
@@ -1381,7 +1384,7 @@ namespace HeatBalanceManager {
 		static int iTC( 0 );
 		static int iMat( 0 );
 
-		// Added TH 7/27/2009 for constructions defined with F or C factro method
+		// Added TH 7/27/2009 for constructions defined with F or C factor method
 		int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
 		int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
@@ -1418,6 +1421,15 @@ namespace HeatBalanceManager {
 
 		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
+
+		if ( TotFfactorConstructs > 0 ) {
+			NoFfactorConstructionsUsed = false;
+		}
+
+		if ( TotCfactorConstructs > 0 ) {
+			NoCfactorConstructionsUsed = false;
+		}
+
 		if ( TotFfactorConstructs + TotCfactorConstructs >= 1 ) {
 			// Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
 			TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
@@ -3715,7 +3727,7 @@ namespace HeatBalanceManager {
 		//  Window5 data file
 		bool EOFonW5File; // True if EOF encountered reading Window5 data file
 		static bool NoRegularMaterialsUsed( true );
-		int MaterialLayerGroup; // window contruction layer material group index
+		int MaterialLayerGroup; // window construction layer material group index
 
 		int iMatGlass; // number of glass layers
 		Array1D_string WConstructNames;
@@ -3728,6 +3740,15 @@ namespace HeatBalanceManager {
 
 		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
+
+		if ( TotFfactorConstructs > 0 ) {
+			NoFfactorConstructionsUsed = false;
+		}
+
+		if ( TotCfactorConstructs > 0 ) {
+			NoCfactorConstructionsUsed = false;
+		}
+
 		TotComplexFenStates = inputProcessor->getNumObjectsFound( "Construction:ComplexFenestrationState" );
 		TotWindow5Constructs = inputProcessor->getNumObjectsFound( "Construction:WindowDataFile" );
 		TotWinEquivLayerConstructs = inputProcessor->getNumObjectsFound( "Construction:WindowEquivalentLayer" );
@@ -3927,8 +3948,8 @@ namespace HeatBalanceManager {
 		TotRegConstructs += TotSourceConstructs;
 		TotConstructs = TotRegConstructs;
 
-		if ( TotConstructs > 0 && NoRegularMaterialsUsed ) {
-			ShowSevereError( "This building has no thermal mass which can cause an unstable solution." );
+		if ( TotConstructs > 0 && ( NoRegularMaterialsUsed && NoCfactorConstructionsUsed && NoFfactorConstructionsUsed ) ) {
+			ShowWarningError( "This building has no thermal mass which can cause an unstable solution." );
 			ShowContinueError( "Use Material object for all opaque material definitions except very light insulation layers." );
 		}
 
@@ -4542,14 +4563,14 @@ namespace HeatBalanceManager {
 		}
 
 		// Zone outdoor environmental variables, used for zone infiltration/ventilation
-		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
-		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
-		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
-		SetupOutputVariable( "Zone Outdoor Air Wind Direction [degree]", Zone( ZoneLoop ).WindDir, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone( ZoneLoop ).WindDir, "Zone", "Average", Zone( ZoneLoop ).Name );
 
 
 		if ( FlagHybridModel ){
-			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate [ach]", Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
+			SetupOutputVariable("Zone Infiltration Hybrid Model Air Change Rate", OutputProcessor::Unit::ach, Zone( ZoneLoop ).InfilOAAirChangeRateHM, "Zone", "Average", Zone(ZoneLoop).Name);
 		}
 
 	}
@@ -4711,18 +4732,10 @@ namespace HeatBalanceManager {
 			SetOutAirNodes();
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum != 0 ) {
-						Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
-					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum != 0 ) {
-						Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
-					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum != 0 ) {
-						Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
-					}
-					if ( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum != 0 ) {
-						Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
-					}
+					Zone( ZoneNum ).OutDryBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirDryBulbSchedNum );
+					Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWetBulbSchedNum );
+					Zone( ZoneNum ).WindSpeed = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindSpeedSchedNum );
+					Zone( ZoneNum ).WindDir = GetCurrentScheduleValue( Node( Zone( ZoneNum ).LinkedOutAirNode ).OutAirWindDirSchedNum );
 				}
 			}
 		}
@@ -5047,6 +5060,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxHeatLoadZone( ZoneNum ) > 1.0e-4 ) { // make sure load big enough to divide
 					MaxHeatLoadZone( ZoneNum ) = std::abs( max( MaxHeatLoadZone( ZoneNum ), MinLoad ) );
+					MaxHeatLoadPrevDay( ZoneNum ) = std::abs( max( MaxHeatLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue = std::abs( ( MaxHeatLoadZone( ZoneNum ) - MaxHeatLoadPrevDay( ZoneNum ) ) / MaxHeatLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxHeatLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 3 ) = 2;
@@ -5060,6 +5074,7 @@ namespace HeatBalanceManager {
 
 				if ( MaxCoolLoadZone( ZoneNum ) > 1.0e-4 ) {
 					MaxCoolLoadZone( ZoneNum ) = std::abs( max( MaxCoolLoadZone( ZoneNum ), MinLoad ) );
+					MaxCoolLoadPrevDay( ZoneNum ) = std::abs( max( MaxCoolLoadPrevDay( ZoneNum ), MinLoad ) );
 					WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue = std::abs( ( MaxCoolLoadZone( ZoneNum ) - MaxCoolLoadPrevDay( ZoneNum ) ) / MaxCoolLoadZone( ZoneNum ) );
 					if ( WarmupConvergenceValues( ZoneNum ).TestMaxCoolLoadValue <= LoadsConvergTol ) {
 						WarmupConvergenceValues( ZoneNum ).PassFlag( 4 ) = 2;
@@ -5584,7 +5599,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > CosPhiIndepVar( 10 ); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
 		int IPhi; // Incidence angle counter
 		Real64 Phi; // Incidence angle (deg)
-		Real64 CosPhi; // Cosine of incidence angle
+		Array1D< Real64 >CosPhi( 10 ); // Cosine of incidence angle
 		Array1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
 		Array1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
 		Array1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
@@ -6009,6 +6024,18 @@ Label20: ;
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
 			++FileLineCount;
 
+			// Pre-calculate constants
+			for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
+			}
+
+			// Pre-calculate constants
+			for( IPhi = 1; IPhi <= 10; ++IPhi ) {
+				Phi = double( IPhi - 1 ) * 10.0;
+				CosPhi( IPhi ) =  std::cos( Phi * DegToRadians );
+				if ( std::abs( CosPhi( IPhi ) ) < 0.0001 ) CosPhi( IPhi ) = 0.0;
+			}
+
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				ConstrNum = TotConstructs - NGlSys + IGlSys;
 				if ( IGlSys == 1 ) {
@@ -6089,10 +6116,6 @@ Label20: ;
 				Construct( ConstrNum ).W5FileMullionWidth = MullionWidth;
 
 				// Fill Construct with system transmission, reflection and absorption properties
-
-				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					CosPhiIndepVar( IPhi ) = std::cos( ( IPhi - 1 ) * 10.0 * DegToRadians );
-				}
 
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
@@ -6203,20 +6226,17 @@ Label20: ;
 
 				// For comparing fitted vs. input distribution in incidence angle
 				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					Phi = double( IPhi - 1 ) * 10.0;
-					CosPhi = std::cos( Phi * DegToRadians );
-					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
-					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef );
-					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef );
-					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef );
+					tsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransSolBeamCoef );
+					tvisFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).TransVisBeamCoef );
+					rfsolFit( IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).ReflSolBeamFrontCoef );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
+						solabsFit( IGlass, IPhi ) = POLYF( CosPhi( IPhi ), Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
 				}
 				// end
 
 				// NominalRforNominalUCalculation of this construction (actually the total resistance of all of its layers; gas layer
-				// conductivity here ignores convective efffects in gap.)
+				// conductivity here ignores convective effects in gap.)
 				NominalRforNominalUCalculation( ConstrNum ) = 0.0;
 				for ( loop = 1; loop <= NGlass( IGlSys ) + NGaps( IGlSys ); ++loop ) {
 					MatNum = Construct( ConstrNum ).LayerPoint( loop );
@@ -6451,6 +6471,14 @@ Label1000: ;
 		// Count number of constructions defined with Ffactor or Cfactor method
 		TotFfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:FfactorGroundFloor" );
 		TotCfactorConstructs = inputProcessor->getNumObjectsFound( "Construction:CfactorUndergroundWall" );
+
+		if ( TotFfactorConstructs > 0 ) {
+			NoFfactorConstructionsUsed = false;
+		}
+
+		if ( TotCfactorConstructs > 0 ) {
+			NoCfactorConstructionsUsed = false;
+		}
 
 		// First create ground floor constructions defined with F factor method if any
 		CurrentModuleObject = "Construction:FfactorGroundFloor";

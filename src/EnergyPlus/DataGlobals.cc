@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -103,7 +104,7 @@ namespace DataGlobals {
 	int const ksRunPeriodWeather( 3 );
 	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
 	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
-	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data proir to the simulation
+	int const ksReadAllWeatherData( 6 ); // a weather period for reading all weather data prior to the simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -116,10 +117,10 @@ namespace DataGlobals {
 	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
 	Real64 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
-	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
+	Real64 const HoursInDay( 24.0 ); // Number of Hours in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
-	Real64 const BigNumber( huge( 1.0 ) ); // Max Number real used for initializations
-	Real64 const rTinyValue( epsilon( 1.0 ) ); // Tiny value to replace use of TINY(x)
+	Real64 const BigNumber( HUGE_( 1.0 ) ); // Max Number real used for initializations
+	Real64 const rTinyValue( EPSILON( 1.0 ) ); // Tiny value to replace use of TINY(x)
 	std::string::size_type const MaxNameLength( 100 ); // Maximum Name Length in Characters -- should be the same
 	// as MaxAlphaArgLength in InputProcessor module
 
@@ -170,6 +171,8 @@ namespace DataGlobals {
 	bool BeginTimeStepFlag( false ); // True at the start of each time step, False after first subtime step of time step
 	int DayOfSim( 0 ); // Counter for days (during the simulation)
 	std::string DayOfSimChr( "0" ); // Counter for days (during the simulation) (character -- for reporting)
+	int CalendarYear( 0 ); // Calendar year of the current day of simulation
+	std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
 	bool EndEnvrnFlag( false ); // True at the end of each environment (last time step of last hour of last day of environ)
 	bool EndDesignDayEnvrnsFlag( false ); // True at the end of the last design day environment
 	// (last time step of last hour of last day of environ which is a design day)
@@ -270,6 +273,8 @@ namespace DataGlobals {
 		BeginTimeStepFlag = false;
 		DayOfSim = 0;
 		DayOfSimChr = "0";
+		CalendarYear = 0;
+		CalendarYearChr = "0";
 		EndEnvrnFlag = false;
 		EndDesignDayEnvrnsFlag = false;
 		EndDayFlag = false;

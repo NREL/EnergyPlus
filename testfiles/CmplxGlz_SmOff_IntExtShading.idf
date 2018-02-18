@@ -71,7 +71,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Output:Diagnostics,
     DisplayExtrawarnings;    !- Key 1
@@ -1429,7 +1429,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     726,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0.7,                     !- Fraction Radiant
     0;                       !- Fraction Lost
@@ -1977,7 +1977,7 @@
     ZSF1Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZSF1 Node,               !- Zone Air Node Name
-    ZSF1 Outlet Node;        !- Zone Return Air Node Name
+    ZSF1 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZNF1,                    !- Zone Name
@@ -1985,7 +1985,7 @@
     ZNF1Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZNF1 Node,               !- Zone Air Node Name
-    ZNF1 Outlet Node;        !- Zone Return Air Node Name
+    ZNF1 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZSF2,                    !- Zone Name
@@ -1993,7 +1993,7 @@
     ZSF2Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZSF2 Node,               !- Zone Air Node Name
-    ZSF2 Outlet Node;        !- Zone Return Air Node Name
+    ZSF2 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZNF2,                    !- Zone Name
@@ -2001,7 +2001,7 @@
     ZNF2Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZNF2 Node,               !- Zone Air Node Name
-    ZNF2 Outlet Node;        !- Zone Return Air Node Name
+    ZNF2 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     South zone1,             !- Name
@@ -2038,6 +2038,7 @@
 
   ZoneHVAC:EquipmentList,
     ZSF1Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZSF1DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2045,6 +2046,7 @@
 
   ZoneHVAC:EquipmentList,
     ZNF1Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZNF1DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2052,6 +2054,7 @@
 
   ZoneHVAC:EquipmentList,
     ZSF2Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZSF2DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2059,6 +2062,7 @@
 
   ZoneHVAC:EquipmentList,
     ZNF2Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZNF2DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

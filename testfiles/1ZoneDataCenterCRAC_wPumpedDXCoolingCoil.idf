@@ -26,7 +26,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,6;
 
@@ -81,8 +81,8 @@
 
   Site:Location,
     Denver Centennial CO USA WMO=724666,  !- Name
-    39.57,                   !- Latitude {deg}
-    -104.85,                 !- Longitude {deg}
+    39.74,                   !- Latitude {deg}
+    -105.18,                 !- Longitude {deg}
     -7.00,                   !- Time Zone {hr}
     1793.00;                 !- Elevation {m}
 
@@ -766,10 +766,11 @@
     Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main Zone Node,          !- Zone Air Node Name
-    Main Zone Outlet Node;   !- Zone Return Air Node Name
+    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Main Zone Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Main Zone ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -846,6 +847,7 @@
   ElectricEquipment:ITE:AirCooled,
     Data Center Servers,     !- Name
     Main Zone,               !- Zone Name
+    FlowFromSystem,          !- Air Flow Caclulation Method
     Watts/Unit,              !- Design Power Input Calculation Method
     500,                     !- Watts per Unit {W}
     100,                     !- Number of Units
@@ -1265,7 +1267,11 @@
 
   EnergyManagementSystem:Program,
     CalcPUE,                 !- Name
-    set PUE = whole_building_power / IT_Equip_power;  !- Program Line 1
+    IF IT_Equip_power > 0.0, !- Program Line 1
+    set PUE = whole_building_power / IT_Equip_power,  !- Program Line 2
+    ELSE,                    !- <none>
+    set PUE = 0.0,           !- <none>
+    ENDIF;                   !- <none>
 
   Output:Variable,*,PUE,Hourly;
 

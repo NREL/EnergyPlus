@@ -82,7 +82,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 118
 
-  Version,8.7;
+  Version,8.9;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -422,14 +422,6 @@
     0.7;                     !- Visible Absorptance
 
 ! ***COMMON CONSTRUCTIONS AND MATERIALS***
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -20947,7 +20939,7 @@
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
     75.3,                    !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.0000,                  !- Fraction Radiant
     0.5000,                  !- Fraction Lost
@@ -20961,7 +20953,7 @@
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
     75.3,                    !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.0000,                  !- Fraction Radiant
     0.5000,                  !- Fraction Lost
@@ -20975,7 +20967,7 @@
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
     75.3,                    !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.0000,                  !- Fraction Radiant
     0.5000,                  !- Fraction Lost
@@ -26019,6 +26011,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Anesthesia Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Anesthesia VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26030,6 +26023,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Bio Haz Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Bio Haz VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26037,6 +26031,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Cafe Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Cafe VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26044,6 +26039,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Clean Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Clean VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26051,6 +26047,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Clean Work Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Clean Work VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26058,6 +26055,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Dictation Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Dictation VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26065,6 +26063,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Dressing Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Dressing Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26072,6 +26071,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Humid Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Humid VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26079,6 +26079,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 IT Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 IT Hall VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26086,6 +26087,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 IT Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 IT Room VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26093,6 +26095,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Lobby Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Lobby VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26100,6 +26103,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Lobby Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Lobby Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26107,6 +26111,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Locker Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Locker Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26114,6 +26119,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Locker Room Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Locker Room Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26121,6 +26127,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Lounge Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Lounge VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26128,6 +26135,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 MRI Control Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 MRI Control Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26139,6 +26147,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 MRI Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 MRI Hall VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26146,6 +26155,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 MRI Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 MRI Room VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26157,6 +26167,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Med Gas Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Med Gas VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26164,6 +26175,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Nourishment Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Nourishment VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26171,6 +26183,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Nurse Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Nurse Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26178,6 +26191,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Nurse Station Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Nurse Station VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26185,6 +26199,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Office Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Office VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26192,6 +26207,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Operating Room 1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Operating Room 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26199,6 +26215,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Operating Room 2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Operating Room 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26206,6 +26223,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Operating Room 3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Operating Room 3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26213,6 +26231,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 PACU Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 PACU VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26220,6 +26239,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Pre-Op Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Pre-Op Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26227,6 +26247,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Pre-Op Room 1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Pre-Op Room 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26234,6 +26255,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Pre-Op Room 2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Pre-Op Room 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26241,6 +26263,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Procedure Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Procedure Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26248,6 +26271,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Reception Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Reception VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26255,6 +26279,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Reception Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Reception Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26262,6 +26287,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Recovery Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Recovery Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26269,6 +26295,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Scheduling Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Scheduling VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26276,6 +26303,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Scrub Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Scrub VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26283,6 +26311,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Soil Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Soil VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26294,6 +26323,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Soil Hold Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Soil Hold VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26305,6 +26335,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Soil Work Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Soil Work VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26316,6 +26347,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Step Down Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Step Down VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26323,6 +26355,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Sterile Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Sterile Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26330,6 +26363,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Sterile Storage Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Sterile Storage VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26337,6 +26371,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Sub-Sterile Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Sub-Sterile VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26344,6 +26379,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Utility Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Utility Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26351,6 +26387,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 1 Vestibule Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 1 Vestibule VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26358,6 +26395,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Conference Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Conference VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26365,6 +26403,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Dictation Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Dictation VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26372,6 +26411,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26379,6 +26419,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 2 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26386,6 +26427,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26393,6 +26435,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26400,6 +26443,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 5 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26407,6 +26451,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 6 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 6 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26414,6 +26459,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 7 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 7 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26421,6 +26467,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 8 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 8 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26428,6 +26475,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 9 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam 9 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26435,6 +26483,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam Hall 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26442,6 +26491,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam Hall 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26449,6 +26499,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam Hall 3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26456,6 +26507,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam Hall 4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26463,6 +26515,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam Hall 5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26470,6 +26523,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 6 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Exam Hall 6 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26477,6 +26531,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Lounge Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Lounge VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26484,6 +26539,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Nurse Station 1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Nurse Station 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26491,6 +26547,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Nurse Station 2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Nurse Station 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26498,6 +26555,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Office Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Office VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26505,6 +26563,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Office Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Office Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26512,6 +26571,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Reception Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Reception VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26519,6 +26579,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Reception Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Reception Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26526,6 +26587,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Scheduling 1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Scheduling 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26533,6 +26595,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Scheduling 2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Scheduling 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26540,6 +26603,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Work Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Work VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26547,6 +26611,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 Work Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 Work Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26554,6 +26619,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 2 X-Ray Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 2 X-Ray VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26561,6 +26627,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Dressing Room Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Dressing Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26568,6 +26635,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Elevator Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Elevator Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26575,6 +26643,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Humid Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Humid VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26582,6 +26651,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Locker Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Locker VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26589,6 +26659,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Lounge Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Lounge VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26596,6 +26667,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Mechanical Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Mechanical Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26603,6 +26675,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Office Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Office VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26610,6 +26683,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Office Hall Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Office Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26617,6 +26691,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Physical Therapy 1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Physical Therapy 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26624,6 +26699,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Physical Therapy 2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Physical Therapy 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26631,6 +26707,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Treatment Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Treatment VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26638,6 +26715,7 @@
 
   ZoneHVAC:EquipmentList,
     Floor 3 Work Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Floor 3 Work VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -30311,7 +30389,7 @@
     Floor 1 Anesthesia Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Floor 1 Anesthesia Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Anesthesia Air Node,  !- Zone Air Node Name
-    Floor 1 Anesthesia Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Anesthesia Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Bio Haz,         !- Zone Name
@@ -30319,7 +30397,7 @@
     Floor 1 Bio Haz Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Bio Haz Air Node,!- Zone Air Node Name
-    Floor 1 Bio Haz Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Bio Haz Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Cafe,            !- Zone Name
@@ -30327,7 +30405,7 @@
     Floor 1 Cafe Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Cafe Air Node,   !- Zone Air Node Name
-    Floor 1 Cafe Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Cafe Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Clean,           !- Zone Name
@@ -30335,7 +30413,7 @@
     Floor 1 Clean Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Clean Air Node,  !- Zone Air Node Name
-    Floor 1 Clean Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Clean Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Clean Work,      !- Zone Name
@@ -30343,7 +30421,7 @@
     Floor 1 Clean Work Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Clean Work Air Node,  !- Zone Air Node Name
-    Floor 1 Clean Work Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Clean Work Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Dictation,       !- Zone Name
@@ -30351,7 +30429,7 @@
     Floor 1 Dictation Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Dictation Air Node,  !- Zone Air Node Name
-    Floor 1 Dictation Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Dictation Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Dressing Room,   !- Zone Name
@@ -30359,7 +30437,7 @@
     Floor 1 Dressing Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Dressing Room Air Node,  !- Zone Air Node Name
-    Floor 1 Dressing Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Dressing Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Humid,           !- Zone Name
@@ -30367,7 +30445,7 @@
     Floor 1 Humid Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Humid Air Node,  !- Zone Air Node Name
-    Floor 1 Humid Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Humid Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 IT Hall,         !- Zone Name
@@ -30375,7 +30453,7 @@
     Floor 1 IT Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 IT Hall Air Node,!- Zone Air Node Name
-    Floor 1 IT Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 IT Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 IT Room,         !- Zone Name
@@ -30383,7 +30461,7 @@
     Floor 1 IT Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 IT Room Air Node,!- Zone Air Node Name
-    Floor 1 IT Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 IT Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Lobby,           !- Zone Name
@@ -30391,7 +30469,7 @@
     Floor 1 Lobby Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Lobby Air Node,  !- Zone Air Node Name
-    Floor 1 Lobby Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Lobby Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Lobby Hall,      !- Zone Name
@@ -30399,7 +30477,7 @@
     Floor 1 Lobby Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Lobby Hall Air Node,  !- Zone Air Node Name
-    Floor 1 Lobby Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Lobby Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Locker Room,     !- Zone Name
@@ -30407,7 +30485,7 @@
     Floor 1 Locker Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Locker Room Air Node,  !- Zone Air Node Name
-    Floor 1 Locker Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Locker Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Locker Room Hall,!- Zone Name
@@ -30415,7 +30493,7 @@
     Floor 1 Locker Room Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Locker Room Hall Air Node,  !- Zone Air Node Name
-    Floor 1 Locker Room Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Locker Room Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Lounge,          !- Zone Name
@@ -30423,7 +30501,7 @@
     Floor 1 Lounge Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Lounge Air Node, !- Zone Air Node Name
-    Floor 1 Lounge Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Lounge Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 MRI Control Room,!- Zone Name
@@ -30431,7 +30509,7 @@
     Floor 1 MRI Control Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Floor 1 MRI Control Room Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Floor 1 MRI Control Room Air Node,  !- Zone Air Node Name
-    Floor 1 MRI Control Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 MRI Control Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 MRI Hall,        !- Zone Name
@@ -30439,7 +30517,7 @@
     Floor 1 MRI Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 MRI Hall Air Node,  !- Zone Air Node Name
-    Floor 1 MRI Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 MRI Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 MRI Room,        !- Zone Name
@@ -30447,7 +30525,7 @@
     Floor 1 MRI Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Floor 1 MRI Room Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Floor 1 MRI Room Air Node,  !- Zone Air Node Name
-    Floor 1 MRI Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 MRI Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Med Gas,         !- Zone Name
@@ -30455,7 +30533,7 @@
     Floor 1 Med Gas Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Med Gas Air Node,!- Zone Air Node Name
-    Floor 1 Med Gas Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Med Gas Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Nourishment,     !- Zone Name
@@ -30463,7 +30541,7 @@
     Floor 1 Nourishment Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Nourishment Air Node,  !- Zone Air Node Name
-    Floor 1 Nourishment Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Nourishment Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Nurse Hall,      !- Zone Name
@@ -30471,7 +30549,7 @@
     Floor 1 Nurse Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Nurse Hall Air Node,  !- Zone Air Node Name
-    Floor 1 Nurse Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Nurse Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Nurse Station,   !- Zone Name
@@ -30479,7 +30557,7 @@
     Floor 1 Nurse Station Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Nurse Station Air Node,  !- Zone Air Node Name
-    Floor 1 Nurse Station Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Nurse Station Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Office,          !- Zone Name
@@ -30487,7 +30565,7 @@
     Floor 1 Office Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Office Air Node, !- Zone Air Node Name
-    Floor 1 Office Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Office Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Operating Room 1,!- Zone Name
@@ -30495,7 +30573,7 @@
     Floor 1 Operating Room 1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Operating Room 1 Air Node,  !- Zone Air Node Name
-    Floor 1 Operating Room 1 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Operating Room 1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Operating Room 2,!- Zone Name
@@ -30503,7 +30581,7 @@
     Floor 1 Operating Room 2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Operating Room 2 Air Node,  !- Zone Air Node Name
-    Floor 1 Operating Room 2 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Operating Room 2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Operating Room 3,!- Zone Name
@@ -30511,7 +30589,7 @@
     Floor 1 Operating Room 3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Operating Room 3 Air Node,  !- Zone Air Node Name
-    Floor 1 Operating Room 3 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Operating Room 3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 PACU,            !- Zone Name
@@ -30519,7 +30597,7 @@
     Floor 1 PACU Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 PACU Air Node,   !- Zone Air Node Name
-    Floor 1 PACU Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 PACU Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Pre-Op Hall,     !- Zone Name
@@ -30527,7 +30605,7 @@
     Floor 1 Pre-Op Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Pre-Op Hall Air Node,  !- Zone Air Node Name
-    Floor 1 Pre-Op Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Pre-Op Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Pre-Op Room 1,   !- Zone Name
@@ -30535,7 +30613,7 @@
     Floor 1 Pre-Op Room 1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Pre-Op Room 1 Air Node,  !- Zone Air Node Name
-    Floor 1 Pre-Op Room 1 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Pre-Op Room 1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Pre-Op Room 2,   !- Zone Name
@@ -30543,7 +30621,7 @@
     Floor 1 Pre-Op Room 2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Pre-Op Room 2 Air Node,  !- Zone Air Node Name
-    Floor 1 Pre-Op Room 2 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Pre-Op Room 2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Procedure Room,  !- Zone Name
@@ -30551,7 +30629,7 @@
     Floor 1 Procedure Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Procedure Room Air Node,  !- Zone Air Node Name
-    Floor 1 Procedure Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Procedure Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Reception,       !- Zone Name
@@ -30559,7 +30637,7 @@
     Floor 1 Reception Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Reception Air Node,  !- Zone Air Node Name
-    Floor 1 Reception Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Reception Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Reception Hall,  !- Zone Name
@@ -30567,7 +30645,7 @@
     Floor 1 Reception Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Reception Hall Air Node,  !- Zone Air Node Name
-    Floor 1 Reception Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Reception Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Recovery Room,   !- Zone Name
@@ -30575,7 +30653,7 @@
     Floor 1 Recovery Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Recovery Room Air Node,  !- Zone Air Node Name
-    Floor 1 Recovery Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Recovery Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Scheduling,      !- Zone Name
@@ -30583,7 +30661,7 @@
     Floor 1 Scheduling Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Scheduling Air Node,  !- Zone Air Node Name
-    Floor 1 Scheduling Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Scheduling Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Scrub,           !- Zone Name
@@ -30591,7 +30669,7 @@
     Floor 1 Scrub Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Scrub Air Node,  !- Zone Air Node Name
-    Floor 1 Scrub Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Scrub Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Soil,            !- Zone Name
@@ -30599,7 +30677,7 @@
     Floor 1 Soil Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     Floor 1 Soil Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Soil Air Node,   !- Zone Air Node Name
-    Floor 1 Soil Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Soil Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Soil Hold,       !- Zone Name
@@ -30607,7 +30685,7 @@
     Floor 1 Soil Hold Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Floor 1 Soil Hold Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Soil Hold Air Node,  !- Zone Air Node Name
-    Floor 1 Soil Hold Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Soil Hold Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Soil Work,       !- Zone Name
@@ -30615,7 +30693,7 @@
     Floor 1 Soil Work Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Floor 1 Soil Work Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Soil Work Air Node,  !- Zone Air Node Name
-    Floor 1 Soil Work Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Soil Work Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Step Down,       !- Zone Name
@@ -30623,7 +30701,7 @@
     Floor 1 Step Down Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Step Down Air Node,  !- Zone Air Node Name
-    Floor 1 Step Down Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Step Down Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Sterile Hall,    !- Zone Name
@@ -30631,7 +30709,7 @@
     Floor 1 Sterile Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Sterile Hall Air Node,  !- Zone Air Node Name
-    Floor 1 Sterile Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Sterile Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Sterile Storage, !- Zone Name
@@ -30639,7 +30717,7 @@
     Floor 1 Sterile Storage Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Sterile Storage Air Node,  !- Zone Air Node Name
-    Floor 1 Sterile Storage Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Sterile Storage Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Sub-Sterile,     !- Zone Name
@@ -30647,7 +30725,7 @@
     Floor 1 Sub-Sterile Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Sub-Sterile Air Node,  !- Zone Air Node Name
-    Floor 1 Sub-Sterile Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Sub-Sterile Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Utility Hall,    !- Zone Name
@@ -30655,7 +30733,7 @@
     Floor 1 Utility Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Utility Hall Air Node,  !- Zone Air Node Name
-    Floor 1 Utility Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Utility Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 1 Vestibule,       !- Zone Name
@@ -30663,7 +30741,7 @@
     Floor 1 Vestibule Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 1 Vestibule Air Node,  !- Zone Air Node Name
-    Floor 1 Vestibule Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 1 Vestibule Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Conference,      !- Zone Name
@@ -30671,7 +30749,7 @@
     Floor 2 Conference Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Conference Air Node,  !- Zone Air Node Name
-    Floor 2 Conference Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Conference Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Dictation,       !- Zone Name
@@ -30679,7 +30757,7 @@
     Floor 2 Dictation Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Dictation Air Node,  !- Zone Air Node Name
-    Floor 2 Dictation Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Dictation Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 1,          !- Zone Name
@@ -30687,7 +30765,7 @@
     Floor 2 Exam 1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 1 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 1 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 2,          !- Zone Name
@@ -30695,7 +30773,7 @@
     Floor 2 Exam 2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 2 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 2 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 3,          !- Zone Name
@@ -30703,7 +30781,7 @@
     Floor 2 Exam 3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 3 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 3 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 4,          !- Zone Name
@@ -30711,7 +30789,7 @@
     Floor 2 Exam 4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 4 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 4 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 5,          !- Zone Name
@@ -30719,7 +30797,7 @@
     Floor 2 Exam 5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 5 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 5 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 5 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 6,          !- Zone Name
@@ -30727,7 +30805,7 @@
     Floor 2 Exam 6 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 6 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 6 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 6 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 7,          !- Zone Name
@@ -30735,7 +30813,7 @@
     Floor 2 Exam 7 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 7 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 7 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 7 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 8,          !- Zone Name
@@ -30743,7 +30821,7 @@
     Floor 2 Exam 8 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 8 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 8 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 8 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam 9,          !- Zone Name
@@ -30751,7 +30829,7 @@
     Floor 2 Exam 9 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam 9 Air Node, !- Zone Air Node Name
-    Floor 2 Exam 9 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam 9 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam Hall 1,     !- Zone Name
@@ -30759,7 +30837,7 @@
     Floor 2 Exam Hall 1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam Hall 1 Air Node,  !- Zone Air Node Name
-    Floor 2 Exam Hall 1 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam Hall 1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam Hall 2,     !- Zone Name
@@ -30767,7 +30845,7 @@
     Floor 2 Exam Hall 2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam Hall 2 Air Node,  !- Zone Air Node Name
-    Floor 2 Exam Hall 2 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam Hall 2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam Hall 3,     !- Zone Name
@@ -30775,7 +30853,7 @@
     Floor 2 Exam Hall 3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam Hall 3 Air Node,  !- Zone Air Node Name
-    Floor 2 Exam Hall 3 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam Hall 3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam Hall 4,     !- Zone Name
@@ -30783,7 +30861,7 @@
     Floor 2 Exam Hall 4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam Hall 4 Air Node,  !- Zone Air Node Name
-    Floor 2 Exam Hall 4 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam Hall 4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam Hall 5,     !- Zone Name
@@ -30791,7 +30869,7 @@
     Floor 2 Exam Hall 5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam Hall 5 Air Node,  !- Zone Air Node Name
-    Floor 2 Exam Hall 5 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam Hall 5 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Exam Hall 6,     !- Zone Name
@@ -30799,7 +30877,7 @@
     Floor 2 Exam Hall 6 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Exam Hall 6 Air Node,  !- Zone Air Node Name
-    Floor 2 Exam Hall 6 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Exam Hall 6 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Lounge,          !- Zone Name
@@ -30807,7 +30885,7 @@
     Floor 2 Lounge Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Lounge Air Node, !- Zone Air Node Name
-    Floor 2 Lounge Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Lounge Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Nurse Station 1, !- Zone Name
@@ -30815,7 +30893,7 @@
     Floor 2 Nurse Station 1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Nurse Station 1 Air Node,  !- Zone Air Node Name
-    Floor 2 Nurse Station 1 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Nurse Station 1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Nurse Station 2, !- Zone Name
@@ -30823,7 +30901,7 @@
     Floor 2 Nurse Station 2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Nurse Station 2 Air Node,  !- Zone Air Node Name
-    Floor 2 Nurse Station 2 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Nurse Station 2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Office,          !- Zone Name
@@ -30831,7 +30909,7 @@
     Floor 2 Office Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Office Air Node, !- Zone Air Node Name
-    Floor 2 Office Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Office Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Office Hall,     !- Zone Name
@@ -30839,7 +30917,7 @@
     Floor 2 Office Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Office Hall Air Node,  !- Zone Air Node Name
-    Floor 2 Office Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Office Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Reception,       !- Zone Name
@@ -30847,7 +30925,7 @@
     Floor 2 Reception Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Reception Air Node,  !- Zone Air Node Name
-    Floor 2 Reception Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Reception Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Reception Hall,  !- Zone Name
@@ -30855,7 +30933,7 @@
     Floor 2 Reception Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Reception Hall Air Node,  !- Zone Air Node Name
-    Floor 2 Reception Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Reception Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Scheduling 1,    !- Zone Name
@@ -30863,7 +30941,7 @@
     Floor 2 Scheduling 1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Scheduling 1 Air Node,  !- Zone Air Node Name
-    Floor 2 Scheduling 1 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Scheduling 1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Scheduling 2,    !- Zone Name
@@ -30871,7 +30949,7 @@
     Floor 2 Scheduling 2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Scheduling 2 Air Node,  !- Zone Air Node Name
-    Floor 2 Scheduling 2 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Scheduling 2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Work,            !- Zone Name
@@ -30879,7 +30957,7 @@
     Floor 2 Work Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Work Air Node,   !- Zone Air Node Name
-    Floor 2 Work Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Work Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 Work Hall,       !- Zone Name
@@ -30887,7 +30965,7 @@
     Floor 2 Work Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 Work Hall Air Node,  !- Zone Air Node Name
-    Floor 2 Work Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 Work Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 2 X-Ray,           !- Zone Name
@@ -30895,7 +30973,7 @@
     Floor 2 X-Ray Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 2 X-Ray Air Node,  !- Zone Air Node Name
-    Floor 2 X-Ray Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 2 X-Ray Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Dressing Room,   !- Zone Name
@@ -30903,7 +30981,7 @@
     Floor 3 Dressing Room Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Dressing Room Air Node,  !- Zone Air Node Name
-    Floor 3 Dressing Room Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Dressing Room Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Elevator Hall,   !- Zone Name
@@ -30911,7 +30989,7 @@
     Floor 3 Elevator Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Elevator Hall Air Node,  !- Zone Air Node Name
-    Floor 3 Elevator Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Elevator Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Humid,           !- Zone Name
@@ -30919,7 +30997,7 @@
     Floor 3 Humid Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Humid Air Node,  !- Zone Air Node Name
-    Floor 3 Humid Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Humid Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Locker,          !- Zone Name
@@ -30927,7 +31005,7 @@
     Floor 3 Locker Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Locker Air Node, !- Zone Air Node Name
-    Floor 3 Locker Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Locker Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Lounge,          !- Zone Name
@@ -30935,7 +31013,7 @@
     Floor 3 Lounge Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Lounge Air Node, !- Zone Air Node Name
-    Floor 3 Lounge Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Lounge Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Mechanical Hall, !- Zone Name
@@ -30943,7 +31021,7 @@
     Floor 3 Mechanical Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Mechanical Hall Air Node,  !- Zone Air Node Name
-    Floor 3 Mechanical Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Mechanical Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Office,          !- Zone Name
@@ -30951,7 +31029,7 @@
     Floor 3 Office Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Office Air Node, !- Zone Air Node Name
-    Floor 3 Office Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Office Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Office Hall,     !- Zone Name
@@ -30959,7 +31037,7 @@
     Floor 3 Office Hall Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Office Hall Air Node,  !- Zone Air Node Name
-    Floor 3 Office Hall Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Office Hall Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Physical Therapy 1,  !- Zone Name
@@ -30967,7 +31045,7 @@
     Floor 3 Physical Therapy 1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Physical Therapy 1 Air Node,  !- Zone Air Node Name
-    Floor 3 Physical Therapy 1 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Physical Therapy 1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Physical Therapy 2,  !- Zone Name
@@ -30975,7 +31053,7 @@
     Floor 3 Physical Therapy 2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Physical Therapy 2 Air Node,  !- Zone Air Node Name
-    Floor 3 Physical Therapy 2 Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Physical Therapy 2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Treatment,       !- Zone Name
@@ -30983,7 +31061,7 @@
     Floor 3 Treatment Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Treatment Air Node,  !- Zone Air Node Name
-    Floor 3 Treatment Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Treatment Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Floor 3 Work,            !- Zone Name
@@ -30991,7 +31069,7 @@
     Floor 3 Work Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Floor 3 Work Air Node,   !- Zone Air Node Name
-    Floor 3 Work Return Air Node Name;  !- Zone Return Air Node Name
+    Floor 3 Work Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:AirDistributionUnit,
     Floor 1 Anesthesia VAV Box,  !- Name
@@ -34138,7 +34216,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34155,7 +34233,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34170,7 +34248,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34178,7 +34256,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34186,7 +34264,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34194,7 +34272,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34202,7 +34280,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34210,7 +34288,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34218,7 +34296,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34226,7 +34304,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -34236,7 +34314,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -34262,7 +34340,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34279,7 +34357,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34287,7 +34365,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34295,7 +34373,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34303,7 +34381,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34311,7 +34389,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34319,7 +34397,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34327,7 +34405,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34335,7 +34413,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -34345,7 +34423,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -34369,7 +34447,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -34394,7 +34472,7 @@
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

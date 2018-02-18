@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -296,7 +297,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		Array1_string const & ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	int
@@ -312,7 +313,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		Array1S_string const ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	template < typename A >
@@ -336,7 +337,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		MArray1< A, std::string > const & ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
@@ -362,7 +363,7 @@ namespace UtilityRoutines {
 		std::string const & String,
 		Container const & ListOfItems
 	) {
-		return FindItemInList( String, ListOfItems, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
 	}
 
 	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
@@ -390,7 +391,7 @@ namespace UtilityRoutines {
 		Container const & ListOfItems,
 		std::string Container::value_type::*name_p
 	) {
-		return FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
+		return UtilityRoutines::FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
 	}
 
 	int
@@ -543,7 +544,7 @@ namespace UtilityRoutines {
 		MArray1< A, std::string > const & ListOfItems,
 		int const NumItems
 	) {
-		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, NumItems ) );
 		if ( item_number != 0 ) return item_number;
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
 			if ( equali( String, ListOfItems( Count ) ) ) return Count;
@@ -570,7 +571,7 @@ namespace UtilityRoutines {
 		Container const & ListOfItems,
 		int const NumItems
 	) {
-		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, NumItems ) );
 		if ( item_number != 0 ) return item_number;
 		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
 			if ( equali( String, ListOfItems[ i ].Name ) ) return i + 1; // 1-based return index
@@ -599,7 +600,7 @@ namespace UtilityRoutines {
 		std::string Container::value_type::*name_p,
 		int const NumItems
 	) {
-		int const item_number( FindItemInList( String, ListOfItems, name_p, NumItems ) );
+		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, name_p, NumItems ) );
 		if ( item_number != 0 ) return item_number;
 		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
 			if ( equali( String, ListOfItems[ i ].*name_p ) ) return i + 1; // 1-based return index

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -391,7 +392,12 @@ namespace EnergyPlus {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
+		int adjustedNumber = getJSONObjNum( Object, Number ); // if incoming input is idf, then use idf object order
+
 		auto find_iterators = objectCacheMap.find( Object );
+		// auto sorted_iterators = find_iterators;
+
+
 		if ( find_iterators == objectCacheMap.end() ) {
 			auto const tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( Object ) );
 			if ( tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find( tmp_umit->second ) == epJSON.end() ) {
@@ -408,7 +414,7 @@ namespace EnergyPlus {
 		auto const & is_NumBlank = present(NumBlank);
 		auto const & is_NumericFieldNames = present(NumericFieldNames);
 
-		auto const & epJSON_it = find_iterators->second.inputObjectIterators.at( Number - 1 );
+		auto const & epJSON_it = find_iterators->second.inputObjectIterators.at( adjustedNumber - 1 );
 		auto const & epJSON_schema_it = find_iterators->second.schemaIterator;
 		auto const & epJSON_schema_it_val = epJSON_schema_it.value();
 
@@ -435,10 +441,23 @@ namespace EnergyPlus {
 
 		Alphas = "";
 		Numbers = 0;
+		if ( is_NumBlank ) {
+			NumBlank() = true;
+		}
+		if ( is_AlphaBlank ) {
+			AlphaBlank() = true;
+		}
+		if ( is_AlphaFieldNames ) {
+			AlphaFieldNames() = "";
+		}
+		if ( is_NumericFieldNames ) {
+			NumericFieldNames() = "";
+		}
 
 		auto const & obj = epJSON_it;
 		auto const & obj_val = obj.value();
 		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
+		// int idfObjCount = obj_val[ "idfOrder"];
 		for ( size_t i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_alphas_fields[ i ];
 			if ( field == "name" && schema_name_field != epJSON_schema_it_val.end() ) {
@@ -673,6 +692,100 @@ namespace EnergyPlus {
 	}
 
 	int
+	InputProcessor::getIDFObjNum(
+		std::string const & Object,
+		int const Number
+	)
+	{
+		// Given the number (index) of an object in JSON order, return it's number in original idf order
+
+		// Only applicable if the incoming file was idf
+		int idfOrderNumber = Number;
+		if ( DataGlobals::isEpJSON ) return idfOrderNumber;
+
+		json * obj;
+		auto obj_iter = epJSON.find( Object );
+		if ( obj_iter == epJSON.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( Object ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
+				return idfOrderNumber;
+			}
+			obj = &epJSON[ tmp_umit->second ];
+		} else {
+			obj = &( obj_iter.value() );
+		}
+
+		std::vector< int > idfObjNums;
+		std::vector< int > idfObjNumsSorted;
+
+		// get list of saved object numbers from idf processing
+		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
+			int objNum = it.value()[ "idfOrder" ];
+			idfObjNums.emplace_back( objNum );
+		}
+
+		idfObjNumsSorted = idfObjNums;
+		std::sort( idfObjNumsSorted.begin(), idfObjNumsSorted.end() );
+
+		// find matching object number in unsorted list
+		int targetIdfObjNum = idfObjNums[ Number - 1 ];
+		for ( size_t i = 1; i <= idfObjNums.size(); ++i ) {
+			if (idfObjNumsSorted[ i - 1 ] == targetIdfObjNum ) {
+				idfOrderNumber = i;
+				break;
+			}
+		}
+		return idfOrderNumber;
+	}
+
+	int
+	InputProcessor::getJSONObjNum(
+		std::string const & Object,
+		int const Number
+	)
+	{
+		// Given the number (index) of an object in original idf order, return it's number in JSON order
+
+		// Only applicable if the incoming file was idf
+		int jSONOrderNumber = Number;
+		if ( DataGlobals::isEpJSON ) return jSONOrderNumber;
+
+		json * obj;
+		auto obj_iter = epJSON.find( Object );
+		if ( obj_iter == epJSON.end() ) {
+			auto tmp_umit = caseInsensitiveObjectMap.find( convertToUpper( Object ) );
+			if ( tmp_umit == caseInsensitiveObjectMap.end() ) {
+				return jSONOrderNumber;
+			}
+			obj = &epJSON[ tmp_umit->second ];
+		} else {
+			obj = &( obj_iter.value() );
+		}
+
+		std::vector< int > idfObjNums;
+		std::vector< int > idfObjNumsSorted;
+
+		// get list of saved object numbers from idf processing
+		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
+			int objNum = it.value()[ "idfOrder" ];
+			idfObjNums.emplace_back( objNum );
+		}
+
+		idfObjNumsSorted = idfObjNums;
+		std::sort( idfObjNumsSorted.begin(), idfObjNumsSorted.end() );
+
+		// find matching object number in unsorted list
+		int targetIdfObjNum = idfObjNumsSorted[ Number - 1 ];
+		for ( size_t i = 1; i <= idfObjNums.size(); ++i ) {
+			if (idfObjNums[ i - 1 ] == targetIdfObjNum ) {
+				jSONOrderNumber = i;
+				break;
+			}
+		}
+		return jSONOrderNumber;
+	}
+
+	int
 	InputProcessor::getObjectItemNum(
 		std::string const & ObjType, // Object Type (ref: IDD Objects)
 		std::string const & ObjName // Name of the object type
@@ -707,8 +820,8 @@ namespace EnergyPlus {
 			// ShowWarningError("Didn't find name, need to probably use search key");
 			return -1;
 		}
-		return object_item_num;
-		}
+		return 	getIDFObjNum( ObjType, object_item_num ); // if incoming input is idf, then return idf object order
+	}
 
 
 	int
@@ -750,7 +863,7 @@ namespace EnergyPlus {
 			// ShowWarningError("Didn't find name, need to probably use search key");
 			return -1;
 		}
-		return object_item_num;
+		return 	getIDFObjNum( ObjType, object_item_num ); // if incoming input is idf, then return idf object order
 	}
 
 	void

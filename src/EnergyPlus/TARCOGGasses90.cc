@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -46,7 +47,6 @@
 
 // C++ Headers
 #include <cassert>
-#include <cmath>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -142,9 +142,6 @@ namespace TARCOGGasses90 {
 		Real64 psiterm;
 		Real64 phikup;
 
-		//Simon: TODO: this is used for EN673 calculations and it is not assigned properly. Check this
-		//REAL(r64), dimension(maxgas, 3) :: xgrho //Autodesk:Unused
-//		static Array2D< Real64 > grho( 3, maxgas ); //Unused
 
 		//REAL(r64) gaslaw
 		//DATA gaslaw /8314.51d0/   ! Molar gas constant in Joules/(kmol*K)
@@ -158,8 +155,6 @@ namespace TARCOGGasses90 {
 		//Autodesk:Uninit Initialize variables used uninitialized
 		//xgrho = 0.0d0 //Autodesk:Uninit Force default initialization
 
-		//Simon: remove this when assigned properly
-//		grho = 0.0; //Unused
 
 		Real64 const tmean_2( pow_2( tmean ) );
 		fcon( 1 ) = xgcon( 1, iprop( 1 ) ) + xgcon( 2, iprop( 1 ) ) * tmean + xgcon( 3, iprop( 1 ) ) * tmean_2;
@@ -201,7 +196,6 @@ namespace TARCOGGasses90 {
 				fcon( i ) = xgcon( 1, iprop( i ) ) + xgcon( 2, iprop( i ) ) * tmean + xgcon( 3, iprop( i ) ) * tmean_2;
 				fvis( i ) = xgvis( 1, iprop( i ) ) + xgvis( 2, iprop( i ) ) * tmean + xgvis( 3, iprop( i ) ) * tmean_2;
 				fcp( i ) = xgcp( 1, iprop( i ) ) + xgcp( 2, iprop( i ) ) * tmean + xgcp( 3, iprop( i ) ) * tmean_2;
-//				fdens( i ) = pres * xwght( iprop( i ) ) / ( UniversalGasConst * tmean ); //Unused
 				if ( stdEN673 ) {
 					//fdens( i ) = grho( iprop( i ), 1 ) + grho( iprop( i ), 2 ) * tmean + grho( iprop( i ), 3 ) * pow_2( tmean );
 					fdens( i ) = ENpressure * xwght( iprop( i ) ) / ( gaslaw * tmean ); // Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
@@ -264,7 +258,11 @@ namespace TARCOGGasses90 {
 				visc = mumix;
 				con = kmix;
 				dens = rhomix;
-				cp = cpmixm / molmix;
+				if ( molmix > 0 ) {
+					cp = cpmixm / molmix;
+				} else {
+					cp = 0;
+				}
 			} else if ( stdEN673 ) {
 				con = 0.0;
 				visc = 0.0;

@@ -62,6 +62,7 @@ REQUIRED_OBJ_STR = 'required-object'
 REQUIRED_FIELD_STR = 'required-field'
 TYPE_STR = 'type'
 REFERENCE_STR = 'reference'
+REFERENCE_CLASS_NAME_STR = '-class-name'
 KEY_STR = 'key'
 NOTE_STR = 'note'
 DEFAULT_STR = 'default'
@@ -390,7 +391,8 @@ def parse_field(data, token):
             root['enum'].append(parse_line(data))
             root['enum'].sort()
 
-        elif token == TOKEN_REFERENCE:
+        elif token == TOKEN_REFERENCE or token == TOKEN_REFERENCE_CLASS_NAME:
+            token_str = 'reference' if token == TOKEN_REFERENCE else 'reference-class-name'
             next_token(data)
             token = look_ahead(data)
             if token == TOKEN_STRING:
@@ -398,11 +400,11 @@ def parse_field(data, token):
             elif token == TOKEN_NUMBER:
                 reference = parse_number(data)
             else:
-                raise RuntimeError("Expected string or number after \\reference")
-            if 'reference' not in root:
-                root['reference'] = []
-            root['reference'].append(reference)
-            root['reference'].sort()
+                raise RuntimeError("Expected string or number after \\" + token_str)
+            if token_str not in root:
+                root[token_str] = []
+            root[token_str].append(reference)
+            root[token_str].sort()
 
         elif token == TOKEN_AUTOCALCULATABLE:
             next_token(data)
@@ -555,6 +557,8 @@ def next_token(data):
         if match_string(data, TYPE_STR):
             return TOKEN_TYPE
         if match_string(data, REFERENCE_STR):
+            if match_string(data, REFERENCE_CLASS_NAME_STR):
+                return TOKEN_REFERENCE_CLASS_NAME
             return TOKEN_REFERENCE
         if match_string(data, REQUIRED_FIELD_STR):
             return TOKEN_REQUIRED_FIELD

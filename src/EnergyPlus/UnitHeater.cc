@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -600,14 +601,14 @@ namespace UnitHeater {
 
 		// Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
 		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) {
-			SetupOutputVariable( "Zone Unit Heater Heating Rate [W]", UnitHeat( UnitHeatNum ).HeatPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
-			SetupOutputVariable( "Zone Unit Heater Heating Energy [J]", UnitHeat( UnitHeatNum ).HeatEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
-			SetupOutputVariable( "Zone Unit Heater Fan Electric Power [W]", UnitHeat( UnitHeatNum ).ElecPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Heating Rate", OutputProcessor::Unit::W, UnitHeat( UnitHeatNum ).HeatPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Heating Energy", OutputProcessor::Unit::J, UnitHeat( UnitHeatNum ).HeatEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Fan Electric Power", OutputProcessor::Unit::W, UnitHeat( UnitHeatNum ).ElecPower, "System", "Average", UnitHeat( UnitHeatNum ).Name );
 			// Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
-			SetupOutputVariable( "Zone Unit Heater Fan Electric Energy [J]", UnitHeat( UnitHeatNum ).ElecEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
-			SetupOutputVariable( "Zone Unit Heater Fan Availability Status []", UnitHeat( UnitHeatNum ).AvailStatus, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Fan Electric Energy", OutputProcessor::Unit::J, UnitHeat( UnitHeatNum ).ElecEnergy, "System", "Sum", UnitHeat( UnitHeatNum ).Name );
+			SetupOutputVariable( "Zone Unit Heater Fan Availability Status", OutputProcessor::Unit::None, UnitHeat( UnitHeatNum ).AvailStatus, "System", "Average", UnitHeat( UnitHeatNum ).Name );
 			if ( UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ) {
-				SetupOutputVariable( "Zone Unit Heater Fan Part Load Ratio []", UnitHeat( UnitHeatNum ).FanPartLoadRatio, "System", "Average", UnitHeat( UnitHeatNum ).Name );
+				SetupOutputVariable( "Zone Unit Heater Fan Part Load Ratio", OutputProcessor::Unit::None, UnitHeat( UnitHeatNum ).FanPartLoadRatio, "System", "Average", UnitHeat( UnitHeatNum ).Name );
 			}
 		}
 

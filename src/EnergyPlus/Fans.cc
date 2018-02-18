@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -843,14 +844,14 @@ namespace Fans {
 
 		for ( FanNum = 1; FanNum <= NumFans; ++FanNum ) {
 			// Setup Report variables for the Fans  CurrentModuleObject='Fans'
-			SetupOutputVariable( "Fan Electric Power [W]", Fan( FanNum ).FanPower, "System", "Average", Fan( FanNum ).FanName );
-			SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", Fan( FanNum ).DeltaTemp, "System", "Average", Fan( FanNum ).FanName );
-			SetupOutputVariable( "Fan Heat Gain to Air [W]", Fan( FanNum ).PowerLossToAir, "System", "Average", Fan( FanNum ).FanName );
-			SetupOutputVariable( "Fan Electric Energy [J]", Fan( FanNum ).FanEnergy, "System", "Sum", Fan( FanNum ).FanName, _, "Electric", "Fans", Fan( FanNum ).EndUseSubcategoryName, "System" );
-			SetupOutputVariable( "Fan Air Mass Flow Rate [kg/s]", Fan( FanNum ).OutletAirMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
+			SetupOutputVariable( "Fan Electric Power", OutputProcessor::Unit::W, Fan( FanNum ).FanPower, "System", "Average", Fan( FanNum ).FanName );
+			SetupOutputVariable( "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, Fan( FanNum ).DeltaTemp, "System", "Average", Fan( FanNum ).FanName );
+			SetupOutputVariable( "Fan Heat Gain to Air", OutputProcessor::Unit::W, Fan( FanNum ).PowerLossToAir, "System", "Average", Fan( FanNum ).FanName );
+			SetupOutputVariable( "Fan Electric Energy", OutputProcessor::Unit::J, Fan( FanNum ).FanEnergy, "System", "Sum", Fan( FanNum ).FanName, _, "Electric", "Fans", Fan( FanNum ).EndUseSubcategoryName, "System" );
+			SetupOutputVariable( "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, Fan( FanNum ).OutletAirMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 			if ( ( Fan( FanNum ).FanType_Num == FanType_ZoneExhaust ) && ( Fan( FanNum ).BalancedFractSchedNum > 0 ) ) {
-				SetupOutputVariable( "Fan Unbalanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).UnbalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
-				SetupOutputVariable( "Fan Balanced Air Mass Flow Rate [kg/s]", Fan( FanNum ).BalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
+				SetupOutputVariable( "Fan Unbalanced Air Mass Flow Rate", OutputProcessor::Unit::kg_s, Fan( FanNum ).UnbalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
+				SetupOutputVariable( "Fan Balanced Air Mass Flow Rate", OutputProcessor::Unit::kg_s, Fan( FanNum ).BalancedOutletMassFlowRate, "System", "Average", Fan( FanNum ).FanName );
 			}
 
 			if ( AnyEnergyManagementSystemInModel ) {
@@ -868,7 +869,7 @@ namespace Fans {
 
 		for ( OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum ) {
 			FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
-			SetupOutputVariable( "Fan Runtime Fraction []", Fan( FanNum ).FanRuntimeFraction, "System", "Average", Fan( FanNum ).FanName );
+			SetupOutputVariable( "Fan Runtime Fraction", OutputProcessor::Unit::None, Fan( FanNum ).FanRuntimeFraction, "System", "Average", Fan( FanNum ).FanName );
 		}
 
 		bool anyRan;

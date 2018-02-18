@@ -49,7 +49,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,8.7;
+  Version,8.9;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -3320,6 +3320,7 @@
 
   ZoneHVAC:EquipmentList,
     LGstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     LGstore1 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3331,6 +3332,7 @@
 
   ZoneHVAC:EquipmentList,
     LGstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     LGstore2 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3342,6 +3344,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore1 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3353,6 +3356,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore2 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3364,6 +3368,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore3 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore3 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3375,6 +3380,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore4 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore4 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3386,6 +3392,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore5 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore5 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3397,6 +3404,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore6 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore6 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3408,6 +3416,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore7 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore7 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3419,6 +3428,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore8 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore8 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3868,7 +3878,7 @@
     LGstore1 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     LGstore1 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     LGstore1 Air Node,       !- Zone Air Node Name
-    LGstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     LGstore2,                !- Zone Name
@@ -3876,7 +3886,7 @@
     LGstore2 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     LGstore2 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     LGstore2 Air Node,       !- Zone Air Node Name
-    LGstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore1,                !- Zone Name
@@ -3884,7 +3894,7 @@
     SMstore1 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore1 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore1 Air Node,       !- Zone Air Node Name
-    SMstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore2,                !- Zone Name
@@ -3892,7 +3902,7 @@
     SMstore2 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore2 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore2 Air Node,       !- Zone Air Node Name
-    SMstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore3,                !- Zone Name
@@ -3900,7 +3910,7 @@
     SMstore3 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore3 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore3 Air Node,       !- Zone Air Node Name
-    SMstore3 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore4,                !- Zone Name
@@ -3908,7 +3918,7 @@
     SMstore4 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore4 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore4 Air Node,       !- Zone Air Node Name
-    SMstore4 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore5,                !- Zone Name
@@ -3916,7 +3926,7 @@
     SMstore5 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore5 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore5 Air Node,       !- Zone Air Node Name
-    SMstore5 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore5 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore6,                !- Zone Name
@@ -3924,7 +3934,7 @@
     SMstore6 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore6 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore6 Air Node,       !- Zone Air Node Name
-    SMstore6 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore6 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore7,                !- Zone Name
@@ -3932,7 +3942,7 @@
     SMstore7 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore7 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore7 Air Node,       !- Zone Air Node Name
-    SMstore7 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore7 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore8,                !- Zone Name
@@ -3940,7 +3950,7 @@
     SMstore8 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore8 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore8 Air Node,       !- Zone Air Node Name
-    SMstore8 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore8 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EvaporativeCoolerUnit,
     LGstore1 Zone Evap Unit, !- Name
@@ -5041,7 +5051,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5049,7 +5059,7 @@
     0.0165;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualIncentiveCostCharge,  !- Name
+    AnnualIncentiveCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5057,7 +5067,7 @@
     0.0021;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCostCharge,  !- Name
+    AnnualEnergyCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5065,7 +5075,7 @@
     0.0083;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCostCharge,  !- Name
+    AnnualEnergyCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5073,7 +5083,7 @@
     12.55;                   !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand25kw,           !- Name
+    MinDemand25kw,           !- Utility Cost Qualify Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5083,7 +5093,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    taxoffourPtNinePercent,  !- Name
+    taxoffourPtNinePercent,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5109,7 +5119,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5117,7 +5127,7 @@
     0.0602;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualIncentiveCharge,   !- Name
+    AnnualIncentiveCharge,   !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5125,7 +5135,7 @@
     0.0021;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCostCharge,  !- Name
+    AnnualEnergyCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5133,7 +5143,7 @@
     0.0082;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand25kw,           !- Name
+    MaxDemand25kw,           !- Utility Cost Qualify Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5143,7 +5153,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    taxoffourPtNinePercent,  !- Name
+    taxoffourPtNinePercent,  !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -568,16 +569,16 @@ namespace HVACFan {
 			ShowFatalError( routineName + "Errors found in input for fan name = " + name + ".  Program terminates." );
 		}
 
-		SetupOutputVariable( "Fan Electric Power [W]", m_fanPower, "System", "Average", name );
-		SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", m_deltaTemp, "System", "Average", name );
-		SetupOutputVariable( "Fan Heat Gain to Air [W]", m_powerLossToAir, "System", "Average", name );
-		SetupOutputVariable( "Fan Electric Energy [J]", m_fanEnergy, "System", "Sum", name, _, "Electric", "Fans", m_endUseSubcategoryName, "System" );
-		SetupOutputVariable( "Fan Air Mass Flow Rate [kg/s]", m_outletAirMassFlowRate, "System", "Average", name );
+		SetupOutputVariable( "Fan Electric Power", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name );
+		SetupOutputVariable( "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name );
+		SetupOutputVariable( "Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name );
+		SetupOutputVariable( "Fan Electric Energy", OutputProcessor::Unit::J, m_fanEnergy, "System", "Sum", name, _, "Electric", "Fans", m_endUseSubcategoryName, "System" );
+		SetupOutputVariable( "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name );
 		if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1 ) {
-			SetupOutputVariable( "Fan Runtime Fraction []", m_fanRunTimeFractionAtSpeed[ 0 ], "System", "Average", name );
+			SetupOutputVariable( "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[ 0 ], "System", "Average", name );
 		} else if ( speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1 ) {
 			for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
-				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + " []", m_fanRunTimeFractionAtSpeed[ speedLoop ], "System", "Average", name );
+				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + "", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[ speedLoop ], "System", "Average", name );
 			}
 		}
 

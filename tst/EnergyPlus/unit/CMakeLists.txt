@@ -34,6 +34,7 @@ set( test_src
   ConvectionCoefficients.unit.cc
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
+  DataEnvironment.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
@@ -62,6 +63,7 @@ set( test_src
   FluidProperties.unit.cc
   Furnaces.unit.cc
   General.unit.cc
+  GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceAirManager.unit.cc
   HeatBalanceManager.unit.cc
@@ -118,6 +120,7 @@ set( test_src
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
+  PVWatts.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -144,6 +147,7 @@ set( test_src
   SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
+  UnitaryHybridAirConditioner.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
@@ -157,6 +161,7 @@ set( test_src
   WeatherManager.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
+  WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
   ZoneEquipmentManager.unit.cc

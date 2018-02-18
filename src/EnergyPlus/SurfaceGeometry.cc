@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -512,7 +513,7 @@ namespace SurfaceGeometry {
 
 		}
 
-		CalculateZoneVolume( ErrorsFound, ZoneCeilingHeightEntered ); // Calculate Zone Volumes
+		CalculateZoneVolume( ZoneCeilingHeightEntered ); // Calculate Zone Volumes
 
 		// Calculate zone centroid (and min/max x,y,z for zone)
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -5557,12 +5558,12 @@ namespace SurfaceGeometry {
 			}
 			ExtVentedCavity( Item ).ActualArea = ExtVentedCavity( Item ).ProjArea * ExtVentedCavity( Item ).AreaRatio;
 
-			SetupOutputVariable( "Surface Exterior Cavity Baffle Surface Temperature [C]", ExtVentedCavity( Item ).Tbaffle, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Air Drybulb Temperature [C]", ExtVentedCavity( Item ).TAirCav, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Air Change Rate [ACH]", ExtVentedCavity( Item ).PassiveACH, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate [kg/s]", ExtVentedCavity( Item ).PassiveMdotVent, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate [kg/s]", ExtVentedCavity( Item ).PassiveMdotWind, "System", "Average", ExtVentedCavity( Item ).Name );
-			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate [kg/s]", ExtVentedCavity( Item ).PassiveMdotTherm, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Baffle Surface Temperature", OutputProcessor::Unit::C, ExtVentedCavity( Item ).Tbaffle, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Air Drybulb Temperature", OutputProcessor::Unit::C, ExtVentedCavity( Item ).TAirCav, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Air Change Rate", OutputProcessor::Unit::ach, ExtVentedCavity( Item ).PassiveACH, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotVent, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotWind, "System", "Average", ExtVentedCavity( Item ).Name );
+			SetupOutputVariable( "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate", OutputProcessor::Unit::kg_s, ExtVentedCavity( Item ).PassiveMdotTherm, "System", "Average", ExtVentedCavity( Item ).Name );
 
 		}
 
@@ -5597,53 +5598,80 @@ namespace SurfaceGeometry {
 				continue;
 			}
 
+			// Choose calculation method
+			std::string calculationMethod = cAlphaArgs( alpF );
+			if ( calculationMethod != "TOTALEXPOSEDPERIMETER" && calculationMethod != "EXPOSEDPERIMETERFRACTION" && calculationMethod != "BYSEGMENT" ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + calculationMethod + " is not a valid choice for " + cAlphaFieldNames( alpF ) );
+				ErrorsFound = true;
+			}
+			alpF++;
 
 			Data data;
 			data.useDetailedExposedPerimeter = true;
-			int optionsUsed = 0;
+
 			if ( !lNumericFieldBlanks( numF ) ) {
-				data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
-				if (data.exposedFraction > 1.0) {
-					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", "+ cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
-					ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
-					ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
-					data.exposedFraction = 1.0;
+				if ( calculationMethod == "TOTALEXPOSEDPERIMETER" ) {
+					data.exposedFraction = rNumericArgs( numF ) / Surface(Found).Perimeter;
+					if (data.exposedFraction > 1.0) {
+						ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cNumericFieldNames( numF ) + " is greater than the perimeter of " + Surface(Found).Name);
+						ShowContinueError( Surface(Found).Name + " perimeter = " + RoundSigDigits(Surface(Found).Perimeter) + ", " + cCurrentModuleObject + " exposed perimeter = " + RoundSigDigits(rNumericArgs( numF )) );
+						ShowContinueError( cNumericFieldNames( numF ) + " will be set equal to " + Surface(Found).Name + " perimeter");
+						data.exposedFraction = 1.0;
+					}
+
+					data.useDetailedExposedPerimeter = false;
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but a value has been set for " + cNumericFieldNames( numF ) + ". This value will be ignored." );
 				}
-
-				data.useDetailedExposedPerimeter = false;
-				optionsUsed++;
-			} numF++;
-			if ( !lNumericFieldBlanks( numF ) ) {data.exposedFraction = rNumericArgs( numF ); data.useDetailedExposedPerimeter = false; optionsUsed++;} numF++;
-
-			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
-			if (numRemainingFields > 0) {
-				optionsUsed++;
-				if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
-					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
-					ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
+			} else {
+				if ( calculationMethod == "TOTALEXPOSEDPERIMETER" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cNumericFieldNames( numF ));
 					ErrorsFound = true;
 				}
-				for (int segNum = 0; segNum < numRemainingFields; segNum++) {
-					if ( lAlphaFieldBlanks( alpF ) || UtilityRoutines::SameString(cAlphaArgs( alpF ), "YES") ) {
-						data.isExposedPerimeter.push_back(true);
-					} else if ( UtilityRoutines::SameString(cAlphaArgs( alpF ), "NO") ) {
-						data.isExposedPerimeter.push_back(false);
-					} else {
-						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + ']' );
+			} numF++;
+
+			if ( !lNumericFieldBlanks( numF )) {
+				if ( calculationMethod == "EXPOSEDPERIMETERFRACTION" ) {
+					data.exposedFraction = rNumericArgs( numF );
+					data.useDetailedExposedPerimeter = false;
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but a value has been set for " + cNumericFieldNames( numF ) + ". This value will be ignored." );
+				}
+			} else {
+				if ( calculationMethod == "EXPOSEDPERIMETERFRACTION" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cNumericFieldNames( numF ));
+					ErrorsFound = true;
+				}
+			}  numF++;
+
+			int numRemainingFields = NumAlphas - (alpF - 1) + NumNumbers - (numF -1);
+			if ( numRemainingFields > 0) {
+				if ( calculationMethod == "BYSEGMENT" ) {
+					if (numRemainingFields != (int)Surface(Found).Vertex.size()) {
+						ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must have equal number of segments as the floor has vertices." + cAlphaFieldNames( alpF ) + "\" and \"" + cNumericFieldNames(numF - 1) +"\"");
+						ShowContinueError( Surface(Found).Name + " number of vertices = " + TrimSigDigits(Surface(Found).Vertex.size()) + ", " + cCurrentModuleObject + " number of segments = " + TrimSigDigits(numRemainingFields) );
 						ErrorsFound = true;
-					} alpF++;
+					}
+					for (int segNum = 0; segNum < numRemainingFields; segNum++) {
+						if ( UtilityRoutines::SameString(cAlphaArgs( alpF ), "YES") ) {
+							data.isExposedPerimeter.push_back(true);
+						} else if ( UtilityRoutines::SameString(cAlphaArgs( alpF ), "NO") ) {
+							data.isExposedPerimeter.push_back(false);
+						} else if ( lAlphaFieldBlanks( alpF ) ) {
+							ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no value has been set for " + cAlphaFieldNames( alpF ) + ". Must be \"Yes\" or \"No\".");
+							ErrorsFound = true;
+						} else {
+							ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + cAlphaFieldNames( alpF ) + " invalid [" + cAlphaArgs( alpF ) + "]. Must be \"Yes\" or \"No\"." );
+							ErrorsFound = true;
+						} alpF++;
+					}
+				}
+			} else {
+				if ( calculationMethod == "BYSEGMENT" ) {
+					ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", " + calculationMethod + " set as calculation method, but no values have been set for Surface Segments Exposed");
+					ErrorsFound = true;
 				}
 			}
-			if (optionsUsed == 0) {
-				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", must define at least one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
-				ErrorsFound = true;
-			}
-
-			if (optionsUsed > 1) {
-				ShowSevereError( cCurrentModuleObject + ": " + Surface(Found).Name + ", may only define one of \"" + cNumericFieldNames( 1 ) + "\", \"" + cNumericFieldNames( 2 ) + "\", or \""  + cAlphaFieldNames( 2 ) + "\"");
-				ErrorsFound = true;
-			}
-
 			surfaceMap[Found] = data;
 		}
 	}
@@ -5880,7 +5908,7 @@ namespace SurfaceGeometry {
 
 				// A3: ground temp sch name
 				if ( !lAlphaFieldBlanks( 3 ) ) {
-					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 4 ) );
+					SurroundingSurfsProperty( Loop ).GroundTempSchNum = GetScheduleIndex( cAlphaArgs( 3 ) );
 				}
 
 				// The object requires at least one srd surface input, each surface requires a set of 3 fields (2 Alpha fields Name and Temp Sch Name and 1 Num fields View Factor)
@@ -5969,6 +5997,46 @@ namespace SurfaceGeometry {
 
 		// Formats
 		static gio::Fmt Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
+
+		cCurrentModuleObject = "SurfaceProperty:HeatBalanceSourceTerm";
+		int CountAddHeatSourceSurf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+
+		for ( Item = 1; Item <= CountAddHeatSourceSurf; ++Item ) {
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface, TotSurfaces );
+
+			if ( Found == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
+				ErrorsFound = true;
+			} else if ( Surface( Found ).InsideHeatSourceTermSchedule || Surface( Found ).OutsideHeatSourceTermSchedule ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", multiple SurfaceProperty:HeatBalanceSourceTerm objects applied to the same surface." );
+				ErrorsFound = true;
+			}
+
+			if ( ! lAlphaFieldBlanks( 2 ) ) {
+				Surface( Found ).InsideHeatSourceTermSchedule = EnergyPlus::ScheduleManager::GetScheduleIndex( cAlphaArgs( 2 ) );
+				if ( Surface( Found ).InsideHeatSourceTermSchedule == 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", cannot find the matching Schedule: " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( ! lAlphaFieldBlanks( 3 ) ) {
+				Surface( Found ).OutsideHeatSourceTermSchedule = EnergyPlus::ScheduleManager::GetScheduleIndex( cAlphaArgs( 3 ) );
+				if ( Surface( Found ).OutsideHeatSourceTermSchedule == 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", cannot find the matching Schedule: " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
+					ErrorsFound = true;
+				} else if ( Surface( Found ).OSCPtr > 0 ) {
+					ShowSevereError( cCurrentModuleObject + "=\"SurfaceProperty:HeatBalanceSourceTerm\", cannot be specified for OtherSideCoefficient Surface=" + cAlphaArgs( 1 ) );
+					ErrorsFound = true;
+				}
+			}
+
+			if ( Surface( Found ).OutsideHeatSourceTermSchedule == 0 && Surface( Found ).InsideHeatSourceTermSchedule == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", no schedule defined for additional heat source." );
+				ErrorsFound = true;
+			}
+		}
 
 		// first initialize each heat transfer surface with the overall model type, array assignment
 		for ( auto & e : Surface ) e.HeatTransferAlgorithm = HeatTransferAlgosUsed( 1 );
@@ -7517,14 +7585,19 @@ namespace SurfaceGeometry {
 				} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "ReturnAir" ) ) {
 					SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
 					int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex( Surface( SurfNum ).ZoneName );
-					if( controlledZoneNum > 0 ) DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+					if( controlledZoneNum > 0 ) {
+						DataZoneEquipment::ZoneEquipConfig( controlledZoneNum ).ZoneHasAirFlowWindowReturn = true;
+						DataHeatBalance::Zone( Surface( SurfNum ).Zone ).HasAirFlowWindowReturn = true;
+					}
+					
 					// Set return air node number
 					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = 0;
 					std::string retNodeName = "";
 					if ( !lAlphaFieldBlanks( 7 ) ) {
 						retNodeName = cAlphaArgs( 7 );
 					}
-					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName );
+					std::string callDescription = cCurrentModuleObject + "=" + Surface( SurfNum ).Name;
+					SurfaceWindow( SurfNum ).AirflowReturnNodePtr = DataZoneEquipment::GetReturnAirNodeForZone( Surface( SurfNum ).ZoneName, retNodeName, callDescription );
 					if ( SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Surface( SurfNum ).Name + "\", airflow window return air node not found for " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 						if ( !lAlphaFieldBlanks( 7 ) ) ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" did not find a matching return air node." );
@@ -7626,20 +7699,25 @@ namespace SurfaceGeometry {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::ZERO_FLUX;
 				} else if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "GroundWater")) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::GROUNDWATER;
-				} else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Autoselect")) */ {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( alpF ), "Autoselect") ) {
 					kivaManager.settings.deepGroundBoundary = HeatBalanceKivaManager::KivaManager::Settings::AUTO;
+				} else {
+					ErrorsFound = true;
+					ShowSevereError( "Foundation:Kiva:Settings, " + cAlphaArgs( alpF ) + " is not a valid choice for " + cAlphaFieldNames( alpF ) );
 				}
 			} alpF++;
 
-			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.deepGroundDepth = rNumericArgs( numF );} numF++;
+			if ( lNumericFieldBlanks( numF ) || rNumericArgs( numF ) == AutoCalculate ) { kivaManager.settings.deepGroundDepth = 40.0; } else {kivaManager.settings.deepGroundDepth = rNumericArgs( numF );} numF++;
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.minCellDim = rNumericArgs( numF );} numF++;
 			if ( !lNumericFieldBlanks( numF ) ) {kivaManager.settings.maxGrowthCoeff = rNumericArgs( numF );} numF++;
 
 			if ( !lAlphaFieldBlanks( alpF ) ) {
 				if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Hourly")) {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::HOURLY;
+					kivaManager.timestep = 3600.; // seconds
 				} else /* if (UtilityRoutines::SameString(cAlphaArgs( alpF ), "Timestep")) */ {
 					kivaManager.settings.timestepType = HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP;
+					kivaManager.timestep = DataGlobals::MinutesPerTimeStep*60.;
 				}
 			} alpF++;
 
@@ -7933,7 +8011,7 @@ namespace SurfaceGeometry {
 						} alpF++;
 
 						if ( lNumericFieldBlanks( numF ) ) {
-							block.depth = 0.0;
+							block.depth = 0.0; // Temporary indicator to default to foundation depth
 						} else {
 							block.depth = rNumericArgs( numF );
 						} numF++;
@@ -8146,7 +8224,7 @@ namespace SurfaceGeometry {
 			}
 			if ( OSC( Loop ).SurfFilmCoef > 0.0 ) {
 				cAlphaArgs( 1 ) = RoundSigDigits( OSC( Loop ).SurfFilmCoef, 3 );
-				SetupOutputVariable( "Surface Other Side Coefficients Exterior Air Drybulb Temperature [C]", OSC( Loop ).OSCTempCalc, "System", "Average", OSC( Loop ).Name );
+				SetupOutputVariable( "Surface Other Side Coefficients Exterior Air Drybulb Temperature", OutputProcessor::Unit::C, OSC( Loop ).OSCTempCalc, "System", "Average", OSC( Loop ).Name );
 			} else {
 				cAlphaArgs( 1 ) = "N/A";
 			}
@@ -8229,10 +8307,10 @@ namespace SurfaceGeometry {
 			// Note no validation of the below at this time:
 			OSCM( OSCMNum ).Class = cAlphaArgs( 2 );
 			// setup output vars for modeled coefficients
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Air Temperature [C]", OSCM( OSCMNum ).TConv, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient [W/m2-K]", OSCM( OSCMNum ).HConv, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Temperature [C]", OSCM( OSCMNum ).TRad, "System", "Average", OSCM( OSCMNum ).Name );
-			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient [W/m2-K]", OSCM( OSCMNum ).HRad, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Air Temperature", OutputProcessor::Unit::C, OSCM( OSCMNum ).TConv, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, OSCM( OSCMNum ).HConv, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Temperature", OutputProcessor::Unit::C, OSCM( OSCMNum ).TRad, "System", "Average", OSCM( OSCMNum ).Name );
+			SetupOutputVariable( "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient", OutputProcessor::Unit::W_m2K, OSCM( OSCMNum ).HRad, "System", "Average", OSCM( OSCMNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Other Side Boundary Conditions", OSCM( OSCMNum ).Name, "Convection Bulk Air Temperature", "[C]", OSCM( OSCMNum ).EMSOverrideOnTConv, OSCM( OSCMNum ).EMSOverrideTConvValue );
@@ -8402,7 +8480,6 @@ namespace SurfaceGeometry {
 	// Calculates the volume (m3) of a zone using the surfaces as possible.
 	void
 	CalculateZoneVolume(
-		bool & ErrorsFound, // If errors found in input
 		Array1S_bool const CeilingHeightEntered
 	)
 	{
@@ -8433,7 +8510,6 @@ namespace SurfaceGeometry {
 		Real64 SurfCount; // Surface Count
 		int SurfNum; // Loop counter for surfaces
 		int ZoneNum; // Loop counter for Zones
-		bool ErrorFlag;
 		Array1D_int surfacenotused;
 		int notused;
 		int NFaces;
@@ -8602,8 +8678,11 @@ namespace SurfaceGeometry {
 			}
 
 			if ( Zone( ZoneNum ).Volume <= 0.0 ) {
-				ShowSevereError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
-				ShowContinueError( "Zone Volume calculated was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowWarningError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "The calculated Zone Volume was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+				ShowContinueError( "The simulation will continue with the Zone Volume set to 10.0 m3. ");
+				ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones." );
+				Zone( ZoneNum ).Volume =  10.;
 			}
 
 			if ( ShowZoneSurfaces ) {
@@ -8651,15 +8730,6 @@ namespace SurfaceGeometry {
 			} else if ( countNotFullyEnclosedZones > 1 ) {
 				ShowWarningError( "CalculateZoneVolume: " + RoundSigDigits( countNotFullyEnclosedZones ) + " zones are not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; " );
 			}
-		}
-
-		ErrorFlag = false;
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( Zone( ZoneNum ).Volume <= 0.0 ) ErrorFlag = true;
-		}
-		if ( ErrorFlag ) {
-			ShowSevereError( "All ZONE Volumes must be > 0.0" );
-			ErrorsFound = true;
 		}
 
 	}

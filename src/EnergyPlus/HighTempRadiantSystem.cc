@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -605,14 +606,14 @@ namespace HighTempRadiantSystem {
 		// Set up the output variables for high temperature radiant heaters
 		// cCurrentModuleObject = "ZoneHVAC:HighTemperatureRadiant"
 		for ( Item = 1; Item <= NumOfHighTempRadSys; ++Item ) {
-			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", HighTempRadSys( Item ).HeatPower, "System", "Average", HighTempRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", HighTempRadSys( Item ).HeatEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, HighTempRadSys( Item ).HeatPower, "System", "Average", HighTempRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, HighTempRadSys( Item ).HeatEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			if ( HighTempRadSys( Item ).HeaterType == Gas ) {
-				SetupOutputVariable( "Zone Radiant HVAC Gas Rate [W]", HighTempRadSys( Item ).GasPower, "System", "Average", HighTempRadSys( Item ).Name );
-				SetupOutputVariable( "Zone Radiant HVAC Gas Energy [J]", HighTempRadSys( Item ).GasEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "Gas", "Heating", _, "System" );
+				SetupOutputVariable( "Zone Radiant HVAC Gas Rate", OutputProcessor::Unit::W, HighTempRadSys( Item ).GasPower, "System", "Average", HighTempRadSys( Item ).Name );
+				SetupOutputVariable( "Zone Radiant HVAC Gas Energy", OutputProcessor::Unit::J, HighTempRadSys( Item ).GasEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "Gas", "Heating", _, "System" );
 			} else if ( HighTempRadSys( Item ).HeaterType == Electric ) {
-				SetupOutputVariable( "Zone Radiant HVAC Electric Power [W]", HighTempRadSys( Item ).ElecPower, "System", "Average", HighTempRadSys( Item ).Name );
-				SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", HighTempRadSys( Item ).ElecEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
+				SetupOutputVariable( "Zone Radiant HVAC Electric Power", OutputProcessor::Unit::W, HighTempRadSys( Item ).ElecPower, "System", "Average", HighTempRadSys( Item ).Name );
+				SetupOutputVariable( "Zone Radiant HVAC Electric Energy", OutputProcessor::Unit::J, HighTempRadSys( Item ).ElecEnergy, "System", "Sum", HighTempRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
 			}
 
 		}

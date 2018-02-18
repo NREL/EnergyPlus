@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -274,7 +275,7 @@ namespace UtilityRoutines {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int FindItem = FindItemInList( String, ListOfItems, NumItems );
+		int FindItem = UtilityRoutines::FindItemInList( String, ListOfItems, NumItems );
 		if ( FindItem != 0 ) return FindItem;
 
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
@@ -303,7 +304,7 @@ namespace UtilityRoutines {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int FindItem = FindItemInList( String, ListOfItems, NumItems );
+		int FindItem = UtilityRoutines::FindItemInList( String, ListOfItems, NumItems );
 		if ( FindItem != 0 ) return FindItem;
 
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
@@ -640,11 +641,11 @@ AbortEnergyPlus()
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
 #endif
+	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
 	CloseOutOpenFiles();
 	// Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
 	// indicating that E+ terminated with an error.
 	if ( NumExternalInterfaces > 0 ) CloseSocket( -1 );
-	std::cerr << "Program terminated: " << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
 	std::exit( EXIT_FAILURE );
 
 }
@@ -888,12 +889,12 @@ EndEnergyPlus()
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
 #endif
+	std::cerr << "EnergyPlus Completed Successfully." << std::endl;
 	CloseOutOpenFiles();
 	// Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
 	// indicating that E+ finished its simulation
 	if ( ( NumExternalInterfaces > 0 ) && haveExternalInterfaceBCVTB ) CloseSocket( 1 );
-	std::cerr << "EnergyPlus Completed Successfully." << std::endl; std::exit( EXIT_SUCCESS );
-
+	std::exit( EXIT_SUCCESS );
 }
 
 int

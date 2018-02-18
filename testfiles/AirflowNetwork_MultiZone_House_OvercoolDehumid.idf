@@ -8,7 +8,7 @@
 ! Highlights:              This example file demonstrates zone air high relative humidity control using
 !                          TemperatureAndHumidity thermostat object. This control option reduces (Overcools)
 !                          the zone air cooling setpoint temperature to enhance zone air dehumidification.
-!                          Also this file does the basic test of an air distribution system in a residetial home.
+!                          Also this file does the basic test of an air distribution system in a residential home.
 !                          It provides forced ventilation during system on period and natural ventilation via
 !                          SIMPLE airflow model during system off period.
 !
@@ -112,7 +112,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -2119,10 +2119,11 @@
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone Node,               !- Zone Air Node Name
-    Zone Outlet Node;        !- Zone Return Air Node Name
+    Zone Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

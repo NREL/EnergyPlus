@@ -7,7 +7,7 @@
 ! Plant:    None.
 ! SolDis=MinimalShadowing, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,1;
 
@@ -246,18 +246,6 @@
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
     B5 - 1 IN DENSE INSULATION,  !- Layer 3
     C12 - 2 IN HW CONCRETE;  !- Layer 4
-
-  Construction:InternalSource,
-    Example Floor,           !- Name
-    4,                       !- Source Present After Layer Number
-    4,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.1524,                  !- Tube Spacing {m}
-    CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
-    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
-    GYP1,                    !- Layer 3
-    GYP2,                    !- Layer 4
-    FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5
 
   Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;
 

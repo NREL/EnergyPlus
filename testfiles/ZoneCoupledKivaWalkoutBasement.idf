@@ -57,7 +57,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.7;
+  Version,8.9;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -241,6 +241,16 @@
     0.000000000000,3.333333333333,-2.325000000000,  !- X,Y,Z ==> Vertex 2 {m}
     0.000000000000,0.000000000000,-2.325000000000,  !- X,Y,Z ==> Vertex 3 {m}
     0.000000000000,0.000000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  SurfaceProperty:ExposedFoundationPerimeter,
+    Basement Floor,          !- Surface Name
+    BySegment,               !- Exposed Perimeter Calculation Method
+    ,                        !- Total Exposed Perimeter {m}
+    ,                        !- Exposed Perimeter Fraction {dimensionless}
+    Yes,                     !- Surface Segment 1 Exposed
+    Yes,                     !- Surface Segment 2 Exposed
+    Yes,                     !- Surface Segment 3 Exposed
+    Yes;                     !- Surface Segment 4 Exposed
 
   BuildingSurface:Detailed,
     Basement Floor,          !- Name
@@ -775,7 +785,7 @@
     0.9,                     !- Ground Thermal Absorptivity {dimensionless}
     0.03,                    !- Ground Surface Roughness {m}
     40,                      !- Far-Field Width {m}
-    Autocalculate;           !- Deep-Ground Boundary Condition
+    Autoselect;              !- Deep-Ground Boundary Condition
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
@@ -839,10 +849,11 @@
     Main Floor Ideal Loads Supply Inlet,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main Floor Zone Air Node,!- Zone Air Node Name
-    Main Floor Return Outlet;!- Zone Return Air Node Name
+    Main Floor Return Outlet;!- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Main Floor Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Main Floor Ideal Loads Air System,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

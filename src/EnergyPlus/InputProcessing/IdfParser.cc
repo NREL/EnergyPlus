@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -173,6 +174,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 		objectTypeMap.emplace( std::move( key ), it.key() );
 	}
 
+	int idfObjectCount = 0;
 	while ( true ) {
 		token = look_ahead( idf, index );
 		if ( token == Token::END ) {
@@ -183,6 +185,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 		} else if ( token == Token::EXCLAMATION ) {
 			eat_comment( idf, index );
 		} else {
+			++idfObjectCount;
 			auto const parsed_obj_name = parse_string( idf, index, success );
 			auto const obj_name = normalizeObjectType( parsed_obj_name );
 			if ( obj_name.empty() ) {
@@ -194,7 +197,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 
 			json const & obj_loc = schema_properties[ obj_name ];
 			json const & legacy_idd = obj_loc[ "legacy_idd" ];
-			json obj = parse_object( idf, index, success, legacy_idd, obj_loc );
+			json obj = parse_object( idf, index, success, legacy_idd, obj_loc, idfObjectCount );
 			if ( !success ) {
 				auto found_index = idf.find_first_of( '\n', beginning_of_line_index );
 				std::string line;
@@ -214,7 +217,9 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 					obj.erase( name_iter );
 					if ( root[ obj_name ].find( name ) != root[ obj_name ].end() ) {
 						// hacky but needed to warn if there are duplicate names in parsed IDF
-						if ( obj_name != "RunPeriod" ) {
+						if ( obj_name == "RunPeriod" ) {
+							name = obj_name + " " + s;
+						} else {
 							warnings.emplace_back( "Duplicate name found. name: \"" + name + "\"" );
 						}
 					}
@@ -229,7 +234,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 }
 
 json IdfParser::parse_object( std::string const & idf, size_t & index, bool & success,
-							  json const & legacy_idd, json const & schema_obj_loc ) {
+							  json const & legacy_idd, json const & schema_obj_loc, int idfObjectCount ) {
 	json root = json::object();
 	json extensible = json::object();
 	json array_of_extensions = json::array();
@@ -257,6 +262,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	index += 1;
 
 	while ( true ) {
+		root[ "idfOrder" ] = idfObjectCount;
 		token = look_ahead( idf, index );
 		if ( token == Token::NONE ) {
 			success = false;

@@ -5,7 +5,7 @@
 ! SingleFamilyHouse_TwoSpeed_ZoneAirBalance.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
-! Highlights:             This file does the basic test of an air distribution system in a residetial home.
+! Highlights:             This file does the basic test of an air distribution system in a residential home.
 !                         A two speed heat pump with a supplmental gas heater provides space heating and cooling.
 !                         It provides ventilation through the ZoneAirBalance:OutdoorAir model.
 !
@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Single family House,     !- Name
@@ -410,10 +410,6 @@
     IN05;                    !- Layer 2
 
   Construction,
-    CEILING:ATTIC,           !- Name
-    GP01;                    !- Outside Layer
-
-  Construction,
     GABLE,                   !- Name
     PW03;                    !- Outside Layer
 
@@ -428,11 +424,6 @@
   Construction,
     Garage:SteelDoor,        !- Name
     HF-A3;                   !- Outside Layer
-
-  Construction,
-    FLOOR:ATTICLIVING,       !- Name
-    GP01,                    !- Outside Layer
-    IN05;                    !- Layer 2
 
   Construction,
     CEILING:Garage,          !- Name
@@ -1372,10 +1363,11 @@
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone Node,               !- Zone Air Node Name
-    Zone Outlet Node;        !- Zone Return Air Node Name
+    Zone Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

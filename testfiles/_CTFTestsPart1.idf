@@ -17,7 +17,7 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -369,7 +369,7 @@
     R26WALL WALLS,           !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
     0.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -379,7 +379,7 @@
   Zone,
     MIXEDWALL WALLS,         !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    30.0000000E+00,           !- X Origin {m}
+    30.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -390,8 +390,8 @@
   Zone,
     MIXEDWALL2 WALLS,        !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    30.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    30.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -401,7 +401,7 @@
   Zone,
     MIXEDWALL3 WALLS,        !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    60.0000000E+00,           !- X Origin {m}
+    60.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -412,8 +412,8 @@
   Zone,
     12INCHHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    60.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    60.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -423,7 +423,7 @@
   Zone,
     12INCHHWCONCREV WALLS,   !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    90.0000000E+00,           !- X Origin {m}
+    90.0000000E+00,          !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -434,8 +434,8 @@
   Zone,
     FOOTOFHWCONC WALLS,      !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    90.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    90.0000000E+00,          !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -445,7 +445,7 @@
   Zone,
     10LAYERWALL WALLS,       !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    120.0000000E+00,           !- X Origin {m}
+    120.0000000E+00,         !- X Origin {m}
     0.0000000E+00,           !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
@@ -456,8 +456,8 @@
   Zone,
     SLOWHWCONCWALL WALLS,    !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    120.0000000E+00,           !- X Origin {m}
-    30.0000000E+00,           !- Y Origin {m}
+    120.0000000E+00,         !- X Origin {m}
+    30.0000000E+00,          !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -473,7 +473,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    Relative;                   !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
@@ -1453,29 +1453,9 @@
 
   Output:VariableDictionary,regular;
 
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary,regular;
-
-  Output:VariableDictionary;
-
   Output:Surfaces:Drawing,dxf;
 
   Output:Constructions,Constructions;
-
-  Output:Meter:MeterFileOnly,Carbon Equivalent:Facility,hourly;
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Building,hourly;
 

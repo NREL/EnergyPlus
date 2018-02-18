@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -106,8 +107,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
 
 	ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
@@ -116,7 +115,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
 	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
 	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
@@ -125,6 +123,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 
 	Zone.allocate( 1 );
 	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+	Zone( 1 ).ZoneEqNum = 1;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	Zone( 1 ).Multiplier = 1.0;
@@ -193,7 +192,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 2 - Unbalanced exhaust flow
@@ -220,7 +219,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 3 - Balanced exhaust flow with proper source flow from mixing
@@ -247,7 +246,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.02;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Case 4 - Balanced exhaust flow without source flow from mixing
@@ -274,11 +273,16 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	MixingMassFlowZone( 1 ) = 0.0;
 	MDotOA( 1 ) = 0.0;
 
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Add a section to check #6119 by L. Gu on 5/16/17
-	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	CorrectZoneHumRat( 1 );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
+
+	// Issue 6233
+	Zone( 1 ).IsControlled = true;
+	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
 	// Deallocate everything
@@ -493,18 +497,10 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
 
-		//indexes (thermostat ones) for TempControlledZone array
-		// used to be acording to old schedule:
-
-		//int HeatZoneNum( 1 );
-		//int CoolZoneNum( 2 );
-		//int CoolHeatZoneNum( 3 );
-		//int DualZoneNum( 4 );
-
-		int HeatZoneNum( 4 );
-		int CoolZoneNum( 3 );
-		int CoolHeatZoneNum( 1 );
-		int DualZoneNum( 2 );
+		int HeatZoneNum( 1 );
+		int CoolZoneNum( 2 );
+		int CoolHeatZoneNum( 3 );
+		int DualZoneNum( 4 );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -995,8 +991,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	ZoneEquipConfig.allocate( 1 );
 	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
-	std::vector< int > controlledZoneEquipConfigNums;
-	controlledZoneEquipConfigNums.push_back( 1 );
 
 	ZoneEquipConfig( 1 ).NumInletNodes = 2;
 	ZoneEquipConfig( 1 ).InletNode.allocate( 2 );
@@ -1005,10 +999,14 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	ZoneEquipConfig( 1 ).NumExhaustNodes = 1;
 	ZoneEquipConfig( 1 ).ExhaustNode.allocate( 1 );
 	ZoneEquipConfig( 1 ).ExhaustNode( 1 ) = 3;
-	ZoneEquipConfig( 1 ).ReturnAirNode = 4;
+	ZoneEquipConfig( 1 ).NumReturnNodes = 1;
+	ZoneEquipConfig( 1 ).ReturnNode.allocate( 1 );
+	ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 	Zone.allocate( 1 );
 	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
+	Zone( 1 ).ZoneEqNum	 = 1;
+	Zone( 1 ).IsControlled = true;
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	Zone( 1 ).Multiplier = 1.0;
@@ -1067,14 +1065,14 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvectio
 	NumZoneReturnPlenums = 0;
 	NumZoneSupplyPlenums = 0;
 
-	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 	EXPECT_EQ( 5.0, SumHA );
 	EXPECT_EQ( 300.0, SumHATsurf );
 	EXPECT_EQ( 150.0, SumHATref );
 
 	Node( 1 ).MassFlowRate = 0.0;
 	Node( 2 ).MassFlowRate = 0.0;
-	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
+	CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
 	EXPECT_EQ( 10.0, SumHA );
 	EXPECT_EQ( 300.0, SumHATsurf );
 	EXPECT_EQ( 50.0, SumHATref );
@@ -1152,7 +1150,7 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 	// J.Glazer - August 2017
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.7;",
+		"Version,8.9;",
 		" ",
 		"ScheduleTypeLimits,",
 		"  Any Number;              !- Name",
@@ -1252,6 +1250,121 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 	EXPECT_EQ( 31, numDays );
 	EXPECT_EQ( "January", monthAssumed );
 
+
+}
+
+TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
+{
+	// On/Off thermostat
+	Schedule.allocate( 3 );
+
+	DataZoneControls::NumTempControlledZones = 1;
+
+	//SingleHeatingSetPoint
+	TempControlledZone.allocate( NumTempControlledZones );
+	TempZoneThermostatSetPoint.allocate( 1 );
+	MAT.allocate( 1 );
+	ZoneThermostatSetPointLo.allocate( 1 );
+	ZoneThermostatSetPointHi.allocate( 1 );
+
+	TempControlledZone( 1 ).DeltaTCutSet = 2.0;
+	TempControlledZone( 1 ).ActualZoneNum = 1;
+	TempControlledZone( 1 ).CTSchedIndex = 1;
+	Schedule( 1 ).CurrentValue = 1;
+	TempControlType.allocate( 1 );
+	TempControlledZone( 1 ).SchIndx_SingleHeatSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx.allocate( 4 );
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleHeating.allocate( 1 );
+	SetPointSingleHeating( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 22.0;
+	MAT( 1 ) = 20.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).HeatOffFlag );
+
+	MAT( 1 ) = 23.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+
+	// SingleCoolingSetPoint
+	Schedule( 1 ).CurrentValue = 2;
+	TempControlledZone( 1 ).SchIndx_SingleCoolSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleCooling.allocate( 1 );
+	SetPointSingleCooling( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 26.0;
+	MAT( 1 ) = 25.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	MAT( 1 ) = 27.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).CoolOffFlag );
+
+	// SingleHeatCoolSetPoint
+	Schedule( 1 ).CurrentValue = 3;
+	TempControlledZone( 1 ).SchIndx_SingleHeatCoolSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleHeatCool.allocate( 1 );
+	SetPointSingleHeatCool( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 24.0;
+	MAT( 1 ) = 25.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+
+	// DualSetPointWithDeadBand : Adjust cooling setpoint
+	SetPointDualHeatCool.allocate( 1 );
+	Schedule( 1 ).CurrentValue = 4;
+	TempControlledZone( 1 ).SchIndx_DualSetPointWDeadBand = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointDualHeatCool( 1 ).HeatTempSchedIndex = 2;
+	SetPointDualHeatCool( 1 ).CoolTempSchedIndex = 3;
+	Schedule( 2 ).CurrentValue = 22.0;
+	Schedule( 3 ).CurrentValue = 26.0;
+	MAT( 1 ) = 25.0;
+
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	// DualSetPointWithDeadBand : Adjust heating setpoint
+	MAT( 1 ) = 21.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_FALSE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_TRUE( TempControlledZone( 1 ).CoolOffFlag );
+
+	// DualSetPointWithDeadBand : Adjust cooling setpoint
+	MAT( 1 ) = 27.0;
+	CalcZoneAirTempSetPoints( );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+	EXPECT_TRUE( TempControlledZone( 1 ).HeatOffFlag );
+	EXPECT_FALSE( TempControlledZone( 1 ).CoolOffFlag );
+
+	TempControlledZone( 1 ).DeltaTCutSet = 0.0;
+	MAT.deallocate( );
+	Schedule.deallocate( );
+	TempZoneThermostatSetPoint.deallocate( );
+	TempControlledZone.deallocate( );
+	TempControlType.deallocate( );
+	SetPointSingleHeating.deallocate( );
+	ZoneThermostatSetPointLo.deallocate( );
+	ZoneThermostatSetPointHi.deallocate( );
+	SetPointSingleCooling.deallocate( );
+	SetPointSingleHeatCool.deallocate( );
+	SetPointDualHeatCool.deallocate( );
 
 }
 

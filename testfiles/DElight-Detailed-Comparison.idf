@@ -18,7 +18,7 @@
 ! System:   Ideal Loads
 ! Plant:    None (simple ideal loads)
 
-  Version,8.7;
+  Version,8.9;
 
   RunPeriod,
     ,                        !- Name
@@ -819,7 +819,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_5,                  !- Zone Air Node Name
-    NODE_6;                  !- Zone Return Air Node Name
+    NODE_6;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
@@ -827,10 +827,11 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_3,                  !- Zone Air Node Name
-    NODE_4;                  !- Zone Return Air Node Name
+    NODE_4;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone2Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -838,6 +839,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

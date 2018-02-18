@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -171,6 +172,7 @@ public:
 		int const recordIndex,
 		int const CumlativeSimulationDays,
 		int const curEnvirNum,
+		int const simulationYear,
 		Optional_int_const Month = _,
 		Optional_int_const DayOfMonth = _,
 		Optional_int_const Hour = _,
@@ -179,6 +181,11 @@ public:
 		Optional_int_const DST = _,
 		Optional_string_const DayType = _,
 		bool const warmupFlag = false
+	);
+
+	void createYearlyTimeIndexRecord(
+		int const simulationYear,
+		int const curEnvirNum
 	);
 
 	void addSQLiteZoneSizingRecord(
@@ -379,6 +386,7 @@ private:
 	static const int LocalReportDaily;     //  Write out at 'EndDayFlag'
 	static const int LocalReportMonthly;   //  Write out at end of month (must be determined)
 	static const int LocalReportSim;       //  Write out once per environment 'EndEnvrnFlag'
+	static const int LocalReportYearly;    //  Write out once per year
 	static const int ReportNameId;
 	static const int ReportForStringId;
 	static const int TableNameId;

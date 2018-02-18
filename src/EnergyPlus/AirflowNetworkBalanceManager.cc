@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -97,6 +98,8 @@
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <ZoneDehumidifier.hh>
+#include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 
 namespace EnergyPlus {
 
@@ -255,6 +258,7 @@ namespace AirflowNetworkBalanceManager {
 	int AirflowNetworkNumOfSurCracks( 0 );
 	int AirflowNetworkNumOfSurELA( 0 );
 	int AirflowNetworkNumOfExtNode( 0 );
+	int AirflowNetworkNumOfOutAirNode( 0 );
 	int AirflowNetworkNumOfSingleSideZones; // Total number of zones with advanced single sided wind pressure coefficient calculation
 	int DisSysNumOfNodes( 0 );
 	int DisSysNumOfLeaks( 0 );
@@ -320,6 +324,7 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkNumOfSurCracks = 0;
 		AirflowNetworkNumOfSurELA = 0;
 		AirflowNetworkNumOfExtNode = 0;
+		AirflowNetworkNumOfOutAirNode = 0;
 		AirflowNetworkNumOfSingleSideZones = 0; // added default value
 		DisSysNumOfNodes = 0;
 		DisSysNumOfLeaks = 0;
@@ -512,6 +517,14 @@ namespace AirflowNetworkBalanceManager {
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
 		using RoomAirModelManager::GetRAFNNodeNum;
+		using NodeInputManager::GetOnlySingleNode;
+		using DataLoopNode::Node;
+		using DataLoopNode::NodeType_Air;
+		using DataLoopNode::NodeConnectionType_Inlet;
+		using DataLoopNode::ObjectIsParent;
+		using DataGlobals::AnyLocalEnvironmentsInModel;
+		using OutAirNodeManager::SetOutAirNodes;
+		using CurveManager::GetCurveIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -547,6 +560,7 @@ namespace AirflowNetworkBalanceManager {
 		bool SimObjectError;
 		std::string StringOut;
 		int ZoneNum;
+		int NodeNum;
 		int FanIndex;
 		int FanType_Num;
 
@@ -919,6 +933,8 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
+		SetOutAirNodes();
+
 		if ( UtilityRoutines::SameString( AirflowNetworkSimu.WPCCntr, "Input" ) ) {
 			AirflowNetworkSimu.iWPCCntr = iWPCCntr_Input;
 			if ( lAlphaBlanks( 4 ) ) {
@@ -953,6 +969,17 @@ namespace AirflowNetworkBalanceManager {
 				ErrorsFound = true;
 				SimObjectError = true;
 			}
+			for ( k = 1; k <= NumOfNodes; ++k ) {
+				if ( Node( k ).IsLocalNode ) {
+					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + "=" + Alphas( 3 ) );
+					ShowContinueError( "A local air node is defined to INPUT the wind pressure coefficient curve, while Wind Pressure Coefficient Type is set to SurfaceAverageCalculation.");
+					ShowContinueError( "It requires  the Wind Pressure Coefficient Type be set to INPUT to use the local air node.");
+					ErrorsFound = true;
+					SimObjectError = true;
+					break;
+				}
+			}
+
 		} else {
 			ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 3 ) + " = " + AirflowNetworkSimu.WPCCntr + " is not valid." );
 			ShowContinueError( "Valid choices are Input or SurfaceAverageCalculation. " + CurrentModuleObject + " = " + AirflowNetworkSimu.AirflowNetworkSimuName );
@@ -1187,11 +1214,16 @@ namespace AirflowNetworkBalanceManager {
 		// *** Read AirflowNetwork external node
 		if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
 			// Wind coefficient == Surface-Average does not need inputs of external nodes
-			CurrentModuleObject = "AirflowNetwork:MultiZone:ExternalNode";
-			AirflowNetworkNumOfExtNode = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+			AirflowNetworkNumOfExtNode = inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:ExternalNode" );
+			if ( AnyLocalEnvironmentsInModel ) {
+				AirflowNetworkNumOfOutAirNode = inputProcessor->getNumObjectsFound( "OutdoorAir:Node" );
+				AirflowNetworkNumOfExtNode += AirflowNetworkNumOfOutAirNode;
+			}
+
 			if ( AirflowNetworkNumOfExtNode > 0 ) {
 				MultizoneExternalNodeData.allocate( AirflowNetworkNumOfExtNode );
-				for ( i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
+				CurrentModuleObject = "AirflowNetwork:MultiZone:ExternalNode";
+				for ( i = 1; i <= AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode; ++i ) {
 					inputProcessor->getObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ); // Name of external node
@@ -1224,6 +1256,45 @@ namespace AirflowNetworkBalanceManager {
 						}
 					}
 				}
+ 				CurrentModuleObject = "OutdoorAir:Node";
+ 				for ( i = AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode + 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
+ 					inputProcessor->getObjectItem( CurrentModuleObject, i - ( AirflowNetworkNumOfExtNode - AirflowNetworkNumOfOutAirNode ), Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+ 					UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+ 					//HACK: Need to verify name is unique between "OutdoorAir:Node" and "AirflowNetwork:MultiZone:ExternalNode"
+
+					if ( NumAlphas > 5 && !lAlphaBlanks( 6 ) ) { // Wind pressure curve
+						MultizoneExternalNodeData( i ).curve = GetCurveIndex( Alphas( 6 ) );
+						if ( MultizoneExternalNodeData( i ).curve == 0 ) {
+							ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 6 ) + "=" + Alphas( 6 ) );
+							ShowContinueError( "Entered in " + CurrentModuleObject + '=' + Alphas( 1 ) );
+							ErrorsFound = true;
+						}
+					}
+
+					if ( NumAlphas > 6 && !lAlphaBlanks( 7 ) ) { // Symmetric curve
+						if ( UtilityRoutines::SameString( Alphas( 7 ), "Yes" ) ) {
+							MultizoneExternalNodeData( i ).symmetricCurve = true;
+						} else if ( ! UtilityRoutines::SameString(Alphas( 7 ), "No" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
+							ShowContinueError( "The default value is assigned as No." );
+						}
+					}
+
+					if ( NumAlphas > 7 && !lAlphaBlanks( 8 ) ) { // Relative or absolute wind angle
+						if ( UtilityRoutines::SameString( Alphas( 8 ), "Relative" ) ) {
+							MultizoneExternalNodeData( i ).useRelativeAngle = true;
+						} else if ( ! UtilityRoutines::SameString(Alphas( 8 ), "Absolute" ) ) {
+							ShowWarningError( RoutineName + CurrentModuleObject + " object, Invalid input " + cAlphaFields( 8 ) + " = " + Alphas( 8 ) );
+							ShowContinueError( "The default value is assigned as Absolute." );
+						}
+					}
+
+ 					MultizoneExternalNodeData( i ).Name = Alphas( 1 ) ; // Name of external node
+ 					NodeNum = GetOnlySingleNode( Alphas( 1 ) , ErrorsFound, CurrentModuleObject, "AirflowNetwork:Multizone:Surface", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+ 					MultizoneExternalNodeData( i ).OutAirNodeNum = NodeNum; // Name of outdoor air node
+ 					MultizoneExternalNodeData( i ).height = Node( NodeNum ).Height; // Nodal height
+ 					MultizoneExternalNodeData( i ).ExtNum = AirflowNetworkNumOfZones + i; // External node number
+ 				}
 			} else {
 				ShowSevereError( RoutineName + "An " + CurrentModuleObject + " object is required but not found when Wind Pressure Coefficient Type = Input." );
 				ErrorsFound = true;
@@ -1242,6 +1313,12 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneSurfaceData( i ).OpeningName = Alphas( 2 ); // Name of crack or opening component,
 				// either simple or detailed large opening, or crack
 				MultizoneSurfaceData( i ).ExternalNodeName = Alphas( 3 ); // Name of external node, but not used at WPC="INPUT"
+				if ( UtilityRoutines::FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) &&
+					MultizoneExternalNodeData( UtilityRoutines::FindItemInList( Alphas( 3 ), MultizoneExternalNodeData ) ).curve == 0 ) {
+					ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + "=" + Alphas( 3 ) );
+					ShowContinueError( "A valid wind pressure coefficient curve name is required but not found when Wind Pressure Coefficient Type = Input." );
+					ErrorsFound = true;
+				}
 				MultizoneSurfaceData( i ).Factor = Numbers( 1 ); // Crack Actual Value or Window Open Factor for Ventilation
 				if ( MultizoneSurfaceData( i ).Factor > 1.0 || MultizoneSurfaceData( i ).Factor <= 0.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + " object=" + MultizoneSurfaceData( i ).SurfName + ", " + cNumericFields( 1 ) + " is out of range (0.0,1.0]" );
@@ -3093,6 +3170,7 @@ namespace AirflowNetworkBalanceManager {
 				AirflowNetworkNodeData( i ).EPlusZoneNum = 0;
 				AirflowNetworkNodeData( i ).NodeHeight = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).height;
 				AirflowNetworkNodeData( i ).ExtNodeNum = i - AirflowNetworkNumOfZones;
+				AirflowNetworkNodeData( i ).OutAirNodeNum = MultizoneExternalNodeData( i - AirflowNetworkNumOfZones ).OutAirNodeNum;
 			}
 		} else { // Surface-Average input
 			for ( i = AirflowNetworkNumOfZones + 1; i <= NumOfNodesMultiZone; ++i ) {
@@ -3969,22 +4047,22 @@ namespace AirflowNetworkBalanceManager {
 			OneTimeFlag = false;
 			if ( Contaminant.CO2Simulation ) {
 				for ( i = 1; i <= NumOfZones; ++i ) {
-					SetupOutputVariable( "AFN Zone Outdoor Air Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMHr, "System", "Average", Zone( i ).Name );
-					SetupOutputVariable( "AFN Zone Mixing Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMMHr, "System", "Average", Zone( i ).Name );
-					SetupOutputVariable( "AFN Zone Outdoor Air CO2 Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMHrCO, "System", "Average", Zone( i ).Name );
-					SetupOutputVariable( "AFN Zone Mixing CO2 Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMMHrCO, "System", "Average", Zone( i ).Name );
-					SetupOutputVariable( "AFN Zone Total CO2 Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).TotalCO2, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMHr, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMMHr, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Outdoor Air CO2 Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMHrCO, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Mixing CO2 Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMMHrCO, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Total CO2 Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).TotalCO2, "System", "Average", Zone( i ).Name );
 				}
 			}
 			if ( Contaminant.GenericContamSimulation ) {
 				for ( i = 1; i <= NumOfZones; ++i ) {
 					if ( ! Contaminant.CO2Simulation ) {
-						SetupOutputVariable( "AFN Zone Outdoor Air Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMHr, "System", "Average", Zone( i ).Name );
-						SetupOutputVariable( "AFN Zone Mixing Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMMHr, "System", "Average", Zone( i ).Name );
+						SetupOutputVariable( "AFN Zone Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMHr, "System", "Average", Zone( i ).Name );
+						SetupOutputVariable( "AFN Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMMHr, "System", "Average", Zone( i ).Name );
 					}
-					SetupOutputVariable( "AFN Zone Outdoor Air Generic Air Contaminant Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMHrGC, "System", "Average", Zone( i ).Name );
-					SetupOutputVariable( "AFN Zone Mixing Generic Air Contaminant Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).SumMMHrGC, "System", "Average", Zone( i ).Name );
-					SetupOutputVariable( "AFN Zone Total Generic Air Contaminant Mass Flow Rate [kg/s]", AirflowNetworkExchangeData( i ).TotalGC, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Outdoor Air Generic Air Contaminant Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMHrGC, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Mixing Generic Air Contaminant Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).SumMMHrGC, "System", "Average", Zone( i ).Name );
+					SetupOutputVariable( "AFN Zone Total Generic Air Contaminant Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkExchangeData( i ).TotalGC, "System", "Average", Zone( i ).Name );
 				}
 			}
 		}
@@ -4057,19 +4135,26 @@ namespace AirflowNetworkBalanceManager {
 						if ( Contaminant.GenericContamSimulation ) AirflowNetworkNodeSimu( i ).GCZ = ANGC( AirflowNetworkNodeData( i ).EPlusZoneNum );
 					}
 					if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 ) {
-						AirflowNetworkNodeSimu( i ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );
-						AirflowNetworkNodeSimu( i ).WZ = OutHumRat;
+						if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 && Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).IsLocalNode ) {
+							AirflowNetworkNodeSimu( i ).TZ = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulb;
+							AirflowNetworkNodeSimu( i ).WZ = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).HumRat;
+						} else {
+							AirflowNetworkNodeSimu( i ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );
+							AirflowNetworkNodeSimu( i ).WZ = OutHumRat;
+						}
+
 						if ( Contaminant.CO2Simulation ) AirflowNetworkNodeSimu( i ).CO2Z = OutdoorCO2;
 						if ( Contaminant.GenericContamSimulation ) AirflowNetworkNodeSimu( i ).GCZ = OutdoorGC;
 					}
+
 					if ( AirflowNetworkNodeData( i ).RAFNNodeNum > 0 ) {
 						ZoneNum = AirflowNetworkNodeData( i ).EPlusZoneNum;
 						if ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirflowNetworkNodeID == i ) {
 							AirflowNetworkNodeSimu( i ).TZ = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).AirTemp;
 							AirflowNetworkNodeSimu( i ).WZ = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( AirflowNetworkNodeData( i ).RAFNNodeNum ).HumRat;
+						}
+					}
 				}
-			}
-		}
 			}
 		}
 
@@ -4191,23 +4276,29 @@ namespace AirflowNetworkBalanceManager {
 
 		// CurrentModuleObject='AirflowNetwork Simulations'
 		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
-			SetupOutputVariable( "AFN Node Temperature [C]", AirflowNetworkNodeSimu( i ).TZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
-			SetupOutputVariable( "AFN Node Humidity Ratio [kgWater/kgDryAir]", AirflowNetworkNodeSimu( i ).WZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
-			if ( Contaminant.CO2Simulation ) SetupOutputVariable( "AFN Node CO2 Concentration [ppm]", AirflowNetworkNodeSimu( i ).CO2Z, "System", "Average", AirflowNetworkNodeData( i ).Name );
-			if ( Contaminant.GenericContamSimulation ) SetupOutputVariable( "AFN Node Generic Air Contaminant Concentration [ppm]", AirflowNetworkNodeSimu( i ).GCZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
-			if ( ! ( SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones ) ) SetupOutputVariable( "AFN Node Total Pressure [Pa]", AirflowNetworkNodeSimu( i ).PZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			SetupOutputVariable( "AFN Node Temperature", OutputProcessor::Unit::C, AirflowNetworkNodeSimu( i ).TZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			SetupOutputVariable( "AFN Node Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, AirflowNetworkNodeSimu( i ).WZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			if ( Contaminant.CO2Simulation ) {
+				SetupOutputVariable( "AFN Node CO2 Concentration", OutputProcessor::Unit::ppm, AirflowNetworkNodeSimu( i ).CO2Z, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				SetupOutputVariable( "AFN Node Generic Air Contaminant Concentration", OutputProcessor::Unit::ppm, AirflowNetworkNodeSimu( i ).GCZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			}
+			if ( ! ( SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfZones ) ) {
+				SetupOutputVariable( "AFN Node Total Pressure", OutputProcessor::Unit::Pa, AirflowNetworkNodeSimu( i ).PZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+			}
 			if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 ) {
-				SetupOutputVariable( "AFN Node Wind Pressure [Pa]", AirflowNetworkNodeSimu( i ).PZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
+				SetupOutputVariable( "AFN Node Wind Pressure", OutputProcessor::Unit::Pa, AirflowNetworkNodeSimu( i ).PZ, "System", "Average", AirflowNetworkNodeData( i ).Name );
 			}
 		}
 
 		for ( i = 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 			if ( ! ( SupplyFanType == FanType_SimpleOnOff && i <= AirflowNetworkNumOfSurfaces ) ) {
-				SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Mass Flow Rate [kg/s]", AirflowNetworkLinkReport( i ).FLOW, "System", "Average", AirflowNetworkLinkageData( i ).Name );
-				SetupOutputVariable( "AFN Linkage Node 2 to Node 1 Mass Flow Rate [kg/s]", AirflowNetworkLinkReport( i ).FLOW2, "System", "Average", AirflowNetworkLinkageData( i ).Name );
-				SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate [m3/s]", AirflowNetworkLinkReport( i ).VolFLOW, "System", "Average", AirflowNetworkLinkageData( i ).Name );
-				SetupOutputVariable( "AFN Linkage Node 2 to Node 1 Volume Flow Rate [m3/s]", AirflowNetworkLinkReport( i ).VolFLOW2, "System", "Average", AirflowNetworkLinkageData( i ).Name );
-				SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Pressure Difference [Pa]", AirflowNetworkLinkSimu( i ).DP, "System", "Average", AirflowNetworkLinkageData( i ).Name );
+				SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkLinkReport( i ).FLOW, "System", "Average", AirflowNetworkLinkageData( i ).Name );
+				SetupOutputVariable( "AFN Linkage Node 2 to Node 1 Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkLinkReport( i ).FLOW2, "System", "Average", AirflowNetworkLinkageData( i ).Name );
+				SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, AirflowNetworkLinkReport( i ).VolFLOW, "System", "Average", AirflowNetworkLinkageData( i ).Name );
+				SetupOutputVariable( "AFN Linkage Node 2 to Node 1 Volume Flow Rate", OutputProcessor::Unit::m3_s, AirflowNetworkLinkReport( i ).VolFLOW2, "System", "Average", AirflowNetworkLinkageData( i ).Name );
+				SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Pressure Difference", OutputProcessor::Unit::Pa, AirflowNetworkLinkSimu( i ).DP, "System", "Average", AirflowNetworkLinkageData( i ).Name );
 			}
 		}
 
@@ -4215,99 +4306,99 @@ namespace AirflowNetworkBalanceManager {
 			n = AirflowNetworkLinkageData( i ).CompNum;
 			if ( AirflowNetworkCompData( n ).CompTypeNum == CompTypeNum_DOP || AirflowNetworkCompData( n ).CompTypeNum == CompTypeNum_SOP || AirflowNetworkCompData( n ).CompTypeNum == CompTypeNum_HOP ) {
 				SurfNum = MultizoneSurfaceData( i ).SurfNum;
-				SetupOutputVariable( "AFN Surface Venting Window or Door Opening Factor []", MultizoneSurfaceData( i ).OpenFactor, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Surface Venting Window or Door Opening Factor", OutputProcessor::Unit::None, MultizoneSurfaceData( i ).OpenFactor, "System", "Average", MultizoneSurfaceData( i ).SurfName );
 				if ( AnyEnergyManagementSystemInModel ) {
 					SetupEMSActuator( "AirFlow Network Window/Door Opening", MultizoneSurfaceData( i ).SurfName, "Venting Opening Factor", "[Fraction]", MultizoneSurfaceData( i ).EMSOpenFactorActuated, MultizoneSurfaceData( i ).EMSOpenFactor );
 				}
-				SetupOutputVariable( "AFN Surface Venting Window or Door Opening Modulation Multiplier []", SurfaceWindow( SurfNum ).VentingOpenFactorMultRep, "System", "Average", Surface( SurfNum ).Name );
-				SetupOutputVariable( "AFN Surface Venting Inside Setpoint Temperature [C]", SurfaceWindow( SurfNum ).InsideTempForVentingRep, "System", "Average", Surface( SurfNum ).Name );
-				SetupOutputVariable( "AFN Surface Venting Availability Status []", SurfaceWindow( SurfNum ).VentingAvailabilityRep, "System", "Average", Surface( SurfNum ).Name );
+				SetupOutputVariable( "AFN Surface Venting Window or Door Opening Modulation Multiplier", OutputProcessor::Unit::None, SurfaceWindow( SurfNum ).VentingOpenFactorMultRep, "System", "Average", Surface( SurfNum ).Name );
+				SetupOutputVariable( "AFN Surface Venting Inside Setpoint Temperature", OutputProcessor::Unit::C, SurfaceWindow( SurfNum ).InsideTempForVentingRep, "System", "Average", Surface( SurfNum ).Name );
+				SetupOutputVariable( "AFN Surface Venting Availability Status", OutputProcessor::Unit::None, SurfaceWindow( SurfNum ).VentingAvailabilityRep, "System", "Average", Surface( SurfNum ).Name );
 				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
-					SetupOutputVariable( "AFN Surface Venting Window or Door Opening Factor at Previous Time Step []", MultizoneSurfaceData( i ).OpenFactorLast, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-					SetupOutputVariable( "AFN Surface Opening Elapsed Time [min]", MultizoneSurfaceData( i ).OpenElapsedTime, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-					SetupOutputVariable( "AFN Surface Closing Elapsed Time [min]", MultizoneSurfaceData( i ).CloseElapsedTime, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-					SetupOutputVariable( "AFN Surface Opening Status at Previous Time Step []", MultizoneSurfaceData( i ).PrevOpeningstatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-					SetupOutputVariable( "AFN Surface Opening Status []", MultizoneSurfaceData( i ).OpeningStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-					SetupOutputVariable( "AFN Surface Opening Probability Status []", MultizoneSurfaceData( i ).OpeningProbStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-					SetupOutputVariable( "AFN Surface Closing Probability Status []", MultizoneSurfaceData( i ).ClosingProbStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Venting Window or Door Opening Factor at Previous Time Step", OutputProcessor::Unit::None, MultizoneSurfaceData( i ).OpenFactorLast, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Elapsed Time", OutputProcessor::Unit::min, MultizoneSurfaceData( i ).OpenElapsedTime, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Closing Elapsed Time", OutputProcessor::Unit::min, MultizoneSurfaceData( i ).CloseElapsedTime, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Status at Previous Time Step", OutputProcessor::Unit::None, MultizoneSurfaceData( i ).PrevOpeningstatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Status", OutputProcessor::Unit::None, MultizoneSurfaceData( i ).OpeningStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Probability Status", OutputProcessor::Unit::None, MultizoneSurfaceData( i ).OpeningProbStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Closing Probability Status", OutputProcessor::Unit::None, MultizoneSurfaceData( i ).ClosingProbStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
 				}
 			}
 		}
 
 		for ( i = 1; i <= NumOfZones; ++i ) {
 			// Multizone losses due to force air systems
-			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Gain Rate [W]", AirflowNetworkReportData( i ).MultiZoneInfiSenGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).MultiZoneInfiSenGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Gain Rate [W]", AirflowNetworkReportData( i ).MultiZoneMixSenGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).MultiZoneMixSenGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Loss Rate [W]", AirflowNetworkReportData( i ).MultiZoneInfiSenLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).MultiZoneInfiSenLossJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Loss Rate [W]", AirflowNetworkReportData( i ).MultiZoneMixSenLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).MultiZoneMixSenLossJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Gain Rate [W]", AirflowNetworkReportData( i ).MultiZoneInfiLatGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).MultiZoneInfiLatGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).MultiZoneInfiLatLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).MultiZoneInfiLatLossJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Latent Heat Gain Rate [W]", AirflowNetworkReportData( i ).MultiZoneMixLatGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).MultiZoneMixLatGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).MultiZoneMixLatLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).MultiZoneInfiLatLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneInfiSenGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneInfiSenGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneMixSenGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneMixSenGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneInfiSenLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Sensible Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneInfiSenLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneMixSenLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Sensible Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneMixSenLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneInfiLatGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneInfiLatGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneInfiLatLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Latent Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneInfiLatLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Latent Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneMixLatGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Latent Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneMixLatGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Latent Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).MultiZoneMixLatLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Latent Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).MultiZoneInfiLatLossJ, "System", "Sum", Zone( i ).Name );
 			// Supply leak losses due to force air systems
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Gain Rate [W]", AirflowNetworkReportData( i ).LeakSenGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).LeakSenGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Loss Rate [W]", AirflowNetworkReportData( i ).LeakSenLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).LeakSenLossJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Gain Rate [W]", AirflowNetworkReportData( i ).LeakLatGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).LeakLatGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).LeakLatLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).LeakLatLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).LeakSenGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).LeakSenGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).LeakSenLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Sensible Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).LeakSenLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).LeakLatGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).LeakLatGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).LeakLatLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Leaked Air Latent Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).LeakLatLossJ, "System", "Sum", Zone( i ).Name );
 			// Conduction losses due to force air systems
-			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Gain Rate [W]", AirflowNetworkReportData( i ).CondSenGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).CondSenGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Loss Rate [W]", AirflowNetworkReportData( i ).CondSenLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).CondSenLossJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Gain Rate [W]", AirflowNetworkReportData( i ).DiffLatGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).DiffLatGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).DiffLatLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).DiffLatLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).CondSenGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).CondSenGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).CondSenLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Conduction Sensible Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).CondSenLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).DiffLatGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).DiffLatGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).DiffLatLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Diffusion Latent Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).DiffLatLossJ, "System", "Sum", Zone( i ).Name );
 			// Radiation losses due to forced air systems
-			SetupOutputVariable( "AFN Zone Duct Radiation Heat Gain Rate [W]", AirflowNetworkReportData( i ).RadGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).RadGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Radiation Heat Loss Rate [W]", AirflowNetworkReportData( i ).RadLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).RadLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).RadGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).RadGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).RadLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Duct Radiation Sensible Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).RadLossJ, "System", "Sum", Zone( i ).Name );
 			// Total losses due to force air systems
-			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Rate [W]", AirflowNetworkReportData( i ).TotalSenGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Energy [J]", AirflowNetworkReportData( i ).TotalSenGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Distribution Sensible Heat Loss Rate [W]", AirflowNetworkReportData( i ).TotalSenLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Distribution Sensible Heat Loss Energy [J]", AirflowNetworkReportData( i ).TotalSenLossJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Distribution Latent Heat Gain Rate [W]", AirflowNetworkReportData( i ).TotalLatGainW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Distribution Latent Heat Gain Energy [J]", AirflowNetworkReportData( i ).TotalLatGainJ, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Distribution Latent Heat Loss Rate [W]", AirflowNetworkReportData( i ).TotalLatLossW, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Distribution Latent Heat Loss Energy [J]", AirflowNetworkReportData( i ).TotalLatLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).TotalSenGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Sensible Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).TotalSenGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Sensible Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).TotalSenLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Sensible Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).TotalSenLossJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Latent Heat Gain Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).TotalLatGainW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Latent Heat Gain Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).TotalLatGainJ, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Latent Heat Loss Rate", OutputProcessor::Unit::W, AirflowNetworkReportData( i ).TotalLatLossW, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Distribution Latent Heat Loss Energy", OutputProcessor::Unit::J, AirflowNetworkReportData( i ).TotalLatLossJ, "System", "Sum", Zone( i ).Name );
 		}
 
 		for ( i = 1; i <= NumOfZones; ++i ) {
-			SetupOutputVariable( "AFN Zone Infiltration Volume [m3]", AirflowNetworkZnRpt( i ).InfilVolume, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Mass [kg]", AirflowNetworkZnRpt( i ).InfilMass, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Infiltration Air Change Rate [ach]", AirflowNetworkZnRpt( i ).InfilAirChangeRate, "System", "Average", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Volume [m3]", AirflowNetworkZnRpt( i ).MixVolume, "System", "Sum", Zone( i ).Name );
-			SetupOutputVariable( "AFN Zone Mixing Mass [kg]", AirflowNetworkZnRpt( i ).MixMass, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Volume", OutputProcessor::Unit::m3, AirflowNetworkZnRpt( i ).InfilVolume, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Mass", OutputProcessor::Unit::kg, AirflowNetworkZnRpt( i ).InfilMass, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Infiltration Air Change Rate", OutputProcessor::Unit::ach, AirflowNetworkZnRpt( i ).InfilAirChangeRate, "System", "Average", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Volume", OutputProcessor::Unit::m3, AirflowNetworkZnRpt( i ).MixVolume, "System", "Sum", Zone( i ).Name );
+			SetupOutputVariable( "AFN Zone Mixing Mass", OutputProcessor::Unit::kg, AirflowNetworkZnRpt( i ).MixMass, "System", "Sum", Zone( i ).Name );
 		}
 
 		if ( SupplyFanType == FanType_SimpleOnOff ) {
 			for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
-				SetupOutputVariable( "AFN Zone Average Pressure [Pa]", AirflowNetworkNodeReport( i ).PZ, "System", "Average", Zone( i ).Name );
-				SetupOutputVariable( "AFN Zone On Cycle Pressure [Pa]", AirflowNetworkNodeReport( i ).PZON, "System", "Average", Zone( i ).Name );
-				SetupOutputVariable( "AFN Zone Off Cycle Pressure [Pa]", AirflowNetworkNodeReport( i ).PZOFF, "System", "Average", Zone( i ).Name );
+				SetupOutputVariable( "AFN Zone Average Pressure", OutputProcessor::Unit::Pa, AirflowNetworkNodeReport( i ).PZ, "System", "Average", Zone( i ).Name );
+				SetupOutputVariable( "AFN Zone On Cycle Pressure", OutputProcessor::Unit::Pa, AirflowNetworkNodeReport( i ).PZON, "System", "Average", Zone( i ).Name );
+				SetupOutputVariable( "AFN Zone Off Cycle Pressure", OutputProcessor::Unit::Pa, AirflowNetworkNodeReport( i ).PZOFF, "System", "Average", Zone( i ).Name );
 			}
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
-				SetupOutputVariable( "AFN Linkage Node 1 to 2 Average Mass Flow Rate [kg/s]", AirflowNetworkLinkReport1( i ).FLOW, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-				SetupOutputVariable( "AFN Linkage Node 2 to 1 Average Mass Flow Rate [kg/s]", AirflowNetworkLinkReport1( i ).FLOW2, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-				SetupOutputVariable( "AFN Linkage Node 1 to 2 Average Volume Flow Rate [m3/s]", AirflowNetworkLinkReport1( i ).VolFLOW, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-				SetupOutputVariable( "AFN Linkage Node 2 to 1 Average Volume Flow Rate [m3/s]", AirflowNetworkLinkReport1( i ).VolFLOW2, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-				SetupOutputVariable( "AFN Surface Average Pressure Difference [Pa]", AirflowNetworkLinkReport1( i ).DP, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-				SetupOutputVariable( "AFN Surface On Cycle Pressure Difference [Pa]", AirflowNetworkLinkReport1( i ).DPON, "System", "Average", MultizoneSurfaceData( i ).SurfName );
-				SetupOutputVariable( "AFN Surface Off Cycle Pressure Difference [Pa]", AirflowNetworkLinkReport1( i ).DPOFF, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Linkage Node 1 to 2 Average Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkLinkReport1( i ).FLOW, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Linkage Node 2 to 1 Average Mass Flow Rate", OutputProcessor::Unit::kg_s, AirflowNetworkLinkReport1( i ).FLOW2, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Linkage Node 1 to 2 Average Volume Flow Rate", OutputProcessor::Unit::m3_s, AirflowNetworkLinkReport1( i ).VolFLOW, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Linkage Node 2 to 1 Average Volume Flow Rate", OutputProcessor::Unit::m3_s, AirflowNetworkLinkReport1( i ).VolFLOW2, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Surface Average Pressure Difference", OutputProcessor::Unit::Pa, AirflowNetworkLinkReport1( i ).DP, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Surface On Cycle Pressure Difference", OutputProcessor::Unit::Pa, AirflowNetworkLinkReport1( i ).DPON, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				SetupOutputVariable( "AFN Surface Off Cycle Pressure Difference", OutputProcessor::Unit::Pa, AirflowNetworkLinkReport1( i ).DPOFF, "System", "Average", MultizoneSurfaceData( i ).SurfName );
 			}
 		}
 
@@ -4350,6 +4441,8 @@ namespace AirflowNetworkBalanceManager {
 		using General::SolveRoot;
 		using DataAirLoop::LoopFanOperationMode;
 		using DataAirLoop::LoopOnOffFanPartLoadRatio;
+		using DataGlobals::AnyLocalEnvironmentsInModel;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -4367,13 +4460,18 @@ namespace AirflowNetworkBalanceManager {
 		int i;
 		int j;
 		int n;
-		Real64 Vref;
+		int NodeNum;
 		static bool OneTimeFlag( true );
 		static bool ErrorsFound( false );
 		Real64 GlobalOpenFactor;
 		Real64 ZonePressure1;
 		Real64 ZonePressure2;
 		Real64 PressureSet;
+		Real64 LocalAzimuth;
+		Real64 LocalWindSpeed;
+		Real64 LocalWindDir;
+		Real64 LocalHumRat;
+		Real64 LocalDryBulb;
 		Array1D< Real64 > Par; // Pressure setpoint
 		Real64 const ErrorToler( 0.00001 );
 		int const MaxIte( 20 );
@@ -4404,15 +4502,33 @@ namespace AirflowNetworkBalanceManager {
 				// Assigning ambient conditions to external nodes
 				i = AirflowNetworkNodeData( n ).ExtNodeNum;
 				if ( i > 0 ) {
-					if ( i <= AirflowNetworkNumOfExtNode ) {
-						Vref = WindSpeedAt( MultizoneExternalNodeData( i ).height );
-						AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve,
-							Vref, AirflowNetworkNodeData( n ).NodeHeight, MultizoneExternalNodeData( i ).azimuth,
-							MultizoneExternalNodeData( i ).symmetricCurve, MultizoneExternalNodeData( i ).useRelativeAngle);
-						//AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).CPVNum, Vref, AirflowNetworkNodeData( n ).NodeHeight );
-					}
 					AirflowNetworkNodeSimu( n ).TZ = OutDryBulbTempAt( AirflowNetworkNodeData( n ).NodeHeight );
 					AirflowNetworkNodeSimu( n ).WZ = OutHumRat;
+					if ( i <= AirflowNetworkNumOfExtNode ) {
+						if ( MultizoneExternalNodeData( i ).OutAirNodeNum == 0 ) {
+							LocalWindSpeed = WindSpeedAt( MultizoneExternalNodeData( i ).height );
+							LocalDryBulb = OutDryBulbTempAt( AirflowNetworkNodeData( n ).NodeHeight );
+							LocalAzimuth = MultizoneExternalNodeData( i ).azimuth;
+							AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve,
+								MultizoneExternalNodeData(i).symmetricCurve, MultizoneExternalNodeData(i).useRelativeAngle,
+								LocalAzimuth, LocalWindSpeed, WindDir, LocalDryBulb, OutHumRat );
+						} else {
+							// If and outdoor air node object is defined as the External Node Name in AirflowNetwork:MultiZone:Surface,
+							// the node object requires to define the Wind Pressure Coefficient Curve Name.
+							NodeNum = MultizoneExternalNodeData( i ).OutAirNodeNum;
+							LocalWindSpeed = Node ( ( NodeNum ) ).OutAirWindSpeed;
+							LocalWindDir = Node ( ( NodeNum ) ).OutAirWindDir;
+							LocalHumRat = Node ( ( NodeNum ) ).HumRat;
+							LocalDryBulb = Node ( ( NodeNum ) ).OutAirDryBulb;
+							LocalAzimuth = MultizoneExternalNodeData( i ).azimuth;
+							AirflowNetworkNodeSimu( n ).PZ = CalcWindPressure( MultizoneExternalNodeData( i ).curve,
+								MultizoneExternalNodeData( i ).symmetricCurve, MultizoneExternalNodeData( i ).useRelativeAngle,
+								LocalAzimuth, LocalWindSpeed, LocalWindDir, LocalDryBulb, LocalHumRat );
+							AirflowNetworkNodeSimu( n ).TZ = LocalDryBulb;
+							AirflowNetworkNodeSimu( n ).WZ = LocalHumRat;
+						}
+					}
+
 				} else {
 					ShowSevereError( "GetAirflowNetworkInput: AIRFLOWNETWORK:DISTRIBUTION:NODE: Invalid external node = " + AirflowNetworkNodeData( n ).Name );
 					ErrorsFound = true;
@@ -5057,20 +5173,23 @@ namespace AirflowNetworkBalanceManager {
 	}
 
 	Real64
-		CalcWindPressure(
-			int const curve, // Curve index, change this to pointer after curve refactor
-			Real64 const Vref, // Velocity at reference height
-			Real64 const height, // Node height for outdoor temperature calculation
-			Real64 const azimuth, // Azimuthal angle of surface
-			bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
-			bool const relativeAngle // True if the Cp curve angle is measured relative to the surface
-		)
+	CalcWindPressure(
+		int const curve, // Curve index, change this to pointer after curve refactor
+		bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
+		bool const relativeAngle, // True if the Cp curve angle is measured relative to the surface
+		Real64 const azimuth, // Azimuthal angle of surface
+		Real64 const windSpeed, // Wind velocity
+		Real64 const windDir, // Wind direction
+		Real64 const dryBulbTemp, // Air node dry bulb temperature
+		Real64 const humRat // Air node humidity ratio
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Lixing Gu
 		//       DATE WRITTEN   Oct. 2005
 		//       MODIFIED       Jason DeGraw, Feb. 2017, modify to use curves
+		//       MODIFIED       Xuan Luo, Aug. 2017, modify to use local air condition
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -5082,13 +5201,12 @@ namespace AirflowNetworkBalanceManager {
 		// Return value is wind pressure[Pa]
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 angle( DataEnvironment::WindDir );
+		Real64 angle( windDir );
 		Real64 rho; // Outdoor air density
 		Real64 Cp; // Cp value at given wind direction
 
 		// Calculate outdoor density
-		rho = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, DataEnvironment::OutDryBulbTempAt(height),
-			DataEnvironment::OutHumRat);
+		rho = PsyRhoAirFnPbTdbW( DataEnvironment::OutBaroPress, dryBulbTemp, humRat );
 
 		// Calculate pressure coefficient
 		if ( relativeAngle ) {
@@ -5102,9 +5220,9 @@ namespace AirflowNetworkBalanceManager {
 				angle = 360.0 - angle;
 			}
 		}
-		Cp = CurveManager::CurveValue(curve, angle);
+		Cp = CurveManager::CurveValue( curve, angle );
 
-		return Cp * 0.5 * rho * Vref * Vref;
+		return Cp * 0.5 * rho * windSpeed * windSpeed;
 	}
 
 	Real64
@@ -5404,6 +5522,7 @@ namespace AirflowNetworkBalanceManager {
 		int NT;
 		int CompTypeNum;
 		int TypeNum;
+		int ExtNodeNum;
 		std::string CompName;
 		Real64 Ei;
 		Real64 DirSign;
@@ -5447,8 +5566,15 @@ namespace AirflowNetworkBalanceManager {
 				}
 
 				if ( AirflowNetworkLinkageData( i ).ZoneNum < 0 ) {
-					Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( AirflowNetworkLinkageData( i ).NodeNums( 2 ) ).NodeHeight );
-					Wamb = OutHumRat;
+					ExtNodeNum = AirflowNetworkLinkageData( i ).NodeNums( 2 );
+					if ( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum > 0 &&
+						Node( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum ).IsLocalNode ) {
+						Tamb = Node( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum ).OutAirDryBulb;
+						Wamb = Node( AirflowNetworkNodeData( ExtNodeNum ).OutAirNodeNum ).HumRat;
+					} else {
+						Tamb = OutDryBulbTempAt( AirflowNetworkNodeData( ExtNodeNum ).NodeHeight );
+						Wamb = OutHumRat;
+					}
 				} else if ( AirflowNetworkLinkageData( i ).ZoneNum == 0 ) {
 					Tamb = AirflowNetworkNodeSimu( LT ).TZ;
 					Wamb = AirflowNetworkNodeSimu( LT ).WZ;
@@ -5738,7 +5864,11 @@ namespace AirflowNetworkBalanceManager {
 			}
 			if ( AirflowNetworkNodeData( i ).ExtNodeNum > 0 && MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) < 0.9e10 ) {
 				MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) = 1.0e10;
-				MV( i ) = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight ) * 1.0e10;
+				if ( AirflowNetworkNodeData( i ).OutAirNodeNum > 0 ) {
+					MV( i ) = Node( AirflowNetworkNodeData( i ).OutAirNodeNum ).OutAirDryBulb * 1.0e10;
+				} else {
+					MV( i ) = OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight ) * 1.0e10;
+				}
 			}
 			if ( AirflowNetworkNodeData( i ).RAFNNodeNum > 0 && MA( ( i - 1 )*AirflowNetworkNumOfNodes + i ) < 0.9e10 ) {
 				MA( ( i - 1 )*AirflowNetworkNumOfNodes + i ) = 1.0e10;
@@ -7851,6 +7981,12 @@ namespace AirflowNetworkBalanceManager {
 				}
 			}
 
+			// Eliminate local external air node for network
+			for ( k = 1; k <= NumOfNodes; ++k ) {
+				if ( NodeFound( k ) ) continue;
+				if ( Node( k ).IsLocalNode ) NodeFound( k ) = true;
+			}
+
 			// Ensure all the nodes used in Eplus are a subset of AirflowNetwork Nodes
 			for ( i = 1; i <= NumOfNodes; ++i ) {
 				if ( NodeFound( i ) ) continue;
@@ -8395,13 +8531,16 @@ namespace AirflowNetworkBalanceManager {
 			for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 				if ( ! ZoneEquipConfig( ControlledZoneNum ).IsControlled ) continue;
 				// Ensure all the zones served by this AirLoopHVAC to be controlled by the hybrid ventilation
-				if ( AirLoopNum > 0 ) {
-					if ( AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ) {
-						ActualZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-					}
-				} else {
-					if ( HybridVentSysAvailActualZoneNum( SysAvailNum ) == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
-						ActualZoneNum = HybridVentSysAvailActualZoneNum( SysAvailNum );
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ControlledZoneNum ).NumInletNodes; ++zoneInNode ) {
+					if ( AirLoopNum > 0 ) {
+						if ( AirLoopNum == ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( zoneInNode ) ) {
+							ActualZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
+							break;
+						}
+					} else {
+						if ( HybridVentSysAvailActualZoneNum( SysAvailNum ) == ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ) {
+							ActualZoneNum = HybridVentSysAvailActualZoneNum( SysAvailNum );
+						}
 					}
 				}
 				if ( ActualZoneNum > 0 ) {
@@ -8857,7 +8996,12 @@ namespace AirflowNetworkBalanceManager {
 
 		if ( MinTimeControlOnly ) return;
 
-		OutDryBulb = OutDryBulbTempAt( Zone( ZoneNum ).Centroid.z );
+		if ( Zone( ZoneNum ).HasLinkedOutAirNode ) {
+			OutDryBulb = Zone( ZoneNum ).OutDryBulbTemp;
+		} else {
+			OutDryBulb = OutDryBulbTempAt( Zone( ZoneNum ).Centroid.z );
+		}
+
 		if ( OutDryBulb < ComfortBouPoint ) {
 			Tcomfort = CurveValue( ComfortLowTempCurveNum, OutDryBulb );
 		} else {

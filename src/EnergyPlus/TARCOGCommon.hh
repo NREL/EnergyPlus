@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -76,17 +77,26 @@ namespace TARCOGCommon {
 	);
 
 	void
+	modifyHcGap(
+		Array1< Real64 > const & hcgap,  // Convective coefficient for gap
+		Array1< Real64 > const & qv,     // Heat flow from ventilation [W/m2]
+		Array1< Real64 > const & hcv,    // Convective heat flow coefficient due to ventilation
+		Array1< Real64 > & hcgapMod,     // Modified heat flow coefficient for gap
+		int const nlayer,                // Number of layers
+		Real64 const edgeGlCorrFac       // Edge of glass correction factor
+	);
+
+	void
 	matrixQBalance(
 		int const nlayer,
 		Array2< Real64 > & a,
 		Array1< Real64 > & b,
-		Array1< Real64 > const & scon,
 		Array1< Real64 > const & thick,
 		Array1< Real64 > const & hcgas,
-		Real64 const hcout,
-		Real64 const hcin,
+		Array1< Real64 > & hcgapMod,
 		Array1< Real64 > const & asol,
 		Array1< Real64 > const & qv,
+		Array1< Real64 > const & hcv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
@@ -94,7 +104,8 @@ namespace TARCOGCommon {
 		Array1< Real64 > const & theta,
 		Array1< Real64 > const & tir,
 		Array1< Real64 > const & rir,
-		Array1< Real64 > const & emis
+		Array1< Real64 > const & emis,
+		Real64 const edgeGlCorrFac
 	);
 
 	void

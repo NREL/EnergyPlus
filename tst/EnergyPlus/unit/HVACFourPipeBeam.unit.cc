@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,6 +58,7 @@
 #include <DataLoopNode.hh>
 #include <NodeInputManager.hh>
 #include <DataDefineEquip.hh>
+#include <GeneralRoutines.hh>
 #include <SimulationManager.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputReportPredefined.hh>
@@ -803,6 +805,7 @@ namespace EnergyPlus {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone One Equipment,  !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Zone One 4pipe Beam,  !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1637,6 +1640,7 @@ namespace EnergyPlus {
 		DataGlobals::KickOffSimulation = true;
 
 		WeatherManager::ResetEnvironmentCounter();
+		TestAirPathIntegrity( ErrorsFound ); // Needed to initialize return node connections to airloops and inlet nodes
 		SimulationManager::SetupSimulation( ErrorsFound );
 		DataGlobals::KickOffSimulation = false;
 
@@ -1656,24 +1660,24 @@ namespace EnergyPlus {
 
 		//indexes values has been changed according to new input_processor output
 		// node indexes may be viewed in NodeID array
-		DataLoopNode::Node( 16 ).Temp = 14.0; // chilled water inlet node
+		DataLoopNode::Node( 14 ).Temp = 14.0; // chilled water inlet node
 		DataLoopNode::Node( 40 ).HumRat = 0.008; // zone node
 		DataLoopNode::Node( 40 ).Temp = 24.0; // zone node
 		DataLoopNode::Node( 44 ).HumRat = 0.008; // primary air inlet node
 
 		DataLoopNode::Node( 44 ).Temp = 12.8; // primary air inlet node
-		DataLoopNode::Node( 26 ).Temp = 45.0; // hot water inlet node
+		DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
 		// DataLoopNode::Node( 44 ).Temp = 12.8; // primary air inlet node
 		// DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
 
 		Real64 NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate( FirstHVACIteration, NonAirSysOutput );
 
-		EXPECT_NEAR( DataLoopNode::Node( 4 ).MassFlowRate, 0.3521952339035046, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 17 ).Temp, 19.191523455437512, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 17 ).MassFlowRate, 0.046199561631265804, 0.00001 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 27 ).Temp, 45.0 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 27 ).MassFlowRate, 0.0 );
+		EXPECT_NEAR( DataLoopNode::Node( 1 ).MassFlowRate, 0.3521952339035046, 0.00001 );
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 19.191523455437512, 0.00001 );
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.046199561631265804, 0.00001 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 
 		EXPECT_NEAR( NonAirSysOutput, -1004.0437766383318, 0.0001 );
 
@@ -1685,10 +1689,10 @@ namespace EnergyPlus {
 		DataLoopNode::Node( 40 ).Temp = 21.0; // zone node
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate( FirstHVACIteration, NonAirSysOutput );
 
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 17 ).Temp, 14.0 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 17 ).MassFlowRate, 0.0 );
-		EXPECT_NEAR( DataLoopNode::Node( 27 ).Temp, 35.064466069323743, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 27 ).MassFlowRate, 0.19320550334974979, 0.00001 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
+		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 35.064466069323743, 0.00001 );
+		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.19320550334974979, 0.00001 );
 
 		EXPECT_NEAR( NonAirSysOutput, 8023.9273066417645, 0.0001 );
 
@@ -1698,20 +1702,20 @@ namespace EnergyPlus {
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = -4000.0;
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.0;
 
-		DataLoopNode::Node( 16 ).Temp = 14.0; // chilled water inlet node
+		DataLoopNode::Node( 14 ).Temp = 14.0; // chilled water inlet node
 		DataLoopNode::Node( 40 ).HumRat = 0.008; // zone node
 		DataLoopNode::Node( 40 ).Temp = 24.0; // zone node
 		DataLoopNode::Node( 44 ).HumRat = 0.008; // primary air inlet node
 		DataLoopNode::Node( 44 ).Temp = 22.0; // primary air inlet node
-		DataLoopNode::Node( 26 ).Temp = 45.0; // hot water inlet node
+		DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
 
 		NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate( FirstHVACIteration, NonAirSysOutput );
 
-		EXPECT_NEAR( DataLoopNode::Node( 17 ).Temp, 18.027306264618733, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 17 ).MassFlowRate, 0.25614844309380103, 0.00001);
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 27 ).Temp, 45.0 );
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 27 ).MassFlowRate, 0.0 );
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
+		EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001);
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).MassFlowRate, 0.0 );
 		// EXPECT_NEAR( DataLoopNode::Node( 15 ).Temp, 18.027306264618733, 0.00001 );
 		// EXPECT_NEAR( DataLoopNode::Node( 15 ).MassFlowRate, 0.25614844309380103, 0.00001 );
 		// EXPECT_DOUBLE_EQ( DataLoopNode::Node( 39 ).Temp, 45.0 );
@@ -1729,10 +1733,10 @@ namespace EnergyPlus {
 		NonAirSysOutput = 0.0;
 		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->simulate( FirstHVACIteration, NonAirSysOutput );
 
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 17 ).Temp, 14.0);
-		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 17 ).MassFlowRate, 0.0);
-		EXPECT_NEAR( DataLoopNode::Node( 27 ).Temp, 33.836239364981424, 0.00001 );
-		EXPECT_NEAR( DataLoopNode::Node( 27 ).MassFlowRate, 0.10040605035467959, 0.00001 );
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0);
+		EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0);
+		EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
+		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.10040605035467959, 0.00001 );
 		// EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).Temp, 14.0 );
 		// EXPECT_DOUBLE_EQ( DataLoopNode::Node( 15 ).MassFlowRate, 0.0 );
 		// EXPECT_NEAR( DataLoopNode::Node( 39 ).Temp, 33.836239364981424, 0.00001 );
@@ -2335,6 +2339,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone One Equipment,  !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    Zone One 4pipe Beam,  !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",

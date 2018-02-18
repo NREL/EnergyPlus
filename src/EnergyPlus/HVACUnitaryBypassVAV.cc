@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -1167,6 +1168,20 @@ namespace HVACUnitaryBypassVAV {
 							ShowContinueError( "Thermostat not found in zone = " + ZoneEquipConfig( CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum ) ).ZoneName + " and the simulation continues." );
 							ShowContinueError( "This zone will not be controlled to a temperature setpoint." );
 						}
+						int zoneNum = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
+						int zoneInlet = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
+						int coolingPriority = 0;
+						int heatingPriority = 0;
+						//setup zone equipment sequence information based on finding matching air terminal
+						if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
+							ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
+							CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) = coolingPriority;
+							CBVAV( CBVAVNum ).ZoneSequenceHeatingNum( AirLoopZoneNum ) = heatingPriority;
+						}
+						if ( CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) == 0 ) {
+							ShowSevereError( "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"" + CBVAV( CBVAVNum ).Name + "\", No matching air terminal found in the zone equipment list for zone = " + ZoneEquipConfig( zoneNum ).ZoneName + "." );
+							ErrorsFound = true;
+						}
 					} else {
 						ShowSevereError( "Controlled Zone node not found." );
 						ErrorsFound = true;
@@ -1193,24 +1208,24 @@ namespace HVACUnitaryBypassVAV {
 
 		for ( CBVAVNum = 1; CBVAVNum <= NumCBVAV; ++CBVAVNum ) {
 			// Setup Report variables for the Fan Coils
-			SetupOutputVariable( "Unitary System Total Heating Rate [W]", CBVAV( CBVAVNum ).TotHeatEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Total Heating Energy [J]", CBVAV( CBVAVNum ).TotHeatEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Total Cooling Rate [W]", CBVAV( CBVAVNum ).TotCoolEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Total Cooling Energy [J]", CBVAV( CBVAVNum ).TotCoolEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Sensible Heating Rate [W]", CBVAV( CBVAVNum ).SensHeatEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Sensible Heating Energy [J]", CBVAV( CBVAVNum ).SensHeatEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Sensible Cooling Rate [W]", CBVAV( CBVAVNum ).SensCoolEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Sensible Cooling Energy [J]", CBVAV( CBVAVNum ).SensCoolEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Latent Heating Rate [W]", CBVAV( CBVAVNum ).LatHeatEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Latent Heating Energy [J]", CBVAV( CBVAVNum ).LatHeatEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Latent Cooling Rate [W]", CBVAV( CBVAVNum ).LatCoolEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Latent Cooling Energy [J]", CBVAV( CBVAVNum ).LatCoolEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Electric Power [W]", CBVAV( CBVAVNum ).ElecPower, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Electric Energy [J]", CBVAV( CBVAVNum ).ElecConsumption, "System", "Sum", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Fan Part Load Ratio []", CBVAV( CBVAVNum ).FanPartLoadRatio, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Compressor Part Load Ratio []", CBVAV( CBVAVNum ).CompPartLoadRatio, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Bypass Air Mass Flow Rate [kg/s]", CBVAV( CBVAVNum ).BypassMassFlowRate, "System", "Average", CBVAV( CBVAVNum ).Name );
-			SetupOutputVariable( "Unitary System Air Outlet Setpoint Temperature [C]", CBVAV( CBVAVNum ).OutletTempSetPoint, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Total Heating Rate", OutputProcessor::Unit::W, CBVAV( CBVAVNum ).TotHeatEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Total Heating Energy", OutputProcessor::Unit::J, CBVAV( CBVAVNum ).TotHeatEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Total Cooling Rate", OutputProcessor::Unit::W, CBVAV( CBVAVNum ).TotCoolEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Total Cooling Energy", OutputProcessor::Unit::J, CBVAV( CBVAVNum ).TotCoolEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Sensible Heating Rate", OutputProcessor::Unit::W, CBVAV( CBVAVNum ).SensHeatEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Sensible Heating Energy", OutputProcessor::Unit::J, CBVAV( CBVAVNum ).SensHeatEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Sensible Cooling Rate", OutputProcessor::Unit::W, CBVAV( CBVAVNum ).SensCoolEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Sensible Cooling Energy", OutputProcessor::Unit::J, CBVAV( CBVAVNum ).SensCoolEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Latent Heating Rate", OutputProcessor::Unit::W, CBVAV( CBVAVNum ).LatHeatEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Latent Heating Energy", OutputProcessor::Unit::J, CBVAV( CBVAVNum ).LatHeatEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Latent Cooling Rate", OutputProcessor::Unit::W, CBVAV( CBVAVNum ).LatCoolEnergyRate, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Latent Cooling Energy", OutputProcessor::Unit::J, CBVAV( CBVAVNum ).LatCoolEnergy, "System", "Sum", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Electric Power", OutputProcessor::Unit::W, CBVAV( CBVAVNum ).ElecPower, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Electric Energy", OutputProcessor::Unit::J, CBVAV( CBVAVNum ).ElecConsumption, "System", "Sum", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Fan Part Load Ratio", OutputProcessor::Unit::None, CBVAV( CBVAVNum ).FanPartLoadRatio, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Compressor Part Load Ratio", OutputProcessor::Unit::None, CBVAV( CBVAVNum ).CompPartLoadRatio, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Bypass Air Mass Flow Rate", OutputProcessor::Unit::kg_s, CBVAV( CBVAVNum ).BypassMassFlowRate, "System", "Average", CBVAV( CBVAVNum ).Name );
+			SetupOutputVariable( "Unitary System Air Outlet Setpoint Temperature", OutputProcessor::Unit::C, CBVAV( CBVAVNum ).OutletTempSetPoint, "System", "Average", CBVAV( CBVAVNum ).Name );
 		}
 
 	}

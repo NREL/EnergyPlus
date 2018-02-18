@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -769,9 +770,10 @@ namespace HeatBalanceHAMTManager {
 				if ( Material( matid ).divs > Material( matid ).divmax ) {
 					Material( matid ).divs = Material( matid ).divmax;
 				}
-				// Check length of cell - reduce number of divisions if neccessary
+				// Check length of cell - reduce number of divisions if necessary
+				Real64 const sin_negPIOvr2 = std::sin( -Pi / 2.0 );
 				while ( true ) {
-					testlen = Material( matid ).Thickness * ( ( std::sin( Pi * ( -1.0 / double( Material( matid ).divs ) ) - Pi / 2.0 ) / 2.0 ) - ( std::sin( -Pi / 2.0 ) / 2.0 ) );
+					testlen = Material( matid ).Thickness * ( ( std::sin( Pi * ( -1.0 / double( Material( matid ).divs ) ) - Pi / 2.0 ) / 2.0 ) - ( sin_negPIOvr2 / 2.0 ) );
 					if ( testlen > adjdist ) break;
 					--Material( matid ).divs;
 					if ( Material( matid ).divs < 1 ) {
@@ -791,7 +793,7 @@ namespace HeatBalanceHAMTManager {
 			ShowFatalError( "CombinedHeatAndMoistureFiniteElement: Incomplete data to start solution, program terminates." );
 		}
 
-		// Make the cells and initialise
+		// Make the cells and initialize
 		cells.allocate( TotCellsMax );
 		for ( auto & e : cells ) {
 			e.adjs = -1;
@@ -936,7 +938,7 @@ namespace HeatBalanceHAMTManager {
 			}
 		}
 
-		// Reset surface virtual cell origins and volumes. Initialise report variables.
+		// Reset surface virtual cell origins and volumes. Initialize report variables.
 		gio::write( OutputFileInits, Format_1966 );
 		gio::write( OutputFileInits, Format_1965 );
 		//cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
@@ -954,14 +956,14 @@ namespace HeatBalanceHAMTManager {
 			surftemp( sid ) = 0.0;
 			surfexttemp( sid ) = 0.0;
 			surfvp( sid ) = 0.0;
-			SetupOutputVariable( "HAMT Surface Average Water Content Ratio [kg/kg]", watertot( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Inside Face Temperature [C]", surftemp( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Inside Face Relative Humidity [%]", surfrh( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Inside Face Vapor Pressure [Pa]", surfvp( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Outside Face Temperature [C]", surfexttemp( sid ), "Zone", "State", Surface( sid ).Name );
-			SetupOutputVariable( "HAMT Surface Outside Face Relative Humidity [%]", surfextrh( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Average Water Content Ratio", OutputProcessor::Unit::kg_kg, watertot( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Inside Face Temperature", OutputProcessor::Unit::C, surftemp( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Inside Face Relative Humidity", OutputProcessor::Unit::Perc, surfrh( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Inside Face Vapor Pressure", OutputProcessor::Unit::Pa, surfvp( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Outside Face Temperature", OutputProcessor::Unit::C, surfexttemp( sid ), "Zone", "State", Surface( sid ).Name );
+			SetupOutputVariable( "HAMT Surface Outside Face Relative Humidity", OutputProcessor::Unit::Perc, surfextrh( sid ), "Zone", "State", Surface( sid ).Name );
 
-			// write cell origins to initilisation output file
+			// write cell origins to initialization output file
 			conid = Surface( sid ).Construction;
 			gio::write( OutputFileInits, "('HAMT cells, ',A,',',A,$)" ) << Surface( sid ).Name << Construct( conid ).Name;
 			for ( int concell = 1, concell_end = Intcell( sid ) - Extcell( sid ) + 1; concell <= concell_end; ++concell ) {
@@ -975,13 +977,13 @@ namespace HeatBalanceHAMTManager {
 			gio::write( OutputFileInits );
 
 			for ( int cellid = Extcell( sid ), concell = 1; cellid <= Intcell( sid ); ++cellid, ++concell ) {
-				SetupOutputVariable( "HAMT Surface Temperature Cell " + TrimSigDigits( concell ) + " [C]", cells( cellid ).temp, "Zone", "State", Surface( sid ).Name );
+				SetupOutputVariable( "HAMT Surface Temperature Cell " + TrimSigDigits( concell ) + "", OutputProcessor::Unit::C, cells( cellid ).temp, "Zone", "State", Surface( sid ).Name );
 			}
 			for ( int cellid = Extcell( sid ), concell = 1; cellid <= Intcell( sid ); ++cellid, ++concell ) {
-				SetupOutputVariable( "HAMT Surface Water Content Cell " + TrimSigDigits( concell ) + " [kg/kg]", cells( cellid ).wreport, "Zone", "State", Surface( sid ).Name );
+				SetupOutputVariable( "HAMT Surface Water Content Cell " + TrimSigDigits( concell ) + "", OutputProcessor::Unit::kg_kg, cells( cellid ).wreport, "Zone", "State", Surface( sid ).Name );
 			}
 			for ( int cellid = Extcell( sid ), concell = 1; cellid <= Intcell( sid ); ++cellid, ++concell ) {
-				SetupOutputVariable( "HAMT Surface Relative Humidity Cell " + TrimSigDigits( concell ) + " [%]", cells( cellid ).rhp, "Zone", "State", Surface( sid ).Name );
+				SetupOutputVariable( "HAMT Surface Relative Humidity Cell " + TrimSigDigits( concell ) + "", OutputProcessor::Unit::Perc, cells( cellid ).rhp, "Zone", "State", Surface( sid ).Name );
 			}
 		}
 
@@ -1026,6 +1028,7 @@ namespace HeatBalanceHAMTManager {
 		using General::RoundSigDigits;
 		using DataSurfaces::OtherSideCondModeledExt;
 		using DataSurfaces::OSCM;
+		using DataHeatBalSurface::QAdditionalHeatSourceInside;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1146,7 +1149,7 @@ namespace HeatBalanceHAMTManager {
 
 		cells( IntConcell( sid ) ).htc = HConvInFD( sid );
 
-		cells( Intcell( sid ) ).Qadds = Surface( sid ).Area * ( QRadSWInAbs( sid ) + NetLWRadToSurf( sid ) + QHTRadSysSurf( sid ) + QCoolingPanelSurf( sid ) + QHWBaseboardSurf( sid ) + QSteamBaseboardSurf( sid ) + QElecBaseboardSurf( sid ) + QRadThermInAbs( sid ) );
+		cells( Intcell( sid ) ).Qadds = Surface( sid ).Area * ( QRadSWInAbs( sid ) + NetLWRadToSurf( sid ) + QHTRadSysSurf( sid ) + QCoolingPanelSurf( sid ) + QHWBaseboardSurf( sid ) + QSteamBaseboardSurf( sid ) + QElecBaseboardSurf( sid ) + QRadThermInAbs( sid ) + QAdditionalHeatSourceInside( sid ) );
 		// Check, Is this per unit area or for the whole wall.
 		//    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 

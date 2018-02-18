@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -72,6 +73,7 @@ const int SQLite::LocalReportHourly   =  1;   // Write out at 'EndHourFlag'
 const int SQLite::LocalReportDaily    =  2;   // Write out at 'EndDayFlag'
 const int SQLite::LocalReportMonthly  =  3;   // Write out at end of month (must be determined)
 const int SQLite::LocalReportSim      =  4;   // Write out once per environment 'EndEnvrnFlag'
+const int SQLite::LocalReportYearly   =  5;   // Write out once per year
 const int SQLite::ReportNameId        =  1;
 const int SQLite::ReportForStringId   =  2;
 const int SQLite::TableNameId         =  3;
@@ -470,6 +472,7 @@ void SQLite::initializeTimeIndicesTable()
 	const std::string timeTableSQL =
 		"CREATE TABLE Time ("
 		"TimeIndex INTEGER PRIMARY KEY, "
+		"Year INTEGER, "
 		"Month INTEGER, "
 		"Day INTEGER, "
 		"Hour INTEGER, "
@@ -487,6 +490,7 @@ void SQLite::initializeTimeIndicesTable()
 	const std::string timeIndexInsertSQL =
 		"INSERT INTO Time ("
 		"TimeIndex, "
+		"Year, "
 		"Month, "
 		"Day, "
 		"Hour, "
@@ -498,7 +502,7 @@ void SQLite::initializeTimeIndicesTable()
 		"DayType, "
 		"EnvironmentPeriodIndex, "
 		"WarmupFlag) "
-		"VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
+		"VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_timeIndexInsertStmt,timeIndexInsertSQL);
 }
@@ -1507,6 +1511,7 @@ void SQLite::createSQLiteReportDataRecord(
 				case LocalReportDaily:
 				case LocalReportMonthly:
 				case LocalReportSim:
+				case LocalReportYearly:
 					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
 					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
 
@@ -1543,6 +1548,7 @@ void SQLite::createSQLiteReportDataRecord(
 				case LocalReportDaily:
 				case LocalReportMonthly:
 				case LocalReportSim:
+				case LocalReportYearly:
 					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
 					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
 
@@ -1580,6 +1586,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 	int const EP_UNUSED( recordIndex ),
 	int const cumlativeSimulationDays,
 	int const curEnvirNum,
+	int const simulationYear,
 	Optional_int_const month,
 	Optional_int_const dayOfMonth,
 	Optional_int_const hour,
@@ -1613,17 +1620,18 @@ void SQLite::createSQLiteTimeIndexRecord(
 			adjustReportingHourAndMinutes(t_hour, intEndMinute);
 
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindInteger(m_timeIndexInsertStmt, 2, month());
-			sqliteBindInteger(m_timeIndexInsertStmt, 3, dayOfMonth());
-			sqliteBindInteger(m_timeIndexInsertStmt, 4, t_hour);
-			sqliteBindInteger(m_timeIndexInsertStmt, 5, intEndMinute);
-			sqliteBindInteger(m_timeIndexInsertStmt, 6, dst());
-			sqliteBindInteger(m_timeIndexInsertStmt, 7, intervalInMinutes);
-			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
-			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
-			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
-			sqliteBindLogical(m_timeIndexInsertStmt, 12, warmupFlag);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
+			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
+			sqliteBindInteger(m_timeIndexInsertStmt, 4, dayOfMonth());
+			sqliteBindInteger(m_timeIndexInsertStmt, 5, t_hour);
+			sqliteBindInteger(m_timeIndexInsertStmt, 6, intEndMinute);
+			sqliteBindInteger(m_timeIndexInsertStmt, 7, dst());
+			sqliteBindInteger(m_timeIndexInsertStmt, 8, intervalInMinutes);
+			sqliteBindInteger(m_timeIndexInsertStmt, 9, reportingInterval);
+			sqliteBindInteger(m_timeIndexInsertStmt, 10, cumlativeSimulationDays);
+			sqliteBindText(m_timeIndexInsertStmt, 11, dayType());
+			sqliteBindInteger(m_timeIndexInsertStmt, 12, curEnvirNum);
+			sqliteBindLogical(m_timeIndexInsertStmt, 13, warmupFlag);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1638,16 +1646,17 @@ void SQLite::createSQLiteTimeIndexRecord(
 			++m_sqlDBTimeIndex;
 
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindInteger(m_timeIndexInsertStmt, 2, month());
-			sqliteBindInteger(m_timeIndexInsertStmt, 3, dayOfMonth());
-			sqliteBindInteger(m_timeIndexInsertStmt, 4, hour());
-			sqliteBindInteger(m_timeIndexInsertStmt, 5, 0);
-			sqliteBindInteger(m_timeIndexInsertStmt, 6, dst());
-			sqliteBindInteger(m_timeIndexInsertStmt, 7, intervalInMinutes);
-			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
-			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
-			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
+			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
+			sqliteBindInteger(m_timeIndexInsertStmt, 4, dayOfMonth());
+			sqliteBindInteger(m_timeIndexInsertStmt, 5, hour());
+			sqliteBindInteger(m_timeIndexInsertStmt, 6, 0);
+			sqliteBindInteger(m_timeIndexInsertStmt, 7, dst());
+			sqliteBindInteger(m_timeIndexInsertStmt, 8, intervalInMinutes);
+			sqliteBindInteger(m_timeIndexInsertStmt, 9, reportingInterval);
+			sqliteBindInteger(m_timeIndexInsertStmt, 10, cumlativeSimulationDays);
+			sqliteBindText(m_timeIndexInsertStmt, 11, dayType());
+			sqliteBindInteger(m_timeIndexInsertStmt, 12, curEnvirNum);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1663,16 +1672,17 @@ void SQLite::createSQLiteTimeIndexRecord(
 
 			intervalInMinutes = 60*24;
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindInteger(m_timeIndexInsertStmt, 2, month());
-			sqliteBindInteger(m_timeIndexInsertStmt, 3, dayOfMonth());
-			sqliteBindInteger(m_timeIndexInsertStmt, 4, 24);
-			sqliteBindInteger(m_timeIndexInsertStmt, 5, 0);
-			sqliteBindInteger(m_timeIndexInsertStmt, 6, dst());
-			sqliteBindInteger(m_timeIndexInsertStmt, 7, intervalInMinutes);
-			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
-			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
-			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
+			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
+			sqliteBindInteger(m_timeIndexInsertStmt, 4, dayOfMonth());
+			sqliteBindInteger(m_timeIndexInsertStmt, 5, 24);
+			sqliteBindInteger(m_timeIndexInsertStmt, 6, 0);
+			sqliteBindInteger(m_timeIndexInsertStmt, 7, dst());
+			sqliteBindInteger(m_timeIndexInsertStmt, 8, intervalInMinutes);
+			sqliteBindInteger(m_timeIndexInsertStmt, 9, reportingInterval);
+			sqliteBindInteger(m_timeIndexInsertStmt, 10, cumlativeSimulationDays);
+			sqliteBindText(m_timeIndexInsertStmt, 11, dayType());
+			sqliteBindInteger(m_timeIndexInsertStmt, 12, curEnvirNum);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1688,16 +1698,17 @@ void SQLite::createSQLiteTimeIndexRecord(
 
 			intervalInMinutes = 60*24*lastDayOfMonth[month() - 1];
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
-			sqliteBindInteger(m_timeIndexInsertStmt, 2, month());
-			sqliteBindInteger(m_timeIndexInsertStmt, 3, lastDayOfMonth[month() - 1]);
-			sqliteBindInteger(m_timeIndexInsertStmt, 4, 24);
-			sqliteBindInteger(m_timeIndexInsertStmt, 5, 0);
-			sqliteBindNULL(m_timeIndexInsertStmt, 6);
-			sqliteBindInteger(m_timeIndexInsertStmt, 7, intervalInMinutes);
-			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
-			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
-			sqliteBindNULL(m_timeIndexInsertStmt, 10);
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
+			sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
+			sqliteBindInteger(m_timeIndexInsertStmt, 3, month());
+			sqliteBindInteger(m_timeIndexInsertStmt, 4, lastDayOfMonth[month() - 1]);
+			sqliteBindInteger(m_timeIndexInsertStmt, 5, 24);
+			sqliteBindInteger(m_timeIndexInsertStmt, 6, 0);
+			sqliteBindNULL(m_timeIndexInsertStmt, 7);
+			sqliteBindInteger(m_timeIndexInsertStmt, 8, intervalInMinutes);
+			sqliteBindInteger(m_timeIndexInsertStmt, 9, reportingInterval);
+			sqliteBindInteger(m_timeIndexInsertStmt, 10, cumlativeSimulationDays);
+			sqliteBindNULL(m_timeIndexInsertStmt, 11);
+			sqliteBindInteger(m_timeIndexInsertStmt, 12, curEnvirNum);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1714,11 +1725,12 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindNULL(m_timeIndexInsertStmt, 4);
 			sqliteBindNULL(m_timeIndexInsertStmt, 5);
 			sqliteBindNULL(m_timeIndexInsertStmt, 6);
-			sqliteBindInteger(m_timeIndexInsertStmt, 7, intervalInMinutes);
-			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
-			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
-			sqliteBindNULL(m_timeIndexInsertStmt, 10);
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
+			sqliteBindNULL(m_timeIndexInsertStmt, 7);
+			sqliteBindInteger(m_timeIndexInsertStmt, 8, intervalInMinutes);
+			sqliteBindInteger(m_timeIndexInsertStmt, 9, reportingInterval);
+			sqliteBindInteger(m_timeIndexInsertStmt, 10, cumlativeSimulationDays);
+			sqliteBindNULL(m_timeIndexInsertStmt, 11);
+			sqliteBindInteger(m_timeIndexInsertStmt, 12, curEnvirNum);
 
 			sqliteStepCommand (m_timeIndexInsertStmt);
 			sqliteResetCommand (m_timeIndexInsertStmt);
@@ -1731,6 +1743,33 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteWriteMessage(ss.str());
 		}
 		}
+	}
+}
+
+void SQLite::createYearlyTimeIndexRecord(
+	int const simulationYear,
+	int const curEnvirNum
+)
+{
+	if ( m_writeOutputToSQLite ) {
+
+		++m_sqlDBTimeIndex;
+
+		sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
+		sqliteBindInteger(m_timeIndexInsertStmt, 2, simulationYear);
+		sqliteBindNULL(m_timeIndexInsertStmt, 3);
+		sqliteBindNULL(m_timeIndexInsertStmt, 4);
+		sqliteBindNULL(m_timeIndexInsertStmt, 5);
+		sqliteBindNULL(m_timeIndexInsertStmt, 6);
+		sqliteBindNULL(m_timeIndexInsertStmt, 7);
+		sqliteBindNULL(m_timeIndexInsertStmt, 8);
+		sqliteBindInteger(m_timeIndexInsertStmt, 9, LocalReportYearly);
+		sqliteBindNULL(m_timeIndexInsertStmt, 10);
+		sqliteBindNULL(m_timeIndexInsertStmt, 11);
+		sqliteBindInteger(m_timeIndexInsertStmt, 12, curEnvirNum);
+
+		sqliteStepCommand(m_timeIndexInsertStmt);
+		sqliteResetCommand(m_timeIndexInsertStmt);
 	}
 }
 

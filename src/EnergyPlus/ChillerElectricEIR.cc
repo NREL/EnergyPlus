@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -755,55 +756,55 @@ namespace ChillerElectricEIR {
 		}
 
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum ) {
-			SetupOutputVariable( "Chiller Part Load Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Cycling Ratio []", ElectricEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory, "Plant" );
+			SetupOutputVariable( "Chiller Part Load Ratio", OutputProcessor::Unit::None, ElectricEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Cycling Ratio", OutputProcessor::Unit::None, ElectricEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Electric Power", OutputProcessor::Unit::W, ElectricEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Electric Energy", OutputProcessor::Unit::J, ElectricEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", ElectricEIRChiller( EIRChillerNum ).EndUseSubcategory, "Plant" );
 
-			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElectricEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
-			SetupOutputVariable( "Chiller False Load Heat Transfer Rate [W]", ElectricEIRChillerReport( EIRChillerNum ).ChillerFalseLoadRate, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller False Load Heat Transfer Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).ChillerFalseLoad, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Inlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).EvapInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Outlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).EvapOutletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate [kg/s]", ElectricEIRChillerReport( EIRChillerNum ).Evapmdot, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, ElectricEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Cooling Energy", OutputProcessor::Unit::J, ElectricEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
+			SetupOutputVariable( "Chiller False Load Heat Transfer Rate", OutputProcessor::Unit::W, ElectricEIRChillerReport( EIRChillerNum ).ChillerFalseLoadRate, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller False Load Heat Transfer Energy", OutputProcessor::Unit::J, ElectricEIRChillerReport( EIRChillerNum ).ChillerFalseLoad, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).EvapInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).EvapOutletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, ElectricEIRChillerReport( EIRChillerNum ).Evapmdot, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate [W]", ElectricEIRChillerReport( EIRChillerNum ).QCond, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).CondEnergy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
-			SetupOutputVariable( "Chiller COP [W/W]", ElectricEIRChillerReport( EIRChillerNum ).ActualCOP, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, ElectricEIRChillerReport( EIRChillerNum ).QCond, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy", OutputProcessor::Unit::J, ElectricEIRChillerReport( EIRChillerNum ).CondEnergy, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
+			SetupOutputVariable( "Chiller COP", OutputProcessor::Unit::W_W, ElectricEIRChillerReport( EIRChillerNum ).ActualCOP, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 
-			SetupOutputVariable( "Chiller Capacity Temperature Modifier Multiplier []", ElectricEIRChillerReport( EIRChillerNum ).ChillerCapFT, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller EIR Temperature Modifier Multiplier []", ElectricEIRChillerReport( EIRChillerNum ).ChillerEIRFT, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller EIR Part Load Modifier Multiplier []", ElectricEIRChillerReport( EIRChillerNum ).ChillerEIRFPLR, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Capacity Temperature Modifier Multiplier", OutputProcessor::Unit::None, ElectricEIRChillerReport( EIRChillerNum ).ChillerCapFT, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller EIR Temperature Modifier Multiplier", OutputProcessor::Unit::None, ElectricEIRChillerReport( EIRChillerNum ).ChillerEIRFT, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller EIR Part Load Modifier Multiplier", OutputProcessor::Unit::None, ElectricEIRChillerReport( EIRChillerNum ).ChillerEIRFPLR, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 
 			// Condenser mass flow and outlet temp are valid for water cooled
 			if ( ElectricEIRChiller( EIRChillerNum ).CondenserType == WaterCooled ) {
-				SetupOutputVariable( "Chiller Condenser Inlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).CondInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-				SetupOutputVariable( "Chiller Condenser Outlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).CondOutletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-				SetupOutputVariable( "Chiller Condenser Mass Flow Rate [kg/s]", ElectricEIRChillerReport( EIRChillerNum ).Condmdot, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).CondInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).CondOutletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, ElectricEIRChillerReport( EIRChillerNum ).Condmdot, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 
 				// If heat recovery is active then setup report variables
 				if ( ElectricEIRChiller( EIRChillerNum ).HeatRecActive ) {
-					SetupOutputVariable( "Chiller Total Recovered Heat Rate [W]", ElectricEIRChillerReport( EIRChillerNum ).QHeatRecovery, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-					SetupOutputVariable( "Chiller Total Recovered Heat Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).EnergyHeatRecovery, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
-					SetupOutputVariable( "Chiller Heat Recovery Inlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).HeatRecInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-					SetupOutputVariable( "Chiller Heat Recovery Outlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).HeatRecOutletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-					SetupOutputVariable( "Chiller Heat Recovery Mass Flow Rate [kg/s]", ElectricEIRChillerReport( EIRChillerNum ).HeatRecMassFlow, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-					SetupOutputVariable( "Chiller Effective Heat Rejection Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).ChillerCondAvgTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+					SetupOutputVariable( "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, ElectricEIRChillerReport( EIRChillerNum ).QHeatRecovery, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+					SetupOutputVariable( "Chiller Total Recovered Heat Energy", OutputProcessor::Unit::J, ElectricEIRChillerReport( EIRChillerNum ).EnergyHeatRecovery, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+					SetupOutputVariable( "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).HeatRecInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+					SetupOutputVariable( "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).HeatRecOutletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+					SetupOutputVariable( "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, ElectricEIRChillerReport( EIRChillerNum ).HeatRecMassFlow, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+					SetupOutputVariable( "Chiller Effective Heat Rejection Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).ChillerCondAvgTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 				}
 
 			} else {
-				SetupOutputVariable( "Chiller Condenser Inlet Temperature [C]", ElectricEIRChillerReport( EIRChillerNum ).CondInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, ElectricEIRChillerReport( EIRChillerNum ).CondInletTemp, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
 				if ( ElectricEIRChiller( EIRChillerNum ).CondenserFanPowerRatio > 0 ) {
-					SetupOutputVariable( "Chiller Condenser Fan Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).CondenserFanPowerUse, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-					SetupOutputVariable( "Chiller Condenser Fan Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).CondenserFanEnergyConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+					SetupOutputVariable( "Chiller Condenser Fan Electric Power", OutputProcessor::Unit::W, ElectricEIRChillerReport( EIRChillerNum ).CondenserFanPowerUse, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+					SetupOutputVariable( "Chiller Condenser Fan Electric Energy", OutputProcessor::Unit::J, ElectricEIRChillerReport( EIRChillerNum ).CondenserFanEnergyConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
 				}
 				if ( ElectricEIRChiller( EIRChillerNum ).CondenserType == EvapCooled ) {
-					SetupOutputVariable( "Chiller Evaporative Condenser Water Volume [m3]", ElectricEIRChillerReport( EIRChillerNum ).EvapWaterConsump, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "Water", "Cooling", _, "System" );
-					SetupOutputVariable( "Chiller Evaporative Condenser Mains Supply Water Volume [m3]", ElectricEIRChillerReport( EIRChillerNum ).EvapWaterConsump, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Chiller Evaporative Condenser Water Volume", OutputProcessor::Unit::m3, ElectricEIRChillerReport( EIRChillerNum ).EvapWaterConsump, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Chiller Evaporative Condenser Mains Supply Water Volume", OutputProcessor::Unit::m3, ElectricEIRChillerReport( EIRChillerNum ).EvapWaterConsump, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "MainsWater", "Cooling", _, "System" );
 					if ( ElectricEIRChiller( EIRChillerNum ).BasinHeaterPowerFTempDiff > 0.0 ) {
-						SetupOutputVariable( "Chiller Basin Heater Electric Power [W]", ElectricEIRChillerReport( EIRChillerNum ).BasinHeaterPower, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
-						SetupOutputVariable( "Chiller Basin Heater Electric Energy [J]", ElectricEIRChillerReport( EIRChillerNum ).BasinHeaterConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "Electric", "CHILLERS", _, "Plant" );
+						SetupOutputVariable( "Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, ElectricEIRChillerReport( EIRChillerNum ).BasinHeaterPower, "System", "Average", ElectricEIRChiller( EIRChillerNum ).Name );
+						SetupOutputVariable( "Chiller Basin Heater Electric Energy", OutputProcessor::Unit::J, ElectricEIRChillerReport( EIRChillerNum ).BasinHeaterConsumption, "System", "Sum", ElectricEIRChiller( EIRChillerNum ).Name, _, "Electric", "CHILLERS", _, "Plant" );
 					}
 				}
 			}

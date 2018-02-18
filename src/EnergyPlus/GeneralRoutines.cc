@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -100,6 +101,21 @@ namespace EnergyPlus {
 
 static gio::Fmt fmtLD( "*" );
 
+// Integer constants for different system types handled by the routines in this file
+enum GeneralRoutinesEquipNums {
+	ParallelPIUReheatNum = 1,
+	SeriesPIUReheatNum = 2,
+	HeatingCoilWaterNum = 3,
+	BBWaterConvOnlyNum = 4,
+	BBSteamRadConvNum = 5,
+	BBWaterRadConvNum = 6,
+	FourPipeFanCoilNum = 7,
+	OutdoorAirUnitNum = 8,
+	UnitHeaterNum = 9,
+	UnitVentilatorNum = 10,
+	VentilatedSlabNum = 11
+};
+
 void
 ControlCompOutput(
 	std::string const & CompName, // the component Name
@@ -183,6 +199,7 @@ ControlCompOutput(
 	bool WaterCoilAirFlowControl; // True if controlling air flow through water coil, water flow fixed
 	int SimCompNum; // internal number for case statement
 	static Real64 HalvingPrec( 0.0 ); // precision of halving algorithm
+	bool BBConvergeCheckFlag; // additional check on convergence specifically for radiant/convective baseboard units
 
 	struct IntervalHalf
 	{
@@ -474,7 +491,7 @@ ControlCompOutput(
 		}
 
 		switch ( SimCompNum ) { //Tuned If block changed to switch
-		case 1: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
+		case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -483,7 +500,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 2: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
+		case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -492,7 +509,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 3: // 'COIL:HEATING:WATER'
+		case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
 			// Simulate reheat coil for the VAV system
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -507,56 +524,56 @@ ControlCompOutput(
 			}
 			break;
 
-		case 4: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
+		case BBWaterConvOnlyNum: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
 			// Simulate baseboard
 			SimHWConvective( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 5: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
+		case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
 			// Simulate baseboard
 			CalcSteamBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 6: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
+		case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
 			// Simulate baseboard
 			CalcHWBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 7: // 'ZONEHVAC:FOURPIPEFANCOIL'
+		case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
 			// Simulate fancoil unit
 			Calc4PipeFanCoil( CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 8: //'ZONEHVAC:OUTDOORAIRUNIT'
+		case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
 			// Simulate outdoor air unit components
 			CalcOAUnitCoilComps( CompNum, FirstHVACIteration, EquipIndex, LoadMet ); //Autodesk:OPTIONAL EquipIndex used without PRESENT check
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 9: // 'ZONEHVAC:UNITHEATER'
+		case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
 			// Simulate unit heater components
 			CalcUnitHeaterComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 10: // 'ZONEHVAC:UNITVENTILATOR'
+		case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
 			// Simulate unit ventilator components
 			CalcUnitVentilatorComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 11: // 'ZONEHVAC:VENTILATEDSLAB'
+		case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
 			// Simulate unit ventilator components
 			CalcVentilatedSlabComps( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
@@ -580,6 +597,20 @@ ControlCompOutput(
 			ZoneInterHalf.MaxResult = 1.0;
 			ZoneInterHalf.MinResult = 0.0;
 			break;
+		}
+		if ( !Converged ) {
+			BBConvergeCheckFlag = BBConvergeCheck( SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow );
+			if ( BBConvergeCheckFlag ) {
+				//Set to converged controller
+				Converged = true;
+				ZoneInterHalf.MaxFlowCalc = true;
+				ZoneInterHalf.MinFlowCalc = false;
+				ZoneInterHalf.NormFlowCalc = false;
+				ZoneInterHalf.MinFlowResult = false;
+				ZoneInterHalf.MaxResult = 1.0;
+				ZoneInterHalf.MinResult = 0.0;
+				break;
+			}
 		}
 
 		++Iter;
@@ -605,6 +636,50 @@ ControlCompOutput(
 
 }
 
+bool
+BBConvergeCheck(
+	int const SimCompNum,
+	Real64 const MaxFlow,
+	Real64 const MinFlow
+)
+{
+
+	// FUNCTION INFORMATION:
+	//       AUTHOR         Rick Strand
+	//       DATE WRITTEN   November 2017
+	
+	// PURPOSE OF THIS SUBROUTINE:
+	// This is an additional check for the radiant/convective baseboard units
+	// to see if they are converged or the flow is sufficiently converged to
+	// procede with the simulation.  With the radiant component to these systems,
+	// the impact on the load met is more difficult to calculate and the impact
+	// on the actual system output is not as well behaved as for convective
+	// systems.  This additional check avoids excessive iterations and max
+	// iteration warnings and provides sufficiently converged results.  It is
+	// only called from ControlCompOutput.
+
+	// Return Value
+	bool BBConvergeCheck;
+	
+	// SUBROUTINE PARAMETER DEFINITIONS:
+	static Real64 const BBIterLimit( 0.00001 );
+	
+	if ( SimCompNum != BBSteamRadConvNum && SimCompNum != BBWaterRadConvNum ) {
+		// For all zone equipment except radiant/convective baseboard (steam and water) units:
+		BBConvergeCheck = false;
+	} else {
+		// For steam and water radiant/convective baseboard units:
+		if ( ( MaxFlow - MinFlow ) > BBIterLimit ) {
+			BBConvergeCheck = false;
+		} else {
+			BBConvergeCheck = true;
+		}
+	}
+	
+	return BBConvergeCheck;
+	
+}
+	
 void
 CheckSysSizing(
 	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
@@ -1716,8 +1791,6 @@ TestReturnAirPathIntegrity(
 	// SUBROUTINE INFORMATION:
 	//       AUTHOR         Linda Lawrie
 	//       DATE WRITTEN   March 2003
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS SUBROUTINE:
 	// This subroutine tests return air path integrity and displays the loop for each branch.
@@ -1979,22 +2052,7 @@ TestReturnAirPathIntegrity(
 					WAirLoop = Count2;
 					ValRetAPaths( _, WAirLoop ) = 0;
 					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
-					for ( int RetPathNode = 1; RetPathNode <= CountNodes; ++RetPathNode ){
-						bool RetNodeFound = false;
-						for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
-							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-							for ( int ZoneOutNum = 1; ZoneOutNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++ZoneOutNum ) {
-								if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNode( ZoneOutNum ) == AllNodes( RetPathNode ) ) {
-									ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( ZoneOutNum ) = WAirLoop;
-									RetNodeFound = true;
-									break; // leave zone return node loop
-								}
-							if ( RetNodeFound ) break; // leave controlled zone loop
-							}
-						}
-
-					}
-					break; // leave air loops loop
+					break;
 				}
 			} else {
 				ShowWarningError( "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo( Count2 ).AirLoopName );

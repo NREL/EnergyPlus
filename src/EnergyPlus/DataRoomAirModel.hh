@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -661,7 +662,6 @@ namespace DataRoomAirModel {
 		int PatternSchedID; // index of pattern selecting schedule
 		//calculated and from elsewhere
 		Real64 ZoneHeight; // in meters, from Zone%CeilingHeight
-		int ReturnAirNodeID; // index in Node array
 		int ZoneNodeID; // index in Node array for this zone
 		Array1D_int ExhaustAirNodeID; // indexes in Node array
 		Real64 TairMean; // comes from MAT
@@ -681,7 +681,6 @@ namespace DataRoomAirModel {
 			AvailSchedID( 0 ),
 			PatternSchedID( 0 ),
 			ZoneHeight( 0.0 ),
-			ReturnAirNodeID( 0 ),
 			ZoneNodeID( 0 ),
 			TairMean( 23.0 ),
 			Tstat( 23.0 ),
@@ -921,7 +920,6 @@ namespace DataRoomAirModel {
 		int ControlAirNodeID; // index of roomair node that is HVAC control sensor location
 		int NumOfAirNodes; // Number of air nodes
 		Array1D< RoomAirflowNetworkAirNodeNestedStruct > Node; // Node struct
-		int ReturnAirNodeID; // index in system Node array
 		int ZoneNodeID; // index in system Node array for this zone
 		Real64 TairMean; // comes from MAT
 		Real64 Tstat; // temperature for thermostat
@@ -939,7 +937,6 @@ namespace DataRoomAirModel {
 			AvailSchedID( 0 ), // index of availability schedule
 			ControlAirNodeID( 0 ), // index of roomair node that is HVAC control sensor location
 			NumOfAirNodes( 0 ), // Number of air nodes
-			ReturnAirNodeID( 0 ), // index in system Node array
 			ZoneNodeID( 0 ), // index in system Node array for this zone
 			TairMean( 23.0 ), // comes from MAT
 			Tstat( 23.0 ), // temperature for thermostat

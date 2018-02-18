@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -960,25 +961,25 @@ namespace Pumps {
 		for ( PumpNum = 1; PumpNum <= NumPumps; ++PumpNum ) { //CurrentModuleObject='Pumps'
 			if ( PumpEquip( PumpNum ).PumpType == Pump_VarSpeed || PumpEquip( PumpNum ).PumpType == Pump_ConSpeed || PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
 
-				SetupOutputVariable( "Pump Electric Energy [J]", PumpEquip( PumpNum ).Energy, "System", "Sum", PumpEquip( PumpNum ).Name, _, "Electric", "Pumps", _, "Plant" );
-				SetupOutputVariable( "Pump Electric Power [W]", PumpEquip( PumpNum ).Power, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Shaft Power [W]", PumpEquipReport( PumpNum ).ShaftPower, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Fluid Heat Gain Rate [W]", PumpEquipReport( PumpNum ).PumpHeattoFluid, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Fluid Heat Gain Energy [J]", PumpEquipReport( PumpNum ).PumpHeattoFluidEnergy, "System", "Sum", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Outlet Temperature [C]", PumpEquipReport( PumpNum ).OutletTemp, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Mass Flow Rate [kg/s]", PumpEquipReport( PumpNum ).PumpMassFlowRate, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Electric Energy", OutputProcessor::Unit::J, PumpEquip( PumpNum ).Energy, "System", "Sum", PumpEquip( PumpNum ).Name, _, "Electric", "Pumps", _, "Plant" );
+				SetupOutputVariable( "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip( PumpNum ).Power, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport( PumpNum ).ShaftPower, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Fluid Heat Gain Rate", OutputProcessor::Unit::W, PumpEquipReport( PumpNum ).PumpHeattoFluid, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Fluid Heat Gain Energy", OutputProcessor::Unit::J, PumpEquipReport( PumpNum ).PumpHeattoFluidEnergy, "System", "Sum", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Outlet Temperature", OutputProcessor::Unit::C, PumpEquipReport( PumpNum ).OutletTemp, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Mass Flow Rate", OutputProcessor::Unit::kg_s, PumpEquipReport( PumpNum ).PumpMassFlowRate, "System", "Average", PumpEquip( PumpNum ).Name );
 
 			}
 			if ( PumpEquip( PumpNum ).PumpType == PumpBank_VarSpeed || PumpEquip( PumpNum ).PumpType == PumpBank_ConSpeed ) { // CurrentModuleObject='HeaderedPumps'
 
-				SetupOutputVariable( "Pump Electric Energy [J]", PumpEquip( PumpNum ).Energy, "System", "Sum", PumpEquip( PumpNum ).Name, _, "Electric", "Pumps", _, "Plant" );
-				SetupOutputVariable( "Pump Electric Power [W]", PumpEquip( PumpNum ).Power, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Shaft Power [W]", PumpEquipReport( PumpNum ).ShaftPower, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Fluid Heat Gain Rate [W]", PumpEquipReport( PumpNum ).PumpHeattoFluid, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Fluid Heat Gain Energy [J]", PumpEquipReport( PumpNum ).PumpHeattoFluidEnergy, "System", "Sum", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Outlet Temperature [C]", PumpEquipReport( PumpNum ).OutletTemp, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Mass Flow Rate [kg/s]", PumpEquipReport( PumpNum ).PumpMassFlowRate, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Operating Pumps Count []", PumpEquipReport( PumpNum ).NumPumpsOperating, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Electric Energy", OutputProcessor::Unit::J, PumpEquip( PumpNum ).Energy, "System", "Sum", PumpEquip( PumpNum ).Name, _, "Electric", "Pumps", _, "Plant" );
+				SetupOutputVariable( "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip( PumpNum ).Power, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport( PumpNum ).ShaftPower, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Fluid Heat Gain Rate", OutputProcessor::Unit::W, PumpEquipReport( PumpNum ).PumpHeattoFluid, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Fluid Heat Gain Energy", OutputProcessor::Unit::J, PumpEquipReport( PumpNum ).PumpHeattoFluidEnergy, "System", "Sum", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Outlet Temperature", OutputProcessor::Unit::C, PumpEquipReport( PumpNum ).OutletTemp, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Mass Flow Rate", OutputProcessor::Unit::kg_s, PumpEquipReport( PumpNum ).PumpMassFlowRate, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Operating Pumps Count", OutputProcessor::Unit::None, PumpEquipReport( PumpNum ).NumPumpsOperating, "System", "Average", PumpEquip( PumpNum ).Name );
 			}
 
 			if ( AnyEnergyManagementSystemInModel ) {
@@ -989,10 +990,10 @@ namespace Pumps {
 
 			if ( PumpEquip( PumpNum ).HeatLossesToZone ) {
 				// setup skin loss output vars
-				SetupOutputVariable( "Pump Zone Total Heating Rate [W]", PumpEquipReport( PumpNum ).ZoneTotalGainRate, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Zone Total Heating Energy [J]", PumpEquipReport( PumpNum ).ZoneTotalGainEnergy, "System", "Sum", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Zone Convective Heating Rate [W]", PumpEquipReport( PumpNum ).ZoneConvGainRate, "System", "Average", PumpEquip( PumpNum ).Name );
-				SetupOutputVariable( "Pump Zone Radiative Heating Rate [W]", PumpEquipReport( PumpNum ).ZoneRadGainRate, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Zone Total Heating Rate", OutputProcessor::Unit::W, PumpEquipReport( PumpNum ).ZoneTotalGainRate, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Zone Total Heating Energy", OutputProcessor::Unit::J, PumpEquipReport( PumpNum ).ZoneTotalGainEnergy, "System", "Sum", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Zone Convective Heating Rate", OutputProcessor::Unit::W, PumpEquipReport( PumpNum ).ZoneConvGainRate, "System", "Average", PumpEquip( PumpNum ).Name );
+				SetupOutputVariable( "Pump Zone Radiative Heating Rate", OutputProcessor::Unit::W, PumpEquipReport( PumpNum ).ZoneRadGainRate, "System", "Average", PumpEquip( PumpNum ).Name );
 
 				// setup internal gains
 				{ auto const SELECT_CASE_var( PumpEquip( PumpNum ).PumpType );
