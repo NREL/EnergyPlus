@@ -1197,7 +1197,7 @@ namespace SingleDuct {
 				}
 			}
 
-			if ( lAlphaFieldBlanks( 5 ) ) {
+			if ( lAlphaBlanks( 5 ) ) {
 				Sys( SysNum ).NoOAFlowInputFromUser = true;
 			} else {
 				Sys( SysNum ).OARequirementsPtr = InputProcessor::FindItemInList( Alphas( 5 ), DataSizing::OARequirements );
@@ -1210,7 +1210,7 @@ namespace SingleDuct {
 				}
 			}
 
-			if ( lAlphaFieldBlanks( 6 ) ) {
+			if ( lAlphaBlanks( 6 ) ) {
 				Sys( SysNum ).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
 			} else {
 				if ( Alphas( 6 ) == "CURRENTOCCUPANCY" ) {

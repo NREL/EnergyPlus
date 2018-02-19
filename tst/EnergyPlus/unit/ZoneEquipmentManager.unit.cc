@@ -65,16 +65,21 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
+using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceAirManager;
 using namespace EnergyPlus::HeatBalanceManager;
+using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::SingleDuct;
+using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 
 TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 {
@@ -89,7 +94,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 		" Space,                    !- Zone Name",
 		" Space Equipment,          !- Zone Conditioning Equipment List Name",
 		" Space In Node,            !- Zone Air Inlet Node or NodeList Name",
-		" Space Exh Nodes,           !- Zone Air Exhaust Node or NodeList Name",
+		" Space Exh Nodes,          !- Zone Air Exhaust Node or NodeList Name",
 		" Space Node,               !- Zone Air Node Name",
 		" Space Ret Node;           !- Zone Return Air Node Name",
 
@@ -606,36 +611,57 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad )
 		"ZoneHVAC:EquipmentList,",
 		" Space Equipment,          !- Name",
 		" SequentialLoad,           !- Load Distribution Scheme",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-		" Air Terminal 1,           !- Zone Equipment 1 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		" Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
 		" 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 2,  !- Zone Equipment 2 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
 		" 2,                        !- Zone Equipment 2 Cooling Sequence",
 		" 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 3,           !- Zone Equipment 3 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
 		" 3,                        !- Zone Equipment 3 Cooling Sequence",
 		" 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 1,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 1,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 1 ADU,       !- Name",
+		" Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 1;           !- Air Terminal Name"
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 2,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 2 ADU,       !- Name",
+		" Zone Equip Inlet 2,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 2;           !- Air Terminal Name"
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 3,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 3,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 3 ADU,       !- Name",
+		" Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 3;           !- Air Terminal Name"
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 1,          !- Name",
+		" ,    !- Availability Schedule Name",
+		" Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 1,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 2,          !- Name",
+		" ,    !- Availability Schedule Name",
+		" Zone Equip Inlet 2 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 2,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 3,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 3,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
 
 		"NodeList,",
 		"  Space Inlet Nodes,       !- Name",
@@ -648,9 +674,17 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad )
 	ASSERT_FALSE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
+
+	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+	ProcessScheduleInput(); // read schedules
+
 	GetZoneData( ErrorsFound );
 	AllocateHeatBalArrays();
 	GetZoneEquipmentData1();
+	//GetZoneAirLoopEquipment();
+	//SingleDuct::GetSysInput();
+
 	ZoneEquipInputsFilled = true;
 	int ZoneNum = 1;
 	DataZoneEnergyDemands::CurDeadBandOrSetback.allocate( 1 );
