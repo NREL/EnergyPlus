@@ -847,7 +847,7 @@ namespace SolarShading {
 			}
 		}
 
-		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
+		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
 		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + cAlphaArgs( 4 ) + ',' + cAlphaArgs( 5 ) + ',' + cAlphaArgs( 6 ) + ',' + cAlphaArgs( 7 );
 
 	}
