@@ -1656,17 +1656,13 @@
 
   Output:Variable,*,Cooling Coil Electric Power,hourly;
 
-  Output:Variable,*,Heating Coil Total Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Total Heating Energy,hourly;
+  Output:Variable,*,Heating Coil Heating Energy,hourly;
 
   Output:Variable,*,Heating Coil Electric Power,hourly;
 
   Output:Variable,*,Heating Coil Defrost Electric Power,hourly;
-
-  Output:Variable,*,Heating Coil Air Heating Energy,hourly;
-
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Gas Rate,hourly;
 

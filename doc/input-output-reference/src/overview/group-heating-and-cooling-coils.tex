@@ -595,22 +595,22 @@ Coil:Heating:Electric:MultiStage,
 
 \begin{itemize}
 \item
-  HVAC,Sum,Heating Coil Energy{[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy{[}J{]}
 \item
-  HVAC,Average,Heating Coil Rate{[}W{]}
+  HVAC,Average,Heating Coil Heating Rate{[}W{]}
 \item
   HVAC,Sum,Heating Coil Electric Consumption {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power {[}W{]}
 \end{itemize}
 
-\paragraph{Heating Coil Energy (J)}\label{heating-coil-energy-j}
+\paragraph{Heating Coil Heating Energy (J)}\label{heating-coil-energy-j}
 
-Heating Coil Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
+Heating Coil Heating Energy is the total amount of heat transfer taking place in the coil at the operating conditions.
 
-\paragraph{Heating Coil Rate{[}W{]}}\label{heating-coil-ratew}
+\paragraph{Heating Coil Heating Rate{[}W{]}}\label{heating-coil-ratew}
 
-Heating Coil Rate is the Rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
+Heating Coil Heating Rate is the rate of heat transfer taking place in the coil at the operating conditions. The units are (J/sec) or Watts.
 
 \paragraph{Heating Coil Electric Consumption {[}J{]}}\label{heating-coil-electric-consumption-j}
 
@@ -713,9 +713,9 @@ Coil:Heating:Desuperheater,
 
 \begin{itemize}
 \item
-  HVAC,Average,Heating Coil Rate {[}W{]}
+  HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Energy {[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Electric Power {[}W{]}
 \item
@@ -1467,9 +1467,9 @@ Coil:Heating:Gas:MultiStage,
 
 \begin{itemize}
 \item
-  HVAC,Sum,Heating Coil Energy{[}J{]}
+  HVAC,Sum,Heating Coil Heating Energy{[}J{]}
 \item
-  HVAC,Average,Heating Coil Rate{[}W{]}
+  HVAC,Average,Heating Coil Heating Rate{[}W{]}
 \item
   HVAC,Sum,Heating Coil Gas Consumption {[}J{]}
 \item
@@ -1486,11 +1486,11 @@ Coil:Heating:Gas:MultiStage,
   HVAC,Average,Heating Coil Parasitic Gas Consumption Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Heating Coil Energy {[}J{]}}\label{heating-coil-energy-j-1}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-energy-j-1}
 
 This field is the total heating output of the coil in Joules over the timestep being reported. This output is also added to an output meter with Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Heating Coil Rate {[}W{]}}\label{heating-coil-rate-w}
+\paragraph{Heating Coil Heating Rate {[}W{]}}\label{heating-coil-rate-w}
 
 This field is the average heating rate output of the coil in Watts over the timestep being reported.
 
@@ -3868,7 +3868,7 @@ Coil:Heating:DX:SingleSpeed,
 
 This field is the total heating rate output of the DX coil in Watts. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-7}
+\paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-7}
 
 This is the total heating output of the DX coil in Joules over the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil. This output is also added to a meter with Resource Type = EnergyTransfer, End Use Key = CoolingCoils, Group Key = System (ref. Output:Meter objects).
 
@@ -4580,7 +4580,7 @@ The output variable is the total electric consumption of the heat pump in Joules
 
 \paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-9}
 
-The output variable is the total cooling output of the coil in Joules over the timestep being reported.
+The output variable is the total heating output of the coil in Joules over the timestep being reported.
 
 \paragraph{Heating Coil Source Side Heat Transfer Energy {[}J{]}}\label{heating-coil-source-side-heat-transfer-energy-j-1}
 
@@ -7218,7 +7218,7 @@ The output variable is the total electric consumption of the heat pump in Joules
 
 \paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-10}
 
-The output variable is the total cooling output of the coil in Joules over the timestep being reported. Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
+The output variable is the heating output of the coil in Joules over the timestep being reported. Resource Type = EnergyTransfer, End Use Key = HeatingCoils, Group Key = System (ref. Output:Meter objects).
 
 \paragraph{Heating Coil Source Side Heat Transfer Energy {[}J{]}}\label{heating-coil-source-side-heat-transfer-energy-j-2}
 
@@ -7679,7 +7679,7 @@ The output variable is the total electric consumption of the heat pump in Joules
 
 \paragraph{Heating Coil Heating Energy {[}J{]}}\label{heating-coil-heating-energy-j-11}
 
-The output variable is the total cooling output of the coil in Joules over the timestep being reported.
+The output variable is the total heating output of the coil in Joules over the timestep being reported.
 
 \paragraph{Heating Coil Source Side Heat Transfer Energy {[}J{]}}\label{heating-coil-source-side-heat-transfer-energy-j-3}
 
