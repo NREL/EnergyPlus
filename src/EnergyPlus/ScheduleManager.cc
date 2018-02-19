@@ -536,10 +536,10 @@ namespace ScheduleManager {
 				ShowSevereError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\" not found when External Shading Calculation Method = ImportedShading." );
 				ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 				ShowContinueError( "Try again with putting full path and file name in the field." );
-				ErrorsFound = true;
+				ShowFatalError( "Program terminates due to previous condition." );
 			} else {
 				SchdFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "read" ); gio::open( SchdFile, ShadingSunlitFracFileName, flags ); read_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "read" ); gio::open( SchdFile, TempFullFileName, flags ); read_stat = flags.ios(); }
 				if ( read_stat != 0 ) {
 					ShowSevereError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\" cannot be opened." );
 					ShowContinueError( "... It may be open in another program (such as Excel).  Please close and try again." );

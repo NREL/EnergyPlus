@@ -206,7 +206,7 @@
 	No;                          !- Output External Shading Calculation Results
 
   Schedule:File:Shading,
-    eplusshading_test.csv;       !- File Name
+    SolarShadingTest_ImportedShading_Data.csv;  !- File Name
 
   Material,
     A2 - 4 IN DENSE FACE BRICK,  !- Name
