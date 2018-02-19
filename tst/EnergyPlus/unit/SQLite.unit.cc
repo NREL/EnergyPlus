@@ -268,25 +268,25 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord ) {
 		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
-		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 1 );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 0, 1, 1, 1, _, _, 0, "WinterDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 0, 1, 2, 2, _, _, 0, "SummerDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 0, 1, 1, 1, 60, 0, 0, "WinterDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( -1, 1, 1, 0, 1, 2, 2, 60, 0, 0, "SummerDesignDay" );
-		sqlite_test->createSQLiteTimeIndexRecord( -1, 1, 1, 1, 1, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 2017, 1 );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 0, 2017, 1, 1, 1, _, _, 0, "WinterDesignDay" );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 0, 2017, 1, 2, 2, _, _, 0, "SummerDesignDay" );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 0, 2017, 1, 1, 1, 60, 0, 0, "WinterDesignDay" );
+		sqlite_test->createSQLiteTimeIndexRecord( -1, 1, 1, 0, 2017, 1, 2, 2, 60, 0, 0, "SummerDesignDay" );
+		sqlite_test->createSQLiteTimeIndexRecord( -1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, "SummerDesignDay", true );
 		auto result = queryResult("SELECT * FROM Time;", "Time");
 		sqlite_test->sqliteCommit();
 
 		ASSERT_EQ(7ul, result.size());
 		// some of these are odd.........
-		std::vector<std::string> testResult0 {"1", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
-		std::vector<std::string> testResult1 {"2", "1", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
-		std::vector<std::string> testResult2 {"3", "1", "1", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
-		std::vector<std::string> testResult3 {"4", "1", "2", "2", "0", "0", "60", "1", "1", "SummerDesignDay", "0", ""};
-		std::vector<std::string> testResult4 {"5", "1", "1", "1", "0", "0", "60", "0", "1", "WinterDesignDay", "0", "0"};
-		std::vector<std::string> testResult5 {"6", "1", "2", "2", "0", "0", "60", "-1", "1", "SummerDesignDay", "0", "0"};
-		std::vector<std::string> testResult6 {"7", "1", "3", "3", "0", "0", "60", "-1", "1", "SummerDesignDay", "1", "1"};
+		std::vector<std::string> testResult0 {"1", "", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
+		std::vector<std::string> testResult1 {"2", "2017", "1", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+		std::vector<std::string> testResult2 {"3", "2017", "1", "1", "24", "0", "0", "1440", "2", "1", "WinterDesignDay", "0", ""};
+		std::vector<std::string> testResult3 {"4", "2017", "1", "2", "2", "0", "0", "60", "1", "1", "SummerDesignDay", "0", ""};
+		std::vector<std::string> testResult4 {"5", "2017", "1", "1", "1", "0", "0", "60", "0", "1", "WinterDesignDay", "0", "0"};
+		std::vector<std::string> testResult5 {"6", "2017", "1", "2", "2", "0", "0", "60", "-1", "1", "SummerDesignDay", "0", "0"};
+		std::vector<std::string> testResult6 {"7", "2017", "1", "3", "3", "0", "0", "60", "-1", "1", "SummerDesignDay", "1", "1"};
 		EXPECT_EQ(testResult0, result[0]);
 		EXPECT_EQ(testResult1, result[1]);
 		EXPECT_EQ(testResult2, result[2]);
@@ -296,7 +296,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult6, result[6]);
 
 		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( -999, 1, 1, 0 );
+		sqlite_test->createSQLiteTimeIndexRecord( -999, 1, 1, 0, 2017 );
 		sqlite_test->sqliteCommit();
 		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteTimeIndexRecord: -999\n", ss->str());
 		ss->str(std::string());
@@ -304,30 +304,30 @@ namespace EnergyPlus {
 		EXPECT_EQ(7ul, result.size());
 
 		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, _, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, _, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
-		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, _, true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 2017, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 2017, 1, 3, 3, 60, _, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 2017, 1, 3, 3, _, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 2017, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 2017, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, _, true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 2017, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 2017, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 2017, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 2017, 1, 3, 3, 60, 0, 0, _, true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 2017, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 2017, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 2017, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 1, 2017, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
 		sqlite_test->sqliteCommit();
 	}
 
 	TEST_F( SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord ) {
 		sqlite_test->sqliteBegin();
-		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
+		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		sqlite_test->createSQLiteReportDataRecord( 1, 999.9 );
 		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, 2, 0, 1310459, 100, 7031530, 15 );

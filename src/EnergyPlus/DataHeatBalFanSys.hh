@@ -154,8 +154,8 @@ namespace DataHeatBalFanSys {
 	// return air flow = 0.
 	extern Array1D< Real64 > SysDepZoneLoadsLagged; // SysDepZoneLoads saved to be added to zone heat balance next
 	// HVAC time step
-	extern Array1D< Real64 > MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT
-	extern Array1D< Real64 > MDotOA; // Airbalance MASS FLOW rate
+	extern Array1D< Real64 > MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+	extern Array1D< Real64 > MDotOA; // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
 
 	extern Array1D< Real64 > MixingMassFlowZone; // Mixing MASS FLOW (kg/s)
 	extern Array1D< Real64 > MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio

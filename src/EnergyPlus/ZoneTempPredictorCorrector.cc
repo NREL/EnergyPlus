@@ -581,6 +581,14 @@ namespace ZoneTempPredictorCorrector {
 						}
 					}
 
+					if ( lAlphaFieldBlanks( 7 ) ) {
+						NumAlphas = 5;
+					} else if ( lAlphaFieldBlanks( 9 ) ) {
+						NumAlphas = 7;
+					} else if ( lAlphaFieldBlanks( 11 ) ) {
+						NumAlphas = 9;
+					}
+
 					TempControlledZone( TempControlledZoneNum ).NumControlTypes = nint( ( NumAlphas - 3.0 ) / 2.0 );
 					TempControlledZone( TempControlledZoneNum ).ControlType.allocate( TempControlledZone( TempControlledZoneNum ).NumControlTypes );
 					TempControlledZone( TempControlledZoneNum ).ControlTypeName.allocate( TempControlledZone( TempControlledZoneNum ).NumControlTypes );
@@ -603,6 +611,23 @@ namespace ZoneTempPredictorCorrector {
 						}
 						TempControlledZone( TempControlledZoneNum ).ControlTypeSchIndx( ControlTypeNum ) = 0;
 					}
+					if ( NumNums > 0 ) {
+						if ( rNumericArgs( 1 ) >= 0.0 ) {
+							TempControlledZone( TempControlledZoneNum ).DeltaTCutSet = rNumericArgs( 1 );
+						} else {
+							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " + cNumericFieldNames( 1 ) + "=[" + TrimSigDigits( rNumericArgs( 1 ), 0 ) + "]." );
+							ShowContinueError( "..Allowable values must be greater or equal to 0" );
+							ErrorsFound = true;
+						}
+					}
+					if ( TempControlledZone( TempControlledZoneNum ).DeltaTCutSet > 0.0 ) {
+						for ( ControlTypeNum = 1; ControlTypeNum <= TempControlledZone( TempControlledZoneNum ).NumControlTypes; ++ControlTypeNum ) {
+							if ( SameString( TempControlledZone( TempControlledZoneNum ).ControlType( ControlTypeNum ), "ThermostatSetpoint:SingleHeatingOrCooling" ) ) {
+								ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + ": The choice of Temperature Difference Between Cutout And Setpoint will not be applied to ThermostatSetpoint:SingleHeatingOrCooling." );
+							}
+						}
+					}
+
 				}
 			} // NumTStatStatements
 		} // Check on number of TempControlledZones
@@ -3081,6 +3106,7 @@ namespace ZoneTempPredictorCorrector {
 		int SchedTypeIndex;
 		Array2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
 		int OccStartTime; // Occupancy start time - for optimum start
+		Real64 DeltaT; // Temperature difference between cutout and setpoint
 
 		// FLOW:
 		TempControlType = 0; // Default
@@ -3094,6 +3120,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 		OccRoomTSetPointHeat = 0.0;
 		OccRoomTSetPointCool = 100.0;
+		DeltaT = 0.0;
 
 		for ( RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum ) {
 
@@ -3101,7 +3128,6 @@ namespace ZoneTempPredictorCorrector {
 			ActualZoneNum = TempControlledZone( RelativeZoneNum ).ActualZoneNum;
 			TempControlSchedIndex = TempControlledZone( RelativeZoneNum ).CTSchedIndex;
 			TempControlType( ActualZoneNum ) = GetCurrentScheduleValue( TempControlSchedIndex );
-
 			// Error detection for these values is done in the Get routine
 
 			{ auto const SELECT_CASE_var( TempControlType( ActualZoneNum ) ); // Is this missing the possibility of sometimes having no control on a zone
@@ -3115,7 +3141,17 @@ namespace ZoneTempPredictorCorrector {
 				SchedTypeIndex = TempControlledZone( RelativeZoneNum ).ControlTypeSchIndx( SchedNameIndex );
 
 				SetPointTempSchedIndex = SetPointSingleHeating( SchedTypeIndex ).TempSchedIndex;
-				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );			
+				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
+				TempControlledZone( RelativeZoneNum ).HeatOffFlag = false;
+				DeltaT = TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				if ( DeltaT > 0.0 ) {
+					if ( MAT( ActualZoneNum ) < TempZoneThermostatSetPoint( ActualZoneNum ) ) {
+						TempZoneThermostatSetPoint( ActualZoneNum ) += DeltaT;
+					} else {
+						TempControlledZone( RelativeZoneNum ).HeatOffFlag = true;
+					}
+				}
+
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
 				//        ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
@@ -3128,6 +3164,15 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleCooling( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
+				TempControlledZone( RelativeZoneNum ).CoolOffFlag = false;
+				DeltaT = TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				if ( DeltaT > 0.0 ) {
+					if ( MAT( ActualZoneNum ) > TempZoneThermostatSetPoint( ActualZoneNum ) ) {
+						TempZoneThermostatSetPoint( ActualZoneNum ) -= DeltaT;
+					} else {
+						TempControlledZone( RelativeZoneNum ).CoolOffFlag = true;
+					}
+				}
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
@@ -3192,6 +3237,18 @@ namespace ZoneTempPredictorCorrector {
 				SetPointTempSchedIndexHot = SetPointDualHeatCool( SchedTypeIndex ).HeatTempSchedIndex;
 				SetPointTempSchedIndexCold = SetPointDualHeatCool( SchedTypeIndex ).CoolTempSchedIndex;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexCold );
+				TempControlledZone( RelativeZoneNum ).CoolOffFlag = false;
+				TempControlledZone( RelativeZoneNum ).HeatOffFlag = false;
+				DeltaT = TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				if ( DeltaT > 0.0 ) {
+					if ( MAT( ActualZoneNum ) > ZoneThermostatSetPointHi( ActualZoneNum ) ) {
+						ZoneThermostatSetPointHi( ActualZoneNum ) -= DeltaT;
+					} else {
+						TempControlledZone( RelativeZoneNum ).CoolOffFlag = true;
+					}
+				} else {
+					ZoneThermostatSetPointHi( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexCold );
+				}
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
@@ -3203,6 +3260,18 @@ namespace ZoneTempPredictorCorrector {
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
 
 				ZoneThermostatSetPointLo( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexHot );
+				if ( DeltaT > 0.0 ) {
+					if ( MAT( ActualZoneNum ) < ZoneThermostatSetPointLo( ActualZoneNum ) ) {
+						ZoneThermostatSetPointLo( ActualZoneNum ) += DeltaT;
+						if ( ZoneThermostatSetPointHi( ActualZoneNum ) < ZoneThermostatSetPointLo( ActualZoneNum ) ) {
+							ZoneThermostatSetPointLo( ActualZoneNum ) = ZoneThermostatSetPointHi( ActualZoneNum );
+						}
+					} else {
+						TempControlledZone( RelativeZoneNum ).HeatOffFlag = true;
+					}
+				} else {
+					ZoneThermostatSetPointLo( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexHot );
+				}
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointLo( ActualZoneNum ) );
 
 				//Change the room set point to occupied set point during optimum start period--------------
@@ -3296,13 +3365,17 @@ namespace ZoneTempPredictorCorrector {
 		Real64 LoadToHeatingSetPoint;
 		Real64 LoadToCoolingSetPoint;
 		Real64 ZoneSetPoint;
-
+		int RelativeZoneNum;
 		// FLOW:
 		DeadBandOrSetback( ZoneNum ) = false;
 		ZoneSetPoint = 0.0;
 		LoadToHeatingSetPoint = 0.0;
 		LoadToCoolingSetPoint = 0.0;
+		
 
+		for ( RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum ) {
+			if ( TempControlledZone( RelativeZoneNum ).ActualZoneNum == ZoneNum ) break;
+		}
 		{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
 
 		if ( SELECT_CASE_var == 0 ) {
@@ -3333,6 +3406,9 @@ namespace ZoneTempPredictorCorrector {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+			if ( TempControlledZone( RelativeZoneNum ).HeatOffFlag ) {
+				LoadToHeatingSetPoint = 0.0;
+			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToCoolingSetPoint = LoadToHeatingSetPoint;
@@ -3356,6 +3432,12 @@ namespace ZoneTempPredictorCorrector {
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
+			}
+			if ( TempControlledZone( RelativeZoneNum ).CoolOffFlag ) {
+				LoadToCoolingSetPoint = 0.0;
+			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToHeatingSetPoint = LoadToCoolingSetPoint;
@@ -3387,6 +3469,10 @@ namespace ZoneTempPredictorCorrector {
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
+
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
+			}
 
 			//PH 3/2/04      ZoneSysEnergyDemand(ZoneNum)%TotalOutputRequired = LoadToHeatingSetPoint ! = LoadToCoolingSetPoint
 			// Note that LoadToHeatingSetPoint is generally not equal to LoadToCoolingSetPoint
@@ -3454,6 +3540,10 @@ namespace ZoneTempPredictorCorrector {
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( RAFNFrac > 0.0 ) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
+			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
+				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
+			}
+
 			// Possible combinations:
 			// 1/  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
 			// 2/  LoadToHeatingSetPoint  >  LoadToCoolingSetPoint       -->  Possible in the unmixed case but should be trapped
@@ -3471,6 +3561,11 @@ namespace ZoneTempPredictorCorrector {
 				ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
+			if ( TempControlledZone( RelativeZoneNum ).CoolOffFlag && TempControlledZone( RelativeZoneNum ).HeatOffFlag ) {
+				LoadToHeatingSetPoint = 0.0;
+				LoadToCoolingSetPoint = 0.0;
+			}
+			
 			if ( LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0 ) {
 				ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 				ZoneSetPoint = ZoneThermostatSetPointLo( ZoneNum );
@@ -4672,8 +4767,6 @@ namespace ZoneTempPredictorCorrector {
 		Real64 C;
 		Real64 WZSat;
 		Real64 MoistureMassFlowRate;
-		Real64 ExhMassFlowRate;
-		Real64 TotExitMassFlowRate;
 		Real64 ZoneMassFlowRate;
 		Real64 SysTimeStepInSeconds;
 		Real64 H2OHtOfVap;
@@ -4686,8 +4779,6 @@ namespace ZoneTempPredictorCorrector {
 		// FLOW:
 		MoistureMassFlowRate = 0.0;
 		ZoneMassFlowRate = 0.0;
-		ExhMassFlowRate = 0.0;
-		TotExitMassFlowRate = 0.0;
 		ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 		// Check to see if this is a controlled zone
@@ -4705,17 +4796,6 @@ namespace ZoneTempPredictorCorrector {
 				MoistureMassFlowRate += ( Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate * Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).HumRat ) / ZoneMult;
 				ZoneMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
-
-			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
-				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
-			} // NodeNum
-
-			TotExitMassFlowRate = ExhMassFlowRate;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes > 0 ) {
-				for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes; ++retNode ) {
-					TotExitMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnNode( retNode ) ).MassFlowRate / ZoneMult;
-				}
-			}
 
 			// Do the calculations for the plenum zone
 		} else if ( ZoneRetPlenumAirFlag ) {
@@ -4739,17 +4819,11 @@ namespace ZoneTempPredictorCorrector {
 					ZoneMassFlowRate += AirDistUnit( ADUNum ).MassFlowRateDnStrLk / ZoneMult;
 				}
 			}
-			// Do not allow exhaust mass flow for a plenum zone
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 
 		} else if ( ZoneSupPlenumAirFlag ) {
 			ZoneSupPlenumNum = Zone( ZoneNum ).PlenumCondNum;
 			MoistureMassFlowRate += ( Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate * Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).HumRat ) / ZoneMult;
 			ZoneMassFlowRate += Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate / ZoneMult;
-			// Do not allow exhaust mass flow for a plenum zone
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 		}
 
 		// Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
@@ -4779,26 +4853,14 @@ namespace ZoneTempPredictorCorrector {
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
-		// Check for the flow and NO flow condition
-		if ( ZoneMassFlowRate > 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
-			A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
-			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-				// Multizone airflow calculated in AirflowNetwork
-				B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
-				A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
-			}
-			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
-		} else if ( ZoneMassFlowRate <= 0.0 ) {
-			B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum );
-			A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum );
-			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-				// Multizone airflow calculated in AirflowNetwork
-				B = ( LatentGain / H2OHtOfVap ) + SumHmARaW( ZoneNum ) + AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW;
-				A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
-			}
-			C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+		B = ( LatentGain / H2OHtOfVap ) + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutHumRat ) + EAMFLxHumRat( ZoneNum ) + (MoistureMassFlowRate)+SumHmARaW( ZoneNum ) + MixingMassFlowXHumRat( ZoneNum ) + MDotOA( ZoneNum ) * OutHumRat;
+		A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + SumHmARa( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+			// Multizone airflow calculated in AirflowNetwork
+			B = ( LatentGain / H2OHtOfVap ) + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrW + AirflowNetworkExchangeData( ZoneNum ).SumMMHrW ) + ( MoistureMassFlowRate ) + SumHmARaW( ZoneNum );
+			A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr + SumHmARa( ZoneNum );
 		}
+		C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
 		if ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) {
 			B += AirflowNetworkExchangeData( ZoneNum ).TotalLat;
