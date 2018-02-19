@@ -460,6 +460,9 @@ private: // methods
 	void
 	writeCoilSelectionOutput();
 	
+	void
+	writeCoilSelectionOutput2();
+	
 	int
 	getIndexForOrCreateDataObjFromCoilName (
 		std::string const & coilName, // user-defined name of the coil

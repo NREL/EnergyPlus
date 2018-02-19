@@ -228,6 +228,7 @@ ReportCoilSelection::finishCoilSummaryReportTable()
 {
 	doFinalProcessingOfCoilData();
 	writeCoilSelectionOutput();
+	writeCoilSelectionOutput2();
 }
 
 void
@@ -420,6 +421,84 @@ ReportCoilSelection::writeCoilSelectionOutput()
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchMoistAirSpecificHeat, c->coilName_, c->cpMoistAir, 4 );
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchDryAirSpecificHeat, c->coilName_, c->cpDryAir, 4 );
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchStandRhoAir, c->coilName_, c->rhoStandAir, 4 );
+
+	}
+}
+
+void
+ReportCoilSelection::writeCoilSelectionOutput2()
+{
+
+	// make calls to fill out predefined tabular report entries for each coil selection report object
+	for ( auto & c : coilSelectionDataObjs ) {
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilType, c->coilName_,  c->coilObjName );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilHVACType, c->coilName_, c->typeHVACname );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilHVACName, c->coilName_, c->userNameforHVACsystem );
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilFinalTotalCap, c->coilName_, c->coilTotCapFinal, 3 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilFinalSensCap, c->coilName_, c->coilSensCapFinal, 3 );
+		if ( c->coilRefAirVolFlowFinal == -999.0 || c->coilRefAirVolFlowFinal == -99999.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 1 );
+		} else {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 6 );
+		}
+
+		if ( c->coilRefWaterVolFlowFinal == -999.0 || c->coilRefWaterVolFlowFinal == -99999.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 1 );
+		} else {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 8 );
+		}
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilDDnameSensIdealPeak, c->coilName_, c->desDayNameAtSensPeak );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilDateTimeSensIdealPeak, c->coilName_, c->coilSensePeakHrMin );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilDDnameAirFlowIdealPeak, c->coilName_, c->desDayNameAtAirFlowPeak );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilDateTimeAirFlowIdealPeak, c->coilName_, c->airPeakHrMin );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilTotalCapIdealPeak, c->coilName_, c->coilTotCapAtPeak, 2 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilSensCapIdealPeak, c->coilName_, c->coilSensCapAtPeak, 2 );
+		if ( c->coilDesVolFlow == -999.0 || c->coilDesVolFlow == -99999.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 1 );
+		} else {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 6 );
+		}
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilEntDryBulbIdealPeak, c->coilName_, c->coilDesEntTemp, 2 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilEntWetBulbIdealPeak, c->coilName_, c->coilDesEntWetBulb, 2 );
+		if ( c->coilDesEntHumRat == -999.0 || c->coilDesEntHumRat == -99999.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 1 );
+		} else {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 8 );
+		}
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilLvgDryBulbIdealPeak, c->coilName_, c->coilDesLvgTemp, 2 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilLvgWetBulbIdealPeak, c->coilName_, c->coilDesLvgWetBulb, 2 );
+		if ( c->coilDesLvgHumRat == -999.0 || c->coilDesLvgHumRat == -99999.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 1 );
+		} else {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 8 );
+		}
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilRatedTotalCap, c->coilName_, c->coilRatedTotCap, 2 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilRatedSensCap, c->coilName_, c->coilRatedSensCap, 2 );
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2OADryBulbIdealPeak, c->coilName_, c->oaPeakTemp, 2 );
+		if ( c->oaPeakHumRat == -999.0 || c->oaPeakHumRat == -99999.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2OAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 1 );
+		} else {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2OAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 8 );
+		}
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2OAWetBulbatIdealPeak, c->coilName_, c->oaPeakWetBulb, 2 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2OAFlowPrcntIdealPeak, c->coilName_, c->oaPeakVolFrac, 4 );
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2ZoneAirDryBulbIdealPeak, c->coilName_, c->rmPeakTemp, 2 );
+		if ( c->rmPeakHumRat == -999.0 || c->rmPeakHumRat == -99999.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2ZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 1 );
+		} else {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2ZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 8 );
+		}
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2ZoneAirRelHumIdealPeak, c->coilName_, c->rmPeakRelHum, 4 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2CoilUA, c->coilName_, c->coilUA, 3 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2ZoneSensibleLoadIdealPeak, c->coilName_, c->rmSensibleAtPeak, 2 );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdch2ZoneLatentLoadIdealPeak, c->coilName_, c->rmLatentAtPeak );
 
 	}
 }
