@@ -108,7 +108,7 @@ namespace ExternalInterface {
 	std::string FMURootWorkingFolder; // FMU root working folder
 
 	// MODULE PARAMETER DEFINITIONS:
-	int const maxVar( 10240000 ); // Maximum number of variables to be exchanged
+	int const maxVar( 100000 ); // Maximum number of variables to be exchanged
 	int const maxErrMsgLength( 10000 ); // Maximum error message length from xml schema validation
 	int const indexSchedule( 1 ); // Index for schedule in inpVarTypes
 	int const indexVariable( 2 ); // Index for variable in inpVarTypes
@@ -2176,7 +2176,7 @@ namespace ExternalInterface {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int varType( 0 ); // 0=not found, 1=integer, 2=real, 3=meter
 		int numKeys( 0 ); // Number of keys found
-		int varAvgSum( 0 ); // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType varAvgSum( OutputProcessor::StoreType::Averaged ); // Variable  is Averaged=1 or Summed=2
 		int varStepType( 0 ); // Variable time step is Zone=1 or HVAC=2
 		OutputProcessor::Unit varUnits( OutputProcessor::Unit::None ); // Units sting, may be blank
 		Array1D_int keyIndexes; // Array index for

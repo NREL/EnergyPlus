@@ -5,7 +5,7 @@
 ! AirflowNetwork_MULTIZONE_House_TwoSpeed.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
-! Highlights:             This file does the basic test of an air distribution system in a residetial home.
+! Highlights:             This file does the basic test of an air distribution system in a residential home.
 !                         A two speed heat pump with a supplmental gas heater provides space heating and cooling.
 !                         It provides ventilation through the AirflowNetwork model.
 !
