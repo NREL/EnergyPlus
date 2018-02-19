@@ -165,7 +165,7 @@ namespace EnergyPlus {
 		int indexType = 1;
 		int repordId = 1;
 
-		Variable var("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, repordId, "C");
+		Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
 
 		std::string expected_result = "{\n         \"Frequency\": \"Timestep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n         \"Units\": \"C\"\n}";
 		EXPECT_EQ(expected_result, var.getJSON().dump('\t'));
@@ -185,9 +185,9 @@ namespace EnergyPlus {
 		int indexType = 1;
 		int reportId = 1;
 
-		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, reportId, "C");
+		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
 		reportId++;
-		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", 0, indexType, reportId, "kgWater/kgDryAir");
+		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
 
 		OutputSchema->RITimestepTSData.addVariable(var0);
 		OutputSchema->RITimestepTSData.addVariable(var1);
@@ -219,7 +219,7 @@ namespace EnergyPlus {
 		int indexType = 1;
 		int reportId = 1;
 
-		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", 0, indexType, reportId, "C");
+		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
 		OutputSchema->RITimestepTSData.addVariable(var0);
 		OutputSchema->RITimestepTSData.newRow(2,25,14,40); //month,day,hour,minute
 		OutputSchema->RITimestepTSData.newRow(2,25,14,45); //month,day,hour,minute
@@ -228,7 +228,7 @@ namespace EnergyPlus {
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 2.0);
 
 		reportId++;
-		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", 0, indexType, reportId, "kgWater/kgDryAir");
+		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
 		OutputSchema->RITimestepTSData.addVariable(var1);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 3.0);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 4.0);
@@ -260,7 +260,7 @@ namespace EnergyPlus {
 
 		// If add one more, it also should go to the top of json cols array
 		reportId++;
-		Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", 0, indexType, reportId, "C");
+		Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
 		OutputSchema->RITimestepTSData.addVariable(var2);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 5.0);
 		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 6.0);

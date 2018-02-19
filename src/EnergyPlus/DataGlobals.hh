@@ -151,6 +151,7 @@ namespace DataGlobals {
 		std::ostream * json_MNstream = nullptr;
 		std::ostream * json_DYstream = nullptr;
 		std::ostream * json_SMstream = nullptr;
+		std::ostream * json_YRstream = nullptr;
 		std::ostream * cbor_stream = nullptr; // Internal stream used for cbor output
 		std::ostream * cbor_TSstream_Zone = nullptr;
 		std::ostream * cbor_TSstream_HVAC = nullptr;
@@ -159,6 +160,7 @@ namespace DataGlobals {
 		std::ostream * cbor_MNstream = nullptr;
 		std::ostream * cbor_DYstream = nullptr;
 		std::ostream * cbor_SMstream = nullptr;
+		std::ostream * cbor_YRstream = nullptr;
 		std::ostream * msgpack_stream = nullptr; // Internal stream used for messagepack output
 		std::ostream * msgpack_TSstream_Zone = nullptr;
 		std::ostream * msgpack_TSstream_HVAC = nullptr;
@@ -167,6 +169,7 @@ namespace DataGlobals {
 		std::ostream * msgpack_MNstream = nullptr;
 		std::ostream * msgpack_DYstream = nullptr;
 		std::ostream * msgpack_SMstream = nullptr;
+		std::ostream * msgpack_YRstream = nullptr;
 
 		int OutputFileJson = 0; // Unit number for Schema output
 		int OutputFileTSZoneJson = 0;
@@ -176,6 +179,7 @@ namespace DataGlobals {
 		int OutputFileDYJson = 0;
 		int OutputFileMNJson = 0;
 		int OutputFileSMJson = 0;
+		int OutputFileYRJson = 0;
 		int OutputFileCBOR = 0; // Unit number for Schema output
 		int OutputFileTSZoneCBOR = 0;
 		int OutputFileTSHVACCBOR = 0;
@@ -184,6 +188,7 @@ namespace DataGlobals {
 		int OutputFileDYCBOR = 0;
 		int OutputFileMNCBOR = 0;
 		int OutputFileSMCBOR = 0;
+		int OutputFileYRCBOR = 0;
 		int OutputFileMsgPack = 0; // Unit number for Schema output
 		int OutputFileTSZoneMsgPack = 0;
 		int OutputFileTSHVACMsgPack = 0;
@@ -192,6 +197,7 @@ namespace DataGlobals {
 		int OutputFileDYMsgPack = 0;
 		int OutputFileMNMsgPack = 0;
 		int OutputFileSMMsgPack = 0;
+		int OutputFileYRMsgPack = 0;
 	};
 
 	extern bool BeginDayFlag; // True at the start of each day, False after first time step in day

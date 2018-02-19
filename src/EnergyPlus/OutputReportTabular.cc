@@ -217,6 +217,8 @@ namespace OutputReportTabular {
 	static std::string const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
 	static std::string const BlankString;
 
+	static std::string const degChar( "\xC2\xB0" ); // °
+
 	//MODULE VARIABLE DECLARATIONS:
 
 	// The Binned table type is different and only references one variable and its structure is very
@@ -5382,21 +5384,8 @@ namespace OutputReportTabular {
 		//   The stat file that is attached may have several formats -- from evolution of the
 		//   stat file from the weather converter (or others that produce a similar stat file).
 
-		// METHODOLOGY EMPLOYED:
-		//   na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace OutputReportPredefined;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const degChar( "°" );
 
 		// LineTypes for reading the stat file
 		int const StatisticsLine( 1 );
@@ -5517,9 +5506,9 @@ namespace OutputReportTabular {
 						coolingDesignlinepassed = true;
 						lineType = coolingConditionsLine;
 					}
-				} else if ( has( lineIn, "(standard) heating degree-days (18.3°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) heating degree-days (18.3" + degChar + "C baseline)" ) ) {
 					lineType = stdHDDLine;
-				} else if ( has( lineIn, "(standard) cooling degree-days (10°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) cooling degree-days (10" + degChar + "C baseline)" ) ) {
 					lineType = stdCDDLine;
 
 				} else if ( has( lineIn, "Maximum Dry Bulb" ) ) {
@@ -5530,9 +5519,9 @@ namespace OutputReportTabular {
 					lineType = maxDewPointLine;
 				} else if ( has( lineIn, "Minimum Dew Point" ) ) {
 					lineType = minDewPointLine;
-				} else if ( has( lineIn, "(wthr file) heating degree-days (18°C baseline)" ) || has( lineIn, "heating degree-days (18°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) heating degree-days (18" + degChar + "C baseline)" ) || has( lineIn, "heating degree-days (18" + degChar + "C baseline)" ) ) {
 					lineType = wthHDDLine;
-				} else if ( has( lineIn, "(wthr file) cooling degree-days (10°C baseline)" ) || has( lineIn, "cooling degree-days (10°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) cooling degree-days (10" + degChar + "C baseline)" ) || has( lineIn, "cooling degree-days (10" + degChar + "C baseline)" ) ) {
 					lineType = wthCDDLine;
 				}
 				// these not part of big if/else because sequential
@@ -5554,7 +5543,12 @@ namespace OutputReportTabular {
 					sposlt = index( lineIn, '{' );
 					eposlt = index( lineIn, '}' );
 					if ( sposlt != std::string::npos && eposlt!= std::string::npos ) {
-						PreDefTableEntry( pdchWthrVal, "Latitude", lineIn.substr( sposlt, eposlt - sposlt + 1 ) );
+						auto latitude = lineIn.substr( sposlt, eposlt - sposlt + 1 );
+						auto found = latitude.find( "\xB0" );
+						if ( found != std::string::npos ) {
+							latitude.replace( found, 1, degChar );
+						}
+						PreDefTableEntry( pdchWthrVal, "Latitude", latitude );
 						// redefine so next scan can go with {}
 						lineIn[ sposlt ] = '[';
 						lineIn[ eposlt ] = ']';
@@ -5564,7 +5558,12 @@ namespace OutputReportTabular {
 					sposlg = index( lineIn, '{' );
 					eposlg = index( lineIn, '}' );
 					if ( sposlg != std::string::npos && eposlg != std::string::npos ) {
-						PreDefTableEntry( pdchWthrVal, "Longitude", lineIn.substr( sposlg, eposlg - sposlg + 1 ) );
+						auto longitude = lineIn.substr( sposlg, eposlg - sposlg + 1 );
+						auto found = longitude.find( "\xB0" );
+						if ( found != std::string::npos ) {
+							longitude.replace( found, 1, degChar );
+						}
+						PreDefTableEntry( pdchWthrVal, "Longitude", longitude );
 						// redefine so next scan can go with {}
 						lineIn[ sposlg ] = '[';
 						lineIn[ eposlg ] = ']';
@@ -5814,26 +5813,26 @@ namespace OutputReportTabular {
 				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
 					if ( storeASHRAEHDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65" + degChar + "(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3" + degChar + "C)", storeASHRAEHDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65" + degChar + "F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3" + degChar + "C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
+						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65" + degChar + "(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18" + degChar + "C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", lineIn.substr( 2, 4 ) );
 					}
 					PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
@@ -5841,26 +5840,26 @@ namespace OutputReportTabular {
 				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
 					if ( storeASHRAECDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50" + degChar + "(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10" + degChar + "C)", storeASHRAECDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50" + degChar + "F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10" + degChar + "C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
+						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50" + degChar + "(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10" + degChar + "C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", lineIn.substr( 2, 4 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (Köppen classification)
@@ -13619,13 +13618,13 @@ namespace OutputReportTabular {
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
 					tbl_stream << "  <tr>\n";
 					if ( rowLabels( jRow ) != "" ) {
-						tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol( rowLabels( jRow ), true ) << "</td>\n";
+						tbl_stream << "    <td align=\"right\">" << ConvertToEscaped( InsertCurrencySymbol( rowLabels( jRow ), true ) ) << "</td>\n";
 					} else {
 						tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
 					}
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
 						if ( body( iCol, jRow ) != "" ) {
-							tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol( body( iCol, jRow ), true ) << "</td>\n";
+							tbl_stream << "    <td align=\"right\">" << ConvertToEscaped( InsertCurrencySymbol( body( iCol, jRow ), true ) ) << "</td>\n";
 						} else {
 							tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
 						}
@@ -14894,7 +14893,7 @@ Label900: ;
 		UnitConvSize = 115;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
-		UnitConv( 2 ).siName = "°C";
+		UnitConv( 2 ).siName = degChar + "C";
 		UnitConv( 3 ).siName = "0=OFF 1=ON";
 		UnitConv( 4 ).siName = "0-NO  1-YES";
 		UnitConv( 5 ).siName = "1-YES 0-NO";

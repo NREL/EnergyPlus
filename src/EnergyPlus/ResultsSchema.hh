@@ -55,14 +55,14 @@ namespace EnergyPlus {
 		class Variable : public BaseResultObject {
 		public:
 			Variable() = default;
-			Variable( const std::string & VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string & units );
+			Variable( const std::string & VarName, const OutputProcessor::ReportingFrequency reportFrequency, const int IndexType, const int ReportID, const OutputProcessor::Unit & units );
 
 			std::string variableName() const;
 			void setVariableName( const std::string & VarName );
 
 			std::string sReportFrequency();
-			int iReportFrequency();
-			void setReportFrequency( const int ReportFrequency );
+			OutputProcessor::ReportingFrequency iReportFrequency();
+			void setReportFrequency( const OutputProcessor::ReportingFrequency reportFrequency );
 
 			int indexType() const;
 			void setIndexType( const int IndexType );
@@ -70,8 +70,8 @@ namespace EnergyPlus {
 			int reportID() const;
 			void setReportID( const int Id );
 
-			std::string units() const;
-			void setUnits( const std::string & units );
+			OutputProcessor::Unit units() const;
+			void setUnits( const OutputProcessor::Unit & units );
 
 			void pushValue( const double val );
 			double value( size_t index ) const;
@@ -82,8 +82,8 @@ namespace EnergyPlus {
 		protected:
 			std::string varName;
 			std::string sReportFreq;
-			std::string Units;
-			int iReportFreq = -1;
+			OutputProcessor::Unit Units;
+			OutputProcessor::ReportingFrequency iReportFreq = OutputProcessor::ReportingFrequency::EachCall;
 			int idxType = -1;
 			int rptID = -1;
 			std::vector<double> Values;
@@ -91,12 +91,12 @@ namespace EnergyPlus {
 
 		class OutputVariable : public Variable {
 		public:
-			OutputVariable( const std::string & VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string & units );
+			OutputVariable( const std::string & VarName, const OutputProcessor::ReportingFrequency reportFrequency, const int IndexType, const int ReportID, const OutputProcessor::Unit & units );
 		};
 
 		class MeterVariable : public Variable {
 		public:
-			MeterVariable( const std::string & VarName, const int ReportFrequency, const int ReportID, const std::string & units, const bool Acculumative = false );
+			MeterVariable( const std::string & VarName, const OutputProcessor::ReportingFrequency reportFrequency, const int ReportID, const OutputProcessor::Unit & units, const bool Acculumative = false );
 
 			bool accumulative();
 			void setAccumulative( bool state );
@@ -221,12 +221,24 @@ namespace EnergyPlus {
 			bool CBOREnabled() const;
 			bool MsgPackEnabled() const;
 
-			void initializeRTSDataFrame( const int ReportFrequency, const Array1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar );
-			void initializeITSDataFrame( const int ReportFrequency, const Array1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar );
-			void initializeMeters( const Array1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency );
+			void initializeRTSDataFrame( const OutputProcessor::ReportingFrequency reportFrequency, const Array1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar );
+			void initializeITSDataFrame( const OutputProcessor::ReportingFrequency reportFrequency, const Array1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar );
+			void initializeMeters( const Array1D< OutputProcessor::MeterType > &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency );
 
-			static DataFrame RIDetailedZoneTSData, RIDetailedHVACTSData, RITimestepTSData, RIHourlyTSData, RIDailyTSData, RIMonthlyTSData, RIRunPeriodTSData;
-			static DataFrame TSMeters, HRMeters, DYMeters, MNMeters, SMMeters;
+			DataFrame RIDetailedZoneTSData = DataFrame( "Detailed-Zone" );
+			DataFrame RIDetailedHVACTSData = DataFrame( "Detailed-HVAC" );
+			DataFrame RITimestepTSData = DataFrame( "Timestep" );
+			DataFrame RIHourlyTSData = DataFrame( "Hourly" );
+			DataFrame RIDailyTSData = DataFrame( "Daily" );
+			DataFrame RIMonthlyTSData = DataFrame( "Monthly" );
+			DataFrame RIRunPeriodTSData = DataFrame( "RunPeriod" );
+			DataFrame RIYearlyTSData = DataFrame( "Yearly" );
+			DataFrame TSMeters = DataFrame( "Timestep" );
+			DataFrame HRMeters = DataFrame( "Hourly" );
+			DataFrame DYMeters = DataFrame( "Daily" );
+			DataFrame MNMeters = DataFrame( "Monthly" );
+			DataFrame SMMeters = DataFrame( "RunPeriod" );
+			DataFrame YRMeters = DataFrame( "Yearly" );
 
 			void writeTimeSeriesReports();
 			void WriteReport();

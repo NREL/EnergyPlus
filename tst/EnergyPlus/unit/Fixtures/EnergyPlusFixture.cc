@@ -182,11 +182,8 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
-<<<<<<< HEAD
-#include <EnergyPlus/ResultsSchema.hh>
-=======
 #include <EnergyPlus/PVWatts.hh>
->>>>>>> update-idd-parser
+#include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>

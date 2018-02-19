@@ -122,9 +122,9 @@ namespace EnergyPlus {
 		}
 
 		// Class Variable
-		Variable::Variable( const std::string & VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string & units ) {
+		Variable::Variable( const std::string & VarName, const OutputProcessor::ReportingFrequency reportFrequency, const int IndexType, const int ReportID, const OutputProcessor::Unit & units ) {
 			varName = VarName;
-			setReportFrequency( ReportFrequency );
+			setReportFrequency( reportFrequency );
 			idxType = IndexType;
 			rptID = ReportID;
 			Units = units;
@@ -142,34 +142,37 @@ namespace EnergyPlus {
 			return sReportFreq;
 		}
 
-		int Variable::iReportFrequency() {
+		OutputProcessor::ReportingFrequency Variable::iReportFrequency() {
 			return iReportFreq;
 		}
 
-		void Variable::setReportFrequency( const int ReportFrequency ) {
-			iReportFreq = ReportFrequency;
+		void Variable::setReportFrequency( const OutputProcessor::ReportingFrequency reportFrequency ) {
+			iReportFreq = reportFrequency;
 			switch ( iReportFreq )
 			{
-			case -1:  // each time UpdatedataandReport is called
+			case OutputProcessor::ReportingFrequency::EachCall:  // each time UpdatedataandReport is called
 				if ( idxType == ZoneVar )
 					sReportFreq = "Detailed - Zone";
 				if ( idxType == HVACVar )
 					sReportFreq = "Detailed - HVAC";
 				break;
-			case 0:  // at 'EndTimeStepFlag'
+			case OutputProcessor::ReportingFrequency::TimeStep:  // at 'EndTimeStepFlag'
 				sReportFreq = "Timestep";
 				break;
-			case 1:  // at 'EndHourFlag'
+			case OutputProcessor::ReportingFrequency::Hourly:  // at 'EndHourFlag'
 				sReportFreq = "Hourly";
 				break;
-			case 2: // at 'EndDayFlag'
+			case OutputProcessor::ReportingFrequency::Daily: // at 'EndDayFlag'
 				sReportFreq = "Daily";
 				break;
-			case 3:  // at end of month
+			case OutputProcessor::ReportingFrequency::Monthly:  // at end of month
 				sReportFreq = "Monthly";
 				break;
-			case 4:  // once per environment 'EndEnvrnFlag'
+			case OutputProcessor::ReportingFrequency::Simulation:  // once per environment 'EndEnvrnFlag'
 				sReportFreq = "RunPeriod";
+				break;
+			case OutputProcessor::ReportingFrequency::Yearly:  // once per environment 'EndEnvrnFlag'
+				sReportFreq = "Yearly";
 				break;
 			}
 		}
@@ -190,11 +193,11 @@ namespace EnergyPlus {
 			rptID = Id;
 		}
 
-		std::string Variable::units() const {
+		OutputProcessor::Unit Variable::units() const {
 			return Units;
 		}
 
-		void Variable::setUnits( const std::string & units ) {
+		void Variable::setUnits( const OutputProcessor::Unit & units ) {
 			Units = units;
 		}
 
@@ -213,7 +216,7 @@ namespace EnergyPlus {
 		json Variable::getJSON() const {
 			json root = {
 					{ "Name" , varName },
-					{ "Units" , Units },
+					{ "Units" , unitEnumToString( Units ) },
 					{ "Frequency", sReportFreq }
 			};
 			return root;
@@ -221,13 +224,13 @@ namespace EnergyPlus {
 
 
 		// Class OutputVariable
-		OutputVariable::OutputVariable( const std::string & VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string & units )
-			: Variable( VarName, ReportFrequency, IndexType, ReportID, units )
+		OutputVariable::OutputVariable( const std::string & VarName, const OutputProcessor::ReportingFrequency reportFrequency, const int IndexType, const int ReportID, const OutputProcessor::Unit & units )
+			: Variable( VarName, reportFrequency, IndexType, ReportID, units )
 		{}
 
 		// Class MeterVariable
-		MeterVariable::MeterVariable( const std::string & VarName, const int ReportFrequency, const int ReportID, const std::string & units, const bool Accumulative )
-			: Variable( VarName, ReportFrequency, ZoneVar, ReportID, units )
+		MeterVariable::MeterVariable( const std::string & VarName, const OutputProcessor::ReportingFrequency reportFrequency, const int ReportID, const OutputProcessor::Unit & units, const bool Accumulative )
+			: Variable( VarName, reportFrequency, ZoneVar, ReportID, units )
 		{
 			acc = Accumulative;
 		}
@@ -326,7 +329,7 @@ namespace EnergyPlus {
 			for ( auto const & varMap : variableMap ) {
 				cols.push_back( {
 					{ "Variable" , varMap.second.variableName() },
-					{ "Units" , varMap.second.units() }
+					{ "Units" , unitEnumToString( varMap.second.units() ) }
 				} );
 			}
 
@@ -447,6 +450,19 @@ namespace EnergyPlus {
 					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_SMstream ) );
 				}
 			}
+			else if ( ReportFrequency == "Yearly" ) {
+				if ( outputJSON && DataGlobals::jsonOutputStreams.json_YRstream ) {
+					*( DataGlobals::jsonOutputStreams.json_YRstream ) << std::setw( 4 ) << root << std::endl;
+				}
+				if ( outputCBOR && DataGlobals::jsonOutputStreams.cbor_YRstream ) {
+					std::vector<uint8_t> v_cbor = json::to_cbor( root );
+					std::copy( v_cbor.begin(), v_cbor.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.cbor_YRstream ) );
+				}
+				if ( outputMsgPack && DataGlobals::jsonOutputStreams.msgpack_YRstream ) {
+					std::vector<uint8_t> v_msgpack = json::to_msgpack( root );
+					std::copy( v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator< uint8_t >( *DataGlobals::jsonOutputStreams.msgpack_YRstream ) );
+				}
+			}
 		}
 		// class Table
 
@@ -470,6 +486,11 @@ namespace EnergyPlus {
 					if ( iCol == 0 ) {
 						// do this once only
 						RowHeaders.push_back( rowLabels[ iRow ] );
+					}
+					auto found = body[ k ].find( "\xC2\xB0" );
+					if (found != std::string::npos) {
+						std::string testing = body[ k ];
+						std::string test = "";
 					}
 					col.push_back( trim( body[ k ] ) );
 					++k;
@@ -581,23 +602,6 @@ namespace EnergyPlus {
 			return root;
 		}
 
-
-		// Class ResultsSchema
-		// initialize data frames
-		DataFrame ResultsSchema::RIDetailedZoneTSData( "Detailed-Zone" ),
-			ResultsSchema::RIDetailedHVACTSData( "Detailed-HVAC" ),
-			ResultsSchema::RITimestepTSData( "Timestep" ),
-			ResultsSchema::RIHourlyTSData( "Hourly" ),
-			ResultsSchema::RIDailyTSData( "Daily" ),
-			ResultsSchema::RIMonthlyTSData( "Monthly" ),
-			ResultsSchema::RIRunPeriodTSData( "RunPeriod" );
-
-		DataFrame ResultsSchema::TSMeters( "Timestep" ),
-			ResultsSchema::HRMeters( "Hourly" ),
-			ResultsSchema::DYMeters( "Daily" ),
-			ResultsSchema::MNMeters( "Monthly" ),
-			ResultsSchema::SMMeters( "RunPeriod" );
-
 		void ResultsSchema::setupOutputOptions() {
 			int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound( "Output:JSON" );
 			if ( numberOfOutputSchemaObjects == 1 ) {
@@ -659,23 +663,23 @@ namespace EnergyPlus {
 			return outputMsgPack;
 		}
 
-		void ResultsSchema::initializeRTSDataFrame( const int ReportFrequency, const Array1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType ) {
+		void ResultsSchema::initializeRTSDataFrame( const OutputProcessor::ReportingFrequency reportFrequency, const Array1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType ) {
 			Reference< RealVariables > RVar;
 
 			for ( int Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 					RVar >>= RVariableTypes( Loop ).VarPtr;
 					auto & rVar( RVar());
-					if ( rVar.Report && rVar.ReportFreq == ReportFrequency ) {
+					if ( rVar.Report && rVar.frequency == reportFrequency ) {
 						// Variable *var = new Variable( RVariableTypes(Loop ).VarName,
-						// 		ReportFrequency, RVariableTypes( Loop ).IndexType,
+						// 		reportFrequency, RVariableTypes( Loop ).IndexType,
 						// 		RVariableTypes( Loop ).ReportID,
-						// 		RVariableTypes( Loop ).UnitsString);
+						// 		RVariableTypes( Loop ).units);
 						Variable var( RVariableTypes(Loop ).VarName,
-								ReportFrequency, RVariableTypes( Loop ).IndexType,
+								reportFrequency, RVariableTypes( Loop ).IndexType,
 								RVariableTypes( Loop ).ReportID,
-								RVariableTypes( Loop ).UnitsString);
-						switch ( ReportFrequency ) {
-						case -1:  // each time UpdatedataandReport is called
+								RVariableTypes( Loop ).units);
+						switch ( reportFrequency ) {
+						case OutputProcessor::ReportingFrequency::EachCall:  // each time UpdatedataandReport is called
 							if ( IndexType == ZoneVar && RVariableTypes(Loop ).IndexType == ZoneVar)
 							{
 								RIDetailedZoneTSData.setRDataFrameEnabled( true );
@@ -687,73 +691,80 @@ namespace EnergyPlus {
 								RIDetailedHVACTSData.addVariable( var );
 							}
 							break;
-						case 0:  // at 'EndTimeStepFlag'
+						case OutputProcessor::ReportingFrequency::TimeStep:  // at 'EndTimeStepFlag'
 							RITimestepTSData.setRDataFrameEnabled( true );
 							RITimestepTSData.addVariable( var );
 							break;
-						case 1:  // at 'EndHourFlag'
+						case OutputProcessor::ReportingFrequency::Hourly:  // at 'EndHourFlag'
 							RIHourlyTSData.setRDataFrameEnabled( true );
 							RIHourlyTSData.addVariable( var );
 							break;
-						case 2: // at 'EndDayFlag'
+						case OutputProcessor::ReportingFrequency::Daily: // at 'EndDayFlag'
 							RIDailyTSData.setRDataFrameEnabled( true );
 							RIDailyTSData.addVariable( var );
 							break;
-						case 3:  // at end of month
+						case OutputProcessor::ReportingFrequency::Monthly:  // at end of month
 							RIMonthlyTSData.setRDataFrameEnabled( true );
 							RIMonthlyTSData.addVariable( var );
 							break;
-						case 4:  // once per environment 'EndEnvrnFlag'
+						case OutputProcessor::ReportingFrequency::Simulation:  // once per environment 'EndEnvrnFlag'
 							RIRunPeriodTSData.setRDataFrameEnabled( true );
 							RIRunPeriodTSData.addVariable( var );
+							break;
+						case OutputProcessor::ReportingFrequency::Yearly:  // at end of year
+							RIYearlyTSData.setRDataFrameEnabled( true );
+							RIYearlyTSData.addVariable( var );
 							break;
 						}
 				}
 			}
 			// set the scanned variables to true or false
-			switch ( ReportFrequency ) {
-				case -1:
+			switch ( reportFrequency ) {
+				case OutputProcessor::ReportingFrequency::EachCall:
 					if ( IndexType == ZoneVar )
 						RIDetailedZoneTSData.setRVariablesScanned( true );
 					if ( IndexType == HVACVar )
 						RIDetailedHVACTSData.setRVariablesScanned( true );
 					break;
-				case 0:  // at 'EndTimeStepFlag'
+				case OutputProcessor::ReportingFrequency::TimeStep:  // at 'EndTimeStepFlag'
 					RITimestepTSData.setRVariablesScanned( true );
 					break;
-				case 1:  // at 'EndHourFlag'
+				case OutputProcessor::ReportingFrequency::Hourly:  // at 'EndHourFlag'
 					RIHourlyTSData.setRVariablesScanned( true );
 					break;
-				case 2: // at 'EndDayFlag'
+				case OutputProcessor::ReportingFrequency::Daily: // at 'EndDayFlag'
 					RIDailyTSData.setRVariablesScanned( true );
 					break;
-				case 3:  // at end of month
+				case OutputProcessor::ReportingFrequency::Monthly:  // at end of month
 					RIMonthlyTSData.setRVariablesScanned( true );
 					break;
-				case 4:  // once per environment 'EndEnvrnFlag'
+				case OutputProcessor::ReportingFrequency::Simulation:  // once per environment 'EndEnvrnFlag'
 					RIRunPeriodTSData.setRVariablesScanned( true );
+					break;
+				case OutputProcessor::ReportingFrequency::Yearly:  // at end of year
+					RIYearlyTSData.setRVariablesScanned( true );
 					break;
 			}
 		}
 
-		void ResultsSchema::initializeITSDataFrame( const int ReportFrequency, const Array1D< IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType ) {
+		void ResultsSchema::initializeITSDataFrame( const OutputProcessor::ReportingFrequency reportFrequency, const Array1D< IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType ) {
 			Reference< IntegerVariables > IVar;
 
 			// loop over values to suck in var info
 			for ( int Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				IVar >>= IVariableTypes( Loop ).VarPtr;
 				auto & iVar( IVar());
-				if ( iVar.Report && iVar.ReportFreq == ReportFrequency ) {
-					// OutputVariable *var = new OutputVariable( IVariableTypes(Loop ).VarName, ReportFrequency,
+				if ( iVar.Report && iVar.frequency == reportFrequency ) {
+					// OutputVariable *var = new OutputVariable( IVariableTypes(Loop ).VarName, reportFrequency,
 					// 			IVariableTypes( Loop ).IndexType,
 					// 			IVariableTypes( Loop ).ReportID,
-					// 			IVariableTypes( Loop ).UnitsString);
-					OutputVariable var( IVariableTypes(Loop ).VarName, ReportFrequency,
+					// 			IVariableTypes( Loop ).units);
+					OutputVariable var( IVariableTypes(Loop ).VarName, reportFrequency,
 								IVariableTypes( Loop ).IndexType,
 								IVariableTypes( Loop ).ReportID,
-								IVariableTypes( Loop ).UnitsString);
-					switch ( ReportFrequency ) {
-					case -1:  // each time UpdatedataandReport is called
+								IVariableTypes( Loop ).units);
+					switch ( reportFrequency ) {
+					case OutputProcessor::ReportingFrequency::EachCall:  // each time UpdatedataandReport is called
 						if ( IndexType == ZoneVar && IVariableTypes(Loop ).IndexType == ZoneVar)
 						{
 							RIDetailedZoneTSData.setIDataFrameEnabled( true );
@@ -765,163 +776,189 @@ namespace EnergyPlus {
 							RIDetailedHVACTSData.addVariable( var );
 						}
 						break;
-					case 0:  // at 'EndTimeStepFlag'
+					case OutputProcessor::ReportingFrequency::TimeStep:  // at 'EndTimeStepFlag'
 						RITimestepTSData.setIDataFrameEnabled( true );
 						RITimestepTSData.addVariable( var );
 						break;
-					case 1:  // at 'EndHourFlag'
+					case OutputProcessor::ReportingFrequency::Hourly:  // at 'EndHourFlag'
 						RIHourlyTSData.setIDataFrameEnabled( true );
 						RIHourlyTSData.addVariable( var );
 						break;
-					case 2: // at 'EndDayFlag'
+					case OutputProcessor::ReportingFrequency::Daily: // at 'EndDayFlag'
 						RIDailyTSData.setIDataFrameEnabled( true );
 						RIDailyTSData.addVariable( var );
 						break;
-					case 3:  // at end of month
+					case OutputProcessor::ReportingFrequency::Monthly:  // at end of month
 						RIMonthlyTSData.setIDataFrameEnabled( true );
 						RIMonthlyTSData.addVariable( var );
 						break;
-					case 4:  // once per environment 'EndEnvrnFlag'
+					case OutputProcessor::ReportingFrequency::Simulation:  // once per environment 'EndEnvrnFlag'
 						RIRunPeriodTSData.setIDataFrameEnabled( true );
 						RIRunPeriodTSData.addVariable( var );
+						break;
+					case OutputProcessor::ReportingFrequency::Yearly:  // once per environment 'EndEnvrnFlag'
+						RIYearlyTSData.setIDataFrameEnabled( true );
+						RIYearlyTSData.addVariable( var );
 						break;
 					}
 				}
 			}
 
 			// set the scanned variables to true or false
-			switch ( ReportFrequency ) {
-				case -1:
+			switch ( reportFrequency ) {
+				case OutputProcessor::ReportingFrequency::EachCall:
 					if ( IndexType == ZoneVar )
 						RIDetailedZoneTSData.setIVariablesScanned( true );
 					if ( IndexType == HVACVar )
 						RIDetailedHVACTSData.setIVariablesScanned( true );
 					break;
-				case 0:  // at 'EndTimeStepFlag'
+				case OutputProcessor::ReportingFrequency::TimeStep:  // at 'EndTimeStepFlag'
 					RITimestepTSData.setIVariablesScanned( true );
 					break;
-				case 1:  // at 'EndHourFlag'
+				case OutputProcessor::ReportingFrequency::Hourly:  // at 'EndHourFlag'
 					RIHourlyTSData.setIVariablesScanned( true );
 					break;
-				case 2: // at 'EndDayFlag'
+				case OutputProcessor::ReportingFrequency::Daily: // at 'EndDayFlag'
 					RIDailyTSData.setIVariablesScanned( true );
 					break;
-				case 3:  // at end of month
+				case OutputProcessor::ReportingFrequency::Monthly:  // at end of month
 					RIMonthlyTSData.setIVariablesScanned( true );
 					break;
-				case 4:  // once per environment 'EndEnvrnFlag'
+				case OutputProcessor::ReportingFrequency::Simulation:  // once per environment 'EndEnvrnFlag'
 					RIRunPeriodTSData.setIVariablesScanned( true );
+					break;
+				case OutputProcessor::ReportingFrequency::Yearly:  // once per environment 'EndEnvrnFlag'
+					RIYearlyTSData.setIVariablesScanned( true );
 					break;
 			}
 		}
 
-		void ResultsSchema::initializeMeters( const Array1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency ) {
-			switch ( ReportFrequency ) {
-				case -1:
+		void ResultsSchema::initializeMeters( const Array1D< OutputProcessor::MeterType > &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency ) {
+			switch ( reportFrequency ) {
+				case OutputProcessor::ReportingFrequency::EachCall:
 					//nothing to do; meters are not reported at this frequency
 					break;
-				case 0:  // at 'Timestep'
+				case OutputProcessor::ReportingFrequency::TimeStep:  // at 'Timestep'
 					for ( size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
 						if ( EnergyMeters(Loop ).RptTS || EnergyMeters( Loop ).RptTSFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).TSRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).TSRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).TSRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).TSRptNum, EnergyMeters( Loop ).Units);
 							TSMeters.addVariable( var );
 							TSMeters.setRDataFrameEnabled( true );
 						}
 						if ( EnergyMeters(Loop ).RptAccTS || EnergyMeters( Loop ).RptAccTSFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).TSAccRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).TSAccRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).TSAccRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).TSAccRptNum, EnergyMeters( Loop ).Units);
 							TSMeters.addVariable( var );
 							TSMeters.setRDataFrameEnabled( true );
 						}
 					}
 					break;
-				case 1:  // at 'Hourly'
+				case OutputProcessor::ReportingFrequency::Hourly:  // at 'Hourly'
 					for ( size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
 						if ( EnergyMeters(Loop ).RptHR || EnergyMeters( Loop ).RptHRFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).HRRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).HRRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).HRRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).HRRptNum, EnergyMeters( Loop ).Units);
 							HRMeters.addVariable( var );
 							HRMeters.setRDataFrameEnabled( true );
 						}
 						if ( EnergyMeters(Loop ).RptAccHR || EnergyMeters( Loop ).RptAccHRFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).HRAccRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).HRAccRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).HRAccRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).HRAccRptNum, EnergyMeters( Loop ).Units);
 							HRMeters.addVariable( var );
 							HRMeters.setRDataFrameEnabled( true );
 						}
 					}
 					break;
-				case 2:  // at 'Daily'
+				case OutputProcessor::ReportingFrequency::Daily:  // at 'Daily'
 					for ( size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
 						if ( EnergyMeters(Loop ).RptDY || EnergyMeters( Loop ).RptDYFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).DYRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).DYRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).DYRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).DYRptNum, EnergyMeters( Loop ).Units);
 							DYMeters.addVariable( var );
 							DYMeters.setRDataFrameEnabled( true );
 						}
 						if ( EnergyMeters(Loop ).RptAccDY || EnergyMeters( Loop ).RptAccDYFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).DYAccRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).DYAccRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).DYAccRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).DYAccRptNum, EnergyMeters( Loop ).Units);
 							DYMeters.addVariable( var );
 							DYMeters.setRDataFrameEnabled( true );
 						}
 					}
 					break;
-				case 3:  // at 'Monthly'
+				case OutputProcessor::ReportingFrequency::Monthly:  // at 'Monthly'
 					for ( size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
 						if ( EnergyMeters(Loop ).RptMN || EnergyMeters( Loop ).RptMNFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).MNRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).MNRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).MNRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).MNRptNum, EnergyMeters( Loop ).Units);
 							MNMeters.addVariable( var );
 							MNMeters.setRDataFrameEnabled( true );
 						}
 						if ( EnergyMeters(Loop ).RptAccMN || EnergyMeters( Loop ).RptAccMNFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).MNAccRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).MNAccRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).MNAccRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).MNAccRptNum, EnergyMeters( Loop ).Units);
 							MNMeters.addVariable( var );
 							MNMeters.setRDataFrameEnabled( true );
 						}
 					}
 					break;
-				case 4:  // at 'RunPeriod'/'SM'
+				case OutputProcessor::ReportingFrequency::Simulation:  // at 'RunPeriod'/'SM'
 					for ( size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
 						if ( EnergyMeters(Loop ).RptSM || EnergyMeters( Loop ).RptSMFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).SMRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).SMRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).SMRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).SMRptNum, EnergyMeters( Loop ).Units);
 							SMMeters.addVariable( var );
 							SMMeters.setRDataFrameEnabled( true );
 						}
 						if ( EnergyMeters(Loop ).RptAccSM || EnergyMeters( Loop ).RptAccSMFO) {
-							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).SMAccRptNum, EnergyMeters( Loop ).Units);
-							MeterVariable var( EnergyMeters(Loop ).Name, ReportFrequency, EnergyMeters( Loop ).SMAccRptNum, EnergyMeters( Loop ).Units);
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).SMAccRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).SMAccRptNum, EnergyMeters( Loop ).Units);
 							SMMeters.addVariable( var );
 							SMMeters.setRDataFrameEnabled( true );
+						}
+					}
+					break;
+				case OutputProcessor::ReportingFrequency::Yearly:  // at 'Yearly'
+					for ( size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+						if ( EnergyMeters(Loop ).RptYR || EnergyMeters( Loop ).RptYRFO) {
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).YRRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).YRRptNum, EnergyMeters( Loop ).Units);
+							YRMeters.addVariable( var );
+							YRMeters.setRDataFrameEnabled( true );
+						}
+						if ( EnergyMeters(Loop ).RptAccYR || EnergyMeters( Loop ).RptAccYRFO) {
+							// MeterVariable *var = new MeterVariable( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).YRAccRptNum, EnergyMeters( Loop ).Units);
+							MeterVariable var( EnergyMeters(Loop ).Name, reportFrequency, EnergyMeters( Loop ).YRAccRptNum, EnergyMeters( Loop ).Units);
+							YRMeters.addVariable( var );
+							YRMeters.setRDataFrameEnabled( true );
 						}
 					}
 					break;
 			}
 
 			// set the scanned variables to true or false
-			switch ( ReportFrequency )
+			switch ( reportFrequency )
 			{
-			case -1:
+			case OutputProcessor::ReportingFrequency::EachCall:
 				// case should not happen in Meters
 				break;
-			case 0:  // at TimeStepFlag
+			case OutputProcessor::ReportingFrequency::TimeStep:  // at TimeStepFlag
 				TSMeters.setRVariablesScanned( true );
 				break;
-			case 1:  // at Hourly
+			case OutputProcessor::ReportingFrequency::Hourly:  // at Hourly
 				HRMeters.setRVariablesScanned( true );
 				break;
-			case 2: // at Daily
+			case OutputProcessor::ReportingFrequency::Daily: // at Daily
 				DYMeters.setRVariablesScanned( true );
 				break;
-			case 3:  // at Monthly
+			case OutputProcessor::ReportingFrequency::Monthly:  // at Monthly
 				MNMeters.setRVariablesScanned( true );
 				break;
-			case 4:  // at RunPeriod/SM
+			case OutputProcessor::ReportingFrequency::Simulation:  // at RunPeriod/SM
 				SMMeters.setRVariablesScanned( true );
+				break;
+			case OutputProcessor::ReportingFrequency::Yearly:  // at Yearly
+				YRMeters.setRVariablesScanned( true );
 				break;
 			}
 		}
@@ -962,6 +999,11 @@ namespace EnergyPlus {
 			if ( OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled() ) {
 				OutputSchema->RIRunPeriodTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
 			}
+
+			// Output yearly time series data
+			if ( OutputSchema->RIYearlyTSData.iDataFrameEnabled() || OutputSchema->RIYearlyTSData.rDataFrameEnabled() ) {
+				OutputSchema->RIYearlyTSData.writeReport( outputJSON, outputCBOR, outputMsgPack );
+			}
 		}
 
 		void ResultsSchema::WriteReport() {
@@ -1001,6 +1043,10 @@ namespace EnergyPlus {
 
 			if ( RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled() ) {
 				outputVars[ "RunPeriod" ] = RIRunPeriodTSData.getVariablesJSON();
+			}
+
+			if ( RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled() ) {
+				outputVars[ "Yearly" ] = RIYearlyTSData.getVariablesJSON();
 			}
 
 			// output dictionary
@@ -1054,6 +1100,10 @@ namespace EnergyPlus {
 
 			if ( SMMeters.rDataFrameEnabled() ) {
 				meterData[ "RunPeriod" ] = SMMeters.getJSON();
+			}
+
+			if ( YRMeters.rDataFrameEnabled() ) {
+				meterData[ "Yearly" ] = YRMeters.getJSON();
 			}
 
 			json mdd;
@@ -1113,6 +1163,11 @@ namespace EnergyPlus {
 			OutputSchema->SMMeters.setRDataFrameEnabled( false );
 			OutputSchema->SMMeters.setIDataFrameEnabled( false );
 			OutputSchema->SMMeters.setIVariablesScanned( false );
+
+			OutputSchema->YRMeters.setRVariablesScanned( false );
+			OutputSchema->YRMeters.setRDataFrameEnabled( false );
+			OutputSchema->YRMeters.setIDataFrameEnabled( false );
+			OutputSchema->YRMeters.setIVariablesScanned( false );
 		}
 	} // ResultsFramework
 
