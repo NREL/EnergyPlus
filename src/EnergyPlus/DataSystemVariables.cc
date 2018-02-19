@@ -165,6 +165,9 @@ namespace DataSystemVariables {
 	bool ReportExtShadingSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are exported as a csv format output
 	bool UseImportedSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are imported altogether as a CSV/JSON file
 	
+	bool DisableGroupSelfShading( false ); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+	bool DisableAllSelfShading( false ); // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+
 	// This update the value during the warmup added for FMI
 	Real64 Elapsed_Time( 0.0 ); // For showing elapsed time at end of run
 	Real64 Time_Start( 0.0 ); // Call to CPU_Time for start time of simulation
