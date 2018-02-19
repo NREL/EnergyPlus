@@ -254,6 +254,10 @@ ProcessArgs(int argc, const char * argv[])
 		isEpJSON = true;
 	} else if ( inputFileExt == "IDF" || inputFileExt == "IMF" ) {
 		isEpJSON = false;
+	} else if ( inputFileExt == "CBOR" ) {
+		isCBOR = true;
+	} else if ( inputFileExt == "MSGPACK" ) {
+		isMsgPack = true;
 	} else {
 		DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
 		exit(EXIT_FAILURE);
