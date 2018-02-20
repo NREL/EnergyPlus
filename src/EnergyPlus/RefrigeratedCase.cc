@@ -5096,7 +5096,7 @@ namespace RefrigeratedCase {
 				GetObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
 				IsBlank = false;
-				VerifyName( Alphas( 1 ), TransSystem, RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				VerifyName( Alphas( 1 ), TransSystem, TransRefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 				if ( IsNotOK ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
