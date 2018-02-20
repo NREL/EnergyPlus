@@ -156,7 +156,7 @@ def parse_idd(data):
 
 
 def parse_obj(data):
-    root = {'type': 'object', 'properties': {}, 'legacy_idd': {'fields': [], 'alphas': { 'fields': [] }, 'numerics': { 'fields': [] } } }
+    root = {'type': 'object', 'properties': {}, 'legacy_idd': {'field_names': {}, 'fields': [], 'alphas': { 'fields': [] }, 'numerics': { 'fields': [] } } }
     extensible_count = 0
     duplicate_field_count = 0
 
@@ -257,6 +257,7 @@ def parse_obj(data):
                 raise RuntimeError("expected /field after , or ;")
             next_token(data)
             field_name = parse_line(data)
+            original_field_name = field_name
             field_name = field_name.lower()
             field_data = parse_field(data, token_a_or_n)
 
@@ -264,7 +265,7 @@ def parse_obj(data):
                 field_data.pop('begin-extensible')
                 field_name = re.sub('[ ]+[0-9]+', '', field_name)
                 field_name = re.sub('[^0-9a-zA-Z]+', '_', field_name)
-                append_field_number(root, field_number, field_name, True)
+                append_field_number(root, field_number, field_name, True, original_field_name)
                 root['properties']['extensions'] = {'type': 'array', 'items': {'properties': {}, 'type': 'object'}}
                 root['legacy_idd']['extensibles'] = [field_name]
                 parse_extensibles(root['properties']['extensions']['items'], field_data, field_name)
@@ -277,7 +278,7 @@ def parse_obj(data):
                 if extensible_count < root['extensible_size']:
                     field_name = re.sub('[ ]+[0-9]+', '', field_name)
                     field_name = re.sub('[^0-9a-zA-Z]+', '_', field_name)
-                    append_field_number(root, field_number, field_name, True)
+                    append_field_number(root, field_number, field_name, True, original_field_name)
                     root['legacy_idd']['extensibles'].append(field_name)
                     parse_extensibles(root['properties']['extensions']['items'], field_data, field_name)
                     extensible_count += 1
@@ -289,7 +290,7 @@ def parse_obj(data):
             if field_name in root['properties']:
                 duplicate_field_count += 1
                 field_name += "_" + str(duplicate_field_count)
-            append_field_number(root, field_number, field_name, False)
+            append_field_number(root, field_number, field_name, False, original_field_name)
             root['legacy_idd']['fields'].append(field_name)
             if field_name != 'name':
                 root['properties'][field_name] = field_data
@@ -476,12 +477,14 @@ def parse_field(data, token):
             return root
 
 
-def append_field_number(root, field_number, field_name, is_in_extensibles):
+def append_field_number(root, field_number, field_name, is_in_extensibles, original_name):
     if not is_in_extensibles:
         if field_number[0].lower() == 'a':
             root['legacy_idd']['alphas']['fields'].append(field_name)
+            root['legacy_idd']['field_names'][field_name] = original_name
         elif field_number[0].lower() == 'n':
             root['legacy_idd']['numerics']['fields'].append(field_name)
+            root['legacy_idd']['field_names'][field_name] = original_name
     else:
         if field_number[0].lower() == 'a':
             if 'extensions' not in root['legacy_idd']['alphas']:
