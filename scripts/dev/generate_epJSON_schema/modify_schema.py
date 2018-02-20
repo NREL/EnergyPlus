@@ -112,7 +112,8 @@ extension_renaming = {
     'Foundation:Kiva': 'blocks',
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
     'SurfaceProperty:SurroundingSurfaces': 'surfaces',
-    'ZoneHVAC:HybridUnitaryHVAC': 'modes'
+    'ZoneHVAC:HybridUnitaryHVAC': 'modes',
+    'ShadowCalculation': 'shading_zone_groups'
 }
 remaining_objects = [
     'Site:SpectrumData',

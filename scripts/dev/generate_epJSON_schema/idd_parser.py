@@ -23,28 +23,29 @@ TOKEN_FORMAT = 13
 TOKEN_UNIQUE_OBJ = 14
 TOKEN_REQUIRED_OBJ = 15
 TOKEN_REFERENCE_CLASS_NAME = 17
+TOKEN_OBSOLETE = 18
 
 # field level tokens
-TOKEN_KEY = 18
-TOKEN_NOTE = 19
-TOKEN_OBJ_LIST = 20
-TOKEN_DEFAULT = 21
-TOKEN_AUTOCALCULATABLE = 22
-TOKEN_AUTOSIZABLE = 23
-TOKEN_MIN = 24
-TOKEN_MIN_EXCLUSIVE = 25
-TOKEN_MAX = 26
-TOKEN_MAX_EXCLUSIVE = 27
-TOKEN_BEGIN_EXTENSIBLE = 28
-TOKEN_UNITS = 29
-TOKEN_TYPE = 30
-TOKEN_REQUIRED_FIELD = 31
-TOKEN_REFERENCE = 32
-TOKEN_IP_UNITS = 33
-TOKEN_UNITS_BASED_ON_FIELD = 34
-TOKEN_DEPRECATED = 35
-TOKEN_EXTERNAL_LIST = 36
-TOKEN_RETAIN_CASE = 37
+TOKEN_KEY = 19
+TOKEN_NOTE = 20
+TOKEN_OBJ_LIST = 21
+TOKEN_DEFAULT = 22
+TOKEN_AUTOCALCULATABLE = 23
+TOKEN_AUTOSIZABLE = 24
+TOKEN_MIN = 25
+TOKEN_MIN_EXCLUSIVE = 26
+TOKEN_MAX = 27
+TOKEN_MAX_EXCLUSIVE = 28
+TOKEN_BEGIN_EXTENSIBLE = 29
+TOKEN_UNITS = 30
+TOKEN_TYPE = 31
+TOKEN_REQUIRED_FIELD = 32
+TOKEN_REFERENCE = 33
+TOKEN_IP_UNITS = 34
+TOKEN_UNITS_BASED_ON_FIELD = 35
+TOKEN_DEPRECATED = 36
+TOKEN_EXTERNAL_LIST = 37
+TOKEN_RETAIN_CASE = 38
 
 # above object level group string
 GROUP_STR = 'group'
@@ -57,6 +58,7 @@ FORMAT_STR = 'format'
 FIELD_STR = 'field'
 UNIQUE_OBJ_STR = 'unique-object'
 REQUIRED_OBJ_STR = 'required-object'
+OBSOLETE_STR = 'obsolete'
 
 # field-level strings
 REQUIRED_FIELD_STR = 'required-field'
@@ -213,6 +215,14 @@ def parse_obj(data):
             if 'format' in root:
                 raise RuntimeError("cannot have duplicate formats")
             root['format'] = parse_line(data)
+
+        elif token == TOKEN_OBSOLETE:
+            next_token(data)
+            if look_ahead(data) != TOKEN_STRING:
+                raise RuntimeError("expected string after /obsolete")
+            if 'obsolete' in root:
+                raise RuntimeError("cannot have duplicate obsolete")
+            root['obsolete'] = parse_line(data)
 
         elif token == TOKEN_A or token == TOKEN_N:  # past all object level comments, should be field now
             token_a_or_n = token
@@ -580,6 +590,8 @@ def next_token(data):
             return TOKEN_BEGIN_EXTENSIBLE
         if match_string(data, DEPRECATED_STR):
             return TOKEN_DEPRECATED
+        if match_string(data, OBSOLETE_STR):
+            return TOKEN_OBSOLETE
         if match_string(data, RETAIN_CASE_STR):
             return TOKEN_RETAIN_CASE
         if match_string(data, GROUP_STR):

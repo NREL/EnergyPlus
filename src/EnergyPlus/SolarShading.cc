@@ -567,13 +567,6 @@ namespace SolarShading {
 		// This subroutine gets the Shadowing Calculation object.
 
 		// Using/Aliasing
-<<<<<<< HEAD
-=======
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
->>>>>>> upstream/develop
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
 		using DataSystemVariables::SutherlandHodgman;
@@ -733,10 +726,10 @@ namespace SolarShading {
 		bool DisableSelfShadingBetweenGroup = false;
 
 		if ( NumAlphas >= 6 ) {
-			if ( SameString( cAlphaArgs( 6 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "Yes" ) ) {
 				DisableSelfShadingWithinGroup = true;
 				cAlphaArgs( 6 ) = "Yes";
-			} else if ( SameString( cAlphaArgs( 6 ), "No" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "No" ) ) {
 				cAlphaArgs( 6 ) = "No";
 			} else {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) );
@@ -747,10 +740,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 7 ) {
-			if ( SameString( cAlphaArgs( 7 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Yes" ) ) {
 				DisableSelfShadingBetweenGroup = true;
 				cAlphaArgs( 7 ) = "Yes";
-			} else if ( SameString( cAlphaArgs( 7 ), "No" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "No" ) ) {
 				cAlphaArgs( 7 ) = "No";
 			} else {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 7 ) );
@@ -773,12 +766,12 @@ namespace SolarShading {
 			if ( NumAlphas >= 8 ) {
 				// Read all shading groups
 				NumOfShadingGroups = NumAlphas - 7;
-				DisableSelfShadingGroups.allocate( NumOfShadingGroups );				
+				DisableSelfShadingGroups.allocate( NumOfShadingGroups );
 				for ( int i = 1; i <= NumOfShadingGroups; i++ ) {
-					Found = FindItemInList( cAlphaArgs( i + 7 ), ZoneList, NumOfZoneLists );
+					Found = UtilityRoutines::FindItemInList( cAlphaArgs( i + 7 ), ZoneList, NumOfZoneLists );
 					if ( Found != 0 ) DisableSelfShadingGroups( i ) = Found;
 				}
-				
+
 				for ( int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++ ) {
 					if ( Surface( SurfNum ).ExtBoundCond == 0 ) { // Loop through all exterior surfaces
 						SurfZoneGroup = 0;
@@ -4674,7 +4667,7 @@ namespace SolarShading {
 					}
 				}
 				// Elimate shawdowing surfaces that is supposed to be disabled.
-				if ( DisableAllSelfShading ) {					
+				if ( DisableAllSelfShading ) {
 					if ( surface.Zone != 0 ) {
 						continue; // Disable all shadowing surfaces in all zones. Attached shading surfaces are not part of a zone, zone value is 0.
 					}
@@ -6343,7 +6336,7 @@ namespace SolarShading {
 					// from this exterior window since the beam-beam transmittance of shades and diffusing glass
 					// is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
 					// assumed to be zero.
-					
+
 					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel )
 						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || SurfaceWindow( SurfNum ).SolarDiffusing || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser || Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) continue;
 

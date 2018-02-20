@@ -384,7 +384,7 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_TwoSpeedDXCoolCoil_Only ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	GetUnitarySystemInputData( ErrorsFound ); // get UnitarySystem input from object above
 	HVACUnitarySystem::GetInputFlag = false; // don't call GetInput more than once (SimUnitarySystem call below will call GetInput if this flag is not set to false)
