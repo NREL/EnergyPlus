@@ -1087,6 +1087,20 @@ namespace DataSizing {
 		bool sysSizeHeatingDominant;
 		bool sysSizeCoolingDominant;
 
+		Real64 CoinCoolCoilMassFlow; // coincident volume flow at time of cooling coil sensible+latent peak [m3/s]
+		Real64 CoinHeatCoilMassFlow; // coincident volume flow at time of heating coil sensible peak [m3/s]
+		Real64 DesCoolCoilVolFlow; // design cooling air volume flow rate at time of coil sens+latent peak [m3/s]
+		Real64 DesHeatCoilVolFlow; // design heating air volume flow rate at time of coil sens peak [m3/s]
+		Real64 DesMainCoilVolFlow; // design main supply duct volume flow at time of coil peak [m3/s]
+		//These are for reporting purposes
+
+		int SysHeatCoilTimeStepPk; // timestep in day of heating coil peak
+		int SysHeatAirTimeStepPk; // timestep in day of heating airflow peak
+		int HeatDDNum; // index of design day for heating 
+		int CoolDDNum; // index of design day for cooling
+
+		Real64 SysCoolCoinSpaceSens; // sum of zone space sensible cooling loads at coincident peak
+		Real64 SysHeatCoinSpaceSens; //  sum of zone space sensible heating loads at coincident peak
 		// Default Constructor
 		SystemSizingData() :
 			LoadSizeType( 0 ),
@@ -1172,7 +1186,18 @@ namespace DataSizing {
 			CoolingPeakLoadType( 0 ), // wfb
 			CoolCapControl( 0 ), // wfb
 			sysSizeHeatingDominant( false ),
-			sysSizeCoolingDominant( false )
+			sysSizeCoolingDominant( false ),
+			CoinCoolCoilMassFlow( 0.0 ), 
+			CoinHeatCoilMassFlow( 0.0 ),
+			DesCoolCoilVolFlow( 0.0 ),
+			DesHeatCoilVolFlow( 0.0 ),
+			DesMainCoilVolFlow( 0.0 ),
+			SysHeatCoilTimeStepPk( 0 ),
+			SysHeatAirTimeStepPk( 0 ),
+			HeatDDNum ( 0 ),
+			CoolDDNum ( 0 ),
+			SysCoolCoinSpaceSens( 0.0 ),
+			SysHeatCoinSpaceSens( 0.0 )
 		{}
 
 	};

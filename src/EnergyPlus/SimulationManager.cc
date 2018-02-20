@@ -139,6 +139,7 @@ extern "C" {
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
 #include <Vectors.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -355,6 +356,7 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 		createFacilityElectricPowerServiceObject();
+		createCoilSelectionReportObj();
 
 		ManageBranchInput(); // just gets input and returns.
 

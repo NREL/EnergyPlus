@@ -83,6 +83,7 @@
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 #include <VariableSpeedCoils.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 
@@ -2444,6 +2445,23 @@ namespace HeatingCoils {
 
 		HeatingCoil( CoilNum ).ParasiticFuelLoad = HeatingCoil( CoilNum ).ParasiticFuelRate * ReportingConstant;
 
+		std::string coilObjClassName;
+		{ auto const SELECT_CASE_var( HeatingCoil( CoilNum ).HCoilType_Num );
+		if ( SELECT_CASE_var == Coil_HeatingElectric ) {
+			coilObjClassName = "Coil:Heating:Electric" ;
+		} else if ( SELECT_CASE_var == Coil_HeatingElectric_MultiStage ) {
+			coilObjClassName = "Coil:Heating:Electric:MultiStage" ;
+		} else if ( SELECT_CASE_var == Coil_HeatingGasOrOtherFuel ) {
+			coilObjClassName =  "Coil:Heating:Fuel" ;
+		} else if ( SELECT_CASE_var == Coil_HeatingGas_MultiStage ) {
+			coilObjClassName = "Coil:Heating:Gas:MultiStage" ;
+		} else if ( SELECT_CASE_var == Coil_HeatingDesuperheater ) {
+			coilObjClassName = "Coil:Heating:Desuperheater" ;
+		}}
+		if ( ! DataGlobals::WarmupFlag && ! DataGlobals::DoingHVACSizingSimulations && ! DataGlobals::DoingSizing && HeatingCoil(CoilNum).reportCoilFinalSizes ) {
+			coilSelectionReportObj->setCoilFinalSizes( HeatingCoil(CoilNum).Name,coilObjClassName, HeatingCoil(CoilNum).NominalCapacity, HeatingCoil(CoilNum).NominalCapacity, -999.0 , -999.0 );
+			HeatingCoil(CoilNum).reportCoilFinalSizes = false;
+		}
 	}
 
 	//        End of Reporting subroutines for the HeatingCoil Module

@@ -5133,6 +5133,12 @@ namespace SimAirServingZones {
 						SysSizing( CurOverallSimDay, AirLoopNum ).OutTempAtCoolPeak = OutDryBulbTemp;
 						SysSizing( CurOverallSimDay, AirLoopNum ).OutHumRatAtCoolPeak = OutHumRat;
 						SysSizing( CurOverallSimDay, AirLoopNum ).MassFlowAtCoolPeak = SysSizing( CurOverallSimDay, AirLoopNum ).CoolFlowSeq( TimeStepInDay );
+
+					}
+					SysSizing( CurOverallSimDay, AirLoopNum ).SysCoolCoinSpaceSens = 0.0;
+					for ( int zonesCoolLoop = 1; zonesCoolLoop <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++zonesCoolLoop ) {
+						int zoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( zonesCoolLoop );
+						SysSizing( CurOverallSimDay, AirLoopNum ).SysCoolCoinSpaceSens += CalcZoneSizing( CurOverallSimDay, zoneNum ).CoolLoadSeq( TimeStepInDay );
 					}
 				}
 				// get the maximum cooling mass flow rate
@@ -5200,7 +5206,21 @@ namespace SimAirServingZones {
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatRetHumRat = SysHeatRetHumRat;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatOutTemp = OutDryBulbTemp;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatOutHumRat = OutHumRat;
+						// save time of system coincident heating coil peak
+						SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatCoilTimeStepPk = TimeStepInDay;
+						SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatCoinSpaceSens = 0.0;
+						if ( AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated > 0 ) {
+							for ( int zonesHeatLoop = 1; zonesHeatLoop <= AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated; ++zonesHeatLoop ) {
+								int zoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( zonesHeatLoop );
+								SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatCoinSpaceSens += CalcZoneSizing( CurOverallSimDay, zoneNum ).HeatLoadSeq( TimeStepInDay );
+							}
+						} 
 					}
+					//! save time of system coincident heating airflow peak
+					if ( SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) > SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow ) {
+						SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatAirTimeStepPk = TimeStepInDay;
+					}
+
 					// Get the maximum system heating flow rate
 					SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow = max( SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow, SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) );
 
@@ -5252,7 +5272,20 @@ namespace SimAirServingZones {
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatRetHumRat = SysHeatRetHumRat;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatOutTemp = OutDryBulbTemp;
 						SysSizing( CurOverallSimDay, AirLoopNum ).HeatOutHumRat = OutHumRat;
+						// save time of system coincident heating coil peak
+						SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatCoilTimeStepPk = TimeStepInDay;
+
+						SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatCoinSpaceSens = 0.0;
+						for ( int zonesCoolLoop = 1; zonesCoolLoop <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++zonesCoolLoop ) {
+							int zoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( zonesCoolLoop );
+							SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatCoinSpaceSens += CalcZoneSizing( CurOverallSimDay, zoneNum ).HeatLoadSeq( TimeStepInDay );
+						}
 					} // Get the maximum system heating flow rate
+					// save time of system coincident heating airflow peak
+					if ( SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) > SysSizing( CurOverallSimDay, AirLoopNum).CoinHeatMassFlow ) {
+						SysSizing( CurOverallSimDay, AirLoopNum ).SysHeatAirTimeStepPk = TimeStepInDay;
+					}
+	
 					SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow = max( SysSizing( CurOverallSimDay, AirLoopNum ).CoinHeatMassFlow, SysSizing( CurOverallSimDay, AirLoopNum ).HeatFlowSeq( TimeStepInDay ) );
 				}
 
@@ -5866,6 +5899,7 @@ namespace SimAirServingZones {
 							CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = SysSizing( DDNum, AirLoopNum ).SysCoolOutHumRatSeq;
 							CalcSysSizing( AirLoopNum ).SysDOASHeatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASHeatAddSeq;
 							CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASLatAddSeq;
+							CalcSysSizing( AirLoopNum ).SysCoolCoinSpaceSens = SysSizing( DDNum, AirLoopNum ).SysCoolCoinSpaceSens;
 						}
 					}
 
@@ -5898,6 +5932,7 @@ namespace SimAirServingZones {
 							CalcSysSizing( AirLoopNum ).SysDOASHeatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASHeatAddSeq;
 							CalcSysSizing( AirLoopNum ).SysDOASLatAddSeq = SysSizing( DDNum, AirLoopNum ).SysDOASLatAddSeq;
 						}
+						CalcSysSizing( AirLoopNum ).SysCoolCoinSpaceSens = SysSizing( DDNum, AirLoopNum ).SysCoolCoinSpaceSens;
 					}
 
 					if ( SysSizing( DDNum, AirLoopNum ).CoinCoolMassFlow > CalcSysSizing( AirLoopNum ).CoinCoolMassFlow ) {
@@ -5929,6 +5964,12 @@ namespace SimAirServingZones {
 						CalcSysSizing( AirLoopNum ).SysHeatRetHumRatSeq = SysSizing( DDNum, AirLoopNum ).SysHeatRetHumRatSeq;
 						CalcSysSizing( AirLoopNum ).SysHeatOutTempSeq = SysSizing( DDNum, AirLoopNum ).SysHeatOutTempSeq;
 						CalcSysSizing( AirLoopNum ).SysHeatOutHumRatSeq = SysSizing( DDNum, AirLoopNum ).SysHeatOutHumRatSeq;
+
+						CalcSysSizing( AirLoopNum ).SysHeatCoilTimeStepPk = SysSizing( DDNum, AirLoopNum ).SysHeatCoilTimeStepPk;
+
+						CalcSysSizing( AirLoopNum ).SysHeatAirTimeStepPk = SysSizing( DDNum, AirLoopNum ).SysHeatAirTimeStepPk;
+						CalcSysSizing( AirLoopNum ).HeatDDNum = DDNum;
+						CalcSysSizing( AirLoopNum ).SysHeatCoinSpaceSens = SysSizing( DDNum, AirLoopNum ).SysHeatCoinSpaceSens;
 					}
 
 				}
@@ -6163,6 +6204,11 @@ namespace SimAirServingZones {
 				z.HeatRetHumRat = c.HeatRetHumRat;
 				z.HeatOutTemp = c.HeatOutTemp;
 				z.HeatOutHumRat = c.HeatOutHumRat;
+				z.SysHeatCoilTimeStepPk = c.SysHeatCoilTimeStepPk;
+				z.SysHeatAirTimeStepPk = c.SysHeatAirTimeStepPk;
+				z.HeatDDNum = c.HeatDDNum;
+				z.SysCoolCoinSpaceSens = c.SysCoolCoinSpaceSens;
+				z.SysHeatCoinSpaceSens = c.SysHeatCoinSpaceSens;
 			}
 
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {

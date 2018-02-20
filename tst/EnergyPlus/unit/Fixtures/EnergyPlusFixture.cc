@@ -183,6 +183,7 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -256,6 +257,7 @@ namespace EnergyPlus {
 		UtilityRoutines::outputErrorHeader = false;
 
 		Psychrometrics::InitializePsychRoutines();
+		createCoilSelectionReportObj();
 	}
 
 	void EnergyPlusFixture::TearDown() {

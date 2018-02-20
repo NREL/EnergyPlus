@@ -84,6 +84,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
@@ -2559,6 +2560,10 @@ namespace SingleDuct {
 				TermUnitSizing( CurTermUnitSizingNum ).ReheatAirFlowMult = 1.0;
 				TermUnitSizing( CurTermUnitSizingNum ).ReheatLoadMult = 1.0;
 			}
+			if ( Sys( SysNum ).ReheatComp_Index > 0 ) {
+				coilSelectionReportObj->setCoilReheatMultiplier( Sys( SysNum ).ReheatName, Sys( SysNum ).ReheatComp,TermUnitSizing( CurTermUnitSizingNum ).ReheatLoadMult );
+			}
+
 		}
 
 		IsAutoSize = false;
@@ -2708,6 +2713,7 @@ namespace SingleDuct {
 			TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac = Sys( SysNum ).ZoneMinAirFrac;
 			TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = Sys( SysNum ).MaxReheatWaterVolFlow;
 			TermUnitSizing( CurTermUnitSizingNum ).MaxSTVolFlow = Sys( SysNum ).MaxReheatSteamVolFlow;
+			TermUnitSizing( CurTermUnitSizingNum ).DesHeatingLoad = DesCoilLoad; // Coil Summary report
 			if ( Sys( SysNum ).ReheatComp_Num == HCoilType_SimpleHeating ) {
 				if ( Sys( SysNum ).DamperHeatingAction == Normal ) {
 					SetCoilDesFlow( Sys( SysNum ).ReheatComp, Sys( SysNum ).ReheatName, Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate, ErrorsFound );
