@@ -82,6 +82,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <WaterManager.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 
@@ -393,8 +394,11 @@ namespace VariableSpeedCoils {
 		WaterVolFlowAutoSized( false ), // Used to report autosizing info for the HPWH DX coil
 		TotalHeatingEnergy( 0.0 ),  //total water heating energy
 		TotalHeatingEnergyRate( 0.0 ), //total WH energy rate
-		bIsDesuperheater( false )//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
+		bIsDesuperheater( false ),//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
 	//end variables for HPWH
+		reportCoilFinalSizes( true ), //coil report
+		capModFacTotal( 0.0 ) // coil report
+
 	{}
 
 
@@ -473,12 +477,12 @@ namespace VariableSpeedCoils {
 			SpeedCal = SpeedNum;
 		}
 
-		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) ) {
+		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) ) {
 			// Cooling mode
 			InitVarSpeedCoil( DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal );
 			CalcVarSpeedCoilCooling( DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal );
 			UpdateVarSpeedCoil( DXCoilNum );
-		} else if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) ) {
+		} else if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) ) {
 			// Heating mode
 			InitVarSpeedCoil( DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal );
 			CalcVarSpeedCoilHeating( DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal );
@@ -644,7 +648,8 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
-			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = TypeOf_CoilVSWAHPCoolingEquationFit;
+			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
+			VarSpeedCoil( DXCoilNum ).VarSpeedCoilType = DataHVACGlobals::cAllCoilTypes( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum );
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
 			VarSpeedCoil( DXCoilNum ).NormSpedLevel = int( NumArray( 2 ) );
 			VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal = NumArray( 3 );
@@ -1024,6 +1029,7 @@ namespace VariableSpeedCoils {
 			DataHeatBalance::HeatReclaimVS_DXCoil( DXCoilNum ).SourceType = CurrentModuleObject;
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "COOLING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_CoolingAirToAirVariableSpeed;
+			VarSpeedCoil( DXCoilNum ).VarSpeedCoilType = DataHVACGlobals::cAllCoilTypes( Coil_CoolingAirToAirVariableSpeed );
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
 			VarSpeedCoil( DXCoilNum ).NormSpedLevel = int( NumArray( 2 ) );
 			VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal = NumArray( 3 );
@@ -1376,7 +1382,9 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).bIsDesuperheater = false;
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "HEATING";
-			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = TypeOf_CoilVSWAHPHeatingEquationFit;
+			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_HeatingWaterToAirHPVSEquationFit; // fix coil type 
+
+			VarSpeedCoil( DXCoilNum ).VarSpeedCoilType = DataHVACGlobals::cAllCoilTypes( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum );
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
 			VarSpeedCoil( DXCoilNum ).NormSpedLevel = int( NumArray( 2 ) );
 			VarSpeedCoil( DXCoilNum ).RatedCapHeat = NumArray( 3 );
@@ -1733,6 +1741,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).Name = AlphArray( 1 );
 			VarSpeedCoil( DXCoilNum ).CoolHeatType = "HEATING";
 			VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum = Coil_HeatingAirToAirVariableSpeed;
+			VarSpeedCoil( DXCoilNum ).VarSpeedCoilType = DataHVACGlobals::cAllCoilTypes( Coil_HeatingAirToAirVariableSpeed );
 			VarSpeedCoil( DXCoilNum ).NumOfSpeeds = int( NumArray( 1 ) );
 			VarSpeedCoil( DXCoilNum ).NormSpedLevel = int( NumArray( 2 ) );
 			VarSpeedCoil( DXCoilNum ).RatedCapHeat = NumArray( 3 );
@@ -2565,7 +2574,7 @@ namespace VariableSpeedCoils {
 				}
 			} else {
 
-				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) {
+				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ) { //fix coil type 
 					// cooling WAHP coil
 					// Setup Report variables for water source Heat Pump
 					SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
@@ -2588,7 +2597,7 @@ namespace VariableSpeedCoils {
 					SetupOutputVariable( "Cooling Coil Upper Speed Level", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio", OutputProcessor::Unit::None, VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 					SetupOutputVariable( "Cooling Coil Recoverable Heat Transfer Rate", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).QWasteHeat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-				} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) {
+				} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ) { //fix coil type 
 					// heating WAHP coil
 					// Setup Report variables for water source Heat Pump
 					SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
@@ -2715,8 +2724,7 @@ namespace VariableSpeedCoils {
 		static bool ErrorsFound( false ); // TRUE when errors found, air loop initialization error
 		Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
 		int Mode; // Performance mode for MultiMode DX coil; Always 1 for other coil types
-		Real64 RatedHeatPumpIndoorAirTemp;
-		// Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
+		Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
 		Real64 RatedHeatPumpIndoorHumRat; // Inlet humidity ratio to heat pump evaporator at rated conditions [kg/kg]
 		Real64 WaterFlowScale; // water flow scaling factor match rated flow rate
 
@@ -2750,10 +2758,17 @@ namespace VariableSpeedCoils {
 
 
 		// water source
-		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) ) {
+		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ) ) { //fix coil type 
 			if ( MyPlantScanFlag( DXCoilNum ) && allocated( PlantLoop ) ) {
+				// switch from coil type numbers in DataHVACGlobals, to coil type numbers in plant.
+				int plantTypeOfNum( 0 );
+				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ) {
+					plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
+				} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ) {
+					plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+				}
 				errFlag = false;
-				ScanPlantLoopsForObject( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum, VarSpeedCoil( DXCoilNum ).LoopNum, VarSpeedCoil( DXCoilNum ).LoopSide, VarSpeedCoil( DXCoilNum ).BranchNum, VarSpeedCoil( DXCoilNum ).CompNum, _, _, _, _, _, errFlag );
+				ScanPlantLoopsForObject( VarSpeedCoil( DXCoilNum ).Name, plantTypeOfNum, VarSpeedCoil( DXCoilNum ).LoopNum, VarSpeedCoil( DXCoilNum ).LoopSide, VarSpeedCoil( DXCoilNum ).BranchNum, VarSpeedCoil( DXCoilNum ).CompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowFatalError( "InitVarSpeedCoil: Program terminated for previous conditions." );
 				}
@@ -2770,7 +2785,7 @@ namespace VariableSpeedCoils {
 			MySizeFlag( DXCoilNum ) = false;
 
 			// Multispeed Cooling
-			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) ) {
+			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) ) {
 				for ( Mode = 1; Mode <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds; ++Mode ) {
 					// Check for zero capacity or zero max flow rate
 					if ( VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) <= 0.0 ) {
@@ -2808,10 +2823,74 @@ namespace VariableSpeedCoils {
 					//                                           VarSpeedCoil(DXCoilNum)%MSRatedAirMassFlowRate(Mode), &
 					//                           VarSpeedCoil(DXCoilNum)%MSRatedSHR(Mode))
 				}
+				// call coil model with everthing set at rating point
+				VarSpeedCoil( DXCoilNum ).InletAirDBTemp = RatedInletAirTemp;
+				VarSpeedCoil( DXCoilNum ).InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel );
+				VarSpeedCoil( DXCoilNum ).InletAirEnthalpy =  Psychrometrics::PsyHFnTdbW( RatedInletAirTemp, VarSpeedCoil( DXCoilNum ).InletAirHumRat  );
+				VarSpeedCoil( DXCoilNum ).InletAirPressure = DataEnvironment::StdPressureSeaLevel;
+
+				VarSpeedCoil( DXCoilNum ).AirMassFlowRate = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdPressureSeaLevel, RatedInletAirTemp, VarSpeedCoil( DXCoilNum ).InletAirHumRat ) ;
+				// store environment data fill back in after rating point calc is over
+				Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+				Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+				Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+				Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
+				Real64 ratedOutdoorAirWetBulb = 23.9; // from I/O ref. more precise value?
+
+				DataEnvironment::OutDryBulbTemp = RatedAmbAirTemp;
+				DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
+				DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level. 
+				DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedAmbAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				if ( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum > 0 ) {
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).Temp = RatedAmbAirTemp;
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).HumRat = DataEnvironment::OutHumRat;
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).Press = DataEnvironment::StdPressureSeaLevel;
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).OutAirWetBulb = ratedOutdoorAirWetBulb;
+				}
+				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ) { // need to set water info for WSHP
+					VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedWaterMassFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+					VarSpeedCoil( DXCoilNum ).InletWaterTemp = RatedInletWaterTemp; // 85 F cooling mode
+					Real64 CpSource = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineName );
+					VarSpeedCoil( DXCoilNum ).InletWaterEnthalpy = VarSpeedCoil( DXCoilNum ).InletWaterTemp * CpSource ;
+				}
+
+				// calculate coil model at rating point
+				Real64 runtimeFrac( 1.0 );
+				VarSpeedCoil( DXCoilNum ).DesignAirMassFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				VarSpeedCoil( DXCoilNum ).DesignAirVolFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				VarSpeedCoil( DXCoilNum ).DesignWaterMassFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedWaterMassFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				VarSpeedCoil( DXCoilNum ).DesignWaterVolFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+
+				CalcVarSpeedCoilCooling( DXCoilNum, 2.0, runtimeFrac, SensLoad, LatentLoad, 1, 1.0, 1.0, 1.0, VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				//coil outlets
+				Real64 RatedOutletWetBulb( 0.0 );
+				RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				coilSelectionReportObj->setRatedCoilConditions( 
+					VarSpeedCoil( DXCoilNum ).Name,
+					VarSpeedCoil( DXCoilNum ).VarSpeedCoilType,
+					VarSpeedCoil( DXCoilNum ).QLoadTotal, // this is the report variable
+					VarSpeedCoil( DXCoilNum ).QSensible, // this is the report variable
+					VarSpeedCoil( DXCoilNum ).AirMassFlowRate,
+					VarSpeedCoil( DXCoilNum ).InletAirDBTemp,
+					VarSpeedCoil( DXCoilNum ).InletAirHumRat,
+					RatedInletWetBulbTemp,
+					VarSpeedCoil( DXCoilNum ).OutletAirDBTemp ,
+					VarSpeedCoil( DXCoilNum ).OutletAirHumRat ,
+					RatedOutletWetBulb,
+					RatedAmbAirTemp,
+					ratedOutdoorAirWetBulb,
+					VarSpeedCoil( DXCoilNum ).MSRatedCBF( VarSpeedCoil( DXCoilNum ).NumOfSpeeds ),
+					-999.0 ); // coil effectiveness not define for DX
+
+				// now replace the outdoor air conditions set above for one time rating point calc
+				DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
+				DataEnvironment::OutHumRat = holdOutHumRat;
+				DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+				DataEnvironment::OutBaroPress = holdOutBaroPress;
 			}
 
 			// Multispeed Heating
-			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) ) {
+			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) ) {
 				RatedHeatPumpIndoorAirTemp = 21.11; // 21.11C or 70F
 				RatedHeatPumpIndoorHumRat = 0.00881; // Humidity ratio corresponding to 70F dry bulb/60F wet bulb
 				for ( Mode = 1; Mode <= VarSpeedCoil( DXCoilNum ).NumOfSpeeds; ++Mode ) {
@@ -2833,8 +2912,92 @@ namespace VariableSpeedCoils {
 					//                Manual for valid range.')
 					//        END IF
 				}
+				// call coil model with everthing set at rating point
+				VarSpeedCoil( DXCoilNum ).InletAirDBTemp = RatedInletAirTempHeat;
+				VarSpeedCoil( DXCoilNum ).InletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedInletAirTempHeat, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel );
+				VarSpeedCoil( DXCoilNum ).InletAirEnthalpy =  Psychrometrics::PsyHFnTdbW( RatedInletAirTempHeat, VarSpeedCoil( DXCoilNum ).InletAirHumRat  );
+				VarSpeedCoil( DXCoilNum ).InletAirPressure = DataEnvironment::StdPressureSeaLevel;
+
+				VarSpeedCoil( DXCoilNum ).AirMassFlowRate = VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW( DataEnvironment::StdPressureSeaLevel, RatedInletAirTempHeat, VarSpeedCoil( DXCoilNum ).InletAirHumRat ) ;
+				// store environment data fill back in after rating point calc is over
+				Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+				Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+				Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+				Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
+
+				DataEnvironment::OutDryBulbTemp = RatedAmbAirTempHeat;
+				DataEnvironment::OutWetBulbTemp = RatedAmbAirWBHeat;
+				DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level. 
+				DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedAmbAirTempHeat, RatedAmbAirWBHeat, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				if ( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum > 0 ) {
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).Temp = RatedAmbAirTempHeat;
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).HumRat = DataEnvironment::OutHumRat;
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).Press = DataEnvironment::StdPressureSeaLevel;
+					Node( VarSpeedCoil( DXCoilNum ).CondenserInletNodeNum ).OutAirWetBulb = RatedAmbAirWBHeat;
+				}
+				
+				if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ) { // need to set water info for WSHP
+					VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedWaterMassFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+					VarSpeedCoil( DXCoilNum ).InletWaterTemp = RatedInletWaterTempHeat; // 21.11C or 70F, heating mode
+					Real64 CpSource = GetSpecificHeatGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, SourceSideInletTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineName );
+					VarSpeedCoil( DXCoilNum ).InletWaterEnthalpy = VarSpeedCoil( DXCoilNum ).InletWaterTemp * CpSource ;
+				}
+
+				// calculate coil model at rating point
+				Real64 runtimeFrac( 1.0 );
+				VarSpeedCoil( DXCoilNum ).DesignAirMassFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				VarSpeedCoil( DXCoilNum ).DesignAirVolFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedAirVolFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				VarSpeedCoil( DXCoilNum ).DesignWaterMassFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedWaterMassFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				VarSpeedCoil( DXCoilNum ).DesignWaterVolFlowRate = VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				CalcVarSpeedCoilHeating( DXCoilNum, 2.0, runtimeFrac, SensLoad, 1, 1.0, 1.0, 1.0, VarSpeedCoil( DXCoilNum ).NumOfSpeeds );
+				//coil outlets
+				Real64 RatedOutletWetBulb( 0.0 );
+				RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, VarSpeedCoil( DXCoilNum ).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				coilSelectionReportObj->setRatedCoilConditions( 
+					VarSpeedCoil( DXCoilNum ).Name,
+					VarSpeedCoil( DXCoilNum ).VarSpeedCoilType,
+					VarSpeedCoil( DXCoilNum ).QLoadTotal, // this is the report variable
+					VarSpeedCoil( DXCoilNum ).QSensible, // this is the report variable
+					VarSpeedCoil( DXCoilNum ).AirMassFlowRate,
+					VarSpeedCoil( DXCoilNum ).InletAirDBTemp,
+					VarSpeedCoil( DXCoilNum ).InletAirHumRat,
+					RatedInletWetBulbTemp,
+					VarSpeedCoil( DXCoilNum ).OutletAirDBTemp ,
+					VarSpeedCoil( DXCoilNum ).OutletAirHumRat ,
+					RatedOutletWetBulb,
+					RatedAmbAirTempHeat,
+					RatedAmbAirWBHeat,
+					VarSpeedCoil( DXCoilNum ).MSRatedCBF( VarSpeedCoil( DXCoilNum ).NumOfSpeeds ),
+					-999.0 ); // coil effectiveness not define for DX
+
+				// now replace the outdoor air conditions set above for one time rating point calc
+				DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
+				DataEnvironment::OutHumRat = holdOutHumRat;
+				DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+				DataEnvironment::OutBaroPress = holdOutBaroPress;
 			}
 
+			// store fan info for coil
+			if ( VarSpeedCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( VarSpeedCoil( DXCoilNum ).SupplyFanIndex > -1 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo(
+						VarSpeedCoil( DXCoilNum ).Name,
+						VarSpeedCoil( DXCoilNum ).VarSpeedCoilType,
+						VarSpeedCoil( DXCoilNum ).SupplyFanName,
+						DataAirSystems::objectVectorOOFanSystemModel,
+						VarSpeedCoil( DXCoilNum ).SupplyFanIndex );
+				}
+
+			} else {
+				if ( VarSpeedCoil( DXCoilNum ).SupplyFanIndex > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo(
+						VarSpeedCoil( DXCoilNum ).Name,
+						VarSpeedCoil( DXCoilNum ).VarSpeedCoilType,
+						VarSpeedCoil( DXCoilNum ).SupplyFanName,
+						DataAirSystems::structArrayLegacyFanModels,
+						VarSpeedCoil( DXCoilNum ).SupplyFanIndex );
+				}
+			}
 		}
 
 		if ( SpeedNum > VarSpeedCoil( DXCoilNum ).NumOfSpeeds ) {
@@ -2893,7 +3056,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).HPTimeConstant = HPTimeConstant;
 			VarSpeedCoil( DXCoilNum ).FanDelayTime = FanDelayTime;
 
-			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) ) {
+			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ) ) {
 				WaterInletNode = VarSpeedCoil( DXCoilNum ).WaterInletNodeNum;
 
 				rho = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, CWInitConvTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineNameSimpleWatertoAirHP );
@@ -2964,7 +3127,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).AirMassFlowRate = 0.0;
 		}
 
-		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) ) {
+		if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ) || ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ) ) {
 			SetComponentFlowRate( VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, VarSpeedCoil( DXCoilNum ).WaterInletNodeNum, VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum, VarSpeedCoil( DXCoilNum ).LoopNum, VarSpeedCoil( DXCoilNum ).LoopSide, VarSpeedCoil( DXCoilNum ).BranchNum, VarSpeedCoil( DXCoilNum ).CompNum );
 
 			VarSpeedCoil( DXCoilNum ).InletWaterTemp = Node( WaterInletNode ).Temp;
@@ -3187,7 +3350,7 @@ namespace VariableSpeedCoils {
 		DefrostCapacityDes = 0.0;
 		DefrostCapacityUser = 0.0;
 
-		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit || VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) {
+		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit || VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ) {
 			CurrentObjSubfix = ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT";
 		} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed ) {
 			CurrentObjSubfix = ":WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
@@ -3202,6 +3365,7 @@ namespace VariableSpeedCoils {
 																VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed );//0.00005035;
 				VarSpeedCoil( DXCoilNum ).AirVolFlowAutoSized = true;
 			}
+			coilSelectionReportObj->setCoilAirFlow( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate, VarSpeedCoil( DXCoilNum ).AirVolFlowAutoSized );
 
 			if ( VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate == AutoCalculate ) {
 				VarSpeedCoil( DXCoilNum ).RatedHPWHCondWaterFlow = VarSpeedCoil( DXCoilNum ).RatedCapWH *
@@ -3211,6 +3375,7 @@ namespace VariableSpeedCoils {
 					VarSpeedCoil( DXCoilNum ).RatedHPWHCondWaterFlow;
 				VarSpeedCoil( DXCoilNum ).WaterVolFlowAutoSized = true;
 			}
+			coilSelectionReportObj->setCoilWaterFlow( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate,VarSpeedCoil( DXCoilNum ).WaterVolFlowAutoSized, -999 , VarSpeedCoil( DXCoilNum ).LoopNum );
 		}
 
 		if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate == AutoSize ) {
@@ -3410,6 +3575,15 @@ namespace VariableSpeedCoils {
 					}
 				}
 			}
+
+			coilSelectionReportObj->setCoilEntAirTemp( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, MixTemp, CurSysNum, CurZoneEqNum );
+			coilSelectionReportObj->setCoilEntAirHumRat( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, MixHumRat );
+			coilSelectionReportObj->setCoilLvgAirTemp( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, SupTemp );
+			coilSelectionReportObj->setCoilLvgAirHumRat( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, SupHumRat );
+			coilSelectionReportObj->setCoilCoolingCapacity( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, RatedCapCoolTotalDes, RatedCapCoolTotalAutoSized, CurSysNum, CurZoneEqNum, CurOASysNum,
+				0.0, // no fan load included in sizing
+				TotCapTempModFac,
+				-999.0, -999.0 ); // VS model doesn't limit, double check
 		}
 
 		// Set the global DX cooling coil capacity variable for use by other objects
@@ -3442,6 +3616,7 @@ namespace VariableSpeedCoils {
 			if ( RatedCapHeatDes < SmallLoad ) {
 				RatedCapHeatDes = 0.0;
 			}
+			coilSelectionReportObj->setCoilHeatingCapacity( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType,RatedCapHeatDes, RatedCapHeatAutoSized, CurSysNum, CurZoneEqNum, CurOASysNum, 0.0, 1.0, -999.0,-999.0 );
 		}
 		if ( RatedCapHeatAutoSized ) {
 			VarSpeedCoil( DXCoilNum ).RatedCapHeat = RatedCapHeatDes;
@@ -3498,6 +3673,8 @@ namespace VariableSpeedCoils {
 					}
 				}
 			}
+			coilSelectionReportObj->setCoilAirFlow( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, RatedAirVolFlowRateDes, RatedAirFlowAutoSized );
+
 		}
 
 		// Check that heat pump heating capacity is within 20% of cooling capacity. Check only for heating coil and report both.
@@ -3596,7 +3773,7 @@ namespace VariableSpeedCoils {
 		}
 
 		// Size water volumetric flow rate
-		if ( ( VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate == AutoSize ) && ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit || VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) ) {
+		if ( ( VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate == AutoSize ) && ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit || VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ) ) {
 			RatedWaterFlowAutoSized = true;
 		}
 
@@ -3627,6 +3804,7 @@ namespace VariableSpeedCoils {
 					//                                TRIM(CurrentObjSubfix), &
 					//                                  VarSpeedCoil(DXCoilNum)%Name, &
 					//                                  'Rated Water Flow Rate [m3/s]', VarSpeedCoil(DXCoilNum)%RatedWaterVolFlowRate)
+					coilSelectionReportObj->setCoilLvgWaterTemp(VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, PlantSizData( PltSizNum ).ExitTemp + PlantSizData( PltSizNum ).DeltaT ); //TRACE 3D Plus coil selection report
 
 				} else if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
 
@@ -3643,7 +3821,13 @@ namespace VariableSpeedCoils {
 					//                                //TRIM(CurrentObjSubfix), &
 					//                                  VarSpeedCoil(DXCoilNum)%Name, &
 					//                                  'Rated Water Flow Rate [m3/s]', VarSpeedCoil(DXCoilNum)%RatedWaterVolFlowRate)
+					coilSelectionReportObj->setCoilLvgWaterTemp(VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, PlantSizData( PltSizNum ).ExitTemp - PlantSizData( PltSizNum ).DeltaT ); //TRACE 3D Plus coil selection report
 				}
+
+
+				coilSelectionReportObj->setCoilEntWaterTemp( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType , PlantSizData( PltSizNum ).ExitTemp ); //TRACE 3D Plus coil selection report
+
+				coilSelectionReportObj->setCoilWaterDeltaT( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, PlantSizData( PltSizNum ).DeltaT );  //TRACE 3D Plus coil selection report
 			} else {
 				ShowSevereError( "Autosizing of water flow requires a loop Sizing:Plant object" );
 				ShowContinueError( "Autosizing also requires physical connection to a plant or condenser loop." );
@@ -3660,6 +3844,7 @@ namespace VariableSpeedCoils {
 			} else if ( RatedCapHeatAutoSized ) {
 				RatedWaterVolFlowRateDes = VarSpeedCoil( DXCoilNum ).RatedCapHeat * VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowPerRatedTotCap( NormSpeed );
 			}
+			coilSelectionReportObj->setCoilWaterFlow( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, RatedWaterVolFlowRateDes, RatedWaterFlowAutoSized, PltSizNum, VarSpeedCoil( DXCoilNum ).LoopNum );
 			VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate = RatedWaterVolFlowRateDes;
 			ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes );
 			// Ensure water flow rate at lower speed must be lower or
@@ -3698,13 +3883,13 @@ namespace VariableSpeedCoils {
 			RegisterPlantCompDesignFlow( VarSpeedCoil( DXCoilNum ).WaterInletNodeNum, 0.5 * VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate );
 		}
 
-		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit || VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) {
+		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit || VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ) {
 
 			RatedSourceTempCool = RatedInletWaterTemp;
 
 			if ( PltSizNum > 0 ) {
 				rhoW = rho;
-			} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit ) {
+			} else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ) {
 				rhoW = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, RatedInletWaterTemp, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineName );
 			} else {
 				rhoW = GetDensityGlycol( PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidName, RatedInletWaterTempHeat, PlantLoop( VarSpeedCoil( DXCoilNum ).LoopNum ).FluidIndex, RoutineName );
@@ -3832,7 +4017,7 @@ namespace VariableSpeedCoils {
 				WaterMassFlowRatio = 1.0;
 			}
 
-			CalcTotCapSHR_VSWSHP( RatedInletAirTemp, RatedInletAirHumRat, RatedInletEnth, RatedInletWetBulbTemp, AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, CBFRated, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( NormSpeed ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1 );
+			CalcTotCapSHR_VSWSHP( RatedInletAirTemp, RatedInletAirHumRat, RatedInletEnth, RatedInletWetBulbTemp, AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, CBFRated, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( NormSpeed ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1, VarSpeedCoil( DXCoilNum ).capModFacTotal );
 
 			RatedCapCoolSensDes = VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal * SHR;
 		} else if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate >= SmallAirVolFlow &&
@@ -4315,7 +4500,7 @@ namespace VariableSpeedCoils {
 
 				if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
 
-				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1 );
+				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1,VarSpeedCoil( DXCoilNum ).capModFacTotal );
 
 				Winput = QLoadTotal * EIR;
 
@@ -4341,7 +4526,7 @@ namespace VariableSpeedCoils {
 				if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
 
 				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal - 1 ), VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ),
-									  VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, SpeedRatio, 2 );
+									  VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, SpeedRatio, 2, VarSpeedCoil( DXCoilNum ).capModFacTotal );
 
 				SpeedCal = SpeedNum - 1;
 				EIRTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), LoadSideInletWBTemp, SourceSideInletTemp );
@@ -5144,6 +5329,18 @@ namespace VariableSpeedCoils {
 	}
 
 	void
+	setVarSpeedFanInfo(
+		int const dXCoilNum,
+		std::string const fanName,
+		int const fanIndex,
+		int const fanTypeNum
+	){
+		VarSpeedCoil( dXCoilNum ).SupplyFanIndex = fanIndex;
+		VarSpeedCoil( dXCoilNum ).SupplyFan_TypeNum = fanTypeNum;
+		VarSpeedCoil( dXCoilNum ).SupplyFanName = fanName;
+	}
+
+	void
 	CalcVarSpeedCoilHeating(
 		int const DXCoilNum, // Heat Pump Number
 		int const CyclingScheme, // Fan/Compressor cycling scheme indicator
@@ -5346,6 +5543,7 @@ namespace VariableSpeedCoils {
 			}
 
 			QLoadTotal = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ) * TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac;
+			VarSpeedCoil( DXCoilNum ).capModFacTotal = TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac;
 			TotRatedCapacity = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ); // for defrosting power cal
 
 			EIRTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), LoadSideInletDBTemp, SourceSideInletTemp );
@@ -6220,6 +6418,14 @@ namespace VariableSpeedCoils {
 			Node( AirOutletNode ).CO2 = Node( AirInletNode ).CO2;
 		}
 
+		if ( ! DataGlobals::WarmupFlag && ! DataGlobals::DoingHVACSizingSimulations && ! DataGlobals::DoingSizing && VarSpeedCoil( DXCoilNum ).reportCoilFinalSizes ) {
+			if ( VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit || VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) { // cooling coil
+				coilSelectionReportObj->setCoilFinalSizes( VarSpeedCoil( DXCoilNum ).Name,VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal, VarSpeedCoil( DXCoilNum ).RatedCapCoolSens, VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate, VarSpeedCoil( DXCoilNum ).RatedWaterMassFlowRate );
+			} else if ( VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit || VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) { // heating coil
+				coilSelectionReportObj->setCoilFinalSizes( VarSpeedCoil( DXCoilNum ).Name,VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).RatedCapHeat, VarSpeedCoil( DXCoilNum ).RatedCapHeat, VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate, VarSpeedCoil( DXCoilNum ).RatedWaterMassFlowRate );
+			}
+			VarSpeedCoil( DXCoilNum ).reportCoilFinalSizes = false;
+		}
 	}
 
 	Real64
@@ -6375,7 +6581,8 @@ namespace VariableSpeedCoils {
 		Real64 const CondInletTemp, // Condenser inlet temperature [C]
 		Real64 const Pressure, // air pressure [Pa]
 		Real64 const SpeedRatio, // from 0.0 to 1.0
-		int const NumSpeeds // number of speeds for input
+		int const NumSpeeds, // number of speeds for input
+		Real64 & TotCapModFac // capacity modification factor, func of temp and func of flow
 	) {
 
 		// SUBROUTINE INFORMATION:
@@ -6474,6 +6681,7 @@ namespace VariableSpeedCoils {
 				TotCapCalc = TotCapNom1 * TotCapAirFlowModFac1 * TotCapWaterFlowModFac1 * TotCapTempModFac1;
 				TotCapCalc1 = TotCapCalc;
 				TotCapCalc2 = 0.0;
+				TotCapModFac = TotCapAirFlowModFac1 * TotCapWaterFlowModFac1 * TotCapTempModFac1;
 			} else {
 				TotCapTempModFac2 = CurveValue( CCapFTemp2, InletWetBulbCalc, CondInletTemp );
 				TotCapAirFlowModFac2 = CurveValue( CCapAirFFlow2, AirMassFlowRatio );
@@ -6488,7 +6696,7 @@ namespace VariableSpeedCoils {
 				TotCapCalc2 = TotCapNom2 * TotCapAirFlowModFac2 * TotCapWaterFlowModFac2 * TotCapTempModFac2;
 
 				TotCapCalc = TotCapCalc2 * SpeedRatio + ( 1.0 - SpeedRatio ) * TotCapCalc1;
-
+				TotCapModFac = ( TotCapAirFlowModFac2 * TotCapWaterFlowModFac2 * TotCapTempModFac2 ) * SpeedRatio + ( 1.0 - SpeedRatio ) * ( TotCapAirFlowModFac1 * TotCapWaterFlowModFac1 * TotCapTempModFac1 );
 			}
 
 			if ( CBF < 0.001 ) {

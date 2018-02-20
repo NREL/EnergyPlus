@@ -441,6 +441,8 @@ SET( SRC
   PVWattsSSC.hh
   RefrigeratedCase.cc
   RefrigeratedCase.hh
+  ReportCoilSelection.cc
+  ReportCoilSelection.hh
   ReportSizingManager.cc
   ReportSizingManager.hh
   ReturnAirPathManager.cc

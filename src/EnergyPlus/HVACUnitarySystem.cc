@@ -90,6 +90,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
@@ -2773,6 +2774,7 @@ namespace HVACUnitarySystem {
 		using VariableSpeedCoils::GetVSCoilCondenserInletNode;
 		using VariableSpeedCoils::GetVSCoilMinOATCompressor;
 		using VariableSpeedCoils::GetVSCoilNumOfSpeeds;
+		using VariableSpeedCoils::setVarSpeedFanInfo;
 		auto & GetWtoAHPCoilCapacity( WaterToAirHeatPump::GetCoilCapacity );
 		auto & GetWtoAHPCoilInletNode( WaterToAirHeatPump::GetCoilInletNode );
 		auto & GetWtoAHPCoilOutletNode( WaterToAirHeatPump::GetCoilOutletNode );
@@ -3514,7 +3516,7 @@ namespace HVACUnitarySystem {
 			//Get fan data
 			FanType = Alphas( iFanTypeAlphaNum );
 			FanName = Alphas( iFanNameAlphaNum );
-			UnitarySystem( UnitarySysNum ).fanName = FanName;
+			UnitarySystem( UnitarySysNum ).fanName = FanName; // for coil selection report
 			if ( ! lAlphaBlanks( iFanTypeAlphaNum ) ) {
 				if ( SameString( FanType, "Fan:SystemModel" ) ) {
 					if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
@@ -3675,6 +3677,7 @@ namespace HVACUnitarySystem {
 			}
 			HeatingCoilPLFCurveIndex = 0;
 			UnitarySystem( UnitarySysNum ).HeatingCoilName = HeatingCoilName;
+			UnitarySystem( UnitarySysNum ).HeatingCoilTypeName = HeatingCoilType; //  for coil selection report
 			if ( ! lAlphaBlanks( iHeatingCoilTypeAlphaNum ) ) {
 				UnitarySystem( UnitarySysNum ).HeatCoilExists = true;
 				PrintMessage = false;
@@ -4379,6 +4382,15 @@ namespace HVACUnitarySystem {
 							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 								UnitarySystem( UnitarySysNum ).HeatPump = true;
 							}
+
+							//set fan info for heating coils
+							if ( UnitarySystem( UnitarySysNum ).FanExists ) {
+								if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+									coilSelectionReportObj->setCoilSupplyFanInfo( UnitarySystem( UnitarySysNum ).HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilTypeName, UnitarySystem( UnitarySysNum ).fanName ,DataAirSystems::objectVectorOOFanSystemModel, UnitarySystem( UnitarySysNum ).FanIndex );
+								} else {
+									coilSelectionReportObj->setCoilSupplyFanInfo( UnitarySystem( UnitarySysNum ).HeatingCoilName, UnitarySystem( UnitarySysNum ).HeatingCoilTypeName, UnitarySystem( UnitarySysNum ).fanName ,DataAirSystems::structArrayLegacyFanModels, UnitarySystem( UnitarySysNum ).FanIndex );
+								}
+							}
 						}
 
 					} // IF (IsNotOK) THEN
@@ -4685,6 +4697,10 @@ namespace HVACUnitarySystem {
 							ErrorsFound = true;
 						}
 
+						//Set fan info
+						if ( UnitarySystem( UnitarySysNum ).FanExists ) {
+							VariableSpeedCoils::setVarSpeedFanInfo( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, FanName, UnitarySystem( UnitarySysNum ).FanIndex, UnitarySystem( UnitarySysNum ).FanType_Num );
+						}
 					}
 
 					if ( errFlag ) {
@@ -5118,7 +5134,10 @@ namespace HVACUnitarySystem {
 			// considered as as 100% DOAS DX cooling coil
 			if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil ) {
 				// set the system DX Coil application type to the child DX coil
-				SetDXCoilTypeData( UnitarySystem( UnitarySysNum ).CoolingCoilName );
+				if ( ! ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ) ) {
+					SetDXCoilTypeData( UnitarySystem( UnitarySysNum ).CoolingCoilName );
+				}
+
 			}
 			// DOAS DX Cooling Coil Leaving Minimum Air Temperature
 			if ( NumNumbers > 0 ) {
@@ -5165,6 +5184,7 @@ namespace HVACUnitarySystem {
 			SuppHeatCoilType = Alphas( iSuppHeatCoilTypeAlphaNum );
 			SuppHeatCoilName = Alphas( iSuppHeatCoilNameAlphaNum );
 			UnitarySystem( UnitarySysNum ).SuppHeatCoilName = SuppHeatCoilName;
+			UnitarySystem( UnitarySysNum ).SuppHeatCoilTypeName = SuppHeatCoilType;
 			errFlag = false;
 
 			if ( SameString( SuppHeatCoilType, "Coil:Heating:Water" ) ) {
@@ -5392,6 +5412,15 @@ namespace HVACUnitarySystem {
 
 			// Add supplemental heating coil to component sets array
 			if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) SetUpCompSets( CurrentModuleObject, Alphas( iNameAlphaNum ), Alphas( iSuppHeatCoilTypeAlphaNum ), Alphas( iSuppHeatCoilNameAlphaNum ), NodeID( SupHeatCoilInletNode ), NodeID( SupHeatCoilOutletNode ) );
+
+			// set fan info for heating coils
+			if ( UnitarySystem( UnitarySysNum ).SuppCoilExists && UnitarySystem( UnitarySysNum ).FanExists ) {
+				if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitarySystem( UnitarySysNum ).SuppHeatCoilName, UnitarySystem( UnitarySysNum ).SuppHeatCoilTypeName, UnitarySystem( UnitarySysNum ).fanName ,DataAirSystems::objectVectorOOFanSystemModel, UnitarySystem( UnitarySysNum ).FanIndex );
+				} else {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitarySystem( UnitarySysNum ).SuppHeatCoilName, UnitarySystem( UnitarySysNum ).SuppHeatCoilTypeName, UnitarySystem( UnitarySysNum ).fanName ,DataAirSystems::structArrayLegacyFanModels, UnitarySystem( UnitarySysNum ).FanIndex );
+				}
+			}
 
 			// Users may not provide SA flow input fields (below) and leave them blank. Check if other coil is autosized first to alieviate input requirements.
 			// check if coil has no air flow input (VolFlow = 0) and other coil is autosized. If so, use autosize for coil with 0 air flow rate.
@@ -13247,7 +13276,10 @@ namespace HVACUnitarySystem {
 			UnitarySysNum = FindItemInList( UnitarySysName, UnitarySystem );
 			if ( UnitarySysNum > 0 ) {
 				if ( UnitarySystem( UnitarySysNum ).ISHundredPercentDOASDXCoil ) {
-					SetDXCoilTypeData( UnitarySystem( UnitarySysNum ).CoolingCoilName );
+
+					if ( ! ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ) ) {
+						SetDXCoilTypeData( UnitarySystem( UnitarySysNum ).CoolingCoilName );
+					}
 				}
 			} else {
 				ShowSevereError( RoutineName + "System not found = AirloopHVAC:UnitarySystem \"" + UnitarySysName + "\"" );

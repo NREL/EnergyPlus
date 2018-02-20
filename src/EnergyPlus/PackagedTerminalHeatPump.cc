@@ -85,6 +85,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SingleDuct.hh>
@@ -3086,6 +3087,35 @@ namespace PackagedTerminalHeatPump {
 			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).FanPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
 			SetupOutputVariable( "Zone Water to Air Heat Pump Compressor Part Load Ratio", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).CompPartLoadRatio, "System", "Average", PTUnit( PTUnitNum ).Name );
 			SetupOutputVariable( "Zone Water to Air Heat Pump Fan Availability Status", OutputProcessor::Unit::None, PTUnit( PTUnitNum ).AvailStatus, "System", "Average", PTUnit( PTUnitNum ).Name );
+		}
+		for ( PTUnitNum = 1; PTUnitNum <= NumPTUs; ++PTUnitNum ) {
+			if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, PTUnit( PTUnitNum ).FanIndex );
+				}
+				if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).DXHeatCoilName, PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, PTUnit( PTUnitNum ).FanIndex );
+				}
+				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).ACHeatCoilName, PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, PTUnit( PTUnitNum ).FanIndex );
+				}
+				if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).SuppHeatCoilName, PTUnit( PTUnitNum ).SuppHeatCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, PTUnit( PTUnitNum ).FanIndex );
+				}
+			} else {
+				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).DXCoolCoilName, PTUnit( PTUnitNum ).DXCoolCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::structArrayLegacyFanModels, PTUnit( PTUnitNum ).FanIndex );
+				}
+				if ( PTUnit( PTUnitNum ).DXHeatCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).DXHeatCoilName, PTUnit( PTUnitNum ).DXHeatCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::structArrayLegacyFanModels, PTUnit( PTUnitNum ).FanIndex );
+				}
+				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).ACHeatCoilName, PTUnit( PTUnitNum ).ACHeatCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::structArrayLegacyFanModels, PTUnit( PTUnitNum ).FanIndex );
+				}
+				if ( PTUnit( PTUnitNum ).SuppHeatCoilType_Num > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( PTUnit( PTUnitNum ).SuppHeatCoilName, PTUnit( PTUnitNum ).SuppHeatCoilType, PTUnit( PTUnitNum ).FanName, DataAirSystems::structArrayLegacyFanModels, PTUnit( PTUnitNum ).FanIndex );
+				}
+			}
 		}
 	}
 
