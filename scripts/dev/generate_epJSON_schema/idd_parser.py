@@ -264,6 +264,7 @@ def parse_obj(data):
             if 'begin-extensible' in field_data:
                 field_data.pop('begin-extensible')
                 field_name = re.sub('[ ]+[0-9]+', '', field_name)
+                original_field_name = re.sub('[ ]+[0-9]+', '', original_field_name)
                 field_name = re.sub('[^0-9a-zA-Z]+', '_', field_name)
                 append_field_number(root, field_number, field_name, True, original_field_name)
                 root['properties']['extensions'] = {'type': 'array', 'items': {'properties': {}, 'type': 'object'}}
@@ -277,6 +278,7 @@ def parse_obj(data):
             elif extensible_count > 0:
                 if extensible_count < root['extensible_size']:
                     field_name = re.sub('[ ]+[0-9]+', '', field_name)
+                    original_field_name = re.sub('[ ]+[0-9]+', '', original_field_name)
                     field_name = re.sub('[^0-9a-zA-Z]+', '_', field_name)
                     append_field_number(root, field_number, field_name, True, original_field_name)
                     root['legacy_idd']['extensibles'].append(field_name)

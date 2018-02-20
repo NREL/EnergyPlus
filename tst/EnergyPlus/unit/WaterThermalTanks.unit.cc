@@ -1218,8 +1218,8 @@ TEST_F( EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning )
 
 	std::string const error_string = delimited_string( {
 		"   ** Severe  ** WaterHeater:HeatPump:PumpedCondenser=\"ZONE4HEATPUMPWATERHEATER\":",
-		"   **   ~~~   ** When inlet_air_configuration=\"OUTDOORAIRONLY\".",
-		"   **   ~~~   ** outdoor_air_node_name and exhaust_air_node_name must be specified.",
+		"   **   ~~~   ** When Inlet Air Configuration=\"OUTDOORAIRONLY\".",
+		"   **   ~~~   ** Outdoor Air Node Name and Exhaust Air Node Name must be specified.",
 		"   ** Severe  ** WaterHeater:HeatPump:PumpedCondenser=\"ZONE4HEATPUMPWATERHEATER\":",
 		"   **   ~~~   ** Heat pump water heater fan outlet node name does not match next connected component.",
 		"   **   ~~~   ** Fan outlet node name = ZONE4AIRINLETNODE"
