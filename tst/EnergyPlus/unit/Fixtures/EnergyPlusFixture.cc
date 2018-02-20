@@ -183,11 +183,8 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/PVWatts.hh>
-<<<<<<< HEAD
 #include <EnergyPlus/ResultsSchema.hh>
-=======
 #include <EnergyPlus/ReportCoilSelection.hh>
->>>>>>> update-idd-parser-w-coil
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
