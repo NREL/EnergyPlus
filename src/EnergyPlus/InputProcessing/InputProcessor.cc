@@ -470,7 +470,9 @@ namespace EnergyPlus {
 					// Alphas( i + 1 ) = obj.key();
 				}
 				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = obj.key().empty();
-				if ( is_AlphaFieldNames ) AlphaFieldNames()( i + 1 ) = (DataGlobals::isEpJSON) ? field : legacy_idd_field_names[field].get<std::string>();
+				if ( is_AlphaFieldNames ) {
+					AlphaFieldNames()( i + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
+				}
 				NumAlphas++;
 				continue;
 			}
@@ -514,7 +516,9 @@ namespace EnergyPlus {
 				Alphas( i + 1 ) = "";
 				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = true;
 			}
-			if ( is_AlphaFieldNames ) AlphaFieldNames()( i + 1 ) = field;
+			if ( is_AlphaFieldNames ) {
+				AlphaFieldNames()( i + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
+			}
 		}
 
 		auto const & legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
@@ -575,7 +579,9 @@ namespace EnergyPlus {
 							Alphas( alphas_index + 1 ) = "";
 							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
 						}
-						if ( is_AlphaFieldNames ) AlphaFieldNames()( alphas_index + 1 ) = field_name;
+						if ( is_AlphaFieldNames ) {
+							AlphaFieldNames()( alphas_index + 1 ) = ( DataGlobals::isEpJSON ) ? field_name : legacy_idd_field_names[ field_name ].get< std::string >();
+						}
 						alphas_index++;
 					}
 				}
@@ -612,7 +618,9 @@ namespace EnergyPlus {
 				if ( is_NumBlank )
 					NumBlank()( i + 1 ) = true;
 			}
-			if ( is_NumericFieldNames ) NumericFieldNames()( i + 1 ) = (DataGlobals::isEpJSON) ? field : legacy_idd_field_names[field].get<std::string>();
+			if ( is_NumericFieldNames ) {
+				NumericFieldNames()( i + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
+			}
 		}
 
 		auto const legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
@@ -683,7 +691,9 @@ namespace EnergyPlus {
 						}
 						if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = true;
 					}
-					if ( is_NumericFieldNames ) NumericFieldNames()( numerics_index + 1 ) = field;
+					if ( is_NumericFieldNames ) {
+						NumericFieldNames()( numerics_index + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
+					}
 					numerics_index++;
 				}
 			}

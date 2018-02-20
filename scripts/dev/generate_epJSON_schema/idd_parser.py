@@ -490,10 +490,14 @@ def append_field_number(root, field_number, field_name, is_in_extensibles, origi
             if 'extensions' not in root['legacy_idd']['alphas']:
                 root['legacy_idd']['alphas']['extensions'] = []
             root['legacy_idd']['alphas']['extensions'].append(field_name)
+            if field_name not in root['legacy_idd']['field_names']:
+                root['legacy_idd']['field_names'][field_name] = original_name
         elif field_number[0].lower() == 'n':
             if 'extensions' not in root['legacy_idd']['numerics']:
                 root['legacy_idd']['numerics']['extensions'] = []
             root['legacy_idd']['numerics']['extensions'].append(field_name)
+            if field_name not in root['legacy_idd']['field_names']:
+                root['legacy_idd']['field_names'][field_name] = original_name
 
 
 def parse_extensibles(items, field_data, field_name):
