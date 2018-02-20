@@ -14,7 +14,7 @@ External Shading Calculation Method, Output External Shading Calculation Results
 
 See [6390](https://github.com/NREL/EnergyPlus/pull/6390)
 
-### System Sizing New Outputs
+### New System Sizing Outputs
 
 A part of a system sizing refactor which includes bug fixes for Std 62.1 sizing, there are several new component sizing outputs that appear in every file with an airloop:
 ```
@@ -30,3 +30,10 @@ Component Sizing Information, AirLoopHVAC, VAV SYS 1, Calculated Heating Air Flo
 
 See [6372](https://github.com/NREL/EnergyPlus/pull/6372)
 
+### New Coil Sizing Reports
+
+A new subtable "Coil Sizing Summary" has been added at the end of the "HVAC Sizing Summary" (HVACSizingSummary) report. This new subtable is always produced with this report.
+
+A new "Coils Sizing Details" (CoilSizingDetails) report has been added. It is an optional report which is included with AllSummary*. The new report has over 80 columns of data. The "Coil Sizing Summary" subtable described above is a straight subset of this report with only about 30 columns.
+
+See [6454](https://github.com/NREL/EnergyPlus/pull/6454)

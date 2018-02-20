@@ -1956,7 +1956,7 @@ namespace OutputReportPredefined {
 		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day {TIMESTAMP}[hr]" );
 		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute {TIMESTAMP}[min]" );
 
-		pdst2CoilSummaryCoilSelection = newPreDefSubTable( pdrSizing, "Coil Sizing Summary Report" );
+		pdst2CoilSummaryCoilSelection = newPreDefSubTable( pdrSizing, "Coil Sizing Summary" );
 		// coil meta data information
 		//	the first column will be the coil name, the unique user name from input. It has no header or column definition
 		pdch2CoilType = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Type" );
