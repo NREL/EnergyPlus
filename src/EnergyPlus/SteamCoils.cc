@@ -68,12 +68,8 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-<<<<<<< HEAD
-#include <InputProcessing/InputProcessor.hh>
-=======
 #include <HVACFan.hh>
-#include <InputProcessor.hh>
->>>>>>> upstream/CoilSizingReport
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -831,7 +827,7 @@ namespace SteamCoils {
 						DesVolFlow = DesMassFlow / RhoAirStd;
 						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 						if ( DesCoilLoad >= SmallLoad ) {
-							TempSteamIn = 100.0; 
+							TempSteamIn = 100.0;
 							// RefrigIndex is set during GetInput for this module
 							EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamCoil( CoilNum ).FluidIndex, RoutineName );
 							EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, SteamCoil( CoilNum ).FluidIndex, RoutineName );
@@ -875,7 +871,7 @@ namespace SteamCoils {
 
 		coilSelectionReportObj->setCoilHeatingCapacity( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, CurSysNum, CurZoneEqNum, CurOASysNum, 0.0, 1.0, -999.0,-999.0 );
 		coilSelectionReportObj->setCoilWaterHeaterCapacity( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, PltSizSteamNum, SteamCoil( CoilNum ).LoopNum );
-		coilSelectionReportObj->setCoilWaterFlow( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", SteamCoil( CoilNum ).MaxSteamVolFlowRate, coilWasAutosized, PltSizSteamNum, SteamCoil( CoilNum ).LoopNum ); 
+		coilSelectionReportObj->setCoilWaterFlow( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", SteamCoil( CoilNum ).MaxSteamVolFlowRate, coilWasAutosized, PltSizSteamNum, SteamCoil( CoilNum ).LoopNum );
 		coilSelectionReportObj->setCoilEntWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn ); //coil  report
 		coilSelectionReportObj->setCoilLvgWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn - SteamCoil( CoilNum ).DegOfSubcooling ); //coil report
 		coilSelectionReportObj->setCoilWaterDeltaT( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , SteamCoil( CoilNum ).DegOfSubcooling );  //coil report
@@ -886,7 +882,7 @@ namespace SteamCoils {
 		}
 
 		//There is no standard rating for heating coils at this point, so fill with dummy flag values
-		coilSelectionReportObj->setRatedCoilConditions( 
+		coilSelectionReportObj->setRatedCoilConditions(
 			SteamCoil( CoilNum ).Name,
 			"Coil:Heating:Steam",
 			-999.0,

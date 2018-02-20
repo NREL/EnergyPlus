@@ -2200,9 +2200,9 @@ namespace WaterToAirHeatPumpSimple {
 
 		if ( ! DataGlobals::WarmupFlag && ! DataGlobals::DoingHVACSizingSimulations && ! DataGlobals::DoingSizing && SimpleWatertoAirHP( HPNum ).reportCoilFinalSizes ) {
 
-			if ( InputProcessor::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "COOLING" )  ) { // cooling
+			if ( UtilityRoutines::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "COOLING" )  ) { // cooling
 				coilSelectionReportObj->setCoilFinalSizes( SimpleWatertoAirHP( HPNum ).Name,"Coil:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens, SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate, SimpleWatertoAirHP( HPNum ).RatedWaterVolFlowRate );
-			} else if ( InputProcessor::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "HEATING" ) ) { // heating
+			} else if ( UtilityRoutines::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "HEATING" ) ) { // heating
 				coilSelectionReportObj->setCoilFinalSizes( SimpleWatertoAirHP( HPNum ).Name,"Coil:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",SimpleWatertoAirHP( HPNum ).RatedCapHeat, SimpleWatertoAirHP( HPNum ).RatedCapHeat, SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate, SimpleWatertoAirHP( HPNum ).RatedWaterVolFlowRate );
 			}
 		}
