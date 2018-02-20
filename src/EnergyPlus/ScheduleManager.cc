@@ -509,9 +509,9 @@ namespace ScheduleManager {
 		//because need a week for each day
 		AddDaySch += NumExternalInterfaceFunctionalMockupUnitExportSchedules; // one day schedule for ExternalInterface
 		// to update during run time
-		
+
 		CurrentModuleObject = "Schedule:File:Shading";
-		NumCommaFileShading = GetNumObjectsFound( CurrentModuleObject );
+		NumCommaFileShading = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumCommaFileShading > 1 ) {
@@ -521,7 +521,7 @@ namespace ScheduleManager {
 		NumCSVAllColumnsSchedules = 0;
 
 		if ( NumCommaFileShading != 0 ) {
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			std::string ShadingSunlitFracFileName = Alphas( 1 );
 			CheckForActualFileName( ShadingSunlitFracFileName, FileExists, TempFullFileName );
 			if ( ! FileExists ) {
@@ -610,7 +610,7 @@ namespace ScheduleManager {
 							CSVAllColumnNameAndValues[ colCnt ] = hourlyColumnValues;
 						}
 					} else {
-						columnValue = ProcessNumber( subString, errFlag );
+						columnValue = UtilityRoutines::ProcessNumber( subString, errFlag );
 						if ( errFlag ) {
 							++numerrors;
 							columnValue = 0.0;
@@ -618,7 +618,7 @@ namespace ScheduleManager {
 						CSVAllColumnNameAndValues[ colCnt ]( rowCnt - 1 ) = columnValue;
 					}
 				}
-				
+
 				if ( rowCnt == rowLimitCount ) break;
 			}
 			gio::close( SchdFile );
@@ -642,11 +642,11 @@ namespace ScheduleManager {
 			}
 			if ( rowCnt == rowLimitCount ) ScheduleFileShadingLeapYear = true;
 		}
-		
+
 		// add week and day schedules for each ExternalInterface:FunctionalMockupUnitExport:Schedule
 		AddWeekSch += NumCSVAllColumnsSchedules * 366; //number of days/year
 		//because need a week for each day
-		AddDaySch += NumCSVAllColumnsSchedules * 366; 
+		AddDaySch += NumCSVAllColumnsSchedules * 366;
 		// to update during run time
 
 		// include additional schedules in with count
@@ -1759,17 +1759,11 @@ namespace ScheduleManager {
 		for ( auto& NameValue : CSVAllColumnNames ) {
 			curName = NameValue.first + "_shading";
 			hourlyColumnValues = CSVAllColumnNameAndValues[ NameValue.second ];
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( curName, Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) curName = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++SchNum;
 			Schedule( SchNum ).Name = curName;
 			Schedule( SchNum ).SchType = ScheduleInput_file;
-			
+
 			iDay = 0;
 			hDay = 0;
 			ifld = 0;

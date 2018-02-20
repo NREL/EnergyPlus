@@ -691,10 +691,7 @@ namespace SolarShading {
 				UseScheduledSunlitFrac = true;
 				cAlphaArgs( 4 ) = "ScheduledShading";
 			}
-<<<<<<< HEAD
-			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
-=======
-			else if ( SameString( cAlphaArgs( 4 ), "ImportedShading" ) ) {
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "ImportedShading" ) ) {
 				if ( ScheduleFileShadingProcessed ) {
 					UseImportedSunlitFrac = true;
 					cAlphaArgs( 4 ) = "ImportedShading";
@@ -703,8 +700,7 @@ namespace SolarShading {
 					ShowContinueError( "Value entered=\"" + cAlphaArgs( 4 ) + "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used." );
 				}
 			}
-			else if ( SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
->>>>>>> upstream/develop
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
 				UseScheduledSunlitFrac = false;
 				UseImportedSunlitFrac = false;
 				cAlphaArgs( 4 ) = "InternalCalculation";
@@ -743,7 +739,7 @@ namespace SolarShading {
 			for ( auto surf : Surface ) {
 			    ExtShadingSchedNum = ScheduleManager::GetScheduleIndex( surf.Name + "_shading" );
 				if ( ExtShadingSchedNum ) {
-					surf.SchedExternalShadingFrac = true; 
+					surf.SchedExternalShadingFrac = true;
 					surf.ExternalShadingSchInd = ExtShadingSchedNum;
 				}
 			}
