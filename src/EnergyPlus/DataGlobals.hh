@@ -68,8 +68,6 @@ namespace DataGlobals {
 	extern bool AnnualSimulation;
 	extern bool outputEpJSONConversion;
 	extern bool isEpJSON;
-	extern bool isCBOR;
-	extern bool isMsgPack;
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const BeginDay;
