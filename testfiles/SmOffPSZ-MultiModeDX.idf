@@ -2858,7 +2858,7 @@
 
   Output:Variable,*,Cooling Coil Dehumidification Mode,hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Meter,Cooling:Electricity,monthly;
 
