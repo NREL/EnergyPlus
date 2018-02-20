@@ -80,6 +80,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -118,6 +119,8 @@ using namespace EnergyPlus::VariableSpeedCoils;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataAirLoop;
+using namespace EnergyPlus::SingleDuct;
+using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 
 using General::TrimSigDigits;
 using DataEnvironment::OutDryBulbTemp;
@@ -5195,19 +5198,28 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 		"  Zone 2 Node,             !- Zone Air Node Name",
 		"  Zone 2 Outlet Node;      !- Zone Return Air Node Name",
 		"  ",
-		"ZoneHVAC:EquipmentList,",
-		"  Zone2Equipment,          !- Name",
-		"  SequentialLoad,                                          !- Load Distribution Scheme",
-		"  AirTerminal:SingleDuct:Uncontrolled, !- Zone Equipment 1 Object Type",
-		"  Zone2DirectAir,          !- Zone Equipment 1 Name",
-		"  1,                       !- Zone Equipment 1 Cooling Sequence",
-		"  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
-		"  ",
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		"  Zone2DirectAir, !- Name",
-		"  FanAndCoilAvailSched, !- Availability Schedule Name",
-		"  Zone 2 Inlet Node, !- Zone Supply Air Node Name",
-		"  0.476;                !- Maximum Air Flow Rate{ m3 / s }",
+
+		"  ZoneHVAC:EquipmentList,",
+		"    Zone2Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
+		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		"    Zone2DirectAirADU,       !- Zone Equipment 1 Name",
+		"    1,                       !- Zone Equipment 1 Cooling Sequence",
+		"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+		"  ZoneHVAC:AirDistributionUnit,",
+		"    Zone2DirectAirADU,       !- Name",
+		"    Zone 2 Inlet Node,       !- Air Distribution Unit Outlet Node Name",
+		"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		"    Zone2DirectAir;          !- Air Terminal Name",
+
+		"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		"    Zone2DirectAir,          !- Name",
+		"    FanAndCoilAvailSched,    !- Availability Schedule Name",
+		"    Zone 2 Inlet Node 2AT,   !- Air Inlet Node Name",
+		"    Zone 2 Inlet Node,       !- Air Outlet Node Name",
+		"    0.467;                   !- Maximum Air Flow Rate {m3/s}",
+
 		"  ",
 		"BranchList,",
 		"  Air Loop Branches, !- Name",
@@ -5891,7 +5903,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	EXPECT_FALSE( ErrorsFound ); // expect no errors
 
 	GetZoneEquipmentData( ); // read zone equipment configuration and list objects
-	DirectAirManager::GetDirectAirInput();
+	GetZoneAirLoopEquipment();
+	SingleDuct::GetSysInput();
 
 	BranchInputManager::ManageBranchInput( ); // just gets input and returns.
 
