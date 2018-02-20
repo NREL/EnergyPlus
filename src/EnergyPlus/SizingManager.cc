@@ -76,14 +76,10 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-<<<<<<< HEAD
-#include <InputProcessing/InputProcessor.hh>
-=======
 #include <HVACCooledBeam.hh>
 #include <HVACFourPipeBeam.hh>
 #include <HVACSingleDuctInduc.hh>
-#include <InputProcessor.hh>
->>>>>>> upstream/develop
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <PoweredInductionUnits.hh>
@@ -767,12 +763,12 @@ namespace SizingManager {
 	void
 	ManageSystemSizingAdjustments()
 	{
-		// This routine adjusts system sizing outcomes based on how the zone air terminals finish out their sizing. 
+		// This routine adjusts system sizing outcomes based on how the zone air terminals finish out their sizing.
 		// The zone models are executed to trigger their sizing routines
-		// Then the air terminal units are scanned to sum design flow rates. Every air terminal connected to a particular air loop is summed for 
-		//  1. minimum heating flow rate, 2. maximum heating flow rate, and 3. maximum flow rate. 
+		// Then the air terminal units are scanned to sum design flow rates. Every air terminal connected to a particular air loop is summed for
+		//  1. minimum heating flow rate, 2. maximum heating flow rate, and 3. maximum flow rate.
 		// the summed values are used to "Adjust" the system sizing results
-		// the corrected values are used to autosize the central heating flow ratio, if set to autosize by the user. 
+		// the corrected values are used to autosize the central heating flow ratio, if set to autosize by the user.
 
 		// Also store zone level flow information for Standard 62.1 calculations, Vpz, Vpz_min, Vdz, and Vdz_min for both cooling and heating
 
@@ -807,7 +803,7 @@ namespace SizingManager {
 							DataSizing::VpzHtgByZone( SingleDuct::Sys( singleDuctATUNum ).CtrlZoneNum ) = SingleDuct::Sys( singleDuctATUNum ).MaxAirVolFlowRate; //store std 62.1 values
 							DataSizing::VpzMinClgByZone( SingleDuct::Sys( singleDuctATUNum ).CtrlZoneNum ) = SingleDuct::Sys( singleDuctATUNum ).MaxAirVolFlowRate; //store std 62.1 values
 							DataSizing::VpzMinHtgByZone( SingleDuct::Sys( singleDuctATUNum ).CtrlZoneNum ) = SingleDuct::Sys( singleDuctATUNum ).MaxAirVolFlowRate; //store std 62.1 values
-							
+
 						} else {
 							airLoopHeatingMinimumFlowRateSum += SingleDuct::Sys( singleDuctATUNum ).MaxAirVolFlowRate * SingleDuct::Sys( singleDuctATUNum ).ZoneMinAirFrac;
 							DataSizing::VpzMinClgByZone( SingleDuct::Sys( singleDuctATUNum ).CtrlZoneNum ) = SingleDuct::Sys( singleDuctATUNum ).MaxAirVolFlowRate * SingleDuct::Sys( singleDuctATUNum ).ZoneMinAirFrac; //store std 62.1 values
@@ -895,7 +891,7 @@ namespace SizingManager {
 							bool UseOccSchFlag = false;
 							bool UseMinOASchFlag = false;
 							Real64 designOAductFlow( 0.0 );
-							designOAductFlow = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( DualDuct::Damper( dualDuctATUNum ).OARequirementsPtr, DualDuct::Damper( dualDuctATUNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag ); 
+							designOAductFlow = DataZoneEquipment::CalcDesignSpecificationOutdoorAir( DualDuct::Damper( dualDuctATUNum ).OARequirementsPtr, DualDuct::Damper( dualDuctATUNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag );
 							airLoopHeatingMinimumFlowRateSum += designOAductFlow;
 							// is this a dual duct is dual path for Std 62.1 ?? not sure, assume not because Vpz = Vdz
 							//anyDualPathAirTerminals = true;
@@ -939,7 +935,7 @@ namespace SizingManager {
 						} else if ( PoweredInductionUnits::PIU( pIUATUNum ).UnitType_Num == PoweredInductionUnits::SingleDuct_ParallelPIU_Reheat ) {
 							airLoopHeatingMaximumFlowRateSum += PoweredInductionUnits::PIU( pIUATUNum ).MinPriAirFlowFrac * PoweredInductionUnits::PIU( pIUATUNum ).MaxPriAirVolFlow;
 							airLoopHeatingMinimumFlowRateSum += PoweredInductionUnits::PIU( pIUATUNum ).MinPriAirFlowFrac * PoweredInductionUnits::PIU( pIUATUNum ).MaxPriAirVolFlow;
-							
+
 							// dual path for std 62.1
 							DataSizing::VpzClgByZone( PoweredInductionUnits::PIU( pIUATUNum ).CtrlZoneNum ) = PoweredInductionUnits::PIU( pIUATUNum ).MaxPriAirVolFlow;
 							DataSizing::VpzMinClgByZone( PoweredInductionUnits::PIU( pIUATUNum ).CtrlZoneNum ) = PoweredInductionUnits::PIU( pIUATUNum ).MinPriAirFlowFrac * PoweredInductionUnits::PIU( pIUATUNum ).MaxPriAirVolFlow;
@@ -1066,13 +1062,13 @@ namespace SizingManager {
 					}
 				} else if ( FinalSysSizing( AirLoopNum ).SizingOption == Coincident ) {
 
-					if ( FinalSysSizing( AirLoopNum ).sysSizeCoolingDominant ) { // use minimum heating flow sum from air terminals 
+					if ( FinalSysSizing( AirLoopNum ).sysSizeCoolingDominant ) { // use minimum heating flow sum from air terminals
 						// know that minimum heating flow is a hard minimum regardless of concurrence situation, so make sure that design is at least that high.
 						FinalSysSizing( AirLoopNum ).DesHeatVolFlow = max( airLoopHeatingMinimumFlowRateSum, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
 						FinalSysSizing( AirLoopNum ).DesMainVolFlow = max( airLoopHeatingMinimumFlowRateSum, FinalSysSizing( AirLoopNum ).DesMainVolFlow );
 						FinalSysSizing( AirLoopNum ).DesCoolVolFlow = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
 						FinalSysSizing( AirLoopNum ).MassFlowAtCoolPeak = FinalSysSizing( AirLoopNum ).DesCoolVolFlow * DataEnvironment::StdRhoAir ;
-					} else if ( FinalSysSizing( AirLoopNum ).sysSizeHeatingDominant ) { // use maximum heating flow sum from air terminals 
+					} else if ( FinalSysSizing( AirLoopNum ).sysSizeHeatingDominant ) { // use maximum heating flow sum from air terminals
 						FinalSysSizing( AirLoopNum ).DesHeatVolFlow = max ( airLoopHeatingMaximumFlowRateSum, FinalSysSizing( AirLoopNum ).DesHeatVolFlow );
 						FinalSysSizing( AirLoopNum ).DesMainVolFlow = max( airLoopHeatingMaximumFlowRateSum, FinalSysSizing( AirLoopNum ).DesMainVolFlow );
 						//make sure cooling is at least at minimum.
@@ -1093,7 +1089,7 @@ namespace SizingManager {
 				if ( FinalSysSizing( AirLoopNum ).SysAirMinFlowRatWasAutoSized ) {
 					if ( FinalSysSizing( AirLoopNum ).DesMainVolFlow > 0.0 ) { // protect div by zero
 						FinalSysSizing( AirLoopNum ).SysAirMinFlowRat = FinalSysSizing( AirLoopNum ).DesHeatVolFlow / FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-					} else { // big trouble anyway. 
+					} else { // big trouble anyway.
 						FinalSysSizing( AirLoopNum ).SysAirMinFlowRat = 1.0;
 					}
 					ReportSizingManager::ReportSizingOutput( "AirLoopHVAC", curName, "Calculated Heating Air Flow Ratio []", FinalSysSizing( AirLoopNum ).SysAirMinFlowRat );
@@ -1123,7 +1119,7 @@ namespace SizingManager {
 
 		//redo 62.1 zone calculations with final (or user) zone terminal flow sizes, only redo calculations that might change with final flows
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-			int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
+			int SysSizNum = UtilityRoutines::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
 			if ( FinalSysSizing( AirLoopNum ).OAAutoSized && SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP && DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones > 1 && FinalSysSizing( AirLoopNum ).LoadSizeType != Ventilation ) {
 
@@ -1203,7 +1199,7 @@ namespace SizingManager {
 						Real64 Fc_Htg = 1.0 - ( 1.0 - Ez_Htg ) * ( 1.0 - Er ) * ( 1 - Ep_Htg );
 						FcByZoneHeat( CtrlZoneNum ) =  Fc_Htg;
 						DataSizing::EvzByZoneHeat( CtrlZoneNum ) =  ( Fa_Htg + DataSizing::XsBySysHeat( AirLoopNum ) * Fb_Htg - DataSizing::ZdzHtgByZone( CtrlZoneNum ) * Fc_Htg ) / Fa_Htg;
-						
+
 					} else { // single path zone
 						DataSizing::EvzByZoneCool( CtrlZoneNum ) = 1.0 + DataSizing::XsBySysCool( AirLoopNum ) - DataSizing::ZdzClgByZone( CtrlZoneNum );
 						SimAirServingZones::LimitZoneVentEff( DataSizing::XsBySysCool( AirLoopNum ), VbzByZone( CtrlZoneNum )/DataSizing::EvzByZoneCool( CtrlZoneNum ), CtrlZoneNum, DataSizing::EvzByZoneCool( CtrlZoneNum )  );
@@ -1292,7 +1288,7 @@ namespace SizingManager {
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svrHtD, FinalSysSizing( AirLoopNum ).AirPriLoopName, DBySys( AirLoopNum ), 4 ); //D
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svrHtVou, FinalSysSizing( AirLoopNum ).AirPriLoopName, FinalSysSizing( AirLoopNum ).SysUncOA, 4 ); //Vou
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svrHtVps, FinalSysSizing( AirLoopNum ).AirPriLoopName, DataSizing::VpsHtgBySys( AirLoopNum ), 4 ); //Vps
-			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svrHtXs, FinalSysSizing( AirLoopNum ).AirPriLoopName, XsBySysHeat( AirLoopNum ), 4 ); //Xs 
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svrHtXs, FinalSysSizing( AirLoopNum ).AirPriLoopName, XsBySysHeat( AirLoopNum ), 4 ); //Xs
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svrHtEv, FinalSysSizing( AirLoopNum ).AirPriLoopName, EvzMinBySysHeat( AirLoopNum ), 4 ); //Ev
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svrHtVot, FinalSysSizing( AirLoopNum ).AirPriLoopName, VotHtgBySys( AirLoopNum ), 4 ); //Vot
 			if ( DataSizing::VpsHtgBySys( AirLoopNum ) != 0.0 ) {
@@ -1352,7 +1348,7 @@ namespace SizingManager {
 				VpzMinHtgSum += VpzMinHtgByZone( CtrlZoneNum );
 				VdzHtgSum += VdzMinHtgByZone( CtrlZoneNum );
 			}
-				
+
 			if ( PzSumBySys( AirLoopNum ) != 0.0 ) {
 				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svpRp, FinalSysSizing( AirLoopNum ).AirPriLoopName, RpPzSum / PzSumBySys( AirLoopNum ), 6 ); //Average Rp for system
 			}
@@ -1360,7 +1356,7 @@ namespace SizingManager {
 			if ( AzSum != 0.0 ) {
 				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svpRa, FinalSysSizing( AirLoopNum ).AirPriLoopName, RaAzSum / AzSum, 6 ); //average Ra for system
 			}
-			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svpAz, FinalSysSizing( AirLoopNum ).AirPriLoopName, AzSum, 4 ); //Az sum 
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svpAz, FinalSysSizing( AirLoopNum ).AirPriLoopName, AzSum, 4 ); //Az sum
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svpVbz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VbzSum, 4 );
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svpClVoz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VozClgSum, 4 ); //Voz-clg
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchS62svpHtVoz, FinalSysSizing( AirLoopNum ).AirPriLoopName, VozHtgSum, 4 ); //Voz-htg
@@ -1440,7 +1436,7 @@ namespace SizingManager {
 
 		// First get the design (max) level of people in all zones connected to air loop
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-			int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
+			int SysSizNum = UtilityRoutines::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 			if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
 			if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 				PzSumBySys( AirLoopNum ) = 0.0;
@@ -1456,7 +1452,7 @@ namespace SizingManager {
 			}
 		}
 
-		// now march through all zone timesteps for entire year to find the concurrent max 
+		// now march through all zone timesteps for entire year to find the concurrent max
 		int DaysInYear( 366 ); //assume leap year
 		int dayOfWeekType( 1 ); // assume year starts on Sunday
 		WeatherManager::CalcSpecialDayTypes();
@@ -1473,7 +1469,7 @@ namespace SizingManager {
 					Real64 TSfraction( 0.0 );
 					if ( NumOfTimeStepInHour > 0.0 ) TSfraction = 1.0 / double( NumOfTimeStepInHour );
 					for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) { // loop over all the air systems
-						int SysSizNum = InputProcessor::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
+						int SysSizNum = UtilityRoutines::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
 						if ( SysSizNum == 0 ) SysSizNum = 1; // use first when none applicable
 						if ( FinalSysSizing( AirLoopNum ).OAAutoSized ) {
 
@@ -1481,7 +1477,7 @@ namespace SizingManager {
 							Real64 TotConcurrentPeopleOnSys = 0.0;
 							for ( int zoneNumOnLoop = 1; zoneNumOnLoop <= DataAirLoop::AirLoopZoneInfo( AirLoopNum ).NumZones; ++zoneNumOnLoop  ) {
 								int CtrlZoneNum = DataAirLoop::AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( zoneNumOnLoop );
-									
+
 								for ( int PeopleNum = 1; PeopleNum <= DataHeatBalance::TotPeople; ++PeopleNum ) {
 									if ( DataHeatBalance::People( PeopleNum ).ZonePtr == FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ) {
 										Real64 PeopleInZone = ( DataHeatBalance::People( PeopleNum ).NumberOfPeople * DataHeatBalance::Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).Multiplier * DataHeatBalance::Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).ListMultiplier );

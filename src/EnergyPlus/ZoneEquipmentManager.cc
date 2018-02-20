@@ -2937,15 +2937,9 @@ namespace ZoneEquipmentManager {
 				}
 
 				// set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
-<<<<<<< HEAD
-				// minimum flow rates
+				// minimum flow rates (comment seems incorrect, really used as a minimum lower limit for the maximum air flow)
 				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow,
 					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2,
-=======
-				// minimum flow rates (comment seems incorrect, really used as a minimum lower limit for the maximum air flow)
-				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, 
-					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, 
->>>>>>> upstream/develop
 					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
 				// set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
 				// max heating flow rates
@@ -3042,7 +3036,7 @@ namespace ZoneEquipmentManager {
 		using SystemAvailabilityManager::GetZoneEqAvailabilityManager;
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
-		using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners; 
+		using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using SwimmingPool::SimSwimmingPool;
