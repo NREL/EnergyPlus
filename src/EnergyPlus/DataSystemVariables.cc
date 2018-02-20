@@ -340,6 +340,50 @@ namespace DataSystemVariables {
 
 	}
 
+	void
+	clear_state()
+	{
+		DDOnly = false;
+		ReverseDD = false;
+		DisableGLHECaching = false;
+		FullAnnualRun = false;
+		DeveloperFlag = false;
+		TimingFlag = false;
+		SutherlandHodgman = true;
+		DetailedSkyDiffuseAlgorithm = false;
+		DetailedSolarTimestepIntegration = false;
+		TrackAirLoopEnvFlag = false;
+		TraceAirLoopEnvFlag = false;
+		TraceHVACControllerEnvFlag = false;
+		ReportDuringWarmup = false;
+		ReportDuringHVACSizingSimulation = false;
+		ReportDetailedWarmupConvergence = false;
+		UpdateDataDuringWarmupExternalInterface = false;
+		UseScheduledSunlitFrac = false;
+		ReportExtShadingSunlitFrac = false;
+		UseImportedSunlitFrac = false;
+		DisableGroupSelfShading = false;
+		DisableAllSelfShading = false;
+		Elapsed_Time = 0.0;
+		Time_Start = 0.0;
+		Time_Finish = 0.0;
+		SortedIDD = true;
+		lMinimalShadowing = false;
+		TestAllPaths = false;
+		iEnvSetThreads = 0;
+		lEnvSetThreadsInput = false;
+		iepEnvSetThreads = 0;
+		lepSetThreadsInput = false;
+		iIDFSetThreads = 0;
+		lIDFSetThreadsInput = false;
+		inumActiveSims = 1;
+		lnumActiveSims = false;
+		MaxNumberOfThreads = 1;
+		NumberIntRadThreads = 1;
+		iNominalTotSurfaces = 0;
+		Threading = false;
+	}
+
 } // DataSystemVariables
 
 } // EnergyPlus

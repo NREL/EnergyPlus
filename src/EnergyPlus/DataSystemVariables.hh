@@ -171,6 +171,10 @@ namespace DataSystemVariables {
 		std::string & CheckedFileName // Blank if not found.
 	);
 
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DataSystemVariables
 
 } // EnergyPlus
