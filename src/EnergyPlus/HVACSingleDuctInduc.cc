@@ -444,6 +444,7 @@ namespace HVACSingleDuctInduc {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = IndUnit( IUNum ).OutAirNode;
 								AirDistUnit( IndUnit( IUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 								AirDistUnit( IndUnit( IUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+								IndUnit( IUNum ).CtrlZoneNum = CtrlZone;
 							}
 							IndUnit( IUNum ).CtrlZoneInNodeIndex = SupAirIn;
 							AirNodeFound = true;

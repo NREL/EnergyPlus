@@ -3495,7 +3495,7 @@ namespace HVACUnitarySystem {
 			//Get fan data
 			FanType = Alphas( iFanTypeAlphaNum );
 			FanName = Alphas( iFanNameAlphaNum );
-			UnitarySystem( UnitarySysNum ).fanName = FanName; //TRANE, for coil selection report
+			UnitarySystem( UnitarySysNum ).fanName = FanName;
 			if ( ! lAlphaBlanks( iFanTypeAlphaNum ) ) {
 				if ( UtilityRoutines::SameString( FanType, "Fan:SystemModel" ) ) {
 					if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
