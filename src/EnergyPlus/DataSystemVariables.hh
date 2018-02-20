@@ -132,6 +132,8 @@ namespace DataSystemVariables {
 	extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
 	extern bool UseScheduledSunlitFrac; // when true, the external shading calculation results will be exported
 	extern bool ReportExtShadingSunlitFrac; // when true, the sunlit fraction for all surfaces are exported as a csv format output
+	extern bool UseImportedSunlitFrac; // when true, the sunlit fraction for all surfaces are imported altogether as a CSV file
+ 
 	extern bool DisableGroupSelfShading; // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
 	extern bool DisableAllSelfShading; // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
@@ -168,6 +170,10 @@ namespace DataSystemVariables {
 		bool & FileFound, // Set to true if file found and is in CheckedFileName
 		std::string & CheckedFileName // Blank if not found.
 	);
+
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // DataSystemVariables
 

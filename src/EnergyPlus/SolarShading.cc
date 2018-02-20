@@ -569,11 +569,13 @@ namespace SolarShading {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
+		using ScheduleManager::ScheduleFileShadingProcessed;
 		using DataSystemVariables::SutherlandHodgman;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		using DataSystemVariables::UseScheduledSunlitFrac;
 		using DataSystemVariables::ReportExtShadingSunlitFrac;
+		using DataSystemVariables::UseImportedSunlitFrac;
 		using DataSystemVariables::DisableGroupSelfShading;
 		using DataSystemVariables::DisableAllSelfShading;
 
@@ -689,8 +691,22 @@ namespace SolarShading {
 				UseScheduledSunlitFrac = true;
 				cAlphaArgs( 4 ) = "ScheduledShading";
 			}
+<<<<<<< HEAD
 			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
+=======
+			else if ( SameString( cAlphaArgs( 4 ), "ImportedShading" ) ) {
+				if ( ScheduleFileShadingProcessed ) {
+					UseImportedSunlitFrac = true;
+					cAlphaArgs( 4 ) = "ImportedShading";
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 4 ) );
+					ShowContinueError( "Value entered=\"" + cAlphaArgs( 4 ) + "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used." );
+				}
+			}
+			else if ( SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
+>>>>>>> upstream/develop
 				UseScheduledSunlitFrac = false;
+				UseImportedSunlitFrac = false;
 				cAlphaArgs( 4 ) = "InternalCalculation";
 			}
 			else {
@@ -701,6 +717,7 @@ namespace SolarShading {
 		else {
 			cAlphaArgs( 4 ) = "InternalCalculation";
 			UseScheduledSunlitFrac = false;
+			UseImportedSunlitFrac = false;
 		}
 
 		if ( NumAlphas >= 5 ) {
@@ -720,6 +737,16 @@ namespace SolarShading {
 		else {
 			cAlphaArgs( 5 ) = "No";
 			ReportExtShadingSunlitFrac = false;
+		}
+		int ExtShadingSchedNum;
+		if ( UseImportedSunlitFrac ) {
+			for ( auto surf : Surface ) {
+			    ExtShadingSchedNum = ScheduleManager::GetScheduleIndex( surf.Name + "_shading" );
+				if ( ExtShadingSchedNum ) {
+					surf.SchedExternalShadingFrac = true; 
+					surf.ExternalShadingSchInd = ExtShadingSchedNum;
+				}
+			}
 		}
 
 		bool DisableSelfShadingWithinGroup = false;

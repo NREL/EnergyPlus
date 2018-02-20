@@ -163,6 +163,8 @@ namespace DataSystemVariables {
 	bool UpdateDataDuringWarmupExternalInterface( false ); // variable sets in the external interface.
 	bool UseScheduledSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are imported from schedule inputs
 	bool ReportExtShadingSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are exported as a csv format output
+	bool UseImportedSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are imported altogether as a CSV/JSON file
+	
 	bool DisableGroupSelfShading( false ); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
 	bool DisableAllSelfShading( false ); // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
@@ -336,6 +338,50 @@ namespace DataSystemVariables {
 			gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
 		}
 
+	}
+
+	void
+	clear_state()
+	{
+		DDOnly = false;
+		ReverseDD = false;
+		DisableGLHECaching = false;
+		FullAnnualRun = false;
+		DeveloperFlag = false;
+		TimingFlag = false;
+		SutherlandHodgman = true;
+		DetailedSkyDiffuseAlgorithm = false;
+		DetailedSolarTimestepIntegration = false;
+		TrackAirLoopEnvFlag = false;
+		TraceAirLoopEnvFlag = false;
+		TraceHVACControllerEnvFlag = false;
+		ReportDuringWarmup = false;
+		ReportDuringHVACSizingSimulation = false;
+		ReportDetailedWarmupConvergence = false;
+		UpdateDataDuringWarmupExternalInterface = false;
+		UseScheduledSunlitFrac = false;
+		ReportExtShadingSunlitFrac = false;
+		UseImportedSunlitFrac = false;
+		DisableGroupSelfShading = false;
+		DisableAllSelfShading = false;
+		Elapsed_Time = 0.0;
+		Time_Start = 0.0;
+		Time_Finish = 0.0;
+		SortedIDD = true;
+		lMinimalShadowing = false;
+		TestAllPaths = false;
+		iEnvSetThreads = 0;
+		lEnvSetThreadsInput = false;
+		iepEnvSetThreads = 0;
+		lepSetThreadsInput = false;
+		iIDFSetThreads = 0;
+		lIDFSetThreadsInput = false;
+		inumActiveSims = 1;
+		lnumActiveSims = false;
+		MaxNumberOfThreads = 1;
+		NumberIntRadThreads = 1;
+		iNominalTotSurfaces = 0;
+		Threading = false;
 	}
 
 } // DataSystemVariables
