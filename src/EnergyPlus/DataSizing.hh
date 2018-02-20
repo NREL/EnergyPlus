@@ -1187,7 +1187,6 @@ namespace DataSizing {
 			CoolCapControl( 0 ), // wfb
 			sysSizeHeatingDominant( false ),
 			sysSizeCoolingDominant( false ),
-			CoolCapControl( 0 ), // wfb
 			CoinCoolCoilMassFlow( 0.0 ), 
 			CoinHeatCoilMassFlow( 0.0 ),
 			DesCoolCoilVolFlow( 0.0 ),
