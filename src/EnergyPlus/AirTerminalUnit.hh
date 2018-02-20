@@ -95,7 +95,9 @@ protected: // Creation
 		airInNodeNum( 0 ),
 		airOutNodeNum( 0 ),
 		zoneIndex( 0 ),
-		zoneNodeIndex( 0 )
+		zoneNodeIndex( 0 ),
+		ctrlZoneInNodeIndex( 0 ),
+		airLoopNum( 0 )
 	{}
 
 	// Copy Constructor
@@ -135,7 +137,17 @@ public: // Methods
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	) = 0;
 
+	virtual
+	int
+	getZoneIndex() = 0;
 
+	virtual
+	int
+	getAirLoopNum() = 0;
+
+	virtual
+	Real64
+	getPrimAirDesignVolFlow() = 0;
 
 protected: // Data
 

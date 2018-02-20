@@ -14,12 +14,19 @@ External Shading Calculation Method, Output External Shading Calculation Results
 
 See [6390](https://github.com/NREL/EnergyPlus/pull/6390)
 
-### Annual reporting frequency
+### System Sizing New Outputs
 
-Output variables and meters can now be reported yearly. The existing `annual` choice is used, which previously was a synonym for `runperiod`. This means that existing input files may report different information than previously if the simulation does not run from 1/1 to 12/31. Input files that have both `runperiod` and `annual` reporting requested will now produce two reports when previously only one report would have been made. The output files are modified as follows:
+A part of a system sizing refactor which includes bug fixes for Std 62.1 sizing, there are several new component sizing outputs that appear in every file with an airloop:
+```
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, Sum of Air Terminal Maximum Heating Flow Rates [m3/s], 0.38521
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, Sum of Air Terminal Minimum Heating Flow Rates [m3/s], 0.38521
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, Sum of Air Terminal Maximum Flow Rates [m3/s], 1.28404
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, Adjusted Heating Design Air Flow Rate [m3/s], 0.49638
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, Adjusted Cooling Design Air Flow Rate [m3/s], 1.28404
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, Adjusted Main Design Air Flow Rate [m3/s], 1.28404
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, User Heating Air Flow Ratio [], 0.30000
+Component Sizing Information, AirLoopHVAC, VAV SYS 1, Calculated Heating Air Flow Ratio [], 0.38657
+```
 
- * Text (ESO, etc.): A new yearly timestamp was added, so entry numbering has been changed. Timestamps for other frequencies is unchanged.
- * SQL: All timestamps have been modified to include a year field. This field is not filled in all situations (e.g. `runperiod` frequency), but users of this format will need to adjust accordingly. See `SQLite::initializeTimeIndicesTable` in SQLiteProcedures.cc.
-
-See [6456](https://github.com/NREL/EnergyPlus/pull/6456)
+See [6372](https://github.com/NREL/EnergyPlus/pull/6372)
 
