@@ -4211,17 +4211,24 @@ namespace EnergyPlus {
 			"    Dual Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name",
 			"    Dual Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name",
 
-			"  AirTerminal:SingleDuct:Uncontrolled,",
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    ZoneDirectAirADU,        !- Name",
+			"    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+			"    ZoneDirectAir;           !- Air Terminal Name",
+
+			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
 			"    ZoneDirectAir,           !- Name",
 			"    HVACAvailSched,          !- Availability Schedule Name",
+			"    Zone Inlet Node 2AT,     !- Air Inlet Node Name",
 			"    Zone Inlet Node,         !- Zone Supply Air Node Name",
 			"    2.36;                    !- Maximum Air Flow Rate {m3/s}",
 
 			"  ZoneHVAC:EquipmentList,",
 			"    ZoneEquipment,           !- Name",
 			"    SequentialLoad,          !- Load Distribution Scheme",
-			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-			"    ZoneDirectAir,           !- Zone Equipment 1 Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    ZoneDirectAirADU,        !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
 			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
 
@@ -4294,7 +4301,7 @@ namespace EnergyPlus {
 			"  AirLoopHVAC:ZoneSplitter,",
 			"    Zone Supply Air Splitter,!- Name",
 			"    Zone Equipment Inlet Node,  !- Inlet Node Name",
-			"    Zone Inlet Node;         !- Outlet 1 Node Name",
+			"    Zone Inlet Node 2AT;      !- Outlet 1 Node Name",
 
 			"  AirLoopHVAC:SupplyPath,",
 			"    TermReheatSupplyPath,    !- Name",
