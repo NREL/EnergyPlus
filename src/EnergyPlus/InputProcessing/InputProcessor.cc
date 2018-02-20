@@ -282,13 +282,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		if ( DataGlobals::isEpJSON ) {
-			epJSON = json::parse( input_file );
-		} else if ( DataGlobals::isCBOR ) {
-			epJSON = json::from_cbor( input_file );
-		} else if ( DataGlobals::isMsgPack ) {
-			epJSON = json::from_msgpack( input_file );
-		}
+		epJSON = json::parse( input_file );
 
 		if ( DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion ) {
 			std::string const encoded = idf_parser->encode( epJSON, schema );
