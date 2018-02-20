@@ -1886,9 +1886,9 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep,ReportSch;
 
-  Output:Variable,*,Heating Coil Total Heating Energy,TimeStep,ReportSch;
+  Output:Variable,*,Heating Coil Heating Energy,TimeStep,ReportSch;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,TimeStep,ReportSch;
+  Output:Variable,*,Heating Coil Heating Energy,TimeStep,ReportSch;
 
   Output:Variable,*,Zone Air Temperature,TimeStep,ReportSch;
 

@@ -767,6 +767,8 @@ namespace DataSurfaces {
 		bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
 		// LG added 1/6/12
 		Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
+
+		std::vector< int > DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
 		// the surface diffusion model
 
 		// Default Constructor

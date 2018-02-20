@@ -315,6 +315,7 @@ namespace EnergyPlus {
 		DataSizing::clear_state();
 		DataSurfaceLists::clear_state();
 		DataSurfaces::clear_state();
+		DataSystemVariables::clear_state();
 		DataUCSDSharedData::clear_state();
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();
