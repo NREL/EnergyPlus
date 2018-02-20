@@ -3451,6 +3451,7 @@ namespace DataHeatBalance {
 	extern Array1D< ZoneData > Zone;
 	extern Array1D< ZoneListData > ZoneList;
 	extern Array1D< ZoneGroupData > ZoneGroup;
+	extern Array1D< ZoneListData > ShadingZoneGroup;
 	extern Array1D< PeopleData > People;
 	extern Array1D< LightsData > Lights;
 	extern Array1D< ZoneEquipData > ZoneElectric;

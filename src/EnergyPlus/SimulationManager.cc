@@ -140,6 +140,7 @@ extern "C" {
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
 #include <Vectors.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -356,6 +357,7 @@ namespace SimulationManager {
 		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 		createFacilityElectricPowerServiceObject();
+		createCoilSelectionReportObj();
 
 		ManageBranchInput(); // just gets input and returns.
 
@@ -377,6 +379,12 @@ namespace SimulationManager {
 		if ( InvalidBranchDefinitions ) {
 			ShowFatalError( "Preceding error(s) in Branch Input cause termination." );
 		}
+
+		DisplayString( "Adjusting Air System Sizing" );
+		SizingManager::ManageSystemSizingAdjustments();
+
+		DisplayString( "Adjusting Standard 62.1 Ventilation Sizing" );
+		SizingManager::ManageSystemVentilationAdjustments();
 
 		DisplayString( "Initializing Simulation" );
 		KickOffSimulation = true;

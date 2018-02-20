@@ -99,7 +99,11 @@
 #include <OutputReportTabularAnnual.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
+<<<<<<< HEAD
 #include <ResultsSchema.hh>
+=======
+#include <ReportCoilSelection.hh>
+>>>>>>> update-idd-parser-w-coil
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
 #include <ThermalComfort.hh>
@@ -5337,13 +5341,16 @@ namespace OutputReportTabular {
 			WriteVeriSumTable();
 			WriteDemandEndUseSummary();
 			WriteSourceEnergyEndUseSummary();
-			WritePredefinedTables();
 			WriteComponentSizing();
 			WriteSurfaceShadowing();
 			WriteCompCostTable();
 			WriteAdaptiveComfortTable();
 			WriteEioTables();
 			WriteLoadComponentSummaryTables();
+
+			coilSelectionReportObj->finishCoilSummaryReportTable(); // call to write out the coil selection summary table data
+			WritePredefinedTables(); // moved to come after zone load components is finished
+
 			if ( DoWeathSim ) {
 				WriteMonthlyTables();
 				WriteTimeBinTables();
@@ -11842,7 +11849,8 @@ namespace OutputReportTabular {
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( ZoneCoolCompLoadTables(iZone).cells, ZoneCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					CollectPeakZoneConditions( ZoneCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
-
+					//send latent load info to coil summary report
+					coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( iZone ,  ZoneCoolCompLoadTables(iZone).cells( cLatent, rGrdTot ) );  
 
 					heatDesSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
 					ZoneHeatCompLoadTables( iZone ).desDayNum = heatDesSelected;
@@ -11852,6 +11860,9 @@ namespace OutputReportTabular {
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( ZoneHeatCompLoadTables( iZone ).cells, ZoneHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					CollectPeakZoneConditions( ZoneHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+
+					//send latent load info to coil summary report
+					coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( iZone , ZoneHeatCompLoadTables( iZone ).cells( cLatent, rGrdTot ) );
 
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, ZoneCoolCompLoadTables( iZone ) );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, ZoneHeatCompLoadTables( iZone ) );

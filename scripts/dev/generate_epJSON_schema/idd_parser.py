@@ -23,28 +23,29 @@ TOKEN_FORMAT = 13
 TOKEN_UNIQUE_OBJ = 14
 TOKEN_REQUIRED_OBJ = 15
 TOKEN_REFERENCE_CLASS_NAME = 17
+TOKEN_OBSOLETE = 18
 
 # field level tokens
-TOKEN_KEY = 18
-TOKEN_NOTE = 19
-TOKEN_OBJ_LIST = 20
-TOKEN_DEFAULT = 21
-TOKEN_AUTOCALCULATABLE = 22
-TOKEN_AUTOSIZABLE = 23
-TOKEN_MIN = 24
-TOKEN_MIN_EXCLUSIVE = 25
-TOKEN_MAX = 26
-TOKEN_MAX_EXCLUSIVE = 27
-TOKEN_BEGIN_EXTENSIBLE = 28
-TOKEN_UNITS = 29
-TOKEN_TYPE = 30
-TOKEN_REQUIRED_FIELD = 31
-TOKEN_REFERENCE = 32
-TOKEN_IP_UNITS = 33
-TOKEN_UNITS_BASED_ON_FIELD = 34
-TOKEN_DEPRECATED = 35
-TOKEN_EXTERNAL_LIST = 36
-TOKEN_RETAIN_CASE = 37
+TOKEN_KEY = 19
+TOKEN_NOTE = 20
+TOKEN_OBJ_LIST = 21
+TOKEN_DEFAULT = 22
+TOKEN_AUTOCALCULATABLE = 23
+TOKEN_AUTOSIZABLE = 24
+TOKEN_MIN = 25
+TOKEN_MIN_EXCLUSIVE = 26
+TOKEN_MAX = 27
+TOKEN_MAX_EXCLUSIVE = 28
+TOKEN_BEGIN_EXTENSIBLE = 29
+TOKEN_UNITS = 30
+TOKEN_TYPE = 31
+TOKEN_REQUIRED_FIELD = 32
+TOKEN_REFERENCE = 33
+TOKEN_IP_UNITS = 34
+TOKEN_UNITS_BASED_ON_FIELD = 35
+TOKEN_DEPRECATED = 36
+TOKEN_EXTERNAL_LIST = 37
+TOKEN_RETAIN_CASE = 38
 
 # above object level group string
 GROUP_STR = 'group'
@@ -57,6 +58,7 @@ FORMAT_STR = 'format'
 FIELD_STR = 'field'
 UNIQUE_OBJ_STR = 'unique-object'
 REQUIRED_OBJ_STR = 'required-object'
+OBSOLETE_STR = 'obsolete'
 
 # field-level strings
 REQUIRED_FIELD_STR = 'required-field'
@@ -154,7 +156,7 @@ def parse_idd(data):
 
 
 def parse_obj(data):
-    root = {'type': 'object', 'properties': {}, 'legacy_idd': {'fields': [], 'alphas': { 'fields': [] }, 'numerics': { 'fields': [] } } }
+    root = {'type': 'object', 'properties': {}, 'legacy_idd': {'field_names': {}, 'fields': [], 'alphas': { 'fields': [] }, 'numerics': { 'fields': [] } } }
     extensible_count = 0
     duplicate_field_count = 0
 
@@ -214,6 +216,14 @@ def parse_obj(data):
                 raise RuntimeError("cannot have duplicate formats")
             root['format'] = parse_line(data)
 
+        elif token == TOKEN_OBSOLETE:
+            next_token(data)
+            if look_ahead(data) != TOKEN_STRING:
+                raise RuntimeError("expected string after /obsolete")
+            if 'obsolete' in root:
+                raise RuntimeError("cannot have duplicate obsolete")
+            root['obsolete'] = parse_line(data)
+
         elif token == TOKEN_A or token == TOKEN_N:  # past all object level comments, should be field now
             token_a_or_n = token
             eat_whitespace(data)
@@ -247,14 +257,16 @@ def parse_obj(data):
                 raise RuntimeError("expected /field after , or ;")
             next_token(data)
             field_name = parse_line(data)
+            original_field_name = field_name
             field_name = field_name.lower()
             field_data = parse_field(data, token_a_or_n)
 
             if 'begin-extensible' in field_data:
                 field_data.pop('begin-extensible')
                 field_name = re.sub('[ ]+[0-9]+', '', field_name)
+                original_field_name = re.sub('[ ]+[0-9]+', '', original_field_name)
                 field_name = re.sub('[^0-9a-zA-Z]+', '_', field_name)
-                append_field_number(root, field_number, field_name, True)
+                append_field_number(root, field_number, field_name, True, original_field_name)
                 root['properties']['extensions'] = {'type': 'array', 'items': {'properties': {}, 'type': 'object'}}
                 root['legacy_idd']['extensibles'] = [field_name]
                 parse_extensibles(root['properties']['extensions']['items'], field_data, field_name)
@@ -266,8 +278,9 @@ def parse_obj(data):
             elif extensible_count > 0:
                 if extensible_count < root['extensible_size']:
                     field_name = re.sub('[ ]+[0-9]+', '', field_name)
+                    original_field_name = re.sub('[ ]+[0-9]+', '', original_field_name)
                     field_name = re.sub('[^0-9a-zA-Z]+', '_', field_name)
-                    append_field_number(root, field_number, field_name, True)
+                    append_field_number(root, field_number, field_name, True, original_field_name)
                     root['legacy_idd']['extensibles'].append(field_name)
                     parse_extensibles(root['properties']['extensions']['items'], field_data, field_name)
                     extensible_count += 1
@@ -279,7 +292,7 @@ def parse_obj(data):
             if field_name in root['properties']:
                 duplicate_field_count += 1
                 field_name += "_" + str(duplicate_field_count)
-            append_field_number(root, field_number, field_name, False)
+            append_field_number(root, field_number, field_name, False, original_field_name)
             root['legacy_idd']['fields'].append(field_name)
             if field_name != 'name':
                 root['properties'][field_name] = field_data
@@ -466,21 +479,27 @@ def parse_field(data, token):
             return root
 
 
-def append_field_number(root, field_number, field_name, is_in_extensibles):
+def append_field_number(root, field_number, field_name, is_in_extensibles, original_name):
     if not is_in_extensibles:
         if field_number[0].lower() == 'a':
             root['legacy_idd']['alphas']['fields'].append(field_name)
+            root['legacy_idd']['field_names'][field_name] = original_name
         elif field_number[0].lower() == 'n':
             root['legacy_idd']['numerics']['fields'].append(field_name)
+            root['legacy_idd']['field_names'][field_name] = original_name
     else:
         if field_number[0].lower() == 'a':
             if 'extensions' not in root['legacy_idd']['alphas']:
                 root['legacy_idd']['alphas']['extensions'] = []
             root['legacy_idd']['alphas']['extensions'].append(field_name)
+            if field_name not in root['legacy_idd']['field_names']:
+                root['legacy_idd']['field_names'][field_name] = original_name
         elif field_number[0].lower() == 'n':
             if 'extensions' not in root['legacy_idd']['numerics']:
                 root['legacy_idd']['numerics']['extensions'] = []
             root['legacy_idd']['numerics']['extensions'].append(field_name)
+            if field_name not in root['legacy_idd']['field_names']:
+                root['legacy_idd']['field_names'][field_name] = original_name
 
 
 def parse_extensibles(items, field_data, field_name):
@@ -580,6 +599,8 @@ def next_token(data):
             return TOKEN_BEGIN_EXTENSIBLE
         if match_string(data, DEPRECATED_STR):
             return TOKEN_DEPRECATED
+        if match_string(data, OBSOLETE_STR):
+            return TOKEN_OBSOLETE
         if match_string(data, RETAIN_CASE_STR):
             return TOKEN_RETAIN_CASE
         if match_string(data, GROUP_STR):

@@ -420,7 +420,12 @@ namespace HVACUnitaryBypassVAV {
 		}
 
 		Real64 locFanElecPower = 0.0;
-		locFanElecPower = Fans::GetFanPower( CBVAV( CBVAVNum ).FanIndex );
+		if ( CBVAV( CBVAVNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = HVACFan::fanObjs[ CBVAV( CBVAVNum ).FanIndex ]->fanPower();
+		} else {
+			locFanElecPower = Fans::GetFanPower( CBVAV( CBVAVNum ).FanIndex );
+		}
+
 		CBVAV( CBVAVNum ).ElecPower = locFanElecPower + DXElecCoolingPower + HeatingPower;
 
 	}

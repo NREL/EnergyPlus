@@ -16,6 +16,7 @@ set( test_src
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
   BoilerHotWater.unit.cc

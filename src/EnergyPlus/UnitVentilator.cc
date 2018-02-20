@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <UnitVentilator.hh>
 #include <BranchNodeConnections.hh>
+#include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -78,6 +79,7 @@
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SingleDuct.hh>
@@ -980,6 +982,40 @@ namespace UnitVentilator {
 			}
 		}
 
+		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) {
+			if ( UnitVent( UnitVentNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			} else {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			}
+		}
+		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) {
+			if ( UnitVent( UnitVentNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			} else {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			}
+		}
 	}
 
 	void

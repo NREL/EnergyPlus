@@ -183,7 +183,11 @@
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/PVWatts.hh>
+<<<<<<< HEAD
 #include <EnergyPlus/ResultsSchema.hh>
+=======
+#include <EnergyPlus/ReportCoilSelection.hh>
+>>>>>>> update-idd-parser-w-coil
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -259,6 +263,7 @@ namespace EnergyPlus {
 		UtilityRoutines::outputErrorHeader = false;
 
 		Psychrometrics::InitializePsychRoutines();
+		createCoilSelectionReportObj();
 	}
 
 	void EnergyPlusFixture::TearDown() {
@@ -330,6 +335,7 @@ namespace EnergyPlus {
 		DataSizing::clear_state();
 		DataSurfaceLists::clear_state();
 		DataSurfaces::clear_state();
+		DataSystemVariables::clear_state();
 		DataUCSDSharedData::clear_state();
 		DataZoneControls::clear_state();
 		DataZoneEnergyDemands::clear_state();

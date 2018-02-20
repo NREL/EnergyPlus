@@ -91,6 +91,7 @@
 #include <StandardRatings.hh>
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 
@@ -4778,8 +4779,8 @@ namespace DXCoils {
 			else if ( Coil.DXCoilType_Num == CoilDX_HeatingEmpirical ) {
 				// Setup Report Variables for Heating Equipment
 				// CurrentModuleObject='Coil:Heating:DX:SingleSpeed'
-				SetupOutputVariable( "Heating Coil Total Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
-				SetupOutputVariable( "Heating Coil Total Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+				SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 				SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, Coil.ElecHeatingConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
 				SetupOutputVariable( "Heating Coil Defrost Electric Power", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name );
@@ -4897,8 +4898,8 @@ namespace DXCoils {
 			else if ( Coil.DXCoilType_Num == CoilDX_MultiSpeedHeating ) {
 				// Setup Report Variables for Heating Equipment:
 				// CurrentModuleObject='Coil:Heating:DX:MultiSpeed'
-				SetupOutputVariable( "Heating Coil Total Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
-				SetupOutputVariable( "Heating Coil Total Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+				SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 				SetupOutputVariable( "Heating Coil Electric Power", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name );
 				SetupOutputVariable( "Heating Coil Electric Energy", OutputProcessor::Unit::J, Coil.ElecHeatingConsumption, "System", "Sum", Coil.Name, _, "Electric", "HEATING", _, "System" );
 
@@ -4948,8 +4949,8 @@ namespace DXCoils {
 			else if ( Coil.DXCoilType_Num == CoilVRF_Heating ) {
 				// Setup Report Variables for Heating Equipment:
 				// CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow
-				SetupOutputVariable( "Heating Coil Total Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
-				SetupOutputVariable( "Heating Coil Total Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+				SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 				SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
 			}
 
@@ -4978,8 +4979,8 @@ namespace DXCoils {
 			else if ( Coil.DXCoilType_Num == CoilVRF_FluidTCtrl_Heating )  {
 				// Setup Report Variables for Heating Equipment:
 				// CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
-				SetupOutputVariable( "Heating Coil Total Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
-				SetupOutputVariable( "Heating Coil Total Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+				SetupOutputVariable( "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, "System", "Average", Coil.Name );
+				SetupOutputVariable( "Heating Coil Heating Energy", OutputProcessor::Unit::J, Coil.TotalHeatingEnergy, "System", "Sum", Coil.Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 				SetupOutputVariable( "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, "System", "Average", Coil.Name );
 				// Followings for VRF_FluidTCtrl Only
 				SetupOutputVariable( "Heating Coil VRF Condensing Temperature", OutputProcessor::Unit::C, Coil.CondensingTemp, "System", "Average", Coil.Name );
@@ -5187,6 +5188,69 @@ namespace DXCoils {
 				// get high speed rated coil bypass factor
 				DXCoil( DXCoilNum ).RatedCBF( Mode ) = CalcCBF( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, RatedInletAirTemp, RatedInletAirHumRat, DXCoil( DXCoilNum ).RatedTotCap( Mode ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
 
+				// call coil model with everthing set at rating point
+				DXCoil( DXCoilNum ).InletAirMassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) ;
+				DXCoil( DXCoilNum ).InletAirMassFlowRateMax = DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) ;
+				DXCoil( DXCoilNum ).InletAirTemp = RatedInletAirTemp;
+				Real64 tempInletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				//DXCoil( DXCoilNum ).InletAirHumRat = RatedInletAirHumRat; // this seems inconsistent with dry bulb and wetbulb, filed NREL issue #5934
+				//Real64 tempInletAirWetBulb = Psychrometrics::PsyTwbFnTdbWPb( RatedInletAirTemp, RatedInletAirHumRat, DataEnvironment::StdPressureSeaLevel );
+				DXCoil( DXCoilNum ).InletAirHumRat = tempInletAirHumRat;
+				DXCoil( DXCoilNum ).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW( RatedInletAirTemp, tempInletAirHumRat );
+
+				// store environment data fill back in after rating point calc is over
+				Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+				Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+				Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+				Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
+				Real64 ratedOutdoorAirWetBulb = 23.9; // from I/O ref. more precise value?
+				DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTemp;
+				DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
+				DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level. 
+				DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				if ( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) > 0 ) { // set condenser inlet node values
+					Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).Temp = RatedOutdoorAirTemp;
+					Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).HumRat = DataEnvironment::OutHumRat;
+					Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).OutAirWetBulb = ratedOutdoorAirWetBulb;
+				}
+
+				// calculate coil model at rating point
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) {
+					CalcDoe2DXCoil( DXCoilNum, 1.0, false, 1.0, 1.0, _, 1.0 );
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ) {
+					CalcMultiSpeedDXCoil( DXCoilNum, 1.0, 1.0 );
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == DataHVACGlobals::CoilVRF_Cooling ) {
+					CalcVRFCoolingCoil( DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _, _ );
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling ) {
+					CalcVRFCoolingCoil_FluidTCtrl( DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _ );
+				}
+
+				//coil outlets
+				Real64 RatedOutletWetBulb( 0.0 );
+				RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( DXCoil( DXCoilNum ).OutletAirTemp, DXCoil( DXCoilNum ).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				
+				coilSelectionReportObj->setRatedCoilConditions( 
+						DXCoil( DXCoilNum ).Name,
+						DXCoil( DXCoilNum ).DXCoilType,
+						DXCoil( DXCoilNum ).TotalCoolingEnergyRate, // this is the report variable
+						DXCoil( DXCoilNum ).SensCoolingEnergyRate, // this is the report variable
+						DXCoil( DXCoilNum ).InletAirMassFlowRate,
+						DXCoil( DXCoilNum ).InletAirTemp,
+						DXCoil( DXCoilNum ).InletAirHumRat,
+						RatedInletWetBulbTemp,
+						DXCoil( DXCoilNum ).OutletAirTemp ,
+						DXCoil( DXCoilNum ).OutletAirHumRat ,
+						RatedOutletWetBulb,
+						RatedOutdoorAirTemp,
+						ratedOutdoorAirWetBulb,
+						DXCoil( DXCoilNum ).RatedCBF( Mode ),
+						-999.0 ); // coil effectiveness not define for DX
+
+				// now replace the outdoor air conditions set above for one time rating point calc
+				DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
+				DataEnvironment::OutHumRat = holdOutHumRat;
+				DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+				DataEnvironment::OutBaroPress = holdOutBaroPress;
 			}
 
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
@@ -5249,6 +5313,69 @@ namespace DXCoils {
 					}
 				}
 
+				// call coil model with everthing set at rating point
+				DXCoil( DXCoilNum ).InletAirMassFlowRate = DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) ;
+				DXCoil( DXCoilNum ).InletAirMassFlowRateMax = DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) ;
+
+				DXCoil( DXCoilNum ).InletAirTemp = RatedInletAirTempHeat;
+				Real64 tempInletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedInletAirTempHeat, RatedInletWetBulbTempHeat, DataEnvironment::StdPressureSeaLevel, RoutineName );
+				DXCoil( DXCoilNum ).InletAirHumRat = tempInletAirHumRat;
+				DXCoil( DXCoilNum ).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW( RatedInletAirTempHeat, tempInletAirHumRat );
+
+				// store environment data fill back in after rating point calc is over
+				Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+				Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+				Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+				Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
+
+				DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTempHeat;
+
+				Real64 ratedOutdoorAirWetBulb = 6.11; // from I/O ref. more precise value?
+				DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
+				DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
+				DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb( RatedOutdoorAirTempHeat, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName );
+
+				if ( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) > 0 ) { // set condenser inlet node values
+					Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).Temp = RatedOutdoorAirTempHeat;
+					Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).HumRat = DataEnvironment::OutHumRat;
+					Node( DXCoil( DXCoilNum ).CondenserInletNodeNum( 1 ) ).OutAirWetBulb = ratedOutdoorAirWetBulb;
+				}
+
+				// calculate coil model at rating point
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
+					CalcDXHeatingCoil( DXCoilNum, 1.0, 1.0, 1.0 );
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+					CalcDXHeatingCoil( DXCoilNum, 1.0, 1.0, _, _ );
+				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating ) {
+					CalcVRFHeatingCoil_FluidTCtrl( 1.0, DXCoilNum, 1.0, 1.0, _, _);
+				}
+				//coil outlets
+				Real64 RatedOutletWetBulb( 0.0 );
+				RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb( DXCoil( DXCoilNum ).OutletAirTemp, DXCoil( DXCoilNum ).OutletAirHumRat, StdPressureSeaLevel, RoutineName );
+				
+				coilSelectionReportObj->setRatedCoilConditions( 
+						DXCoil( DXCoilNum ).Name,
+						DXCoil( DXCoilNum ).DXCoilType,
+						DXCoil( DXCoilNum ).TotalHeatingEnergyRate, // this is the report variable
+						DXCoil( DXCoilNum ).TotalHeatingEnergyRate, // this is the report variable
+						DXCoil( DXCoilNum ).InletAirMassFlowRate,
+						DXCoil( DXCoilNum ).InletAirTemp,
+						DXCoil( DXCoilNum ).InletAirHumRat,
+						RatedInletWetBulbTempHeat,
+						DXCoil( DXCoilNum ).OutletAirTemp ,
+						DXCoil( DXCoilNum ).OutletAirHumRat ,
+						RatedOutletWetBulb,
+						RatedOutdoorAirTempHeat,
+						ratedOutdoorAirWetBulb, 
+						DXCoil( DXCoilNum ).RatedCBF( Mode ),
+						-999.0 ); // coil effectiveness not define for DX
+
+
+				// now replace the outdoor air conditions set above for one time rating point calc
+				DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
+				DataEnvironment::OutHumRat = holdOutHumRat;
+				DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+				DataEnvironment::OutBaroPress = holdOutBaroPress;
 			}
 
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed ) {
@@ -5312,6 +5439,27 @@ namespace DXCoils {
 				}
 			}
 
+			// store fan info for coil
+			if ( DXCoil( DXCoilNum ).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( DXCoil( DXCoilNum ).SupplyFanIndex > -1 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo(
+						DXCoil( DXCoilNum ).Name,
+						DXCoil( DXCoilNum ).DXCoilType,
+						DXCoil( DXCoilNum ).SupplyFanName,
+						DataAirSystems::objectVectorOOFanSystemModel,
+						DXCoil( DXCoilNum ).SupplyFanIndex );
+				}
+
+			} else {
+				if ( DXCoil( DXCoilNum ).SupplyFanIndex > 0 ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo(
+						DXCoil( DXCoilNum ).Name,
+						DXCoil( DXCoilNum ).DXCoilType,
+						DXCoil( DXCoilNum ).SupplyFanName,
+						DataAirSystems::structArrayLegacyFanModels,
+						DXCoil( DXCoilNum ).SupplyFanIndex );
+				}
+			}
 		}
 
 		AirInletNode = DXCoil( DXCoilNum ).AirInNode;
@@ -9012,7 +9160,7 @@ Label50: ;
 				RatedCBFHS = DXCoil( DXCoilNum ).RatedCBF( Mode );
 				CBFHS = AdjustCBF( RatedCBFHS, DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), DXCoil( DXCoilNum ).InletAirMassFlowRateMax );
 				// get high speed total capacity and SHR at current conditions
-				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatio, DXCoil( DXCoilNum ).InletAirMassFlowRateMax, DXCoil( DXCoilNum ).RatedTotCap( Mode ), CBFHS, DXCoil( DXCoilNum ).CCapFTemp( Mode ), DXCoil( DXCoilNum ).CCapFFlow( Mode ), TotCapHS, SHRHS, CondInletTemp, OutdoorPressure );
+				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatio, DXCoil( DXCoilNum ).InletAirMassFlowRateMax, DXCoil( DXCoilNum ).RatedTotCap( Mode ), CBFHS, DXCoil( DXCoilNum ).CCapFTemp( Mode ), DXCoil( DXCoilNum ).CCapFFlow( Mode ), TotCapHS, SHRHS, CondInletTemp, OutdoorPressure, DXCoil( DXCoilNum ).capModFacTotal );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//                       CondInletTemp, Node(DXCoil(DXCoilNum)%AirInNode)%Press)
 				// get the high speed SHR from user specified SHR modifier curves
@@ -9020,7 +9168,7 @@ Label50: ;
 					SHRHS = CalcSHRUserDefinedCurves( InletAirDryBulbTemp, InletAirWetBulbC, AirMassFlowRatio, DXCoil( DXCoilNum ).SHRFTemp( Mode ), DXCoil( DXCoilNum ).SHRFFlow( Mode ), DXCoil( DXCoilNum ).RatedSHR( Mode ) );
 				}
 				// get low speed total capacity and SHR at current conditions
-				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, 1.0, DXCoil( DXCoilNum ).RatedAirMassFlowRate2, DXCoil( DXCoilNum ).RatedTotCap2, DXCoil( DXCoilNum ).RatedCBF2, DXCoil( DXCoilNum ).CCapFTemp2, DXCoil( DXCoilNum ).CCapFFlow( Mode ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure );
+				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, 1.0, DXCoil( DXCoilNum ).RatedAirMassFlowRate2, DXCoil( DXCoilNum ).RatedTotCap2, DXCoil( DXCoilNum ).RatedCBF2, DXCoil( DXCoilNum ).CCapFTemp2, DXCoil( DXCoilNum ).CCapFFlow( Mode ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure, DXCoil( DXCoilNum ).capModFacTotal );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//                       Node(DXCoil(DXCoilNum)%AirInNode)%Press)
 				// get the low speed SHR from user specified SHR modifier curves
@@ -9139,7 +9287,7 @@ Label50: ;
 				// Adjust low speed coil bypass factor for actual flow rate.
 				// CBF = AdjustCBF(DXCoil(DXCoilNum)%RatedCBF2,DXCoil(DXCoilNum)%RatedAirMassFlowRate2,AirMassFlow)
 				// get low speed total capacity and SHR at current conditions
-				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, 1.0, DXCoil( DXCoilNum ).RatedAirMassFlowRate2, DXCoil( DXCoilNum ).RatedTotCap2, DXCoil( DXCoilNum ).RatedCBF2, DXCoil( DXCoilNum ).CCapFTemp2, DXCoil( DXCoilNum ).CCapFFlow( Mode ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure );
+				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, 1.0, DXCoil( DXCoilNum ).RatedAirMassFlowRate2, DXCoil( DXCoilNum ).RatedTotCap2, DXCoil( DXCoilNum ).RatedCBF2, DXCoil( DXCoilNum ).CCapFTemp2, DXCoil( DXCoilNum ).CCapFFlow( Mode ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure, DXCoil( DXCoilNum ).capModFacTotal );
 				// get the low speed SHR from user specified SHR modifier curves
 				if ( DXCoil( DXCoilNum ).UserSHRCurveExists ) {
 					SHRLS = CalcSHRUserDefinedCurves( InletAirDryBulbTemp, InletAirWetBulbC, 1.0, DXCoil( DXCoilNum ).SHRFTemp2, DXCoil( DXCoilNum ).SHRFFlow2, DXCoil( DXCoilNum ).RatedSHR2 );
@@ -9860,7 +10008,8 @@ Label50: ;
 		Real64 & TotCap, // total capacity at the given conditions [W]
 		Real64 & SHR, // sensible heat ratio at the given conditions
 		Real64 const CondInletTemp, // Condenser inlet temperature [C]
-		Real64 const Pressure // air pressure [Pa]
+		Real64 const Pressure, // air pressure [Pa]
+		Real64 & TotCapModFac // capacity modification factor, func of temp and func of flow
 	)
 	{
 
@@ -9928,6 +10077,12 @@ Label50: ;
 		InletWetBulbCalc = InletWetBulb;
 		InletHumRatCalc = InletHumRat;
 
+		if ( AirMassFlow <= 0.00001 ) {
+			TotCap = 0.0;
+			SHR = 0.0;
+			return;
+		}
+
 		//  DO WHILE (ABS(werror) .gt. Tolerance .OR. Counter == 0)
 		//   Get capacity modifying factor (function of inlet wetbulb & outside drybulb) for off-rated conditions
 		while ( true ) {
@@ -9974,6 +10129,7 @@ Label50: ;
 
 		SHR = SHRCalc;
 		TotCap = TotCapCalc;
+		TotCapModFac = TotCapTempModFac * TotCapFlowModFac;
 
 	}
 
@@ -10234,7 +10390,7 @@ Label50: ;
 				RatedCBFLS = DXCoil( DXCoilNum ).MSRatedCBF( SpeedNumLS );
 				CBFLS = AdjustCBF( RatedCBFLS, DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS ), MSHPMassFlowRateLow );
 				// get low speed total capacity and SHR at current conditions
-				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioLS, MSHPMassFlowRateLow, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ), CBFLS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumLS ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumLS ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure );
+				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioLS, MSHPMassFlowRateLow, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ), CBFLS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumLS ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumLS ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure, DXCoil( DXCoilNum ).capModFacTotal );
 				// get low speed outlet conditions
 				hDelta = TotCapLS / MSHPMassFlowRateLow;
 				// Calculate new apparatus dew point conditions
@@ -10264,7 +10420,7 @@ Label50: ;
 
 				// get high speed total capacity and SHR at current conditions
 
-				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioHS, MSHPMassFlowRateHigh, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumHS ), CBFHS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumHS ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumHS ), TotCapHS, SHRHS, CondInletTemp, OutdoorPressure );
+				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioHS, MSHPMassFlowRateHigh, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumHS ), CBFHS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumHS ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumHS ), TotCapHS, SHRHS, CondInletTemp, OutdoorPressure, DXCoil( DXCoilNum ).capModFacTotal );
 				hDelta = TotCapHS / MSHPMassFlowRateHigh;
 				// Calculate new apparatus dew point conditions
 				hADP = InletAirEnthalpy - hDelta / ( 1.0 - CBFHS );
@@ -10456,7 +10612,7 @@ Label50: ;
 				// Adjust low speed coil bypass factor for actual flow rate.
 				// CBF = AdjustCBF(DXCoil(DXCoilNum)%RatedCBF2,DXCoil(DXCoilNum)%RatedAirMassFlowRate2,AirMassFlow)
 				// get low speed total capacity and SHR at current conditions
-				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioLS, MSHPMassFlowRateHigh, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNum ), CBFLS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNum ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNum ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure );
+				CalcTotCapSHR( InletAirDryBulbTemp, InletAirHumRat, InletAirEnthalpy, InletAirWetBulbC, AirMassFlowRatioLS, MSHPMassFlowRateHigh, DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNum ), CBFLS, DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNum ), DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNum ), TotCapLS, SHRLS, CondInletTemp, OutdoorPressure, DXCoil( DXCoilNum ).capModFacTotal );
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  Node(DXCoil(DXCoilNum)%AirInNode)%Press)
 				hDelta = TotCapLS / AirMassFlow;
@@ -11379,6 +11535,13 @@ Label50: ;
 		Real64 SpecHumOut;
 		Real64 SpecHumIn;
 		Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
+
+		if ( ! DataGlobals::WarmupFlag && ! DataGlobals::DoingHVACSizingSimulations && ! DataGlobals::DoingSizing && DXCoil( DXCoilNum ).reportCoilFinalSizes ) {
+			Real64 ratedSensCap( 0.0);
+			ratedSensCap = DXCoil( DXCoilNum ).RatedTotCap( 1 ) * DXCoil( DXCoilNum ).RatedSHR( 1 );
+			coilSelectionReportObj->setCoilFinalSizes( DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).RatedTotCap( 1 ), ratedSensCap, DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ), -999.0 );
+			DXCoil( DXCoilNum ).reportCoilFinalSizes = false;
+		}
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
@@ -13069,6 +13232,13 @@ Label50: ;
 
 		if ( present( SupplyFan_TypeNum ) ) {
 			DXCoil( DXCoilNum ).SupplyFan_TypeNum = SupplyFan_TypeNum;
+			if ( DXCoil( DXCoilNum ).SupplyFanIndex > -1 ) {
+				if ( SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( DXCoil( DXCoilNum ).Name , DXCoil( DXCoilNum ).DXCoilType, HVACFan::fanObjs[ DXCoil( DXCoilNum ).SupplyFanIndex ]->name, DataAirSystems::objectVectorOOFanSystemModel, DXCoil( DXCoilNum ).SupplyFanIndex );
+				} else {
+					coilSelectionReportObj->setCoilSupplyFanInfo( DXCoil( DXCoilNum ).Name , DXCoil( DXCoilNum ).DXCoilType, Fans::Fan( DXCoil( DXCoilNum ).SupplyFanIndex ).FanName, DataAirSystems::structArrayLegacyFanModels, DXCoil( DXCoilNum ).SupplyFanIndex );
+				}
+			}
 		}
 
 	}

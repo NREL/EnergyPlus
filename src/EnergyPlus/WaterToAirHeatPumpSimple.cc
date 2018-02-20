@@ -74,6 +74,7 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 
@@ -2195,6 +2196,15 @@ namespace WaterToAirHeatPumpSimple {
 		}
 		if ( Contaminant.GenericContamSimulation ) {
 			Node( AirOutletNode ).GenContam = Node( AirInletNode ).GenContam;
+		}
+
+		if ( ! DataGlobals::WarmupFlag && ! DataGlobals::DoingHVACSizingSimulations && ! DataGlobals::DoingSizing && SimpleWatertoAirHP( HPNum ).reportCoilFinalSizes ) {
+
+			if ( UtilityRoutines::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "COOLING" )  ) { // cooling
+				coilSelectionReportObj->setCoilFinalSizes( SimpleWatertoAirHP( HPNum ).Name,"Coil:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens, SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate, SimpleWatertoAirHP( HPNum ).RatedWaterVolFlowRate );
+			} else if ( UtilityRoutines::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "HEATING" ) ) { // heating
+				coilSelectionReportObj->setCoilFinalSizes( SimpleWatertoAirHP( HPNum ).Name,"Coil:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",SimpleWatertoAirHP( HPNum ).RatedCapHeat, SimpleWatertoAirHP( HPNum ).RatedCapHeat, SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate, SimpleWatertoAirHP( HPNum ).RatedWaterVolFlowRate );
+			}
 		}
 
 	}

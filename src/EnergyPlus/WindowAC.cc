@@ -77,6 +77,7 @@
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -689,6 +690,13 @@ namespace WindowAC {
 				SetupEMSActuator( "Window Air Conditioner", WindAC( WindACNum ).Name, "Part Load Ratio", "[fraction]", WindAC( WindACNum ).EMSOverridePartLoadFrac, WindAC( WindACNum ).EMSValueForPartLoadFrac );
 			}
 
+		}
+		for ( WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum ) {
+			if ( WindAC( WindACNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				coilSelectionReportObj->setCoilSupplyFanInfo( WindAC( WindACNum ).DXCoilName , WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel , WindAC( WindACNum ).FanIndex );
+			} else {
+				coilSelectionReportObj->setCoilSupplyFanInfo( WindAC( WindACNum ).DXCoilName , WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).FanName, DataAirSystems::structArrayLegacyFanModels , WindAC( WindACNum ).FanIndex );
+			}
 		}
 
 	}

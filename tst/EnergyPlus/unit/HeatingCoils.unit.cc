@@ -93,11 +93,11 @@ namespace EnergyPlus {
 		ASSERT_THROW( HeatingCoils::GetHeatingCoilInput(), std::runtime_error );
 
 		std::string const error_string = delimited_string( {
-			"   ** Severe  ** GetHeatingCoilInput: Coil:Heating:Fuel: Invalid fuel_type entered =ELECTRIC for name=FURNACE COIL",
+			"   ** Severe  ** GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
 			"   **  Fatal  ** GetHeatingCoilInput: Errors found in input.  Program terminates.",
 			"   ...Summary of Errors that led to program termination:",
 			"   ..... Reference severe error count=1",
-			"   ..... Last severe error=GetHeatingCoilInput: Coil:Heating:Fuel: Invalid fuel_type entered =ELECTRIC for name=FURNACE COIL",
+			"   ..... Last severe error=GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
 		} );
 
 

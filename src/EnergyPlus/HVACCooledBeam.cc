@@ -378,6 +378,8 @@ namespace HVACCooledBeam {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = CoolBeam( CBNum ).AirOutNode;
 							AirDistUnit( CoolBeam( CBNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( CoolBeam( CBNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							CoolBeam( CBNum ).CtrlZoneNum = CtrlZone;
+							CoolBeam( CBNum ).ctrlZoneInNodeIndex = SupAirIn;
 							AirNodeFound = true;
 							break;
 						}
@@ -517,6 +519,12 @@ namespace HVACCooledBeam {
 			InWaterNode = CoolBeam( CBNum ).CWInNode;
 			OutWaterNode = CoolBeam( CBNum ).CWOutNode;
 			InitComponentNodes( 0.0, CoolBeam( CBNum ).MaxCoolWaterMassFlow, InWaterNode, OutWaterNode, CoolBeam( CBNum ).CWLoopNum, CoolBeam( CBNum ).CWLoopSideNum, CoolBeam( CBNum ).CWBranchNum, CoolBeam( CBNum ).CWCompNum );
+
+			if ( CoolBeam( CBNum ).AirLoopNum == 0 ) { // fill air loop index
+				if ( CoolBeam( CBNum ).CtrlZoneNum > 0 && CoolBeam( CBNum ).ctrlZoneInNodeIndex > 0 ) {
+					CoolBeam( CBNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( CoolBeam( CBNum ).CtrlZoneNum ).InletNodeAirLoopNum( CoolBeam( CBNum ).ctrlZoneInNodeIndex );
+				}
+			}
 
 			MyEnvrnFlag( CBNum ) = false;
 		} // end one time inits
