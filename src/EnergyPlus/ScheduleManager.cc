@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -141,6 +144,7 @@ namespace ScheduleManager {
 	//Logical Variables for Module
 	bool ScheduleInputProcessed( false ); // This is false until the Schedule Input has been processed.
 	bool ScheduleDSTSFileWarningIssued( false );
+	bool ScheduleFileShadingProcessed( false );
 
 		namespace {
 	// These were static variables within different functions. They were pulled out into the namespace
@@ -285,6 +289,8 @@ namespace ScheduleManager {
 		int NumCptSchedules; // Number of "compact" Schedules
 		int NumCommaFileSchedules; // Number of Schedule:File schedules
 		int NumConstantSchedules; // Number of "constant" schedules
+		int NumCSVAllColumnsSchedules; // Number of imported shading schedules
+		int NumCommaFileShading; // Number of shading csv schedules
 		int TS; // Counter for Num Of Time Steps in Hour
 		int Hr; // Hour Counter
 		Array2D< Real64 > MinuteValue; // Temporary for processing interval schedules
@@ -322,6 +328,8 @@ namespace ScheduleManager {
 		bool FileExists;
 		// for SCHEDULE:FILE
 		Array1D< Real64 > hourlyFileValues;
+		std::map< std::string, int> CSVAllColumnNames;
+		std::map< int, Array1D< Real64 > > CSVAllColumnNameAndValues;
 		int SchdFile;
 		int colCnt;
 		int rowCnt;
@@ -346,12 +354,14 @@ namespace ScheduleManager {
 		bool firstLine;
 		bool FileIntervalInterpolated;
 		int rowLimitCount;
+		int rowLimitMinCount;
 		int skiprowCount;
 		int curcolCount;
 		int numHourlyValues;
 		int numerrors;
 		int ifld;
 		int hrLimitCount;
+		bool ScheduleFileShadingLeapYear;
 
 		MaxNums = 1; // Need at least 1 number because it's used as a local variable in the Schedule Types loop
 		MaxAlps = 0;
@@ -419,6 +429,7 @@ namespace ScheduleManager {
 			MaxNums = max( MaxNums, NumNumbers );
 			MaxAlps = max( MaxAlps, NumAlphas );
 		}
+
 		CurrentModuleObject = "Schedule:Constant";
 		NumConstantSchedules = GetNumObjectsFound( CurrentModuleObject );
 		if ( NumConstantSchedules > 0 ) {
@@ -506,12 +517,151 @@ namespace ScheduleManager {
 		//because need a week for each day
 		AddDaySch += NumExternalInterfaceFunctionalMockupUnitExportSchedules; // one day schedule for ExternalInterface
 		// to update during run time
+		
+		CurrentModuleObject = "Schedule:File:Shading";
+		NumCommaFileShading = GetNumObjectsFound( CurrentModuleObject );
+		NumAlphas = 0;
+		NumNumbers = 0;
+		if ( NumCommaFileShading > 1 ) {
+			ShowWarningError( CurrentModuleObject + ": More than 1 occurence of this object found, only first will be used." );
+		}
+
+		NumCSVAllColumnsSchedules = 0;
+
+		if ( NumCommaFileShading != 0 ) {
+			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			std::string ShadingSunlitFracFileName = Alphas( 1 );
+			CheckForActualFileName( ShadingSunlitFracFileName, FileExists, TempFullFileName );
+			if ( ! FileExists ) {
+				ShowSevereError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\" not found when External Shading Calculation Method = ImportedShading." );
+				ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
+				ShowContinueError( "Try again with putting full path and file name in the field." );
+				ShowFatalError( "Program terminates due to previous condition." );
+			} else {
+				SchdFile = GetNewUnitNumber();
+				{ IOFlags flags; flags.ACTION( "read" ); gio::open( SchdFile, TempFullFileName, flags ); read_stat = flags.ios(); }
+				if ( read_stat != 0 ) {
+					ShowSevereError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\" cannot be opened." );
+					ShowContinueError( "... It may be open in another program (such as Excel).  Please close and try again." );
+					ShowFatalError( "Program terminates due to previous condition." );
+				}
+				// check for stripping
+				{ IOFlags flags; gio::read( SchdFile, fmtA, flags ) >> LineIn; read_stat = flags.ios(); }
+				endLine = len( LineIn );
+				if ( endLine > 0 ) {
+					if ( int( LineIn[ endLine - 1 ] ) == iUnicode_end ) {
+						gio::close( SchdFile );
+						ShowSevereError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file." );
+						ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
+						ShowFatalError( "Program terminates due to previous condition." );
+					}
+				}
+				gio::backspace( SchdFile );
+			}
+
+			numerrors = 0;
+			errFlag = false;
+			read_stat = 0;
+
+			rowCnt = 0;
+			firstLine = true;
+			rowLimitCount = 8774;
+			rowLimitMinCount = 8760;
+			ColumnSep = CharComma;
+			while ( read_stat == 0 ) { //end of file
+				{ IOFlags flags; gio::read( SchdFile, fmtA, flags ) >> LineIn; read_stat = flags.ios(); }
+				++rowCnt;
+				colCnt = 0;
+				wordStart = 0;
+				columnValue = 0.0;
+				//scan through the line and write values into 2d array
+				while ( true ) {
+					sepPos = index( LineIn, ColumnSep );
+					++colCnt;
+					if ( sepPos != std::string::npos ) {
+						if ( sepPos > 0 ) {
+							wordEnd = sepPos - 1;
+						} else {
+							wordEnd = wordStart;
+						}
+						subString = LineIn.substr( wordStart, wordEnd - wordStart + 1 );
+						//the next word will start after the comma
+						wordStart = sepPos + 1;
+						//get rid of separator so next INDEX will find next separator
+						LineIn.erase( 0, wordStart );
+						firstLine = false;
+						wordStart = 0;
+					} else {
+						//no more commas
+						subString = LineIn.substr( wordStart );
+						if ( firstLine && subString == BlankString ) {
+							ShowWarningError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\"  first line does not contain the indicated column separator=comma." );
+							ShowContinueError( "...first 40 characters of line=[" + LineIn.substr( 0, 40 ) + ']' );
+							firstLine = false;
+						}
+						break;
+					}
+					if ( rowCnt == 1 ) {
+						if ( subString == BlankString ) {
+							ShowWarningError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
+							errFlag = true;
+						} else if ( CSVAllColumnNames.count( subString ) ) {
+							ShowWarningError( RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString + "\".");
+							ShowContinueError( "The first occurence of the same surface name would be used." );
+							errFlag = true;
+						}
+						if ( !errFlag ) {
+							NumCSVAllColumnsSchedules++;
+							Array1D< Real64 > hourlyColumnValues;
+							hourlyColumnValues.allocate( 8784 );
+							CSVAllColumnNames[ subString ] = colCnt;
+							CSVAllColumnNameAndValues[ colCnt ] = hourlyColumnValues;
+						}
+					} else {
+						columnValue = ProcessNumber( subString, errFlag );
+						if ( errFlag ) {
+							++numerrors;
+							columnValue = 0.0;
+						}
+						CSVAllColumnNameAndValues[ colCnt ]( rowCnt - 1 ) = columnValue;
+					}
+				}
+				
+				if ( rowCnt == rowLimitCount ) break;
+			}
+			gio::close( SchdFile );
+
+			ScheduleFileShadingProcessed = true;
+			ScheduleFileShadingLeapYear = false;
+
+			// schedule values have been filled into the CSVAllColumnNameAndValues map.
+
+			if ( numerrors > 0 ) {
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" " + RoundSigDigits( numerrors ) + " records had errors - these values are set to 0." );
+				ShowContinueError( "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error." );
+			}
+			if ( rowCnt < rowLimitMinCount ) {
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than 8760 hourly values read from file." );
+				ShowContinueError( "..Number read=" + std::to_string( rowCnt ) + '.' );
+			}
+			if ( rowCnt < rowLimitMinCount ) {
+				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" less than specified hourly values read from file." );
+				ShowContinueError( " Actual number of hourly values included=" + std::to_string( rowCnt ) + "." );
+			}
+			if ( rowCnt == rowLimitCount ) ScheduleFileShadingLeapYear = true;
+		}
+		
+		// add week and day schedules for each ExternalInterface:FunctionalMockupUnitExport:Schedule
+		AddWeekSch += NumCSVAllColumnsSchedules * 366; //number of days/year
+		//because need a week for each day
+		AddDaySch += NumCSVAllColumnsSchedules * 366; 
+		// to update during run time
 
 		// include additional schedules in with count
 		NumRegDaySchedules = NumHrDaySchedules + NumIntDaySchedules + NumLstDaySchedules;
 		NumDaySchedules = NumRegDaySchedules + AddDaySch;
 		NumWeekSchedules = NumRegWeekSchedules + NumCptWeekSchedules + AddWeekSch;
-		NumSchedules = NumRegSchedules + NumCptSchedules + NumCommaFileSchedules + NumConstantSchedules + NumExternalInterfaceSchedules + NumExternalInterfaceFunctionalMockupUnitImportSchedules + NumExternalInterfaceFunctionalMockupUnitExportSchedules;
+		NumSchedules = NumRegSchedules + NumCptSchedules + NumCommaFileSchedules + NumConstantSchedules + NumExternalInterfaceSchedules + NumExternalInterfaceFunctionalMockupUnitImportSchedules + NumExternalInterfaceFunctionalMockupUnitExportSchedules + NumCSVAllColumnsSchedules;
 
 		//!  Most initializations in the schedule data structures are taken care of in
 		//!  the definitions (see above)
@@ -1659,6 +1809,63 @@ namespace ScheduleManager {
 		}
 		if ( NumCommaFileSchedules > 0 ) {
 			hourlyFileValues.deallocate();
+		}
+
+		std::string curName;
+		Array1D< Real64 > hourlyColumnValues;
+		for ( auto& NameValue : CSVAllColumnNames ) {
+			curName = NameValue.first + "_shading";
+			hourlyColumnValues = CSVAllColumnNameAndValues[ NameValue.second ];
+			IsNotOK = false;
+			IsBlank = false;
+			VerifyName( curName, Schedule( {1,NumSchedules} ), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			if ( IsNotOK ) {
+				ErrorsFound = true;
+				if ( IsBlank ) curName = "xxxxx";
+			}
+			++SchNum;
+			Schedule( SchNum ).Name = curName;
+			Schedule( SchNum ).SchType = ScheduleInput_file;
+			
+			iDay = 0;
+			hDay = 0;
+			ifld = 0;
+			while ( true ) {
+				// create string of which day of year
+				++iDay;
+				++hDay;
+				if ( iDay > 366 ) break;
+				ExtraField = RoundSigDigits( iDay );
+				// increment both since a week schedule is being defined for each day so that a day is valid
+				// no matter what the day type that is used in a design day.
+				++AddWeekSch;
+				++AddDaySch;
+				// define week schedule
+				WeekSchedule( AddWeekSch ).Name = curName + "_shading_wk_" + ExtraField;
+				// for all day types point the week schedule to the newly defined day schedule
+				for ( kDayType = 1; kDayType <= MaxDayTypes; ++kDayType ) {
+					WeekSchedule( AddWeekSch ).DaySchedulePointer( kDayType ) = AddDaySch;
+				}
+				// day schedule
+				DaySchedule( AddDaySch ).Name = curName + "_shading_dy_" + ExtraField;
+				DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
+				// schedule is pointing to the week schedule
+				Schedule( SchNum ).WeekSchedulePointer( iDay ) = AddWeekSch;
+				// MinutesPerItem == 60
+
+				for ( jHour = 1; jHour <= 24; ++jHour ) {
+					++ifld;
+					curHrVal = hourlyColumnValues( ifld ); // hourlyFileValues((hDay - 1) * 24 + jHour)
+					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						DaySchedule( AddDaySch ).TSValue( TS, jHour ) = curHrVal;
+					}
+				}
+				if ( iDay == 59 && ScheduleFileShadingLeapYear ) { // 28 Feb
+					// Dup 28 Feb to 29 Feb (60)
+					++iDay;
+					Schedule( SchNum ).WeekSchedulePointer( iDay ) = Schedule( SchNum ).WeekSchedulePointer( iDay - 1 );
+				}
+			}
 		}
 
 		MinuteValue.deallocate();
