@@ -379,6 +379,12 @@ namespace SimulationManager {
 			ShowFatalError( "Preceding error(s) in Branch Input cause termination." );
 		}
 
+		DisplayString( "Adjusting Air System Sizing" );
+		SizingManager::ManageSystemSizingAdjustments();
+
+		DisplayString( "Adjusting Standard 62.1 Ventilation Sizing" );
+		SizingManager::ManageSystemVentilationAdjustments();
+
 		DisplayString( "Initializing Simulation" );
 		KickOffSimulation = true;
 

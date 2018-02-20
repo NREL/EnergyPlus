@@ -500,6 +500,8 @@ namespace PoweredInductionUnits {
 							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
 							AirNodeFound = true;
+							PIU( PIUNum ).CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
+							PIU( PIUNum ).ctrlZoneInNodeIndex = SupAirIn;
 							break;
 						}
 					}
@@ -665,6 +667,8 @@ namespace PoweredInductionUnits {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
+							PIU( PIUNum ).CtrlZoneNum = CtrlZone; // store control zone index for later use in finding air loop index
+							PIU( PIUNum ).ctrlZoneInNodeIndex = SupAirIn;
 							AirNodeFound = true;
 						}
 					}
@@ -827,6 +831,13 @@ namespace PoweredInductionUnits {
 			if ( ( ( PIU( PIUNum ).HCoilType_Num == HCoilType_SimpleHeating ) || ( PIU( PIUNum ).HCoilType_Num == HCoilType_SteamAirHeating ) ) && ! MyPlantScanFlag( PIUNum ) ) {
 				InitComponentNodes( PIU( PIUNum ).MinHotWaterFlow, PIU( PIUNum ).MaxHotWaterFlow, PIU( PIUNum ).HotControlNode, PIU( PIUNum ).HotCoilOutNodeNum, PIU( PIUNum ).HWLoopNum, PIU( PIUNum ).HWLoopSide, PIU( PIUNum ).HWBranchNum, PIU( PIUNum ).HWCompNum );
 			}
+
+			if ( PIU( PIUNum ).AirLoopNum == 0 ) { // fill air loop index
+				if ( PIU( PIUNum ).CtrlZoneNum > 0 && PIU( PIUNum ).ctrlZoneInNodeIndex > 0 ) {
+					PIU( PIUNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).ctrlZoneInNodeIndex );
+				}
+			}
+
 			MyEnvrnFlag( PIUNum ) = false;
 		} // end one time inits
 

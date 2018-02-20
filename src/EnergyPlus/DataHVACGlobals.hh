@@ -414,6 +414,7 @@ namespace DataHVACGlobals {
 	extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
 	extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAV;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat;

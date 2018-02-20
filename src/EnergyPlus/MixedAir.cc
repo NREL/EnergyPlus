@@ -1343,16 +1343,7 @@ namespace MixedAir {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int MaxNumAirLoopZones; // maximum number of heating plus cooling zones attached to any air loop
-		int NumAirLoopZones; // number of heating plus cooling zones attached to a given air loop
-		int NumofAirLoop; // counter for NumPrimaryAirSys
-		int NumAirLoopCooledZones; // number of cooling zones for a given air loop
-		int NumAirLoopCooledZonesTemp; // index for number of cooling zones
-		int AirLoopZones; // total number of unique heating and cooling zones for each air loop
-		int NumAirLoopHeatedZones; // number of heating zones for a given air loop
-		int NumAirLoopHeatedZonesTemp; // index for number of heating zones
 		int ZoneNum; // zone number attached to a given air loop
-		bool CommonZone; // logical for the same zone being a cooling zone and a heating zone
 		int NumNums; // Number of real numbers returned by GetObjectItem
 		int NumAlphas; // Number of alphanumerics returned by GetObjectItem
 		int OutAirNum; // Number of Controller:OutdoorAir or CONTROLLER:STAND ALONE ERV objects
@@ -1463,48 +1454,6 @@ namespace MixedAir {
 		}
 
 		GetOAControllerInputFlag = false;
-
-		// Find the maximum number of zones attached to any air loop, used for mechanical ventilation objects
-		MaxNumAirLoopZones = 0;
-		for ( NumofAirLoop = 1; NumofAirLoop <= NumPrimaryAirSys; ++NumofAirLoop ) {
-			NumAirLoopZones = AirToZoneNodeInfo( NumofAirLoop ).NumZonesCooled + AirToZoneNodeInfo( NumofAirLoop ).NumZonesHeated;
-			// NumZonesCooled + NumZonesHeated must be > 0 or Fatal error is issued in SimAirServingZones
-			MaxNumAirLoopZones = max( MaxNumAirLoopZones, NumAirLoopZones ); // Max number of zones on any air loop being simulated
-		}
-
-		if ( NumPrimaryAirSys > 0 ) {
-			AirLoopZoneInfo.allocate( NumPrimaryAirSys ); // Defined in DataAirLoop.cc
-		}
-
-		// Find the zones attached to each air loop
-		for ( NumofAirLoop = 1; NumofAirLoop <= NumPrimaryAirSys; ++NumofAirLoop ) {
-			AirLoopZoneInfo( NumofAirLoop ).Zone.allocate( MaxNumAirLoopZones );
-			AirLoopZoneInfo( NumofAirLoop ).ActualZoneNumber.allocate( MaxNumAirLoopZones );
-			NumAirLoopCooledZones = AirToZoneNodeInfo( NumofAirLoop ).NumZonesCooled;
-			AirLoopZones = NumAirLoopCooledZones;
-			NumAirLoopHeatedZones = AirToZoneNodeInfo( NumofAirLoop ).NumZonesHeated;
-			// Store cooling zone numbers in AirLoopZoneInfo data structure
-			for ( NumAirLoopCooledZonesTemp = 1; NumAirLoopCooledZonesTemp <= NumAirLoopCooledZones; ++NumAirLoopCooledZonesTemp ) {
-				AirLoopZoneInfo( NumofAirLoop ).Zone( NumAirLoopCooledZonesTemp ) = AirToZoneNodeInfo( NumofAirLoop ).CoolCtrlZoneNums( NumAirLoopCooledZonesTemp );
-				AirLoopZoneInfo( NumofAirLoop ).ActualZoneNumber( NumAirLoopCooledZonesTemp ) = ZoneEquipConfig( AirToZoneNodeInfo( NumofAirLoop ).CoolCtrlZoneNums( NumAirLoopCooledZonesTemp ) ).ActualZoneNum;
-			}
-			// Store heating zone numbers in AirLoopZoneInfo data structure
-			// Only store zone numbers that aren't already defined as cooling zones above
-			for ( NumAirLoopHeatedZonesTemp = 1; NumAirLoopHeatedZonesTemp <= NumAirLoopHeatedZones; ++NumAirLoopHeatedZonesTemp ) {
-				ZoneNum = AirToZoneNodeInfo( NumofAirLoop ).HeatCtrlZoneNums( NumAirLoopHeatedZonesTemp );
-				CommonZone = false;
-				for ( NumAirLoopCooledZonesTemp = 1; NumAirLoopCooledZonesTemp <= NumAirLoopCooledZones; ++NumAirLoopCooledZonesTemp ) {
-					if ( ZoneNum != AirToZoneNodeInfo( NumofAirLoop ).CoolCtrlZoneNums( NumAirLoopCooledZonesTemp ) ) continue;
-					CommonZone = true;
-				}
-				if ( ! CommonZone ) {
-					++AirLoopZones;
-					AirLoopZoneInfo( NumofAirLoop ).Zone( AirLoopZones ) = ZoneNum;
-					AirLoopZoneInfo( NumofAirLoop ).ActualZoneNumber( AirLoopZones ) = ZoneEquipConfig( ZoneNum ).ActualZoneNum;
-				}
-			}
-			AirLoopZoneInfo( NumofAirLoop ).NumZones = AirLoopZones;
-		}
 
 		// Process Controller:MechanicalVentilation objects
 		CurrentModuleObject = CurrentModuleObjects( CMO_MechVentilation );
