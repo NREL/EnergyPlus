@@ -1361,7 +1361,7 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,Monthly;
+  Output:Variable,*,Heating Coil Heating Energy,Monthly;
 
   Output:Variable,*,Cooling Coil Sensible Cooling Energy,Monthly;
 

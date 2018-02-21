@@ -169,7 +169,7 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputsFailure )
 		";",
 		"Output:Variable,*,Generator Produced DC Electric Power,timestep;"
 	});
-	ASSERT_FALSE(process_idf(idfTxt));
+	ASSERT_TRUE(process_idf(idfTxt));
 	ASSERT_THROW( GetOrCreatePVWattsGenerator("PVWattsArray1"), std::runtime_error );
 	std::string const error_string = delimited_string({
 		"   ** Severe  ** PVWatts: Invalid Module Type: PRIMO",
@@ -313,7 +313,7 @@ TEST_F( EnergyPlusFixture, PVWattsInverter_Constructor )
 		",",
 		";"
 	});
-	ASSERT_FALSE(process_idf(idfTxt));
+	ASSERT_TRUE(process_idf(idfTxt));
 	auto eplc(ElectPowerLoadCenter(1));
 	ASSERT_TRUE(eplc.inverterPresent);
 	EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);

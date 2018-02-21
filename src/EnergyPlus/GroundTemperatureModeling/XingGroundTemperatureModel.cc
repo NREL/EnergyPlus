@@ -53,7 +53,8 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -92,11 +93,11 @@ namespace EnergyPlus {
 		std::shared_ptr< XingGroundTempsModel > thisModel( new XingGroundTempsModel() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
-		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrModels = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( objectName == cAlphaArgs( 1 ) ) {
 				// Read input into object here

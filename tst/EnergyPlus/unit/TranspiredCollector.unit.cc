@@ -200,7 +200,7 @@ TEST_F( EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest ) {
 		"    ZN1_ExtWallSouth_2;      !- Surface 2 Name",
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 1;
 	DataGlobals::MinutesPerTimeStep = 60;

@@ -72,12 +72,12 @@ using namespace EnergyPlus::DataSizing;
 
 
 namespace EnergyPlus {
-	
+
 	TEST_F( EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem )
 	{
 
 		bool ErrorsFound;
-	
+
 		std::string const idf_objects = delimited_string( {
 		    "  ZoneHVAC:HighTemperatureRadiant,",
 			"    ZONERADHEATER,           !- Name",
@@ -99,15 +99,15 @@ namespace EnergyPlus {
 			"	 WALL1,                   !- Surface 1 Name",
 			"	 0.80;                    !- Fraction of Radiant Energy to Surface 1",
 		} );
-		
-		ASSERT_FALSE( process_idf( idf_objects ) );
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		Zone.allocate( 1 );
 		Zone( 1 ).Name = "ZONE1";
 		Surface.allocate( 1 );
 		Surface( 1 ).Name = "WALL1";
 		Surface( 1 ).Zone = 1;
-	
+
 		ErrorsFound = false;
 
 		GetHighTempRadiantSystem( ErrorsFound );
@@ -123,7 +123,7 @@ namespace EnergyPlus {
 			"   **   ~~~   ** This means that the fraction of radiant energy that would be lost from the high temperature radiant heater would be = 0.16000",
 			"   **   ~~~   ** Please check and correct this so that all radiant energy is accounted for in ZoneHVAC:HighTemperatureRadiant = ZONERADHEATER"
 			} );
-	
+
 		EXPECT_TRUE( compare_err_stream( error_string01, true ) );
 		EXPECT_TRUE( ErrorsFound );
 
@@ -133,10 +133,10 @@ namespace EnergyPlus {
 	{
 		int RadSysNum;
 		int SizingTypesNum;
-		
+
 		DataSizing::DataScalableCapSizingON = false;
 		DataSizing::CurZoneEqNum = 1;
-		
+
 		RadSysNum = 1;
 		HighTempRadSys.allocate( RadSysNum );
 		HighTempRadSysNumericFields.allocate( RadSysNum );
@@ -151,11 +151,11 @@ namespace EnergyPlus {
 		SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
 		if ( SizingTypesNum < 1 ) SizingTypesNum = 1;
 		ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( DataHVACGlobals::NumOfSizingTypes );
-		
+
 		SizeHighTempRadiantSystem( RadSysNum );
 		EXPECT_FALSE( DataSizing::DataScalableSizingON );
-	
+
 	}
-	
+
 }
 

@@ -79,7 +79,6 @@
 #include <FanCoilUnits.hh>
 #include <HVACStandAloneERV.hh>
 #include <HVACVariableRefrigerantFlow.hh>
-#include <InputProcessor.hh>
 #include <OutdoorAirUnit.hh>
 #include <OutputProcessor.hh>
 #include <PackagedTerminalHeatPump.hh>
@@ -268,23 +267,13 @@ namespace SystemReports {
 		// Once all compsets have been established (second iteration) find all components
 		// subcomponents, etc.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using namespace DataGlobalConstants;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const EnergyTransfer( 1 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
 
 		int AirDistUnitNum;
 		int MatchLoop;
@@ -343,7 +332,7 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
 					AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
@@ -457,7 +446,7 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				//loop over the zone supply air path inlet nodes
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
@@ -3394,7 +3383,6 @@ namespace SystemReports {
 		using Psychrometrics::PsyHFnTdbW;
 		using namespace DataZoneEnergyDemands;
 		using namespace DataGlobalConstants;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3424,6 +3412,7 @@ namespace SystemReports {
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEBEAM,
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION,
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT,
+			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT,
 			AIRTERMINAL_SINGLEDUCT_MIXER,
 			AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT,
 			AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT,
@@ -3512,6 +3501,7 @@ namespace SystemReports {
 			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEBEAM },
 			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION },
 			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT },
 			{ "AIRTERMINAL:SINGLEDUCT:MIXER", AIRTERMINAL_SINGLEDUCT_MIXER },
 			{ "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT },
 			{ "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT },
@@ -3824,6 +3814,7 @@ namespace SystemReports {
 		case AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_RECIRCULATEDAIR:
 		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION:
 		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT:
+		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT:
 		case AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT:
 		case AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT:
 		case AIRTERMINAL_SINGLEDUCT_UNCONTROLLED:
@@ -3895,7 +3886,7 @@ namespace SystemReports {
 		default:
 			found = 0;
 			if ( NumCompTypes > 0 ) {
-				found = FindItemInList( CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes );
+				found = UtilityRoutines::FindItemInList( CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes );
 			}
 			if ( found == 0 ) {
 				CompTypeErrors( ++NumCompTypes ).CompType = CompType;
@@ -3923,9 +3914,6 @@ namespace SystemReports {
 		// calculate energy contribution of outside air through mixing box and pro-rate to
 		// zones according to zone mass flow rates.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3938,7 +3926,6 @@ namespace SystemReports {
 		using DataHeatBalFanSys::ZoneAirHumRatAvg;
 		using DataEnvironment::StdRhoAir;
 		using DataEnvironment::OutBaroPress;
-
 		using WindowAC::GetWindowACOutAirNode;
 		using WindowAC::GetWindowACMixedAirNode;
 		using WindowAC::GetWindowACZoneInletAirNode;
@@ -3971,18 +3958,8 @@ namespace SystemReports {
 		using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
 		using HVACStandAloneERV::GetStandAloneERVZoneInletAirNode;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallLoad( 0.1 ); // (W)
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CtrlZoneNum; // ZONE counter
@@ -4505,21 +4482,6 @@ namespace SystemReports {
 		// Simply cycles through the plant and condenser demand sides until
 		// a component is found that matches the component type and name
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PassBranchNum; // DO loop counter for branches
 		int PassCompNum; // DO loop counter for components
@@ -4541,7 +4503,7 @@ namespace SystemReports {
 			for ( PassLoopNum = 1; PassLoopNum <= NumPlantLoops; ++PassLoopNum ) {
 				for ( PassBranchNum = 1; PassBranchNum <= VentRepPlantDemandSide( PassLoopNum ).TotalBranches; ++PassBranchNum ) {
 					for ( PassCompNum = 1; PassCompNum <= VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).TotalComponents; ++PassCompNum ) {
-						if ( SameString( CompType, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && SameString( CompName, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
+						if ( UtilityRoutines::SameString( CompType, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && UtilityRoutines::SameString( CompName, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
 							// Found a match on the plant demand side--increment the counter
 							MatchFound = true;
 							MatchLoopType = 1;
@@ -4561,7 +4523,7 @@ namespace SystemReports {
 			for ( PassLoopNum = 1; PassLoopNum <= NumCondLoops; ++PassLoopNum ) {
 				for ( PassBranchNum = 1; PassBranchNum <= VentRepCondDemandSide( PassLoopNum ).TotalBranches; ++PassBranchNum ) {
 					for ( PassCompNum = 1; PassCompNum <= VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).TotalComponents; ++PassCompNum ) {
-						if ( SameString( CompType, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && SameString( CompName, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
+						if ( UtilityRoutines::SameString( CompType, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && UtilityRoutines::SameString( CompName, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
 							// Found a match on the plant demand side--increment the counter
 							MatchFound = true;
 							MatchLoopType = 2;

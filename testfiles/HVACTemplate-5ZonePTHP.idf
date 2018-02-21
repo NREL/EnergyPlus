@@ -2032,7 +2032,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Heat Pump Compressor Part Load Ratio,hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Electric Power,hourly;
 

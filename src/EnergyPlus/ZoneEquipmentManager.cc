@@ -96,7 +96,6 @@
 #include <HVACUnitarySystem.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
 #include <OutdoorAirUnit.hh>
@@ -556,7 +555,7 @@ namespace ZoneEquipmentManager {
 				}
 			}
 		}
-		
+
 		for ( int airLoop = 1; airLoop <= DataHVACGlobals::NumPrimaryAirSys; ++airLoop ) {
 			AirLoopFlow( airLoop ).SupFlow = 0.0;
 			AirLoopFlow( airLoop ).ZoneRetFlow = 0.0;
@@ -657,7 +656,7 @@ namespace ZoneEquipmentManager {
 			ActualZoneNum = CalcZoneSizing( CurOverallSimDay, ControlledZoneNum ).ActualZoneNum;
 			NonAirSystemResponse( ActualZoneNum ) = 0.0;
 			SysDepZoneLoads( ActualZoneNum ) = 0.0;
-			SysOutputProvided = 0.0; 
+			SysOutputProvided = 0.0;
 			LatOutputProvided = 0.0;
 			InitSystemOutputRequired( ActualZoneNum, true );
 			ZoneNode = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
@@ -883,8 +882,6 @@ namespace ZoneEquipmentManager {
 		// REFERENCES:
 		// Consult the "DOAS Effect On Zone Sizing" new feature proposal and design documents
 
-		// Using/Aliasing
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcDOASSupCondsForSizing" );
 
@@ -958,7 +955,6 @@ namespace ZoneEquipmentManager {
 		using DataGlobals::OutputFileInits;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::isPulseZoneSizing;
-		using InputProcessor::FindItemInList;
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
 		using DataHeatBalance::Zone;
@@ -1012,13 +1008,13 @@ namespace ZoneEquipmentManager {
 		static gio::Fmt Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
 
 		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
-			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone );
+			ZoneIndex = UtilityRoutines::FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone );
 			if ( ZoneIndex == 0 ) {
 				ShowSevereError( "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\" references unknown zone" );
 				ErrorsFound = true;
 			}
 			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
-				ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+				ZoneIndex = UtilityRoutines::FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneIndex == 0 ) {
 					if ( ! isPulseZoneSizing ) {
 						ShowWarningError( "SetUpZoneSizingArrays: Requested Sizing for Zone=\"" + ZoneSizingInput( ZoneSizIndex ).ZoneName + "\", Zone is not found in the Controlled Zones List" );
@@ -1081,7 +1077,7 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
 				CalcZoneSizing( DesDayNum, CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
 				// For each Zone Sizing object, find the corresponding controlled zone
-				ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+				ZoneSizNum = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 				if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 					ZoneSizing( DesDayNum, CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
@@ -1325,7 +1321,7 @@ namespace ZoneEquipmentManager {
 			FinalZoneSizing( CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
 			CalcFinalZoneSizing( CtrlZoneNum ).ZoneName = ZoneEquipConfig( CtrlZoneNum ).ZoneName;
 			CalcFinalZoneSizing( CtrlZoneNum ).ActualZoneNum = ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum;
-			ZoneSizNum = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
+			ZoneSizNum = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).ZoneName, ZoneSizingInput, &ZoneSizingInputData::ZoneName );
 			if ( ZoneSizNum > 0 ) { // move data from zone sizing input
 				FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnCoolDgnSAMethod;
 				FinalZoneSizing( CtrlZoneNum ).ZnHeatDgnSAMethod = ZoneSizingInput( ZoneSizNum ).ZnHeatDgnSAMethod;
@@ -3016,11 +3012,15 @@ namespace ZoneEquipmentManager {
 				}
 
 				// set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
-				// minimum flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow, FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2, FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
+				// minimum flow rates (comment seems incorrect, really used as a minimum lower limit for the maximum air flow)
+				FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlowMin = max( FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow,
+					FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2,
+					FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow * FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowFrac );
 				// set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
 				// max heating flow rates
-				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) * FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
+				FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlowMax = max( FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow,
+					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlow2, max( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow, FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow ) *
+					FinalZoneSizing( CtrlZoneNum ).DesHeatMaxAirFlowFrac );
 				// Determine the design cooling supply air temperature if the supply air temperature difference is specified by user.
 				if ( FinalZoneSizing( CtrlZoneNum ).ZnCoolDgnSAMethod == TemperatureDifference ) {
 					FinalZoneSizing( CtrlZoneNum ).CoolDesTemp = FinalZoneSizing( CtrlZoneNum ).ZoneTempAtCoolPeak - std::abs( FinalZoneSizing( CtrlZoneNum ).CoolDesTempDiff );
@@ -3109,7 +3109,7 @@ namespace ZoneEquipmentManager {
 		using SystemAvailabilityManager::GetZoneEqAvailabilityManager;
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
-		using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners; 
+		using HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners;
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::ZoneAirMassFlow;
 		using SwimmingPool::SimSwimmingPool;
@@ -3366,10 +3366,10 @@ namespace ZoneEquipmentManager {
 
 				} else if ( SELECT_CASE_var == CoolingPanel_Num ) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 					SimCoolingPanel( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
-					
+
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
 					LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
-					
+
 				} else if ( SELECT_CASE_var == HiTempRadiant_Num ) { // 'ZoneHVAC:HighTemperatureRadiant'
 					SimHighTempRadiantSystem( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 					LatOutputProvided = 0.0; // This baseboard currently sends its latent heat gain directly to predictor/corrector
@@ -3654,21 +3654,21 @@ namespace ZoneEquipmentManager {
 			if ( allocated( ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP ) ) ZoneSysMoistureDemand( ZoneNum ).SequencedOutputRequiredToDehumidSP = ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP; // array assignment
 		} else if ( FirstHVACIteration && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading ) && ( ZoneEquipList( ZoneNum ).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading ) ) {
 			//init each sequenced demand to the zone design load in order to get available capacities from equipment
-			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) { 
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired ) ) {
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = DataSizing::FinalZoneSizing( ZoneNum ).DesHeatLoad; // array assignment
 				} else {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequired = -DataSizing::FinalZoneSizing( ZoneNum ).DesCoolLoad; // array assignment
 				}
 			}
-			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) { 
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP ) ) {
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = DataSizing::FinalZoneSizing( ZoneNum ).DesHeatLoad; // array assignment
 				} else {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToHeatingSP = -DataSizing::FinalZoneSizing( ZoneNum ).DesCoolLoad; // array assignment
 				}
 			}
-			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) { 
+			if ( allocated( ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP ) ) {
 				if ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
 					ZoneSysEnergyDemand( ZoneNum ).SequencedOutputRequiredToCoolingSP = DataSizing::FinalZoneSizing( ZoneNum ).DesHeatLoad; // array assignment
 				} else {
@@ -4091,9 +4091,9 @@ namespace ZoneEquipmentManager {
 				}
 				break;
 			case DataZoneEquipment::LoadDist::UniformLoading:
-			case DataZoneEquipment::LoadDist::UniformPLRLoading: 
+			case DataZoneEquipment::LoadDist::UniformPLRLoading:
 			case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
-				// For every load distribution scheme except SequentialLoad, do not touch the sequenced loads, 
+				// For every load distribution scheme except SequentialLoad, do not touch the sequenced loads,
 				// but set the remaining loads to the next equipment type's load to support equipment types that don't use the sequenced loads
 				if ( present( EquipPriorityNum ) ) {
 					if ( EquipPriorityNum + 1 <= energy.NumZoneEquipment ) {
@@ -4139,7 +4139,6 @@ namespace ZoneEquipmentManager {
 		using DataAirSystems::PrimaryAirSystem;
 		using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 		using DataGlobals::isPulseZoneSizing;
-
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::MassConservation;
 		using DataHeatBalance::Infiltration;
@@ -4201,7 +4200,7 @@ namespace ZoneEquipmentManager {
 			if  ( airLoop > 0 ) {
 				AirLoopFlow( airLoop ).SupFlow += Node( DirectAirManager::DirectAir( directAirUnit ).ZoneSupplyAirNode ).MassFlowRate ;
 			}
-		}	
+		}
 
 		do {
 			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
@@ -4514,7 +4513,7 @@ namespace ZoneEquipmentManager {
 				}
 
 				// Return node 1 is special
-				if( returnNum == 1 ){ 
+				if( returnNum == 1 ){
 					// Make no return air flow adjustments during sizing
 					if ( ( DataGlobals::DoingSizing || DataGlobals::isPulseZoneSizing ) && numRetNodes == 1 ) {
 						returnNodeMassFlow = ExpTotalReturnMassFlow;
@@ -4893,12 +4892,6 @@ namespace ZoneEquipmentManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates the air component of the heat balance.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutHumRat;
@@ -4929,16 +4922,12 @@ namespace ZoneEquipmentManager {
 		using DataContaminantBalance::MixingMassFlowCO2;
 		using DataContaminantBalance::ZoneAirGC;
 		using DataContaminantBalance::MixingMassFlowGC;
-
 		using DataHeatBalance::Ventilation;
 		using DataGlobals::SecInHour;
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::HourOfDay;
 		using DataHVACGlobals::TimeStepSys;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StdGravity( 9.80665 ); // The acceleration of gravity at the sea level (m/s2)
@@ -4947,12 +4936,6 @@ namespace ZoneEquipmentManager {
 		static std::string const RoutineNameRefrigerationDoorMixing( "CalcAirFlowSimple:RefrigerationDoorMixing" );
 		static std::string const RoutineNameInfiltration( "CalcAirFlowSimple:Infiltration" );
 		static std::string const RoutineNameZoneAirBalance( "CalcAirFlowSimple:ZoneAirBalance" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MCP;
@@ -5111,7 +5094,7 @@ namespace ZoneEquipmentManager {
 			}
 			else {
 				HumRatExt = OutHumRat;
-				EnthalpyExt = OutEnthalpy;					
+				EnthalpyExt = OutEnthalpy;
 			}
 			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, TempExt, HumRatExt );
 			CpAir = PsyCpAirFnWTdb( HumRatExt, TempExt );
@@ -5686,7 +5669,7 @@ namespace ZoneEquipmentManager {
 			WindSpeedExt = Zone( NZ ).WindSpeed;
 
 			// Use air node information linked to the zone if defined
-			
+
 			if ( Zone( NZ ).HasLinkedOutAirNode ) {
 				HumRatExt = Node( Zone( NZ ).LinkedOutAirNode ).HumRat;
 				}
@@ -6026,19 +6009,8 @@ namespace ZoneEquipmentManager {
 		// This subroutine does the autosizing calculations for the Sizing:Zone
 		// DOAS input.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// See IO Ref for suggested values
-		
-		// Using/Aliasing
-
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// na
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ZoneSizIndex;
@@ -6150,7 +6122,7 @@ namespace ZoneEquipmentManager {
 
 		// BSLLC Start
 		// if ( sqlite ) {
-		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, 
+		// 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin,
 		// 		PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
 		// }
 		// BSLLC Finish

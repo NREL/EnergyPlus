@@ -435,7 +435,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );
@@ -459,19 +459,19 @@ namespace EnergyPlus {
 		PlantLoop( 2 ).FluidName = "ChilledWater";
 		PlantLoop( 2 ).FluidIndex = 1;
 		PlantLoop( 2 ).FluidName = "WATER";
-		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = VarSpeedCoil( 2 ).Name;
-		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = VarSpeedCoil( 2 ).VSCoilTypeOfNum;
-		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = VarSpeedCoil( 2 ).WaterInletNodeNum;
-		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = VarSpeedCoil( 2 ).WaterOutletNodeNum;
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = VarSpeedCoil( 1 ).Name;
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = VarSpeedCoil( 1 ).WaterInletNodeNum;
+		PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = VarSpeedCoil( 1 ).WaterOutletNodeNum;
 
 		PlantLoop( 1 ).Name = "HotWaterLoop";
 		PlantLoop( 1 ).FluidName = "HotWater";
 		PlantLoop( 1 ).FluidIndex = 1;
 		PlantLoop( 1 ).FluidName = "WATER";
-		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = VarSpeedCoil( 1 ).Name;
-		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = VarSpeedCoil( 1 ).VSCoilTypeOfNum;
-		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = VarSpeedCoil( 1 ).WaterInletNodeNum;
-		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = VarSpeedCoil( 1 ).WaterOutletNodeNum;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = VarSpeedCoil( 2 ).Name;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = VarSpeedCoil( 2 ).WaterInletNodeNum;
+		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = VarSpeedCoil( 2 ).WaterOutletNodeNum;
 
 		DataSizing::CurZoneEqNum = 1;
 		DataSizing::ZoneSizingRunDone = true;
@@ -768,7 +768,7 @@ namespace EnergyPlus {
 			"NodeList,",
 			"    SPACE1-1 Exhausts,       !- Name",
 			"    SPACE1-1 HP Inlet Node;  !- Node 1 Name",
-			
+
 			"NodeList,",
 			"    OutsideAirInletNodes,    !- Name",
 			"    PTACOAInNode;            !- Node 1 Name",
@@ -777,7 +777,7 @@ namespace EnergyPlus {
 			"    OutsideAirInletNodes;    !- Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -828,7 +828,7 @@ namespace EnergyPlus {
 
 		PTUnitNum = 1;
 		PTUnit( 1 ).OpMode = ContFanCycCoil;
-		
+
 		Schedule( PTUnit( 1 ).FanSchedPtr ).CurrentValue = 1.0; // unit is always on
 		Schedule( PTUnit( 1 ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( PTUnit( 1 ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
@@ -854,7 +854,7 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( PTUnit( 1 ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( PTUnit( 1 ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( 1 ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -884,7 +884,7 @@ namespace EnergyPlus {
 
 		// initialized to false
 		ASSERT_FALSE( PackagedTerminalHeatPump::HeatingLoad );
-		// Init PTAC zoneHVAC equipment 
+		// Init PTAC zoneHVAC equipment
 		InitPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq );
 		// init sets heating mode to true due to cold ventilation air
 		ASSERT_TRUE( PackagedTerminalHeatPump::HeatingLoad );
@@ -898,9 +898,9 @@ namespace EnergyPlus {
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).InletAirTemp, 16.74764, 0.00001 );
 		// heating coil tempers cold ventilation air to neutral (zone air temp)
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).OutletAirTemp, 21.1, 0.00001 );
-		// heating coil air flow rate, continuous fan operation 
+		// heating coil air flow rate, continuous fan operation
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).OutletAirMassFlowRate, 0.50, 0.00001 );
-		// heating coil load due to cold ventilation air 
+		// heating coil load due to cold ventilation air
 		ASSERT_NEAR( HeatingCoils::HeatingCoil( 1 ).HeatingCoilRate, 2217.0, 1.0 );
 
 	}
@@ -1128,7 +1128,7 @@ namespace EnergyPlus {
 			"    OutsideAirInletNodes;    !- Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -1199,7 +1199,7 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).OutsideAirNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( PTUnit( 1 ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( PTUnit( 1 ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( 1 ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -1230,7 +1230,7 @@ namespace EnergyPlus {
 
 		// initialized to false
 		ASSERT_FALSE( PackagedTerminalHeatPump::HeatingLoad );
-		// Init PTAC zoneHVAC equipment 
+		// Init PTAC zoneHVAC equipment
 		InitPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq );
 		BeginEnvrnFlag = false;
 		InitPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq );

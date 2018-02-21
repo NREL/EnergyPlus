@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 
 #include <map>
@@ -114,8 +115,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportTSMeters_PrintESOTimeStamp )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -155,7 +156,7 @@ namespace EnergyPlus {
 			int StartMinute = 0;
 			bool PrintESOTimeStamp = true;
 
-			functionUsingSQLite( std::bind( ReportTSMeters, StartMinute, EndMinute, PrintESOTimeStamp, true ) );
+			ReportTSMeters( StartMinute, EndMinute, PrintESOTimeStamp, true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -184,8 +185,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportTSMeters )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -225,7 +226,7 @@ namespace EnergyPlus {
 			int StartMinute = 0;
 			bool PrintESOTimeStamp = false;
 
-			functionUsingSQLite( std::bind( ReportTSMeters, StartMinute, EndMinute, PrintESOTimeStamp, true ) );
+			ReportTSMeters( StartMinute, EndMinute, PrintESOTimeStamp, true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -254,8 +255,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportHRMeters )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -290,7 +291,7 @@ namespace EnergyPlus {
 			DataEnvironment::DayOfWeek = 2;
 			DataEnvironment::HolidayIndex = 3;
 
-			functionUsingSQLite( std::bind( ReportHRMeters, true ) );
+			ReportHRMeters( true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -318,8 +319,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportDYMeters )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -362,7 +363,7 @@ namespace EnergyPlus {
 			DataEnvironment::DayOfWeek = 2;
 			DataEnvironment::HolidayIndex = 3;
 
-			functionUsingSQLite( std::bind( ReportDYMeters, true ) );
+			ReportDYMeters( true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -394,8 +395,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportMNMeters )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -438,7 +439,7 @@ namespace EnergyPlus {
 			DataEnvironment::DayOfWeek = 2;
 			DataEnvironment::HolidayIndex = 3;
 
-			functionUsingSQLite( std::bind( ReportMNMeters, true ) );
+			ReportMNMeters( true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -470,8 +471,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportSMMeters )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -514,7 +515,7 @@ namespace EnergyPlus {
 			DataEnvironment::DayOfWeek = 2;
 			DataEnvironment::HolidayIndex = 3;
 
-			functionUsingSQLite( std::bind( ReportSMMeters, true ) );
+			ReportSMMeters( true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -546,8 +547,8 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_reportYRMeters )
 		{
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
-			sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
 
 			NumEnergyMeters = 2;
 			EnergyMeters.allocate( NumEnergyMeters );
@@ -592,7 +593,7 @@ namespace EnergyPlus {
 			DataEnvironment::DayOfWeek = 2;
 			DataEnvironment::HolidayIndex = 3;
 
-			functionUsingSQLite( std::bind( OutputProcessor::ReportYRMeters, true ) );
+			OutputProcessor::ReportYRMeters( true );
 
 			auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -648,35 +649,35 @@ namespace EnergyPlus {
 			int CurDayType = 10;
 
 			// TSMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::TimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
-				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::TimeStep, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
+				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
 
 			// TSMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::EachCall, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
-				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) ) );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::EachCall, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
+				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay" } ) ) );
 
 			// HRMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Hourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
-				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Hourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim,
+				DayOfSimChr, PrintTimeStamp, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay" } ) ) );
 
 			// DYMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Daily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr,
-				PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) ) );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Daily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr,
+				PrintTimeStamp, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12,21, 0,WinterDesignDay" } ) ) );
 
 			// MNMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, _, _, _, _, _, _ ) );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, Month, _, _, _, _, _, _ );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,12" } ) ) );
 
 			// SMMeter
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ ) );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1" } ) ) );
 
 			// Bad input
-			functionUsingSQLite( std::bind( WriteTimeStampFormatData, DataGlobals::mtr_stream, static_cast<ReportingFrequency>( 999 ), RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ ) );
+			WriteTimeStampFormatData( DataGlobals::mtr_stream, static_cast<ReportingFrequency>( 999 ), RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, PrintTimeStamp, _, _, _, _, _, _, _ );
 
 			EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to WriteTimeStampFormatData: 999\n", ss->str());
 			ss->str(std::string());
@@ -701,52 +702,52 @@ namespace EnergyPlus {
 		{
 			DataGlobals::MinutesPerTimeStep = 10;
 
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false ) );
+			WriteReportMeterData( 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 999.9, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0, false ) );
+			WriteReportMeterData( 1, "1", 999.9, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,999.9" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true ) );
+			WriteReportMeterData( 1, "1", 616771620.98702729, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportMeterData, 1, "1", 0, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false ) );
+			WriteReportMeterData( 1, "1", 0, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
@@ -789,46 +790,46 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportRealData )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 ) );
+			WriteReportRealData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0 ) );
+			WriteReportRealData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0.0, 0, 0.0, 0 ) );
+			WriteReportRealData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211779,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 ) );
+			WriteReportRealData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportRealData, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 ) );
+			WriteReportRealData( 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -868,46 +869,46 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeReportIntegerData )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 ) );
+			WriteReportIntegerData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0, 0, 0, 0 ) );
+			WriteReportIntegerData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0, 0, 0, 0 ) );
+			WriteReportIntegerData( 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136, 1,10,4283196,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136,21, 1,10,4283196,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 0, 0, 0, 0 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 0, 0, 0, 0 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 0, 0, 0, 0 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136, 1,10,4283196,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 ) );
+			WriteReportIntegerData( 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportIntegerData, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 ) );
+			WriteReportIntegerData( 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -947,28 +948,28 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_1 )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 999 ); } );
+			WriteNumericData( 1, "1", 999 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
+			WriteNumericData( 1, "1", 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -999 ); } );
+			WriteNumericData( 1, "1", -999 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-999" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 999.9 ); } );
+			WriteNumericData( 1, "1", 999.9 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,999.9" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.0 ); } );
+			WriteNumericData( 1, "1", 0.0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -999.9 ); } );
+			WriteNumericData( 1, "1", -999.9 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-999.9" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
+			WriteNumericData( 1, "1", 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
 			auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -1073,14 +1074,12 @@ namespace EnergyPlus {
 				EXPECT_FALSE( error_found );
 			}
 
-			sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+			EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 			auto const meterType = "BAD INPUT";
 			out_resource_type = "BAD INPUT";
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetStandardMeterResourceType( out_resource_type, meterType, error_found );
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			EXPECT_EQ( meterType, out_resource_type );
 			EXPECT_TRUE( error_found );
@@ -1166,16 +1165,11 @@ namespace EnergyPlus {
 				EXPECT_EQ( variableType.second, validateVariableType( variableType.first ) ) << "where variableTypeKey is " << variableType.first;
 			}
 
-			sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+			EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 			std::string const variableTypeKey = "BAD INPUT";
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			auto index = validateVariableType( variableTypeKey );
-			sqlite_test = std::move( EnergyPlus::sqlite );
-			// See note in SQLiteFixture.hh, can maybe move to this in the future.
-			// auto index = functionUsingSQLite( std::bind( ValidateVariableType, variableTypeKey ) );
-			// auto index = functionUsingSQLite<int>( std::bind( ValidateVariableType, variableTypeKey ) );
 
 			EXPECT_EQ( StoreType::Averaged, index );
 
@@ -1228,9 +1222,8 @@ namespace EnergyPlus {
 			EXPECT_EQ( RT_IPUnits_OtherL, ipUnits );
 			EXPECT_FALSE( errorFound );
 
-			sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+			EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 
 			ipUnits = -999999;
 			DetermineMeterIPUnits( ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound );  //was "badunits"
@@ -1242,7 +1235,6 @@ namespace EnergyPlus {
 			EXPECT_EQ( RT_IPUnits_Electricity, ipUnits );
 			EXPECT_TRUE( errorFound );
 
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
@@ -1289,114 +1281,114 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,meterName [J] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "meterName", OutputProcessor::Unit::W, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "meterName", OutputProcessor::Unit::W, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,meterName [W] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "meterName", OutputProcessor::Unit::J, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "meterName", OutputProcessor::Unit::J, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,Cumulative meterName [J] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "meterName", OutputProcessor::Unit::W, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "meterName", OutputProcessor::Unit::W, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "4,1,meterName [W] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "meterName", OutputProcessor::Unit::W, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "meterName", OutputProcessor::Unit::W, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "5,1,Cumulative meterName [W] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "meterName", OutputProcessor::Unit::J, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "meterName", OutputProcessor::Unit::J, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "meterName", OutputProcessor::Unit::J, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "meterName", OutputProcessor::Unit::J, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,Cumulative meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "meterName", OutputProcessor::Unit::J, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "meterName", OutputProcessor::Unit::J, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "9,1,meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "meterName", OutputProcessor::Unit::J, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "meterName", OutputProcessor::Unit::J, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "10,1,Cumulative meterName [J] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "meterName", OutputProcessor::Unit::J, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "meterName", OutputProcessor::Unit::J, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,meterName [J] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "meterName", OutputProcessor::Unit::None, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "meterName", OutputProcessor::Unit::None, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "meterName", OutputProcessor::Unit::None, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "meterName", OutputProcessor::Unit::None, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,Cumulative meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "meterName", OutputProcessor::Unit::None, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "meterName", OutputProcessor::Unit::None, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "14,1,meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "meterName", OutputProcessor::Unit::None, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "meterName", OutputProcessor::Unit::None, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "15,1,Cumulative meterName [] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "meterName", OutputProcessor::Unit::None, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "meterName", OutputProcessor::Unit::None, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "meterName", OutputProcessor::Unit::None, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "meterName", OutputProcessor::Unit::None, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "meterName", OutputProcessor::Unit::deltaC, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "meterName", OutputProcessor::Unit::deltaC, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "19,7,meterName [deltaC] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "meterName", OutputProcessor::Unit::deltaC, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "20,1,Cumulative meterName [deltaC] !Daily " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "meterName", OutputProcessor::Unit::deltaC, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "meterName", OutputProcessor::Unit::deltaC, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "24,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "meterName", OutputProcessor::Unit::deltaC, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "25,1,Cumulative meterName [deltaC] !Monthly " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "meterName", OutputProcessor::Unit::deltaC, false, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "meterName", OutputProcessor::Unit::deltaC, false, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "meterName", OutputProcessor::Unit::deltaC, true, false ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "meterName", OutputProcessor::Unit::deltaC, true, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "meterName", OutputProcessor::Unit::deltaC, false, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "meterName", OutputProcessor::Unit::deltaC, false, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteMeterDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "meterName", OutputProcessor::Unit::deltaC, true, true ) );
+			WriteMeterDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "meterName", OutputProcessor::Unit::deltaC, true, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "30,1,Cumulative meterName [deltaC] !RunPeriod " } ) ) );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -1442,134 +1434,134 @@ namespace EnergyPlus {
 		{
 			InitializeOutput();
 
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "2,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "4,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "5,1,keyedValue,variableName [m3/s] !TimeStep" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "6,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "7,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "9,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "10,1,keyedValue,variableName [m3/s] !Each Call" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "11,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "12,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "14,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingHourlyVariables );
 			TrackingHourlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "15,1,keyedValue,variableName [m3/s] !Hourly" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "17,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingDailyVariables );
 			TrackingDailyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "22,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingMonthlyVariables );
 			TrackingMonthlyVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "keyedValue", "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName" );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "keyedValue", "variableName", 2, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteReportVariableDictionaryItem, ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ ) );
+			WriteReportVariableDictionaryItem( ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "keyedValue", "variableName", 3, OutputProcessor::Unit::m3_s, _, _ );
 			EXPECT_TRUE( TrackingRunPeriodVariables );
 			TrackingRunPeriodVariables = false;
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]" } ) ) );
@@ -1615,20 +1607,20 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, true ) );
+			WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 616771620.98702729, false ) );
+			WriteCumulativeReportMeterData( 1, "1", 616771620.98702729, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,616771620.9870273" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 0, true ) );
+			WriteCumulativeReportMeterData( 1, "1", 0, true );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
 
-			functionUsingSQLite( std::bind( WriteCumulativeReportMeterData, 1, "1", 0, false ) );
+			WriteCumulativeReportMeterData( 1, "1", 0, false );
 			EXPECT_TRUE( compare_mtr_stream( delimited_string( { "1,0.0" } ) ) );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0" } ) ) );
 
@@ -1651,209 +1643,209 @@ namespace EnergyPlus {
 
 		TEST_F( SQLiteFixture, OutputProcessor_writeNumericData_2 )
 		{
-			sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
-			sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+			EnergyPlus::sqlite->createSQLiteTimeIndexRecord( 4, 1, 1, 0, 2017 );
+			EnergyPlus::sqlite->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0 ); } );
+			WriteNumericData( 1, "1", 0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.1 ); } );
+			WriteNumericData( 1, "1", 0.1 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.1" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -0.1 ); } );
+			WriteNumericData( 1, "1", -0.1 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-0.1" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-2 ); } );
+			WriteNumericData( 1, "1", 1.0e-2 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.01" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.01" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-3 ); } );
+			WriteNumericData( 1, "1", 1.0e-3 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.001" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.001" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-4 ); } );
+			WriteNumericData( 1, "1", 1.0e-4 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0001" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.0001" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-5 ); } );
+			WriteNumericData( 1, "1", 1.0e-5 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.00001" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.00001" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-6 ); } );
+			WriteNumericData( 1, "1", 1.0e-6 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.000001" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.000001" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-7 ); } );
+			WriteNumericData( 1, "1", 1.0e-7 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-7" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-7" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-8 ); } );
+			WriteNumericData( 1, "1", 1.0e-8 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-8" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-8" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-9 ); } );
+			WriteNumericData( 1, "1", 1.0e-9 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-9" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-9" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-10 ); } );
+			WriteNumericData( 1, "1", 1.0e-10 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-10" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-10" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-11 ); } );
+			WriteNumericData( 1, "1", 1.0e-11 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-11" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-11" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-12 ); } );
+			WriteNumericData( 1, "1", 1.0e-12 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-12" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-12" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-13 ); } );
+			WriteNumericData( 1, "1", 1.0e-13 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-13" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-13" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-14 ); } );
+			WriteNumericData( 1, "1", 1.0e-14 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-14" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-14" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-15 ); } );
+			WriteNumericData( 1, "1", 1.0e-15 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-15" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-15" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-16 ); } );
+			WriteNumericData( 1, "1", 1.0e-16 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-16" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-16" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e-16 ); } );
+			WriteNumericData( 1, "1", -1.0e-16 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1e-16" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-1e-16" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e-19 ); } );
+			WriteNumericData( 1, "1", 1.0e-19 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-19" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e-19" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 0.5 ); } );
+			WriteNumericData( 1, "1", 0.5 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,0.5" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0 ); } );
+			WriteNumericData( 1, "1", 1.0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 10.0 ); } );
+			WriteNumericData( 1, "1", 10.0 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e2 ); } );
+			WriteNumericData( 1, "1", 1.0e2 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e3 ); } );
+			WriteNumericData( 1, "1", 1.0e3 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e4 ); } );
+			WriteNumericData( 1, "1", 1.0e4 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e5 ); } );
+			WriteNumericData( 1, "1", 1.0e5 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e6 ); } );
+			WriteNumericData( 1, "1", 1.0e6 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e7 ); } );
+			WriteNumericData( 1, "1", 1.0e7 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e8 ); } );
+			WriteNumericData( 1, "1", 1.0e8 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e9 ); } );
+			WriteNumericData( 1, "1", 1.0e9 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e10 ); } );
+			WriteNumericData( 1, "1", 1.0e10 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e11 ); } );
+			WriteNumericData( 1, "1", 1.0e11 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e12 ); } );
+			WriteNumericData( 1, "1", 1.0e12 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e13 ); } );
+			WriteNumericData( 1, "1", 1.0e13 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e14 ); } );
+			WriteNumericData( 1, "1", 1.0e14 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e15 ); } );
+			WriteNumericData( 1, "1", 1.0e15 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1000000000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e16 ); } );
+			WriteNumericData( 1, "1", 1.0e16 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,10000000000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e17 ); } );
+			WriteNumericData( 1, "1", 1.0e17 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000000.0" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,100000000000000000.0" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e16 ); } );
+			WriteNumericData( 1, "1", -1.0e16 );
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-10000000000000000.0" } ) ) );
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", -1.0e17 ); } );
+			WriteNumericData( 1, "1", -1.0e17 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-100000000000000000.0" } ) ) );
 		#else
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,-100000000000000000.0" } ) ) );
 		#endif
 
-			functionUsingSQLite( [](){ WriteNumericData( 1, "1", 1.0e25 ); } );
+			WriteNumericData( 1, "1", 1.0e25 );
 		#if defined( _WIN32 ) && _MSC_VER < 1900
 			EXPECT_TRUE( compare_eso_stream( delimited_string( { "1,1e25" } ) ) );
 		#else
@@ -1955,7 +1947,7 @@ namespace EnergyPlus {
 			EXPECT_EQ( 1, NumEnergyMeters );
 			EXPECT_EQ( 1ul, EnergyMeters.size() );
 
-			sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+			EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 			auto const name2( "testMeter2" );
 			OutputProcessor::Unit const units2( OutputProcessor::Unit::unknown ); // was "kwh"
@@ -1963,7 +1955,7 @@ namespace EnergyPlus {
 			auto const endUse2( "testEndUse2" );
 			auto const endUseSub2( "testEndUseSub2" );
 			auto const group2( "testGroup2" );
-			functionUsingSQLite( std::bind(AddMeter, name2, units2, resourceType2, endUse2, endUseSub2, group2 ) );
+			AddMeter( name2, units2, resourceType2, endUse2, endUseSub2, group2 );
 
 			auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
@@ -2201,9 +2193,8 @@ namespace EnergyPlus {
 				EXPECT_EQ( result_map[ i ], EnergyMeters( i + 1 ).Name );
 			}
 
-			sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+			EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 
 			OutputProcessor::Unit units = OutputProcessor::Unit::J;
 			std::string resourceType = "ELEC";
@@ -2225,7 +2216,6 @@ namespace EnergyPlus {
 			ValidateNStandardizeMeterTitles( units, resourceType, endUse, endUseSub, group, errorFound );
 			EXPECT_TRUE( errorFound );
 
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
 
@@ -2267,11 +2257,11 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			GetReportVariableInput();
 
-			NumOfReqVariables = InputProcessor::GetNumObjectsFound( "Output:Variable" );
+			NumOfReqVariables = inputProcessor->getNumObjectsFound( "Output:Variable" );
 
 			EXPECT_EQ( 5, NumOfReqVariables );
 
@@ -2323,7 +2313,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			GetReportVariableInput();
 
@@ -2386,9 +2376,9 @@ namespace EnergyPlus {
 				"Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			InputProcessor::PreScanReportingVariables();
+			inputProcessor->preScanReportingVariables();
 			InitializeOutput();
 
 			Real64 ilgrGarage;
@@ -2444,9 +2434,9 @@ namespace EnergyPlus {
 				"Output:Variable,Living,Zone Total Internal Sensible Gain Rate,Hourly;",
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			InputProcessor::PreScanReportingVariables();
+			inputProcessor->preScanReportingVariables();
 			InitializeOutput();
 
 			Real64 ilgrGarage;
@@ -2497,7 +2487,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			InitializeOutput();
 
@@ -2589,7 +2579,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			AddToOutputVariableList( "Site Outdoor Air Drybulb Temperature", 1, StoreType::Averaged, 2, OutputProcessor::Unit::C );
 			AddToOutputVariableList( "Site Outdoor Air Wetbulb Temperature", 1, StoreType::Averaged, 2, OutputProcessor::Unit::C );
@@ -2636,12 +2626,10 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2675,15 +2663,13 @@ namespace EnergyPlus {
 				"Output:Variable,*,Boiler Gas Rate,runperiod;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2714,15 +2700,13 @@ namespace EnergyPlus {
 				"Output:Variable,Boiler[13],Boiler Gas Rate,runperiod;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2751,15 +2735,13 @@ namespace EnergyPlus {
 				"Output:Variable,Boiler.*,Boiler Gas Rate,runperiod;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 fuel_used = 999;
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2" );
 			SetupOutputVariable( "Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3" );
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2789,16 +2771,14 @@ namespace EnergyPlus {
 				"Output:Variable,Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall002:Win001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall003" );
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
 
@@ -2830,16 +2810,14 @@ namespace EnergyPlus {
 				"Output:Variable,(?i)Zn003:Wall.*,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;"
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			Real64 vol_flow = 999;
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL002:WIN001" );
 			SetupOutputVariable( "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL003" );
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto reportDataDictionaryResults = queryResult( "SELECT * FROM ReportDataDictionary;", "ReportDataDictionary" );
 
@@ -2875,7 +2853,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			auto const keyed_value = "Environment";
 			auto const var_name = "Site Outdoor Air Drybulb Temperature";
@@ -2958,7 +2936,7 @@ namespace EnergyPlus {
 				"    MyGeneralLights;         !- Output Variable or Meter Name 1",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			Real64 light_consumption = 0;
 			SetupOutputVariable( "Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _, "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1 );
@@ -3022,7 +3000,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			InitializeOutput();
 
@@ -3077,7 +3055,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -3114,7 +3092,6 @@ namespace EnergyPlus {
 			TimeValue( 1 ).CurMinute = 50;
 			TimeValue( 2 ).CurMinute = 50;
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
@@ -3134,7 +3111,6 @@ namespace EnergyPlus {
 
 			UpdateDataandReport( DataGlobals::ZoneTSReporting );
 
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -3259,7 +3235,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -3296,7 +3272,6 @@ namespace EnergyPlus {
 			TimeValue( 1 ).CurMinute = 50;
 			TimeValue( 2 ).CurMinute = 50;
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
@@ -3320,7 +3295,6 @@ namespace EnergyPlus {
 
 			UpdateDataandReport( DataGlobals::ZoneTSReporting );
 
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -3454,7 +3428,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,runperiod;",
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -3491,7 +3465,6 @@ namespace EnergyPlus {
 			TimeValue( 1 ).CurMinute = 50;
 			TimeValue( 2 ).CurMinute = 50;
 
-			EnergyPlus::sqlite = std::move( sqlite_test );
 			GetReportVariableInput();
 			SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment" );
 			Real64 light_consumption = 999;
@@ -3515,7 +3488,6 @@ namespace EnergyPlus {
 
 			UpdateDataandReport( DataGlobals::HVACTSReporting );
 
-			sqlite_test = std::move( EnergyPlus::sqlite );
 
 			auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -3597,7 +3569,7 @@ namespace EnergyPlus {
 				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,r;",
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			// Setup so that UpdateDataandReport can be called.
 			DataGlobals::DayOfSim = 365;
@@ -3725,7 +3697,7 @@ namespace EnergyPlus {
 				"Output:Meter,Electricity:Facility,timestep;",
 			});
 
-			ASSERT_FALSE (process_idf (idf_objects));
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::DayOfSim = 365;
 			DataGlobals::DayOfSimChr = "365";
@@ -3801,7 +3773,7 @@ namespace EnergyPlus {
 				"Output:Meter,CustomMeter2,Hourly;"
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			bool errors_found = false;
 
@@ -3810,11 +3782,11 @@ namespace EnergyPlus {
 			EXPECT_FALSE( errors_found );
 
 			std::string errMsg = delimited_string ({
-				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name 1=\"DISTRICTHEATING:FACILITY\".",
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATING:FACILITY\".",
 				"   **   ~~~   ** ...will not be shown with the Meter results.",
 				"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
 				"   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.",
-				"   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter Name 1=\"CUSTOMMETER1\"."
+				"   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter Name=\"CUSTOMMETER1\"."
 			});
 
 			compare_err_stream(errMsg);

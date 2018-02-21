@@ -69,7 +69,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -181,7 +181,6 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
-		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetActuatedBranchFlowRate;
@@ -202,7 +201,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );
 			}
@@ -283,10 +282,6 @@ namespace BaseboardRadiator {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using namespace DataLoopNode;
@@ -320,13 +315,11 @@ namespace BaseboardRadiator {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		cCurrentModuleObject = cCMO_BBRadiator_Water;
 
-		NumConvHWBaseboards = GetNumObjectsFound( cCurrentModuleObject );
+		NumConvHWBaseboards = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// Calculate total number of baseboard units
 		NumBaseboards = NumConvHWBaseboards;
@@ -339,17 +332,13 @@ namespace BaseboardRadiator {
 			BaseboardNum = 0;
 			for ( ConvHWBaseboardNum = 1; ConvHWBaseboardNum <= NumConvHWBaseboards; ++ConvHWBaseboardNum ) {
 
-				GetObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames.allocate(NumNums);
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
@@ -377,7 +366,7 @@ namespace BaseboardRadiator {
 				TestCompSet( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Hot Water Nodes" );
 
 				// Determine steam baseboard radiator system heating design capacity sizing method
-				if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity" ) ) {
 					Baseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
 					if ( !lNumericFieldBlanks(iHeatDesignCapacityNumericNum) ) {
 						Baseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
@@ -392,7 +381,7 @@ namespace BaseboardRadiator {
 						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
 					if ( !lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -413,7 +402,7 @@ namespace BaseboardRadiator {
 						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 					if ( !lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -679,7 +668,7 @@ namespace BaseboardRadiator {
 		if ( PltSizHeatNum > 0 ) {
 
 			DataScalableCapSizingON = false;
-			
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {
@@ -1232,7 +1221,6 @@ namespace BaseboardRadiator {
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataGlobals::KickOffSimulation;
 
@@ -1255,7 +1243,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );
 			}

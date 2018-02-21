@@ -34,7 +34,6 @@
 !  Multi-Deck Rear Dairy/Deli Merchandiser with Synergy-E,
 !  Multi-Deck Deli back ,
 !  Single Deck Club Case Merchandiser,
-!  Single Deck Club Case Merchandiser,
 !  Single Deck Club Merchandiser,
 !  Single Deck Club Case Merchandiser,
 !  Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,
@@ -396,12 +395,17 @@
 
   Refrigeration:CaseAndWalkInList,
     NameofCaseList,          !- Name
-    Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Case or WalkIn 1 Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 1,  !- Case or WalkIn 1a Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 2,  !- Case or WalkIn 1b Name
     Multi-Deck Deli back,    !- Case or WalkIn 2 Name
-    A_Single Deck Club Case Merchandiser,  !- Case or WalkIn 3 Name
-    B_Single Deck Club Case Merchandiser,  !- Case or WalkIn 4 Name
-    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Case or WalkIn 5 Name
-    Multi Deck Frozen Food Merchandiser,  !- Case or WalkIn 6 Name
+    Single Deck Club Case Merchandiser 1,  !- Case or WalkIn 3 Name
+    Single Deck Club Case Merchandiser 2,  !- Case or WalkIn 4 Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 1,  !- Case or WalkIn 5a Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 2,  !- Case or WalkIn 5b Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 3,  !- Case or WalkIn 5b Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 4,  !- Case or WalkIn 5b Name
+    Multi Deck Frozen Food Merchandiser 1,  !- Case or WalkIn 6a Name
+    Multi Deck Frozen Food Merchandiser 2,  !- Case or WalkIn 6b Name
     Wide Island Multi-Deck Deli/Meat Merchandiser,  !- Case or WalkIn 7 Name
     International Style Service Deli/Meat/Seafood Merchandiser;  !- Case or WalkIn 8 Name
 
@@ -412,7 +416,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -541,7 +545,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Single Deck Club Case Merchandiser,  !- Name
+    Single Deck Club Case Merchandiser 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -577,48 +581,6 @@
     -5.56,                   !- Design Evaporator Temperature or Brine Inlet Temperature {C}
     ;                        !- Average Refrigerant Charge Inventory {kg/m}
 
-!- Single Deck Club Case Merchandiser is a Doored Case based on Hill Phoenix CUBNH  served by the Medium Temperature .
-!- NOTES : Data sheet 03/08
-!- Lighting Notes : One light level offered; 1 row
-!- Fan Notes : High Efficiency Fans are not applicable for the model
-!- Defrost Notes :
-
-  Refrigeration:Case,
-    Single Deck Club Case Merchandiser,  !- Name
-    ,                        !- Availability Schedule Name
-    UserProvideZoneName,     !- Zone Name
-    23.89,                   !- Rated Ambient Temperature {C}
-    55,                      !- Rated Ambient Relative Humidity {percent}
-    625,                     !- Rated Total Cooling Capacity per Unit Length {W/m}
-    0.30,                    !- Rated Latent Heat Ratio
-    0.85,                    !- Rated Runtime Fraction
-    2.4,                     !- Case Length {m}
-    1.11,                    !- Case Operating Temperature {C}
-    CaseTemperatureMethod,   !- Latent Case Credit Curve Type
-    Single_Shelf_Horizontal_Latent_Case_Credit_Curve,  !- Latent Case Credit Curve Name
-    23.0,                    !- Standard Case Fan Power per Unit Length {W/m}
-    23.0,                    !- Operating Case Fan Power per Unit Length {W/m}
-    27.3,                    !- Standard Case Lighting Power per Unit Length {W/m}
-    27.3,                    !- Installed Case Lighting Power per Unit Length {W/m}
-    ,                        !- Case Lighting Schedule Name
-    1.0,                     !- Fraction of Lighting Energy to Case
-    0.0,                     !- Case Anti-Sweat Heater Power per Unit Length {W/m}
-    ,                        !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
-    None,                    !- Anti-Sweat Heater Control Type
-    ,                        !- Humidity at Zero Anti-Sweat Heater Energy {percent}
-    ,                        !- Case Height {m}
-    1.0,                     !- Fraction of Anti-Sweat Heater Energy to Case
-    0.0,                     !- Case Defrost Power per Unit Length {W/m}
-    Off Cycle,               !- Case Defrost Type
-    UserProvideDefSched3PerDay20MinEa,  !- Case Defrost Schedule Name
-    UserProvideDefSched3PerDay27MinEa,  !- Case Defrost Drip-Down Schedule Name
-    CaseTemperatureMethod,   !- Defrost Energy Correction Curve Type
-    Single Shelf Horizontal, !- Defrost Energy Correction Curve Name
-    0.00,                    !- Under Case HVAC Return Air Fraction
-    ,                        !- Refrigerated Case Restocking Schedule Name
-    ,                        !- Case Credit Fraction Schedule Name
-    -5.56,                   !- Design Evaporator Temperature or Brine Inlet Temperature {C}
-    ;                        !- Average Refrigerant Charge Inventory {kg/m}
 
 !- Single Deck Club Merchandiser is a Doored Case based on Hill Phoenix CUBW served by the Medium Temperature .
 !- NOTES : Data sheet 03/08
@@ -670,7 +632,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Single Deck Club Case Merchandiser,  !- Name
+    Single Deck Club Case Merchandiser 2 ,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -713,7 +675,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -756,7 +718,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi-Deck Dairy/Deli Merchandiser with Synergy-E,  !- Name
+    Multi-Deck Dairy/Deli Merchandiser with Synergy-E 2,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -799,7 +761,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi Deck Frozen Food Merchandiser,  !- Name
+    Multi Deck Frozen Food Merchandiser 1,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -842,7 +804,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi Deck Frozen Food Merchandiser,  !- Name
+    Multi Deck Frozen Food Merchandiser 2,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -885,7 +847,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 2,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -1100,7 +1062,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 3,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -1229,7 +1191,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser 4,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -5271,7 +5233,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    A_Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
@@ -7679,7 +7641,7 @@
 !- Defrost Notes :
 
   Refrigeration:Case,
-    Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
+    B_Narrow Multi-Deck Produce/Dairy/Deli/Meat/Seafood Merchandiser,  !- Name
     ,                        !- Availability Schedule Name
     UserProvideZoneName,     !- Zone Name
     23.89,                   !- Rated Ambient Temperature {C}
