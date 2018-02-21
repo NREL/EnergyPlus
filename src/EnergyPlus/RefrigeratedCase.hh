@@ -501,6 +501,9 @@ namespace RefrigeratedCase {
 			DeltaDefrostEnergy( 0.0 )
 		{}
 
+		void
+		clear_state();
+
 		// Reset Initialization Values to Zeros
 		void
 		reset_init()

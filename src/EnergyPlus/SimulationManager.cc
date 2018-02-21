@@ -112,7 +112,7 @@ extern "C" {
 #include <HVACControllers.hh>
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -245,8 +245,8 @@ namespace SimulationManager {
 		using DataEnvironment::TotDesDays;
 		using DataEnvironment::TotRunDesPersDays;
 		using DataEnvironment::EndMonthFlag;
-		using InputProcessor::GetNumRangeCheckErrorsFound;
-		using InputProcessor::GetNumObjectsFound;
+
+
 		using SizingManager::ManageSizing;
 		using ExteriorEnergyUse::ManageExteriorEnergyUse;
 		using OutputReportTabular::WriteTabularReports;
@@ -337,7 +337,7 @@ namespace SimulationManager {
 		DoOutputReporting = false;
 		DisplayPerfSimulationFlag = false;
 		DoWeatherInitReporting = false;
-		RunPeriodsInInput = ( GetNumObjectsFound( "RunPeriod" ) > 0 || GetNumObjectsFound( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
+		RunPeriodsInInput = ( inputProcessor->getNumObjectsFound( "RunPeriod" ) > 0 || inputProcessor->getNumObjectsFound( "RunPeriod:CustomRange" ) > 0 || FullAnnualRun );
 		AskForConnectionsReport = false; // set to false until sizing is finished
 
 		OpenOutputFiles();
@@ -456,10 +456,10 @@ namespace SimulationManager {
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
-		
+
 		// check for variable latitude/location/etc
 		WeatherManager::ReadVariableLocationOrientation();
-		
+
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
 			ManageHVACSizingSimulation( ErrorsFound );
@@ -592,13 +592,6 @@ namespace SimulationManager {
 
 						ManageHeatBalance();
 
-						//  After the first iteration of HeatBalance, all the 'input' has been gotten
-						if ( BeginFullSimFlag ) {
-							if ( GetNumRangeCheckErrorsFound() > 0 ) {
-								ShowFatalError( "Out of \"range\" values found in input" );
-							}
-						}
-
 						if ( oneTimeUnderwaterBoundaryCheck ) {
 						    AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
 						    oneTimeUnderwaterBoundaryCheck = false;
@@ -701,11 +694,7 @@ namespace SimulationManager {
 		// METHODOLOGY EMPLOYED:
 		// Use GetObjectItem from the Input Processor
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using namespace InputProcessor;
 		using DataStringGlobals::MatchVersion;
 		using namespace DataConvergParams;
 		using namespace DataSystemVariables;
@@ -719,18 +708,8 @@ namespace SimulationManager {
 		using DataEnvironment::IgnoreDiffuseRadiation;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_int const Div60( 12, { 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60 } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string Alphas( 6 );
@@ -762,9 +741,9 @@ namespace SimulationManager {
 		ErrorsFound = false;
 
 		CurrentModuleObject = "Version";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			std::string::size_type const lenVer( len( MatchVersion ) );
 			if ( ( lenVer > 0 ) && ( MatchVersion[ lenVer - 1 ] == '0' ) ) {
 				Which = static_cast< int >( index( Alphas( 1 ).substr( 0, lenVer - 2 ), MatchVersion.substr( 0, lenVer - 2 ) ) );
@@ -784,10 +763,10 @@ namespace SimulationManager {
 
 		// Do Mini Gets on HB Algorithm and by-surface overrides
 		CurrentModuleObject = "HeatBalanceAlgorithm";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		CondFDAlgo = false;
 		if ( Num > 0 ) {
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			{ auto const SELECT_CASE_var( Alphas( 1 ) );
 			if ( ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) || ( SELECT_CASE_var == "CONDFD" ) || ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED" ) || ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCESIMPLIFIED" ) ) {
 				CondFDAlgo = true;
@@ -795,10 +774,10 @@ namespace SimulationManager {
 			}}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( Alphas( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -808,10 +787,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( Alphas( 3 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -820,10 +799,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:SurfaceList";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -832,10 +811,10 @@ namespace SimulationManager {
 			}
 		}
 		CurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:Construction";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
 			for ( Item = 1; Item <= Num; ++Item ) {
-				GetObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 				if ( SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE" ) {
 					CondFDAlgo = true;
@@ -845,9 +824,9 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Timestep";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			NumOfTimeStepInHour = Number( 1 );
 			if ( NumOfTimeStepInHour <= 0 || NumOfTimeStepInHour > 60 ) {
 				Alphas( 1 ) = RoundSigDigits( NumOfTimeStepInHour );
@@ -868,16 +847,16 @@ namespace SimulationManager {
 				ShowContinueError( "..." + CurrentModuleObject + " is set to 20." );
 				NumOfTimeStepInHour = 20;
 			}
-			if ( NumOfTimeStepInHour < 4 && GetNumObjectsFound( "Zone" ) > 0 ) {
+			if ( NumOfTimeStepInHour < 4 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 ) {
 				ShowWarningError( CurrentModuleObject + ": Requested number (" + RoundSigDigits( NumOfTimeStepInHour ) + ") is less than the suggested minimum of 4." );
 				ShowContinueError( "Please see entry for " + CurrentModuleObject + " in Input/Output Reference for discussion of considerations." );
 			}
-		} else if ( Num == 0 && GetNumObjectsFound( "Zone" ) > 0 && ! CondFDAlgo ) {
+		} else if ( Num == 0 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 && ! CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 4." );
 			NumOfTimeStepInHour = 4;
 		} else if ( Num == 0 && ! CondFDAlgo ) {
 			NumOfTimeStepInHour = 4;
-		} else if ( Num == 0 && GetNumObjectsFound( "Zone" ) > 0 && CondFDAlgo ) {
+		} else if ( Num == 0 && inputProcessor->getNumObjectsFound( "Zone" ) > 0 && CondFDAlgo ) {
 			ShowWarningError( "No " + CurrentModuleObject + " object found.  Number of TimeSteps in Hour defaulted to 20." );
 			ShowContinueError( "...Due to presence of Conduction Finite Difference Algorithm selection." );
 			NumOfTimeStepInHour = 20;
@@ -893,9 +872,9 @@ namespace SimulationManager {
 		TimeStepZoneSec = TimeStepZone * SecInHour;
 
 		CurrentModuleObject = "ConvergenceLimits";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			MinInt = int( Number( 1 ) );
 			if ( MinInt > MinutesPerTimeStep ) {
 				MinInt = MinutesPerTimeStep;
@@ -934,9 +913,9 @@ namespace SimulationManager {
 		DebugOutput = false;
 		EvenDuringWarmup = false;
 		CurrentModuleObject = "Output:DebuggingData";
-		NumDebugOut = GetNumObjectsFound( CurrentModuleObject );
+		NumDebugOut = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDebugOut > 0 ) {
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			if ( int( Number( 1 ) ) == 1 ) {
 				DebugOutput = true;
 			}
@@ -946,53 +925,53 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "Output:Diagnostics";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( Num1 = 1; Num1 <= Num; ++Num1 ) {
-			GetObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
+			inputProcessor->getObjectItem( CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat );
 			for ( NumA = 1; NumA <= NumAlpha; ++NumA ) {
-				if ( SameString( Alphas( NumA ), "DisplayExtraWarnings" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayExtraWarnings" ) ) {
 					DisplayExtraWarnings = true;
-				} else if ( SameString( Alphas( NumA ), "DisplayAdvancedReportVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayAdvancedReportVariables" ) ) {
 					DisplayAdvancedReportVariables = true;
-				} else if ( SameString( Alphas( NumA ), "DisplayAllWarnings" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayAllWarnings" ) ) {
 					DisplayAllWarnings = true;
 					DisplayExtraWarnings = true;
 					DisplayUnusedObjects = true;
 					DisplayUnusedSchedules = true;
-				} else if ( SameString( Alphas( NumA ), "DisplayUnusedObjects" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayUnusedObjects" ) ) {
 					DisplayUnusedObjects = true;
-				} else if ( SameString( Alphas( NumA ), "DisplayUnusedSchedules" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayUnusedSchedules" ) ) {
 					DisplayUnusedSchedules = true;
-				} else if ( SameString( Alphas( NumA ), "DisplayZoneAirHeatBalanceOffBalance" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayZoneAirHeatBalanceOffBalance" ) ) {
 					DisplayZoneAirHeatBalanceOffBalance = true;
-				} else if ( SameString( Alphas( NumA ), "DoNotMirrorDetachedShading" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DoNotMirrorDetachedShading" ) ) {
 					MakeMirroredDetachedShading = false;
-				} else if ( SameString( Alphas( NumA ), "DoNotMirrorAttachedShading" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DoNotMirrorAttachedShading" ) ) {
 					MakeMirroredAttachedShading = false;
-				} else if ( SameString( Alphas( NumA ), "IgnoreInteriorWindowTransmission" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreInteriorWindowTransmission" ) ) {
 					IgnoreInteriorWindowTransmission = true;
-				} else if ( SameString( Alphas( NumA ), "ReportDuringWarmup" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDuringWarmup" ) ) {
 					ReportDuringWarmup = true;
-				} else if ( SameString( Alphas( NumA ), "DisplayWeatherMissingDataWarnings" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DisplayWeatherMissingDataWarnings" ) ) {
 					DisplayWeatherMissingDataWarnings = true;
-				} else if ( SameString( Alphas( NumA ), "IgnoreSolarRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreSolarRadiation" ) ) {
 					IgnoreSolarRadiation = true;
-				} else if ( SameString( Alphas( NumA ), "IgnoreBeamRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreBeamRadiation" ) ) {
 					IgnoreBeamRadiation = true;
-				} else if ( SameString( Alphas( NumA ), "IgnoreDiffuseRadiation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "IgnoreDiffuseRadiation" ) ) {
 					IgnoreDiffuseRadiation = true;
-				} else if ( SameString( Alphas( NumA ), "DeveloperFlag" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "DeveloperFlag" ) ) {
 					DeveloperFlag = true;
-				} else if ( SameString( Alphas( NumA ), "TimingFlag" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "TimingFlag" ) ) {
 					TimingFlag = true;
-				} else if ( SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
 					ReportDetailedWarmupConvergence = true;
-				} else if ( SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
 					ReportDuringHVACSizingSimulation = true;
-				} else if ( SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
 					continue;
 					//        CreateMinimalSurfaceVariables=.TRUE.
-				} else if ( SameString( Alphas( NumA ), "CreateNormalSurfaceVariables" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( NumA ), "CreateNormalSurfaceVariables" ) ) {
 					continue;
 					//        IF (CreateMinimalSurfaceVariables) THEN
 					//          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
@@ -1006,9 +985,9 @@ namespace SimulationManager {
 		}
 
 		CurrentModuleObject = "OutputControl:ReportingTolerances";
-		Num = GetNumObjectsFound( CurrentModuleObject );
+		Num = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( Num > 0 ) {
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( ! lNumericFieldBlanks( 1 ) ) {
 				deviationFromSetPtThresholdHtg = -Number( 1 );
 			} else {
@@ -1029,10 +1008,10 @@ namespace SimulationManager {
 		DoHVACSizingSimulation = false;
 		HVACSizingSimMaxIterations = 0;
 		CurrentModuleObject = "SimulationControl";
-		NumRunControl = GetNumObjectsFound( CurrentModuleObject );
+		NumRunControl = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumRunControl > 0 ) {
 			RunControlInInput = true;
-			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( Alphas( 1 ) == "YES" ) DoZoneSizing = true;
 			if ( Alphas( 2 ) == "YES" ) DoSystemSizing = true;
 			if ( Alphas( 3 ) == "YES" ) DoPlantSizing = true;
@@ -1146,25 +1125,6 @@ namespace SimulationManager {
 		// For now (8/2008), the routine will query several objects in the input.  And try to produce warnings or
 		// fatals as a result.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumZoneSizing;
 		int NumSystemSizing;
@@ -1176,11 +1136,11 @@ namespace SimulationManager {
 		bool ErrorsFound;
 
 		ErrorsFound = false;
-		NumZoneSizing = GetNumObjectsFound( "Sizing:Zone" );
-		NumSystemSizing = GetNumObjectsFound( "Sizing:System" );
-		NumPlantSizing = GetNumObjectsFound( "Sizing:Plant" );
-		NumDesignDays = GetNumObjectsFound( "SizingPeriod:DesignDay" );
-		NumRunPeriodDesign = GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+		NumZoneSizing = inputProcessor->getNumObjectsFound( "Sizing:Zone" );
+		NumSystemSizing = inputProcessor->getNumObjectsFound( "Sizing:System" );
+		NumPlantSizing = inputProcessor->getNumObjectsFound( "Sizing:Plant" );
+		NumDesignDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" );
+		NumRunPeriodDesign = inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); WeatherFileAttached = flags.exists(); }
 
@@ -1263,37 +1223,15 @@ namespace SimulationManager {
 		// results should be produced (either sizing periods or weather files are run) but no reports are
 		// requested.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool SimPeriods;
 		bool ReportingRequested;
 
 		ReportingRequested = false;
-		SimPeriods = ( GetNumObjectsFound( "SizingPeriod:DesignDay" ) > 0 || GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) > 0 || GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" ) > 0 || GetNumObjectsFound( "RunPeriod" ) > 0 );
+		SimPeriods = ( inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" ) > 0 || inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" ) > 0 || inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" ) > 0 || inputProcessor->getNumObjectsFound( "RunPeriod" ) > 0 );
 
 		if ( ( DoDesDaySim || DoWeathSim ) && SimPeriods ) {
-			ReportingRequested = ( GetNumObjectsFound( "Output:Table:SummaryReports" ) > 0 || GetNumObjectsFound( "Output:Table:TimeBins" ) > 0 || GetNumObjectsFound( "Output:Table:Monthly" ) > 0 || GetNumObjectsFound( "Output:Variable" ) > 0 || GetNumObjectsFound( "Output:Meter" ) > 0 || GetNumObjectsFound( "Output:Meter:MeterFileOnly" ) > 0 || GetNumObjectsFound( "Output:Meter:Cumulative" ) > 0 || GetNumObjectsFound( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
+			ReportingRequested = ( inputProcessor->getNumObjectsFound( "Output:Table:SummaryReports" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Table:TimeBins" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Table:Monthly" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Variable" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:MeterFileOnly" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:Cumulative" ) > 0 || inputProcessor->getNumObjectsFound( "Output:Meter:Cumulative:MeterFileOnly" ) > 0 );
 			// Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
 			if ( ! ReportingRequested ) {
 				ShowWarningError( "No reporting elements have been requested. No simulation results produced." );
@@ -1601,32 +1539,16 @@ namespace SimulationManager {
 		// Using global flag (kickoff simulation), only a few time steps are executed.
 		// global flag is used in other parts of simulation to terminate quickly.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using ExteriorEnergyUse::ManageExteriorEnergyUse;
 		using DataEnvironment::EndMonthFlag;
 		using DataEnvironment::EnvironmentName;
-		using InputProcessor::GetNumRangeCheckErrorsFound;
 		using CostEstimateManager::SimCostEstimate;
 		using General::TrimSigDigits;
 		using namespace DataTimings;
 		using PlantPipingSystemsManager::SimulateGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool Available( false ); // an environment is available to process
@@ -1670,13 +1592,6 @@ namespace SimulationManager {
 			ManageExteriorEnergyUse();
 
 			ManageHeatBalance();
-
-			//  After the first iteration of HeatBalance, all the 'input' has been gotten
-			if ( BeginFullSimFlag ) {
-				if ( GetNumRangeCheckErrorsFound() > 0 ) {
-					ShowFatalError( "Out of \"range\" values found in input" );
-				}
-			}
 
 			BeginHourFlag = false;
 			BeginDayFlag = false;
@@ -1731,32 +1646,11 @@ namespace SimulationManager {
 		// This subroutine 'reports' the NodeConnection data structure.  It groups the
 		// report/dump by parent, non-parent objects.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
 		using namespace DataBranchNodeConnections;
 		using DataGlobals::OutputFileBNDetails;
 		using DataLoopNode::NumOfNodes;
 		using DataLoopNode::NodeID;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -1799,12 +1693,12 @@ namespace SimulationManager {
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << " Parent Node Connection," + NodeConnections( Loop ).NodeName + ',' + NodeConnections( Loop ).ObjectType + ',' + NodeConnections( Loop ).ObjectName + ',' + NodeConnections( Loop ).ConnectionType + ',' + ChrOut;
 			// Build ParentNodeLists
-			if ( SameString( NodeConnections( Loop ).ConnectionType, "Inlet" ) || SameString( NodeConnections( Loop ).ConnectionType, "Outlet" ) ) {
+			if ( UtilityRoutines::SameString( NodeConnections( Loop ).ConnectionType, "Inlet" ) || UtilityRoutines::SameString( NodeConnections( Loop ).ConnectionType, "Outlet" ) ) {
 				ParentComponentFound = false;
 				for ( Loop1 = 1; Loop1 <= NumOfActualParents; ++Loop1 ) {
 					if ( ParentNodeList( Loop1 ).CType != NodeConnections( Loop ).ObjectType || ParentNodeList( Loop1 ).CName != NodeConnections( Loop ).ObjectName ) continue;
 					ParentComponentFound = true;
-					{ auto const SELECT_CASE_var( MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
 					if ( SELECT_CASE_var == "INLET" ) {
 						ParentNodeList( Loop1 ).InletNodeName = NodeConnections( Loop ).NodeName;
 					} else if ( SELECT_CASE_var == "OUTLET" ) {
@@ -1815,7 +1709,7 @@ namespace SimulationManager {
 					++NumOfActualParents;
 					ParentNodeList( NumOfActualParents ).CType = NodeConnections( Loop ).ObjectType;
 					ParentNodeList( NumOfActualParents ).CName = NodeConnections( Loop ).ObjectName;
-					{ auto const SELECT_CASE_var( MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( NodeConnections( Loop ).ConnectionType ) );
 					if ( SELECT_CASE_var == "INLET" ) {
 						ParentNodeList( NumOfActualParents ).InletNodeName = NodeConnections( Loop ).NodeName;
 					} else if ( SELECT_CASE_var == "OUTLET" ) {
@@ -1878,14 +1772,7 @@ namespace SimulationManager {
 		// return air paths, controlled zones.
 		// This information should be useful in diagnosing node connection input errors.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::SameString;
 		using namespace DataAirLoop;
 		using namespace DataBranchNodeConnections;
 		using DataLoopNode::NumOfNodes;
@@ -1900,18 +1787,8 @@ namespace SimulationManager {
 		using DualDuct::ReportDualDuctConnections;
 		using DataGlobals::OutputFileBNDetails;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const errstring( "**error**" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string ChrOut;
@@ -1972,7 +1849,7 @@ namespace SimulationManager {
 				ShowContinueError( "  Inlet Node : " + CompSets( Count ).InletNodeName );
 				ShowContinueError( "  Outlet Node: " + CompSets( Count ).OutletNodeName );
 				++NumNodeConnectionErrors;
-				if ( SameString( CompSets( Count ).CType, "SolarCollector:UnglazedTranspired" ) ) {
+				if ( UtilityRoutines::SameString( CompSets( Count ).CType, "SolarCollector:UnglazedTranspired" ) ) {
 					ShowContinueError( "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector" );
 				}
 			}
@@ -2450,51 +2327,20 @@ namespace SimulationManager {
 	void
 	PostIPProcessing()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This provides post processing (for errors, etc) directly after the InputProcessor
 		// finishes.  Code originally in the Input Processor.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		//using SQLiteProcedures::CreateSQLiteDatabase;
-		using InputProcessor::PreProcessorCheck;
-		using InputProcessor::OverallErrorFlag;
-		using InputProcessor::CompactObjectsCheck;
-		using InputProcessor::ParametricObjectsCheck;
-		using InputProcessor::GetNumSectionsFound;
-		using InputProcessor::PreScanReportingVariables;
-		using InputProcessor::NumOutOfRangeErrorsFound;
-		using InputProcessor::NumBlankReqFieldFound;
-		using InputProcessor::NumMiscErrorsFound;
 		using FluidProperties::FluidIndex_Water;
 		using FluidProperties::FluidIndex_EthyleneGlycol;
 		using FluidProperties::FluidIndex_PropoleneGlycol;
 		using FluidProperties::FindGlycol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//////////// hoisted into namespace ////////////////////////////////////////////////
@@ -2503,53 +2349,10 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
-
-		CheckCachedIPErrors();
+		inputProcessor->preProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
 		if ( PreP_Fatal ) {
 			ShowFatalError( "Preprocessor condition(s) cause termination." );
-		}
-
-		if ( OverallErrorFlag ) {
-			ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );
-		}
-
-		CompactObjectsCheck(); // Check to see if Compact Objects (CompactHVAC, etc) are in input file.
-		// If so, ExpandObjects didn't get called...
-		ParametricObjectsCheck(); // check to see if any parametric objects are in the input file
-		// parametric preprocessor was not run
-
-		if ( NumOutOfRangeErrorsFound + NumBlankReqFieldFound + NumMiscErrorsFound > 0 ) {
-			ShowSevereError( "IP: Out of \"range\" values and/or blank required fields found in input" );
-			ShowFatalError( "IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination." );
-		}
-
-		if ( GetNumSectionsFound( "DISPLAYALLWARNINGS" ) > 0 ) {
-			DisplayAllWarnings = true;
-			DisplayExtraWarnings = true;
-			DisplayUnusedSchedules = true;
-			DisplayUnusedObjects = true;
-		}
-
-		if ( GetNumSectionsFound( "DISPLAYEXTRAWARNINGS" ) > 0 ) {
-			DisplayExtraWarnings = true;
-		}
-
-		if ( GetNumSectionsFound( "DISPLAYUNUSEDOBJECTS" ) > 0 ) {
-			DisplayUnusedObjects = true;
-		}
-
-		if ( GetNumSectionsFound( "DISPLAYUNUSEDSCHEDULES" ) > 0 ) {
-			DisplayUnusedSchedules = true;
-		}
-
-		if ( GetNumSectionsFound( "DisplayZoneAirHeatBalanceOffBalance" ) > 0 ) {
-			DisplayZoneAirHeatBalanceOffBalance = true;
-		}
-
-		if ( GetNumSectionsFound( "DISPLAYADVANCEDREPORTVARIABLES" ) > 0 ) {
-			DisplayAdvancedReportVariables = true;
 		}
 
 		//Set up more globals - process fluid input.
@@ -2557,71 +2360,7 @@ namespace SimulationManager {
 		FluidIndex_EthyleneGlycol = FindGlycol( "EthyleneGlycol" );
 		FluidIndex_PropoleneGlycol = FindGlycol( "PropoleneGlycol" );
 
-		PreScanReportingVariables();
-
-	}
-
-	void
-	CheckCachedIPErrors()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   August 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine displays the cached error messages after the preprocessor
-		// errors have been checked and produced.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iostatus;
-		std::string ErrorMessage;
-
-		gio::close( CacheIPErrorFile );
-		gio::open( CacheIPErrorFile, DataStringGlobals::outputIperrFileName );
-		iostatus = 0;
-		while ( iostatus == 0 ) {
-			{ IOFlags flags; gio::read( CacheIPErrorFile, fmtA, flags ) >> ErrorMessage; iostatus = flags.ios(); }
-			if ( iostatus != 0 ) break;
-			if ( is_blank( ErrorMessage ) ) continue;
-			ShowErrorMessage( ErrorMessage );
-			if ( sqlite ) {
-				// Following code relies on specific formatting of Severes, Warnings, and continues
-				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
-				// automatic sending of error messages to SQLite are turned on.
-				if ( ErrorMessage[ 4 ] == 'S' ) {
-					sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
-				} else if ( ErrorMessage[ 4 ] == 'W' ) {
-					sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
-				} else if ( ErrorMessage[ 6 ] == '~' ) {
-					sqlite->updateSQLiteErrorRecord( ErrorMessage );
-				}
-			}
-		}
-
-		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
+		inputProcessor->preScanReportingVariables();
 
 	}
 
@@ -2706,13 +2445,9 @@ Resimulate(
 	using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
 	using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
 	using DataContaminantBalance::Contaminant;
-
 	using DataHeatBalance::ZoneAirMassFlow;
 	using namespace ZoneEquipmentManager;
 	//using ZoneEquipmentManager::CalcAirFlowSimple;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	Real64 ZoneTempChange( 0.0 ); // Dummy variable needed for calling ManageZoneAirUpdates

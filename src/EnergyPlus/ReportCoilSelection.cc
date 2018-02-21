@@ -51,7 +51,6 @@
 
 // EnergyPlus Headers
 #include <ReportCoilSelection.hh>
-#include <InputProcessor.hh>
 #include <BoilerSteam.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
@@ -68,6 +67,7 @@
 #include <General.hh>
 #include <HVACFan.hh>
 #include <HVACVariableRefrigerantFlow.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <OutdoorAirUnit.hh>
 #include <OutputReportPredefined.hh>
@@ -78,6 +78,7 @@
 #include <PackagedTerminalHeatPump.hh>
 #include <Psychrometrics.hh>
 #include <FluidProperties.hh>
+#include <UtilityRoutines.hh>
 
 
 namespace EnergyPlus {
@@ -343,7 +344,7 @@ ReportCoilSelection::writeCoilSelectionOutput()
 		} else {
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchCoilRatedAirMass, c->coilName_, c->ratedAirMassFlow, 8 );
 		}
-		
+
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchCoilRatedEntDryBulb, c->coilName_, c->ratedCoilInDb, 2 );
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchCoilRatedEntWetBulb, c->coilName_, c->ratedCoilInWb, 2 );
 		if ( c->ratedCoilInHumRat == -999.0 || c->ratedCoilInHumRat == -99999.0 ) {
@@ -379,7 +380,7 @@ ReportCoilSelection::writeCoilSelectionOutput()
 		} else {
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchCoilFlowPrcntPlantFlow, c->coilName_, c->coilFlowPrcntPlantFlow, 6 );
 		}
-		
+
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchOADryBulbIdealPeak, c->coilName_, c->oaPeakTemp, 2 );
 		if ( c->oaPeakHumRat == -999.0 || c->oaPeakHumRat == -99999.0 ) {
 			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchOAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 1 );
@@ -504,7 +505,7 @@ ReportCoilSelection::writeCoilSelectionOutput2()
 }
 
 void
-ReportCoilSelection::setCoilFinalSizes(  
+ReportCoilSelection::setCoilFinalSizes(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilObjName , //  coil object name, e.g., Coil:Cooling:Water
 	Real64 const totGrossCap, // total capacity [W]
@@ -586,7 +587,7 @@ ReportCoilSelection::doZoneEqSetup(
 	c->coilLocation = "Zone";
 	c->zoneNum.resize( 1 );
 	c->zoneNum[ 0 ]  = DataZoneEquipment::ZoneEquipConfig( c->zoneEqNum  ).ActualZoneNum;
-	c->zoneName.resize( 1 ); 
+	c->zoneName.resize( 1 );
 	c->zoneName[ 0 ] = DataHeatBalance::Zone( c->zoneNum[ 0 ] ).Name;
 	c->typeHVACname = "Zone Equipment"; // init
 
@@ -597,7 +598,7 @@ ReportCoilSelection::doZoneEqSetup(
 	// going to need the zone inlet node index for this now... how to find it??
 
 	// maybe not needed, would be set in other calls   c->airloopNum = DataZoneEquipment::ZoneEquipConfig( c->zoneEqNum  ).AirLoopNum;
-	
+
 	if ( c->airloopNum > 0) {
 		if ( DataAirSystems::PrimaryAirSystem( c->airloopNum ).OASysExists ) {
 			//loop over OA controllers and match node num ?
@@ -667,7 +668,7 @@ ReportCoilSelection::doZoneEqSetup(
 					}
 			}
 		}
-	} 
+	}
 
 }
 
@@ -680,7 +681,7 @@ ReportCoilSelection::doFinalProcessingOfCoilData()
 		//mine final/hard values from coil models
 
 
-	
+
 		if ( c->zoneEqNum > 0 ) {
 			c->coilLocation = "Unknown";
 			c->typeHVACname = "Unknown";
@@ -718,8 +719,8 @@ ReportCoilSelection::doFinalProcessingOfCoilData()
 						}
 				}
 			}
-		} 
-		
+		}
+
 		if ( c->airloopNum > 0 && c->zoneEqNum == 0) {
 			c->coilLocation = "AirLoop";
 			c->typeHVACname = "AirLoopHVAC";
@@ -728,13 +729,13 @@ ReportCoilSelection::doFinalProcessingOfCoilData()
 			c->userNameforHVACsystem += " on air system named " + DataAirSystems::PrimaryAirSystem( c->airloopNum ).Name;
 			c->coilLocation = "Zone Equipment";
 		}
-		
+
 		if ( c->coilDesVolFlow > 0 ) {
 			c->oaPeakVolFrac = ( c->oaPeakVolFlow / c->coilDesVolFlow ) * 100.0 ; // make into percentage
 		} else  {
 			c->oaPeakVolFrac = -999.0;
 		}
-		
+
 
 
 		if ( c->coilSizingMethodConcurrence == DataSizing::NonCoincident ) {
@@ -800,7 +801,7 @@ ReportCoilSelection::doFinalProcessingOfCoilData()
 			if ( DataSizing::PlantSizData( c->pltSizNum  ).LoopType != DataSizing::SteamLoop ) {
 				c->rhoFluid = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::doFinalProcessingOfCoilData" );
 
-				c->cpFluid = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::doFinalProcessingOfCoilData" );		
+				c->cpFluid = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::doFinalProcessingOfCoilData" );
 			} else { // steam loop
 				c->rhoFluid = FluidProperties::GetSatDensityRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 1.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::doFinalProcessingOfCoilData" );
 				c->cpFluid =  FluidProperties::GetSatSpecificHeatRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 0.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::doFinalProcessingOfCoilData" );
@@ -860,7 +861,7 @@ ReportCoilSelection::doFinalProcessingOfCoilData()
 			} else if ( DataSizing::PlantSizData( c->pltSizNum  ).LoopType == DataSizing::CoolingLoop || DataSizing::PlantSizData( c->pltSizNum  ).LoopType == DataSizing::CondenserLoop ) {
 				c->plantDesRetTemp = c->plantDesSupTemp + c->plantDesDeltaTemp;
 			}
-			
+
 			if ( DataSizing::PlantSizData( c->pltSizNum  ).LoopType != DataSizing::SteamLoop ) {
 				c->plantDesCapacity = c->cpFluid * c->rhoFluid * DataSizing::PlantSizData( c->pltSizNum ).DeltaT * DataSizing::PlantSizData( c->pltSizNum ).DesVolFlowRate;
 			} else {
@@ -874,7 +875,7 @@ ReportCoilSelection::doFinalProcessingOfCoilData()
 						}
 					}
 				}
-				
+
 			}
 
 			if ( c->plantDesCapacity > 0.0 ) {
@@ -934,8 +935,8 @@ ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName (
 	int index( -1 );
 	for ( int i = 0; i < numCoilsReported_ ; i++ ) {
 		if ( coilSelectionDataObjs[ i ] != nullptr ) {
-			if ( InputProcessor::SameString( coilSelectionDataObjs[ i ]->coilName_ , coilName ) ) {
-				if ( InputProcessor::SameString( coilSelectionDataObjs[ i ]->coilObjName , coilType ) ) {
+			if ( UtilityRoutines::SameString( coilSelectionDataObjs[ i ]->coilName_ , coilName ) ) {
+				if ( UtilityRoutines::SameString( coilSelectionDataObjs[ i ]->coilObjName , coilType ) ) {
 					return index = i;
 				} else {
 					// throw error  coil type does not match coil name, check for unique names across coil types
@@ -951,10 +952,10 @@ ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName (
 		bool locIsCooling( false );
 		bool locIsHeating( false );
 		for ( int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop ) {
-			if ( InputProcessor::SameString( coilType, DataHVACGlobals::cAllCoilTypes( loop ) ) ) {
+			if ( UtilityRoutines::SameString( coilType, DataHVACGlobals::cAllCoilTypes( loop ) ) ) {
 				found = true;
-				locIsCooling = InputProcessor::SameString( coilType, DataHVACGlobals::cCoolingCoilTypes( loop ) );
-				locIsHeating = InputProcessor::SameString( coilType, DataHVACGlobals::cHeatingCoilTypes( loop ) );
+				locIsCooling = UtilityRoutines::SameString( coilType, DataHVACGlobals::cCoolingCoilTypes( loop ) );
+				locIsHeating = UtilityRoutines::SameString( coilType, DataHVACGlobals::cHeatingCoilTypes( loop ) );
 				break;
 			}
 		}
@@ -1020,7 +1021,7 @@ ReportCoilSelection::setRatedCoilConditions(
 
 	c->ratedCoilEff = RatedCoilEff;
 	c->ratedCoilBpFactor = RatedCoilBpFactor;
-//TODO	//c->ratedCoilAppDewPt = 
+//TODO	//c->ratedCoilAppDewPt =
 	c->ratedCoilOadbRef = RatedCoilOadbRef;
 	c->ratedCoilOawbRef = RatedCoilOawbRef;
 }
@@ -1062,7 +1063,7 @@ ReportCoilSelection::setCoilWaterFlow(
 		if ( DataSizing::PlantSizData( c->pltSizNum  ).LoopType != DataSizing::SteamLoop ) {
 			c->rhoFluid = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
 
-			c->cpFluid = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );		
+			c->cpFluid = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
 		} else { // steam loop
 			c->rhoFluid = FluidProperties::GetSatDensityRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 1.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
 			c->cpFluid =  FluidProperties::GetSatSpecificHeatRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 0.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
@@ -1098,7 +1099,7 @@ void
 ReportCoilSelection::setCoilEntAirHumRat(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
-	Real64 const entAirHumrat // 
+	Real64 const entAirHumrat //
 )
 {
 	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
@@ -1110,7 +1111,7 @@ void
 ReportCoilSelection::setCoilEntWaterTemp(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
-	Real64 const entWaterTemp // 
+	Real64 const entWaterTemp //
 )
 {
 	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
@@ -1122,7 +1123,7 @@ void
 ReportCoilSelection::setCoilLvgWaterTemp(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
-	Real64 const lvgWaterTemp // 
+	Real64 const lvgWaterTemp //
 )
 {
 	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
@@ -1146,7 +1147,7 @@ void
 ReportCoilSelection::setCoilLvgAirTemp(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
-	Real64 const lvgAirDryBulbTemp // 
+	Real64 const lvgAirDryBulbTemp //
 )
 {
 	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
@@ -1159,7 +1160,7 @@ void
 ReportCoilSelection::setCoilLvgAirHumRat(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
-	Real64 const lvgAirHumRat // 
+	Real64 const lvgAirHumRat //
 )
 {
 	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
@@ -1295,7 +1296,7 @@ ReportCoilSelection::setCoilCoolingCapacity(
 			c->coilSensePeakHrMin = General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDDNum ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDDNum ).DayOfMonth ) + " " + getTimeText( DataSizing::FinalZoneSizing( curZoneEqNum ).TimeStepNumAtCoolMax );
 			c->airPeakHrMin = General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDDNum ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDDNum ).DayOfMonth ) + " " + getTimeText( DataSizing::FinalZoneSizing( curZoneEqNum ).TimeStepNumAtCoolMax );
 		}
-		
+
 		c->rmSensibleAtPeak = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolLoad;
 
 		c->oaPeakVolFlow = DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow;
@@ -1446,7 +1447,7 @@ ReportCoilSelection::setCoilHeatingCapacity(
 				c->oaPretreated = true;
 			}
 		}
-		
+
 	} else if ( curZoneEqNum > 0 && allocated( DataSizing::FinalZoneSizing ) ) {
 		c->desDayNameAtSensPeak = DataSizing::FinalZoneSizing( curZoneEqNum ).HeatDesDay;
 		c->oaPeakTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).OutTempAtHeatPeak;
@@ -1603,7 +1604,7 @@ void
 ReportCoilSelection::setCoilUA(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
-	Real64 const UAvalue, // [W/k] UA value for coil, 
+	Real64 const UAvalue, // [W/k] UA value for coil,
 	Real64 const dataCapacityUsedForSizing, // [W] sizing global
 	bool const isAutoSize, // true if value was autosized
 	int const curSysNum, // airloop system number index, if non zero
@@ -1712,15 +1713,15 @@ ReportCoilSelection::isCompTypeFan(
 )
 {
 	// if compType name is one of the fan objects, then return true
-	if ( InputProcessor::SameString( compType, "Fan:SystemModel" ) ) {
+	if ( UtilityRoutines::SameString( compType, "Fan:SystemModel" ) ) {
 		return true;
-	} else if ( InputProcessor::SameString( compType, "Fan:ComponentModel" ) ) {
+	} else if ( UtilityRoutines::SameString( compType, "Fan:ComponentModel" ) ) {
 		return true;
-	} else if ( InputProcessor::SameString( compType, "Fan:OnOff" ) ) {
+	} else if ( UtilityRoutines::SameString( compType, "Fan:OnOff" ) ) {
 		return true;
-	} else if ( InputProcessor::SameString( compType, "Fan:ConstantVolume" ) ) {
+	} else if ( UtilityRoutines::SameString( compType, "Fan:ConstantVolume" ) ) {
 		return true;
-	} else if ( InputProcessor::SameString( compType, "Fan:VariableVolume" ) ) {
+	} else if ( UtilityRoutines::SameString( compType, "Fan:VariableVolume" ) ) {
 		return true;
 	} else {
 		return false;
@@ -1735,7 +1736,7 @@ ReportCoilSelection::isCompTypeCoil(
 	// if compType name is one of the coil objects, then return true
 	bool found( false );
 	for ( int loop = 1; loop < DataHVACGlobals::NumAllCoilTypes; ++loop ) {
-		if ( InputProcessor::SameString( compType, DataHVACGlobals::cAllCoilTypes( loop ) ) ) {
+		if ( UtilityRoutines::SameString( compType, DataHVACGlobals::cAllCoilTypes( loop ) ) ) {
 			found = true;
 			break;
 		}

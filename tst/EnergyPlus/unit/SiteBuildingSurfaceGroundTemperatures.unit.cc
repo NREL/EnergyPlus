@@ -77,7 +77,7 @@ TEST_F( EnergyPlusFixture, SiteBuildingSurfaceGroundTempTest )
 		"	32.00;	!- December",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp );
 

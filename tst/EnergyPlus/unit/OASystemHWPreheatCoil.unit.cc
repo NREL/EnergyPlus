@@ -1037,7 +1037,7 @@ namespace EnergyPlus {
 			"    For: AllDays,            !- Field 2",
 			"    Until: 24:00,0.0;        !- Field 3",
 		} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		SimulationManager::ManageSimulation();
@@ -1045,9 +1045,9 @@ namespace EnergyPlus {
 		EXPECT_EQ( 1, NumOASystems );
 		EXPECT_EQ( "OA SYS 1", OutsideAirSys( OASysNum ).Name );
 		EXPECT_EQ( 2, OutsideAirSys( OASysNum ).NumComponents ); // there are two components in OA system
-		EXPECT_EQ( "OA PREHEAT HW COIL", OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil 
-		EXPECT_EQ( WaterCoil( 1 ).Name, OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil 
-		EXPECT_EQ( "OA MIXING BOX", OutsideAirSys( OASysNum ).ComponentName( 2 ) ); // OA mixer 
+		EXPECT_EQ( "OA PREHEAT HW COIL", OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil
+		EXPECT_EQ( WaterCoil( 1 ).Name, OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil
+		EXPECT_EQ( "OA MIXING BOX", OutsideAirSys( OASysNum ).ComponentName( 2 ) ); // OA mixer
 
 		// simulate the outdoor air system
 		ManageOutsideAirSystem( OutsideAirSys( OASysNum ).Name, false, AirLoopNum, OASysNum );
@@ -1063,7 +1063,7 @@ namespace EnergyPlus {
 
 		int AirLoopNum( 1 );
 		int OASysNum( 1 );
-		int AirInletNodeNum( 0 );	
+		int AirInletNodeNum( 0 );
 		Real64 CpAir( 0.0 );
 
 		std::string const idf_objects = delimited_string( {
@@ -2015,7 +2015,7 @@ namespace EnergyPlus {
 			"    32.2,                    !- Rated Outlet Air Temperature {C}",
 			"    ;                        !- Rated Ratio for Air and Water Convection",
 		} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		SimulationManager::ManageSimulation();
@@ -2023,21 +2023,21 @@ namespace EnergyPlus {
 		EXPECT_EQ( 1, NumOASystems );
 		EXPECT_EQ( "OA SYS 1", OutsideAirSys( OASysNum ).Name );
 		EXPECT_EQ( 2, OutsideAirSys( OASysNum ).NumComponents ); // there are two components in OA system
-		EXPECT_EQ( "OA PREHEAT HW COIL", OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil 
-		EXPECT_EQ( WaterCoil( 1 ).Name, OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil 
-		EXPECT_EQ( "OA MIXING BOX", OutsideAirSys( OASysNum ).ComponentName( 2 ) ); // OA mixer 
+		EXPECT_EQ( "OA PREHEAT HW COIL", OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil
+		EXPECT_EQ( WaterCoil( 1 ).Name, OutsideAirSys( OASysNum ).ComponentName( 1 ) ); // pre heat hot water coil
+		EXPECT_EQ( "OA MIXING BOX", OutsideAirSys( OASysNum ).ComponentName( 2 ) ); // OA mixer
 
 		// simulate the outdoor air system
 		ManageOutsideAirSystem( OutsideAirSys( OASysNum ).Name, false, AirLoopNum, OASysNum );
 
 		EXPECT_DOUBLE_EQ( WaterCoil( 1 ).InletAirTemp, -17.3 ); // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
-		
+
 		EXPECT_DOUBLE_EQ( 11.6, Node( WaterCoil( 1 ).AirOutletNodeNum ).TempSetPoint ); // check the setpoint at the preheat Hot Water coil air outlet node
 		EXPECT_NEAR( 11.6, WaterCoil( 1 ).OutletAirTemp, 0.01 ); // preheat hot water coil is on and is heating the OA air stream
 
 		AirInletNodeNum = WaterCoil( 1 ).AirInletNodeNum;
 		CpAir = PsyCpAirFnWTdb( Node( AirInletNodeNum ).HumRat, Node( AirInletNodeNum ).Temp );
-		EXPECT_NEAR( WaterCoil( 1 ).TotWaterHeatingCoilRate, WaterCoil( 1 ).InletAirMassFlowRate * CpAir * ( WaterCoil( 1 ).OutletAirTemp - WaterCoil( 1 ).InletAirTemp ), 1.0 ); 
+		EXPECT_NEAR( WaterCoil( 1 ).TotWaterHeatingCoilRate, WaterCoil( 1 ).InletAirMassFlowRate * CpAir * ( WaterCoil( 1 ).OutletAirTemp - WaterCoil( 1 ).InletAirTemp ), 1.0 );
 
 		// test that OA sys water coil bypasses normal controller calls before air loop simulation
 		EXPECT_EQ( "PREHEAT COIL CONTROLLER", HVACControllers::ControllerProps( 1 ).ControllerName );

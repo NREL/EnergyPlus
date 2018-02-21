@@ -57,7 +57,6 @@
 #include <DataEnvironment.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -1603,7 +1602,6 @@ namespace DataHeatBalance {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1626,7 +1624,7 @@ namespace DataHeatBalance {
 
 		// maybe it's already there
 		errFlag = false;
-		Found = FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
+		Found = UtilityRoutines::FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
 		if ( Found == 0 ) {
 			// Add a new blind
 			Blind.redimension( ++TotBlinds );

@@ -608,7 +608,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	SimulationManager::GetProjectData();
 	bool FoundError = false;
@@ -645,7 +645,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 	SurfaceGeometry::GetSurfaceData( FoundError ); // setup zone geometry and get zone data
 	EXPECT_FALSE( FoundError ); // expect no errors
 
-	compare_err_stream( "" ); // just for debugging
+//	compare_err_stream( "" ); // just for debugging
 
 	SurfaceGeometry::SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
 	EXPECT_FALSE( FoundError );
@@ -657,7 +657,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 	DataGlobals::TimeStep = 4;
 	DataGlobals::HourOfDay = 9;
 
-	compare_err_stream( "" ); // just for debugging
+//	compare_err_stream( "" ); // just for debugging
 
 	DataSurfaces::ShadingTransmittanceVaries = true;
 	DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
@@ -1003,7 +1003,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	SolarShading::clear_state();
 
@@ -1041,7 +1041,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 
 	compare_err_stream( "" ); // just for debugging
 	SurfaceGeometry::SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
-	EXPECT_FALSE( FoundError );	
+	EXPECT_FALSE( FoundError );
 
 	SolarShading::AllocateModuleArrays();
 	SolarShading::DetermineShadowingCombinations();
@@ -1056,14 +1056,14 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 	DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
 	DataSystemVariables::UseScheduledSunlitFrac = true;
 	SolarDistribution = FullExterior;
-	
+
 
 	CalcSkyDifShading = true;
 	SolarShading::InitSolarCalculations();
 	SolarShading::SkyDifSolarShading();
 	CalcSkyDifShading = false;
 
-	
+
 	ScheduleManager::UpdateScheduleValues();
 	DataBSDFWindow::SUNCOSTS( 4, 9, 1 ) = 0.1;
 	DataBSDFWindow::SUNCOSTS( 4, 9, 2 ) = 0.1;
@@ -1075,7 +1075,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 	EXPECT_FALSE( SolarShading::SUNCOS( 3 ) < 0.00001 );
 	EXPECT_DOUBLE_EQ( 0.00001, DataEnvironment::SunIsUpValue );;
 	EXPECT_FALSE( SolarShading::SUNCOS( 3 ) < DataEnvironment::SunIsUpValue );
-	
+
 	EXPECT_DOUBLE_EQ( 1, SunlitFrac( 4, 9, 3 ) );
 	EXPECT_DOUBLE_EQ( 1, SunlitFrac( 4, 9, 6 ) );
 	EXPECT_DOUBLE_EQ( 0.5432, SunlitFrac( 4, 9, 9 ) );
@@ -1410,7 +1410,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	SolarShading::clear_state();
 
@@ -1439,7 +1439,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 	EXPECT_FALSE( FoundError );
 
 	SizingManager::GetZoneSizingInput();
-	
+
 
 	SurfaceGeometry::CosZoneRelNorth.allocate( 1 );
 	SurfaceGeometry::SinZoneRelNorth.allocate( 1 );
@@ -1451,7 +1451,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 
 	compare_err_stream( "" ); // just for debugging
 	SurfaceGeometry::SetupZoneGeometry( FoundError ); // this calls GetSurfaceData()
-	EXPECT_FALSE( FoundError );	
+	EXPECT_FALSE( FoundError );
 
 	compare_err_stream( "" ); // just for debugging
 

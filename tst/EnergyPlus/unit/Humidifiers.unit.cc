@@ -226,7 +226,7 @@ namespace EnergyPlus {
 			"    Dimensionless;           !- Output Unit Type",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetHumidifierInput();
 		ASSERT_EQ( 1, NumHumidifiers );
@@ -284,7 +284,7 @@ namespace EnergyPlus {
 			"    1.2;                     !- Maximum Value of x",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		thisHum.EfficiencyCurvePtr = CurveManager::GetCurveIndex( "THERMALEFFICIENCYFPLR" );
 		thisHum.EfficiencyCurveType = CurveManager::Quadratic;

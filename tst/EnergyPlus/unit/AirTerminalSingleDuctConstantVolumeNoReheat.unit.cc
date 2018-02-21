@@ -98,14 +98,14 @@ namespace EnergyPlus {
 			"    Zone1NoReheatAirInletNode,   !- Air Inlet Node Name",
 			"    Zone1NoReheatAirOutletNode,  !- Air Outlet Node Name",
 			"    0.50;                    !- Maximum Air Flow Rate {m3/s}",
-			
+
 			"  Schedule:Compact,",
 			"    AvailSchedule,           !- Name",
 			"    Fraction,                !- Schedule Type Limits Name",
 			"    Through: 12/31,          !- Field 1",
 			"    For: AllDays,            !- Field 2",
 			"    Until: 24:00,1.0;        !- Field 3",
-			
+
 			"  ZoneHVAC:EquipmentList,",
 			"    Zone1Equipment,          !- Name",
 			"    SequentialLoad,          !- Load Distribution Scheme",
@@ -113,13 +113,13 @@ namespace EnergyPlus {
 			"    SDCVNoReheatADU1,        !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
 			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
-			
+
 			"  ZoneHVAC:AirDistributionUnit,",
 			"    SDCVNoReheatADU1,        !- Name",
 			"    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
 			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
 			"    SDCVNoReheatAT1;         !- Air Terminal Name",
-			
+
 			"  Zone,",
 			"    West Zone,               !- Name",
 			"    0,                       !- Direction of Relative North {deg}",
@@ -130,7 +130,7 @@ namespace EnergyPlus {
 			"    1,                       !- Multiplier",
 			"    2.40,                    !- Ceiling Height {m}",
 			"    240.0;                   !- Volume {m3}",
-			
+
 			"  ZoneHVAC:EquipmentConnections,",
 			"    West Zone,               !- Zone Name",
 			"    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
@@ -138,31 +138,31 @@ namespace EnergyPlus {
 			"    ,                        !- Zone Air Exhaust Node or NodeList Name",
 			"    Zone 1 Node,             !- Zone Air Node Name",
 			"    Zone 1 Outlet Node;      !- Zone Return Air Node Name",
-			
+
 			"  NodeList,",
 			"    Zone1Inlets,             !- Name",
 			"    Zone1NoReheatAirOutletNode;   !- Node 1 Name",
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
-		
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 		ProcessScheduleInput(); // read schedules
-		
+
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );
-		
+
 		GetZoneEquipmentData1();
 		GetZoneAirLoopEquipment();
 		GetSysInput();
-		
+
 		EXPECT_EQ( "AirTerminal:SingleDuct:ConstantVolume:NoReheat", Sys( 1 ).SysType ); // AT SD constant volume no reheat object type
 		EXPECT_EQ( "SDCVNOREHEATAT1", Sys( 1 ).SysName ); // AT SD constant volume no reheat name
 		EXPECT_EQ( "AVAILSCHEDULE", Sys( 1 ).Schedule ); // AT SD constant volume no reheat availability schedule name
 		EXPECT_EQ( 0.50, Sys( 1 ).MaxAirVolFlowRate ); // maximum volume flow Rate
-		ASSERT_TRUE( Sys( 1 ).NoOAFlowInputFromUser ); // no OA flow input from user 
+		ASSERT_TRUE( Sys( 1 ).NoOAFlowInputFromUser ); // no OA flow input from user
 		EXPECT_EQ( DataZoneEquipment::PerPersonDCVByCurrentLevel, Sys( 1 ).OAPerPersonMode ); // default value when A6 input field is blank
 
 	}
@@ -227,7 +227,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -313,7 +313,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -353,7 +353,7 @@ namespace EnergyPlus {
 		// calculate the heating rate provided by TA unit
 		Real64 CpAir = PsyCpAirFnWTdb( 0.5 * ( Node( InletNode ).HumRat + Node( ZoneAirNodeNum ).HumRat), 0.5 * ( Node( InletNode ).Temp + Node( ZoneAirNodeNum ).Temp) );
 		Real64 SensHeatRateProvided = MassFlowRateMaxAvail * CpAir * ( Node( InletNode ).Temp - Node( ZoneAirNodeNum ).Temp);
-		
+
 		// set inlet mass flow rate to zero
 		Node( InletNode ).MassFlowRateMaxAvail = 0.0;
 		FirstHVACIteration = true;
@@ -366,7 +366,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.0, SysInlet( SysNum ).AirMassFlowRate ); // outlet mass flow rate is zero
 		EXPECT_EQ( 0.0, SysOutlet( SysNum ).AirMassFlowRate ); // outlet mass flow rate is zero
 		EXPECT_EQ( 0.0, Sys( SysNum ).HeatRate ); // delivered heat rate is zero
-		
+
 		FirstHVACIteration = false;
 		Node( InletNode ).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
 		EXPECT_EQ( 1.0, MassFlowRateMaxAvail );
@@ -444,7 +444,7 @@ namespace EnergyPlus {
 			"    Zone1NoReheatAirOutletNode;   !- Node 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -494,7 +494,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( SysOutlet( SysNum ).AirHumRat, SysInlet( SysNum ).AirHumRat );
 		EXPECT_EQ( SysOutlet( SysNum ).AirEnthalpy, SysInlet( SysNum ).AirEnthalpy );
 		EXPECT_EQ( SysOutlet( SysNum ).AirMassFlowRate, SysInlet( SysNum ).AirMassFlowRate );
-		// sets EMS actuators 
+		// sets EMS actuators
 		Sys( SysNum ).EMSOverrideAirFlow = true;
 		Sys( SysNum ).EMSMassFlowRateValue = 0.5;
 		// run SimulateSingleDuct() function

@@ -66,7 +66,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -215,8 +215,6 @@ namespace WaterToAirHeatPumpSimple {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Simple Water to Air Heat Pump component simulation.
 
-		// METHODOLOGY EMPLOYED:
-
 		// REFERENCES:
 		// (1) Lash.T.A.,1992.Simulation and Analysis of a Water Loop Heat Pump System.
 		// M.S. Thesis, University of Illinois at Urbana Champaign.
@@ -228,24 +226,11 @@ namespace WaterToAirHeatPumpSimple {
 		// Oklahoma State University. (downloadable from www.hvac.okstate.edu)
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// percent on-time (on-time/cycle time)
 		// shut off after compressor cycle off  [s]
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HPNum; // The WatertoAirHP that you are currently loading input into
@@ -261,7 +246,7 @@ namespace WaterToAirHeatPumpSimple {
 		}
 
 		if ( CompIndex == 0 ) {
-			HPNum = FindItemInList( CompName, SimpleWatertoAirHP );
+			HPNum = UtilityRoutines::FindItemInList( CompName, SimpleWatertoAirHP );
 			if ( HPNum == 0 ) {
 				ShowFatalError( "WaterToAirHPSimple not found=" + CompName );
 			}
@@ -328,24 +313,13 @@ namespace WaterToAirHeatPumpSimple {
 		// Oklahoma State University. (downloadable from www.hvac.okstate.edu)
 
 		// Using/Aliasing
-		using namespace InputProcessor;
 		using namespace NodeInputManager;
 		using BranchNodeConnections::TestCompSet;
 		using GlobalNames::VerifyUniqueCoilName;
 		using namespace OutputReportPredefined;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSimpleWatertoAirHPInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HPNum; // The Water to Air HP that you are currently loading input into
@@ -359,9 +333,6 @@ namespace WaterToAirHeatPumpSimple {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
-		bool errFlag;
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string AlphArray; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -370,8 +341,8 @@ namespace WaterToAirHeatPumpSimple {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
-		NumCool = GetNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:EquationFit" );
-		NumHeat = GetNumObjectsFound( "Coil:Heating:WaterToAirHeatPump:EquationFit" );
+		NumCool = inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:EquationFit" );
+		NumHeat = inputProcessor->getNumObjectsFound( "Coil:Heating:WaterToAirHeatPump:EquationFit" );
 		NumWatertoAirHPs = NumCool + NumHeat;
 		HPNum = 0;
 
@@ -386,10 +357,10 @@ namespace WaterToAirHeatPumpSimple {
 			SimpleHPTimeStepFlag.dimension( NumWatertoAirHPs, true );
 		}
 
-		GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "Coil:Heating:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		AlphArray.allocate( MaxAlphas );
@@ -406,20 +377,8 @@ namespace WaterToAirHeatPumpSimple {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-
-			VerifyName( AlphArray( 1 ), SimpleWatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			SimpleWatertoAirHP( HPNum ).Name = AlphArray( 1 );
 			SimpleWatertoAirHP( HPNum ).WatertoAirHPType = "COOLING";
@@ -481,20 +440,8 @@ namespace WaterToAirHeatPumpSimple {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-
-			VerifyName( AlphArray( 1 ), SimpleWatertoAirHP, HPNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), ErrorsFound, CurrentModuleObject + " Name" );
 
 			SimpleWatertoAirHP( HPNum ).Name = AlphArray( 1 );
 			SimpleWatertoAirHP( HPNum ).WatertoAirHPType = "HEATING";
@@ -2253,9 +2200,9 @@ namespace WaterToAirHeatPumpSimple {
 
 		if ( ! DataGlobals::WarmupFlag && ! DataGlobals::DoingHVACSizingSimulations && ! DataGlobals::DoingSizing && SimpleWatertoAirHP( HPNum ).reportCoilFinalSizes ) {
 
-			if ( InputProcessor::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "COOLING" )  ) { // cooling
+			if ( UtilityRoutines::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "COOLING" )  ) { // cooling
 				coilSelectionReportObj->setCoilFinalSizes( SimpleWatertoAirHP( HPNum ).Name,"Coil:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, SimpleWatertoAirHP( HPNum ).RatedCapCoolSens, SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate, SimpleWatertoAirHP( HPNum ).RatedWaterVolFlowRate );
-			} else if ( InputProcessor::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "HEATING" ) ) { // heating
+			} else if ( UtilityRoutines::SameString( SimpleWatertoAirHP( HPNum ).WatertoAirHPType, "HEATING" ) ) { // heating
 				coilSelectionReportObj->setCoilFinalSizes( SimpleWatertoAirHP( HPNum ).Name,"Coil:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",SimpleWatertoAirHP( HPNum ).RatedCapHeat, SimpleWatertoAirHP( HPNum ).RatedCapHeat, SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate, SimpleWatertoAirHP( HPNum ).RatedWaterVolFlowRate );
 			}
 		}
@@ -2440,7 +2387,6 @@ namespace WaterToAirHeatPumpSimple {
 
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int IndexNum; // returned index of matched coil
@@ -2467,7 +2413,7 @@ namespace WaterToAirHeatPumpSimple {
 			GetCoilsInputFlag = false;
 		}
 
-		IndexNum = FindItemInList( CoilName, SimpleWatertoAirHP );
+		IndexNum = UtilityRoutines::FindItemInList( CoilName, SimpleWatertoAirHP );
 
 		if ( IndexNum == 0 ) {
 			ShowSevereError( "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
@@ -2497,31 +2443,11 @@ namespace WaterToAirHeatPumpSimple {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2533,10 +2459,10 @@ namespace WaterToAirHeatPumpSimple {
 			GetCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) || SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) ) {
-			WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
+		if ( UtilityRoutines::SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) || UtilityRoutines::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) ) {
+			WhichCoil = UtilityRoutines::FindItemInList( CoilName, SimpleWatertoAirHP );
 			if ( WhichCoil != 0 ) {
-				if ( SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) ) {
+				if ( UtilityRoutines::SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) ) {
 					CoilCapacity = SimpleWatertoAirHP( WhichCoil ).RatedCapHeat;
 				} else {
 					CoilCapacity = SimpleWatertoAirHP( WhichCoil ).RatedCapCoolTotal;
@@ -2575,31 +2501,8 @@ namespace WaterToAirHeatPumpSimple {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		//  USE FluidProperties, ONLY: FindGlycol
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		Real64 CoilAirFlowRate; // returned air volume flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2612,7 +2515,7 @@ namespace WaterToAirHeatPumpSimple {
 		}
 
 		if ( CoilType == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" || CoilType == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) {
-			WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
+			WhichCoil = UtilityRoutines::FindItemInList( CoilName, SimpleWatertoAirHP );
 			if ( WhichCoil != 0 ) {
 				CoilAirFlowRate = SimpleWatertoAirHP( WhichCoil ).RatedAirVolFlowRate;
 			}
@@ -2657,7 +2560,6 @@ namespace WaterToAirHeatPumpSimple {
 
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched coil
@@ -2683,7 +2585,7 @@ namespace WaterToAirHeatPumpSimple {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, SimpleWatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = SimpleWatertoAirHP( WhichCoil ).AirInletNodeNum;
 		}
@@ -2725,7 +2627,6 @@ namespace WaterToAirHeatPumpSimple {
 
 		// Using/Aliasing
 		using FluidProperties::FindGlycol;
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int NodeNumber; // returned outlet node of matched coil
@@ -2752,7 +2653,7 @@ namespace WaterToAirHeatPumpSimple {
 			GetCoilsInputFlag = false;
 		}
 
-		WhichCoil = FindItemInList( CoilName, SimpleWatertoAirHP );
+		WhichCoil = UtilityRoutines::FindItemInList( CoilName, SimpleWatertoAirHP );
 		if ( WhichCoil != 0 ) {
 			NodeNumber = SimpleWatertoAirHP( WhichCoil ).AirOutletNodeNum;
 		}
@@ -2787,32 +2688,9 @@ namespace WaterToAirHeatPumpSimple {
 		// This routine was designed to "push" information from a parent object to
 		// this WSHP coil object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using FluidProperties::FindGlycol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered

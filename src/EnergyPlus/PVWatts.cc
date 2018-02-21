@@ -56,13 +56,14 @@
 #include <PVWatts.hh>
 #include <PVWattsSSC.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataGlobals.hh>
 #include <WeatherManager.hh>
 #include <DataEnvironment.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -191,10 +192,6 @@ namespace PVWatts {
 
 	PVWattsGenerator PVWattsGenerator::createFromIdfObj(int objNum)
 	{
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-
 		Array1D_string cAlphaFieldNames;
 		Array1D_string cNumericFieldNames;
 		Array1D_bool lNumericFieldBlanks;
@@ -214,7 +211,7 @@ namespace PVWatts {
 		int IOStat;
 		bool errorsFound = false;
 
-		GetObjectItem("Generator:PVWatts", objNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+		inputProcessor->getObjectItem("Generator:PVWatts", objNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
 		const std::string name(cAlphaArgs(AlphaFields::NAME));
 		const Real64 dcSystemCapacity(rNumericArgs(NumFields::DC_SYSTEM_CAPACITY));
@@ -255,7 +252,7 @@ namespace PVWatts {
 		if (lAlphaFieldBlanks(AlphaFields::SURFACE_NAME)) {
 			surfaceNum = 0;
 		} else {
-			surfaceNum = FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), DataSurfaces::Surface);
+			surfaceNum = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), DataSurfaces::Surface);
 		}
 
 		if (errorsFound) {
@@ -496,7 +493,7 @@ namespace PVWatts {
 
 	PVWattsGenerator& GetOrCreatePVWattsGenerator(std::string const & GeneratorName) {
 		// Find the generator, and create a new one if it hasn't been loaded yet.
-		int ObjNum = InputProcessor::GetObjectItemNum("Generator:PVWatts", InputProcessor::MakeUPPERCase(GeneratorName));
+		int ObjNum = inputProcessor->getObjectItemNum("Generator:PVWatts", UtilityRoutines::MakeUPPERCase(GeneratorName));
 		assert(ObjNum >= 0);
 		if (ObjNum == 0) {
 			ShowFatalError("Cannot find Generator:PVWatts " + GeneratorName);

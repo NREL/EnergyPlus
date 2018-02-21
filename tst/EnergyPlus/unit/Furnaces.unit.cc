@@ -1064,26 +1064,26 @@ namespace EnergyPlus {
 		"    DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		int CompIndex( 0 );
 		int AirLoopNum( 1 );
 		bool FirstHVACIteration( false );
 
 		OutputProcessor::TimeValue.allocate( 2 ); //
-		ManageSimulation();	
+		ManageSimulation();
 		// check the design max air outlet temperature
-		EXPECT_DOUBLE_EQ( 45.0, Furnace( 1 ).DesignMaxOutletTemp ); 
+		EXPECT_DOUBLE_EQ( 45.0, Furnace( 1 ).DesignMaxOutletTemp );
 
 		ZoneSysEnergyDemand( 1 ).SequencedOutputRequiredToCoolingSP( 1 ) = 25000.0;
-		ZoneSysEnergyDemand( 1 ).SequencedOutputRequiredToHeatingSP( 1 ) = 25000.0;		
+		ZoneSysEnergyDemand( 1 ).SequencedOutputRequiredToHeatingSP( 1 ) = 25000.0;
 		SimFurnace( Furnace( 1 ).Name, FirstHVACIteration, AirLoopNum, CompIndex );
 		// check the heating mode is On
 		EXPECT_TRUE( Furnaces::HeatingLoad );
 		// check the cooling mode is Off
 		EXPECT_FALSE( Furnaces::CoolingLoad );
 		// check if the air-to-air heat pump outlet temperature is capped at 45.0C
-		EXPECT_NEAR( 45.0, Node( Furnace( 1 ).FurnaceOutletNodeNum ).Temp, 0.000001 );	
+		EXPECT_NEAR( 45.0, Node( Furnace( 1 ).FurnaceOutletNodeNum ).Temp, 0.000001 );
 
 	}
 

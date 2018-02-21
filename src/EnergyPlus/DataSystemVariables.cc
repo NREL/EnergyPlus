@@ -271,14 +271,14 @@ namespace DataSystemVariables {
 		}
 
 		// Look relative to input file path
-		{ IOFlags flags; gio::inquire( DataStringGlobals::idfDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = DataStringGlobals::idfDirPathName + InputFileName;
-			gio::write(EchoInputFile, fmtA) << "found (idf)=" + getAbsolutePath(CheckedFileName);
+			CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "found (input file)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write(EchoInputFile, fmtA) << "not found (idf)=" + getAbsolutePath(DataStringGlobals::idfDirPathName + InputFileName);
+			gio::write(EchoInputFile, fmtA) << "not found (input file)=" + getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName);
 		}
 
 		// Look relative to input path
