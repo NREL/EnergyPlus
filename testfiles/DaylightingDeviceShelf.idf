@@ -723,6 +723,17 @@
     10;                      !- Number of Y Grid Points
 
   Output:IlluminanceMap,
+    Daylit Map 2,            !- Name
+    Daylit Zone,             !- Zone Name
+    0.0,                     !- Z height {m}
+    0.1,                     !- X Minimum Coordinate {m}
+    4.9,                     !- X Maximum Coordinate {m}
+    5,                       !- Number of X Grid Points
+    0.1,                     !- Y Minimum Coordinate {m}
+    19.9,                    !- Y Maximum Coordinate {m}
+    10;                      !- Number of Y Grid Points
+
+  Output:IlluminanceMap,
     Standard Map,            !- Name
     Standard Zone,           !- Zone Name
     0.8,                     !- Z height {m}
