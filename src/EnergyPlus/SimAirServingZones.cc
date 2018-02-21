@@ -6546,7 +6546,6 @@ namespace SimAirServingZones {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
 				int NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
-				int NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 
 				if ( NumZonesHeated > 0 ) { // IF there are centrally heated zones
 					for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum ) {
