@@ -867,7 +867,7 @@ namespace HeatBalanceIntRadExchange {
 		Array1D_string ZoneSurfaceNames;
 
 		NoUserInputF = true;
-		UserFZoneIndex = inputProcessor->getObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
+		UserFZoneIndex = inputProcessor->getObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", "zone_name", ZoneName );
 
 		if ( UserFZoneIndex > 0 ) {
 			ZoneSurfaceNames.allocate( N );
