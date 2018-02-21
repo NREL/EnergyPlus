@@ -59,6 +59,13 @@
 // UNUSED( foo );
 #define EP_UNUSED( expr )
 
+// macro to suppress fallthrough warnings on switch statements
+#ifdef __GNUC__
+  #define ATTR_FALLTHROUGH __attribute__((fallthrough))
+#else
+  #define ATTR_FALLTHROUGH
+#endif
+
 // ObjexxFCL
 namespace ObjexxFCL {
 namespace fmt {

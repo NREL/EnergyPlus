@@ -1823,7 +1823,7 @@ namespace General {
 							return zero_string;
 						}
 					}
-					// [[fallthrough]];
+					ATTR_FALLTHROUGH;
 				default:
 					return InputString.substr( 0, InputString.find_last_not_of( '0' ) + 1 );
 				}
@@ -1868,7 +1868,7 @@ namespace General {
 							break;
 						}
 					}
-					// [[fallthrough]];
+					ATTR_FALLTHROUGH;
 				default:
 					InputString.erase( pos + 1 );
 				}
