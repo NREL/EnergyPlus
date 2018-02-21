@@ -1431,6 +1431,17 @@ namespace SizingManager {
 
 	void
 	DetermineSystemPopulationDiversity(){
+
+		//first determine if any airloops use VRP, if not then quick return
+		bool anyVRPinModel( false );
+		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
+				anyVRPinModel = true;
+			} 
+		}
+		if ( ! anyVRPinModel ) {
+			return;
+		}
 		// determine Pz sum, Ps, and D for each air system for standard 62.1
 		DisplayString( "Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System" );
 
