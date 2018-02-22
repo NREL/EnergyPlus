@@ -4164,7 +4164,7 @@
 
 ! Coil
 
-  Output:Variable,*,Heating Coil Total Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 

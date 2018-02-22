@@ -64,6 +64,8 @@ Where:
 
 \subsubsection{Calculation of system minimum outdoor air flow}\label{calculation-of-system-minimum-outdoor-air-flow}
 
+Occupant diversity, \emph{D}, is the expected peak system population, \emph{Ps}, divided by the sum of the design zone population for all the zones attached to the air system, \emph{Pzsum}. In EnergyPlus, \emph{D}, \emph{Ps}, and \emph{Pzsum} are determined by a side calculation, in the routine DetermineSystemPopulationDiversity.  This routine loops over each airloop in the model and processes the People descriptions in each zone attached to a given airloop.  The design level is summed and includes zone multipliers.  The concurrent system peak population is calculated by stepping through a full year of zone timesteps and multiplying the people schedules (input field Number of People Schedule Name) to the design level and summing up a total people concurrent at each timestep.  The largest value for the total concurrent people on a system is used for \emph{Pzsum}.  For single zone air systems, \emph{D} is forced to be 1.0 because there is no diversity that could come from serving multiple zones. 
+
 For single zone systems, the system outdoor air flow,
 
 \begin{equation}

@@ -537,6 +537,8 @@ This object is used to control some details of EnergyPlus's solar, shadowing and
 
 This object also allows setting up global flags to import and export exterior shading calculations results. This enables importing pre-calculated results of the shading fractions for each exterior building surface from external simulation tools. This also enables reusing the shading results for parametric runs which usually do not change external shading.
 
+The object also allows input to disable self-shading effect from exterior surfaces from all zones, or from a subset of zones. Two flags are defined to enable the maximal flexibility of various interpretation of self-shading: one to disable shading between zones of a same zone group, the other to disable shading between different zone groups. The shading by exterior surfaces of the specified zones groups will be bypassed.
+
 \subsubsection{Inputs}\label{inputs-10-019}
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method-000}
@@ -565,12 +567,28 @@ This field applies to the method called ``AverageOverDaysInFrequency.'' When the
 
 \paragraph{Field: External Shading Calculation Method}\label{field-external-shading-calculation-method}
 
-The field has two options: \textbf{ScheduledShading} and \textbf{InternalCalculation}. The field indicates whether the external shading is pre-calculated and imported as schedules, which overwrite the EnergyPlus calculated array of the surface sunlit fraction. If \textbf{ScheduledShading} is chosen, all external shading calculation would be performed externally (EnergyPlus internal calculations of external shading will be turned off) and be imported during the initialization of an EnergyPlus run with the schedule object defined by the \textbf{SurfaceProperty:LocalEnvironment} object of this surface. If some exterior surfaces do not have their \textbf{SurfaceProperty:LocalEnvironment} objects, no shading is assigned on those exterior surfaces. The default choice is \textbf{InternalCalculation}, indicating EnergyPlus will do the external shading calculations and no external results will be used.
+The field has three options: \textbf{ScheduledShading}, \textbf{ImportedShading} and \textbf{InternalCalculation}. The field indicates whether the external shading is pre-calculated and imported as schedules, which overwrite the EnergyPlus calculated array of the surface sunlit fraction. If \textbf{ScheduledShading} or \textbf{ImportedShading} is chosen, all external shading calculation would be performed externally (EnergyPlus internal calculations of external shading will be turned off). 
+
+If \textbf{ScheduledShading} is chosen, the shading calculation results are imported during the initialization of an EnergyPlus run with the schedule object defined by the \textbf{SurfaceProperty:LocalEnvironment} object of this surface. If some exterior surfaces do not have their \textbf{SurfaceProperty:LocalEnvironment} objects, no shading is assigned on those exterior surfaces. 
+
+If \textbf{ImportedShading} is chosen, a \textbf{Schedule:File:Shading} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{Schedule:File:Shading} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
+
+The default choice is \textbf{InternalCalculation}, indicating EnergyPlus will do the external shading calculations and no external results will be used.
 
 The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
 
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
 This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. If \textbf{Yes} is chosen, the calculated results will be exported as "eplusshading.csv" file. Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. The default choice is \textbf{No}.
+
+\paragraph{Field: Disable Self-Shading Within Shading Zone Groups}\label{fieldself--disable-shading-within-a-zone-group}
+This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the self-shading effect by exterior surfaces of all zones within the target Zone Group is disabled. If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to surfaces within the same Shading Zone Group. If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, then all self-shading from exterior surfaces will be disabled.If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored. Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
+
+\paragraph{Field: Disable Self-Shading From Shading Zone Groups to Other Zones}\label{field-self-disable-shading-between-zone-groups}
+This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the self-shading effect from all exterior surfaces in the target Zone Group to other zones is disabled. If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to all other zones in the model. If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, then all self-shading from exterior surfaces will be disabled. If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored. Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
+
+\paragraph{Field: Shading Zone Group ZoneList Name}\label{field-shading-zone-group-zoneList-name}
+The shading zones group specifies group of zones which are controlled by the Disable Self-Shading fields.
+This field is extensible.
 
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
@@ -580,6 +598,8 @@ ShadowCalculation,AverageOverDaysInFrequency,1;
 ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
 
 ShadowCalculation, AverageOverDaysInFrequency, , , , , ScheduledShading, YES;
+
+ShadowCalculation, AverageOverDaysInFrequency, , , , , , , , Yes, No, ShadingZoneGroup;
 \end{lstlisting}
 
 Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
@@ -778,7 +798,7 @@ algorithm will be used to find a part load ratio or mass flow rate at given equi
 
 \subsubsection{Inputs}\label{inputs-hvacystemrootfindingalgorithm}
 
-\paragraph{Field: Algorithm}\label{field-algorithm}
+\paragraph{Field: Algorithm}\label{field-algorithm-201710020807}
 
 Five choices are allowed to select which solution algorithm will be used: RegulaFalsi, Bisection,  BisectionThenRegulaFalsi, RegulaFalsiThenBisection, and Alternation. The RegulaFalsi
 selection is the default selection. Bisection selection will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.

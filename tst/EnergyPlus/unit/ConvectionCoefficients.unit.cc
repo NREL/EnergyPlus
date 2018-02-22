@@ -407,7 +407,7 @@ TEST_F( EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClass
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool errorsFound( false );
 	HeatBalanceManager::GetProjectControlData( errorsFound ); // read project control data

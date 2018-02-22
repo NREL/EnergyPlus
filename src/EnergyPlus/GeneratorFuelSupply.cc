@@ -63,7 +63,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -136,20 +136,7 @@ namespace GeneratorFuelSupply {
 		//       RE-ENGINEERED  this module extracted from older SOFC module for
 		//                      reuse with both Annex 42 models,
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound; // might also use FindItemInList
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
@@ -159,19 +146,6 @@ namespace GeneratorFuelSupply {
 		using DataLoopNode::ObjectIsNotParent;
 		using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER                     :: GeneratorNum !Generator counter
 		int NumAlphas; // Number of elements in the alpha array
@@ -180,8 +154,6 @@ namespace GeneratorFuelSupply {
 		Array1D_string AlphArray( 25 ); // character string data
 		Array1D< Real64 > NumArray( 200 ); // numeric data TODO deal with allocatable for extensible
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int FuelSupNum;
 		static bool MyOneTimeFlag( true );
 		std::string ObjMSGName;
@@ -189,7 +161,7 @@ namespace GeneratorFuelSupply {
 
 		if ( MyOneTimeFlag ) {
 			cCurrentModuleObject = "Generator:FuelSupply";
-			NumGeneratorFuelSups = GetNumObjectsFound( cCurrentModuleObject );
+			NumGeneratorFuelSups = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( NumGeneratorFuelSups <= 0 ) {
 				ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -199,21 +171,14 @@ namespace GeneratorFuelSupply {
 			FuelSupply.allocate( NumGeneratorFuelSups );
 
 			for ( FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum ) {
-				GetObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), FuelSupply, FuelSupNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
 				FuelSupply( FuelSupNum ).Name = AlphArray( 1 );
 				ObjMSGName = cCurrentModuleObject + " Named " + AlphArray( 1 );
-				if ( SameString( "TemperatureFromAirNode", AlphArray( 2 ) ) ) {
+				if ( UtilityRoutines::SameString( "TemperatureFromAirNode", AlphArray( 2 ) ) ) {
 					FuelSupply( FuelSupNum ).FuelTempMode = FuelInTempFromNode;
-				} else if ( SameString( "Scheduled", AlphArray( 2 ) ) ) {
+				} else if ( UtilityRoutines::SameString( "Scheduled", AlphArray( 2 ) ) ) {
 					FuelSupply( FuelSupNum ).FuelTempMode = FuelInTempSchedule;
 				} else {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 2 ) + " = " + AlphArray( 2 ) );
@@ -242,9 +207,9 @@ namespace GeneratorFuelSupply {
 
 				for ( auto & e : FuelSupply ) e.CompPowerLossFactor = NumArray( 1 );
 
-				if ( SameString( AlphArray( 6 ), "GaseousConstituents" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 6 ), "GaseousConstituents" ) ) {
 					FuelSupply( FuelSupNum ).FuelTypeMode = fuelModeGaseousConstituents;
-				} else if ( SameString( AlphArray( 6 ), "LiquidGeneric" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphArray( 6 ), "LiquidGeneric" ) ) {
 					FuelSupply( FuelSupNum ).FuelTypeMode = fuelModeGenericLiquid;
 				} else {
 					ShowSevereError( "Invalid, " + cAlphaFieldNames( 6 ) + " = " + AlphArray( 6 ) );
@@ -322,27 +287,6 @@ namespace GeneratorFuelSupply {
 
 		// METHODOLOGY EMPLOYED:
 		// Hardcoded data from NIST is filled into data structure one time only
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumHardCodedConstituents; // number of gases included in data
@@ -692,7 +636,7 @@ namespace GeneratorFuelSupply {
 			for ( i = 1; i <= FuelSupply( FuelSupplyNum ).NumConstituents; ++i ) {
 
 				thisName = FuelSupply( FuelSupplyNum ).ConstitName( i );
-				thisGasID = FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
+				thisGasID = UtilityRoutines::FindItem( thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName );
 				FuelSupply( FuelSupplyNum ).GasLibID( i ) = thisGasID;
 
 				if ( thisGasID == 0 ) {

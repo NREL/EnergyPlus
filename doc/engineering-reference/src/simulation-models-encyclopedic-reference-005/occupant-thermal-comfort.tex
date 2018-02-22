@@ -374,7 +374,7 @@ In the EnergyPlus code, \(\alpha\) or SkinMassRat is calculated using the equiva
 
 SkinMassRat = 0.0417737 + 0.7451832/(SkinBloodFlow + 0.585417)
 
-Furthermore, the model takes into account the deviations of the core, skin, and mean body temperature weighted by alpha from their respective setpoints. Thermoregulatory effector mechanisms (regulatory sweating, skin blood flow, and shivering) are defined in terms of thermal signals from the core, skin and body in °C (Doherty and Arens 1988) by the following equations:
+Furthermore, the model takes into account the deviations of the core, skin, and mean body temperature weighted by alpha from their respective setpoints. Thermoregulatory effector mechanisms (regulatory sweating, skin blood flow, and shivering) are defined in terms of thermal signals from the core, skin and body in $^{\circ}$C (Doherty and Arens 1988) by the following equations:
 
 \begin{equation}
 SI{G_{cr}} = {T_{cr}} - 36.8
@@ -388,14 +388,14 @@ SI{G_{sk}} = {T_{sk}} - 33.7
 SI{G_b} = {T_b} - 36.49
 \end{equation}
 
-In the EnergyPlus code, when SkinTemp is greater than SkinTempSet (33.7°C), then SkinThermSigWarm = SkinTemp - SkinTempSet and 
+In the EnergyPlus code, when SkinTemp is greater than SkinTempSet (33.7$^{\circ}$C), then SkinThermSigWarm = SkinTemp - SkinTempSet and 
 SkinThermSigCold = 0.0. Otherwise, when SkinTemp is less than or equal to SkinTempSet, then SkinThermSigWarm = 0.0 and SkinThermSigCold = SkinTempSet - SkinTemp.
 
-In the EnergyPlus code, when CoreTemp is greater than CoreTempSet (36.8°C), then CoreThermSigWarm = CoreTemp - CoreTempSet and CoreThermSigCold = 0.0. Otherwise, when CoreTemp is less than or equal to CoreTempSet, then CoreThermSigWarm = 0.0 and CoreThermSigCold = CoreTempSet - CoreTemp.
+In the EnergyPlus code, when CoreTemp is greater than CoreTempSet (36.8$^{\circ}$C), then CoreThermSigWarm = CoreTemp - CoreTempSet and CoreThermSigCold = 0.0. Otherwise, when CoreTemp is less than or equal to CoreTempSet, then CoreThermSigWarm = 0.0 and CoreThermSigCold = CoreTempSet - CoreTemp.
 
-In the EnergyPlus code, when AvgBodyTemp is greater than AvgBodyTempSet(36.49°C), then BodyThermSigWarm = AvgBodyTemp - AvgBodyTempSet and BodyThermSigCold = 0.0. Otherwise, when AvgBodyTemp is less than or equal to AvgBodyTempSet, then BodyThermSigWarm = 0.0 and BodyThermSigCold = AvgBodyTempSet-AvgBodyTemp.
+In the EnergyPlus code, when AvgBodyTemp is greater than AvgBodyTempSet(36.49$^{\circ}$C), then BodyThermSigWarm = AvgBodyTemp - AvgBodyTempSet and BodyThermSigCold = 0.0. Otherwise, when AvgBodyTemp is less than or equal to AvgBodyTempSet, then BodyThermSigWarm = 0.0 and BodyThermSigCold = AvgBodyTempSet-AvgBodyTemp.
 
-The skin flood flow rate in L/hrâ€¢m\(^{2}\) is calculated using:
+The skin blood flow rate in L/hr$\cdot$m\(^{2}\) is calculated using:
 
 \begin{equation}
 SKBF = (6.3 + C{}_{dil} \times SI{G_{cr}})/(1 + {S_{tr}} \times (SI{G_{sk}}))
@@ -497,7 +497,7 @@ In the EnergyPlus code, h\(_{r}\) or Hr is calculated using the following equati
 
 Hr = 4.*RadSurfEff*StefanBoltz*((CloSurfTemp + RadTemp)/2. + TAbsConv)**3
 
-In the Pierce model, T\(_{cl}\) in °C is estimated by each iteration using following equation:
+In the Pierce model, T\(_{cl}\) in $^{\circ}$C is estimated by each iteration using following equation:
 
 \begin{equation}
 {T_{cl}} = ({T_{sk}}/{I_{cl}} + {f_{cl}}({h_c}{T_a} + {h_r}{T_r}))/(1/{I_{cl}} + {f_{cl}}({h_c} + {h_r}))
@@ -563,7 +563,7 @@ or as shown in the EnergyPlus source code:
 
 HeatFlow = (CoreTemp-SkinTemp)*(5.28 + 1.163*SkinBloodFlow)
 
-where 5.28 is the average body tissue conductance in W/m\(^2 \cdot \)€K and 1.163 is the thermal capacity of blood in W \(\cdot\) h/L \(\cdot\)€ K.
+where 5.28 is the average body tissue conductance in W/m\(^2 \cdot \) K and 1.163 is the thermal capacity of blood in W \(\cdot\) h/L \(\cdot\) K.
 
 Thus, individual heat balance equations for core and skin compartments are expressed using this term, Q\(_{c-s}\). New temperatures of core, skin and body are calculated for each iteration from rates of heat storage in the core and skin.
 

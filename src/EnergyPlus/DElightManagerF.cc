@@ -70,7 +70,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputReportPredefined.hh>
 #include <UtilityRoutines.hh>
@@ -136,7 +136,6 @@ namespace DElightManagerF {
 		using namespace DataEnvironment; // Gives access to Site data
 		using namespace DataSurfaces; // Gives access to Surface data
 		using namespace DataStringGlobals; // Gives access to Program Path and Current Time/Date
-		using InputProcessor::FindItemInList;
 		using namespace DataDaylighting;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
@@ -272,7 +271,7 @@ namespace DElightManagerF {
 
 		for ( auto & znDayl : ZoneDaylight ) {
 			if ( znDayl.DaylightMethod == DElightDaylighting ){
-				int const izone = FindItemInList( znDayl.ZoneName, Zone );
+				int const izone = UtilityRoutines::FindItemInList( znDayl.ZoneName, Zone );
 				if ( izone != 0 ) {
 
 					rLightLevel = GetDesignLightingLevelForZone( izone );
@@ -634,9 +633,6 @@ namespace DElightManagerF {
 
 		using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
 		using namespace DataDaylighting;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
 
 		int NumAlpha;
@@ -646,19 +642,19 @@ namespace DElightManagerF {
 
 		static std::string const cCurrentModuleObject( "Daylighting:DELight:ComplexFenestration" );
 
-		TotDElightCFS = GetNumObjectsFound( cCurrentModuleObject );
+		TotDElightCFS = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		DElightComplexFene.allocate( TotDElightCFS );
 		for ( auto & cfs : DElightComplexFene ){
-			GetObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ++CFSNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			cfs.Name = cAlphaArgs( 1 );
 			cfs.ComplexFeneType = cAlphaArgs( 2 );
 			cfs.surfName = cAlphaArgs( 3 );
-			if ( FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( UtilityRoutines::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cfs.surfName + "\"." );
 				ErrorsFound = true;
 			}
 			cfs.wndwName = cAlphaArgs( 4 );
-			if ( FindItemInList( cfs.surfName, Surface ) == 0 ){
+			if ( UtilityRoutines::FindItemInList( cfs.surfName, Surface ) == 0 ){
 				ShowSevereError( cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames( 4 ) + "=\"" + cfs.wndwName + "\"." );
 				ErrorsFound = true;
 			}
@@ -695,7 +691,6 @@ namespace DElightManagerF {
 		// USE STATEMENTS:
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using namespace InputProcessor;
 		using DataDaylighting::ZoneDaylight;
 		using DataSurfaces::WorldCoordSystem;
 		using DataSurfaces::AspectTransform;
@@ -716,8 +711,8 @@ namespace DElightManagerF {
 		OldAspectRatio = 1.0;
 		NewAspectRatio = 1.0;
 
-		if ( GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( inputProcessor->getNumObjectsFound( CurrentModuleObject ) == 1 ) {
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OldAspectRatio = rNumerics( 1 );
 			NewAspectRatio = rNumerics( 2 );
 			if ( cAlphas( 1 ) != "XY" ) {
@@ -740,7 +735,7 @@ namespace DElightManagerF {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Robert J. Hitchcock
 		//       DATE WRITTEN   August 2003
-		//       MODIFIED       From MakeUPPERCase function by Linda K. Lawrie
+		//       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -748,25 +743,6 @@ namespace DElightManagerF {
 
 		// METHODOLOGY EMPLOYED:
 		// Uses the std::replace function from the C++ library
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Return value
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 

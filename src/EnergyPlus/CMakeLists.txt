@@ -6,7 +6,8 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
 # Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
 if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
-  configure_file( ConfiguredFunctions.in.hh "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh" )
+  configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
+  file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 endif()
 
 SET( SRC
@@ -50,7 +51,8 @@ SET( SRC
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
   ConductionTransferFunctionCalc.hh
-  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.hh"
+  ConfiguredFunctions.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc"
   ConvectionCoefficients.cc
   ConvectionCoefficients.hh
   CoolTower.cc
@@ -312,6 +314,10 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+  HybridUnitaryAirConditioners.cc
+  HybridUnitaryAirConditioners.hh
+  HybridEvapCoolingModel.cc
+  HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
@@ -330,8 +336,15 @@ SET( SRC
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
-  InputProcessor.cc
-  InputProcessor.hh
+  InputProcessing/DataStorage.hh
+  InputProcessing/EmbeddedEpJSONSchema.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
+  InputProcessing/IdfParser.cc
+  InputProcessing/IdfParser.hh
+  InputProcessing/InputProcessor.cc
+  InputProcessing/InputProcessor.hh
+  InputProcessing/InputValidation.cc
+  InputProcessing/InputValidation.hh
   IntegratedHeatPump.cc
   IntegratedHeatPump.hh
   InternalHeatGains.cc
@@ -430,8 +443,14 @@ SET( SRC
   Pumps.hh
   PurchasedAirManager.cc
   PurchasedAirManager.hh
+  PVWatts.cc
+  PVWatts.hh
+  PVWattsSSC.cc
+  PVWattsSSC.hh
   RefrigeratedCase.cc
   RefrigeratedCase.hh
+  ReportCoilSelection.cc
+  ReportCoilSelection.hh
   ReportSizingManager.cc
   ReportSizingManager.hh
   ReturnAirPathManager.cc
@@ -491,6 +510,8 @@ SET( SRC
   SystemAvailabilityManager.hh
   SystemReports.cc
   SystemReports.hh
+  SZVAVModel.cc
+  SZVAVModel.hh
   TARCOGArgs.cc
   TARCOGArgs.hh
   TARCOGCommon.cc
@@ -578,11 +599,22 @@ if (UNIX)
   ADD_DEFINITIONS("-fPIC")
 endif()
 
+add_custom_target( GenerateEmbeddedEpJSONSchema
+                   COMMAND ${CMAKE_COMMAND} -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
+                           -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                           -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}"
+                           -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
+                           -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddedable_epJSON_schema>"
+                           -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
+                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                   DEPENDS generate_embeddedable_epJSON_schema )
+
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva)
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva )
+add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )

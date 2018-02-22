@@ -57,7 +57,8 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -68,9 +69,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Site:GroundTemperature:BuildingSurface factory
-	std::shared_ptr< SiteBuildingSurfaceGroundTemps > 
-	SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory( 
-		int objectType, 
+	std::shared_ptr< SiteBuildingSurfaceGroundTemps >
+	SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -85,7 +86,7 @@ namespace EnergyPlus {
 
 		// USE STATEMENTS:
 		using DataEnvironment::GroundTempObjInput;
-		using DataGlobals::OutputFileInits;		
+		using DataGlobals::OutputFileInits;
 		using namespace DataIPShortCuts;
 		using namespace GroundTemperatureManager;
 		using namespace ObjexxFCL::gio;
@@ -102,7 +103,7 @@ namespace EnergyPlus {
 		std::shared_ptr< SiteBuildingSurfaceGroundTemps > thisModel( new SiteBuildingSurfaceGroundTemps() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp );
-		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		thisModel->objectType = objectType;
 		thisModel->objectName = objectName;
@@ -110,7 +111,7 @@ namespace EnergyPlus {
 		if ( numCurrObjects == 1 ) {
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( NumNums < 12 ) {
 				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
