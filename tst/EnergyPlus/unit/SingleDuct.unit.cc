@@ -2687,7 +2687,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac ) {
 		"    ;                        !- Temperature Setpoint Node Name",
 	} ) ;
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData(ErrorsFound);
