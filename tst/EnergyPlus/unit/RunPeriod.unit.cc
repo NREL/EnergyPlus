@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
 
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	bool errors_in_input( false );
 	int totalrps( 4 );
 	WeatherManager::GetRunPeriodData( totalrps, errors_in_input );
@@ -192,7 +192,7 @@ TEST_F( EnergyPlusFixture, RunPeriod_EndYearOnly )
 		"BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	bool errors_in_input( false );
 	int totalrps( 1 );
 	WeatherManager::GetRunPeriodData( totalrps, errors_in_input );
