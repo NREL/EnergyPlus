@@ -166,6 +166,8 @@ namespace HeatingCoils {
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 		
+		bool reportCoilFinalSizes; //one time report of sizes to coil report
+
 		// Default Constructor
 		HeatingCoilEquipConditions() :
 			HCoilType_Num( 0 ),
@@ -212,7 +214,9 @@ namespace HeatingCoils {
 			DesiccantDehumNum( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+			reportCoilFinalSizes( true )
+
 		{}
 
 	};

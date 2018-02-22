@@ -122,7 +122,7 @@ TEST_F( EnergyPlusFixture, OutputReports_SurfaceDetailsReport )
 		"Output:Surfaces:List,Details;"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool foundErrors( false );
 	HeatBalanceManager::GetProjectControlData( foundErrors ); // read project control data

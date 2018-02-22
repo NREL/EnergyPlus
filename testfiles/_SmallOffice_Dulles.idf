@@ -3869,9 +3869,9 @@
 
   Output:Variable,*,Heating Coil Electric Power,annual;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,monthly;
+  Output:Variable,*,Heating Coil Heating Energy,monthly;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,annual;
+  Output:Variable,*,Heating Coil Heating Energy,annual;
 
   Output:Variable,*,Heating Coil Gas Energy,monthly;
 
@@ -3889,9 +3889,9 @@
 
   Output:Variable,*,Heating Coil Ancillary Gas Rate,annual;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,monthly;
+  Output:Variable,*,Heating Coil Heating Rate,monthly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,annual;
+  Output:Variable,*,Heating Coil Heating Rate,annual;
 
   Output:Variable,*,Heating Coil Runtime Fraction,monthly;
 

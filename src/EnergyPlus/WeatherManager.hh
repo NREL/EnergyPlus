@@ -124,7 +124,6 @@ namespace WeatherManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	extern int YearofSim; // The Present year of Simulation.
 	extern int const NumDaysInYear;
 	extern int EnvironmentReportNbr; // Report number for the environment stamp
 	extern std::string EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)

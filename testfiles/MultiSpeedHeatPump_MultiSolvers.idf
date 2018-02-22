@@ -2189,9 +2189,9 @@
 
   Output:Variable,*,Heating Coil Defrost Gas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,timestep;
+  Output:Variable,*,Heating Coil Heating Energy,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 

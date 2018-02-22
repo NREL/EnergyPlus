@@ -203,7 +203,7 @@ namespace EnergyPlus {
 			"    23,                      !- Peak Freezing Temperature {C}",
 			"    1;                       !- Low Temperature Difference of Freezing Curve {deltaC}"
 		} );
-		ASSERT_FALSE( process_idf( idf_objects, false ) );
+		ASSERT_TRUE( process_idf( idf_objects, false ) );
 		
 		// allocate a finite difference surface object and needed member variables
 		int const surfaceIndex = 1;

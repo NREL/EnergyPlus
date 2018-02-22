@@ -2759,6 +2759,7 @@
   ElectricEquipment:ITE:AirCooled,
     WestDataCenter_Equip,    !- Name
     West Zone,               !- Zone Name
+    FlowFromSystem,
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
@@ -2899,6 +2900,7 @@
   ElectricEquipment:ITE:AirCooled,
     EastDataCenter_Equip,    !- Name
     East Zone,               !- Zone Name
+    FlowControlWithApproachTemperatures, !- Air Flow Caclulation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
@@ -2923,7 +2925,11 @@
     1,                       !- Fraction of Electric Power Supply Losses to Zone
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
-    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
+    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
+    2,                       !- field Supply Approach Temperature
+    ,                        !- field Supply Approach Temperature Schedule
+    0,                      !- field Return Approach Temperature 
+    ;                        !- field Return Approach Temperature Schedule
 
   Schedule:Compact,
     LIGHTS-1,                !- Name

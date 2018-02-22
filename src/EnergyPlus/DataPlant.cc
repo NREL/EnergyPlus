@@ -54,7 +54,6 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -494,25 +493,11 @@ namespace DataPlant {
 		//  when distributing loads to components
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
-		// REFERENCES:
-		// na
+
 		// Using/Aliasing
 		using namespace DataGlobals;
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 		using BranchInputManager::AuditBranches;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopCtr;
@@ -546,7 +531,7 @@ namespace DataPlant {
 					for ( CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr ) {
 						auto & this_component( this_branch.Comp( CompCtr ) );
 						if ( this_component.TypeOf_Num == CompType ) {
-							if ( SameString( CompName, this_component.Name ) ) {
+							if ( UtilityRoutines::SameString( CompName, this_component.Name ) ) {
 								FoundCompName = true;
 								if ( present( InletNodeNumber ) ) {
 									if ( InletNodeNumber > 0 ) {
@@ -883,26 +868,6 @@ namespace DataPlant {
 		// This routine will display (with continue error messages) the branch/component
 		// structure of the given loop.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string DemandSupply;
 		int LSN; // LoopSide counter
@@ -955,11 +920,7 @@ namespace DataPlant {
 		// output nodes match the desired input & output nodes. This plant loop index is then used
 		// to search the Plant Sizing array for the matching Plant Sizing object.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSizing::NumPltSizInput;
 		using DataSizing::PlantSizData;
 		using DataSizing::PlantSizingData;
@@ -967,18 +928,6 @@ namespace DataPlant {
 
 		// Return value
 		int MyPltSizNum; // returned plant sizing index
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -1007,7 +956,7 @@ namespace DataPlant {
 
 		if ( MyPltLoopNum > 0 ) {
 			if ( NumPltSizInput > 0 ) {
-				MyPltSizNum = FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
+				MyPltSizNum = UtilityRoutines::FindItemInList( PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
 			}
 			if ( MyPltSizNum == 0 ) {
 				if ( PrintErrorFlag ) {

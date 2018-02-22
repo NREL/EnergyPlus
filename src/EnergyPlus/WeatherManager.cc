@@ -74,8 +74,9 @@
 #include <DisplayRoutines.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
@@ -120,7 +121,6 @@ namespace WeatherManager {
 	using namespace DataReportingFlags;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
-
 	using General::ProcessDateString; // , ValidateMonthDay
 	using General::RoundSigDigits;
 	using namespace Psychrometrics;
@@ -184,7 +184,7 @@ namespace WeatherManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 
-	int YearofSim( 1 ); // The Present year of Simulation.
+	int YearOfSim( 1 ); // The Present year of Simulation.
 	int const NumDaysInYear( 365 );
 	int EnvironmentReportNbr( 0 ); // Report number for the environment stamp
 	std::string EnvironmentReportChr; // Report number for the environment stamp (character -- for printing)
@@ -336,7 +336,9 @@ namespace WeatherManager {
 	Array1D< DesignDayData > DesDayInput; // Design day Input Data
 	Array1D< EnvironmentData > Environment; // Environment data
 	Array1D< RunPeriodData > RunPeriodInput;
+	std::unordered_map <std::string, std::string> RunPeriodInputUniqueNames;
 	Array1D< RunPeriodData > RunPeriodDesignInput;
+	std::unordered_map <std::string, std::string> RunPeriodDesignInputUniqueNames;
 	Array1D< TypicalExtremeData > TypicalExtremePeriods;
 	DaylightSavingPeriodData EPWDST; // Daylight Saving Period Data from EPW file
 	DaylightSavingPeriodData IDFDST; // Daylight Saving Period Data from IDF file
@@ -354,7 +356,7 @@ namespace WeatherManager {
 	static gio::Fmt fmtAN( "(A,$)" );
 
 	std::vector< UnderwaterBoundary > underwaterBoundaries;
-	
+
 	// MODULE SUBROUTINES:
 
 	// Functions
@@ -362,7 +364,7 @@ namespace WeatherManager {
 	clear_state()
 	{
 		Debugout = false ;
-		YearofSim = 1 ; // The Present year of Simulation.
+		YearOfSim = 1 ; // The Present year of Simulation.
 		EnvironmentReportNbr = 0 ; // Report number for the environment stamp
 		EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
 		TimeStampReportNbr = 0; // Report number for the time stamp
@@ -494,7 +496,9 @@ namespace WeatherManager {
 		DesDayInput.deallocate(); // Design day Input Data
 		Environment.deallocate(); // Environment data
 		RunPeriodInput.deallocate();
+		RunPeriodInputUniqueNames.clear();
 		RunPeriodDesignInput.deallocate();
+		RunPeriodDesignInputUniqueNames.clear();
 		TypicalExtremePeriods.deallocate();
 
 		EPWDST.StDateType = 0 ;
@@ -607,24 +611,24 @@ namespace WeatherManager {
 		bool errorsFound = false;
 		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
 		DataIPShortCuts::cCurrentModuleObject = "SurfaceProperty:Underwater";
-		int Num = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+		int Num = inputProcessor->getNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 		for ( int i = 1; i <= Num; i++ ) {
-			InputProcessor::GetObjectItem(
-				DataIPShortCuts::cCurrentModuleObject, i, 
-				DataIPShortCuts::cAlphaArgs, 
-				NumAlpha, 
-				DataIPShortCuts::rNumericArgs, 
-				NumNumber, 
-				IOStat, 
-				DataIPShortCuts::lNumericFieldBlanks, 
-				DataIPShortCuts::lAlphaFieldBlanks, 
-				DataIPShortCuts::cAlphaFieldNames, 
+			inputProcessor->getObjectItem(
+				DataIPShortCuts::cCurrentModuleObject, i,
+				DataIPShortCuts::cAlphaArgs,
+				NumAlpha,
+				DataIPShortCuts::rNumericArgs,
+				NumNumber,
+				IOStat,
+				DataIPShortCuts::lNumericFieldBlanks,
+				DataIPShortCuts::lAlphaFieldBlanks,
+				DataIPShortCuts::cAlphaFieldNames,
 				DataIPShortCuts::cNumericFieldNames
 			);
 			underwaterBoundaries.push_back( UnderwaterBoundary() );
 			underwaterBoundaries[ i-1 ].Name = DataIPShortCuts::cAlphaArgs( 1 );
 			underwaterBoundaries[ i-1 ].distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs( 1 );
-			underwaterBoundaries[ i-1 ].OSCMIndex = InputProcessor::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
+			underwaterBoundaries[ i-1 ].OSCMIndex = UtilityRoutines::FindItemInList( underwaterBoundaries[ i-1 ].Name, DataSurfaces::OSCM );
 			if ( underwaterBoundaries[ i-1 ].OSCMIndex <= 0 ) {
 				ShowSevereError( "Could not match underwater boundary condition object with an Other Side Conditions Model input object." );
 				errorsFound = true;
@@ -701,16 +705,16 @@ namespace WeatherManager {
 	{
 		int NumAlpha = 0, NumNumber = 0, IOStat = 0;
 		DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
-		if ( InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
-		InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, 1, 
-			DataIPShortCuts::cAlphaArgs, 
-			NumAlpha, 
-			DataIPShortCuts::rNumericArgs, 
-			NumNumber, 
-			IOStat, 
-			DataIPShortCuts::lNumericFieldBlanks, 
-			DataIPShortCuts::lAlphaFieldBlanks, 
-			DataIPShortCuts::cAlphaFieldNames, 
+		if ( inputProcessor->getNumObjectsFound( DataIPShortCuts::cCurrentModuleObject ) == 0 ) return;
+		inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, 1,
+			DataIPShortCuts::cAlphaArgs,
+			NumAlpha,
+			DataIPShortCuts::rNumericArgs,
+			NumNumber,
+			IOStat,
+			DataIPShortCuts::lNumericFieldBlanks,
+			DataIPShortCuts::lAlphaFieldBlanks,
+			DataIPShortCuts::cAlphaFieldNames,
 			DataIPShortCuts::cNumericFieldNames
 		);
 		DataEnvironment::varyingLocationSchedIndexLat = ScheduleManager::GetScheduleIndex( DataIPShortCuts::cAlphaArgs( 1 ) );
@@ -770,25 +774,15 @@ namespace WeatherManager {
 		// if another environment is available in the "run list" or if the end has been
 		// reached.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using General::InvJulianDay;
 		using General::JulianDay;
 		using General::BetweenDates;
 		using namespace DataSystemVariables;
-
 		using DataHeatBalance::AdaptiveComfortRequested_ASH55;
 		using DataHeatBalance::AdaptiveComfortRequested_CEN15251;
 		using ThermalComfort::CalcThermalComfortAdaptiveASH55;
 		using ThermalComfort::CalcThermalComfortAdaptiveCEN15251;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetNextEnvironment: " );
@@ -801,12 +795,6 @@ namespace WeatherManager {
 		static gio::Fmt DateFormatwithYear( "(I2.2,'/',I2.2,'/',I4.4)" );
 		static Array1D_string const SpecialDayNames( 5, { "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 		static Array1D_string const ValidDayNames( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
@@ -962,6 +950,8 @@ namespace WeatherManager {
 			KindOfSim = Environment( Envrn ).KindOfEnvrn;
 			DayOfYear = Environment( Envrn ).StartJDay;
 			DayOfMonth = Environment( Envrn ).StartDay;
+			DataGlobals::CalendarYear = Environment( Envrn ).StartYear;
+			DataGlobals::CalendarYearChr = std::to_string( DataGlobals::CalendarYear );
 			Month = Environment( Envrn ).StartMonth;
 			NumOfDayInEnvrn = Environment( Envrn ).TotalDays; // Set day loop maximum from DataGlobals
 			if ( ! DoingSizing && ! KickOffSimulation ) {
@@ -2121,7 +2111,9 @@ namespace WeatherManager {
 							}
 							SetSpecialDayDates( Environment( Envrn ).MonWeekDay );
 						}
-						++YearofSim;
+						++YearOfSim;
+						DataGlobals::CalendarYear += 1;
+						DataGlobals::CalendarYearChr = std::to_string( DataGlobals::CalendarYear );
 						FirstSimDayofYear = 1;
 						ReadWeatherForDay( FirstSimDayofYear, Envrn, false ); // Read tomorrow's weather
 					} else {
@@ -2130,8 +2122,10 @@ namespace WeatherManager {
 				}
 			}
 
+			EndYearFlag = false;
 			if ( DayOfMonth == EndDayOfMonth( Month ) ) {
 				EndMonthFlag = true;
+				EndYearFlag = ( Month == 12 );
 			}
 
 			// Set Tomorrow's date data
@@ -2369,23 +2363,12 @@ namespace WeatherManager {
 		// Using/Aliasing
 		using General::JulianDay;
 		using ScheduleManager::UpdateScheduleValues;
-		using InputProcessor::SameString;
 		using namespace GroundTemperatureManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char time_stamp[ 10 ];
 		static char day_stamp[ 6 ];
 		static std::string const RoutineName( "SetCurrentWeather" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int NextHour;
@@ -2621,28 +2604,15 @@ namespace WeatherManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine reads the appropriate day of EPW weather data.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::RangeCheck;
 		using General::JulianDay;
 		using General::RoundSigDigits;
 		using ScheduleManager::GetScheduleValuesForDay;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtLD( "*" );
 		static gio::Fmt YMDHFmt( "(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)" );
 		static gio::Fmt YMDHFmt1( "(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
 
 		// DERIVED TYPE DEFINITIONS:
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2830,14 +2800,14 @@ namespace WeatherManager {
 					}
 					// Do the range checks on the first set of fields -- no others.
 					ErrorsFound = false;
-					if ( DryBulb >= 99.9 ) RangeCheck( ErrorsFound, "DryBulb Temperature", "WeatherFile", "Severe", ">= -90", ( DryBulb >= -90.0 ), "<= 70", ( DryBulb <= 70.0 ), RoundSigDigits( DryBulb, 2 ), WeatherFileLocationTitle );
-					if ( DewPoint < 99.9 ) RangeCheck( ErrorsFound, "DewPoint Temperature", "WeatherFile", "Severe", ">= -90", ( DewPoint >= -90.0 ), "<= 70", ( DewPoint <= 70.0 ), RoundSigDigits( DewPoint, 2 ), WeatherFileLocationTitle );
-					if ( RelHum < 999.0 ) RangeCheck( ErrorsFound, "Relative Humidity", "WeatherFile", "Severe", "> 0", ( RelHum >= 0.0 ), "<= 110", ( RelHum <= 110.0 ), RoundSigDigits( RelHum, 0 ), WeatherFileLocationTitle );
-					if ( AtmPress < 999999.0 ) RangeCheck( ErrorsFound, "Atmospheric Pressure", "WeatherFile", "Severe", "> 31000", ( AtmPress > 31000.0 ), "<=120000", ( AtmPress <= 120000.0 ), RoundSigDigits( AtmPress, 0 ), WeatherFileLocationTitle );
-					if ( DirectRad < 9999.0 ) RangeCheck( ErrorsFound, "Direct Radiation", "WeatherFile", "Severe", ">= 0", ( DirectRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
-					if ( DiffuseRad < 9999.0 ) RangeCheck( ErrorsFound, "Diffuse Radiation", "WeatherFile", "Severe", ">= 0", ( DiffuseRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
-					if ( WindDir < 999.0 ) RangeCheck( ErrorsFound, "Wind Direction", "WeatherFile", "Severe", ">=0", ( WindDir >= 0.0 ), "<=360", ( WindDir <= 360.0 ), RoundSigDigits( WindDir, 0 ), WeatherFileLocationTitle );
-					if ( WindSpeed < 999.0 ) RangeCheck( ErrorsFound, "Wind Speed", "WeatherFile", "Severe", ">=0", ( WindSpeed >= 0.0 ), "<=40", ( WindSpeed <= 40.0 ), RoundSigDigits( WindSpeed, 2 ), WeatherFileLocationTitle );
+					if ( DryBulb >= 99.9 ) inputProcessor->rangeCheck( ErrorsFound, "DryBulb Temperature", "WeatherFile", "Severe", ">= -90", ( DryBulb >= -90.0 ), "<= 70", ( DryBulb <= 70.0 ), RoundSigDigits( DryBulb, 2 ), WeatherFileLocationTitle );
+					if ( DewPoint < 99.9 ) inputProcessor->rangeCheck( ErrorsFound, "DewPoint Temperature", "WeatherFile", "Severe", ">= -90", ( DewPoint >= -90.0 ), "<= 70", ( DewPoint <= 70.0 ), RoundSigDigits( DewPoint, 2 ), WeatherFileLocationTitle );
+					if ( RelHum < 999.0 ) inputProcessor->rangeCheck( ErrorsFound, "Relative Humidity", "WeatherFile", "Severe", "> 0", ( RelHum >= 0.0 ), "<= 110", ( RelHum <= 110.0 ), RoundSigDigits( RelHum, 0 ), WeatherFileLocationTitle );
+					if ( AtmPress < 999999.0 ) inputProcessor->rangeCheck( ErrorsFound, "Atmospheric Pressure", "WeatherFile", "Severe", "> 31000", ( AtmPress > 31000.0 ), "<=120000", ( AtmPress <= 120000.0 ), RoundSigDigits( AtmPress, 0 ), WeatherFileLocationTitle );
+					if ( DirectRad < 9999.0 ) inputProcessor->rangeCheck( ErrorsFound, "Direct Radiation", "WeatherFile", "Severe", ">= 0", ( DirectRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
+					if ( DiffuseRad < 9999.0 ) inputProcessor->rangeCheck( ErrorsFound, "Diffuse Radiation", "WeatherFile", "Severe", ">= 0", ( DiffuseRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
+					if ( WindDir < 999.0 ) inputProcessor->rangeCheck( ErrorsFound, "Wind Direction", "WeatherFile", "Severe", ">=0", ( WindDir >= 0.0 ), "<=360", ( WindDir <= 360.0 ), RoundSigDigits( WindDir, 0 ), WeatherFileLocationTitle );
+					if ( WindSpeed < 999.0 ) inputProcessor->rangeCheck( ErrorsFound, "Wind Speed", "WeatherFile", "Severe", ">=0", ( WindSpeed >= 0.0 ), "<=40", ( WindSpeed <= 40.0 ), RoundSigDigits( WindSpeed, 2 ), WeatherFileLocationTitle );
 					if ( ErrorsFound ) {
 						ShowSevereError( "Out of Range errors found with initial day of WeatherFile" );
 					}
@@ -3755,11 +3725,7 @@ Label902: ;
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::JulianDay;
-		using InputProcessor::SameString;
 		using ScheduleManager::GetSingleDayScheduleValues;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const GlobalSolarConstant( 1367.0 );
@@ -3782,11 +3748,6 @@ Label902: ;
 		static std::string const RoutineNamePsyWFnTdbH( "SetUpDesignDay:PsyWFnTdbH" );
 		static std::string const WeatherManager( "WeatherManager" );
 		static std::string const RoutineNameLong( "WeatherManager.cc subroutine SetUpDesignDay" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Hour;
@@ -4804,22 +4765,8 @@ Label902: ;
 		// METHODOLOGY EMPLOYED:
 		// List directed reads, as possible.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const Header( 8, { "LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string Line;
@@ -4852,7 +4799,7 @@ Label902: ;
 				std::string::size_type const Pos = FindNonSpace( Line );
 				std::string::size_type const HdPos = index( Line, Header( HdLine ) );
 				if ( Pos != HdPos ) continue;
-				//      line=MakeUPPERCase(line)
+				//      line=UtilityRoutines::MakeUPPERCase(line)
 				ProcessEPWHeader( Header( HdLine ), Line, ErrorsFound );
 				++HdLine;
 				if ( HdLine == 9 ) StillLooking = false;
@@ -5184,7 +5131,7 @@ Label9999: ;
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   June 1997
-		//       MODIFIED       na
+		//       MODIFIED       December 2017; Jason DeGraw
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -5202,22 +5149,12 @@ Label9999: ;
 		// REFERENCES:
 		// EnergyPlus Output Description document.
 
-		// Using/Aliasing
-		using OutputProcessor::TimeStepStampReportNbr;
-		using OutputProcessor::DailyStampReportNbr;
-		using OutputProcessor::MonthlyStampReportNbr;
-		using OutputProcessor::RunPeriodStampReportNbr;
-		using OutputProcessor::TimeStepStampReportChr;
-		using OutputProcessor::DailyStampReportChr;
-		using OutputProcessor::MonthlyStampReportChr;
-		using OutputProcessor::RunPeriodStampReportChr;
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt IntFmt( "(I3)" );
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5228,46 +5165,52 @@ Label9999: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Format descriptor for the environment title
-		static gio::Fmt EnvironmentFormat( "(a,',5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]')" );
-		static gio::Fmt TimeStepFormat( "(a,',6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType')" );
-		static gio::Fmt DailyFormat( "(a,',3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ',A,' Requested')" );
-		static gio::Fmt MonthlyFormat( "(a,',2,Cumulative Days of Simulation[],Month[]  ! When Monthly ',A,' Requested')" );
-		static gio::Fmt RunPeriodFormat( "(a,',1,Cumulative Days of Simulation[] ! When Run Period ',A,' Requested')" );
-
-		// FLOW:
+		static gio::Fmt A("(a)");
+		static std::string EnvironmentString( ",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]" );
+		static std::string TimeStepString( ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType" );
+		static std::string DailyString( ",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily " );
+		static std::string MonthlyString( ",2,Cumulative Days of Simulation[],Month[]  ! When Monthly " );
+		static std::string RunPeriodString( ",1,Cumulative Days of Simulation[] ! When Run Period " );
+		static std::string YearlyString( ",1,Calendar Year of Simulation[] ! When Annual " );
 
 		AssignReportNumber( EnvironmentReportNbr );
 		if ( EnvironmentReportNbr != 1 ) { //  problem
 			ShowFatalError( "ReportOutputFileHeaders: Assigned report number for Environment title is not 1.  Contact Support." );
 		}
-		gio::write( EnvironmentReportChr, IntFmt ) << EnvironmentReportNbr;
+		EnvironmentReportChr = std::to_string( EnvironmentReportNbr );
 		strip( EnvironmentReportChr );
-		gio::write( OutputFileStandard, EnvironmentFormat ) << EnvironmentReportChr;
-		gio::write( OutputFileMeters, EnvironmentFormat ) << EnvironmentReportChr;
+		gio::write( OutputFileStandard, A ) << EnvironmentReportChr + EnvironmentString;
+		gio::write( OutputFileMeters, A ) << EnvironmentReportChr + EnvironmentString;
 
-		AssignReportNumber( TimeStepStampReportNbr );
-		gio::write( TimeStepStampReportChr, IntFmt ) << TimeStepStampReportNbr;
-		strip( TimeStepStampReportChr );
-		gio::write( OutputFileStandard, TimeStepFormat ) << TimeStepStampReportChr;
-		gio::write( OutputFileMeters, TimeStepFormat ) << TimeStepStampReportChr;
+		AssignReportNumber( OutputProcessor::TimeStepStampReportNbr );
+		OutputProcessor::TimeStepStampReportChr = std::to_string( OutputProcessor::TimeStepStampReportNbr );
+		strip( OutputProcessor::TimeStepStampReportChr );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
+		gio::write( OutputFileMeters, A ) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
 
-		AssignReportNumber( DailyStampReportNbr );
-		gio::write( DailyStampReportChr, IntFmt ) << DailyStampReportNbr;
-		strip( DailyStampReportChr );
-		gio::write( OutputFileStandard, DailyFormat ) << DailyStampReportChr << "Report Variables";
-		gio::write( OutputFileMeters, DailyFormat ) << DailyStampReportChr << "Meters";
+		AssignReportNumber( OutputProcessor::DailyStampReportNbr );
+		OutputProcessor::DailyStampReportChr = std::to_string( OutputProcessor::DailyStampReportNbr );
+		strip( OutputProcessor::DailyStampReportChr );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::DailyStampReportChr + DailyString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::DailyStampReportChr + DailyString + "Meters Requested";
 
-		AssignReportNumber( MonthlyStampReportNbr );
-		gio::write( MonthlyStampReportChr, IntFmt ) << MonthlyStampReportNbr;
-		strip( MonthlyStampReportChr );
-		gio::write( OutputFileStandard, MonthlyFormat ) << MonthlyStampReportChr << "Report Variables";
-		gio::write( OutputFileMeters, MonthlyFormat ) << MonthlyStampReportChr << "Meters";
+		AssignReportNumber( OutputProcessor::MonthlyStampReportNbr );
+		OutputProcessor::MonthlyStampReportChr = std::to_string( OutputProcessor::MonthlyStampReportNbr );
+		strip( OutputProcessor::MonthlyStampReportChr );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Meters Requested";
 
-		AssignReportNumber( RunPeriodStampReportNbr );
-		gio::write( RunPeriodStampReportChr, IntFmt ) << RunPeriodStampReportNbr;
-		strip( RunPeriodStampReportChr );
-		gio::write( OutputFileStandard, RunPeriodFormat ) << RunPeriodStampReportChr << "Report Variables";
-		gio::write( OutputFileMeters, RunPeriodFormat ) << RunPeriodStampReportChr << "Meters";
+		AssignReportNumber( OutputProcessor::RunPeriodStampReportNbr );
+		OutputProcessor::RunPeriodStampReportChr = std::to_string( OutputProcessor::RunPeriodStampReportNbr );
+		strip( OutputProcessor::RunPeriodStampReportChr );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Meters Requested";
+
+		AssignReportNumber( OutputProcessor::YearlyStampReportNbr );
+		OutputProcessor::YearlyStampReportChr = std::to_string( OutputProcessor::YearlyStampReportNbr );
+		strip( OutputProcessor::YearlyStampReportChr );
+		gio::write( OutputFileStandard, A ) << OutputProcessor::YearlyStampReportChr + YearlyString + "Report Variables Requested";
+		gio::write( OutputFileMeters, A ) << OutputProcessor::YearlyStampReportChr + YearlyString + "Meters Requested";
 
 	}
 
@@ -5365,28 +5308,8 @@ Label9999: ;
 		// It controls the assignment of weather related global variables as
 		// well as the reads and writes for retrieving weather information.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
 		using namespace DataSystemVariables;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Env; // Environment Loop Counter
@@ -5397,10 +5320,10 @@ Label9999: ;
 		// FLOW:
 
 		//Get the number of design days and annual runs from user inpout
-		TotDesDays = GetNumObjectsFound( "SizingPeriod:DesignDay" );
-		RPD1 = GetNumObjectsFound( "SizingPeriod:WeatherFileDays" );
-		RPD2 = GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
-		TotRunPers = GetNumObjectsFound("RunPeriod");
+		TotDesDays = inputProcessor->getNumObjectsFound( "SizingPeriod:DesignDay" );
+		RPD1 = inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" );
+		RPD2 = inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+		TotRunPers = inputProcessor->getNumObjectsFound("RunPeriod");
 		NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
 		if ( TotRunPers > 0 ) {
 			WeathSimReq = true;
@@ -5448,6 +5371,11 @@ Label9999: ;
 		// which will have to be completed to run the annual run.
 		if ( TotRunPers >= 1 || FullAnnualRun ) {
 			GetRunPeriodData( TotRunPers, ErrorsFound );
+		}
+
+		if ( FullAnnualRun ){
+			// GetRunPeriodData may have reset the value of TotRunPers
+			NumOfEnvrn = TotDesDays + TotRunPers + RPD1 + RPD2;
 		}
 
 		if ( RPD1 >= 1 || RPD2 >= 1 || TotRunPers >= 1 || FullAnnualRun ) {
@@ -5520,60 +5448,36 @@ Label9999: ;
 		// This subroutine gets the run period info from User input and the
 		//  simulation dates
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetNumObjectsFound;
 		using General::JulianDay;
 		using General::TrimSigDigits;
 		using namespace DataSystemVariables;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlpha; // Number of alphas being input
 		int NumNumeric; // Number of numbers being input
 		int IOStat; // IO Status when calling get input subroutine
 		int Loop;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int Count;
 
 		//Call Input Get routine to retrieve annual run data
 		RunPeriodInput.allocate( TotRunPers );
+		RunPeriodInputUniqueNames.reserve(static_cast< unsigned >(TotRunPers));
 
 		cCurrentModuleObject = "RunPeriod";
 		Count = 0;
+		//if ( ! WFAllowsLeapYears ) {
+		//	LocalLeapYearAdd = 0;
+		//} else {
+		//	LocalLeapYearAdd = 1;
+		//}
 		for ( Loop = 1; Loop <= TotRunPers; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumeric, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// A1, \field Name
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), RunPeriodInput, &RunPeriodData::title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName(RunPeriodInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			}
 
 			++Count;
@@ -5738,9 +5642,9 @@ Label9999: ;
 			}
 
 			// A3,  \field Use Weather File Holidays and Special Days
-			if ( lAlphaFieldBlanks( 3 ) || SameString( cAlphaArgs( 3 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 3 ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "YES" ) ) {
 				RunPeriodInput( Loop ).useHolidays = true;
-			} else if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "NO" ) ) {
 				RunPeriodInput( Loop ).useHolidays = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 3 ) + " invalid [" + cAlphaArgs( 3 ) + ']' );
@@ -5748,9 +5652,9 @@ Label9999: ;
 			}
 
 			// A4,  \field Use Weather File Daylight Saving Period
-			if ( lAlphaFieldBlanks( 4 ) || SameString( cAlphaArgs( 4 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 4 ) || UtilityRoutines::SameString( cAlphaArgs( 4 ), "YES" ) ) {
 				RunPeriodInput( Loop ).useDST = true;
-			} else if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "NO" ) ) {
 				RunPeriodInput( Loop ).useDST = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 4 ) + " invalid [" + cAlphaArgs( 4 ) + ']' );
@@ -5758,9 +5662,9 @@ Label9999: ;
 			}
 
 			// A5,  \field Apply Weekend Holiday Rule
-			if ( lAlphaFieldBlanks( 5 ) || SameString( cAlphaArgs( 5 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 5 ) || UtilityRoutines::SameString( cAlphaArgs( 5 ), "YES" ) ) {
 				RunPeriodInput( Loop ).applyWeekendRule = true;
-			} else if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "NO" ) ) {
 				RunPeriodInput( Loop ).applyWeekendRule = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 5 ) + " invalid [" + cAlphaArgs( 5 ) + ']' );
@@ -5768,9 +5672,9 @@ Label9999: ;
 			}
 
 			// A6,  \field Use Weather File Rain Indicators
-			if ( lAlphaFieldBlanks( 6 ) || SameString( cAlphaArgs( 6 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 6 ) || UtilityRoutines::SameString( cAlphaArgs( 6 ), "YES" ) ) {
 				RunPeriodInput( Loop ).useRain = true;
-			} else if ( SameString( cAlphaArgs( 6 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "NO" ) ) {
 				RunPeriodInput( Loop ).useRain = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 6 ) + " invalid [" + cAlphaArgs( 6 ) + ']' );
@@ -5778,9 +5682,9 @@ Label9999: ;
 			}
 
 			// A7,  \field Use Weather File Snow Indicators
-			if ( lAlphaFieldBlanks( 7 ) || SameString( cAlphaArgs( 7 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 7 ) || UtilityRoutines::SameString( cAlphaArgs( 7 ), "YES" ) ) {
 				RunPeriodInput( Loop ).useSnow = true;
-			} else if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "NO" ) ) {
 				RunPeriodInput( Loop ).useSnow = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 7 ) + " invalid [" + cAlphaArgs( 7 ) + ']' );
@@ -5788,9 +5692,9 @@ Label9999: ;
 			}
 
 			// A8,  \field Treat Weather as Actual
-			if ( lAlphaFieldBlanks( 8 ) || SameString( cAlphaArgs( 8 ), "NO" ) ) {
+			if ( lAlphaFieldBlanks( 8 ) || UtilityRoutines::SameString( cAlphaArgs( 8 ), "NO" ) ) {
 				RunPeriodInput( Loop ).actualWeather = false;
-			} else if ( SameString( cAlphaArgs( 8 ), "YES" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "YES" ) ) {
 				RunPeriodInput(Loop).actualWeather = true;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 8 ) + " invalid [" + cAlphaArgs( 8 ) + ']' );
@@ -5817,6 +5721,8 @@ Label9999: ;
 			if ( RunPeriodInput( 1 ).dayOfWeek != 0 && ! ErrorsFound ) {
 				SetupWeekDaysByMonth( RunPeriodInput( 1 ).startMonth, RunPeriodInput( 1 ).startDay, RunPeriodInput( 1 ).dayOfWeek, RunPeriodInput( 1 ).monWeekDay );
 			}
+		} else if ( TotRunPers > 1 && FullAnnualRun ) {
+			TotRunPers = 1;
 		}
 	}
 
@@ -5834,42 +5740,20 @@ Label9999: ;
 		// This subroutine gets the run period design info from User input and the
 		//  simulation dates
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItem;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using General::JulianDay;
 		using General::TrimSigDigits;
 		using namespace DataSystemVariables;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Number of alphas being input
 		int NumNumerics; // Number of Numerics being input
 		int IOStat; // IO Status when calling get input subroutine
 		int Loop;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int RPD1;
 		int RPD2;
 		int Count;
@@ -5878,24 +5762,18 @@ Label9999: ;
 
 		// FLOW:
 		//Call Input Get routine to retrieve annual run data
-		RPD1 = GetNumObjectsFound( "SizingPeriod:WeatherFileDays" );
-		RPD2 = GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
+		RPD1 = inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileDays" );
+		RPD2 = inputProcessor->getNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		TotRunDesPers = RPD1 + RPD2;
 
 		RunPeriodDesignInput.allocate( RPD1 + RPD2 );
+		RunPeriodDesignInputUniqueNames.reserve(static_cast< unsigned >(RPD1 + RPD2));
 
 		Count = 0;
 		cCurrentModuleObject = "SizingPeriod:WeatherFileDays";
 		for ( Loop = 1; Loop <= RPD1; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			++Count;
 			RunPeriodDesignInput( Count ).title = cAlphaArgs( 1 );
 			RunPeriodDesignInput( Count ).periodType = "User Selected WeatherFile RunPeriod (Design)";
@@ -5931,26 +5809,26 @@ Label9999: ;
 			if ( lAlphaFieldBlanks( 2 ) ) {
 				RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 			} else {
-				RunPeriodDesignInput( Count ).dayOfWeek = FindItemInList( cAlphaArgs( 2 ), ValidNames, 12 );
+				RunPeriodDesignInput( Count ).dayOfWeek = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ValidNames, 12 );
 				if ( RunPeriodDesignInput( Count ).dayOfWeek == 0 || RunPeriodDesignInput( Count ).dayOfWeek == 8 ) {
 					ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 1 ) + " invalid (Day of Week) [" + cAlphaArgs( 1 ) + " for Start is not Valid, Monday will be Used." );
 					RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 				}
 			}
 
-			if ( lAlphaFieldBlanks( 3 ) || SameString( cAlphaArgs( 3 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 3 ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "YES" ) ) {
 				RunPeriodDesignInput( Count ).useDST = true;
-			} else if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "NO" ) ) {
 				RunPeriodDesignInput( Count ).useDST = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 3 ) + " invalid [" + cAlphaArgs( 3 ) + ']' );
 				ErrorsFound = true;
 			}
 
-			if ( lAlphaFieldBlanks( 4 ) || SameString( cAlphaArgs( 4 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 4 ) || UtilityRoutines::SameString( cAlphaArgs( 4 ), "YES" ) ) {
 				RunPeriodDesignInput( Count ).useRain = true;
 				RunPeriodDesignInput( Count ).useSnow = true;
-			} else if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "NO" ) ) {
 				RunPeriodDesignInput( Count ).useRain = false;
 				RunPeriodDesignInput( Count ).useSnow = false;
 			} else {
@@ -5974,22 +5852,15 @@ Label9999: ;
 
 		cCurrentModuleObject = "SizingPeriod:WeatherFileConditionType";
 		for ( Loop = 1; Loop <= RPD2; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), RunPeriodDesignInput, &RunPeriodData::title, Count, IsNotOK, IsBlank, cCurrentModuleObject + " Title" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName(RunPeriodDesignInputUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),ErrorsFound );
 			++Count;
 			RunPeriodDesignInput( Count ).title = cAlphaArgs( 1 );
 			RunPeriodDesignInput( Count ).periodType = "User Selected WeatherFile Typical/Extreme Period (Design)=" + cAlphaArgs( 2 );
 
 			// Period Selection
 			if ( ! lAlphaFieldBlanks( 2 ) ) {
-				WhichPeriod = FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue );
+				WhichPeriod = UtilityRoutines::FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue );
 				if ( WhichPeriod != 0 ) {
 					RunPeriodDesignInput( Count ).startDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
 					RunPeriodDesignInput( Count ).startMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
@@ -5999,7 +5870,7 @@ Label9999: ;
 					RunPeriodDesignInput( Count ).endJulianDate = TypicalExtremePeriods( WhichPeriod ).EndJDay;
 					RunPeriodDesignInput( Count ).totalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
 				} else {
-					WhichPeriod = FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue1 );
+					WhichPeriod = UtilityRoutines::FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue1 );
 					if ( WhichPeriod != 0 ) {
 						RunPeriodDesignInput( Count ).startDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
 						RunPeriodDesignInput( Count ).startMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
@@ -6010,7 +5881,7 @@ Label9999: ;
 						RunPeriodDesignInput( Count ).totalDays = TypicalExtremePeriods( WhichPeriod ).TotalDays;
 						ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) + " matched to " + TypicalExtremePeriods( WhichPeriod ).MatchValue );
 					} else {
-						WhichPeriod = FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue2 );
+						WhichPeriod = UtilityRoutines::FindItem( cAlphaArgs( 2 ), TypicalExtremePeriods, &TypicalExtremeData::MatchValue2 );
 						if ( WhichPeriod != 0 ) {
 							RunPeriodDesignInput( Count ).startDay = TypicalExtremePeriods( WhichPeriod ).StartDay;
 							RunPeriodDesignInput( Count ).startMonth = TypicalExtremePeriods( WhichPeriod ).StartMonth;
@@ -6034,26 +5905,26 @@ Label9999: ;
 			if ( lAlphaFieldBlanks( 3 ) ) {
 				RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 			} else {
-				RunPeriodDesignInput( Count ).dayOfWeek = FindItemInList( cAlphaArgs( 3 ), ValidNames, 12 );
+				RunPeriodDesignInput( Count ).dayOfWeek = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), ValidNames, 12 );
 				if ( RunPeriodDesignInput( Count ).dayOfWeek == 0 || RunPeriodDesignInput( Count ).dayOfWeek == 8 ) {
 					ShowWarningError( cCurrentModuleObject + ": object=" + RunPeriodDesignInput( Count ).title + ' ' + cAlphaFieldNames( 3 ) + " invalid (Day of Week) [" + cAlphaArgs( 3 ) + " for Start is not Valid, Monday will be Used." );
 					RunPeriodDesignInput( Count ).dayOfWeek = 2; // Defaults to Monday
 				}
 			}
 
-			if ( lAlphaFieldBlanks( 4 ) || SameString( cAlphaArgs( 4 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 4 ) || UtilityRoutines::SameString( cAlphaArgs( 4 ), "YES" ) ) {
 				RunPeriodDesignInput( Count ).useDST = true;
-			} else if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "NO" ) ) {
 				RunPeriodDesignInput( Count ).useDST = false;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": object #" + TrimSigDigits( Loop ) + cAlphaFieldNames( 4 ) + " invalid [" + cAlphaArgs( 4 ) + ']' );
 				ErrorsFound = true;
 			}
 
-			if ( lAlphaFieldBlanks( 5 ) || SameString( cAlphaArgs( 5 ), "YES" ) ) {
+			if ( lAlphaFieldBlanks( 5 ) || UtilityRoutines::SameString( cAlphaArgs( 5 ), "YES" ) ) {
 				RunPeriodDesignInput( Count ).useRain = true;
 				RunPeriodDesignInput( Count ).useSnow = true;
-			} else if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "NO" ) ) {
 				RunPeriodDesignInput( Count ).useRain = false;
 				RunPeriodDesignInput( Count ).useSnow = false;
 			} else {
@@ -6112,28 +5983,12 @@ Label9999: ;
 		//        \key CustomDay1
 		//        \key CustomDay2
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const ValidDayTypes( 5, { "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string AlphArray( 3 );
@@ -6149,11 +6004,9 @@ Label9999: ;
 		int DateType;
 		int IOStat;
 		int DayType;
-		static bool IsNotOK( false ); // Flag to verify name
-		static bool IsBlank( false ); // Flag for blank name
 
 		cCurrentModuleObject = "RunPeriodControl:SpecialDays";
-		NumSpecDays = GetNumObjectsFound( cCurrentModuleObject );
+		NumSpecDays = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( allocated( SpecialDays ) ) { // EPW already allocated the array
 			Count = NumSpecialDays - NumSpecDays + 1;
 		} else {
@@ -6164,14 +6017,8 @@ Label9999: ;
 
 		for ( Loop = 1; Loop <= NumSpecDays; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, AlphArray, NumAlphas, Duration, NumNumbers, IOStat );
-
-			VerifyName( AlphArray( 1 ), SpecialDays, Count - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, AlphArray, NumAlphas, Duration, NumNumbers, IOStat );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 			SpecialDays( Count ).Name = AlphArray( 1 );
 
 			ProcessDateString( AlphArray( 2 ), PMonth, PDay, PWeekDay, DateType, ErrorsFound );
@@ -6201,7 +6048,7 @@ Label9999: ;
 				ErrorsFound = true;
 			}
 
-			DayType = FindItemInList( AlphArray( 3 ), ValidDayTypes, 5 );
+			DayType = UtilityRoutines::FindItemInList( AlphArray( 3 ), ValidDayTypes, 5 );
 			if ( DayType == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": " + AlphArray( 1 ) + " Invalid " + cAlphaFieldNames( 3 ) + '=' + AlphArray( 3 ) );
 				ErrorsFound = true;
@@ -6319,25 +6166,8 @@ Label9999: ;
 		//      \memo <Weekday> can be Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
 		//      \memo <Nth> can be 1 or 1st, 2 or 2nd, etc. up to 5(?)
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumFound;
@@ -6346,10 +6176,10 @@ Label9999: ;
 		int NumNumbers;
 
 		cCurrentModuleObject = "RunPeriodControl:DaylightSavingTime";
-		NumFound = GetNumObjectsFound( cCurrentModuleObject );
+		NumFound = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumFound == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( NumAlphas != 2 ) {
 				ShowSevereError( cCurrentModuleObject + ": Insufficient fields, must have Start AND End Dates" );
 				ErrorsFound = true;
@@ -6423,11 +6253,6 @@ Label9999: ;
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::RangeCheck;
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 		using General::FindNumberInList;
 		using ScheduleManager::GetDayScheduleIndex;
@@ -6435,9 +6260,6 @@ Label9999: ;
 		using ScheduleManager::CheckDayScheduleValueMinMax;
 		using namespace DataSystemVariables;
 		using namespace OutputReportPredefined;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const ValidNames( 12, { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "HOLIDAY", "SUMMERDESIGNDAY", "WINTERDESIGNDAY", "CUSTOMDAY1", "CUSTOMDAY2" } );
@@ -6448,19 +6270,11 @@ Label9999: ;
 		// Below are the 2009 fractions, HOF, Chap 14, Table 6
 		static Array1D< Real64 > const DefaultTempRangeMult( 24, { 0.88, 0.92, 0.95, 0.98, 1.0, 0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13, 0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82 } );
 
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EnvrnNum; // Environment Loop to pass to Design Day Setup Routine
 		int NumAlpha; // Number of material alpha names being passed
 		int NumNumerics; // Number of material properties being passed
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int HrLoop;
 		int TSLoop;
 		Real64 LastHrValue;
@@ -6518,16 +6332,8 @@ Label9999: ;
 			//Call Input Get routine to retrieve design day data
 			MaxDryBulbEntered = false;
 			PressureEntered = false;
-			GetObjectItem( cCurrentModuleObject, DDLoop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			//   A1, \field Name
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DesDayInput, &DesignDayData::Title, EnvrnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, DDLoop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			DesDayInput( EnvrnNum ).Title = cAlphaArgs( 1 ); // Environment name
 			Environment( EnvrnNum ).Title = DesDayInput( EnvrnNum ).Title;
 
@@ -6560,9 +6366,9 @@ Label9999: ;
 			DesDayInput( EnvrnNum ).SkyClear = rNumericArgs( 14 ); // Sky Clearness (0 to 1)
 
 			//   A7,  \field Rain Indicator
-			if ( SameString( cAlphaArgs( 7 ), "Yes" ) || SameString( cAlphaArgs( 7 ), "1" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Yes" ) || UtilityRoutines::SameString( cAlphaArgs( 7 ), "1" ) ) {
 				DesDayInput( EnvrnNum ).RainInd = 1;
-			} else if ( SameString( cAlphaArgs( 7 ), "No" ) || SameString( cAlphaArgs( 7 ), "0" ) || lAlphaFieldBlanks( 7 ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "No" ) || UtilityRoutines::SameString( cAlphaArgs( 7 ), "0" ) || lAlphaFieldBlanks( 7 ) ) {
 				DesDayInput( EnvrnNum ).RainInd = 0;
 			} else {
 				ShowWarningError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid field: " + cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
@@ -6571,9 +6377,9 @@ Label9999: ;
 			}
 
 			//   A8,  \field Snow Indicator
-			if ( SameString( cAlphaArgs( 8 ), "Yes" ) || SameString( cAlphaArgs( 8 ), "1" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "Yes" ) || UtilityRoutines::SameString( cAlphaArgs( 8 ), "1" ) ) {
 				DesDayInput( EnvrnNum ).SnowInd = 1;
-			} else if ( SameString( cAlphaArgs( 8 ), "No" ) || SameString( cAlphaArgs( 8 ), "0" ) || lAlphaFieldBlanks( 8 ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "No" ) || UtilityRoutines::SameString( cAlphaArgs( 8 ), "0" ) || lAlphaFieldBlanks( 8 ) ) {
 				DesDayInput( EnvrnNum ).SnowInd = 0;
 			} else {
 				ShowWarningError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid field: " + cAlphaFieldNames( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
@@ -6586,21 +6392,21 @@ Label9999: ;
 			if ( lAlphaFieldBlanks( 3 ) ) {
 				cAlphaArgs( 3 ) = "DefaultMultipliers";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Default;
-			} else if ( SameString( cAlphaArgs( 3 ), "Multiplier" ) || SameString( cAlphaArgs( 3 ), "MultiplierSchedule" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Multiplier" ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "MultiplierSchedule" ) ) {
 				cAlphaArgs( 3 ) = "MultiplierSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Multiplier;
 				units = "[]";
 				unitType = OutputProcessor::Unit::None;
-			} else if ( SameString( cAlphaArgs( 3 ), "Difference" ) || SameString( cAlphaArgs( 3 ), "Delta" ) || SameString( cAlphaArgs( 3 ), "DifferenceSchedule" ) || SameString( cAlphaArgs( 3 ), "DeltaSchedule" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "Difference" ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "Delta" ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "DifferenceSchedule" ) || UtilityRoutines::SameString( cAlphaArgs( 3 ), "DeltaSchedule" ) ) {
 				cAlphaArgs( 3 ) = "DifferenceSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Difference;
 				units = "[deltaC]";
 				unitType = OutputProcessor::Unit::deltaC;
-			} else if ( SameString( cAlphaArgs( 3 ), "DefaultMultipliers" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DefaultMultipliers" ) ) {
 				cAlphaArgs( 3 ) = "DefaultMultipliers";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Default;
 				// Validate Temperature - Daily range
-			} else if ( SameString( cAlphaArgs( 3 ), "TemperatureProfileSchedule" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "TemperatureProfileSchedule" ) ) {
 				cAlphaArgs( 3 ) = "TemperatureProfileSchedule";
 				DesDayInput( EnvrnNum ).DBTempRangeType = DDDBRangeType_Profile;
 				units = "[C]";
@@ -6624,7 +6430,7 @@ Label9999: ;
 			if ( DesDayInput( EnvrnNum ).DBTempRangeType != DDDBRangeType_Difference && DesDayInput( EnvrnNum ).DBTempRangeType != DDDBRangeType_Profile ) {
 				testval = DesDayInput( EnvrnNum ).MaxDryBulb - DesDayInput( EnvrnNum ).DailyDBRange;
 				errFlag = false;
-				RangeCheck( errFlag, cAlphaFieldNames( 3 ), cCurrentModuleObject, "Severe", ">= -90", ( testval >= -90.0 ), "<= 70", ( testval <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
+				inputProcessor->rangeCheck( errFlag, cAlphaFieldNames( 3 ), cCurrentModuleObject, "Severe", ">= -90", ( testval >= -90.0 ), "<= 70", ( testval <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				}
@@ -6680,7 +6486,7 @@ Label9999: ;
 						testval = maxval( DDDBRngModifier( _, _, EnvrnNum ) );
 						testval = DesDayInput( EnvrnNum ).MaxDryBulb - testval;
 						errFlag = false;
-						RangeCheck( errFlag, cAlphaFieldNames( 4 ), cCurrentModuleObject, "Severe", ">= -90", ( testval >= -90.0 ), "<= 70", ( testval <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
+						inputProcessor->rangeCheck( errFlag, cAlphaFieldNames( 4 ), cCurrentModuleObject, "Severe", ">= -90", ( testval >= -90.0 ), "<= 70", ( testval <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
 						if ( errFlag ) {
 							ErrorsFound = true;
 						}
@@ -6705,7 +6511,7 @@ Label9999: ;
 			}
 
 			//   A5,  \field Humidity Condition Type
-			if ( SameString( cAlphaArgs( 5 ), "WetBulb" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "WetBulb" ) ) {
 				cAlphaArgs( 5 ) = "WetBulb";
 				//   N5,  \field Wetbulb or DewPoint at Maximum Dry-Bulb
 				if ( ! lNumericFieldBlanks( 5 ) ) {
@@ -6718,12 +6524,12 @@ Label9999: ;
 				}
 				errFlag = false;
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WetBulb;
-				RangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Wet-Bulb", cCurrentModuleObject, "Severe", ">= -90", ( DesDayInput( EnvrnNum ).HumIndValue >= -90.0 ), "<= 70", ( DesDayInput( EnvrnNum ).HumIndValue <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
+				inputProcessor->rangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Wet-Bulb", cCurrentModuleObject, "Severe", ">= -90", ( DesDayInput( EnvrnNum ).HumIndValue >= -90.0 ), "<= 70", ( DesDayInput( EnvrnNum ).HumIndValue <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
 				if ( errFlag ) {
 					//        CALL ShowContinueError(TRIM(cCurrentModuleObject)//': Occured in '//TRIM(DesDayInput(EnvrnNum)%Title))
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( 5 ), "DewPoint" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "DewPoint" ) ) {
 				cAlphaArgs( 5 ) = "DewPoint";
 				if ( ! lNumericFieldBlanks( 5 ) ) {
 					DesDayInput( EnvrnNum ).HumIndValue = rNumericArgs( 5 ); // Humidity Indicating Conditions at Max Dry-Bulb
@@ -6735,11 +6541,11 @@ Label9999: ;
 				}
 				errFlag = false;
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_DewPoint;
-				RangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Dew-Point", cCurrentModuleObject, "Severe", ">= -90", ( DesDayInput( EnvrnNum ).HumIndValue >= -90.0 ), "<= 70", ( DesDayInput( EnvrnNum ).HumIndValue <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
+				inputProcessor->rangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Dew-Point", cCurrentModuleObject, "Severe", ">= -90", ( DesDayInput( EnvrnNum ).HumIndValue >= -90.0 ), "<= 70", ( DesDayInput( EnvrnNum ).HumIndValue <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( 5 ), "HumidityRatio" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "HumidityRatio" ) ) {
 				cAlphaArgs( 5 ) = "HumidityRatio";
 				//   N6,  \field Humidity Ratio at Maximum Dry-Bulb
 				if ( ! lNumericFieldBlanks( 6 ) ) {
@@ -6752,11 +6558,11 @@ Label9999: ;
 				}
 				errFlag = false;
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_HumRatio;
-				RangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Humidity-Ratio", cCurrentModuleObject, "Severe", ">= 0", ( DesDayInput( EnvrnNum ).HumIndValue >= 0.0 ), "<= .03", ( DesDayInput( EnvrnNum ).HumIndValue <= 0.03 ), _, DesDayInput( EnvrnNum ).Title );
+				inputProcessor->rangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Humidity-Ratio", cCurrentModuleObject, "Severe", ">= 0", ( DesDayInput( EnvrnNum ).HumIndValue >= 0.0 ), "<= .03", ( DesDayInput( EnvrnNum ).HumIndValue <= 0.03 ), _, DesDayInput( EnvrnNum ).Title );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( 5 ), "Enthalpy" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Enthalpy" ) ) {
 				cAlphaArgs( 5 ) = "Enthalpy";
 				//   N7,  \field Enthalpy at Maximum Dry-Bulb  !will require units transition.
 				if ( ! lNumericFieldBlanks( 7 ) ) {
@@ -6769,16 +6575,16 @@ Label9999: ;
 				}
 				errFlag = false;
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_Enthalpy;
-				RangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Enthalpy", "SizingPeriod:DesignDay", "Severe", ">= 0.0", ( DesDayInput( EnvrnNum ).HumIndValue >= 0.0 ), "<= 130000", ( DesDayInput( EnvrnNum ).HumIndValue <= 130000.0 ), _, DesDayInput( EnvrnNum ).Title );
+				inputProcessor->rangeCheck( errFlag, cAlphaFieldNames( 5 ) + " - Enthalpy", "SizingPeriod:DesignDay", "Severe", ">= 0.0", ( DesDayInput( EnvrnNum ).HumIndValue >= 0.0 ), "<= 130000", ( DesDayInput( EnvrnNum ).HumIndValue <= 130000.0 ), _, DesDayInput( EnvrnNum ).Title );
 				if ( errFlag ) {
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( 5 ), "RelativeHumiditySchedule" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "RelativeHumiditySchedule" ) ) {
 				cAlphaArgs( 5 ) = "RelativeHumiditySchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_RelHumSch;
 				units = "[%]";
 				unitType = OutputProcessor::Unit::Perc;
-			} else if ( SameString( cAlphaArgs( 5 ), "WetBulbProfileMultiplierSchedule" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "WetBulbProfileMultiplierSchedule" ) ) {
 				cAlphaArgs( 5 ) = "WetBulbProfileMultiplierSchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfMul;
 				units = "[]";
@@ -6791,7 +6597,7 @@ Label9999: ;
 					ShowContinueError( "..field is required when " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( 5 ), "WetBulbProfileDifferenceSchedule" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "WetBulbProfileDifferenceSchedule" ) ) {
 				cAlphaArgs( 5 ) = "WetBulbProfileDifferenceSchedule";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfDif;
 				units = "[]";
@@ -6804,7 +6610,7 @@ Label9999: ;
 					ShowContinueError( "..field is required when " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( 5 ), "WetBulbProfileDefaultMultipliers" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "WetBulbProfileDefaultMultipliers" ) ) {
 				cAlphaArgs( 5 ) = "WetBulbProfileDefaultMultipliers";
 				DesDayInput( EnvrnNum ).HumIndType = DDHumIndType_WBProfDef;
 				if ( ! lNumericFieldBlanks( 5 ) ) {
@@ -6919,13 +6725,13 @@ Label9999: ;
 			//   A10, \field Solar Model Indicator
 			if ( lAlphaFieldBlanks( 10 ) ) {
 				DesDayInput( EnvrnNum ).SolarModel = ASHRAE_ClearSky;
-			} else if ( SameString( cAlphaArgs( 10 ), "ASHRAEClearSky" ) || SameString( cAlphaArgs( 10 ), "CLEARSKY" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ASHRAEClearSky" ) || UtilityRoutines::SameString( cAlphaArgs( 10 ), "CLEARSKY" ) ) {
 				DesDayInput( EnvrnNum ).SolarModel = ASHRAE_ClearSky;
-			} else if ( SameString( cAlphaArgs( 10 ), "ZhangHuang" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ZhangHuang" ) ) {
 				DesDayInput( EnvrnNum ).SolarModel = Zhang_Huang;
-			} else if ( SameString( cAlphaArgs( 10 ), "ASHRAETau" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ASHRAETau" ) ) {
 				DesDayInput( EnvrnNum ).SolarModel = ASHRAE_Tau;
-			} else if ( SameString( cAlphaArgs( 10 ), "Schedule" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "Schedule" ) ) {
 				DesDayInput( EnvrnNum ).SolarModel = SolarModel_Schedule;
 			} else {
 				ShowWarningError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -7046,9 +6852,9 @@ Label9999: ;
 			}}
 
 			//   A9,  \field Daylight Saving Time Indicator
-			if ( SameString( cAlphaArgs( 9 ), "Yes" ) || SameString( cAlphaArgs( 9 ), "1" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "Yes" ) || UtilityRoutines::SameString( cAlphaArgs( 9 ), "1" ) ) {
 				DesDayInput( EnvrnNum ).DSTIndicator = 1;
-			} else if ( SameString( cAlphaArgs( 9 ), "No" ) || SameString( cAlphaArgs( 9 ), "0" ) || lAlphaFieldBlanks( 9 ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "No" ) || UtilityRoutines::SameString( cAlphaArgs( 9 ), "0" ) || lAlphaFieldBlanks( 9 ) ) {
 				DesDayInput( EnvrnNum ).DSTIndicator = 0;
 			} else {
 				ShowWarningError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
@@ -7057,7 +6863,7 @@ Label9999: ;
 			}
 
 			//   A2,  \field Day Type
-			DesDayInput( EnvrnNum ).DayType = FindItemInList( cAlphaArgs( 2 ), ValidNames, 12 );
+			DesDayInput( EnvrnNum ).DayType = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ValidNames, 12 );
 			if ( DesDayInput( EnvrnNum ).DayType == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
 				ShowContinueError( "..invalid field: " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -7110,27 +6916,8 @@ Label9999: ;
 		// This subroutine gets the location info from the IDF file; latitude,
 		//  longitude and time zone number.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LocNumAlpha; // Number of alpha names being passed
@@ -7142,7 +6929,7 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:Location";
-		NumLocations = GetNumObjectsFound( cCurrentModuleObject );
+		NumLocations = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumLocations > 1 ) {
 			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
@@ -7151,7 +6938,7 @@ Label9999: ;
 
 		if ( NumLocations == 1 ) {
 			//Call Input Get routine to retrieve Location information
-			GetObjectItem( cCurrentModuleObject, 1, LocNames, LocNumAlpha, LocProps, LocNumProp, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, LocNames, LocNumAlpha, LocProps, LocNumProp, IOStat );
 
 			//set latitude, longitude, and time zone number variables
 			LocationTitle = LocNames( 1 );
@@ -7201,35 +6988,19 @@ Label9999: ;
 		//        \object-list ScheduleNames
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetDayScheduleIndex;
 		using namespace DataIPShortCuts;
 		using General::FindNumberInList;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetWeatherProperties:" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item;
 		int IOStat;
 		int NumAlpha;
 		int NumNumerics;
-		bool IsNotOK;
-		bool IsBlank;
 		int Found;
 		int envFound;
 		int Count;
@@ -7239,13 +7010,13 @@ Label9999: ;
 		OutputProcessor::Unit unitType;
 
 		cCurrentModuleObject = "WeatherProperty:SkyTemperature";
-		NumWPSkyTemperatures = GetNumObjectsFound( cCurrentModuleObject );
+		NumWPSkyTemperatures = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		WPSkyTemperature.allocate( NumWPSkyTemperatures ); // by default, not used.
 
 		for ( Item = 1; Item <= NumWPSkyTemperatures; ++Item ) {
 			MultipleEnvironments = false;
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumerics, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			{ auto const SELECT_CASE_var( cAlphaArgs( 1 ) );
 			if ( SELECT_CASE_var == "" ) {
@@ -7272,7 +7043,7 @@ Label9999: ;
 					continue;
 				}
 			} else { // really a name
-				Found = FindItemInList( cAlphaArgs( 1 ), Environment, &EnvironmentData::Title );
+				Found = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Environment, &EnvironmentData::Title );
 				envFound = Found;
 				if ( Found == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid Environment Name referenced." );
@@ -7291,29 +7062,23 @@ Label9999: ;
 			}}
 
 			if ( ! lAlphaFieldBlanks( 1 ) ) {
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WPSkyTemperature, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WPSkyTemperature( Item ).Name = cAlphaArgs( 1 ); // Name
 			} else {
 				WPSkyTemperature( Item ).Name = "All RunPeriods";
 			}
 			// Validate Calculation Type.
-			if ( SameString( cAlphaArgs( 2 ), "ScheduleValue" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "ScheduleValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_ScheduleValue;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[C]";
 				unitType = OutputProcessor::Unit::C;
-			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDryBulbValue" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "DifferenceScheduleDryBulbValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DryBulbDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";
 				unitType = OutputProcessor::Unit::deltaC;
-			} else if ( SameString( cAlphaArgs( 2 ), "DifferenceScheduleDewPointValue" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "DifferenceScheduleDewPointValue" ) ) {
 				WPSkyTemperature( Item ).CalculationType = WP_DewPointDelta;
 				WPSkyTemperature( Item ).IsSchedule = true;
 				units = "[deltaC]";
@@ -7382,31 +7147,9 @@ Label9999: ;
 		// This file reads the Ground Temps from the input file and puts them
 		//  in a new variable.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
 		using namespace GroundTemperatureManager;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Formats
 		static gio::Fmt Format_720( "(' ',A,12(', ',F6.2))" );
@@ -7451,28 +7194,8 @@ Label9999: ;
 		// This file reads the Ground Reflectances from the input file (optional) and
 		// places them in the monthly array.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -7488,13 +7211,13 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:GroundReflectance";
-		I = GetNumObjectsFound( cCurrentModuleObject );
+		I = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( I != 0 ) {
 			GndProps.allocate( 12 );
 			GndAlphas.allocate( 1 );
 			if ( I == 1 ) {
 				//Get the object names for each construction from the input processor
-				GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
+				inputProcessor->getObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
 
 				if ( GndNumProp < 12 ) {
 					ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
@@ -7536,28 +7259,8 @@ Label9999: ;
 		// This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
 		// places them in the variables.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -7574,13 +7277,13 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
-		I = GetNumObjectsFound( cCurrentModuleObject );
+		I = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( I != 0 ) {
 			GndProps.allocate( 2 );
 			GndAlphas.allocate( 1 );
 			if ( I == 1 ) {
 				//Get the object names for each construction from the input processor
-				GetObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
+				inputProcessor->getObjectItem( cCurrentModuleObject, 1, GndAlphas, GndNumAlpha, GndProps, GndNumProp, IOStat );
 
 				//Assign the ground reflectances to the variable
 				SnowGndRefModifier = GndProps( 1 );
@@ -7626,18 +7329,9 @@ Label9999: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// Reads the input data for the WATER MAINS TEMPERATURES object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumObjects;
@@ -7649,12 +7343,12 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:WaterMainsTemperature";
-		NumObjects = GetNumObjectsFound( cCurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumObjects == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			if ( SameString( AlphArray( 1 ), "Schedule" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 1 ), "Schedule" ) ) {
 				WaterMainsTempsMethod = ScheduleMethod;
 
 				WaterMainsTempsSchedule = GetScheduleIndex( AlphArray( 2 ) );
@@ -7663,7 +7357,7 @@ Label9999: ;
 					ErrorsFound = true;
 				}
 
-			} else if ( SameString( AlphArray( 1 ), "Correlation" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 1 ), "Correlation" ) ) {
 				WaterMainsTempsMethod = CorrelationMethod;
 
 				if ( NumNums == 0 ) {
@@ -7772,17 +7466,9 @@ Label9999: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// Reads the input data for the WEATHER STATION object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumObjects;
@@ -7804,7 +7490,7 @@ Label9999: ;
 
 		// FLOW:
 		cCurrentModuleObject = "Site:WeatherStation";
-		NumObjects = GetNumObjectsFound( cCurrentModuleObject );
+		NumObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// Default conditions for a weather station in an open field at a height of 10 m. (These should match the IDD defaults.)
 		WeatherFileWindSensorHeight = 10.0;
@@ -7813,7 +7499,7 @@ Label9999: ;
 		WeatherFileTempSensorHeight = 1.5;
 
 		if ( NumObjects == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 
 			if ( NumNums > 0 ) WeatherFileWindSensorHeight = NumArray( 1 );
 			if ( NumNums > 1 ) WeatherFileWindExp = NumArray( 2 );
@@ -8110,28 +7796,11 @@ Label9999: ;
 		// File is positioned to the correct line, then backspaced.  This routine
 		// reads in the line and processes as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::ProcessNumber;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::SameString;
 		using General::JulianDay;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtLD( "*" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string Title;
@@ -8165,7 +7834,7 @@ Label9999: ;
 		}
 		if ( Pos != std::string::npos ) Line.erase( 0, Pos + 1 );
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( HeaderString ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( HeaderString ) );
 
 		if ( SELECT_CASE_var == "LOCATION" ) {
 
@@ -8204,7 +7873,7 @@ Label9999: ;
 					Title += " WMO#=" + WMO;
 
 				} else if ( ( SELECT_CASE_var1 == 6 ) || ( SELECT_CASE_var1 == 7 ) || ( SELECT_CASE_var1 == 8 ) || ( SELECT_CASE_var1 == 9 ) ) {
-					Number = ProcessNumber( Line.substr( 0, Pos ), errFlag );
+					Number = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), errFlag );
 					if ( ! errFlag ) {
 						{ auto const SELECT_CASE_var2( Count );
 						if ( SELECT_CASE_var2 == 6 ) {
@@ -8244,7 +7913,7 @@ Label9999: ;
 					Pos = len( Line );
 				}
 			}
-			NumEPWTypExtSets = ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+			NumEPWTypExtSets = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 			Line.erase( 0, Pos + 1 );
 			TypicalExtremePeriods.allocate( NumEPWTypExtSets );
 			TropExtremeCount = 0;
@@ -8265,7 +7934,7 @@ Label9999: ;
 				if ( Pos != std::string::npos ) {
 					TypicalExtremePeriods( Count ).TEType = Line.substr( 0, Pos );
 					Line.erase( 0, Pos + 1 );
-					if ( SameString( TypicalExtremePeriods( Count ).TEType, "EXTREME" ) ) {
+					if ( UtilityRoutines::SameString( TypicalExtremePeriods( Count ).TEType, "EXTREME" ) ) {
 						if ( has_prefixi( TypicalExtremePeriods( Count ).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MAX" ) ) {
 							TypicalExtremePeriods( Count ).ShortTitle = "NoDrySeasonMax";
 						} else if ( has_prefixi( TypicalExtremePeriods( Count ).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MIN" ) ) {
@@ -8383,9 +8052,9 @@ Label9999: ;
 			// Process periods to set up other values.
 			for ( Count = 1; Count <= NumEPWTypExtSets; ++Count ) {
 				// JulianDay (Month,Day,LeapYearValue)
-				{ auto const SELECT_CASE_var1( MakeUPPERCase( TypicalExtremePeriods( Count ).ShortTitle ) );
+				{ auto const SELECT_CASE_var1( UtilityRoutines::MakeUPPERCase( TypicalExtremePeriods( Count ).ShortTitle ) );
 				if ( SELECT_CASE_var1 == "SUMMER" ) {
-					if ( SameString( TypicalExtremePeriods( Count ).TEType, "EXTREME" ) ) {
+					if ( UtilityRoutines::SameString( TypicalExtremePeriods( Count ).TEType, "EXTREME" ) ) {
 						TypicalExtremePeriods( Count ).MatchValue = "SummerExtreme";
 						TypicalExtremePeriods( Count ).MatchValue1 = "TropicalHot";
 						TypicalExtremePeriods( Count ).MatchValue2 = "NoDrySeasonMax";
@@ -8394,7 +8063,7 @@ Label9999: ;
 					}
 
 				} else if ( SELECT_CASE_var1 == "WINTER" ) {
-					if ( SameString( TypicalExtremePeriods( Count ).TEType, "EXTREME" ) ) {
+					if ( UtilityRoutines::SameString( TypicalExtremePeriods( Count ).TEType, "EXTREME" ) ) {
 						TypicalExtremePeriods( Count ).MatchValue = "WinterExtreme";
 						TypicalExtremePeriods( Count ).MatchValue1 = "TropicalCold";
 						TypicalExtremePeriods( Count ).MatchValue2 = "NoDrySeasonMin";
@@ -8459,7 +8128,7 @@ Label9999: ;
 			// or first set on a weather file, if any.
 			Pos = index( Line, ',' );
 			if ( Pos != std::string::npos ) {
-				NumGrndTemps = ProcessNumber( Line.substr( 0, Pos ), errFlag );
+				NumGrndTemps = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), errFlag );
 				if ( ! errFlag && NumGrndTemps >= 1 ) {
 					Line.erase( 0, Pos + 1 );
 					// skip depth, soil conductivity, soil density, soil specific heat
@@ -8476,12 +8145,12 @@ Label9999: ;
 					for ( Count = 1; Count <= 12; ++Count ) { // take the first set of ground temperatures.
 						Pos = index( Line, ',' );
 						if ( Pos != std::string::npos ) {
-							Number = ProcessNumber( Line.substr( 0, Pos ), errFlag );
+							Number = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), errFlag );
 							GroundTempsFCFromEPWHeader( Count ) = Number;
 							++actcount;
 						} else {
 							if ( len( Line ) > 0 ) {
-								Number = ProcessNumber( Line.substr( 0, Pos ), errFlag );
+								Number = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), errFlag );
 								GroundTempsFCFromEPWHeader( Count ) = Number;
 								++actcount;
 							}
@@ -8578,8 +8247,8 @@ Label9999: ;
 					}
 
 				} else if ( SELECT_CASE_var1 == 4 ) {
-					NumEPWHolidays = ProcessNumber( Line.substr( 0, Pos ), IOStatus );
-					NumSpecialDays = NumEPWHolidays + GetNumObjectsFound( "RunPeriodControl:SpecialDays" );
+					NumEPWHolidays = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					NumSpecialDays = NumEPWHolidays + inputProcessor->getNumObjectsFound( "RunPeriodControl:SpecialDays" );
 					SpecialDays.allocate( NumSpecialDays );
 					NumHdArgs = 4 + NumEPWHolidays * 2;
 					CurCount = 0;
@@ -8676,7 +8345,7 @@ Label9999: ;
 				{ auto const SELECT_CASE_var1( Count );
 
 				if ( SELECT_CASE_var1 == 1 ) {
-					NumDataPeriods = ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					NumDataPeriods = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 					DataPeriods.allocate( NumDataPeriods );
 					NumHdArgs += 4 * NumDataPeriods;
 					if ( NumDataPeriods > 0 ) {
@@ -8685,7 +8354,7 @@ Label9999: ;
 					CurCount = 0;
 
 				} else if ( SELECT_CASE_var1 == 2 ) {
-					NumIntervalsPerHour = ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					NumIntervalsPerHour = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 					//          IF (NumIntervalsPerHour /= 1) THEN
 					//            CALL ShowSevereError('Process EPW: Not ready for more than one interval per hour')
 					//            ErrorsFound=.TRUE.
@@ -8710,7 +8379,7 @@ Label9999: ;
 						// Start Day of Week
 						if ( CurCount <= NumDataPeriods ) {
 							DataPeriods( CurCount ).DayOfWeek = Line.substr( 0, Pos );
-							DataPeriods( CurCount ).WeekDay = FindItemInList( DataPeriods( CurCount ).DayOfWeek, DaysOfWeek, 7 );
+							DataPeriods( CurCount ).WeekDay = UtilityRoutines::FindItemInList( DataPeriods( CurCount ).DayOfWeek, DaysOfWeek, 7 );
 							if ( DataPeriods( CurCount ).WeekDay == 0 ) {
 								gio::write( ErrNum, fmtLD ) << CurCount;
 								strip( ErrNum );
@@ -8799,24 +8468,8 @@ Label9999: ;
 		// METHODOLOGY EMPLOYED:
 		// List directed reads, as possible.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::ProcessNumber;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const Header( "DATA PERIODS" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string::size_type Pos;
@@ -8876,7 +8529,7 @@ Label9999: ;
 			{ auto const SELECT_CASE_var( Count );
 
 			if ( SELECT_CASE_var == 1 ) {
-				NumPeriods = ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+				NumPeriods = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 				NumHdArgs += 4 * NumPeriods;
 				CurCount = 0;
 

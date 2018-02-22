@@ -2596,7 +2596,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly,ReportSch;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly,ReportSch;
+  Output:Variable,*,Heating Coil Heating Rate,hourly,ReportSch;
 
   Output:Meter,Cooling:Electricity,monthly;
 

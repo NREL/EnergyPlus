@@ -851,6 +851,7 @@
   ElectricEquipment:ITE:AirCooled,
     Data Center Servers,     !- Name
     Main Zone,               !- Zone Name
+    FlowFromSystem,          !- Air Flow Caclulation Method
     Watts/Unit,              !- Design Power Input Calculation Method
     500,                     !- Watts per Unit {W}
     100,                     !- Number of Units

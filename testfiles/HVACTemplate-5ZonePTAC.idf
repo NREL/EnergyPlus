@@ -1993,8 +1993,6 @@
 
   Output:Variable,*,Zone Cooling Setpoint Not Met While Occupied Time,hourly;
 
-  Output:Variable,*,Heating Coil Heating Rate,hourly;
-
   Output:Variable,*,Plant Supply Side Outlet Temperature,hourly;
 
   Output:Variable,*,Boiler Heating Rate,hourly;
@@ -2019,7 +2017,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio,hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Electric Power,hourly;
 

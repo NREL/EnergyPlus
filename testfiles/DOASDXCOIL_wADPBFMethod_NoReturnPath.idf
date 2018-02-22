@@ -3574,7 +3574,7 @@
 
   Output:Variable,*,VRF Heat Pump Operating Mode,hourly;
 
-  Output:Variable,*,Heating Coil Total Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Electric Power,hourly;
 

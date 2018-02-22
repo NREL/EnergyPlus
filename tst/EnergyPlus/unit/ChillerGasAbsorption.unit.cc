@@ -138,7 +138,7 @@ TEST_F( EnergyPlusFixture, GasAbsorption_GetInput_Test )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGasAbsorberInput();
 

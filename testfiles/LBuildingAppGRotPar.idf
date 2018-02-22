@@ -265,7 +265,7 @@
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 

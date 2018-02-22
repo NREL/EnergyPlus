@@ -3234,7 +3234,7 @@
 
   Output:Variable,SPACE1-1 PTAC,Unitary System Sensible Cooling Rate,hourly;
 
-  Output:Variable,SPACE1-1 Heating Coil,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,SPACE1-1 Heating Coil,Heating Coil Heating Rate,hourly;
 
   Output:Variable,DOAS Mixed Air Outlet,System Node Mass Flow Rate,hourly;
 

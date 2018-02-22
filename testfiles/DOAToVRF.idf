@@ -3385,7 +3385,7 @@
 
   Output:Variable,TU1 VRF DX COOLING COIL,Cooling Coil Runtime Fraction,timestep;
 
-  Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Total Heating Rate,timestep;
+  Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Heating Rate,timestep;
 
   Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Runtime Fraction,timestep;
 

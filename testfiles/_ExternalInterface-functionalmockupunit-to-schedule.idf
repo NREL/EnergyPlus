@@ -364,10 +364,10 @@
   Building,
     office zone,             !- Name
     0,                       !- North Axis {deg}
-    1,                       !- Terrain
+    Country,                       !- Terrain // changed from '1', no enum indices allowed
     4.0000000E-02,           !- Loads Convergence Tolerance Value
     4.0000000E-01,           !- Temperature Convergence Tolerance Value {deltaC}
-    1,                       !- Solar Distribution
+    FullExteriorWithReflections,                       !- Solar Distribution // changed from '1', no enum indices allowed
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 

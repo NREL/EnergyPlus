@@ -4981,7 +4981,7 @@
 
   Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 
