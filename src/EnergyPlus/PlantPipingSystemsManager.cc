@@ -3855,7 +3855,7 @@ namespace PlantPipingSystemsManager {
 						break;
 					case CellType::Unknown:
 						cellType = CellType::GeneralField;
-						ATTR_FALLTHROUGH;
+						// fallthrough
 					default:
 						++TotNumCells;
 					}

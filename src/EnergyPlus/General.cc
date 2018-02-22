@@ -1823,7 +1823,7 @@ namespace General {
 							return zero_string;
 						}
 					}
-					ATTR_FALLTHROUGH;
+					// fallthrough
 				default:
 					return InputString.substr( 0, InputString.find_last_not_of( '0' ) + 1 );
 				}
@@ -1868,7 +1868,7 @@ namespace General {
 							break;
 						}
 					}
-					ATTR_FALLTHROUGH;
+					// fallthrough
 				default:
 					InputString.erase( pos + 1 );
 				}
@@ -2521,7 +2521,7 @@ namespace General {
 
 	}
 
-	// returns the Julian date for the first, second, etc. day of week for a given month 
+	// returns the Julian date for the first, second, etc. day of week for a given month
 	int
 	nthDayOfWeekOfMonth(
 		int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
