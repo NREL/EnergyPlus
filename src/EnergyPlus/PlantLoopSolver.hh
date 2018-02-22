@@ -59,9 +59,6 @@ namespace EnergyPlus {
 
 namespace PlantLoopSolver {
 
-	// Data
-	// DERIVED TYPE DEFINITIONS
-
 	// MODULE VARIABLE DEFINITIONS
 	extern Real64 InitialDemandToLoopSetPoint;
 	extern Real64 CurrentAlterationsToDemand;
@@ -69,11 +66,6 @@ namespace PlantLoopSolver {
 	extern Real64 LoadToLoopSetPointThatWasntMet; // Unmet Demand
 	extern Real64 InitialDemandToLoopSetPointSAVED;
 	extern int RefrigIndex; // Index denoting refrigerant used (possibly steam)
-
-	// SUBROUTINE SPECIFICATIONS:
-	//PRIVATE EvaluatePumpFlowConditions
-
-	// Types
 
 	struct Location
 	{
@@ -107,7 +99,6 @@ namespace PlantLoopSolver {
 
 	};
 
-	// Functions
 	void
 	clear_state();
 
@@ -119,43 +110,45 @@ namespace PlantLoopSolver {
 		bool & ReSimOtherSideNeeded
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//================= TOPOLOGY VALIDATION ROUTINE ====================!
-	//==================================================================!
-
 	m_FlowControlValidator
 	ValidateFlowControlPaths(
 		int const LoopNum,
 		int const LoopSideNum
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//==================== PREDICT LOOP FLOW ===========================!
-	//==================================================================!
-
-	void
+	Real64
 	SetupLoopFlowRequest(
 		int const LoopNum,
 		int const ThisSide,
-		int const OtherSide,
-		Real64 & LoopFlow // Once all flow requests are evaluated, this is the desired flow on this side
+		int const OtherSide
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
+	Real64
+	DetermineLoopSideFlowRate(
+		int LoopNum,
+		int ThisSide,
+		int ThisSideInletNode,
+		Real64 ThisSideLoopFlowRequest
+	);
 
-	//==================================================================!
-	//================== LOOPSIDE BRANCH SIMULATION ====================!
-	//==================================================================!
+	void DisableAnyBranchPumpsConnectedToUnloadedEquipment(
+		int LoopNum,
+		int ThisSide
+	);
+
+	void TurnOnAllLoopSideBranches(
+			int LoopNum,
+			int LoopSide
+	);
+
+	void
+	DoFlowAndLoadSolutionPass(
+		int LoopNum,
+		int ThisSide,
+		int OtherSide,
+		int ThisSideInletNode,
+		bool FirstHVACIteration
+	);
 
 	void
 	SimulateAllLoopSideBranches(
@@ -165,14 +158,6 @@ namespace PlantLoopSolver {
 		bool const FirstHVACIteration,
 		bool & LoopShutDownFlag
 	);
-
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//================ SINGLE BRANCH GROUP SIMULATION ==================!
-	//==================================================================!
 
 	void
 	SimulateLoopSideBranchGroup(
@@ -186,14 +171,6 @@ namespace PlantLoopSolver {
 		bool const StartingNewLoopSidePass = false
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//==================== SIMULATE LOOP SIDE PUMPS ====================!
-	//==================================================================!
-
 	void
 	SimulateAllLoopSidePumps(
 		int const LoopNum,
@@ -202,27 +179,11 @@ namespace PlantLoopSolver {
 		Optional< Real64 const > SpecificPumpFlowRate = _
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//============ EVALUATE LOAD REQUIRED FOR WHOLE LOOP ===============!
-	//==================================================================!
-
 	Real64
 	CalcOtherSideDemand(
 		int const LoopNum,
 		int const ThisSide
 	);
-
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//========= EVALUATE LOAD REQUIRED TO MEET LOOP SETPOINT ===========!
-	//==================================================================!
 
 	Real64
 	EvaluateLoopSetPointLoad(
@@ -233,10 +194,6 @@ namespace PlantLoopSolver {
 		Array1S_int LastComponentSimulated
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
 	void
 	UpdateAnyLoopDemandAlterations(
 		int const LoopNum,
@@ -244,14 +201,6 @@ namespace PlantLoopSolver {
 		int const BranchNum,
 		int const CompNum
 	);
-
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//=================== FLOW RESOLVER ROUTINE ========================!
-	//==================================================================!
 
 	void
 	ResolveParallelFlows(
@@ -261,10 +210,6 @@ namespace PlantLoopSolver {
 		bool const FirstHVACIteration // TRUE if First HVAC iteration of Time step
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
 	void
 	PropagateResolvedFlow(
 		int const LoopNum,
@@ -272,20 +217,12 @@ namespace PlantLoopSolver {
 		bool const FirstHVACIteration
 	);
 
-	//==================================================================!
-	//================= EVALUATING BRANCH REQUEST ======================!
-	//==================================================================!
-
 	Real64
 	DetermineBranchFlowRequest(
 		int const LoopNum,
 		int const LoopSideNum,
 		int const BranchNum
 	);
-
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
 
 	void
 	PushBranchFlowCharacteristics(
@@ -295,10 +232,6 @@ namespace PlantLoopSolver {
 		Real64 const ValueToPush,
 		bool const FirstHVACIteration // TRUE if First HVAC iteration of Time step
 	);
-
-	//==================================================================!
-	//================== REPORT VARIABLE UPDATE ========================!
-	//==================================================================!
 
 	void
 	UpdateLoopSideReportVars(
@@ -314,14 +247,6 @@ namespace PlantLoopSolver {
 		int const LoopSideNum
 	);
 
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
-
-	//==================================================================!
-	//================ VERIFYING LOOP EXIT NODE STATE ==================!
-	//==================================================================!
-
 	void
 	CheckLoopExitNode(
 		int const LoopNum, // plant loop counter
@@ -336,10 +261,6 @@ namespace PlantLoopSolver {
 		int const CompNum,
 		Real64 & FlowToRequest
 	);
-
-	//==================================================================!
-	//==================================================================!
-	//==================================================================!
 
 } // PlantLoopSolver
 

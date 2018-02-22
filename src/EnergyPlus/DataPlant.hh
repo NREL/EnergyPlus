@@ -650,6 +650,7 @@ namespace DataPlant {
 		int PressureCurveType; // Either none, pressure curve, or generic curve
 		int PressureCurveIndex; // Curve: index for pressure drop calculations
 		Real64 PressureEffectiveK;
+		bool QuickDisableForCSBranchPumping;
 
 		// Default Constructor
 		BranchData() :
@@ -672,7 +673,8 @@ namespace DataPlant {
 			PressureDrop( 0.0 ),
 			PressureCurveType( 0 ),
 			PressureCurveIndex( 0 ),
-			PressureEffectiveK( 0.0 )
+			PressureEffectiveK( 0.0 ),
+			QuickDisableForCSBranchPumping( false )
 		{}
 
 		// Max abs of Comp array MyLoad values //Autodesk:Tuned For replacement of any( abs( Comp.MyLoad() > SmallLoad ) usage
