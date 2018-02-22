@@ -19,6 +19,7 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
   BranchInputManager.unit.cc
