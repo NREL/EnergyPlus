@@ -822,30 +822,61 @@ namespace BaseboardRadiator {
 						// set the lower and upper limits on the UA
 						UA0 = 0.001 * DesCoilLoad;
 						UA1 = DesCoilLoad;
-						// Invert the baseboard model: given the design inlet conditions and the design load,
-						// find the design UA.
-						SolveRoot( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
-						// if the numerical inversion failed, issue error messages.
-						if ( SolFla == -1 ) {
-							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
-							ShowContinueError( "Iteration limit exceeded in calculating coil UA" );
-							if ( UAAutoSize ) {
-								ErrorsFound = true;
-							} else {
-								ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
-								UA = 0.0;
+
+						// before iterating on a design UA check output at lower UA bound 
+						Baseboard( BaseboardNum ).UA = UA0;
+						Real64 LoadMet = 0.0;
+						int BBIndex = BaseboardNum;
+						SimHWConvective( BBIndex, LoadMet );
+						if ( LoadMet < DesCoilLoad ) { // baseboard output should be below design load
+							// now check output at max UA (where UA = design load)
+							Baseboard( BaseboardNum ).UA = UA1;
+							SimHWConvective( BBIndex, LoadMet );
+
+							if ( LoadMet > DesCoilLoad ) { // if the load met is greater than design load, OK to iterate on UA
+								// Invert the baseboard model: given the design inlet conditions and the design load,
+								// find the design UA.
+								SolveRoot( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
+								// if the numerical inversion failed, issue error messages.
+								if ( SolFla == -1 ) {
+									ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Iteration limit exceeded in calculating coil UA" );
+									if ( UAAutoSize ) {
+										ErrorsFound = true;
+									} else {
+										ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
+										UA = 0.0;
+									}
+								} else if ( SolFla == -2 ) {
+									ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Bad starting values for UA" );
+									if ( UAAutoSize ) {
+										ErrorsFound = true;
+									} else {
+										ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
+										UA = 0.0;
+									}
+								}
+								UADes = UA; //Baseboard(BaseboardNum)%UA = UA
+							} else { // baseboard design load is greater than output at UA = design load so set UA = design load
+								UADes = UA1;
+								if ( UAAutoSize ) {
+									ShowWarningError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Design UA set equal to design coil load for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Design coil load used during sizing = " + RoundSigDigits( DesCoilLoad, 5 ) + " W." );
+									ShowContinueError( "Inlet water temperature used during sizing = " + RoundSigDigits( Baseboard( BaseboardNum ).WaterInletTemp, 5 ) + " C." );
+								}
 							}
-						} else if ( SolFla == -2 ) {
-							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
-							ShowContinueError( "Bad starting values for UA" );
+						} else { // baseboard design load is less than output at UA = 0.001 * design load so set UA to minimum value
+							UADes = UA0;
 							if ( UAAutoSize ) {
-								ErrorsFound = true;
-							} else {
-								ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
-								UA = 0.0;
+								ShowWarningError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+								ShowContinueError( "Design UA set equal to 0.001 * design coil load for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+								ShowContinueError( "Design coil load used during sizing = " + RoundSigDigits( DesCoilLoad, 5 ) + " W." );
+								ShowContinueError( "Inlet water temperature used during sizing = " + RoundSigDigits( Baseboard( BaseboardNum ).WaterInletTemp, 5 ) + " C." );
 							}
 						}
-						UADes = UA; //Baseboard(BaseboardNum)%UA = UA
+
 					} else {
 						UADes = 0.0;
 					}
