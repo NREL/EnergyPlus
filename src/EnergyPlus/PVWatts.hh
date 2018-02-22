@@ -58,7 +58,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
-#include <InputProcessor.hh>
 #include <PVWattsSSC.hh>
 
 namespace EnergyPlus {

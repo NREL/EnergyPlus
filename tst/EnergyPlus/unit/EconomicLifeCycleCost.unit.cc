@@ -251,7 +251,7 @@ TEST_F( EnergyPlusFixture, EconomicLifeCycleCost_GetInput )
 
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetInputForLifeCycleCost();
 

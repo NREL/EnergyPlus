@@ -307,6 +307,9 @@ namespace PipeHeatTransfer {
 		PlantComponent * factory( int objectType, std::string objectName );
 
 		void
+		clear_state();
+
+		void
 		simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
 
 		void

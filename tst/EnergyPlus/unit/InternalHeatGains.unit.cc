@@ -108,7 +108,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType )
 
 	} );
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 	EXPECT_FALSE(has_err_output());
 
 	bool ErrorsFound(false);
@@ -159,7 +159,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel 
 
 	} );
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 	EXPECT_FALSE(has_err_output());
 
 	bool ErrorsFound(false);
@@ -174,7 +174,6 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel 
 	ASSERT_THROW( InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error );
 
 	std::string const error_string = delimited_string({
-		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
 		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
 		"   ** Severe  ** GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", Design Level is not allowed to be negative",
 		"   **   ~~~   ** ... when a fuel type of FuelOil#1 is specified.",
@@ -212,7 +211,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
 
 	} );
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 	EXPECT_FALSE(has_err_output());
 
 	bool ErrorsFound(false);
@@ -229,7 +228,6 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType ) {
 	std::string const error_string = delimited_string({
 		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
 		"   ** Severe  ** GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1",
-		"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
 		"   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
 		"   ...Summary of Errors that led to program termination:",
 		"   ..... Reference severe error count=1",
@@ -288,7 +286,7 @@ TEST_F( EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortM
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound1( false );
 
@@ -419,10 +417,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 		"  Dimensionless,           !- Input Unit Type for X",
 		"  Temperature,             !- Input Unit Type for Y",
 		"  Dimensionless;           !- Output Unit Type",
-	
+
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 
 	bool ErrorsFound( false );
@@ -457,7 +455,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals) {
 		"Zone,Zone1;",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 
 	bool ErrorsFound( false );
@@ -495,7 +493,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals) {
 	DataGlobals::TimeStep = 1;
 	OutputReportTabular::AllocateLoadComponentArrays();
 	int timeStepInDay = ( DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
-		
+
 	DataGlobals::CompLoadReportIsReq = true;
 	DataGlobals::isPulseZoneSizing = false;
 	InternalHeatGains::GatherComponentLoadsIntGain();
@@ -626,10 +624,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 		"  Dimensionless,           !- Input Unit Type for X",
 		"  Temperature,             !- Input Unit Type for Y",
 		"  Dimensionless;           !- Output Unit Type",
-	
+
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 
 	bool ErrorsFound( false );

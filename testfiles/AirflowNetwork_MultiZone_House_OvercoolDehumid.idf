@@ -2300,7 +2300,7 @@
 
   Output:Variable,*,Cooling Coil Electric Power,Timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,Timestep;
+  Output:Variable,*,Heating Coil Heating Rate,Timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,Timestep;
 

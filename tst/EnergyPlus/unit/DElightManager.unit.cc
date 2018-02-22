@@ -62,7 +62,7 @@
 #include <DataSurfaces.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
@@ -301,7 +301,7 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool foundErrors = false;
 
@@ -363,6 +363,5 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 	EXPECT_EQ( 0. , DElightComplexFene( 1 ).feneRota );
 
 }
-
 
 

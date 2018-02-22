@@ -3296,7 +3296,7 @@
 
   Output:Variable,SPACE1-1 Heat Pump,Zone Packaged Terminal Heat Pump Sensible Cooling Rate,hourly;
 
-  Output:Variable,SPACE1-1 HP Supp Coil,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,SPACE1-1 HP Supp Coil,Heating Coil Heating Rate,hourly;
 
   Output:Variable,DOAS Mixed Air Outlet,System Node Mass Flow Rate,hourly;
 

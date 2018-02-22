@@ -994,7 +994,7 @@ namespace DataPlant {
 		// Default Constructor
 		PlantLoopData() :
 			FluidType( 0 ),
-			FluidIndex( 0 ),
+			FluidIndex( 1 ), // default to water
 			MFErrIndex( 0 ),
 			MFErrIndex1( 0 ),
 			MFErrIndex2( 0 ),
