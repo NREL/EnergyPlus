@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -53,7 +54,9 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array5D.hh>
+#include <ObjexxFCL/Array6D.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -275,6 +278,8 @@ namespace CurveManager {
 		Real64 Var4Min; // minimum of 4th independent variable
 		Real64 Var5Max; // maximum of 5th independent variable
 		Real64 Var5Min; // minimum of 5th independent variable
+		Real64 Var6Max; // maximum of 6th independent variable
+		Real64 Var6Min; // minimum of 6th independent variable
 		Real64 CurveMin; // minimum value of curve output
 		Real64 CurveMax; // maximum value of curve output
 		bool CurveMinPresent; // If TRUE, then cap minimum curve output
@@ -289,16 +294,20 @@ namespace CurveManager {
 		bool Var4MaxPresent;  // uses data set limit to set Var4Max if false
 		bool Var5MinPresent;  // uses data set limit to set Var5Min if false
 		bool Var5MaxPresent;  // uses data set limit to set Var5Max if false
+		bool Var6MinPresent;  // uses data set limit to set Var6Min if false
+		bool Var6MaxPresent;  // uses data set limit to set Var6Max if false
 		Array1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
 		bool EMSOverrideOn; // if TRUE, then EMS is calling to override curve value
 		Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
+		bool OpticalProperty; // if TRUE, this table is used to store optical property
 		// report variables
 		Real64 CurveOutput; // curve output or result
 		Real64 CurveInput1; // curve input #1 (e.g., x or X1 variable)
-		Real64 CurveInput2; // curve input #1 (e.g., y or X2 variable)
-		Real64 CurveInput3; // curve input #1 (e.g., z or X3 variable)
-		Real64 CurveInput4; // curve input #1 (e.g., X4 variable)
-		Real64 CurveInput5; // curve input #1 (e.g., X5 variable)
+		Real64 CurveInput2; // curve input #2 (e.g., y or X2 variable)
+		Real64 CurveInput3; // curve input #3 (e.g., z or X3 variable)
+		Real64 CurveInput4; // curve input #4 (e.g., X4 variable)
+		Real64 CurveInput5; // curve input #5 (e.g., X5 variable)
+		Real64 CurveInput6; // curve input #6 (e.g., X6 variable)
 
 		// Default Constructor
 		PerfomanceCurveData() :
@@ -334,6 +343,8 @@ namespace CurveManager {
 			Var4Min( 0.0 ),
 			Var5Max( 0.0 ),
 			Var5Min( 0.0 ),
+			Var6Max( 0.0 ),
+			Var6Min( 0.0 ),
 			CurveMin( 0.0 ),
 			CurveMax( 0.0 ),
 			CurveMinPresent( false ),
@@ -348,14 +359,18 @@ namespace CurveManager {
 			Var4MaxPresent( false ),
 			Var5MinPresent( false ),
 			Var5MaxPresent( false ),
+			Var6MinPresent( false ),
+			Var6MaxPresent( false ),
 			EMSOverrideOn( false ),
 			EMSOverrideCurveValue( 0.0 ),
+			OpticalProperty( false ),
 			CurveOutput( 0.0 ),
 			CurveInput1( 0.0 ),
 			CurveInput2( 0.0 ),
 			CurveInput3( 0.0 ),
 			CurveInput4( 0.0 ),
-			CurveInput5( 0.0 )
+			CurveInput5( 0.0 ),
+			CurveInput6( 0.0 )
 		{}
 
 	};
@@ -375,7 +390,9 @@ namespace CurveManager {
 		Array1D< Real64 > X4Var;
 		int NumX5Vars; // Number of variables for independent variable #5
 		Array1D< Real64 > X5Var;
-		Array5D< Real64 > TableLookupZData;
+		int NumX6Vars; // Number of variables for independent variable #6
+		Array1D< Real64 > X6Var;
+		Array6D< Real64 > TableLookupZData;
 
 		// Default Constructor
 		TableLookupData() :
@@ -385,7 +402,8 @@ namespace CurveManager {
 			NumX2Vars( 0 ),
 			NumX3Vars( 0 ),
 			NumX4Vars( 0 ),
-			NumX5Vars( 0 )
+			NumX5Vars( 0 ),
+			NumX6Vars( 0 )
 		{}
 
 	};
@@ -415,7 +433,8 @@ namespace CurveManager {
 		Optional< Real64 const > Var2 = _, // 2nd independent variable
 		Optional< Real64 const > Var3 = _, // 3rd independent variable
 		Optional< Real64 const > Var4 = _, // 4th independent variable
-		Optional< Real64 const > Var5 = _ // 5th independent variable
+		Optional< Real64 const > Var5 = _, // 5th independent variable
+		Optional< Real64 const > Var6 = _  // 6th independent variable
 	);
 
 	void
@@ -477,7 +496,8 @@ namespace CurveManager {
 		Optional< Real64 const > Var2 = _, // 2nd independent variable
 		Optional< Real64 const > Var3 = _, // 3rd independent variable
 		Optional< Real64 const > Var4 = _, // 4th independent variable
-		Optional< Real64 const > Var5 = _ // 5th independent variable
+		Optional< Real64 const > Var5 = _, // 5th independent variable
+		Optional< Real64 const > Var6 = _
 	);
 
 	void
@@ -511,6 +531,8 @@ namespace CurveManager {
 
 	std::string
 	GetCurveName( int const CurveIndex ); // index of curve in curve array
+
+	Real64 GetNormalPoint(int const CurveIndex);
 
 	int
 	GetCurveIndex( std::string const & CurveName ); // name of the curve
@@ -570,6 +592,45 @@ namespace CurveManager {
 
 	int
 	GetCurveObjectTypeNum( int const CurveIndex ); // index of curve in curve array
+
+	void
+	checkCurveIsNormalizedToOne(
+		std::string const callingRoutineObj,  // calling routine with object type
+		std::string const objectName,         // parent object where curve is used
+		int const curveIndex,                 // index to curve object
+		std::string const cFieldName,         // object field name
+		std::string const cFieldValue,        // user input curve name
+		Real64 const Var1,                    // required 1st independent variable
+		Optional <Real64 const > Var2 = _,    // 2nd independent variable
+		Optional< Real64 const > Var3 = _,    // 3rd independent variable
+		Optional< Real64 const > Var4 = _,    // 4th independent variable
+		Optional< Real64 const > Var5 = _     // 5th independent variable
+	);
+
+	int
+	GetCurveInterpolationMethodNum( int const CurveIndex ); // index of curve in curve array
+
+	void
+	ReadTwoVarTableDataFromFile(
+		int const CurveNum,
+		std::string & FileName,
+		int & lineNum
+	);
+
+	void
+	SetSameIndeVariableValues(
+		int const TransCurveIndex,
+		int const FRefleCurveIndex,
+		int const BRefleCurveIndex
+	);
+
+	void
+	SetCommonIncidentAngles(
+		int const ConstrNum,  // Construction number
+		int const NGlass,     // The number of glass layers in the construction with index = ConstrNum
+		int & TotalIPhi,      // The number of incident angles
+		Array1A_int const Tables // Store construction layer number for SpectralAndAngleGlassLayer glass only. Otherwise = 0 for other layers.
+	);
 
 	//=================================================================================================!
 

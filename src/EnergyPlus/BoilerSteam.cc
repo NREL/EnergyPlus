@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -67,7 +68,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -177,14 +178,13 @@ namespace BoilerSteam {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subrountine controls the boiler component simulation
+		// This subroutine controls the boiler component simulation
 
 		// METHODOLOGY EMPLOYED: na
 
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using namespace FluidProperties;
 
 		// Locals
@@ -208,7 +208,7 @@ namespace BoilerSteam {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			BoilerNum = FindItemInList( BoilerName, Boiler );
+			BoilerNum = UtilityRoutines::FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
 				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
@@ -266,10 +266,6 @@ namespace BoilerSteam {
 
 		// Using/Aliasing
 		using namespace DataGlobalConstants;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -287,8 +283,6 @@ namespace BoilerSteam {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int SteamFluidIndex; // Fluid Index for Steam
 		static bool ErrorsFound( false );
 		bool errFlag;
@@ -296,7 +290,7 @@ namespace BoilerSteam {
 
 		SteamFluidIndex = 0;
 		cCurrentModuleObject = "Boiler:Steam";
-		NumBoilers = GetNumObjectsFound( cCurrentModuleObject );
+		NumBoilers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBoilers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -315,15 +309,8 @@ namespace BoilerSteam {
 
 		//LOAD ARRAYS WITH CURVE FIT Boiler DATA
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			GetObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Boiler, BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueBoilerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -383,6 +370,10 @@ namespace BoilerSteam {
 
 			// INPUTS from the IDF file
 			Boiler( BoilerNum ).BoilerMaxOperPress = rNumericArgs( 1 );
+			if ( Boiler( BoilerNum ).BoilerMaxOperPress < 1e5 ) {
+				ShowWarningMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
+				ShowContinueError( "Field: Maximum Operation Pressure units are Pa. Verify units." );
+			}
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			Boiler( BoilerNum ).TempUpLimitBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 4 );
@@ -430,6 +421,11 @@ namespace BoilerSteam {
 
 			Boiler( BoilerNum ).FluidIndex = SteamFluidIndex;
 
+			if ( NumAlphas > 4 ) {
+				Boiler( BoilerNum ).EndUseSubcategory = cAlphaArgs( 5 );
+			} else {
+				Boiler( BoilerNum ).EndUseSubcategory = "General";
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -437,17 +433,17 @@ namespace BoilerSteam {
 		}
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			SetupOutputVariable( "Boiler Heating Rate [W]", BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Heating Energy [J]", BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
-			if ( SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Heating Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
+			if ( UtilityRoutines::SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
-				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate [W]", BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
+				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			}
-			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy [J]", BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", _, "Plant" );
-			SetupOutputVariable( "Boiler Steam Inlet Temperature [C]", BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Steam Outlet Temperature [C]", BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
-			SetupOutputVariable( "Boiler Steam Mass Flow Rate [kg/s]", BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).FuelConsumed, "System", "Sum", Boiler( BoilerNum ).Name, _, BoilerFuelTypeForOutputVariable( BoilerNum ), "Heating", Boiler( BoilerNum ).EndUseSubcategory, "Plant" );
+			SetupOutputVariable( "Boiler Steam Inlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerInletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Steam Outlet Temperature", OutputProcessor::Unit::C, BoilerReport( BoilerNum ).BoilerOutletTemp, "System", "Average", Boiler( BoilerNum ).Name );
+			SetupOutputVariable( "Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, BoilerReport( BoilerNum ).Mdot, "System", "Average", Boiler( BoilerNum ).Name );
 
 		}
 

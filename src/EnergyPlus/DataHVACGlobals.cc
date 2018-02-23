@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -232,6 +233,9 @@ namespace DataHVACGlobals {
 
 	Array1D_string const cAllCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "Coil:Heating:DX:SingleSpeed", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "Coil:Cooling:DX:MultiSpeed", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Fuel", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:DX:VariableRefrigerantFlow", "Coil:Heating:DX:VariableRefrigerantFlow", "Coil:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:DX:VariableSpeed", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl", "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" } );
 
+	Array1D_string const cCoolingCoilTypes( NumAllCoilTypes, { "Coil:Cooling:DX:SingleSpeed", "", "Coil:Cooling:DX:TwoSpeed", "CoilSystem:Cooling:DX:HeatExchangerAssisted", "Coil:Cooling:DX:TwoStageWithHumidityControlMode", "", "", "Coil:Cooling:DX:MultiSpeed", "", "", "", "", "", "", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "", "", "CoilSystem:Cooling:Water:HeatExchangerAssisted", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "", "Coil:Cooling:DX:VariableRefrigerantFlow", "", "", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "", "Coil:Cooling:DX:VariableSpeed", "", "", "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl", "" } );
+
+	Array1D_string const cHeatingCoilTypes( NumAllCoilTypes, { "", "Coil:Heating:DX:SingleSpeed", "", "", "", "Coil:WaterHeating:AirToWaterHeatPump:Pumped", "Coil:WaterHeating:AirToWaterHeatPump:Wrapped", "", "Coil:Heating:DX:MultiSpeed", "Coil:Heating:Gas", "Coil:Heating:Gas:MultiStage", "Coil:Heating:Electric", "Coil:Heating:Electric:MultiStage", "Coil:Heating:Desuperheater", "", "", "Coil:Heating:Water", "Coil:Heating:Steam", "", "", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "", "Coil:Heating:WaterToAirHeatPump:EquationFit", "", "Coil:Heating:DX:VariableRefrigerantFlow", "", "", "", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "", "Coil:Heating:DX:VariableSpeed", "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", "", "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" } );
 
 	// Water to air HP coil types
 	int const WatertoAir_Simple( 1 );
@@ -309,6 +313,9 @@ namespace DataHVACGlobals {
 	// for oscillation of zone temperature to be detected.
 	Real64 const OscillateMagnitude( 0.15 );
 
+	// Parameters for HVACSystemRootFindingAlgorithm
+	int const Bisection( 2 );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -356,6 +363,7 @@ namespace DataHVACGlobals {
 	Real64 HPWHCrankcaseDBTemp( 0.0 ); // Used for HEAT PUMP:WATER HEATER crankcase heater ambient temperature calculations
 	bool AirLoopInit( false ); // flag for whether InitAirLoops has been called
 	bool AirLoopsSimOnce( false ); // True means that the air loops have been simulated once in this environment
+	bool GetAirPathDataDone( false ); // True means that air loops inputs have been processed
 
 	// Hybrid ventilation control part
 	int NumHybridVentSysAvailMgrs( 0 ); // Number of hybrid ventilation control
@@ -381,8 +389,9 @@ namespace DataHVACGlobals {
 	bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 	bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
+	int MinAirLoopIterationsAfterFirst( 1 ); // minimum number of HVAC iterations after FirstHVACIteration (must be at least 2 for sequenced loads to operate on air loops)
 
-	int const NumZoneHVACTerminalTypes( 37 );
+	int const NumZoneHVACTerminalTypes( 38 );
 
 	Array1D_string const ZoneHVACTerminalTypes( NumZoneHVACTerminalTypes,
 	{
@@ -412,6 +421,7 @@ namespace DataHVACGlobals {
 		"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",
 		"AIRTERMINAL:DUALDUCT:VAV",
 		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
+		"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT",
 		"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
 		"AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",
 		"AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
@@ -453,6 +463,7 @@ namespace DataHVACGlobals {
 		"AirTerminal:DualDuct:ConstantVolume",
 		"AirTerminal:DualDuct:VAV",
 		"AirTerminal:SingleDuct:ConstantVolume:Reheat",
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat",
 		"AirTerminal:SingleDuct:VAV:Reheat",
 		"AirTerminal:SingleDuct:VAV:NoReheat",
 		"AirTerminal:SingleDuct:SeriesPIU:Reheat",
@@ -492,22 +503,24 @@ namespace DataHVACGlobals {
 	int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume( 24 );
 	int const ZoneEquipTypeOf_AirTerminalDualDuctVAV( 25 );
 	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat( 26 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat( 27 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat( 28 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat( 29 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat( 30 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction( 31 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan( 32 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat( 33 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat( 34 );
-	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam( 35 );
-	int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir( 36 );
-	int const ZoneEquipTypeOf_AirLoopHVACReturnAir( 37 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat( 27 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat( 28 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat( 29 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat( 30 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat( 31 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction( 32 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan( 33 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat( 34 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat( 35 );
+	int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam( 36 );
+	int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir( 37 );
+	int const ZoneEquipTypeOf_AirLoopHVACReturnAir( 38 );
 
 	// Object Data
 	Array1D< ZoneCompTypeData > ZoneComp;
 	OptStartDataType OptStartData; // For optimum start
 	Array1D< ComponentSetPtData > CompSetPtEquip;
+	HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.
@@ -552,6 +565,7 @@ namespace DataHVACGlobals {
 		HPWHCrankcaseDBTemp = 0.0;
 		AirLoopInit = false;
 		AirLoopsSimOnce = false;
+		GetAirPathDataDone = false;
 		NumHybridVentSysAvailMgrs = 0;
 		HybridVentSysAvailAirLoopNum.deallocate();
 		HybridVentSysAvailVentCtrl.deallocate();
@@ -572,6 +586,7 @@ namespace DataHVACGlobals {
 		SimZoneEquipmentFlag = true;
 		SimNonZoneEquipmentFlag = true;
 		ZoneMassBalanceHVACReSim = true;
+		MinAirLoopIterationsAfterFirst = 1;
 		ZoneComp.deallocate();
 		CompSetPtEquip.deallocate();
 		OptStartData = OptStartDataType();

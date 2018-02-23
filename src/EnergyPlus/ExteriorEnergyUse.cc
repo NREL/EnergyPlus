@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -51,7 +52,8 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
@@ -106,6 +108,7 @@ namespace ExteriorEnergyUse {
 	int const DistrictHeatUse( 12 ); // Purchased Heating
 	int const OtherFuel1Use( 13 ); // OtherFuel1
 	int const OtherFuel2Use( 14 ); // OtherFuel2
+	bool GetExteriorEnergyInputFlag( true ); // First time, input is "gotten"
 
 	int const ScheduleOnly( 1 ); // exterior lights only on schedule
 	int const AstroClockOverride( 2 ); // exterior lights controlled to turn off during day.
@@ -125,6 +128,7 @@ namespace ExteriorEnergyUse {
 	// Object Data
 	Array1D< ExteriorLightUsage > ExteriorLights; // Structure for Exterior Light reporting
 	Array1D< ExteriorEquipmentUsage > ExteriorEquipment; // Structure for Exterior Equipment Reporting
+	std::unordered_map< std::string, std::string > UniqueExteriorEquipNames;
 
 	// Functions
 
@@ -137,6 +141,8 @@ namespace ExteriorEnergyUse {
 		NumExteriorEqs = 0;
 		ExteriorLights.deallocate();
 		ExteriorEquipment.deallocate();
+		UniqueExteriorEquipNames.clear();
+		GetExteriorEnergyInputFlag = true;
 	}
 
 	void
@@ -152,34 +158,9 @@ namespace ExteriorEnergyUse {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine provides the usual call for the Simulation Manager.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
-
-		if ( GetInputFlag ) {
+		if ( GetExteriorEnergyInputFlag ) {
 			GetExteriorEnergyUseInput();
-			GetInputFlag = false;
+			GetExteriorEnergyInputFlag = false;
 		}
 
 		ReportExteriorEnergyUse();
@@ -199,18 +180,8 @@ namespace ExteriorEnergyUse {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the Exterior Lights and Equipment.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleMinValue;
 		using ScheduleManager::GetScheduleMaxValue;
@@ -219,18 +190,8 @@ namespace ExteriorEnergyUse {
 		using namespace OutputReportPredefined;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetExteriorEnergyUseInput: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -241,35 +202,29 @@ namespace ExteriorEnergyUse {
 		int NumFuelEq; // Temporary -- number of ExteriorFuelEquipment statements
 		int NumWtrEq; // Temporary -- number of ExteriorWaterEquipment statements
 		std::string TypeString; // Fuel Type string (returned from Validation)
-		std::string ConUnits; // String for Fuel Consumption units (allow Water)
 		std::string EndUseSubcategoryName;
-		bool ErrorInName;
-		bool IsBlank;
 		Real64 SchMax; // Max value of schedule for item
 		Real64 SchMin; // Min value of schedule for item
 		static Real64 sumDesignLevel( 0.0 ); // for predefined report of design level total
 
-		NumExteriorLights = GetNumObjectsFound( "Exterior:Lights" );
+		NumExteriorLights = inputProcessor->getNumObjectsFound( "Exterior:Lights" );
 		ExteriorLights.allocate( NumExteriorLights );
 
-		NumFuelEq = GetNumObjectsFound( "Exterior:FuelEquipment" );
-		NumWtrEq = GetNumObjectsFound( "Exterior:WaterEquipment" );
+		NumFuelEq = inputProcessor->getNumObjectsFound( "Exterior:FuelEquipment" );
+		NumWtrEq = inputProcessor->getNumObjectsFound( "Exterior:WaterEquipment" );
 		ExteriorEquipment.allocate( NumFuelEq + NumWtrEq );
+		UniqueExteriorEquipNames.reserve( NumFuelEq + NumWtrEq );
 
+		GetExteriorEnergyInputFlag = false;
 		NumExteriorEqs = 0;
 
 		// =================================  Get Exterior Lights
 
 		cCurrentModuleObject = "Exterior:Lights";
 		for ( Item = 1; Item <= NumExteriorLights; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorLights, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+
 			ExteriorLights( Item ).Name = cAlphaArgs( 1 );
 			ExteriorLights( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
 			if ( ExteriorLights( Item ).SchedPtr == 0 ) {
@@ -297,9 +252,9 @@ namespace ExteriorEnergyUse {
 			}
 			if ( lAlphaFieldBlanks( 3 ) ) {
 				ExteriorLights( Item ).ControlMode = ScheduleOnly;
-			} else if ( SameString( cAlphaArgs( 3 ), "ScheduleNameOnly" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "ScheduleNameOnly" ) ) {
 				ExteriorLights( Item ).ControlMode = ScheduleOnly;
-			} else if ( SameString( cAlphaArgs( 3 ), "AstronomicalClock" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "AstronomicalClock" ) ) {
 				ExteriorLights( Item ).ControlMode = AstroClockOverride;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 3 ) + '=' + cAlphaArgs( 3 ) + " for " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) );
@@ -316,9 +271,10 @@ namespace ExteriorEnergyUse {
 				SetupEMSActuator( "ExteriorLights", ExteriorLights( Item ).Name, "Electric Power", "W", ExteriorLights( Item ).PowerActuatorOn, ExteriorLights( Item ).PowerActuatorValue );
 			}
 
-			SetupOutputVariable( "Exterior Lights Electric Power [W]", ExteriorLights( Item ).Power, "Zone", "Average", ExteriorLights( Item ).Name );
+			SetupOutputVariable( "Exterior Lights Electric Power", OutputProcessor::Unit::W, ExteriorLights( Item ).Power, "Zone", "Average", ExteriorLights( Item ).Name );
 
-			SetupOutputVariable( "Exterior Lights Electric Energy [J]", ExteriorLights( Item ).CurrentUse, "Zone", "Sum", ExteriorLights( Item ).Name, _, "Electricity", "Exterior Lights", EndUseSubcategoryName );
+			SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, ExteriorLights( Item ).CurrentUse, "Zone", "Sum", ExteriorLights( Item ).Name, _, "Electricity", "Exterior Lights", EndUseSubcategoryName );
+
 
 			// entries for predefined tables
 			PreDefTableEntry( pdchExLtPower, ExteriorLights( Item ).Name, ExteriorLights( Item ).DesignLevel );
@@ -338,14 +294,10 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:FuelEquipment";
 		for ( Item = 1; Item <= NumFuelEq; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 
@@ -365,15 +317,11 @@ namespace ExteriorEnergyUse {
 				ErrorsFound = true;
 			} else {
 				if ( ExteriorEquipment( NumExteriorEqs ).FuelType != WaterUse ) {
-					SetupOutputVariable( "Exterior Equipment Fuel Rate [W]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
-
-					ConUnits = "[J]";
-					SetupOutputVariable( "Exterior Equipment " + TypeString + " Energy " + ConUnits, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
+					SetupOutputVariable( "Exterior Equipment Fuel Rate", OutputProcessor::Unit::W, ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
+					SetupOutputVariable( "Exterior Equipment " + TypeString + " Energy", OutputProcessor::Unit::J, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
 				} else {
-					SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate [m3/s]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
-
-					ConUnits = "[m3]";
-					SetupOutputVariable( "Exterior Equipment " + TypeString + " Volume " + ConUnits, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
+					SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate", OutputProcessor::Unit::m3_s, ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
+					SetupOutputVariable( "Exterior Equipment " + TypeString + " Volume", OutputProcessor::Unit::m3, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, TypeString, "ExteriorEquipment", EndUseSubcategoryName );
 				}
 
 			}
@@ -408,14 +356,10 @@ namespace ExteriorEnergyUse {
 
 		cCurrentModuleObject = "Exterior:WaterEquipment";
 		for ( Item = 1; Item <= NumWtrEq; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ErrorInName = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExteriorEquipment, Item, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
-			if ( ErrorInName ) {
-				ErrorsFound = true;
-				continue;
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+			GlobalNames::VerifyUniqueInterObjectName( UniqueExteriorEquipNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			++NumExteriorEqs;
 			ExteriorEquipment( NumExteriorEqs ).Name = cAlphaArgs( 1 );
 			ExteriorEquipment( NumExteriorEqs ).FuelType = WaterUse;
@@ -452,10 +396,10 @@ namespace ExteriorEnergyUse {
 
 			ExteriorEquipment( NumExteriorEqs ).DesignLevel = rNumericArgs( 1 );
 
-			SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate [m3/s]", ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
+			SetupOutputVariable( "Exterior Equipment Water Volume Flow Rate", OutputProcessor::Unit::m3_s, ExteriorEquipment( NumExteriorEqs ).Power, "Zone", "Average", ExteriorEquipment( NumExteriorEqs ).Name );
 
-			SetupOutputVariable( "Exterior Equipment Water Volume [m3]", ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "Water", "ExteriorEquipment", EndUseSubcategoryName );
-			SetupOutputVariable( "Exterior Equipment Mains Water Volume [m3]", ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "MainsWater", "ExteriorEquipment", EndUseSubcategoryName );
+			SetupOutputVariable( "Exterior Equipment Water Volume", OutputProcessor::Unit::m3, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "Water", "ExteriorEquipment", EndUseSubcategoryName );
+			SetupOutputVariable( "Exterior Equipment Mains Water Volume", OutputProcessor::Unit::m3, ExteriorEquipment( NumExteriorEqs ).CurrentUse, "Zone", "Sum", ExteriorEquipment( NumExteriorEqs ).Name, _, "MainsWater", "ExteriorEquipment", EndUseSubcategoryName );
 		}
 
 		if ( ErrorsFound ) {
@@ -485,26 +429,8 @@ namespace ExteriorEnergyUse {
 		// This subroutine compares the input Fuel Type value against the
 		// valid values and sets the correct in the returned FuelTypeNumber.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ValidateFuelType: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -512,46 +438,46 @@ namespace ExteriorEnergyUse {
 		FuelTypeString = "";
 
 		//Select the correct Number for the associated ascii name for the fuel type
-		if ( SameString( FuelTypeAlpha, "Electricity" ) || SameString( FuelTypeAlpha, "Electric" ) ) {
+		if ( UtilityRoutines::SameString( FuelTypeAlpha, "Electricity" ) || UtilityRoutines::SameString( FuelTypeAlpha, "Electric" ) ) {
 			FuelTypeNumber = ElecUse;
 			FuelTypeString = "Electric";
-		} else if ( SameString( FuelTypeAlpha, "NaturalGas" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "NaturalGas" ) ) {
 			FuelTypeNumber = GasUse;
 			FuelTypeString = "Gas";
-		} else if ( SameString( FuelTypeAlpha, "Coal" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "Coal" ) ) {
 			FuelTypeNumber = CoalUse;
 			FuelTypeString = "Coal";
-		} else if ( SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "FuelOil#1" ) ) {
 			FuelTypeNumber = FuelOil1Use;
 			FuelTypeString = "FuelOil#1";
-		} else if ( SameString( FuelTypeAlpha, "PropaneGas" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "PropaneGas" ) ) {
 			FuelTypeNumber = LPGUse;
 			FuelTypeString = "Propane";
-		} else if ( SameString( FuelTypeAlpha, "Gasoline" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "Gasoline" ) ) {
 			FuelTypeNumber = GasolineUse;
 			FuelTypeString = "Gasoline";
-		} else if ( SameString( FuelTypeAlpha, "Diesel" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "Diesel" ) ) {
 			FuelTypeNumber = DieselUse;
 			FuelTypeString = "Diesel";
-		} else if ( SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "FuelOil#2" ) ) {
 			FuelTypeNumber = FuelOil2Use;
 			FuelTypeString = "FuelOil#2";
-		} else if ( SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "OtherFuel1" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel1";
-		} else if ( SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "OtherFuel2" ) ) {
 			FuelTypeNumber = OtherFuel1Use;
 			FuelTypeString = "OtherFuel2";
-		} else if ( SameString( FuelTypeAlpha, "Water" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "Water" ) ) {
 			FuelTypeNumber = WaterUse;
 			FuelTypeString = "Water";
-		} else if ( SameString( FuelTypeAlpha, "Steam" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "Steam" ) ) {
 			FuelTypeNumber = SteamUse;
 			FuelTypeString = "Steam";
-		} else if ( SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "DistrictCooling" ) ) {
 			FuelTypeNumber = DistrictCoolUse;
 			FuelTypeString = "DistrictCooling";
-		} else if ( SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
+		} else if ( UtilityRoutines::SameString( FuelTypeAlpha, "DistrictHeating" ) ) {
 			FuelTypeNumber = DistrictHeatUse;
 			FuelTypeString = "DistrictHeating";
 		} else {

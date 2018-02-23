@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <HVACControllers.hh>
+#include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataConvergParams.hh>
 #include <DataEnvironment.hh>
@@ -67,7 +69,7 @@
 #include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <PlantUtilities.hh>
@@ -190,7 +192,7 @@ namespace HVACControllers {
 	// MODULE PARAMETER DEFINITIONS
 	// Number of significant digits to display in error messages for floating-point numbers
 	Real64 const SomeFloatingPoint( 1.0 );
-	int const NumSigDigits( precision( SomeFloatingPoint ) );
+	int const NumSigDigits( PRECISION( SomeFloatingPoint ) );
 
 	static std::string const BlankString;
 
@@ -289,11 +291,11 @@ namespace HVACControllers {
 		std::string const & ControllerName,
 		int & ControllerIndex,
 		bool const FirstHVACIteration,
-		int const EP_UNUSED( AirLoopNum ), // unused1208
-		int const AirLoopPass,
+		int const AirLoopNum,
 		int const Operation,
 		bool & IsConvergedFlag,
 		bool & IsUpToDateFlag,
+		bool & BypassOAController,
 		Optional_bool AllowWarmRestartFlag
 	)
 	{
@@ -311,18 +313,12 @@ namespace HVACControllers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages Controller component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSystemVariables;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::FlowLocked;
+		using DataAirLoop::AirLoopControlInfo;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -335,21 +331,10 @@ namespace HVACControllers {
 		// Only used within the Calc routines
 		// TRUE if speculative warm restart is supported by this controller
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// The Controller that you are currently loading input into
 		int ControlNum;
 		int ControllerType;
-
-		// FLOW:
 
 		// Obtains and Allocates Controller related parameters from input file
 		if ( GetControllerInputFlag ) { //First time subroutine has been entered
@@ -358,7 +343,7 @@ namespace HVACControllers {
 		}
 
 		if ( ControllerIndex == 0 ) {
-			ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+			ControlNum = UtilityRoutines::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 			if ( ControlNum == 0 ) {
 				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 			}
@@ -375,6 +360,14 @@ namespace HVACControllers {
 				CheckEquipName( ControlNum ) = false;
 			}
 		}
+
+		if ( ControllerProps( ControlNum ).BypassControllerCalc && BypassOAController ) {
+			IsUpToDateFlag = true;
+			IsConvergedFlag = true;
+			if ( present( AllowWarmRestartFlag ) ) AllowWarmRestartFlag = true;
+			return;
+		}
+
 		// Find the correct ControllerNumber with the AirLoop & CompNum from AirLoop Derived Type
 		//ControlNum = AirLoopEquip(AirLoopNum)%ComponentOfTypeNum(CompNum)
 
@@ -485,7 +478,7 @@ namespace HVACControllers {
 		// To enable generating an individual, detailed trace file for each controller on each air loop,
 		// define the environment variable TRACE_CONTROLLER=YES or TRACE_CONTROLLER=Y
 		if ( TraceHVACControllerEnvFlag ) {
-			TraceIndividualController( ControlNum, FirstHVACIteration, AirLoopPass, Operation, IsConvergedFlag );
+			TraceIndividualController( ControlNum, FirstHVACIteration, AirLoopControlInfo( AirLoopNum ).AirLoopPass, Operation, IsConvergedFlag );
 		}
 
 	}
@@ -554,11 +547,6 @@ namespace HVACControllers {
 		using DataSystemVariables::TrackAirLoopEnvFlag;
 		using DataSystemVariables::TraceAirLoopEnvFlag;
 		using DataSystemVariables::TraceHVACControllerEnvFlag;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataHVACGlobals::NumPrimaryAirSys;
 		using DataAirSystems::PrimaryAirSystem;
@@ -573,19 +561,8 @@ namespace HVACControllers {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iHumidityRatioMaxSetPoint;
 
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "HVACControllers: GetControllerInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Num; // The Controller that you are currently loading input into
@@ -603,8 +580,6 @@ namespace HVACControllers {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		int iNodeType; // for checking actuator node type
 		bool NodeNotFound; // flag true if the sensor node is on the coil air outlet node
@@ -615,7 +590,7 @@ namespace HVACControllers {
 		// be retrieved by name as they are needed.
 
 		CurrentModuleObject = "Controller:WaterCoil";
-		NumSimpleControllers = GetNumObjectsFound( CurrentModuleObject );
+		NumSimpleControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumControllers = NumSimpleControllers;
 
 		// Allocate stats data structure for each air loop and controller if needed
@@ -638,7 +613,7 @@ namespace HVACControllers {
 		RootFinders.allocate( NumControllers );
 		CheckEquipName.dimension( NumControllers, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNums );
@@ -649,15 +624,9 @@ namespace HVACControllers {
 		// Now find and load all of the simple controllers.
 		if ( NumSimpleControllers > 0 ) {
 			for ( Num = 1; Num <= NumSimpleControllers; ++Num ) {
-				GetObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), ControllerProps, &ControllerPropsType::ControllerName, Num - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				ControllerProps( Num ).ControllerName = AlphArray( 1 );
 				ControllerProps( Num ).ControllerType = CurrentModuleObject;
 				{ auto const SELECT_CASE_var( AlphArray( 2 ) );
@@ -674,9 +643,9 @@ namespace HVACControllers {
 					ShowSevereError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\", must be Temperature, HumidityRatio, or TemperatureAndHumidityRatio." );
 					ErrorsFound = true;
 				}}
-				if ( SameString( AlphArray( 3 ), "Normal" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 3 ), "Normal" ) ) {
 					ControllerProps( Num ).Action = iNormalAction;
-				} else if ( SameString( AlphArray( 3 ), "Reverse" ) ) {
+				} else if ( UtilityRoutines::SameString( AlphArray( 3 ), "Reverse" ) ) {
 					ControllerProps( Num ).Action = iReverseAction;
 				} else if ( lAlphaBlanks( 3 ) ) {
 					ControllerProps( Num ).Action = 0;
@@ -937,7 +906,7 @@ namespace HVACControllers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
 		//       DATE WRITTEN   July 1998
-		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC), 
+		//       MODIFIED       Jan. 2004, Shirey/Raustad (FSEC),
 		//       MODIFIED       Feb. 2006, Dimitri Curtil (LBNL), Moved first call convergence test code to ResetController()
 		//                      Jul. 2016, R. Zhang (LBNL), Applied the water coil supply air temperature sensor offset fault model
 		//       RE-ENGINEERED  na
@@ -1204,7 +1173,7 @@ namespace HVACControllers {
 			if ( ! ControllerProps( ControlNum ).IsSetPointDefinedFlag ) {
 				ControllerProps( ControlNum ).SetPointValue = Node( SensedNode ).TempSetPoint;
 				ControllerProps( ControlNum ).IsSetPointDefinedFlag = true;
-				
+
 				//If there is a fault of water coil SAT sensor (zrp_Jul2016)
 				if( ControllerProps( ControlNum ).FaultyCoilSATFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 					//calculate the sensor offset using fault information
@@ -2172,51 +2141,6 @@ namespace HVACControllers {
 		}
 
 	}
-
-	void
-	LimitController(
-		int & EP_UNUSED( ControlNum ), // unused1208
-		bool & EP_UNUSED( IsConvergedFlag ) // unused1208
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR
-		//       DATE WRITTEN   July 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-	}
-
-	// End Algorithm Section of the Module
-	// *****************************************************************************
-
-	// Beginning of Update subroutines for the Controller Module
-	// *****************************************************************************
 
 	void
 	UpdateController( int const ControlNum )
@@ -3402,27 +3326,9 @@ Label100: ;
 		// METHODOLOGY EMPLOYED:
 		// setup data for sensed nodes and compare positions if on the same branch
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataAirSystems::PrimaryAirSystem;
 		using DataHVACGlobals::NumPrimaryAirSys;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AirSysNum;
@@ -3440,7 +3346,7 @@ Label100: ;
 				// first see how many are water coil controllers
 				WaterCoilContrlCount = 0; //init
 				for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
-					if ( SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
+					if ( UtilityRoutines::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 						++WaterCoilContrlCount;
 					}
 				}
@@ -3450,9 +3356,9 @@ Label100: ;
 					ContrlSensedNodeNums = 0;
 					SensedNodeIndex = 0;
 					for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
-						if ( SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
+						if ( UtilityRoutines::SameString( PrimaryAirSystem( AirSysNum ).ControllerType( ContrlNum ), "CONTROLLER:WATERCOIL" ) ) {
 							++SensedNodeIndex;
-							foundControl = FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
+							foundControl = UtilityRoutines::FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps, &ControllerPropsType::ControllerName );
 							if ( foundControl > 0 ) {
 								ContrlSensedNodeNums( 1, SensedNodeIndex ) = ControllerProps( foundControl ).SensedNode;
 							}
@@ -3555,6 +3461,47 @@ Label100: ;
 	}
 
 	void
+	GetControllerNameAndIndex(
+		int const WaterInletNodeNum, // input actuator node number
+		std::string & ControllerName, // controller name used by water coil
+		int & ControllerIndex, // controller index used by water coil
+		bool & ErrorsFound // true if matching actuator node not found
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad
+		//       DATE WRITTEN   June 2017
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine checks that the water inlet node number is matched by
+		// the actuator node number of some water coil and passed back controller name and index
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int ControlNum;
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		ControllerName = " ";
+		ControllerIndex = 0;
+		for ( ControlNum = 1; ControlNum <= NumControllers; ++ControlNum ) {
+			if ( ControllerProps( ControlNum ).ActuatedNode == WaterInletNodeNum ) {
+				ControllerIndex = ControlNum;
+				ControllerName = ControllerProps( ControlNum ).ControllerName;
+				break;
+			}
+		}
+
+		if ( ControllerIndex == 0 ) {
+			ErrorsFound = true;
+		}
+
+	}
+
+	void
 	GetControllerActuatorNodeNum(
 		std::string const & ControllerName, // name of coil controller
 		int & WaterInletNodeNum, // input actuator node number
@@ -3571,27 +3518,6 @@ Label100: ;
 		// PURPOSE OF THIS FUNCTION:
 		// This subroutine finds the controllers actuator node number
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlNum;
 
@@ -3601,11 +3527,36 @@ Label100: ;
 		}
 
 		NodeNotFound = true;
-		ControlNum = FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		ControlNum = UtilityRoutines::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
 		if ( ControlNum > 0 && ControlNum <= NumControllers ) {
 			WaterInletNodeNum = ControllerProps( ControlNum ).ActuatedNode;
 			NodeNotFound = false;
 		}
+
+	}
+
+	int
+	GetControllerIndex(
+		std::string const & ControllerName // name of coil controller
+	) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Richard Raustad, FSEC
+		//       DATE WRITTEN   January 2018
+
+		// This subroutine finds the controllers actuator node number
+
+		if ( GetControllerInputFlag ) {
+			GetControllerInput();
+			GetControllerInputFlag = false;
+		}
+
+		int ControllerIndex = UtilityRoutines::FindItemInList( ControllerName, ControllerProps, &ControllerPropsType::ControllerName );
+		if ( ControllerIndex == 0 ) {
+			ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
+		}
+
+		return ControllerIndex;
 
 	}
 

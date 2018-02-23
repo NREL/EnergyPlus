@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,6 @@
 #include <DataSurfaces.hh>
 #include <DataUCSDSharedData.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -277,35 +277,12 @@ namespace DisplacementVentMgr {
 		// initial calculations and averages the final result comparing the position of the surface with
 		// the interface subzone height.
 
-		// METHODOLOGY EMPLOYED:
-		// -
-		// -
-		// -
-		// -
-
-		// REFERENCES:
-		// -
-		// -
-
 		// Using/Aliasing
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::BeginEnvrnFlag;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Ctd; // DO loop counter for surfaces
@@ -608,22 +585,15 @@ namespace DisplacementVentMgr {
 		// room air equivalent temperatures and three space temperatures (floor subzone, occupied zone and upper,
 		// mixed subzone temperature)
 
-		// METHODOLOGY EMPLOYED:
-		// -
-		// -
-		// -
-		// -
-
 		// REFERENCES:
 		// Model developed by Paul Linden (UCSD), G. Carrilho da Graca (UCSD) and P. Haves (LBL).
 		// Work funded by the California Energy Comission. More information on the model can found in:
-		// "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graça, Ph.D. thesis UCSD. December 2003.
+		// "Simplified Models for Heat Transfer in Rooms" G. Carrilho da GraÃ§a, Ph.D. thesis UCSD. December 2003.
 
 		// Using/Aliasing
 		using namespace DataHeatBalFanSys;
 		using namespace DataEnvironment;
 		using namespace DataHeatBalance;
-		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -634,21 +604,9 @@ namespace DisplacementVentMgr {
 		using InternalHeatGains::SumInternalConvectionGainsByTypes;
 		using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 const OneThird( 1.0 / 3.0 );
 		static Real64 const MinFlow_pow_fac( std::pow( 1.0 / 24.55 * 1.0, 1.0 / 0.6 ) );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 HeightFrac; // Fractional height of transition between occupied and mixed subzones
@@ -692,7 +650,7 @@ namespace DisplacementVentMgr {
 		int FlagApertures;
 		static Real64 TempDepCoef( 0.0 ); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
 		static Real64 TempIndCoef( 0.0 ); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-		static Array1D_int IntGainTypesOccupied( 28, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
+		static Array1D_int IntGainTypesOccupied( 29, { IntGainTypeOf_People, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified, IntGainTypeOf_ThermalStorageChilledWaterMixed, IntGainTypeOf_ThermalStorageChilledWaterStratified, IntGainTypeOf_ElectricEquipment, IntGainTypeOf_ElectricEquipmentITEAirCooled, IntGainTypeOf_GasEquipment, IntGainTypeOf_HotWaterEquipment, IntGainTypeOf_SteamEquipment, IntGainTypeOf_OtherEquipment, IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled, IntGainTypeOf_GeneratorFuelCell, IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_GeneratorMicroCHP, IntGainTypeOf_ElectricLoadCenterTransformer, IntGainTypeOf_ElectricLoadCenterInverterSimple, IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower, IntGainTypeOf_ElectricLoadCenterInverterLookUpTable, IntGainTypeOf_ElectricLoadCenterStorageBattery, IntGainTypeOf_ElectricLoadCenterStorageSimple, IntGainTypeOf_PipeIndoor, IntGainTypeOf_RefrigerationCase, IntGainTypeOf_RefrigerationCompressorRack, IntGainTypeOf_RefrigerationSystemAirCooledCondenser, IntGainTypeOf_RefrigerationSystemSuctionPipe, IntGainTypeOf_RefrigerationSecondaryReceiver, IntGainTypeOf_RefrigerationSecondaryPipe, IntGainTypeOf_RefrigerationWalkIn } );
 
 		static Array1D_int IntGainTypesMixedSubzone( 2, { IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights } );
 		Real64 RetAirGain;
@@ -851,8 +809,8 @@ namespace DisplacementVentMgr {
 				//HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) / CeilingHeight, 1.0 ); //Tuned This does not vary in loop
 				//EPTeam-replaces above (cause diffs)      HeightFrac = MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
-				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour ); 
+				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour );
+				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * Zone( ZoneNum ).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 
 				if ( UseZoneTimeStepHistory ) {

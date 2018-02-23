@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -59,8 +60,10 @@
 #include <DataPrecisionGlobals.hh>
 #include <DXCoils.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatRecovery.hh>
-#include <InputProcessor.hh>
+#include <HVACControllers.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -121,6 +124,7 @@ namespace HVACHXAssistedCoolingCoil {
 	// PUBLIC so others can access this information
 	bool GetCoilsInputFlag( true ); // Flag to allow input data to be retrieved from idf on first call to this subroutine
 	Array1D_bool CheckEquipName;
+	std::unordered_map< std::string, std::string > UniqueHXAssistedCoilNames;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -150,6 +154,18 @@ namespace HVACHXAssistedCoolingCoil {
 	// Functions
 
 	void
+	clear_state()
+	{
+		UniqueHXAssistedCoilNames.clear();
+		HXAssistedCoil.deallocate();
+		TotalNumHXAssistedCoils = 0;
+		HXAssistedCoilOutletTemp.deallocate();
+		HXAssistedCoilOutletHumRat.deallocate();
+		GetCoilsInputFlag = true;
+		CheckEquipName.deallocate();
+	}
+
+	void
 	SimHXAssistedCoolingCoil(
 		std::string const & HXAssistedCoilName, // Name of HXAssistedCoolingCoil
 		bool const FirstHVACIteration, // FirstHVACIteration flag
@@ -174,28 +190,12 @@ namespace HVACHXAssistedCoolingCoil {
 		//  This subroutine manages the simulation of the
 		//  cooling coil/heat exchanger combination.
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// (not used for Coil:Water:DetailedFlatCooling)
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HXAssistedCoilNum; // Index for HXAssistedCoolingCoil
@@ -214,7 +214,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		// Find the correct HXAssistedCoolingCoil number
 		if ( CompIndex == 0 ) {
-			HXAssistedCoilNum = FindItemInList( HXAssistedCoilName, HXAssistedCoil );
+			HXAssistedCoilNum = UtilityRoutines::FindItemInList( HXAssistedCoilName, HXAssistedCoil );
 			if ( HXAssistedCoilNum == 0 ) {
 				ShowFatalError( "HX Assisted Coil not found=" + HXAssistedCoilName );
 			}
@@ -287,39 +287,24 @@ namespace HVACHXAssistedCoolingCoil {
 		// METHODOLOGY EMPLOYED:
 		//  Uses "Get" routines to read in data.
 
-		// REFERENCES:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
-		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
-		auto & GetDXCoilOutletNode( DXCoils::GetCoilOutletNode );
 		using DXCoils::GetDXCoilIndex;
-		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
-		auto & GetWaterCoilOutletNode( WaterCoils::GetCoilOutletNode );
 		using HeatRecovery::GetSupplyInletNode;
 		using HeatRecovery::GetSupplyOutletNode;
 		using HeatRecovery::GetSecondaryInletNode;
 		using HeatRecovery::GetSecondaryOutletNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
+		using HVACControllers::GetControllerNameAndIndex;
+		using NodeInputManager::GetOnlySingleNode;
+		using WaterCoils::GetCoilWaterInletNode;
+		auto & GetDXCoilInletNode( DXCoils::GetCoilInletNode );
+		auto & GetDXCoilOutletNode( DXCoils::GetCoilOutletNode );
+		auto & GetWaterCoilInletNode( WaterCoils::GetCoilInletNode );
+		auto & GetWaterCoilOutletNode( WaterCoils::GetCoilOutletNode );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetHXAssistedCoolingCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HXAssistedCoilNum; // Index number of the HXAssistedCoolingCoil for which input data is being read from the idf
@@ -327,8 +312,6 @@ namespace HVACHXAssistedCoolingCoil {
 		int NumNums; // Number of number inputs
 		int IOStat; // Return status from GetObjectItem call
 		static bool ErrorsFound( false ); // set TRUE if errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumHXAssistedDXCoils; // Number of HXAssistedCoolingCoil objects using a DX coil
 		int NumHXAssistedWaterCoils; // Number of HXAssistedCoolingCoil objects using a chilled water coil
 		//    LOGICAL :: FanErrFlag              ! Error flag for fan operating mode mining call
@@ -338,8 +321,9 @@ namespace HVACHXAssistedCoolingCoil {
 		int SupplyAirOutletNode; // supply air outlet node number mined from heat exchanger object (ExchCond structure)
 		int SecondaryAirInletNode; // secondary air inlet node number mined from heat exchanger object (ExchCond structure)
 		int SecondaryAirOutletNode; // secondary air outlet node number mined from heat exchanger object (ExchCond structure)
-		int CoolingCoilInletNodeNum; // outlet node number of cooling coil, used for warning messages
-		int CoolingCoilOutletNodeNum; // outlet node number of cooling coil, used for warning messages
+		int CoolingCoilInletNodeNum; // air outlet node number of cooling coil, used for warning messages
+		int CoolingCoilWaterInletNodeNum; // water coil water inlet node number used to find controller index
+		int CoolingCoilOutletNodeNum; // air outlet node number of cooling coil, used for warning messages
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		Array1D_string AlphArray; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -351,20 +335,21 @@ namespace HVACHXAssistedCoolingCoil {
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 
-		NumHXAssistedDXCoils = GetNumObjectsFound( "CoilSystem:Cooling:DX:HeatExchangerAssisted" );
-		NumHXAssistedWaterCoils = GetNumObjectsFound( "CoilSystem:Cooling:Water:HeatExchangerAssisted" );
+		NumHXAssistedDXCoils = inputProcessor->getNumObjectsFound( "CoilSystem:Cooling:DX:HeatExchangerAssisted" );
+		NumHXAssistedWaterCoils = inputProcessor->getNumObjectsFound( "CoilSystem:Cooling:Water:HeatExchangerAssisted" );
 		TotalNumHXAssistedCoils = NumHXAssistedDXCoils + NumHXAssistedWaterCoils;
 		if ( TotalNumHXAssistedCoils > 0 ) {
 			HXAssistedCoil.allocate( TotalNumHXAssistedCoils );
 			HXAssistedCoilOutletTemp.allocate( TotalNumHXAssistedCoils );
 			HXAssistedCoilOutletHumRat.allocate( TotalNumHXAssistedCoils );
 			CheckEquipName.dimension( TotalNumHXAssistedCoils, true );
+			UniqueHXAssistedCoilNames.reserve( TotalNumHXAssistedCoils );
 		}
 
-		GetObjectDefMaxArgs( "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "CoilSystem:Cooling:Water:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "CoilSystem:Cooling:Water:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -379,24 +364,18 @@ namespace HVACHXAssistedCoolingCoil {
 		CurrentModuleObject = "CoilSystem:Cooling:DX:HeatExchangerAssisted";
 
 		for ( HXAssistedCoilNum = 1; HXAssistedCoilNum <= NumHXAssistedDXCoils; ++HXAssistedCoilNum ) {
-			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
-			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
+			inputProcessor->getObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueHXAssistedCoilNames, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
+			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType = AlphArray( 2 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName = AlphArray( 3 );
 
-			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent" ) ) {
+			if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType_Num = HX_AIRTOAIR_GENERIC;
-			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate" ) ) {
+			} else if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType_Num = HX_AIRTOAIR_FLATPLATE;
-			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow" ) ) {
+			} else if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType_Num = HX_DESICCANT_BALANCED;
 			} else {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
@@ -407,7 +386,7 @@ namespace HVACHXAssistedCoolingCoil {
 			HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType = AlphArray( 4 );
 			HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName = AlphArray( 5 );
 
-			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
+			if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
@@ -417,7 +396,7 @@ namespace HVACHXAssistedCoolingCoil {
 					ShowContinueError( "...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType = CurrentModuleObject;
 				HXAssistedCoil( HXAssistedCoilNum ).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
@@ -463,7 +442,7 @@ namespace HVACHXAssistedCoolingCoil {
 				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
-			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
+			if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed" ) ) {
 				//         Check node names in heat exchanger and coil objects for consistency
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = GetDXCoilInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
@@ -494,7 +473,7 @@ namespace HVACHXAssistedCoolingCoil {
 					ErrorsFound = true;
 				}
 
-			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
+			} else if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:DX:VariableSpeed" ) ) {
 				//         Check node names in heat exchanger and coil objects for consistency
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = VariableSpeedCoils::GetCoilInletNodeVariableSpeed( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
@@ -546,25 +525,20 @@ namespace HVACHXAssistedCoolingCoil {
 
 		for ( HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum ) {
 
-			GetObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), HXAssistedCoil, HXAssistedCoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, HXAssistedCoilNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueHXAssistedCoilNames, AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
+
 			HXAssistedCoil( HXAssistedCoilNum ).Name = AlphArray( 1 );
 
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType = AlphArray( 2 );
 			HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerName = AlphArray( 3 );
 
-			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent" ) ) {
+			if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType_Num = HX_AIRTOAIR_GENERIC;
-			} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate" ) ) {
+			} else if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate" ) ) {
 				HXAssistedCoil( HXAssistedCoilNum ).HeatExchangerType_Num = HX_AIRTOAIR_FLATPLATE;
 				//       balanced desiccant HX not allowed with water coils at this time
-				//       ELSEIF(SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow')) THEN
+				//       ELSEIF(UtilityRoutines::SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow')) THEN
 				//         HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType_Num = HX_DESICCANT_BALANCED
 			} else {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
@@ -599,10 +573,10 @@ namespace HVACHXAssistedCoolingCoil {
 				ShowContinueError( "...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 			}
 
-			if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water" ) || SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
-				if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+			if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water" ) || UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+				if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 					HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = Coil_CoolingWaterDetailed;
-				} else if ( SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water" ) ) {
+				} else if ( UtilityRoutines::SameString( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, "Coil:Cooling:Water" ) ) {
 					HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num = Coil_CoolingWater;
 				}
 
@@ -612,6 +586,8 @@ namespace HVACHXAssistedCoolingCoil {
 				//         Check node names in heat exchanger and coil objects for consistency
 				CoolingCoilErrFlag = false;
 				CoolingCoilInletNodeNum = GetWaterCoilInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType, HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilName, CoolingCoilErrFlag );
+				GetControllerNameAndIndex( CoolingCoilWaterInletNodeNum, HXAssistedCoil( HXAssistedCoilNum ).ControllerName, HXAssistedCoil( HXAssistedCoilNum ).ControllerIndex, CoolingCoilErrFlag );
 				if ( CoolingCoilErrFlag ) ShowContinueError( "...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
 				if ( SupplyAirOutletNode != CoolingCoilInletNodeNum ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil( HXAssistedCoilNum ).Name + "\"" );
@@ -719,8 +695,8 @@ namespace HVACHXAssistedCoolingCoil {
 			DXCoilFullLoadOutAirTemp( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 			DXCoilFullLoadOutAirHumRat( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilIndex ) = 0.0;
 		} else if ( HXAssistedCoil( HXAssistedCoilNum ).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
-			// 
-		
+			//
+
 		}
 
 	}
@@ -782,11 +758,13 @@ namespace HVACHXAssistedCoolingCoil {
 		static Real64 CoilOutputTempLast; // Exiting cooling coil temperature from last iteration
 		Real64 AirMassFlow; // Inlet air mass flow rate
 		Real64 Error; // Error (exiting coil temp from last iteration minus current coil exiting temp)
+		Real64 ErrorLast; // check for oscillations
 		int Iter; // Number of iterations
 		int CompanionCoilIndexNum; // Index to DX coil
 
 		AirMassFlow = HXAssistedCoil( HXAssistedCoilNum ).MassFlowRate;
 		Error = 1.0; // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)
+		ErrorLast = Error; // initialize variable used to test loop termination
 		Iter = 0; // Initialize iteration counter to zero
 
 		if ( FirstHVACIteration ) CoilOutputTempLast = -99.0; // Initialize coil output temp
@@ -831,6 +809,10 @@ namespace HVACHXAssistedCoolingCoil {
 			}
 
 			Error = CoilOutputTempLast - Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).Temp;
+			if ( Iter > 40 ) { // check for oscillation (one of these being negative and one positive) before hitting max iteration limit
+				if ( Error + ErrorLast < 0.000001 ) Error = 0.0; // result bounced back and forth with same positive and negative result, no possible solution without this check
+			}
+			ErrorLast = Error;
 			CoilOutputTempLast = Node( HXAssistedCoil( HXAssistedCoilNum ).HXExhaustAirInletNodeNum ).Temp;
 			++Iter;
 
@@ -874,30 +856,6 @@ namespace HVACHXAssistedCoolingCoil {
 		// This subroutine sets an index for a given HX Assisted Cooling Coil -- issues error message if that
 		// HX is not a legal HX Assisted Cooling Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		// Obtains and allocates HXAssistedCoolingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { // First time subroutine has been called, get input data
 			// Get the HXAssistedCoolingCoil input
@@ -906,7 +864,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			HXDXCoilIndex = FindItem( HXDXCoilName, HXAssistedCoil );
+			HXDXCoilIndex = UtilityRoutines::FindItem( HXDXCoilName, HXAssistedCoil );
 		} else {
 			HXDXCoilIndex = 0;
 		}
@@ -941,27 +899,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// This routine provides a method for outside routines to check if
 		// the hx assisted cooling coil is scheduled to be on.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItem;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HXAssistedCoilNum;
@@ -976,7 +915,7 @@ namespace HVACHXAssistedCoolingCoil {
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
 			if ( TotalNumHXAssistedCoils > 0 ) {
-				HXAssistedCoilNum = FindItem( CompName, HXAssistedCoil );
+				HXAssistedCoilNum = UtilityRoutines::FindItem( CompName, HXAssistedCoil );
 			} else {
 				HXAssistedCoilNum = 0;
 			}
@@ -1019,32 +958,12 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
 		auto & GetDXCoilCapacity( DXCoils::GetCoilCapacity );
 		using WaterCoils::GetWaterCoilCapacity;
 
 		// Return value
 		Real64 CoilCapacity; // returned capacity of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1061,12 +980,12 @@ namespace HVACHXAssistedCoolingCoil {
 		errFlag = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
 
-		if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+		if ( UtilityRoutines::SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 			if ( WhichCoil != 0 ) {
 				// coil does not have capacity in input so mine information from DX cooling coil
 
@@ -1079,7 +998,7 @@ namespace HVACHXAssistedCoolingCoil {
 					ShowRecurringWarningErrorAtEnd( "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount );
 				}
 			}
-		} else if ( SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+		} else if ( UtilityRoutines::SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 			if ( WhichCoil != 0 ) {
 				// coil does not have capacity in input so mine information from DX cooling coil
 				CoilCapacity = GetWaterCoilCapacity( HXAssistedCoil( WhichCoil ).CoolingCoilType, HXAssistedCoil( WhichCoil ).CoolingCoilName, errFlag );
@@ -1123,29 +1042,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// This function looks up the HX coil type and returns it (CoilDX_CoolingHXAssisted, CoilWater_CoolingHXAssisted)
 		// If incorrect coil type or name is given, ErrorsFound is returned as true.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		int TypeNum; // returned integerized type of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1165,7 +1063,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1205,29 +1103,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		int TypeNum; // returned integerized type of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1247,7 +1124,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1285,29 +1162,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1320,7 +1176,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1356,30 +1212,11 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItem;
 		auto & GetWaterCoilWaterInletNode( WaterCoils::GetCoilWaterInletNode );
 
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1392,7 +1229,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1436,29 +1273,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1471,7 +1287,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1507,29 +1323,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
 		// is returned as blank
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		std::string DXCoilType; // returned type of cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1542,7 +1337,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1578,29 +1373,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
 		// is returned as blank
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		std::string DXCoilName; // returned name of cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1614,7 +1388,7 @@ namespace HVACHXAssistedCoolingCoil {
 
 		//  HXAssistedCoil(HXAssistedCoilNum)%CoolingCoilName            = AlphArray(7)
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1650,29 +1424,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the name
 		// is returned as blank
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		int DXCoilIndex; // returned index of DX cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1685,7 +1438,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1722,29 +1475,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and the cooling
 		// coil type is returned as blank.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
 		// Return value
 		std::string CoolingCoilType; // returned type of cooling coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1757,7 +1489,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1793,27 +1525,6 @@ namespace HVACHXAssistedCoolingCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Need to get child coil type and name.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
 
@@ -1825,7 +1536,7 @@ namespace HVACHXAssistedCoolingCoil {
 		}
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 		} else {
 			WhichCoil = 0;
 		}
@@ -1861,31 +1572,11 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
 		auto & GetWaterCoilMaxFlowRate( WaterCoils::GetCoilMaxWaterFlowRate );
 
 		// Return value
 		Real64 MaxWaterFlowRate; // returned max water flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1900,15 +1591,15 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 
-			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+			if ( UtilityRoutines::SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
 					// coil does not specify MaxWaterFlowRate
 					MaxWaterFlowRate = 0.0;
 					ShowRecurringWarningErrorAtEnd( "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A", ErrCount );
 				}
-			} else if ( SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+			} else if ( UtilityRoutines::SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
 					MaxWaterFlowRate = GetWaterCoilMaxFlowRate( cAllCoilTypes( GetCoilObjectTypeNum( CoilType, CoilName, ErrorsFound ) ), GetHXDXCoilName( CoilType, CoilName, ErrorsFound ), ErrorsFound );
 				}
@@ -1950,31 +1641,11 @@ namespace HVACHXAssistedCoolingCoil {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
 		using HeatRecovery::GetSupplyAirFlowRate;
 
 		// Return value
 		Real64 MaxAirFlowRate; // returned max air flow rate of matched HX
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1988,9 +1659,9 @@ namespace HVACHXAssistedCoolingCoil {
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
 
-			WhichCoil = FindItem( CoilName, HXAssistedCoil );
+			WhichCoil = UtilityRoutines::FindItem( CoilName, HXAssistedCoil );
 
-			if ( SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+			if ( UtilityRoutines::SameString( CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || UtilityRoutines::SameString( CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 				if ( WhichCoil != 0 ) {
 					MaxAirFlowRate = GetSupplyAirFlowRate( HXAssistedCoil( WhichCoil ).HeatExchangerName, ErrorsFound );
 				}
@@ -2029,30 +1700,8 @@ namespace HVACHXAssistedCoolingCoil {
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up the given heat exchanger name and type and returns true or false.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		bool Found; // set to true if found
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2067,13 +1716,13 @@ namespace HVACHXAssistedCoolingCoil {
 		Found = false;
 
 		if ( TotalNumHXAssistedCoils > 0 ) {
-			WhichCoil = FindItem( HXName, HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName );
+			WhichCoil = UtilityRoutines::FindItem( HXName, HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName );
 		} else {
 			WhichCoil = 0;
 		}
 
 		if ( WhichCoil != 0 ) {
-			if ( SameString( HXAssistedCoil( WhichCoil ).HeatExchangerType, HXType ) ) {
+			if ( UtilityRoutines::SameString( HXAssistedCoil( WhichCoil ).HeatExchangerType, HXType ) ) {
 				Found = true;
 			}
 		}

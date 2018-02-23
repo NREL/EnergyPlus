@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,7 @@
 #include <DataZoneControls.hh>
 #include <EMSManager.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <RuntimeLanguageProcessor.hh>
@@ -151,28 +152,9 @@ namespace EMSManager {
 		// Get number of EMS-related input objects and set
 		// global logical AnyEnergyManagementSystemInModel
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		//  USE DataIPShortCuts
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using General::ScanForReports;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -180,59 +162,59 @@ namespace EMSManager {
 		std::string cCurrentModuleObject;
 
 		cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-		NumSensors = GetNumObjectsFound( cCurrentModuleObject );
+		NumSensors = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-		numActuatorsUsed = GetNumObjectsFound( cCurrentModuleObject );
+		numActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-		NumProgramCallManagers = GetNumObjectsFound( cCurrentModuleObject );
+		NumProgramCallManagers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:Program";
-		NumErlPrograms = GetNumObjectsFound( cCurrentModuleObject );
+		NumErlPrograms = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-		NumErlSubroutines = GetNumObjectsFound( cCurrentModuleObject );
+		NumErlSubroutines = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-		NumUserGlobalVariables = GetNumObjectsFound( cCurrentModuleObject );
+		NumUserGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-		NumEMSOutputVariables = GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSOutputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:MeteredOutputVariable";
-		NumEMSMeteredOutputVariables = GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSMeteredOutputVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
-		NumEMSCurveIndices = GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSCurveIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ExternalInterface:Variable";
-		NumExternalInterfaceGlobalVariables = GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUImport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-		NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUExport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-		NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ExternalInterface:Actuator";
-		NumExternalInterfaceActuatorsUsed = GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUImport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-		NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMUExport
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-		NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = GetNumObjectsFound( cCurrentModuleObject );
+		NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
-		NumEMSConstructionIndices = GetNumObjectsFound( cCurrentModuleObject );
+		NumEMSConstructionIndices = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "Output:EnergyManagementSystem";
-		int NumOutputEMSs = GetNumObjectsFound( cCurrentModuleObject );
+		int NumOutputEMSs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// added for FMU
 		if ( ( NumSensors + numActuatorsUsed + NumProgramCallManagers + NumErlPrograms
@@ -298,26 +280,12 @@ namespace EMSManager {
 		using DataGlobals::emsCallFromExternalInterface;
 		using DataGlobals::emsCallFromBeginNewEvironment;
 		using DataGlobals::emsCallFromUserDefinedComponentModel;
-
 		using RuntimeLanguageProcessor::EvaluateStack;
 		using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
 		using OutputProcessor::MeterType;
 		using OutputProcessor::RealVariables;
 		using OutputProcessor::RealVariableType;
-		using OutputProcessor::RVar;
 		using OutputProcessor::RVariableTypes;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -472,6 +440,7 @@ namespace EMSManager {
 			SetupSurfaceConvectionActuators();
 			SetupSurfaceConstructionActuators();
 			SetupSurfaceOutdoorBoundaryConditionActuators();
+			SetupZoneOutdoorBoundaryConditionActuators();
 			GetEMSInput();
 			GetEMSUserInput = false;
 		}
@@ -600,24 +569,11 @@ namespace EMSManager {
 		using DataGlobals::emsCallFromComponentGetInput;
 		using DataGlobals::emsCallFromUserDefinedComponentModel;
 		using DataGlobals::emsCallFromUnitarySystemSizing;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		//  USE OutputProcessor, ONLY: GetReportVarPointerForEMS
-		//  USE DataIPShortCuts
-
 		using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
 		using RuntimeLanguageProcessor::FindEMSVariable;
 		using RuntimeLanguageProcessor::NewEMSVariable;
 		using RuntimeLanguageProcessor::ExternalInterfaceInitializeErlVariable;
 		using RuntimeLanguageProcessor::SetErlValueNumber;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -633,8 +589,6 @@ namespace EMSManager {
 		int IOStat; // IO Status when calling get input subroutine
 		//  CHARACTER(len=MaxNameLength), DIMENSION(99) :: AlphArray  ! Character string data  ! 99 should really be some kind of constant
 		//  REAL(r64), DIMENSION(1)          :: NumArray  ! Numeric data
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		//  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
 		Array1D_string cAlphaFieldNames;
@@ -662,59 +616,59 @@ namespace EMSManager {
 
 		// FLOW:
 		cCurrentModuleObject = "EnergyManagementSystem:Sensor";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = NumNums;
 		MaxNumAlphas = NumAlphas;
 		cCurrentModuleObject = "EnergyManagementSystem:Actuator";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:Program";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:Subroutine";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "EnergyManagementSystem:OutputVariable";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "ExternalInterface:Variable";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "ExternalInterface:Actuator";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Variable";
-		GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-		GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Variable";
-		GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-		GetObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+		inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
 		MaxNumNumbers = max(MaxNumNumbers, NumNums);
 		MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 		//  cCurrentModuleObject = 'EnergyManagementSystem:Sensor'
-		//  CALL GetObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
+		//  CALL inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject,TotalArgs,NumAlphas,NumNums)
 		//  MaxNumNumbers=MAX(MaxNumNumbers,NumNums)
 		//  MaxNumAlphas=MAX(MaxNumAlphas,NumAlphas)
 		cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
-		GetObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
@@ -730,16 +684,8 @@ namespace EMSManager {
 			Sensor.allocate( NumSensors );
 
 			for ( SensorNum = 1; SensorNum <= NumSensors; ++SensorNum ) {
-				GetObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Sensor, SensorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-
+				inputProcessor->getObjectItem( cCurrentModuleObject, SensorNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					Sensor( SensorNum ).Name = cAlphaArgs( 1 );
@@ -755,7 +701,7 @@ namespace EMSManager {
 					} else {
 						VariableNum = NewEMSVariable( cAlphaArgs( 1 ), 0 );
 						Sensor( SensorNum ).VariableNum = VariableNum;
-						ErlVariable( VariableNum ).Value.initialized = true; 
+						ErlVariable( VariableNum ).Value.initialized = true;
 					}
 				}
 
@@ -802,18 +748,18 @@ namespace EMSManager {
 				// If we process the ExternalInterface actuators, all we need to do is to change the
 				// name of the module object, and shift the ActuatorNum in GetObjectItem
 				if ( ActuatorNum <= numActuatorsUsed ) {
-					GetObjectItem( cCurrentModuleObject, ActuatorNum, cAlphaArgs, NumAlphas,
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum, cAlphaArgs, NumAlphas,
 						rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				} else if ( ActuatorNum > numActuatorsUsed && ActuatorNum <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed ) {
 					cCurrentModuleObject = "ExternalInterface:Actuator";
-					GetObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed, cAlphaArgs,
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed, cAlphaArgs,
 						NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
 						lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed
 					&& ActuatorNum <= ( numActuatorsUsed + NumExternalInterfaceActuatorsUsed
 					+ NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed ) ) {
 					cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:To:Actuator";
-					GetObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
 						- NumExternalInterfaceActuatorsUsed, cAlphaArgs, NumAlphas, rNumericArgs,
 						NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				} else if ( ActuatorNum > numActuatorsUsed + NumExternalInterfaceActuatorsUsed
@@ -821,20 +767,13 @@ namespace EMSManager {
 					+ NumExternalInterfaceActuatorsUsed + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed
 					+ NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed ) {
 					cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitExport:To:Actuator";
-					GetObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
+					inputProcessor->getObjectItem( cCurrentModuleObject, ActuatorNum - numActuatorsUsed
 						- NumExternalInterfaceActuatorsUsed - NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed,
 						cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,
 						cAlphaFieldNames, cNumericFieldNames );
 				}
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EMSActuatorUsed, ActuatorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSActuatorUsed( ActuatorNum ).Name = cAlphaArgs( 1 );
@@ -868,11 +807,11 @@ namespace EMSManager {
 				FoundObjectName = false;
 				FoundActuatorName = false;
 				for ( ActuatorVariableNum = 1; ActuatorVariableNum <= numEMSActuatorsAvailable; ++ActuatorVariableNum ) {
-					if ( SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, cAlphaArgs( 3 ) ) ) {
+					if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, cAlphaArgs( 3 ) ) ) {
 						FoundObjectType = true;
-						if ( SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
+						if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
 							FoundObjectName = true;
-							if ( SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, cAlphaArgs( 4 ) ) ) {
+							if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, cAlphaArgs( 4 ) ) ) {
 								FoundActuatorName = true;
 								break;
 							}
@@ -888,21 +827,14 @@ namespace EMSManager {
 		}
 
 		cCurrentModuleObject = "EnergyManagementSystem:InternalVariable";
-		NumInternalVariablesUsed = GetNumObjectsFound( cCurrentModuleObject );
+		NumInternalVariablesUsed = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumInternalVariablesUsed > 0 ) {
 			EMSInternalVarsUsed.allocate( NumInternalVariablesUsed );
 
 			for ( InternVarNum = 1; InternVarNum <= NumInternalVariablesUsed; ++InternVarNum ) {
-				GetObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, InternVarNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EMSInternalVarsUsed, InternVarNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				ValidateEMSVariableName( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaFieldNames( 1 ), errFlag, ErrorsFound );
 				if ( ! errFlag ) {
 					EMSInternalVarsUsed( InternVarNum ).Name = cAlphaArgs( 1 );
@@ -923,9 +855,9 @@ namespace EMSManager {
 					FoundObjectType = false;
 					FoundObjectName = false;
 					for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-						if ( SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, cAlphaArgs( 3 ) ) ) {
+						if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, cAlphaArgs( 3 ) ) ) {
 							FoundObjectType = true;
-							if ( SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
+							if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, cAlphaArgs( 2 ) ) ) {
 								FoundObjectName = true;
 								break; // InternalVarAvailNum now holds needed index pointer
 							}
@@ -949,15 +881,9 @@ namespace EMSManager {
 
 			for ( CallManagerNum = 1; CallManagerNum <= NumProgramCallManagers; ++CallManagerNum ) {
 
-				GetObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, CallManagerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EMSProgramCallManager, CallManagerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				EMSProgramCallManager( CallManagerNum ).Name = cAlphaArgs( 1 );
 
 				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
@@ -1011,7 +937,7 @@ namespace EMSManager {
 						ErrorsFound = true;
 					}
 
-					StackNum = FindItemInList( cAlphaArgs( AlphaNum ), ErlStack );
+					StackNum = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), ErlStack );
 
 					if ( StackNum > 0 ) { // found it
 						// check for duplicate and warn.
@@ -1080,27 +1006,9 @@ namespace EMSManager {
 		// but we also want to allow customizing sizing calcs which occur much earlier in the simulation.
 		//  so here we do a final pass and throw the errors that would usually occur during get input.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		//  USE DataIPShortCuts, ONLY: cCurrentModuleObject
 		// Using/Aliasing
-		using InputProcessor::SameString;
 		using RuntimeLanguageProcessor::BeginEnvrnInitializeRuntimeLanguage;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SensorNum; // local loop
@@ -1151,7 +1059,7 @@ namespace EMSManager {
 					Sensor( SensorNum ).Index = VarIndex;
 					Sensor( SensorNum ).CheckedOkay = true;
 					// If variable is Schedule Value, then get the schedule id to register it as being used
-					if ( SameString( Sensor( SensorNum ).OutputVarName, "Schedule Value" ) ) {
+					if ( UtilityRoutines::SameString( Sensor( SensorNum ).OutputVarName, "Schedule Value" ) ) {
 						Sensor( SensorNum ).SchedNum = GetScheduleIndex( Sensor( SensorNum ).UniqueKeyName );
 						if ( Sensor( SensorNum ).SchedNum == 0 ) {
 							Sensor( SensorNum ).CheckedOkay = false;
@@ -1197,11 +1105,11 @@ namespace EMSManager {
 			FoundObjectName = false;
 			FoundActuatorName = false;
 			for ( ActuatorVariableNum = 1; ActuatorVariableNum <= numEMSActuatorsAvailable; ++ActuatorVariableNum ) {
-				if ( SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, EMSActuatorUsed( ActuatorNum ).ComponentTypeName ) ) {
+				if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ComponentTypeName, EMSActuatorUsed( ActuatorNum ).ComponentTypeName ) ) {
 					FoundObjectType = true;
-					if ( SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, EMSActuatorUsed( ActuatorNum ).UniqueIDName ) ) {
+					if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).UniqueIDName, EMSActuatorUsed( ActuatorNum ).UniqueIDName ) ) {
 						FoundObjectName = true;
-						if ( SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, EMSActuatorUsed( ActuatorNum ).ControlTypeName ) ) {
+						if ( UtilityRoutines::SameString( EMSActuatorAvailable( ActuatorVariableNum ).ControlTypeName, EMSActuatorUsed( ActuatorNum ).ControlTypeName ) ) {
 							FoundActuatorName = true;
 							break;
 						}
@@ -1261,9 +1169,9 @@ namespace EMSManager {
 			FoundObjectType = false;
 			FoundObjectName = false;
 			for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-				if ( SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, EMSInternalVarsUsed( InternVarNum ).InternalDataTypeName ) ) {
+				if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName, EMSInternalVarsUsed( InternVarNum ).InternalDataTypeName ) ) {
 					FoundObjectType = true;
-					if ( SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, EMSInternalVarsUsed( InternVarNum ).UniqueIDName ) ) {
+					if ( UtilityRoutines::SameString( EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName, EMSInternalVarsUsed( InternVarNum ).UniqueIDName ) ) {
 						FoundObjectName = true;
 						break; // InternalVarAvailNum now holds needed index pointer
 					}
@@ -1340,9 +1248,9 @@ namespace EMSManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumKeys;
 		int KeyNum;
-		int AvgOrSum;
+		OutputProcessor::StoreType AvgOrSum;
 		int StepType;
-		std::string Units;
+		OutputProcessor::Unit Units( OutputProcessor::Unit::None );
 		Array1D_string KeyName;
 		Array1D_int KeyIndex;
 		bool Found;
@@ -1395,24 +1303,8 @@ namespace EMSManager {
 		// mine structure and write to edd file
 		// note this executes after final processing and sizing-related calling points may already execute Erl programs
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1428,8 +1320,8 @@ namespace EMSManager {
 			int FoundControlType;
 			for ( int ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
 				if ( ActuatorLoop + 1 <= numEMSActuatorsAvailable ) {
-					FoundTypeName = FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ComponentTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
-					FoundControlType = FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ControlTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ControlTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
+					FoundTypeName = UtilityRoutines::FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ComponentTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
+					FoundControlType = UtilityRoutines::FindItemInList( EMSActuatorAvailable( ActuatorLoop ).ControlTypeName, EMSActuatorAvailable( {ActuatorLoop + 1,numEMSActuatorsAvailable} ), &EMSActuatorAvailableType::ControlTypeName, numEMSActuatorsAvailable - ( ActuatorLoop + 1 ) );
 				} else {
 					FoundTypeName = 1;
 					FoundControlType = 1;
@@ -1458,25 +1350,8 @@ namespace EMSManager {
 		// METHODOLOGY EMPLOYED:
 		// mine structure and write to eio file
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1492,7 +1367,7 @@ namespace EMSManager {
 			for ( int InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
 				int Found( 0 );
 				if ( InternalDataLoop + 1 <= numEMSInternalVarsAvailable ) {
-					Found = FindItemInList( EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName, EMSInternalVarsAvailable( {InternalDataLoop + 1,numEMSInternalVarsAvailable} ), &InternalVarsAvailableType::DataTypeName, numEMSInternalVarsAvailable - ( InternalDataLoop + 1 ) );
+					Found = UtilityRoutines::FindItemInList( EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName, EMSInternalVarsAvailable( {InternalDataLoop + 1,numEMSInternalVarsAvailable} ), &InternalVarsAvailableType::DataTypeName, numEMSInternalVarsAvailable - ( InternalDataLoop + 1 ) );
 				}
 				if ( Found == 0 ) {
 					gio::write( OutputEMSFileUnitNum, fmtA ) << "EnergyManagementSystem:InternalVariable Available, *," + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
@@ -1575,6 +1450,8 @@ namespace EMSManager {
 				NodeNum = OutsideAirNodeList( OutsideAirNodeNum );
 				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Drybulb Temperature", "[C]", Node( NodeNum ).EMSOverrideOutAirDryBulb, Node( NodeNum ).EMSValueForOutAirDryBulb );
 				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wetbulb Temperature", "[C]", Node( NodeNum ).EMSOverrideOutAirWetBulb, Node( NodeNum ).EMSValueForOutAirWetBulb );
+				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wind Speed", "[m/s]", Node( NodeNum ).EMSOverrideOutAirWindSpeed, Node( NodeNum ).EMSValueForOutAirWindSpeed);
+				SetupEMSActuator( "Outdoor Air System Node", NodeID( NodeNum ), "Wind Direction", "[degree]", Node( NodeNum ).EMSOverrideOutAirWindDir, Node( NodeNum ).EMSValueForOutAirWindDir );
 			}
 		}
 
@@ -1660,26 +1537,8 @@ namespace EMSManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Provide method to verify that a specific node is (probably) managed by EMS
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::SameString;
 		using DataLoopNode::NodeID;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int Loop( 0 ); // local do loop index
@@ -1715,7 +1574,7 @@ namespace EMSManager {
 		}}
 
 		for ( Loop = 1; Loop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++Loop ) {
-			if ( ( SameString( EMSActuatorUsed( Loop ).ComponentTypeName, cComponentTypeName ) ) && ( SameString( EMSActuatorUsed( Loop ).UniqueIDName, cNodeName ) ) && ( SameString( EMSActuatorUsed( Loop ).ControlTypeName, cControlTypeName ) ) ) {
+			if ( ( UtilityRoutines::SameString( EMSActuatorUsed( Loop ).ComponentTypeName, cComponentTypeName ) ) && ( UtilityRoutines::SameString( EMSActuatorUsed( Loop ).UniqueIDName, cNodeName ) ) && ( UtilityRoutines::SameString( EMSActuatorUsed( Loop ).ControlTypeName, cControlTypeName ) ) ) {
 				FoundControl = true;
 			}
 
@@ -1734,7 +1593,7 @@ namespace EMSManager {
 
 	returnValue = false;
 	for (auto loop = 1; loop <= NumSensors; ++loop ) {
-		if ( Sensor( loop ).UniqueKeyName == DataLoopNode::NodeID( nodeNum ) && InputProcessor::SameString(Sensor( loop ).OutputVarName ,varName) ) {
+		if ( Sensor( loop ).UniqueKeyName == DataLoopNode::NodeID( nodeNum ) && UtilityRoutines::SameString(Sensor( loop ).OutputVarName ,varName) ) {
 			returnValue = true;
 		}
 	}
@@ -2065,6 +1924,7 @@ namespace EMSManager {
 			SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wetbulb Temperature", "[C]", Surface( SurfNum ).OutWetBulbTempEMSOverrideOn, Surface( SurfNum ).OutWetBulbTempEMSOverrideValue );
 			if ( Surface( SurfNum ).ExtWind ) {
 				SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wind Speed", "[m/s]", Surface( SurfNum ).WindSpeedEMSOverrideOn, Surface( SurfNum ).WindSpeedEMSOverrideValue );
+				SetupEMSActuator( "Surface", Surface( SurfNum ).Name, "Outdoor Air Wind Direction", "[degree]", Surface( SurfNum ).WindDirEMSOverrideOn, Surface( SurfNum ).WindDirEMSOverrideValue );
 			}
 		}
 
@@ -2124,9 +1984,47 @@ namespace EMSManager {
 	}
 
 	void
+	SetupZoneOutdoorBoundaryConditionActuators()
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         X Luo
+		//       DATE WRITTEN   July 2017
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// setup EMS actuators for outside boundary conditions by surface
+
+		// METHODOLOGY EMPLOYED:
+		// loop through all surfaces, cycle if not heat transfer or outdoors BC
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataHeatBalance::Zone;
+		using DataGlobals::NumOfZones;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int ZoneNum; // local loop index.
+
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Drybulb Temperature", "[C]", Zone( ZoneNum ).OutDryBulbTempEMSOverrideOn, Zone( ZoneNum ).OutDryBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wetbulb Temperature", "[C]", Zone( ZoneNum ).OutWetBulbTempEMSOverrideOn, Zone( ZoneNum ).OutWetBulbTempEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wind Speed", "[m/s]", Zone( ZoneNum ).WindSpeedEMSOverrideOn, Zone( ZoneNum ).WindSpeedEMSOverrideValue );
+			SetupEMSActuator( "Zone", Zone( ZoneNum ).Name, "Outdoor Air Wind Direction", "[degree]", Zone( ZoneNum ).WindDirEMSOverrideOn, Zone( ZoneNum ).WindDirEMSOverrideValue );
+
+		}
+
+	}
+
+
+	void
 	checkForUnusedActuatorsAtEnd()
 	{
-		// call at end of simulation to check if any of the user's actuators were never initialized.  
+		// call at end of simulation to check if any of the user's actuators were never initialized.
 		// Could be a mistake we want to help users catch // Issue #4404.
 		for ( int actuatorUsedLoop = 1; actuatorUsedLoop <= numActuatorsUsed; ++actuatorUsedLoop ) {
 			if ( ! ErlVariable( EMSActuatorUsed( actuatorUsedLoop ).ErlVariableNum ).Value.initialized ) {
@@ -2137,9 +2035,9 @@ namespace EMSManager {
 				ShowContinueError( "EMS Actuator control type = " + EMSActuatorUsed( actuatorUsedLoop ).ControlTypeName );
 			}
 		}
-	
+
 	}
-	
+
 } // EMSManager
 
 //Moved these setup EMS actuator routines out of module to solve circular use problems between
@@ -2171,22 +2069,12 @@ SetupEMSActuator(
 	//  check for duplicates.
 
 	// Using/Aliasing
-	using InputProcessor::MakeUPPERCase;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	// Object Data
-
-	// FLOW:
-
-	std::string const UpperCaseObjectType( MakeUPPERCase( cComponentTypeName ) );
-	std::string const UpperCaseObjectName( MakeUPPERCase( cUniqueIDName ) );
-	std::string const UpperCaseActuatorName( MakeUPPERCase( cControlTypeName ) );
+	std::string const UpperCaseObjectType( UtilityRoutines::MakeUPPERCase( cComponentTypeName ) );
+	std::string const UpperCaseObjectName( UtilityRoutines::MakeUPPERCase( cUniqueIDName ) );
+	std::string const UpperCaseActuatorName( UtilityRoutines::MakeUPPERCase( cControlTypeName ) );
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
@@ -2241,27 +2129,12 @@ SetupEMSActuator(
 	//  check for duplicates.
 
 	// Using/Aliasing
-	using InputProcessor::MakeUPPERCase;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	// Object Data
-
-	// FLOW:
-	//  IF (.NOT. ActuatorFileOpen) THEN
-	//    !OPEN(88,file='eplusout.add')
-	//    !WRITE(88, '(A)') 'Object Type,Actuator Name'
-	//    ActuatorFileOpen = .TRUE.
-	//  END IF
-
-	std::string const UpperCaseObjectType( MakeUPPERCase( cComponentTypeName ) );
-	std::string const UpperCaseObjectName( MakeUPPERCase( cUniqueIDName ) );
-	std::string const UpperCaseActuatorName( MakeUPPERCase( cControlTypeName ) );
+	std::string const UpperCaseObjectType( UtilityRoutines::MakeUPPERCase( cComponentTypeName ) );
+	std::string const UpperCaseObjectName( UtilityRoutines::MakeUPPERCase( cUniqueIDName ) );
+	std::string const UpperCaseActuatorName( UtilityRoutines::MakeUPPERCase( cControlTypeName ) );
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
@@ -2316,22 +2189,12 @@ SetupEMSActuator(
 	//  check for duplicates.
 
 	// Using/Aliasing
-	using InputProcessor::MakeUPPERCase;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	// Object Data
-
-	// FLOW:
-
-	std::string const UpperCaseObjectType( MakeUPPERCase( cComponentTypeName ) );
-	std::string const UpperCaseObjectName( MakeUPPERCase( cUniqueIDName ) );
-	std::string const UpperCaseActuatorName( MakeUPPERCase( cControlTypeName ) );
+	std::string const UpperCaseObjectType( UtilityRoutines::MakeUPPERCase( cComponentTypeName ) );
+	std::string const UpperCaseObjectName( UtilityRoutines::MakeUPPERCase( cUniqueIDName ) );
+	std::string const UpperCaseActuatorName( UtilityRoutines::MakeUPPERCase( cControlTypeName ) );
 
 	EMSActuatorKey const key( UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName );
 
@@ -2378,28 +2241,9 @@ SetupEMSInternalVariable(
 	// PURPOSE OF THIS SUBROUTINE:
 	// Setup internal data source and make available to EMS
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
-	using InputProcessor::SameString;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int InternalVarAvailNum; // loop index
@@ -2412,7 +2256,7 @@ SetupEMSInternalVariable(
 	FoundDuplicate = false;
 
 	for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-		if ( ( SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
+		if ( ( UtilityRoutines::SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( UtilityRoutines::SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
 			FoundDuplicate = true;
 			break;
 		}
@@ -2463,28 +2307,9 @@ SetupEMSInternalVariable(
 	// PURPOSE OF THIS SUBROUTINE:
 	// Setup internal data source and make available to EMS
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
-	using InputProcessor::SameString;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int InternalVarAvailNum; // loop index
@@ -2497,7 +2322,7 @@ SetupEMSInternalVariable(
 	FoundDuplicate = false;
 
 	for ( InternalVarAvailNum = 1; InternalVarAvailNum <= numEMSInternalVarsAvailable; ++InternalVarAvailNum ) {
-		if ( ( SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
+		if ( ( UtilityRoutines::SameString( cDataTypeName, EMSInternalVarsAvailable( InternalVarAvailNum ).DataTypeName ) ) && ( UtilityRoutines::SameString( cUniqueIDName, EMSInternalVarsAvailable( InternalVarAvailNum ).UniqueIDName ) ) ) {
 			FoundDuplicate = true;
 			break;
 		}

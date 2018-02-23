@@ -119,6 +119,10 @@ Actuators are available for overriding the autosize values related to supply air
 
 An actuator called ``AirTerminal:SingleDuct:Uncontrolled'' is available with a control type called ``Mass Flow Rate.''~ This actuator is available in models that use the direct air terminal. The units are kg/s. This actuator is used to control the flow rate. Normally, the flow rate of direct air terminals is fixed by the input or sizing results, but this actuator provides a way to override the flow with Erl programs.
 
+\subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airTerminalsingleductconstantvolumenoreheat}
+
+An actuator called ``AirTerminal:SingleDuct:ConstantVolume:NoReheat'' is available with a control type called ``Mass Flow Rate.''~ This actuator is available in models that use the single duct constant volume no reheat air terminal. The units are kg/s. This actuator is used to control the mass flow rate. Normally, the flow rate of single duct constant volume no reheat air terminals is fixed by the input, sizing results or OA requirement for DOA system, but this actuator provides a way to override the flow with Erl programs.
+
 \subsection{Outdoor Air Controller}\label{outdoor-air-controller}
 
 An actuator called ``Outdoor Air Controller'' is available with the control type called ``Air Mass Flow Rate.'' ~This provides override control over the rate of outdoor air. The units are kg/s. The unique identifier is the name of the Controller:OutdoorAir input object. The actuated mass flow rate is not allowed to be greater than the current system mixed air flow rate.

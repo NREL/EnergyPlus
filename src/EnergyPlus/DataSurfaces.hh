@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -332,6 +333,7 @@ namespace DataSurfaces {
 	extern int TotOSC; // Total number of Other Side Coefficient Blocks
 	extern int TotOSCM; // Total number of Other Side Conditions Model Blocks.
 	extern int TotExtVentCav;
+	extern int TotSurfLocalEnv; // Total number of surface level outdoor air node.
 	extern int TotSurfIncSolSSG; // Total number of scheduled surface gains for incident solar radiation on surface
 	extern int TotFenLayAbsSSG; // Total number of scheduled surface gains for absorbed solar radiation in window layers
 	extern int Corner; // Which corner is specified as the first vertice
@@ -604,6 +606,8 @@ namespace DataSurfaces {
 		Real64 Width; // Width of the surface (m)
 		// Boundary conditions and interconnections
 		bool HeatTransSurf; // True if surface is a heat transfer surface,
+		int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+		int InsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
 		// False if a (detached) shadowing (sub)surface
 		int HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
 		std::string BaseSurfName; // Name of BaseSurf
@@ -670,6 +674,7 @@ namespace DataSurfaces {
 		bool MovInsulIntPresent; // True when movable insulation is present
 		bool MovInsulIntPresentPrevTS; // True when movable insulation was present during the previous time step
 		// Vertices
+		Array1D< Vector > NewVertex;
 		Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
 		Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
 		Vector lcsx;
@@ -714,6 +719,21 @@ namespace DataSurfaces {
 		Real64 WindSpeed; // Surface outside wind speed, for surface heat balance (m/s)
 		bool WindSpeedEMSOverrideOn;
 		Real64 WindSpeedEMSOverrideValue;
+
+		// XL added 7/19/2017
+		Real64 WindDir; // Surface outside wind direction, for surface heat balance and ventilation(degree) 
+		bool WindDirEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind direction
+		Real64 WindDirEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+
+		// XL added 7/25/2017
+		
+		bool SchedExternalShadingFrac; // true if the external shading is scheduled or calculated externally to be imported
+		int ExternalShadingSchInd; // Schedule for a the external shading
+		bool HasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
+		int SurroundingSurfacesNum; // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+		bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
+		int LinkedOutAirNode; // Index of the an OutdoorAir:Node
+
 		std::string UNomWOFilm; // Nominal U Value without films stored as string
 		std::string UNomFilm; // Nominal U Value with films stored as string
 		bool ExtEcoRoof; // True if the top outside construction material is of type Eco Roof
@@ -747,6 +767,8 @@ namespace DataSurfaces {
 		bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
 		// LG added 1/6/12
 		Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
+
+		std::vector< int > DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
 		// the surface diffusion model
 
 		// Default Constructor
@@ -768,6 +790,8 @@ namespace DataSurfaces {
 			Tilt( 0.0 ),
 			Width( 0.0 ),
 			HeatTransSurf( false ),
+			OutsideHeatSourceTermSchedule( 0 ),
+			InsideHeatSourceTermSchedule( 0 ),
 			HeatTransferAlgorithm( HeatTransferModel_NotSet ),
 			BaseSurf( 0 ),
 			NumSubSurfaces( 0 ),
@@ -839,6 +863,19 @@ namespace DataSurfaces {
 			WindSpeed( 0.0 ),
 			WindSpeedEMSOverrideOn( false ),
 			WindSpeedEMSOverrideValue( 0.0 ),
+
+			WindDir( 0.0 ),
+			WindDirEMSOverrideOn( false ),
+			WindDirEMSOverrideValue( 0.0 ),
+
+
+			SchedExternalShadingFrac( false ), 
+			ExternalShadingSchInd( 0 ),
+			HasSurroundingSurfProperties( false ),
+			SurroundingSurfacesNum( 0 ),
+			HasLinkedOutAirNode ( false ),
+			LinkedOutAirNode( 0 ),
+
 			UNomWOFilm( "-              " ),
 			UNomFilm( "-              " ),
 			ExtEcoRoof( false ),
@@ -882,6 +919,10 @@ namespace DataSurfaces {
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+		void
+		SetWindDirAt( Real64 const fac );
+
 
 	private: // Methods
 
@@ -1103,6 +1144,7 @@ namespace DataSurfaces {
 		Real64 GlTsolDifDif; // Time-step value of glass diffuse-diffuse solar transmittance (-)
 		int AirflowSource; // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
 		int AirflowDestination; // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+		int AirflowReturnNodePtr; // Return node pointer for destination = ReturnAir
 		Real64 MaxAirflow; // Maximum gap airflow (m3/s per m of glazing width)
 		int AirflowControlType; // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
 		bool AirflowHasSchedule; // True if gap airflow is scheduled
@@ -1284,6 +1326,7 @@ namespace DataSurfaces {
 			GlTsolDifDif( 0.0 ),
 			AirflowSource( 0 ),
 			AirflowDestination( 0 ),
+			AirflowReturnNodePtr( 0 ),
 			MaxAirflow( 0.0 ),
 			AirflowControlType( 0 ),
 			AirflowHasSchedule( false ),
@@ -1798,6 +1841,63 @@ namespace DataSurfaces {
 
 	};
 
+	struct SurfaceLocalEnvironment
+	{
+		// Members
+		std::string Name;
+		int SurfPtr; // surface pointer
+		int ExtShadingSchedPtr; // schedule pointer
+		int SurroundingSurfsPtr; // schedule pointer
+		int OutdoorAirNodePtr; // schedule pointer
+
+		// Default Constructor
+		SurfaceLocalEnvironment() :
+			SurfPtr( 0 ),
+			ExtShadingSchedPtr( 0 ),
+			SurroundingSurfsPtr( 0 ),
+			OutdoorAirNodePtr( 0 )
+		{}
+
+	};
+
+
+	struct SurroundingSurfProperty
+	{
+		// Members
+		std::string Name;
+		Real64 ViewFactor;
+		int TempSchNum; // schedule pointer
+						// Default Constructor
+		SurroundingSurfProperty() :
+			ViewFactor( 0.0 ),
+			TempSchNum( 0 )
+		{}
+
+	};
+
+	struct SurroundingSurfacesProperty
+	{
+		// Members
+		std::string Name;
+		Real64 SkyViewFactor; 
+		int SkyTempSchNum; // schedule pointer
+		Real64 GroundViewFactor;
+		int GroundTempSchNum; // schedule pointer
+		int TotSurroundingSurface; // Total number of surrounding surfaces defined for an exterior surface
+		Array1D< SurroundingSurfProperty > SurroundingSurfs; 
+
+		// Default Constructor
+		SurroundingSurfacesProperty() :
+			SkyViewFactor( -1.0 ),
+			SkyTempSchNum( 0 ),
+			GroundViewFactor( -1.0 ),
+			GroundTempSchNum( 0 ),
+			TotSurroundingSurface( 0 )
+		{}
+
+	};
+
+
 	// Object Data
 	extern Array1D< SurfaceData > Surface;
 	extern Array1D< SurfaceWindowCalc > SurfaceWindow;
@@ -1812,6 +1912,8 @@ namespace DataSurfaces {
 	extern Array1D< ExtVentedCavityStruct > ExtVentedCavity;
 	extern Array1D< SurfaceSolarIncident > SurfIncSolSSG;
 	extern Array1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
+	extern Array1D< SurfaceLocalEnvironment > SurfLocalEnvironment;
+	extern Array1D< SurroundingSurfacesProperty > SurroundingSurfsProperty;
 
 	// Functions
 
@@ -1828,6 +1930,9 @@ namespace DataSurfaces {
 
 	void
 	SetSurfaceWindSpeedAt();
+
+	void
+	SetSurfaceWindDirAt();
 
 	std::string
 	cSurfaceClass( int const ClassNo );

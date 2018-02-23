@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -333,6 +334,7 @@ namespace DataSurfaces {
 	int TotExtVentCav( 0 );
 	int TotSurfIncSolSSG( 0 ); // Total number of scheduled surface gains for incident solar radiation on surface
 	int TotFenLayAbsSSG( 0 ); // Total number of scheduled surface gains for absorbed solar radiation in window layers
+	int TotSurfLocalEnv( 0 ); // Total number of surface level outdoor air node.
 	int Corner( 0 ); // Which corner is specified as the first vertice
 	int MaxVerticesPerSurface( 4 ); // Maximum number of vertices allowed for a single surface (default -- can go higher)
 
@@ -481,6 +483,8 @@ namespace DataSurfaces {
 	Array1D< ExtVentedCavityStruct > ExtVentedCavity;
 	Array1D< SurfaceSolarIncident > SurfIncSolSSG;
 	Array1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
+	Array1D< SurfaceLocalEnvironment > SurfLocalEnvironment;
+	Array1D< SurroundingSurfacesProperty > SurroundingSurfsProperty;
 
 	// Class Methods
 
@@ -665,6 +669,24 @@ namespace DataSurfaces {
 			}
 		}
 
+		void
+		SurfaceData::
+		SetWindDirAt( Real64 const fac )
+		{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         X Luo
+			//       DATE WRITTEN   June 2017
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Routine provides facility for doing bulk Set Windspeed locally.
+
+			// Using/Aliasing
+			WindDir = fac;
+		}
+
+
 		// Computed Shape Category
 		ShapeCat
 		SurfaceData::
@@ -793,6 +815,7 @@ namespace DataSurfaces {
 		TotExtVentCav = 0;
 		TotSurfIncSolSSG = 0;
 		TotFenLayAbsSSG = 0;
+		TotSurfLocalEnv = 0;
 		Corner = 0;
 		MaxVerticesPerSurface = 4;
 		BuildingShadingCount = 0;
@@ -884,6 +907,8 @@ namespace DataSurfaces {
 		ExtVentedCavity.deallocate();
 		SurfIncSolSSG.deallocate();
 		FenLayAbsSSG.deallocate();
+		SurfLocalEnvironment.deallocate();
+		SurroundingSurfsProperty.deallocate();
 	}
 
 	void
@@ -918,6 +943,16 @@ namespace DataSurfaces {
 		Real64 const fac( DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
 		for ( auto & surface : Surface ) {
 			surface.SetWindSpeedAt( fac );
+		}
+	}
+
+	void
+	SetSurfaceWindDirAt()
+	{
+		// Using/Aliasing
+		using DataEnvironment::WindDir;
+		for ( auto & surface : Surface ) {
+			surface.SetWindDirAt( WindDir );
 		}
 	}
 

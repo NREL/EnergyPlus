@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,9 +69,10 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -159,6 +161,7 @@ namespace PipeHeatTransfer {
 
 	// Object Data
 	Array1D< PipeHTData > PipeHT;
+	std::unordered_map< std::string, std::string > PipeHTUniqueNames;
 
 	//==============================================================================
 
@@ -180,6 +183,11 @@ namespace PipeHeatTransfer {
 		ShowFatalError( "PipeHTFactory: Error getting inputs for pipe named: " + objectName );
 		// Shut up the compiler
 		return nullptr;
+	}
+
+	void
+	PipeHTData::clear_state() {
+		PipeHTUniqueNames.clear();
 	}
 
 	void PipeHTData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const FirstHVACIteration, Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
@@ -233,11 +241,6 @@ namespace PipeHeatTransfer {
 		// from the user input file.  This will contain all of the information
 		// needed to define and simulate the surface.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
 		using DataGlobals::Pi;
@@ -245,11 +248,6 @@ namespace PipeHeatTransfer {
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::Material;
 		using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -258,26 +256,14 @@ namespace PipeHeatTransfer {
 		using ScheduleManager::GetScheduleIndex;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const NumPipeSections( 20 );
 		int const NumberOfDepthNodes( 8 ); // Number of nodes in the cartesian grid-Should be an even # for now
 		Real64 const SecondsInHour( SecInHour );
 		Real64 const HoursInDay( 24.0 );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input,
-		static bool IsNotOK( false );
-		static bool IsBlank( false );
 
 		// fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
@@ -292,38 +278,33 @@ namespace PipeHeatTransfer {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "Pipe:Indoor";
-		NumOfPipeHTInt = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTInt = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Outdoor";
-		NumOfPipeHTExt = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTExt = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "Pipe:Underground";
-		NumOfPipeHTUG = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPipeHTUG = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		nsvNumOfPipeHT = NumOfPipeHTInt + NumOfPipeHTExt + NumOfPipeHTUG;
 		// allocate data structures
 		if ( allocated( PipeHT ) ) PipeHT.deallocate();
 
 		PipeHT.allocate( nsvNumOfPipeHT );
+		PipeHTUniqueNames.reserve( static_cast< unsigned >( nsvNumOfPipeHT ) );
 		Item = 0;
 
 		cCurrentModuleObject = "Pipe:Indoor";
 		for ( PipeItem = 1; PipeItem <= NumOfPipeHTInt; ++PipeItem ) {
 			++Item;
 			// get the object name
-			GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeInterior;
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			PipeHT( Item ).ConstructionNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -360,7 +341,7 @@ namespace PipeHeatTransfer {
 			if ( SELECT_CASE_var == "ZONE" ) {
 				PipeHT( Item ).EnvironmentPtr = ZoneEnv;
 				PipeHT( Item ).EnvrZone = cAlphaArgs( 6 );
-				PipeHT( Item ).EnvrZonePtr = FindItemInList( cAlphaArgs( 6 ), Zone );
+				PipeHT( Item ).EnvrZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), Zone );
 				if ( PipeHT( Item ).EnvrZonePtr == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + cAlphaArgs( 6 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -420,21 +401,15 @@ namespace PipeHeatTransfer {
 		for ( PipeItem = 1; PipeItem <= NumOfPipeHTExt; ++PipeItem ) {
 			++Item;
 			// get the object name
-			GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeExterior;
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			PipeHT( Item ).ConstructionNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -510,21 +485,15 @@ namespace PipeHeatTransfer {
 
 			++Item;
 			// get the object name
-			GetObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, PipeItem, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PipeHT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PipeHTUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PipeHT( Item ).Name = cAlphaArgs( 1 );
 			PipeHT( Item ).TypeOf = TypeOf_PipeUnderground;
 
 			// General user input data
 			PipeHT( Item ).Construction = cAlphaArgs( 2 );
-			PipeHT( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			PipeHT( Item ).ConstructionNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( PipeHT( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -556,9 +525,9 @@ namespace PipeHeatTransfer {
 
 			// Solar inclusion flag
 			// A6,  \field Sun Exposure
-			if ( SameString( cAlphaArgs( 5 ), "SUNEXPOSED" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "SUNEXPOSED" ) ) {
 				PipeHT( Item ).SolarExposed = true;
-			} else if ( SameString( cAlphaArgs( 5 ), "NOSUN" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "NOSUN" ) ) {
 				PipeHT( Item ).SolarExposed = false;
 			} else {
 				ShowSevereError( "GetPipesHeatTransfer: invalid key for sun exposure flag for " + cAlphaArgs( 1 ) );
@@ -586,7 +555,7 @@ namespace PipeHeatTransfer {
 			// Also get the soil material name
 			// A7,  \field Soil Material
 			PipeHT( Item ).SoilMaterial = cAlphaArgs( 6 );
-			PipeHT( Item ).SoilMaterialNum = FindItemInList( cAlphaArgs( 6 ), Material );
+			PipeHT( Item ).SoilMaterialNum = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), Material );
 			if ( PipeHT( Item ).SoilMaterialNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + PipeHT( Item ).SoilMaterial );
 				ShowContinueError( "Found in " + cCurrentModuleObject + '=' + PipeHT( Item ).Name );
@@ -668,21 +637,21 @@ namespace PipeHeatTransfer {
 		// Set up the output variables CurrentModuleObject='Pipe:Indoor/Outdoor/Underground'
 		for ( Item = 1; Item <= nsvNumOfPipeHT; ++Item ) {
 
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate [W]", PipeHT( Item ).FluidHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy [J]", PipeHT( Item ).FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Rate", OutputProcessor::Unit::W, PipeHT( Item ).FluidHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Fluid Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT( Item ).FluidHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
 
 			if ( PipeHT( Item ).EnvironmentPtr == ZoneEnv ) {
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate [W]", PipeHT( Item ).EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
-				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy [J]", PipeHT( Item ).EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Rate", OutputProcessor::Unit::W, PipeHT( Item ).EnvironmentHeatLossRate, "Plant", "Average", PipeHT( Item ).Name );
+				SetupOutputVariable( "Pipe Ambient Heat Transfer Energy", OutputProcessor::Unit::J, PipeHT( Item ).EnvHeatLossEnergy, "Plant", "Sum", PipeHT( Item ).Name );
 
 				SetupZoneInternalGain( PipeHT( Item ).EnvrZonePtr, "Pipe:Indoor", PipeHT( Item ).Name, IntGainTypeOf_PipeIndoor, PipeHT( Item ).ZoneHeatGainRate );
 
 			}
 
-			SetupOutputVariable( "Pipe Mass Flow Rate [kg/s]", PipeHT( Item ).MassFlowRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Volume Flow Rate [m3/s]", PipeHT( Item ).VolumeFlowRate, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Inlet Temperature [C]", PipeHT( Item ).FluidInletTemp, "Plant", "Average", PipeHT( Item ).Name );
-			SetupOutputVariable( "Pipe Outlet Temperature [C]", PipeHT( Item ).FluidOutletTemp, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Mass Flow Rate", OutputProcessor::Unit::kg_s, PipeHT( Item ).MassFlowRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Volume Flow Rate", OutputProcessor::Unit::m3_s, PipeHT( Item ).VolumeFlowRate, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Inlet Temperature", OutputProcessor::Unit::C, PipeHT( Item ).FluidInletTemp, "Plant", "Average", PipeHT( Item ).Name );
+			SetupOutputVariable( "Pipe Outlet Temperature", OutputProcessor::Unit::C, PipeHT( Item ).FluidOutletTemp, "Plant", "Average", PipeHT( Item ).Name );
 		}
 
 	}
@@ -804,11 +773,6 @@ namespace PipeHeatTransfer {
 		// METHODOLOGY EMPLOYED:
 		// Check flags and update data structure
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataGlobals::BeginSimFlag;
 		using DataGlobals::BeginEnvrnFlag;
@@ -825,24 +789,14 @@ namespace PipeHeatTransfer {
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
 		using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
-		using InputProcessor::SameString;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPipesHeatTransfer" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

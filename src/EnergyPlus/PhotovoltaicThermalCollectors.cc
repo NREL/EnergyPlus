@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -71,7 +72,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -178,27 +179,8 @@ namespace PhotovoltaicThermalCollectors {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -210,7 +192,7 @@ namespace PhotovoltaicThermalCollectors {
 
 		if ( present( PVTName ) ) {
 			if ( PVTnum == 0 ) {
-				PVTnum = FindItemInList( PVTName, PVT );
+				PVTnum = UtilityRoutines::FindItemInList( PVTName, PVT );
 				if ( PVTnum == 0 ) {
 					ShowFatalError( "SimPVTcollectors: Unit not found=" + PVTName() );
 				}
@@ -269,15 +251,7 @@ namespace PhotovoltaicThermalCollectors {
 		// METHODOLOGY EMPLOYED:
 		// usual E+ methods
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
 		using namespace DataHeatBalance;
 		using namespace DataLoopNode;
@@ -291,19 +265,6 @@ namespace PhotovoltaicThermalCollectors {
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace DataPlant; // DSU
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -312,33 +273,23 @@ namespace PhotovoltaicThermalCollectors {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int SurfNum; // local use only
 		int ThisParamObj;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		// Object Data
 		Array1D< SimplePVTModelStruct > tmpSimplePVTperf;
 
 		// first load the performance object info into temporary structure
 		cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
-		NumSimplePVTPerform = GetNumObjectsFound( cCurrentModuleObject );
+		NumSimplePVTPerform = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumSimplePVTPerform > 0 ) {
 			tmpSimplePVTperf.allocate( NumSimplePVTPerform );
 			for ( Item = 1; Item <= NumSimplePVTPerform; ++Item ) {
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), tmpSimplePVTperf, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Names" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) {
-						ShowSevereError( "Invalid " + cCurrentModuleObject + ", Name cannot be blank" );
-					}
-					continue;
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) continue;
+
 				tmpSimplePVTperf( Item ).Name = cAlphaArgs( 1 );
-				if ( SameString( cAlphaArgs( 2 ), "Fixed" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Fixed" ) ) {
 					tmpSimplePVTperf( Item ).ThermEfficMode = FixedThermEffic;
-				} else if ( SameString( cAlphaArgs( 2 ), "Scheduled" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Scheduled" ) ) {
 					tmpSimplePVTperf( Item ).ThermEfficMode = ScheduledThermEffic;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -361,27 +312,18 @@ namespace PhotovoltaicThermalCollectors {
 
 		// now get main PVT objects
 		cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
-		NumPVT = GetNumObjectsFound( cCurrentModuleObject );
+		NumPVT = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		PVT.allocate( NumPVT );
 		CheckEquipName.dimension( NumPVT, true );
 
 		for ( Item = 1; Item <= NumPVT; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			//check name
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PVT, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) {
-					ShowSevereError( "Invalid " + cCurrentModuleObject + ", Name cannot be blank" );
-				}
-				continue;
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound) ) continue;
+
 			PVT( Item ).Name = cAlphaArgs( 1 );
 			PVT( Item ).TypeNum = TypeOf_PVTSolarCollectorFlatPlate; //DSU, assigned in DataPlant
 
-			PVT( Item ).SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+			PVT( Item ).SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 			// check surface
 			if ( PVT( Item ).SurfNum == 0 ) {
 				if ( lAlphaFieldBlanks( 2 ) ) {
@@ -421,7 +363,7 @@ namespace PhotovoltaicThermalCollectors {
 				ErrorsFound = true;
 			} else {
 				PVT( Item ).PVTModelName = cAlphaArgs( 3 );
-				ThisParamObj = FindItemInList( PVT( Item ).PVTModelName, tmpSimplePVTperf );
+				ThisParamObj = UtilityRoutines::FindItemInList( PVT( Item ).PVTModelName, tmpSimplePVTperf );
 				if ( ThisParamObj > 0 ) {
 					PVT( Item ).Simple = tmpSimplePVTperf( ThisParamObj ); // entire structure assigned
 					// do one-time setups on input data
@@ -436,7 +378,7 @@ namespace PhotovoltaicThermalCollectors {
 
 			}
 			if ( allocated( PVarray ) ) { // then PV input gotten... but don't expect this to be true.
-				PVT( Item ).PVnum = FindItemInList( cAlphaArgs( 4 ), PVarray );
+				PVT( Item ).PVnum = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), PVarray );
 				// check PV
 				if ( PVT( Item ).PVnum == 0 ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
@@ -451,9 +393,9 @@ namespace PhotovoltaicThermalCollectors {
 				PVT( Item ).PVfound = false;
 			}
 
-			if ( SameString( cAlphaArgs( 5 ), "Water" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Water" ) ) {
 				PVT( Item ).WorkingFluidType = LiquidWorkingFluid;
-			} else if ( SameString( cAlphaArgs( 5 ), "Air" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Air" ) ) {
 				PVT( Item ).WorkingFluidType = AirWorkingFluid;
 			} else {
 				if ( lAlphaFieldBlanks( 5 ) ) {
@@ -506,17 +448,17 @@ namespace PhotovoltaicThermalCollectors {
 			// electrical production reporting under generator:photovoltaic....
 			//    only thermal side reported here,
 
-			SetupOutputVariable( "Generator Produced Thermal Rate [W]", PVT( Item ).Report.ThermPower, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, PVT( Item ).Report.ThermPower, "System", "Average", PVT( Item ).Name );
 			if ( PVT( Item ).WorkingFluidType == LiquidWorkingFluid ) {
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarWater", "HeatProduced", _, "Plant" );
 			} else if ( PVT( Item ).WorkingFluidType == AirWorkingFluid ) {
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
-				SetupOutputVariable( "Generator PVT Fluid Bypass Status []", PVT( Item ).Report.BypassStatus, "System", "Average", PVT( Item ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, PVT( Item ).Report.ThermEnergy, "System", "Sum", PVT( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
+				SetupOutputVariable( "Generator PVT Fluid Bypass Status", OutputProcessor::Unit::None, PVT( Item ).Report.BypassStatus, "System", "Average", PVT( Item ).Name );
 			}
 
-			SetupOutputVariable( "Generator PVT Fluid Inlet Temperature [C]", PVT( Item ).Report.TinletWorkFluid, "System", "Average", PVT( Item ).Name );
-			SetupOutputVariable( "Generator PVT Fluid Outlet Temperature [C]", PVT( Item ).Report.ToutletWorkFluid, "System", "Average", PVT( Item ).Name );
-			SetupOutputVariable( "Generator PVT Fluid Mass Flow Rate [kg/s]", PVT( Item ).Report.MdotWorkFluid, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator PVT Fluid Inlet Temperature", OutputProcessor::Unit::C, PVT( Item ).Report.TinletWorkFluid, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator PVT Fluid Outlet Temperature", OutputProcessor::Unit::C, PVT( Item ).Report.ToutletWorkFluid, "System", "Average", PVT( Item ).Name );
+			SetupOutputVariable( "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, PVT( Item ).Report.MdotWorkFluid, "System", "Average", PVT( Item ).Name );
 		}
 
 		if ( ErrorsFound ) {
@@ -550,7 +492,6 @@ namespace PhotovoltaicThermalCollectors {
 		using DataLoopNode::Node;
 		using DataLoopNode::SensedNodeFlagValue;
 		using FluidProperties::GetDensityGlycol;
-		using InputProcessor::FindItemInList;
 		using DataHVACGlobals::DoSetPointTest;
 		using DataHVACGlobals::SetPointErrorFlag;
 		using DataHeatBalance::QRadSWOutIncident;
@@ -597,7 +538,7 @@ namespace PhotovoltaicThermalCollectors {
 		// finish set up of PV, becaues PV get-input follows PVT's get input.
 		if ( ! PVT( PVTnum ).PVfound ) {
 			if ( allocated( PVarray ) ) {
-				PVT( PVTnum ).PVnum = FindItemInList( PVT( PVTnum ).PVname, PVarray );
+				PVT( PVTnum ).PVnum = UtilityRoutines::FindItemInList( PVT( PVTnum ).PVname, PVarray );
 				if ( PVT( PVTnum ).PVnum == 0 ) {
 					ShowSevereError( "Invalid name for photovoltaic generator = " + PVT( PVTnum ).PVname );
 					ShowContinueError( "Entered in flat plate photovoltaic-thermal collector = " + PVT( PVTnum ).Name );

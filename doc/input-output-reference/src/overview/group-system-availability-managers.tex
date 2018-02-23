@@ -163,6 +163,17 @@ The possible inputs are \emph{StayOff}, \emph{CycleOnAny}, \emph{CycleOnControlZ
 
 The Thermostat Tolerance defines the amount by which the zone temperature must fall outside the current zone heating and cooling setpoints for the Night Cycle manager to turn the system on. The zone temperature must exceed the cooling set point or fall below the heating set point by 1/2 the Thermostat Tolerance in order for the availability manager to signal that the system should turn on. The Thermostat Tolerance is specified in degrees Celsius. The default is 1 degree C.
 
+\paragraph{Field: Cycling Run Time Control Type}\label{field-cycling-run-time-control-type}
+
+The possible inputs are: \emph{FixedRunTime}, \emph{Thermostat}, and \emph{ThermostatWithMinimumRunTime}. The default cycling run time control type is \emph{FixedRunTime}.
+
+\begin{itemize}
+\tightlist
+\item  \emph{FixedRunTime} cycling run time control type the AvailabilityManager:NightCycle activates an airloop or zone equipment for a fixed amount of run time when the zone air temperature is one half of the Thermostat Tolerance above the thermostat cooling setpoint or when the zone air temperature is one half of the Thermostat Tolerance below the thermostat heating setpoint. 
+\item  \emph{Thermostat} cycling run time control type the AvailabilityManager:NightCycle activates an airloop or zone equipment until the zone air temperature is within 0.05 deg C above the thermostat cooling setpoint in cooling mode or until the zone air temperature is within 0.05 deg C below the thermostat heating setpoint in heating mode. Cycling Run Time input field below is not used for this cycling run time control type.
+\item  \emph{ThermostatWithMinimumRunTime} cycling run time control type the AvailabilityManager:NightCycle activates an airloop or zone equipment for the specified minimum Cycling Run Time when the zone air temperature is with in 0.05 deg C above the thermostat cooling setpoint or when the zone air temperature is within 0.05 deg C below the thermostat heating setpoint and then continues running beyond the minimum Cycling Run Time until the zone air temperature reaches the thermostat setpoint within 0.05 deg C thermostat tolerance.
+\end{itemize}
+
 \paragraph{Field: Cycling Run Time}\label{field-cycling-run-time}
 
 The time in seconds for which the system will run after it has cycled on. The default is 3600 seconds (1 hour).
@@ -758,7 +769,7 @@ To limit too early start of the system maximum value for the start time can be e
 
 \paragraph{Field: Control Algorithm}\label{field-control-algorithm}
 
-The four possible inputs are \textbf{ConstantTemperatureGradient, AdaptiveTemperatureGradient, AdaptiveASHRAE,} and \textbf{ConstantStartTime}. In ConstantTemperatureGradient algorithm the temperature gradient entered by the user will be constant throughout the simulation. The response to heating and cooling operation can be non-linear thus two separate fields for temperature gradients are used. AdaptiveTemperatureGradient algorithm will modify the temperature gradients based on the arithmetic average of the actual temperature gradients calculated for the specified number of previous days. For this algorithm user should enter two initial start values. AdaptiveASHRAE algorithm implements equations suggested in ASHRAE Handbook HVAC Applications (2007). This algorithm will calculate the coefficients of the equation within the code and users need not provide temperature response related inputs. ConstantStartTime method calculates the start time based on specified number of hours before occupancy for each day. \textbf{The AdaptiveASHRAE algorithm has not been implemented yet.}
+The four possible inputs are \textbf{ConstantTemperatureGradient, AdaptiveTemperatureGradient, AdaptiveASHRAE,} and \textbf{ConstantStartTime}. In ConstantTemperatureGradient algorithm the temperature gradient entered by the user will be constant throughout the simulation. The response to heating and cooling operation can be non-linear thus two separate fields for temperature gradients are used. AdaptiveTemperatureGradient algorithm will modify the temperature gradients based on the arithmetic average of the actual temperature gradients calculated for the specified number of previous days. For this algorithm user should enter two initial start values. AdaptiveASHRAE algorithm implements equations suggested in ASHRAE Handbook HVAC Applications (2007). This algorithm will calculate the coefficients of the equation within the code and users need not provide temperature response related inputs. ConstantStartTime method calculates the start time based on specified number of hours before occupancy for each day. \textbf{The default control algorithm is AdaptiveASHRAE.}
 
 \paragraph{Field: Constant Temperature Gradient during Cooling}\label{field-constant-temperature-gradient-during-cooling}
 

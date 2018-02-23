@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -75,7 +76,7 @@ using namespace ObjexxFCL;
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 {
 
-	std::string const idf_objects = delimited_string( { 
+	std::string const idf_objects = delimited_string( {
 	"Version,8.4;",
   "ElectricLoadCenter:Distribution,",
 "    PV Array Load Center,    !- Name",
@@ -196,7 +197,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
@@ -229,7 +230,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest )
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1 )
 {
 
-	std::string const idf_objects = delimited_string( { 
+	std::string const idf_objects = delimited_string( {
 	"Version,8.4;",
 
 "  ElectricLoadCenter:Distribution,",
@@ -265,7 +266,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
@@ -296,7 +297,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2 )
 {
 
-	std::string const idf_objects = delimited_string( { 
+	std::string const idf_objects = delimited_string( {
 	"Version,8.4;",
 
 "  ElectricLoadCenter:Distribution,",
@@ -343,7 +344,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
@@ -382,7 +383,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3 )
 {
 
-	std::string const idf_objects = delimited_string( { 
+	std::string const idf_objects = delimited_string( {
 	"Version,8.4;",
 
 "  ElectricLoadCenter:Distribution,",
@@ -436,7 +437,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3
 "    1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// get availability schedule to work
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -479,7 +480,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4 )
 {
 
-	std::string const idf_objects = delimited_string( { 
+	std::string const idf_objects = delimited_string( {
 	"Version,8.4;",
 
 "  ElectricLoadCenter:Distribution,",
@@ -545,8 +546,10 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
+	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 	createFacilityElectricPowerServiceObject();
 	facilityElectricServiceObj->elecLoadCenterObjs.emplace_back( new ElectPowerLoadCenter ( 1 ) );
 
@@ -590,7 +593,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5 )
 {
 
-	std::string const idf_objects = delimited_string( { 
+	std::string const idf_objects = delimited_string( {
 	"Version,8.4;",
 
 "  ElectricLoadCenter:Distribution,",
@@ -644,7 +647,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5
 "    Until: 24:00,1;          !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// get availability schedule to work
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
@@ -696,7 +699,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5
 TEST_F( EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting )
 {
 
-	std::string const idf_objects = delimited_string( { 
+	std::string const idf_objects = delimited_string( {
 
 	"  LoadProfile:Plant,",
 	"    Campus Load Profile, !- Name",
@@ -707,7 +710,7 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting )
 	"    Campus output Flow Frac;         !- Flow Rate Fraction Schedule Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	createFacilityElectricPowerServiceObject();
 	bool SimElecCircuitsFlag = false;
@@ -715,5 +718,5 @@ TEST_F( EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting )
 	facilityElectricServiceObj->manageElectricPowerService( true, SimElecCircuitsFlag, false );
 	EXPECT_TRUE( SimElecCircuitsFlag );
 	EXPECT_EQ( facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->numGenerators, 0 ); // dummy generator has been added and report variables are available
-	
+
 }

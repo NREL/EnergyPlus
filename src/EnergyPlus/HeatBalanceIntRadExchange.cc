@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,7 @@
 #include <DataViewFactorInformation.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
 #include <Timer.h>
@@ -174,7 +175,6 @@ namespace HeatBalanceIntRadExchange {
 		using General::InterpSlatAng; // Function for slat angle interpolation
 		using namespace DataTimings;
 		using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
-		using InputProcessor::SameString;
 		using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 
 		// Argument array dimensioning
@@ -330,7 +330,7 @@ namespace HeatBalanceIntRadExchange {
 				auto const & surface_window( SurfaceWindow( SendSurfNum ) );
 				ConstrNumSend = Surface( SendSurfNum ).Construction;
 				auto const & construct( Construct( ConstrNumSend ) );
-				if ( construct.WindowTypeEQL ) {
+				if ( construct.WindowTypeEQL || construct.WindowTypeBSDF ) {
 					SendSurfTemp = surface_window.EffInsSurfTemp;
 				} else if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser ) {
 					if ( SurfIterations == 0 && surface_window.ShadingFlag <= 0 ) {
@@ -361,6 +361,9 @@ namespace HeatBalanceIntRadExchange {
 				if ( construct.WindowTypeEQL ) {
 					RecSurfEmiss = EQLWindowInsideEffectiveEmiss( ConstrNumRec );
 					RecSurfTemp = surface_window.EffInsSurfTemp;
+				} else if ( construct.WindowTypeBSDF && surface_window.ShadingFlag == IntShadeOn ) {
+					RecSurfTemp = surface_window.EffInsSurfTemp;
+					RecSurfEmiss = surface_window.EffShBlindEmiss[ 0 ] + surface_window.EffGlassEmiss[ 0 ];
 				} else if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser ) {
 					if ( SurfIterations == 0 && surface_window.ShadingFlag <= 0 ) {
 						// If the window is bare this TS and it is the first time through we use the previous TS glass
@@ -454,12 +457,12 @@ namespace HeatBalanceIntRadExchange {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   July 2016
-		
+
 		// PURPOSE OF THIS SUBROUTINE:
 		// To determine if any changes in interior movable insulation have happened.
 		// If there have been changes due to a schedule change AND a change in properties,
 		// then the matrices which are used to calculate interior radiation must be recalculated.
-				
+
 		MovableInsulationChange = false;
 		if ( Surface( SurfNum ).MaterialMovInsulInt > 0 ) {
 			Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
@@ -476,7 +479,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 	}
-	
+
 	void
 	InitInteriorRadExchange()
 	{
@@ -491,32 +494,13 @@ namespace HeatBalanceIntRadExchange {
 		// Initializes the various parameters for Hottel's ScriptF method for
 		// the grey interchange between surfaces in an enclosure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using General::RoundSigDigits;
 		using General::ScanForReports;
 
-		// Locals
-		// SUBROUTINE ARGUMENTS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt AFormat( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumOfZoneSurfaces; // total number of surfaces in the zone.
@@ -552,7 +536,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
-		NumZonesWithUserFbyS = GetNumObjectsFound( cCurrentModuleObject );
+		NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		MaxNumOfZoneSurfaces = 0;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -800,33 +784,13 @@ namespace HeatBalanceIntRadExchange {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine gets the user view factor info.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
 		using General::TrimSigDigits;
 
 		// Argument array dimensioning
 		F.dim( N, N );
 		SPtr.dim( N );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER   :: NumZonesWithUserF
@@ -840,12 +804,12 @@ namespace HeatBalanceIntRadExchange {
 		//unused  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ZoneSurfaceNames
 
 		NoUserInputF = true;
-		UserFZoneIndex = GetObjectItemNum( "ZoneProperty:UserViewFactors", ZoneName );
+		UserFZoneIndex = inputProcessor->getObjectItemNum( "ZoneProperty:UserViewFactors", ZoneName );
 
 		if ( UserFZoneIndex > 0 ) {
 			NoUserInputF = false;
 
-			GetObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < 3 * pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
@@ -883,34 +847,13 @@ namespace HeatBalanceIntRadExchange {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This routine gets the user view factor info.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 
 		// Argument array dimensioning
 		F.dim( N, N );
 		SPtr.dim( N );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UserFZoneIndex;
@@ -924,7 +867,7 @@ namespace HeatBalanceIntRadExchange {
 		Array1D_string ZoneSurfaceNames;
 
 		NoUserInputF = true;
-		UserFZoneIndex = GetObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
+		UserFZoneIndex = inputProcessor->getObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", "zone_name", ZoneName );
 
 		if ( UserFZoneIndex > 0 ) {
 			ZoneSurfaceNames.allocate( N );
@@ -933,7 +876,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 			NoUserInputF = false;
 
-			GetObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			if ( NumNums < pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
@@ -945,8 +888,8 @@ namespace HeatBalanceIntRadExchange {
 			numinx1 = 0;
 
 			for ( index = 2; index <= NumAlphas; index += 2 ) {
-				inx1 = FindItemInList( cAlphaArgs( index ), ZoneSurfaceNames, N );
-				inx2 = FindItemInList( cAlphaArgs( index + 1 ), ZoneSurfaceNames, N );
+				inx1 = UtilityRoutines::FindItemInList( cAlphaArgs( index ), ZoneSurfaceNames, N );
+				inx2 = UtilityRoutines::FindItemInList( cAlphaArgs( index + 1 ), ZoneSurfaceNames, N );
 				if ( inx1 == 0 ) {
 					ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name." );
 					ShowContinueError( "...Surface name=\"" + cAlphaArgs( index ) + "\", not in this zone." );

@@ -1078,37 +1078,19 @@ For Coil:Heating:DX:SingleSpeed the rated heating capacity is set equal to the c
 
 \subsubsection{Rated SHR}\label{rated-shr}
 
-The rated sensible heat ratio is calculated to be the sensible cooling (from rated inlet conditions to user specified supply conditions) divided by the total cooling (from rated inlet to specified supply).
+The rated sensible heat ratio (SHR) is calculated based upon empirical data from manufacturers. The rated SHR is fit to this empirical data using a linear function of the rated flow per capacity ratio. Separate correlations were established depending upon whether the DX coil is part of a Dedicated Outdoor Air system (DOAS).
 
-\emph{T\(_{in,rated}\)} = 26.6667 \(^{o}\)C (80 \(^{o}\)F)
+\begin{equation}
+SHR_{non-DOAS,rated} = 0.431 + 6086.0 * FlowCapRatio
+\end{equation}
 
-\emph{W\(_{in,rated}\)} = 0.01125 (corresponds to 80 \(^{o}\)F drybulb, 67 \(^{o}\)F wetbulb)
+\begin{equation}
+SHR_{DOAS,rated} = 0.389 + 7684.0 * FlowCapRatio
+\end{equation}
 
-\emph{C\(_{p,air}\)} = \emph{PsyCpAirFnWTdb}(\emph{W\(_{in,rated}\)}, \emph{T\(_{in,rated}\)})
+For rated flow per capacity ratios outside of the min and max bounds defined above, the rated SHR is held constant using the respective relationships at their bounding rated flow per capacity ratios.
 
-For system coils
-
-\emph{T\(_{sup}\)} = \emph{CoolSupTemp\(_{sys}\)}
-
-\emph{W\(_{sup}\)} = \emph{CoolSupHumRat\(_{sys}\)}
-
-For zone coils
-
-\emph{T\(_{sup}\)} = \emph{CoolDesTemp\(_{zone}\)}
-
-\emph{W\(_{sup}\)} = \emph{CoolDesHumRat\(_{zone}\)}
-
-Then
-
-\emph{h\(_{rated}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{in,rated}\)}, \emph{W\(_{in,rated}\)})
-
-\emph{h\(_{sup}\)} = \emph{PsyHFnTdbW}(\emph{T\(_{sup}\)}, \emph{W\(_{sup}\)})
-
-\emph{Dh}\(_{rated,sup}\) = \emph{h\(_{rated}\)}-\emph{h\(_{sup}\)}
-
-\emph{DQs\(_{rated,sup}\)} = \emph{C\(_{p,air}\)} *(\emph{T\(_{in,rated}\)}-\emph{T\(_{sup}\)})
-
-\emph{SHR\(_{rated}\)} = \emph{DQs\(_{rated,sup}\)}/\emph{Dh}\(_{rated,sup}\)
+If the rated SHR results in outlet conditions above saturation, the SHR is adjusted to a condition at saturation with the same exiting enthalpy.
 
 \subsubsection{Evaporative Condenser Air Volume Flow Rate}\label{evaporative-condenser-air-volume-flow-rate}
 
@@ -1253,7 +1235,7 @@ where
 
 \subsection{Electric Chiller Sizing}\label{electric-chiller-sizing}
 
-Generally chillers will need nominal cooling capacity, evaporator flow rate and condenser flow rate. All three quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.  Chillers may also have a third plant loop connection for heat recovery and this flow rate can also be obtained. 
+Generally chillers will need nominal cooling capacity, evaporator flow rate and condenser flow rate. All three quantities can be straightforwardly obtained using the user specified loop sizing data and the loop design flow rates.  Chillers may also have a third plant loop connection for heat recovery and this flow rate can also be obtained.
 
 All chillers on a loop are sized to meet the full loop load multiplied by a component-level sizing factor.  This sizing factor is set by the user in the chiller input object. If there are multiple chillers on a loop that call for autosizing, they will all use their own sizing factor applied to the loop level flow rate.
 
@@ -1306,7 +1288,7 @@ where
 The chiller heat recovery volume flow rate, \( \dot V_{hr,des} \), is obtained from the condenser volume flow rate modified by a capacity fraction.
 
 \begin{equation}
-\dot V_{hr,des} = \dot V_{cond,des} \cdot F_{HR,cap} 
+\dot V_{hr,des} = \dot V_{cond,des} \cdot F_{HR,cap}
 \end{equation}
 
 where
@@ -1316,7 +1298,7 @@ where
 
 \subsection{Water to Water Heat Pump Sizing}\label{WWHP-sizing}
 
-Generally water to water heat pumps will need nominal capacity and fluid volume flow rates for both the load and source sides.  The models for HeatPump:WaterToWater:EquationFit:Cooling and HeatPump:WaterToWater:EquationFit:Heating also need a reference power consumption.  
+Generally water to water heat pumps will need nominal capacity and fluid volume flow rates for both the load and source sides.  The models for HeatPump:WaterToWater:EquationFit:Cooling and HeatPump:WaterToWater:EquationFit:Heating also need a reference power consumption.
 
 \subsubsection{Reference Load Side Flow Rate}\label{WWHP-ref-load-side-flow-rate}
 
@@ -2690,5 +2672,3 @@ where
 \emph{c\(_{p,air}\) is the specific heat of zone air, (J/kg K)}
 
 \emph{V\(_{air,min}\) is the air volume flow rate at minimum fan speed, (m\(^{3}\)/s)}
-
-

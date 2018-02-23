@@ -15,6 +15,9 @@
 !===============================================================================
 ! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
 
+!  Version,
+!    8.8;                    !- Version Identifier
+
   Construction,
     Light Exterior Wall,     !- Name
     F08 Metal surface,       !- Outside Layer
@@ -1916,7 +1919,7 @@
     0.013;                   !- Thermal Resistance {m2-K/W}
 
   Material:NoMass,
-    Cement Placter: Sand aggregate - 20mm,  !- Name
+    Cement Plaster: Sand aggregate - 20mm,  !- Name
     Smooth,                  !- Roughness
     0.026;                   !- Thermal Resistance {m2-K/W}
 

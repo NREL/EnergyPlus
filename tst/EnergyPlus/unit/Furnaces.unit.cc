@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,7 +58,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -922,10 +922,24 @@ namespace EnergyPlus {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone2Equipment,          !- Name",
-		"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-		"    Zone2DirectAir,          !- Zone Equipment 1 Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
+		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		"    Zone2DirectAirADU,       !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
 		"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+		"  ZoneHVAC:AirDistributionUnit,",
+		"    Zone2DirectAirADU,       !- Name",
+		"    Zone 2 Inlet Node,       !- Air Distribution Unit Outlet Node Name",
+		"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		"    Zone2DirectAir;      !- Air Terminal Name",
+
+		"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		"    Zone2DirectAir,          !- Name",
+		"    FanAndCoilAvailSched,    !- Availability Schedule Name",
+		"    Zone 2 Inlet Node 2AT,   !- Air Inlet Node Name",
+		"    Zone 2 Inlet Node,       !- Air Outlet Node Name",
+		"    autosize;                !- Maximum Air Flow Rate {m3/s}",
 
 		"  AirLoopHVAC:UnitaryHeatPump:AirToAir,",
 		"    DXAC Heat Pump 1,        !- Name",
@@ -948,12 +962,6 @@ namespace EnergyPlus {
 		"    21.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
 		"    BlowThrough,             !- Fan Placement",
 		"    CyclingFanSchedule;      !- Supply Air Fan Operating Mode Schedule Name",
-
-		"  AirTerminal:SingleDuct:Uncontrolled,",
-		"    Zone2DirectAir,          !- Name",
-		"    FanAndCoilAvailSched,    !- Availability Schedule Name",
-		"    Zone 2 Inlet Node,       !- Zone Supply Air Node Name",
-		"    autosize;                !- Maximum Air Flow Rate {m3/s}",
 
 		"  ZoneControl:Thermostat,",
 		"    Zone 2 Thermostat,       !- Name",
@@ -987,7 +995,7 @@ namespace EnergyPlus {
 		"  AirLoopHVAC:ZoneSplitter,",
 		"    Zone Supply Air Splitter,!- Name",
 		"    Zone Equipment Inlet Node,  !- Inlet Node Name",
-		"    Zone 2 Inlet Node;       !- Outlet 2 Node Name",
+		"    Zone 2 Inlet Node 2AT;   !- Outlet 2 Node Name",
 
 		"  AirLoopHVAC:ZoneMixer,",
 		"    Zone Return Air Mixer,   !- Name",
@@ -1056,26 +1064,26 @@ namespace EnergyPlus {
 		"    DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		int CompIndex( 0 );
 		int AirLoopNum( 1 );
 		bool FirstHVACIteration( false );
 
 		OutputProcessor::TimeValue.allocate( 2 ); //
-		ManageSimulation();	
+		ManageSimulation();
 		// check the design max air outlet temperature
-		EXPECT_DOUBLE_EQ( 45.0, Furnace( 1 ).DesignMaxOutletTemp ); 
+		EXPECT_DOUBLE_EQ( 45.0, Furnace( 1 ).DesignMaxOutletTemp );
 
 		ZoneSysEnergyDemand( 1 ).SequencedOutputRequiredToCoolingSP( 1 ) = 25000.0;
-		ZoneSysEnergyDemand( 1 ).SequencedOutputRequiredToHeatingSP( 1 ) = 25000.0;		
+		ZoneSysEnergyDemand( 1 ).SequencedOutputRequiredToHeatingSP( 1 ) = 25000.0;
 		SimFurnace( Furnace( 1 ).Name, FirstHVACIteration, AirLoopNum, CompIndex );
 		// check the heating mode is On
 		EXPECT_TRUE( Furnaces::HeatingLoad );
 		// check the cooling mode is Off
 		EXPECT_FALSE( Furnaces::CoolingLoad );
 		// check if the air-to-air heat pump outlet temperature is capped at 45.0C
-		EXPECT_NEAR( 45.0, Node( Furnace( 1 ).FurnaceOutletNodeNum ).Temp, 0.000001 );	
+		EXPECT_NEAR( 45.0, Node( Furnace( 1 ).FurnaceOutletNodeNum ).Temp, 0.000001 );
 
 	}
 

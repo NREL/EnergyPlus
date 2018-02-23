@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -110,7 +111,7 @@ namespace UserDefinedComponents {
 		Real64 MaxLoad; // filled by actuator, reports back size for load dispatch [W]
 		Real64 OptLoad; // filled by actuator, reports back size for load dispatch [W]
 		Real64 InletRho; // fills internal variable, current density for fluid type and inlet temperature [kg/m3]
-		Real64 InletCp; // fills internal Varaible, current specific heat for fluid type and inlet temperature [J/kg-C]
+		Real64 InletCp; // fills internal Variable, current specific heat for fluid type and inlet temperature [J/kg-C]
 		Real64 InletTemp; // fills internal variable, current inlet fluid temperature [C]
 		Real64 InletMassFlowRate; // fills internal variable, current inlet mass flow rate [kg/s]
 		Real64 OutletTemp; // filled by actuator, componenent outlet temperature [C]
@@ -307,6 +308,7 @@ namespace UserDefinedComponents {
 		// Members
 		std::string Name; // user identifier
 		int ActualCtrlZoneNum;
+		int ADUNum; // index of corresponding air distribution unit
 		int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
 		int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
 		AirConnectionStruct AirLoop;
@@ -323,6 +325,7 @@ namespace UserDefinedComponents {
 		// Default Constructor
 		UserAirTerminalComponentStruct() :
 			ActualCtrlZoneNum( 0 ),
+			ADUNum( 0 ),
 			ErlSimProgramMngr( 0 ),
 			ErlInitProgramMngr( 0 ),
 			NumPlantConnections( 0 ),

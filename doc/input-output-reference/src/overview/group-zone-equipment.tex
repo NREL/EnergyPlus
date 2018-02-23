@@ -111,6 +111,10 @@ This is the leakage upstream of the terminal unit as a fraction of the design fl
 
 This is the leakage downstream of the terminal unit as a fraction of the current flow rate through the terminal unit. This fraction is held constant, so the leakage flow rate will vary proportinally with the supply air flow rate. This input is optional; the default is zero.
 
+\paragraph{Field: Design Specification Air Terminal Sizing Name}\label{design-specification-air-terminal-sizing-name2}
+
+This optional input field is the name of a DesignSpecification:AirTerminal:Sizing object which specifies sizing adjustments to be made for the air terminal unit referenced by this object. The terminal unit is initially sized according to the inputs in the corresponding Sizing:Zone object. Then the adjustment factors in the DesignSpecification:AirTerminal:Sizing object are applied. See DesignSpecification:AirTerminal:Sizing for more details. If left blank, then no adjustments are made.
+
 Two example IDF excerpts (one with duct leakage, one without):
 
 \begin{lstlisting}
@@ -132,7 +136,7 @@ ZoneHVAC:AirDistributionUnit,
 
 \subsection{ZoneHVAC:EquipmentConnections}\label{zonehvacequipmentconnections}
 
-Finally, the ZoneHVAC:EquipmentConnections statement defines the remaining details about each thermal zone from an HVAC perspective (besides the controls which were defined above). As with other statements, the first two items in this object are the keyword and an identifying name which links the zone back to its geometrical input, internal gains, etc. and other statements in the HVAC section of the input. The next three items are names of lists (equipment, air inlet nodes, and air exhaust nodes) that are described in more detail below. Note that if there are no air exhaust nodes from the zone that field is left blank. And if there are no air inlet nodes, that field is left blank. Finally, two node names are necessary to complete the zone-HVAC description. The first node is the main air node for the zone upon which the air heat balance is performed. The other node begins the return air path from the zone.
+Finally, the ZoneHVAC:EquipmentConnections statement defines the remaining details about each thermal zone from an HVAC perspective (besides the controls which were defined above). As with other statements, the first two items in this object are the keyword and an identifying name which links the zone back to its geometrical input, internal gains, etc. and other statements in the HVAC section of the input. The next three items are names of lists (equipment, air inlet nodes, and air exhaust nodes) that are described in more detail below. Note that if there are no air exhaust nodes from the zone that field is left blank. And if there are no air inlet nodes, that field is left blank. Finally, two node names are necessary to complete the zone-HVAC description. The first node is the main air node for the zone upon which the air heat balance is performed. The other node(s) begins the return air path(s) from the zone.
 
 Note that all nodes mentioned in the ZoneHVAC:EquipmentConnections input must be unique.~ That is, all nodes in all the ZoneHVAC:EquipmentConnections statements referenced by the ``Zone Air Inlet Nodes'', ``Zone Air Exhaust Nodes'', ``Zone Air Node Name'' and ``Zone Return Air Node Name'' cannot have any node name appearing more than once.
 
@@ -158,17 +162,17 @@ List of exhaust nodes leaving the zone for exhaust fans, zone energy recovery, e
 
 The conditions at this node represent the average state of the air in the zone. For zones modeled as fully mixed the conditions at this node are assumed to represent the air in the entire zone. This field is required for all ZoneHVAC:EquipmentConnections statements.
 
-\paragraph{Field: Zone Return Air Node Name}\label{field-zone-return-air-node-name}
+\paragraph{Field: Zone Return Air Node or NodeList Name}\label{field-zone-return-air-node-or-nodelist-name}
 
-The name of the return air node which attaches the zone to the return air path described above. Even if there is no return air or no return air path a unique name must be entered in this field. The conditions at this node represent the state of the air leaving the zone including any heat gain from light-heat-to-return.
+The name of one or more return air nodes which attach the zone to an air loop return air path. Even if there is no return air or no return air path, a unique name must be entered in this field. The conditions at each return node represent the state of the air leaving the zone including any heat gain assigned to that return node from Lights, refrigeration equipment or airflow windows.
 
-\paragraph{Field: Zone Return Air Flow Rate Fraction Schedule Name}\label{field-zone-return-air-flow-rate-fraction-schedule-name}
+\paragraph{Field: Zone Return Air Node 1 Flow Rate Fraction Schedule Name}\label{field-zone-return-air-flow-rate-fraction-schedule-name}
 
-The name of a schedule to specify the return air flow rate as a fraction of the base return air. If the next field is blank, then the return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone multiplied by this schedule name. If this field is left blank, the schedule defaults to 1.0 at all times.
+The name of a schedule to specify the return air flow rate for the first return air node as a fraction of the base return air. If the next field is blank, then the return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone multiplied by this schedule name. If this field is left blank, the schedule defaults to 1.0 at all times.
 
-\paragraph{Field: Zone Return Air Flow Rate Basis Node or NodeList Name}\label{field-zone-return-air-flow-rate-basis-node-or-nodelist-name}
+\paragraph{Field: Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name}\label{field-zone-return-air-flow-rate-basis-node-or-nodelist-name}
 
-The name of a node or list of nodes (NodeList) that is used to calculate the return air flow rate for this zone. The sum of the current flow rates for this node(s) multiplied by the Zone Return Air Flow Rate Fraction Schedule determines the return air flow rate. If this field is blank, then the base return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone.
+The name of a node or list of nodes (NodeList) that is used to calculate the return air flow rate for the first return air node in this zone. The sum of the current flow rates for this node(s) multiplied by the Zone Return Air Node 1 Flow Rate Fraction Schedule determines the return air flow rate. If this field is blank, then the base return air flow rate is the total supply inlet flow rate to the zone less the total exhaust node flow rate from the zone in the case of a single air loop serving this zone. If there are multiple air loops serving this zone, the base return air flow rate is governed by the corresponding supply inlet flow rate and the AirloopHVAC Design Return Air Flow Fraction of Supply Air Flow.
 
 An example of this statement in an IDF is:
 
@@ -180,7 +184,7 @@ ZoneHVAC:EquipmentConnections,
       SPACE3-1 In Nodes,     !- List Name: Zone Air Inlet Nodes
       ,                      !- List Name: Zone Air Exhaust Nodes
       SPACE3-1 Node,         !- Zone Air Node Name
-      SPACE3-1 Out Node;     !- Zone Return Air Node Name
+      SPACE3-1 Out Node;     !- Zone Return Air Node or NodeList Name
 \end{lstlisting}
 
 The following HVAC equipment types are allowed as zone equipment. The component matrix shows which coils and fans are allowed with which equipment models.
@@ -203,6 +207,20 @@ Note that a ZoneHVAC:AirDistributionUnit or AirTerminal:SingleDuct:Uncontrolled 
 
 Unique identifying name.
 
+\paragraph{Field: Load Distribution Scheme}\label{field-load-distribution-scheme-000}
+
+The Load Distribution Scheme selects the algorithm used to allocate the current zone load across the zone equipment. There are four choices: SequentialLoad, UniformLoad, UniformPLR, and SequentialUniformPLR. The default is SequentialLoad. In all cases, the equipment operates in the order specifed by the Zone Equipment Cooling Sequence and Heating or No-Load Sequence fields.
+
+\begin{itemize}
+\item
+  SequentialLoad loads each piece of available equipment sequentially with the full remaining load. 
+\item
+  UniformLoad evenly distributes the total load equally among all available components on the equipment list for the current load type. 
+\item
+  UniformPLR evenly distributes the total load among all available components on the equipment list for the current load type at a uniform part load ratio (PLR). 
+\item
+  SequentialUniformPLR determines how many of the available components are required to meet the current load, then distributes the load at a uniform part load ratio (PLR).
+\end{itemize}
 \paragraph{Field Set (Zone Equipment: Object Type, Name, Cooling Sequence, Heating or No-Load Sequence)}\label{field-set-zone-equipment-object-type-name-cooling-sequence-heating-or-no-load-sequence}
 
 This set is used together in order to sequence the equipment for heating and cooling. The \#1 sequence equipment will try to meet the entire demand with its capacity and then pass the results on to the \#2 and so on for both heating and cooling. This field set is extensible by duplicating the last four fields.

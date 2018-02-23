@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -140,6 +141,13 @@ namespace TranspiredCollector {
 	Array1D< UTSCDataStruct > UTSC;
 
 	// Functions
+	void
+	clear_state()
+	{
+		NumUTSC = 0;
+		GetInputFlag = true;
+		UTSC.deallocate();
+	}
 
 	void
 	SimTranspiredCollector(
@@ -160,27 +168,11 @@ namespace TranspiredCollector {
 		// METHODOLOGY EMPLOYED:
 		// Setup to avoid string comparisons after first call
 
-		// REFERENCES:
-		//  none
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataLoopNode::Node;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataHVACGlobals::TempControlTol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -193,7 +185,7 @@ namespace TranspiredCollector {
 
 		// Find the correct transpired collector with the Component name and/or index
 		if ( CompIndex == 0 ) {
-			UTSCNum = FindItemInList( CompName, UTSC );
+			UTSCNum = UtilityRoutines::FindItemInList( CompName, UTSC );
 			if ( UTSCNum == 0 ) {
 				ShowFatalError( "Transpired Collector not found=" + CompName );
 			}
@@ -259,14 +251,7 @@ namespace TranspiredCollector {
 		// usual EnergyPlus input
 		// Extensible UTSC object for underlying heat transfer surfaces and for multisystem
 
-		// REFERENCES:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using DataGlobals::Pi;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -290,19 +275,6 @@ namespace TranspiredCollector {
 		using DataHeatBalance::Smooth;
 		using DataHeatBalance::VerySmooth;
 		using BranchNodeConnections::TestCompSet;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -343,7 +315,7 @@ namespace TranspiredCollector {
 		std::string CurrentModuleMultiObject; // for ease in renaming.
 
 		CurrentModuleObject = "SolarCollector:UnglazedTranspired";
-		GetObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
 
 		if ( MaxNumNumbers != 11 ) {
 			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
@@ -353,23 +325,23 @@ namespace TranspiredCollector {
 		Numbers = 0.0;
 		Alphas = "";
 
-		NumUTSC = GetNumObjectsFound( CurrentModuleObject );
+		NumUTSC = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		CurrentModuleMultiObject = "SolarCollector:UnglazedTranspired:Multisystem";
-		NumUTSCSplitter = GetNumObjectsFound( CurrentModuleMultiObject );
+		NumUTSCSplitter = inputProcessor->getNumObjectsFound( CurrentModuleMultiObject );
 
 		UTSC.allocate( NumUTSC );
 		CheckEquipName.dimension( NumUTSC, true );
 		SplitterNameOK.dimension( NumUTSCSplitter, false );
 
 		for ( Item = 1; Item <= NumUTSC; ++Item ) {
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// first handle alphas
 			UTSC( Item ).Name = Alphas( 1 );
 
 			// now check for multisystem
 			if ( NumUTSCSplitter > 0 ) {
-				GetObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
+				inputProcessor->getObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
 
 				if ( MaxNumNumbersSplit != 0 ) {
 					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
@@ -379,8 +351,8 @@ namespace TranspiredCollector {
 				NumbersSplit = 0.0;
 				AlphasSplit = "";
 				for ( ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit ) {
-					GetObjectItem( CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit );
-					if ( ! ( SameString( AlphasSplit( 1 ), Alphas( 1 ) ) ) ) continue;
+					inputProcessor->getObjectItem( CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit );
+					if ( ! ( UtilityRoutines::SameString( AlphasSplit( 1 ), Alphas( 1 ) ) ) ) continue;
 					SplitterNameOK( ItemSplit ) = true;
 					UTSC( Item ).NumOASysAttached = std::floor( NumAlphasSplit / 4.0 );
 					if ( mod( ( NumAlphasSplit ), 4 ) != 1 ) {
@@ -411,7 +383,7 @@ namespace TranspiredCollector {
 			} // any UTSC Multisystem present
 
 			UTSC( Item ).OSCMName = Alphas( 2 );
-			Found = FindItemInList( UTSC( Item ).OSCMName, OSCM );
+			Found = UtilityRoutines::FindItemInList( UTSC( Item ).OSCMName, OSCM );
 			if ( Found == 0 ) {
 				ShowSevereError( cAlphaFieldNames( 2 ) + " not found=" + UTSC( Item ).OSCMName + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				ErrorsFound = true;
@@ -455,9 +427,9 @@ namespace TranspiredCollector {
 				continue;
 			}
 
-			if ( SameString( Alphas( 9 ), "Triangle" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 9 ), "Triangle" ) ) {
 				UTSC( Item ).Layout = Layout_Triangle;
-			} else if ( SameString( Alphas( 9 ), "Square" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 9 ), "Square" ) ) {
 				UTSC( Item ).Layout = Layout_Square;
 			} else {
 				ShowSevereError( cAlphaFieldNames( 9 ) + " has incorrect entry of " + Alphas( 9 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
@@ -465,9 +437,9 @@ namespace TranspiredCollector {
 				continue;
 			}
 
-			if ( SameString( Alphas( 10 ), "Kutscher1994" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 10 ), "Kutscher1994" ) ) {
 				UTSC( Item ).Correlation = Correlation_Kutscher1994;
-			} else if ( SameString( Alphas( 10 ), "VanDeckerHollandsBrunger2001" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 10 ), "VanDeckerHollandsBrunger2001" ) ) {
 				UTSC( Item ).Correlation = Correlation_VanDeckerHollandsBrunger2001;
 			} else {
 				ShowSevereError( cAlphaFieldNames( 10 ) + " has incorrect entry of " + Alphas( 9 ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
@@ -477,12 +449,12 @@ namespace TranspiredCollector {
 
 			Roughness = Alphas( 11 );
 			//Select the correct Number for the associated ascii name for the roughness type
-			if ( SameString( Roughness, "VeryRough" ) ) UTSC( Item ).CollRoughness = VeryRough;
-			if ( SameString( Roughness, "Rough" ) ) UTSC( Item ).CollRoughness = Rough;
-			if ( SameString( Roughness, "MediumRough" ) ) UTSC( Item ).CollRoughness = MediumRough;
-			if ( SameString( Roughness, "MediumSmooth" ) ) UTSC( Item ).CollRoughness = MediumSmooth;
-			if ( SameString( Roughness, "Smooth" ) ) UTSC( Item ).CollRoughness = Smooth;
-			if ( SameString( Roughness, "VerySmooth" ) ) UTSC( Item ).CollRoughness = VerySmooth;
+			if ( UtilityRoutines::SameString( Roughness, "VeryRough" ) ) UTSC( Item ).CollRoughness = VeryRough;
+			if ( UtilityRoutines::SameString( Roughness, "Rough" ) ) UTSC( Item ).CollRoughness = Rough;
+			if ( UtilityRoutines::SameString( Roughness, "MediumRough" ) ) UTSC( Item ).CollRoughness = MediumRough;
+			if ( UtilityRoutines::SameString( Roughness, "MediumSmooth" ) ) UTSC( Item ).CollRoughness = MediumSmooth;
+			if ( UtilityRoutines::SameString( Roughness, "Smooth" ) ) UTSC( Item ).CollRoughness = Smooth;
+			if ( UtilityRoutines::SameString( Roughness, "VerySmooth" ) ) UTSC( Item ).CollRoughness = VerySmooth;
 
 			// Was it set?
 			if ( UTSC( Item ).CollRoughness == 0 ) {
@@ -500,7 +472,7 @@ namespace TranspiredCollector {
 			UTSC( Item ).SurfPtrs.allocate( UTSC( Item ).NumSurfs );
 			UTSC( Item ).SurfPtrs = 0;
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
-				Found = FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface );
+				Found = UtilityRoutines::FindItemInList( Alphas( ThisSurf + AlphaOffset ), Surface );
 				if ( Found == 0 ) {
 					ShowSevereError( "Surface Name not found=" + Alphas( ThisSurf + AlphaOffset ) + " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
@@ -613,21 +585,21 @@ namespace TranspiredCollector {
 			tempHdeltaNPL = std::sin( TiltRads ) * UTSC( Item ).Height / 4.0;
 			UTSC( Item ).HdeltaNPL = max( tempHdeltaNPL, UTSC( Item ).PlenGapThick );
 
-			SetupOutputVariable( "Solar Collector Heat Exchanger Effectiveness []", UTSC( Item ).HXeff, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Leaving Air Temperature [C]", UTSC( Item ).TairHX, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Outside Face Suction Velocity [m/s]", UTSC( Item ).Vsuction, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Surface Temperature [C]", UTSC( Item ).Tcoll, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Plenum Air Temperature [C]", UTSC( Item ).Tplen, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Sensible Heating Rate [W]", UTSC( Item ).SensHeatingRate, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Sensible Heating Energy [J]", UTSC( Item ).SensHeatingEnergy, "System", "Sum", UTSC( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
+			SetupOutputVariable( "Solar Collector Heat Exchanger Effectiveness", OutputProcessor::Unit::None, UTSC( Item ).HXeff, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Leaving Air Temperature", OutputProcessor::Unit::C, UTSC( Item ).TairHX, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Outside Face Suction Velocity", OutputProcessor::Unit::m_s, UTSC( Item ).Vsuction, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Surface Temperature", OutputProcessor::Unit::C, UTSC( Item ).Tcoll, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Plenum Air Temperature", OutputProcessor::Unit::C, UTSC( Item ).Tplen, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Sensible Heating Rate", OutputProcessor::Unit::W, UTSC( Item ).SensHeatingRate, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Sensible Heating Energy", OutputProcessor::Unit::J, UTSC( Item ).SensHeatingEnergy, "System", "Sum", UTSC( Item ).Name, _, "SolarAir", "HeatProduced", _, "System" );
 
-			SetupOutputVariable( "Solar Collector Natural Ventilation Air Change Rate [ACH]", UTSC( Item ).PassiveACH, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotVent, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Wind Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotWind, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate [kg/s]", UTSC( Item ).PassiveMdotTherm, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Incident Solar Radiation [W/m2]", UTSC( Item ).Isc, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector System Efficiency []", UTSC( Item ).UTSCEfficiency, "System", "Average", UTSC( Item ).Name );
-			SetupOutputVariable( "Solar Collector Surface Efficiency []", UTSC( Item ).UTSCCollEff, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Natural Ventilation Air Change Rate", OutputProcessor::Unit::ach, UTSC( Item ).PassiveACH, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotVent, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Wind Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotWind, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, UTSC( Item ).PassiveMdotTherm, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Incident Solar Radiation", OutputProcessor::Unit::W_m2, UTSC( Item ).Isc, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector System Efficiency", OutputProcessor::Unit::None, UTSC( Item ).UTSCEfficiency, "System", "Average", UTSC( Item ).Name );
+			SetupOutputVariable( "Solar Collector Surface Efficiency", OutputProcessor::Unit::None, UTSC( Item ).UTSCCollEff, "System", "Average", UTSC( Item ).Name );
 
 		}
 
@@ -672,6 +644,8 @@ namespace TranspiredCollector {
 		using namespace DataLoopNode;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
+		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceData;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -694,6 +668,7 @@ namespace TranspiredCollector {
 		//unused  INTEGER             :: InletNode
 		int SplitBranch;
 		int thisUTSC;
+		Real64 Tamb;
 
 		if ( MyOneTimeFlag ) {
 			// do various one time setups and pitch adjustments across all UTSC
@@ -750,20 +725,29 @@ namespace TranspiredCollector {
 		if ( BeginEnvrnFlag && MyEnvrnFlag( UTSCNum ) ) {
 			UTSC( UTSCNum ).TplenLast = 22.5;
 			UTSC( UTSCNum ).TcollLast = 22.0;
+
 			MyEnvrnFlag( UTSCNum ) = false;
 		}
 		if ( ! BeginEnvrnFlag ) {
 			MyEnvrnFlag( UTSCNum ) = true;
 		}
 
+		// determine average ambient temperature
+		Real64 const surfaceArea( sum_sub( Surface, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) );
+		if ( !DataEnvironment::IsRain ) {
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea;
+		} else { // when raining we use wet bulb not drybulb
+			Tamb = sum_product_sub( Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC( UTSCNum ).SurfPtrs ) / surfaceArea;
+		}
+
 		//inits for each iteration
 //		UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 		UTSC( UTSCNum ).InletMDot = sum_sub( Node, &DataLoopNode::NodeData::MassFlowRate, UTSC( UTSCNum ).InletNode ); //Autodesk:F2C++ Functions handle array subscript usage
 		UTSC( UTSCNum ).IsOn = false; // intialize then turn on if appropriate
-		UTSC( UTSCNum ).Tplen = 0.0;
-		UTSC( UTSCNum ).Tcoll = 0.0;
+		UTSC( UTSCNum ).Tplen = UTSC( UTSCNum ).TplenLast;
+		UTSC( UTSCNum ).Tcoll = UTSC( UTSCNum ).TcollLast;
+		UTSC( UTSCNum ).TairHX = Tamb;
 		UTSC( UTSCNum ).MdotVent = 0.0;
-		UTSC( UTSCNum ).TairHX = 0.0;
 		UTSC( UTSCNum ).HXeff = 0.0;
 		UTSC( UTSCNum ).Isc = 0.0;
 
@@ -1113,14 +1097,11 @@ namespace TranspiredCollector {
 
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
-		using DataEnvironment::OutEnthalpy;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using Psychrometrics::PsyCpAirFnWTdb;
+		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdbTwbPb;
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceData;
-		using DataHVACGlobals::TimeStepSys;
-		using ConvectionCoefficients::InitExteriorConvectionCoeff;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1172,14 +1153,14 @@ namespace TranspiredCollector {
 		UTSC( UTSCNum ).Tcoll = TmpTscoll;
 		UTSC( UTSCNum ).HrPlen = HrPlen;
 		UTSC( UTSCNum ).HcPlen = HcPlen;
-		UTSC( UTSCNum ).TairHX = 0.0;
+		UTSC( UTSCNum ).TairHX = Tamb;
 		UTSC( UTSCNum ).InletMDot = 0.0;
 		UTSC( UTSCNum ).InletTempDB = Tamb;
 		UTSC( UTSCNum ).Vsuction = 0.0;
 		UTSC( UTSCNum ).PlenumVelocity = 0.0;
-		UTSC( UTSCNum ).SupOutTemp = Tamb;
+		UTSC( UTSCNum ).SupOutTemp = TmpTaPlen;
 		UTSC( UTSCNum ).SupOutHumRat = OutHumRatAmb;
-		UTSC( UTSCNum ).SupOutEnth = OutEnthalpy;
+		UTSC( UTSCNum ).SupOutEnth = PsyHFnTdbW( TmpTaPlen, OutHumRatAmb );
 		UTSC( UTSCNum ).SupOutMassFlow = 0.0;
 		UTSC( UTSCNum ).SensHeatingRate = 0.0;
 		UTSC( UTSCNum ).SensHeatingEnergy = 0.0;
@@ -1348,21 +1329,8 @@ namespace TranspiredCollector {
 		// mine Surface derived type for correct index/number of surface
 		// mine UTSC derived type that has the surface.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UTSCNum; // temporary

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -219,6 +220,10 @@ namespace DataHeatBalSurface {
 	// Variables that are used in both the Surface Heat Balance and the Moisture Balance
 	Array1D< Real64 > QRadSWOutAbs; // Short wave radiation absorbed on outside of opaque surface
 	Array1D< Real64 > QRadSWInAbs; // Short wave radiation absorbed on inside of opaque surface
+	Array1D< Real64 > QRadLWOutSrdSurfs;  // Long wave radiation absorbed on outside of exterior surface
+
+	Array1D< Real64 > QAdditionalHeatSourceOutside; // Additional heat source term on boundary conditions at outside surface
+	Array1D< Real64 > QAdditionalHeatSourceInside; // Additional heat source term on boundary conditions at inside surface
 
 	Array1D< Real64 > InitialDifSolInAbs; // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
 	Array1D< Real64 > InitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
@@ -322,6 +327,9 @@ namespace DataHeatBalSurface {
 		QRadSWLightsInAbs.deallocate();
 		QRadSWOutAbs.deallocate();
 		QRadSWInAbs.deallocate();
+		QRadLWOutSrdSurfs.deallocate();
+		QAdditionalHeatSourceOutside.deallocate();
+		QAdditionalHeatSourceInside.deallocate();
 		InitialDifSolInAbs.deallocate();
 		InitialDifSolInTrans.deallocate();
 		TH.deallocate();

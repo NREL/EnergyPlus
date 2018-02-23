@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -61,7 +62,7 @@
 #include <DataPlant.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -130,24 +131,8 @@ namespace ICEngineElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -160,7 +145,7 @@ namespace ICEngineElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, ICEngineGenerator );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, ICEngineGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimICEngineGenerator: Specified Generator not one of Valid ICEngine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -256,32 +241,9 @@ namespace ICEngineElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Generator_ICEngine;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN)          :: FlowLock !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		if ( GetICEInput ) {
 			GetICEngineGeneratorInput();
@@ -289,7 +251,7 @@ namespace ICEngineElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, ICEngineGenerator );
+			CompNum = UtilityRoutines::FindItemInList( CompName, ICEngineGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimICEPlantHeatRecovery: ICE Generator Unit not found=" + CompName );
 				return;
@@ -324,12 +286,7 @@ namespace ICEngineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
@@ -337,9 +294,6 @@ namespace ICEngineElectricGenerator {
 		using BranchNodeConnections::TestCompSet;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// PARAMETERS
 
 		//LOCAL VARIABLES
 		int GeneratorNum; // Generator counter
@@ -349,13 +303,11 @@ namespace ICEngineElectricGenerator {
 		Array1D_string AlphArray( 10 ); // character string data
 		Array1D< Real64 > NumArray( 11 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 xValue; // test curve limits
 
 		//FLOW
 		cCurrentModuleObject = "Generator:InternalCombustionEngine";
-		NumICEngineGenerators = GetNumObjectsFound( cCurrentModuleObject );
+		NumICEngineGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumICEngineGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -370,15 +322,9 @@ namespace ICEngineElectricGenerator {
 
 		//LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum ) {
-			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ICEngineGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			ICEngineGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			ICEngineGenerator( GeneratorNum ).RatedPowerOutput = NumArray( 1 );
@@ -515,38 +461,38 @@ namespace ICEngineElectricGenerator {
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumICEngineGenerators; ++GeneratorNum ) {
-			SetupOutputVariable( "Generator Produced Electric Power [W]", ICEngineGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator Produced Electric Energy [J]", ICEngineGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, ICEngineGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, ICEngineGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Rate [W]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Energy [J]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, ICEngineGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Rate", OutputProcessor::Unit::W, ICEngineGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Energy", OutputProcessor::Unit::J, ICEngineGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, ICEngineGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
 
 			//    general fuel use report to match other generators.
-			SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", ICEngineGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, ICEngineGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, ICEngineGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Mass Flow Rate [kg/s]", ICEngineGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + ICEngineGenerator( GeneratorNum ).FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, ICEngineGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator Exhaust Air Temperature [C]", ICEngineGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, ICEngineGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 
 			if ( ICEngineGenerator( GeneratorNum ).HeatRecActive ) {
-				SetupOutputVariable( "Generator Heat Recovery Mass Flow Rate [kg/s]", ICEngineGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, ICEngineGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Jacket Heat Recovery Rate [W]", ICEngineGeneratorReport( GeneratorNum ).QJacketRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Jacket Heat Recovery Energy [J]", ICEngineGeneratorReport( GeneratorNum ).JacketEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Jacket Heat Recovery Rate", OutputProcessor::Unit::W, ICEngineGeneratorReport( GeneratorNum ).QJacketRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Jacket Heat Recovery Energy", OutputProcessor::Unit::J, ICEngineGeneratorReport( GeneratorNum ).JacketEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Lube Heat Recovery Rate [W]", ICEngineGeneratorReport( GeneratorNum ).QLubeOilRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Lube Heat Recovery Energy [J]", ICEngineGeneratorReport( GeneratorNum ).LubeOilEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, ICEngineGeneratorReport( GeneratorNum ).QLubeOilRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Lube Heat Recovery Energy", OutputProcessor::Unit::J, ICEngineGeneratorReport( GeneratorNum ).LubeOilEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Exhaust Heat Recovery Rate [W]", ICEngineGeneratorReport( GeneratorNum ).QExhaustRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Exhaust Heat Recovery Energy [J]", ICEngineGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, ICEngineGeneratorReport( GeneratorNum ).QExhaustRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Exhaust Heat Recovery Energy", OutputProcessor::Unit::J, ICEngineGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Produced Thermal Rate [W]", ICEngineGeneratorReport( GeneratorNum ).QTotalHeatRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", ICEngineGeneratorReport( GeneratorNum ).TotalHeatEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, ICEngineGeneratorReport( GeneratorNum ).QTotalHeatRecovered, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, ICEngineGeneratorReport( GeneratorNum ).TotalHeatEnergyRec, "System", "Sum", ICEngineGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature [C]", ICEngineGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, ICEngineGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature [C]", ICEngineGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, ICEngineGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", ICEngineGenerator( GeneratorNum ).Name );
 			}
 
 		}

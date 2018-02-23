@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -51,1482 +52,3325 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
+#include <ConfiguredFunctions.hh>
 
 #include "Fixtures/InputProcessorFixture.hh"
 
 #include <tuple>
 #include <map>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
+
+std::vector<std::string> getAllLinesInFile( std::string filePath ) {
+	std::ifstream infile(filePath);
+	std::vector<std::string> lines;
+	std::string line;
+	while ( std::getline( infile, line ) )
+	{
+		lines.push_back( line );
+	}
+	return lines;
+}
 
 namespace EnergyPlus {
 
-	namespace InputProcessor {
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_good ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
 
-		TEST_F( InputProcessorFixture, compareIDF )
-		{
-			std::string const idf_objects = delimited_string({
-				"Version,8.3;",
-				"	 BUILDING, Bldg2, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
-				"SimulationControl, NO, NO, NO, YES, YES;",
-				"  Schedule:Compact,",
-				"    ACTIVITY_SCH,            !- Name",
-				"    Any Number,              !- Schedule Type Limits Name",
-				"    Through: 12/31,          !- Field 1",
-				"    For: AllDays,            !- Field 2",
-				"    Until: 24:00,120.;       !- Field 3",
-				"  Site:Location,",
-				"    USA IL-CHICAGO-OHARE,    !- Name",
-				"    41.77,                   !- Latitude {deg}",
-				"    -87.75,                  !- Longitude {deg}",
-				"    -6.00,                   !- Time Zone {hr}",
-				"    190;                     !- Elevation {m}",
-				"  BuildingSurface:Detailed,",
-				"    Zn001:Wall001,           !- Name",
-				"    Wall,                    !- Surface Type",
-				"    R13WALL,                 !- Construction Name",
-				"    Main Zone,               !- Zone Name",
-				"    Outdoors,                !- Outside Boundary Condition",
-				"    ,                        !- Outside Boundary Condition Object",
-				"    SunExposed,              !- Sun Exposure",
-				"    WindExposed,             !- Wind Exposure",
-				"    0.5000000,               !- View Factor to Ground",
-				"    4,                       !- Number of Vertices",
-				"    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
-				"    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
-				"    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
-				"    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
-			});
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
 
-			EXPECT_TRUE( compare_idf( "VERSION", 1, 0, { "8.3" }, { false }, {}, {} ) );
+	// 	size_t total = 0;
 
-			EXPECT_TRUE( compare_idf( "SIMULATIONCONTROL", 5, 0, { "NO", "NO", "NO", "YES", "YES" }, { false, false, false, false, false }, {}, {} ) );
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:Compressor" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:Bicubic" );
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:Case" );
+	// 		total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIR" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:Biquadratic" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:Quadratic" );
+	// 	}
 
-			EXPECT_TRUE( compare_idf( "SCHEDULE:COMPACT", 6, 0, { "ACTIVITY_SCH", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "120." }, { false, false, false, false, false, false }, { }, { } ) );
+	// 	EXPECT_EQ( 4038000ul * 10000, total );
+	// }
 
-			EXPECT_TRUE( compare_idf( "SITE:LOCATION", 1, 4, { "USA IL-CHICAGO-OHARE" }, { false }, { 41.77, -87.75, -6.0, 190 }, { false, false, false, false } ) );
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_bad ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
 
-			EXPECT_TRUE( compare_idf(
-				"BUILDINGSURFACE:DETAILED",
-				8,
-				14,
-				{ "ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" },
-				{ false, false, false, false, false, true, false, false },
-				{ 0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 },
-				{ false, false, false, false, false, false, false, false, false, false, false, false, false, false }
-			) );
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
 
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
+
+	// 	size_t total = 0;
+
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:CompressoR" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:BicubiC" );
+	// 		total += inputProcessor->getNumObjectsFound( "Refrigeration:CasE" );
+	// 		total += inputProcessor->getNumObjectsFound( "Chiller:Electric:EIr" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:BiquadratiC" );
+	// 		total += inputProcessor->getNumObjectsFound( "Curve:QuadratiC" );
+	// 	}
+
+	// 	EXPECT_EQ( 4038000ul * 10000, total );
+	// }
+
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_worse ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
+
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
+
+	// 	size_t total = 0;
+
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Inside" );
+	// 		total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGains" );
+	// 		total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpening" );
+	// 		total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit" );
+	// 		total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Cooling" );
+	// 		total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratified" );
+	// 	}
+
+	// 	EXPECT_EQ( 0ul, total );
+	// }
+
+	// TEST_F( InputProcessorFixture, stress_get_number_objects_worst ) {
+	// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
+	// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
+	// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+
+	// 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
+	// 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
+
+	// 	ASSERT_TRUE( process_idf( delimited_string( compressors ) ) );
+
+	// 	size_t total = 0;
+
+	// 	for (int i = 0; i < 10000000; ++i)
+	// 	{
+	// 		total += inputProcessor->getNumObjectsFound( "SurfaceConvectionAlgorithm:Insides" );
+	// 		total += inputProcessor->getNumObjectsFound( "RoomAir:Node:AirflowNetwork:InternalGainss" );
+	// 		total += inputProcessor->getNumObjectsFound( "AirflowNetwork:MultiZone:Component:DetailedOpenings" );
+	// 		total += inputProcessor->getNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFits" );
+	// 		total += inputProcessor->getNumObjectsFound( "HeatPump:WaterToWater:ParameterEstimation:Coolings" );
+	// 		total += inputProcessor->getNumObjectsFound( "WaterHeater:Stratifieds" );
+	// 	}
+
+	// 	EXPECT_EQ( 0ul, total );
+	// }
+
+	TEST_F( InputProcessorFixture, decode_encode_1 ) {
+		auto const idf = delimited_string({
+											"Building,",
+											"  Ref Bldg Medium Office New2004_v1.3_5.0,",
+											"  0.0,",
+											"  City,",
+											"  0.04,",
+											"  0.2,",
+											"  FullInteriorAndExterior,",
+											"  25.0,",
+											"  6.0;",
+											"",
+											"BuildingSurface:Detailed,",
+											"  Zn009:Flr001,",
+											"  Floor,",
+											"  FLOOR38,",
+											"  SCWINDOW,",
+											"  Surface,",
+											"  Zn009:Flr001,",
+											"  NoSun,",
+											"  NoWind,",
+											"  1.0,",
+											"  4.0,",
+											"  10.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  10.0,",
+											"  0.0,",
+											"  10.0,",
+											"  10.0,",
+											"  0.0;",
+											"",
+											"GlobalGeometryRules,",
+											"  UpperLeftCorner,",
+											"  Counterclockwise,",
+											"  Relative,",
+											"  Relative,",
+											"  Relative;",
+											""
+										  });
+		ASSERT_TRUE(process_idf(idf));
+		std::string encoded = encodeIDF();
+		EXPECT_EQ(idf, encoded);
+	}
+
+
+	TEST_F( InputProcessorFixture, decode_encode_2 ) {
+		auto const idf(delimited_string({
+											"Zone,",
+											"  Core_mid,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  0.0,",
+											"  1.0,",
+											"  1.0,",
+											"  ,",
+											"  ,",
+											"  autocalculate,",
+											"  ,",
+											"  ,",
+											"  Yes;",
+										}));
+
+		auto const expected(delimited_string({
+												"Building,",
+												"  Bldg,",
+												"  0.0,",
+												"  Suburbs,",
+												"  0.04,",
+												"  0.4,",
+												"  FullExterior,",
+												"  25.0,",
+												"  6.0;",
+												"",
+												"GlobalGeometryRules,",
+												"  UpperLeftCorner,",
+												"  Counterclockwise,",
+												"  Relative,",
+												"  Relative,",
+												"  Relative;"
+												"",
+												"",
+												"Zone,",
+												"  Core_mid,",
+												"  0.0,",
+												"  0.0,",
+												"  0.0,",
+												"  0.0,",
+												"  1.0,",
+												"  1.0,",
+												"  ,",
+												"  ,",
+												"  Autocalculate,",
+												"  ,",
+												"  ,",
+												"  Yes;",
+												""
+											 }));
+
+		ASSERT_TRUE(process_idf(idf));
+		std::string encoded = encodeIDF();
+		EXPECT_EQ(expected, encoded);
+	}
+
+	TEST_F( InputProcessorFixture, parse_empty_fields) {
+		std::string const idf( delimited_string( {
+													"  Building,",
+													"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+													"    ,                  !- North Axis {deg}",
+													"    ,                    !- Terrain",
+													"    ,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    , !- Solar Distribution",
+													"    25,                      !- Maximum Number of Warmup Days",
+													"    6;",
+												 } ) );
+
+		json expected = {
+				{
+					"Building",
+					{
+						{
+							"Ref Bldg Medium Office New2004_v1.3_5.0",
+							{
+								{"north_axis", ""},
+								{"terrain", ""},
+								{"loads_convergence_tolerance_value", ""},
+								{"temperature_convergence_tolerance_value", 0.2000},
+								{"solar_distribution", ""},
+								{"maximum_number_of_warmup_days", 25},
+								{"minimum_number_of_warmup_days", 6}
+							}
+						}
+					}
+				}
+		};
+
+		ASSERT_TRUE( process_idf(idf) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+				}
+			}
+		}
+	}
+
+
+	TEST_F( InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects ) {
+		std::string const idf( delimited_string( {
+													"  Building,",
+													"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400123456789123,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    25,                      !- Maximum Number of Warmup Days",
+													"    6;",
+													"",
+													"  Building,",
+													"    Another Building Name,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    25,                      !- Maximum Number of Warmup Days",
+													"    6;",
+												 } ) );
+
+		json expected =
+				{
+					{
+						"Building",
+						{
+							{
+								"Ref Bldg Medium Office New2004_v1.3_5.0",
+								{
+									{"north_axis", 0.0000},
+									{"terrain", "City"},
+									{"loads_convergence_tolerance_value", 0.0400123456789123},
+									{"temperature_convergence_tolerance_value", 0.2000},
+									{"solar_distribution", "FullInteriorAndExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								},
+							},
+							{
+								"Another Building Name",
+								{
+									{"north_axis", 0.0000},
+									{"terrain", "City"},
+									{"loads_convergence_tolerance_value", 0.0400},
+									{"temperature_convergence_tolerance_value", 0.2000},
+									{"solar_distribution", "FullInteriorAndExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								},
+							}
+						}
+					},
+					{
+						"GlobalGeometryRules",
+						{
+							{
+								"",
+								{
+									{"starting_vertex_position", "UpperLeftCorner"},
+									{"vertex_entry_direction", "Counterclockwise"},
+									{"coordinate_system", "Relative"},
+									{"daylighting_reference_point_coordinate_system", "Relative"},
+									{"rectangular_surface_coordinate_system", "Relative"}
+								}
+							}
+						}
+					}
+				};
+
+		ASSERT_TRUE(process_idf(idf));
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+				}
+			}
+		}
+		auto const & errors = validationErrors();
+		EXPECT_EQ(errors.size(), 0ul);
+	}
+
+
+	TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles) {
+
+		std::string const idf(delimited_string(
+				{
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    "",10,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    "",10.00000,"";  !- X,Y,Z ==> Vertex 4 {m}"
+				}));
+
+		json expected =
+				{
+					{
+						"BuildingSurface:Detailed",
+						{
+							{"Zn009:Flr001",
+								{
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
+										{
+											{
+												{"vertex_x_coordinate", ""},
+												{"vertex_y_coordinate", 10},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", ""},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", ""},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", ""}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					{
+						"GlobalGeometryRules",
+						{
+							{
+								"",
+								{
+									{"starting_vertex_position", "UpperLeftCorner"},
+									{"vertex_entry_direction", "Counterclockwise"},
+									{"coordinate_system", "Relative"},
+									{"daylighting_reference_point_coordinate_system", "Relative"},
+									{"rectangular_surface_coordinate_system", "Relative"}
+								}
+							}
+						}
+					},
+					{
+						"Building",
+						{
+							{
+								"Bldg",
+								{
+									{"north_axis", 0.0},
+									{"terrain", "Suburbs"},
+									{"loads_convergence_tolerance_value", 0.04},
+									{"temperature_convergence_tolerance_value", 0.4000},
+									{"solar_distribution", "FullExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								}
+							}
+						}
+					}
+				};
+
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					if (!tmp.is_array()) {
+						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+					} else {
+						for (size_t i = 0; i < it_in_in.value().size(); i++) {
+							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible) {
+		bool success = true;
+
+		std::string const idf(delimited_string(
+				{
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+				}));
+
+		json expected =
+				{
+					{"BuildingSurface:Detailed",
+						{
+							{"Zn009:Flr001",
+								{
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
+										{
+											{
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", 0}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				};
+
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					if (!tmp.is_array()) {
+						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+					} else {
+						for (size_t i = 0; i < it_in_in.value().size(); i++) {
+							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+							}
+						}
+					}
+				}
+			}
+		}
+		json::parse( epJSON.dump(2) );
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
+		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
+		EXPECT_TRUE(success);
+	}
+
+	TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects) {
+
+		std::string const idf(delimited_string(
+				{
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"BuildingSurface:Detailed,",
+					"Some Surface Name,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+				}));
+
+		json expected =
+				{
+					{
+						"BuildingSurface:Detailed",
+						{
+							{"Zn009:Flr001",
+								{
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
+										{
+											{
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", 0}
+											}
+										}
+									}
+								}
+							},
+							{"Some Surface Name",
+								{
+									{"surface_type", "Floor"},
+									{"construction_name", "FLOOR38"},
+									{"zone_name", "SCWINDOW"},
+									{"outside_boundary_condition", "Surface"},
+									{"outside_boundary_condition_object", "Zn009:Flr001"},
+									{"sun_exposure", "NoSun"},
+									{"wind_exposure", "NoWind"},
+									{"view_factor_to_ground", 1.000000},
+									{"number_of_vertices", 4},
+									{"vertices",
+									{
+											{
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 0.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 0.0},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", 0}
+											},
+											{
+												{"vertex_x_coordinate", 10.0},
+												{"vertex_y_coordinate", 10.0},
+												{"vertex_z_coordinate", 0}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					{
+						"GlobalGeometryRules",
+						{
+							{
+								"",
+								{
+									{"starting_vertex_position", "UpperLeftCorner"},
+									{"vertex_entry_direction", "Counterclockwise"},
+									{"coordinate_system", "Relative"},
+									{"daylighting_reference_point_coordinate_system", "Relative"},
+									{"rectangular_surface_coordinate_system", "Relative"}
+								}
+							}
+						}
+					},
+					{
+						"Building",
+						{
+							{
+								"Bldg",
+								{
+									{"north_axis", 0.0},
+									{"terrain", "Suburbs"},
+									{"loads_convergence_tolerance_value", 0.04},
+									{"temperature_convergence_tolerance_value", 0.4000},
+									{"solar_distribution", "FullExterior"},
+									{"maximum_number_of_warmup_days", 25},
+									{"minimum_number_of_warmup_days", 6}
+								}
+							}
+						}
+					}
+				};
+
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					if (!tmp.is_array()) {
+						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+					} else {
+						for (size_t i = 0; i < it_in_in.value().size(); i++) {
+							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+							}
+						}
+					}
+				}
+			}
 		}
 
-		TEST_F(InputProcessorFixture, MisleadingIDDWarningTest)
-		{
-			bool errors_found = false;
+		json::parse( epJSON.dump(2) );
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
+		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
+	}
 
-			std::string const idf_contents = delimited_string({
-				"Timestep, 4;"
-			});
 
-			ASSERT_FALSE( process_idf( idf_contents, errors_found ) );
-			EXPECT_TRUE( compare_err_stream( "", true ) );
+	TEST_F(InputProcessorFixture, validate_two_extensible_objects_and_one_non_extensible_object) {
+		std::string const idf(delimited_string(
+				{
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"BuildingSurface:Detailed,",
+					"Building Surface Name,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"  Building,",
+					"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+					"    0.0000,                  !- North Axis {deg}",
+					"    City,                    !- Terrain",
+					"    0.0400,                  !- Loads Convergence Tolerance Value",
+					"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+					"    FullInteriorAndExterior, !- Solar Distribution",
+					"    25,                      !- Maximum Number of Warmup Days",
+					"    6;",
+				}));
 
-			std::string saveMatchVersion = DataStringGlobals::MatchVersion;
-			DataStringGlobals::MatchVersion = "2.0";
-			ASSERT_FALSE(process_idf(idf_contents, errors_found ));
+		ASSERT_TRUE( process_idf( idf ) );
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
+		EXPECT_EQ(errors.size() + warnings.size(), 0ul);
+	}
 
-			std::string const error_string = delimited_string( {
-				"   ** Severe  ** IP: Possible incorrect IDD File",
-				"   **   ~~~   ** " + DataStringGlobals::IDDVerString + " not the same as expected =\"2.0\""
-			} );
-			EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
-			DataStringGlobals::MatchVersion = saveMatchVersion;
+	TEST_F( InputProcessorFixture, parse_idf ) {
+		std::string const idf(
+			delimited_string(
+				{
+					"  Building,",
+					"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+					"    0.0000,                  !- North Axis {deg}",
+					"    City,                    !- Terrain",
+					"    0.0400,                  !- Loads Convergence Tolerance Value",
+					"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+					"    FullInteriorAndExterior, !- Solar Distribution",
+					"    25,                      !- Maximum Number of Warmup Days",
+					"    6;",
+				}
+			)
+		);
+
+		json expected = {
+			{
+				"Building",
+				{
+					{
+						"Ref Bldg Medium Office New2004_v1.3_5.0",
+						{
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0400},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 25},
+							{"minimum_number_of_warmup_days", 6}
+						},
+					}
+				}
+			}
+		};
+
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+				}
+			}
 		}
+	}
 
-		TEST_F( InputProcessorFixture, processIDD_Full_IDD )
-		{
-			using namespace InputProcessor;
-			std::string const idd_objects;
 
-			bool errors_found = false;
+	TEST_F( InputProcessorFixture, parse_idf_two_objects ) {
+		std::string const idf( delimited_string( {
+													"  Building,",
+													"    Ref Bldg Medium Office New2004_v1.3_5.0,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    20,                      !- Maximum Number of Warmup Days",
+													"    6;",
+													"",
+													"  Building,",
+													"    Random Building Name 3,  !- Name",
+													"    0.0000,                  !- North Axis {deg}",
+													"    City,                    !- Terrain",
+													"    0.0400,                  !- Loads Convergence Tolerance Value",
+													"    0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}",
+													"    FullInteriorAndExterior, !- Solar Distribution",
+													"    20,                      !- Maximum Number of Warmup Days",
+													"    6;",
+												 } ) );
 
-			ASSERT_FALSE( process_idd( idd_objects, errors_found ) );
+		json expected = {
+			{
+				"Building",
+				{
+					{
+						"Ref Bldg Medium Office New2004_v1.3_5.0",
+						{
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0400},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 20},
+							{"minimum_number_of_warmup_days", 6}
+						},
+					},
+					{
+						"Random Building Name 3",
+						{
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0400},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 20},
+							{"minimum_number_of_warmup_days", 6}
+						}
+					}
+				}
+			}
+		};
 
-			// EXPECT_EQ( 745, NumObjectDefs ) << "If not equal, probably added or removed IDD object (change expected value).";
-			ASSERT_EQ( static_cast<unsigned long>( NumObjectDefs ), ListOfObjects.size() );
-
-			std::string const name( "OUTPUT:SQLITE" );
-
-			auto index = FindItemInSortedList( name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			EXPECT_EQ( name, ObjectDef( index ).Name );
-			EXPECT_EQ( 1, ObjectDef( index ).NumParams );
-			EXPECT_EQ( 1, ObjectDef( index ).NumAlpha );
-			EXPECT_EQ( 0, ObjectDef( index ).NumNumeric );
-			EXPECT_EQ( 0, ObjectDef( index ).MinNumFields );
-			EXPECT_FALSE( ObjectDef( index ).NameAlpha1 );
-			EXPECT_TRUE( ObjectDef( index ).UniqueObject );
-			EXPECT_FALSE( ObjectDef( index ).RequiredObject );
-			EXPECT_FALSE( ObjectDef( index ).ExtensibleObject );
-			EXPECT_EQ( 0, ObjectDef( index ).ExtensibleNum );
-			EXPECT_EQ( 0, ObjectDef( index ).LastExtendAlpha );
-			EXPECT_EQ( 0, ObjectDef( index ).LastExtendNum );
-			EXPECT_EQ( 0, ObjectDef( index ).ObsPtr );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), ObjectDef( index ).AlphaOrNumeric ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( index ).ReqField ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( index ).AlphRetainCase ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Option Type" } ), ObjectDef( index ).AlphFieldChks ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( index ).AlphFieldDefs ) );
-			// EXPECT_TRUE( compare_containers( Array1D< RangeCheckDef >( { RangeCheckDef() } ), ObjectDef( index ).NumRangeChks ) );
-			EXPECT_EQ( 0, ObjectDef( index ).NumFound );
-
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+				}
+			}
 		}
+	}
 
-		TEST_F( InputProcessorFixture, processIDD )
+
+	TEST_F(InputProcessorFixture, parse_idf_extensibles) {
+		std::string const idf(delimited_string(
+				{
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+				}));
+
+		json expected =
 		{
-			using namespace InputProcessor;
-			std::string const idd_objects = delimited_string({
-				"Output:SQLite,",
-				"       \\memo Output from EnergyPlus can be written to an SQLite format file.",
-				"       \\unique-object",
-				"  A1 ; \\field Option Type",
-				"       \\type choice",
-				"       \\key Simple",
-				"       \\key SimpleAndTabular"
-			});
+			{"BuildingSurface:Detailed",
+				{
+					{"Zn009:Flr001",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
+							{
+								{
+									{"vertex_x_coordinate", 10.0},
+									{"vertex_y_coordinate", 0.0},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 0.0},
+									{"vertex_y_coordinate", 0.0},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 0.0},
+									{"vertex_y_coordinate", 10.0},
+									{"vertex_z_coordinate", 0}
+								},
+								{
+									{"vertex_x_coordinate", 10.0},
+									{"vertex_y_coordinate", 10.0},
+									{"vertex_z_coordinate", 0}
+								}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
 
-			bool errors_found = false;
-
-			ASSERT_FALSE( process_idd( idd_objects, errors_found ) );
-
-			EXPECT_EQ( 1, NumObjectDefs );
-
-			EXPECT_EQ( "OUTPUT:SQLITE", ObjectDef( 1 ).Name );
-			EXPECT_EQ( 1, ObjectDef( 1 ).NumParams );
-			EXPECT_EQ( 1, ObjectDef( 1 ).NumAlpha );
-			EXPECT_EQ( 0, ObjectDef( 1 ).NumNumeric );
-			EXPECT_EQ( 0, ObjectDef( 1 ).MinNumFields );
-			EXPECT_FALSE( ObjectDef( 1 ).NameAlpha1 );
-			EXPECT_TRUE( ObjectDef( 1 ).UniqueObject );
-			EXPECT_FALSE( ObjectDef( 1 ).RequiredObject );
-			EXPECT_FALSE( ObjectDef( 1 ).ExtensibleObject );
-			EXPECT_EQ( 0, ObjectDef( 1 ).ExtensibleNum );
-			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
-			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
-			EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), ObjectDef( 1 ).AlphaOrNumeric ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).ReqField ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).AlphRetainCase ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Option Type" } ), ObjectDef( 1 ).AlphFieldChks ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( 1 ).AlphFieldDefs ) );
-			// EXPECT_TRUE( compare_containers( Array1D< RangeCheckDef >( { RangeCheckDef() } ), ObjectDef( 1 ).NumRangeChks ) );
-			EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
-
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					if (!tmp.is_array()) {
+						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+					} else {
+						for (size_t i = 0; i < it_in_in.value().size(); i++) {
+							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+							}
+						}
+					}
+				}
+			}
 		}
+	}
 
-		TEST_F( InputProcessorFixture, processIDF )
+
+	TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects) {
+		std::string const idf(delimited_string(
+				{
+					"BuildingSurface:Detailed,",
+					"Zn009:Flr001,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+					"",
+					"BuildingSurface:Detailed,",
+					"Building Surface Name,            !- Name",
+					"    Floor,                   !- Surface Type",
+					"    FLOOR38,                 !- Construction Name",
+					"    SCWINDOW,                !- Zone Name",
+					"    Surface,                 !- Outside Boundary Condition",
+					"    Zn009:Flr001,            !- Outside Boundary Condition Object",
+					"    NoSun,                   !- Sun Exposure",
+					"    NoWind,                  !- Wind Exposure",
+					"    1.000000,                !- View Factor to Ground",
+					"    4,                       !- Number of Vertices",
+					"    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+					"    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+					"    0.000000,10.00000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+					"    10.00000,10.00000,0;  !- X,Y,Z ==> Vertex 4 {m}"
+				}));
+
+		json expected =
 		{
-			using namespace InputProcessor;
-			std::string const idf_objects = delimited_string({
-				"Version,",
-				"8.3;",
-				"SimulationControl, NO, NO, NO, YES, YES;",
-			});
+			{"BuildingSurface:Detailed",
+				{
+					{"Zn009:Flr001",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
+								{
+									{
+										{"vertex_x_coordinate", 10.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 10.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10.0},
+										{"vertex_y_coordinate", 10.0},
+										{"vertex_z_coordinate", 0}
+									}
+								}
+							}
+						}
+					},
+					{"Building Surface Name",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
+								{
+									{
+										{"vertex_x_coordinate", 10.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 0.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 0.0},
+										{"vertex_y_coordinate", 10.0},
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10.0},
+										{"vertex_y_coordinate", 10.0},
+										{"vertex_z_coordinate", 0}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
 
-			ASSERT_FALSE( process_idf( idf_objects, true, false ) );
-
-			EXPECT_FALSE( OverallErrorFlag );
-
-			EXPECT_FALSE( has_cout_output() );
-			EXPECT_FALSE( has_cerr_output() );
-
-			std::string const version_name( "VERSION" );
-
-			auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			EXPECT_EQ( 1, index );
-
-			EXPECT_EQ( version_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.3" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-			std::string const simulation_control_name( "SIMULATIONCONTROL" );
-
-			index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 2, index );
-
-			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json tmp;
+		for (auto it = expected.begin(); it != expected.end(); ++it) {
+			ASSERT_NO_THROW(tmp = epJSON[it.key()]);
+			for (auto it_in = it.value().begin(); it_in != it.value().end(); ++it_in) {
+				ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
+				for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
+					ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
+					if (!tmp.is_array()) {
+						EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+					} else {
+						for (size_t i = 0; i < it_in_in.value().size(); i++) {
+							for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
+								ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
+								EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+							}
+						}
+					}
+				}
+			}
 		}
+	}
 
-		TEST_F( InputProcessorFixture, processIDF_Cached )
-		{
-			using namespace InputProcessor;
-			std::string const idf_objects = delimited_string({
-				"Version,8.3;",
-				"SimulationControl, NO, NO, NO, YES, YES;",
-				"  Schedule:Compact,",
-				"    ACTIVITY_SCH,            !- Name",
-				"    Any Number,              !- Schedule Type Limits Name",
-				"    Through: 12/31,          !- Field 1",
-				"    For: AllDays,            !- Field 2",
-				"    Until: 24:00,120.;       !- Field 3",
-				"  Site:Location,",
-				"    USA IL-CHICAGO-OHARE,    !- Name",
-				"    41.77,                   !- Latitude {deg}",
-				"    -87.75,                  !- Longitude {deg}",
-				"    -6.00,                   !- Time Zone {hr}",
-				"    190;                     !- Elevation {m}",
-			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
-
-			EXPECT_FALSE( OverallErrorFlag );
-
-			EXPECT_FALSE( has_cout_output() );
-			EXPECT_FALSE( has_cerr_output() );
-
-			std::string const version_name( "VERSION" );
-
-			auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 1, index );
-
-			EXPECT_EQ( version_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.3" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-			std::string const simulation_control_name( "SIMULATIONCONTROL" );
-
-			index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 2, index );
-
-			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-			std::string const schedule_compact_name( "SCHEDULE:COMPACT" );
-
-			index = FindItemInSortedList( schedule_compact_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 3, index );
-
-			EXPECT_EQ( schedule_compact_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 6, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ACTIVITY_SCH", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "120." } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), IDFRecords( index ).NumBlank ) );
-
-			std::string const site_location_name( "SITE:LOCATION" );
-
-			index = FindItemInSortedList( site_location_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 4, index );
-
-			EXPECT_EQ( site_location_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 4, IDFRecords( index ).NumNumbers );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "USA IL-CHICAGO-OHARE" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 41.77, -87.75, -6.0, 190 } ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), IDFRecords( index ).NumBlank ) );
-
+	TEST_F(InputProcessorFixture, validate_epJSON_parametric_template) {
+		std::string const idf(delimited_string(
+				{
+					"Parametric:Logic,",
+					"Main,                    !- Name",
+					"PARAMETER $bldgArea,     !- Parametric Logic Line 1",
+					"PARAMETER $depth,        !- Parametric Logic Line 2",
+					"PARAMETER $width,        !- Parametric Logic Line 3",
+					"PARAMETER $height,       !- Parametric Logic Line 4",
+					"$bldgArea = 300.0,       !- Parametric Logic Line 5",
+					"$depth = SQRT($bldgArea / $aspectRatio),  !- Parametric Logic Line 6",
+					"$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
+					"$height = 4.0;           !- Parametric Logic Line 8"
+					"",
+					"HVACTemplate:Thermostat,",
+					"All Zones,               !- Name",
+					"Htg-SetP-Sch,            !- Heating Setpoint Schedule Name",
+					",                        !- Constant Heating Setpoint {C}",
+					"Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
+					";                        !- Constant Cooling Setpoint {C}"
+				}));
+		ASSERT_TRUE( process_idf( idf ) );
+		json & epJSON = getEpJSON();
+		json::parse( epJSON.dump(2) );
+		auto const & errors = validationErrors();
+		// auto const & warnings = validationWarnings();
+		// EXPECT_EQ(errors.size() + warnings.size(), 2ul);
+		if (errors.size() >= 2) {
+			EXPECT_NE(errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("You must run Parametric Preprocessor for \"Parametric:Logic\" at line"), std::string::npos);
 		}
+	}
 
-		TEST_F( InputProcessorFixture, getObjectItem1 )
+
+	TEST_F(InputProcessorFixture, non_existent_keys) {
+		json root =
 		{
-			std::string const idf_objects = delimited_string({
-				"Version,8.3;",
-				"Output:SQLite,SimpleAndTabular;",
-			});
-
-			ASSERT_FALSE( process_idf( idf_objects ) );
-
-			std::string const CurrentModuleObject = "Output:SQLite";
-
-			int NumSQLite = GetNumObjectsFound( CurrentModuleObject );
-			ASSERT_EQ( 1, NumSQLite );
-
-			int TotalArgs = 0;
-			int NumAlphas = 0;
-			int NumNumbers = 0;
-
-			GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
-
-			int IOStatus = 0;
-			Array1D_string Alphas( NumAlphas );
-			Array1D< Real64 > Numbers( NumNumbers, 0.0 );
-			Array1D_bool lNumericBlanks( NumAlphas, true );
-			Array1D_bool lAlphaBlanks( NumAlphas, true );
-			Array1D_string cAlphaFields( NumAlphas );
-			Array1D_string cNumericFields( NumNumbers );
-
-			GetObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Option Type" } ), cAlphaFields ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { } ), cNumericFields ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), lNumericBlanks ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), lAlphaBlanks ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
-			EXPECT_EQ( 1, NumAlphas );
-			EXPECT_EQ( 0, NumNumbers );
-			EXPECT_EQ( 1, IOStatus );
-
-		}
-
-		TEST_F( InputProcessorFixture, getObjectItem2 )
-		{
-			std::string const idf_objects = delimited_string({
-				"Version,8.3;",
-				"Humidifier:Steam:Gas,",
-				"  Main Gas Humidifier,     !- Name",
-				"  ,                        !- Availability Schedule Name",
-				"  autosize,                !- Rated Capacity {m3/s}",
-				"  autosize,                !- Rated Gas Use Rate {W}",
-				"  0.80,                    !- Thermal Efficiency {-} ",
-				"  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
-				"  0,                       !- Rated Fan Power {W}",
-				"  0,                       !- Auxiliary Electric Power {W}",
-				"  Mixed Air Node 1,        !- Air Inlet Node Name",
-				"  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
-				"  ;                        !- Water Storage Tank Name",
-			});
-
-			ASSERT_FALSE( process_idf( idf_objects ) );
-
-			std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
-
-			int NumGasSteamHums = GetNumObjectsFound( CurrentModuleObject );
-			ASSERT_EQ( 1, NumGasSteamHums );
-
-			int TotalArgs = 0;
-			int NumAlphas = 0;
-			int NumNumbers = 0;
-
-			GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
-
-			int IOStatus = 0;
-			Array1D_string Alphas( NumAlphas );
-			Array1D< Real64 > Numbers( NumNumbers, 0.0 );
-			Array1D_bool lNumericBlanks( NumAlphas, true );
-			Array1D_bool lAlphaBlanks( NumAlphas, true );
-			Array1D_string cAlphaFields( NumAlphas );
-			Array1D_string cNumericFields( NumNumbers );
-
-			GetObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" } ), Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
-			EXPECT_EQ( 6, NumAlphas );
-			EXPECT_EQ( 5, NumNumbers );
-			EXPECT_EQ( 1, IOStatus );
-
-		}
-
-		TEST_F( InputProcessorFixture, findItemInSortedList )
-		{
-			InputProcessor::ListOfObjects = Array1D_string ({
-				"OUTPUT:METER",
-				"OUTPUT:METER:CUMULATIVE",
-				"OUTPUT:METER:CUMULATIVE:METERFILEONLY",
-				"OUTPUT:METER:METERFILEONLY",
-				"OUTPUT:SQLITE",
-				"OUTPUT:VARIABLE"
-			});
-
-			InputProcessor::NumObjectDefs = ListOfObjects.size();
-
-			iListOfObjects.allocate( NumObjectDefs );
-			SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );
-
-			auto index1 = FindItemInSortedList( "OUTPUT:METER", ListOfObjects, NumObjectDefs );
-			auto index2 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE", ListOfObjects, NumObjectDefs );
-			auto index3 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE:METERFILEONLY", ListOfObjects, NumObjectDefs );
-			auto index4 = FindItemInSortedList( "OUTPUT:METER:METERFILEONLY", ListOfObjects, NumObjectDefs );
-			auto index5 = FindItemInSortedList( "OUTPUT:SQLITE", ListOfObjects, NumObjectDefs );
-			auto index6 = FindItemInSortedList( "OUTPUT:VARIABLE", ListOfObjects, NumObjectDefs );
-
-
-			EXPECT_EQ( 1, index1 );
-			EXPECT_EQ( 2, index2 );
-			EXPECT_EQ( 3, index3 );
-			EXPECT_EQ( 4, index4 );
-			EXPECT_EQ( 5, index5 );
-			EXPECT_EQ( 6, index6 );
-
-			EXPECT_EQ( 1, iListOfObjects( index1 ) );
-			EXPECT_EQ( 2, iListOfObjects( index2 ) );
-			EXPECT_EQ( 3, iListOfObjects( index3 ) );
-			EXPECT_EQ( 4, iListOfObjects( index4 ) );
-			EXPECT_EQ( 5, iListOfObjects( index5 ) );
-			EXPECT_EQ( 6, iListOfObjects( index6 ) );
-
-		}
-
-		TEST_F( InputProcessorFixture, findItemInSortedList_unsorted )
-		{
-			InputProcessor::ListOfObjects = Array1D_string ({
-				"OUTPUT:VARIABLE",
-				"OUTPUT:METER",
-				"OUTPUT:METER:METERFILEONLY",
-				"OUTPUT:METER:CUMULATIVE",
-				"OUTPUT:METER:CUMULATIVE:METERFILEONLY",
-				"OUTPUT:SQLITE"
-			});
-
-			InputProcessor::NumObjectDefs = ListOfObjects.size();
-
-			iListOfObjects.allocate( NumObjectDefs );
-			SortAndStringUtilities::SetupAndSort( ListOfObjects, iListOfObjects );
-
-			auto index1 = FindItemInSortedList( "OUTPUT:METER", ListOfObjects, NumObjectDefs );
-			auto index2 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE", ListOfObjects, NumObjectDefs );
-			auto index3 = FindItemInSortedList( "OUTPUT:METER:CUMULATIVE:METERFILEONLY", ListOfObjects, NumObjectDefs );
-			auto index4 = FindItemInSortedList( "OUTPUT:METER:METERFILEONLY", ListOfObjects, NumObjectDefs );
-			auto index5 = FindItemInSortedList( "OUTPUT:SQLITE", ListOfObjects, NumObjectDefs );
-			auto index6 = FindItemInSortedList( "OUTPUT:VARIABLE", ListOfObjects, NumObjectDefs );
-
-
-			EXPECT_EQ( 1, index1 );
-			EXPECT_EQ( 2, index2 );
-			EXPECT_EQ( 3, index3 );
-			EXPECT_EQ( 4, index4 );
-			EXPECT_EQ( 5, index5 );
-			EXPECT_EQ( 6, index6 );
-
-			EXPECT_EQ( 2, iListOfObjects( index1 ) );
-			EXPECT_EQ( 4, iListOfObjects( index2 ) );
-			EXPECT_EQ( 5, iListOfObjects( index3 ) );
-			EXPECT_EQ( 3, iListOfObjects( index4 ) );
-			EXPECT_EQ( 6, iListOfObjects( index5 ) );
-			EXPECT_EQ( 1, iListOfObjects( index6 ) );
-
-		}
-
-		TEST_F( InputProcessorFixture, findItemInList )
-		{
-			InputProcessor::ListOfObjects = Array1D_string ({
-				"OUTPUT:VARIABLE",
-				"OUTPUT:METER",
-				"OUTPUT:METER:METERFILEONLY",
-				"OUTPUT:METER:CUMULATIVE",
-				"OUTPUT:METER:CUMULATIVE:METERFILEONLY",
-				"OUTPUT:SQLITE"
-			});
-
-			InputProcessor::NumObjectDefs = ListOfObjects.size();
-
-			EXPECT_EQ( 2, FindItemInList( "OUTPUT:METER", ListOfObjects, NumObjectDefs ) );
-			EXPECT_EQ( 4, FindItemInList( "OUTPUT:METER:CUMULATIVE", ListOfObjects, NumObjectDefs ) );
-			EXPECT_EQ( 5, FindItemInList( "OUTPUT:METER:CUMULATIVE:METERFILEONLY", ListOfObjects, NumObjectDefs ) );
-			EXPECT_EQ( 3, FindItemInList( "OUTPUT:METER:METERFILEONLY", ListOfObjects, NumObjectDefs ) );
-			EXPECT_EQ( 6, FindItemInList( "OUTPUT:SQLITE", ListOfObjects, NumObjectDefs ) );
-			EXPECT_EQ( 1, FindItemInList( "OUTPUT:VARIABLE", ListOfObjects, NumObjectDefs ) );
-
-		}
-
-		TEST_F( InputProcessorFixture, addObjectDefandParse )
-		{
-			std::string const idd_objects =
-				"Output:SQLite,\n"
-				"       \\memo Output from EnergyPlus can be written to an SQLite format file.\n"
-				"       \\unique-object\n"
-				"  A1 ; \field Option Type\n"
-				"       \type choice\n"
-				"       \\key Simple\n"
-				"       \\key SimpleAndTabular\n";
-
-			auto idd_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idd_objects ) );
-
-			MaxSectionDefs = SectionDefAllocInc;
-			MaxObjectDefs = ObjectDefAllocInc;
-
-			SectionDef.allocate( MaxSectionDefs );
-			ObjectDef.allocate( MaxObjectDefs );
-
-			NumObjectDefs = 0;
-			NumSectionDefs = 0;
-
-			ProcessingIDD = true;
-
-			bool errors_found( false );
-			bool end_of_file( false );
-			bool blank_line( false );
-			std::string::size_type current_pos;
-
-			ReadInputLine( *idd_stream, current_pos, blank_line, end_of_file );
-			current_pos = scan( InputLine, ",;" );
-			AddObjectDefandParse( *idd_stream, InputLine.substr( 0, current_pos ), current_pos, end_of_file, errors_found );
-
-			EXPECT_EQ( "OUTPUT:SQLITE", ObjectDef( 1 ).Name );
-			EXPECT_EQ( 1, ObjectDef( 1 ).NumParams );
-			EXPECT_EQ( 1, ObjectDef( 1 ).NumAlpha );
-			EXPECT_EQ( 0, ObjectDef( 1 ).NumNumeric );
-			EXPECT_EQ( 0, ObjectDef( 1 ).MinNumFields );
-			EXPECT_FALSE( ObjectDef( 1 ).NameAlpha1 );
-			EXPECT_TRUE( ObjectDef( 1 ).UniqueObject );
-			EXPECT_FALSE( ObjectDef( 1 ).RequiredObject );
-			EXPECT_FALSE( ObjectDef( 1 ).ExtensibleObject );
-			EXPECT_EQ( 0, ObjectDef( 1 ).ExtensibleNum );
-			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendAlpha );
-			EXPECT_EQ( 0, ObjectDef( 1 ).LastExtendNum );
-			EXPECT_EQ( 0, ObjectDef( 1 ).ObsPtr );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ), ObjectDef( 1 ).AlphaOrNumeric ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).ReqField ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), ObjectDef( 1 ).AlphRetainCase ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( 1 ).AlphFieldChks ) );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "" } ), ObjectDef( 1 ).AlphFieldDefs ) );
-			// EXPECT_TRUE( compare_containers( Array1D< RangeCheckDef >( { RangeCheckDef() } ), ObjectDef( 1 ).NumRangeChks ) );
-			EXPECT_EQ( 0, ObjectDef( 1 ).NumFound );
-
-		}
-
-		TEST_F( InputProcessorFixture, addSectionDef )
-		{
-			std::string const idd_objects = delimited_string({
-				"Lead Input;",
-				"Simulation Data;",
-			});
-
-			auto idd_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idd_objects ) );
-
-			MaxSectionDefs = SectionDefAllocInc;
-			SectionDef.allocate( MaxSectionDefs );
-			NumSectionDefs = 0;
-
-			ProcessingIDD = true;
-
-			bool errors_found( false );
-			bool end_of_file( false );
-			bool blank_line( false );
-			std::string::size_type current_pos;
-
-			while ( ! end_of_file ) {
-				ReadInputLine( *idd_stream, current_pos, blank_line, end_of_file );
-				if ( blank_line || end_of_file ) continue;
-				current_pos = scan( InputLine, ",;" );
-				if ( InputLine[ current_pos ] == ';' ) {
-					AddSectionDef( InputLine.substr( 0, current_pos ), errors_found );
-					EXPECT_FALSE( errors_found );
+			{"BuildingSurface:Detailed",
+				{
+					{"Zn009:Flr001",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "FLOOR38"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"non_existent_field_1", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"non_existent_field_2", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
+								{
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{
+				"GlobalGeometryRules",
+				{
+					{
+						"",
+						{
+							{"starting_vertex_position", "UpperLeftCorner"},
+							{"vertex_entry_direction", "Counterclockwise"},
+							{"coordinate_system", "Relative"},
+							{"daylighting_reference_point_coordinate_system", "Relative"},
+							{"rectangular_surface_coordinate_system", "Relative"}
+						}
+					}
+				}
+			},
+			{
+				"Building",
+				{
+					{
+						"Bldg",
+						{
+							{"north_axis", 0.0},
+							{"terrain", "Suburbs"},
+							{"loads_convergence_tolerance_value", 0.04},
+							{"temperature_convergence_tolerance_value", 0.4000},
+							{"solar_distribution", "FullExterior"},
+							{"maximum_number_of_warmup_days", 25},
+							{"minimum_number_of_warmup_days", 6}
+						}
+					}
 				}
 			}
 
-			ASSERT_EQ( 2, NumSectionDefs );
+		};
 
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
-			EXPECT_EQ( 0, SectionDef( 1 ).NumFound );
-
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
-			EXPECT_EQ( 0, SectionDef( 2 ).NumFound );
-
+		json::parse( root.dump(2) );
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
+		// EXPECT_EQ(errors.size(), 2ul);
+		EXPECT_EQ(warnings.size(), 0ul);
+		if (errors.size() >= 2) {
+			EXPECT_NE(errors[0].find("Key \"non_existent_field_1\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("Key \"non_existent_field_2\" in object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+//            EXPECT_NE(errors[2].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
+//            EXPECT_NE(errors[3].find("Required object \"Building\" was not provided"), std::string::npos);
 		}
+	}
 
-		TEST_F( InputProcessorFixture, validateObjectandParse )
+	TEST_F(InputProcessorFixture, required_fields_required_extensibles_and_missing_enum) {
+		json root =
 		{
-			std::string const idf_objects = delimited_string({
-				"Version,",
-				"8.3;",
-				"SimulationControl,",
-				"NO, NO, NO, YES, YES;"
-			});
-
-			NumIDFRecords = 2;
-			IDFRecords.allocate( 2 );
-
-			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
-
-			EnergyPlusFixture::use_cached_idd();
-
-			NumLines = 0;
-
-			MaxIDFRecords = ObjectsIDFAllocInc;
-			NumIDFRecords = 0;
-			MaxIDFSections = SectionsIDFAllocInc;
-			NumIDFSections = 0;
-
-			SectionsOnFile.allocate( MaxIDFSections );
-			IDFRecords.allocate( MaxIDFRecords );
-			LineItem.Numbers.allocate( MaxNumericArgsFound );
-			LineItem.NumBlank.allocate( MaxNumericArgsFound );
-			LineItem.Alphas.allocate( MaxAlphaArgsFound );
-			LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
-
-			bool end_of_file( false );
-			bool blank_line( false );
-			std::string::size_type current_pos;
-
-			while ( ! end_of_file ) {
-				ReadInputLine( *idf_stream, current_pos, blank_line, end_of_file );
-				if ( blank_line || end_of_file ) continue;
-				current_pos = scan( InputLine, ",;" );
-				ValidateObjectandParse( *idf_stream, InputLine.substr( 0, current_pos ), current_pos, end_of_file );
-			}
-
-			EXPECT_FALSE( OverallErrorFlag );
-
-			EXPECT_FALSE( has_cout_output() );
-			EXPECT_FALSE( has_cerr_output() );
-
-			std::string const version_name( "VERSION" );
-
-			auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			EXPECT_EQ( 1, index );
-
-			EXPECT_EQ( version_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 1, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.3" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-			std::string const simulation_control_name( "SIMULATIONCONTROL" );
-
-			index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 2, index );
-
-			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-		}
-
-		TEST_F( InputProcessorFixture, validateSection )
-		{
-			std::string const idf_objects = delimited_string({
-				"Simulation Data;",
-				"report variable dictionary;",
-				"Lead Input;",
-				"End Lead Input;",
-				"SimulationControl;", // object used like section
-				"Building;", // object used like section
-			});
-
-			NumIDFRecords = 2;
-			IDFRecords.allocate( 2 );
-
-			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
-
-			EnergyPlusFixture::use_cached_idd();
-
-			NumLines = 0;
-
-			MaxIDFRecords = ObjectsIDFAllocInc;
-			NumIDFRecords = 0;
-			MaxIDFSections = SectionsIDFAllocInc;
-			NumIDFSections = 0;
-
-			SectionsOnFile.allocate( MaxIDFSections );
-			IDFRecords.allocate( MaxIDFRecords );
-			LineItem.Numbers.allocate( MaxNumericArgsFound );
-			LineItem.NumBlank.allocate( MaxNumericArgsFound );
-			LineItem.Alphas.allocate( MaxAlphaArgsFound );
-			LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
-
-			bool errors_found( false );
-			bool end_of_file( false );
-			bool blank_line( false );
-			std::string::size_type current_pos;
-
-			while ( ! end_of_file ) {
-				ReadInputLine( *idf_stream, current_pos, blank_line, end_of_file );
-				if ( blank_line || end_of_file ) continue;
-				current_pos = scan( InputLine, ",;" );
-				if ( InputLine[ current_pos ] == ';' ) {
-					ValidateSection( InputLine.substr( 0, current_pos ), errors_found );
-					EXPECT_FALSE( errors_found );
-				}
-			}
-
-			std::string const simulation_control_name( "SIMULATIONCONTROL" );
-
-			auto index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 1, index );
-
-			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-			EXPECT_EQ( 1, ObjectDef( 2 ).NumFound );
-
-			std::string const building_name( "BUILDING" );
-
-			index = FindItemInSortedList( building_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 2, index );
-
-			EXPECT_EQ( building_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 3, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 5, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 3, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NONE", "SUBURBS", "FULLEXTERIOR" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.0, 0.04, 0.4, 25, 6 } ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true, true, true, true } ), IDFRecords( index ).NumBlank ) );
-
-			EXPECT_EQ( 1, ObjectDef( 3 ).NumFound );
-
-			ASSERT_EQ( 5, NumSectionDefs );
-
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
-			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
-
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
-			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
-
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
-			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
-
-			EXPECT_EQ( "SIMULATIONCONTROL", SectionDef( 4 ).Name );
-			EXPECT_EQ( 1, SectionDef( 4 ).NumFound );
-
-			EXPECT_EQ( "BUILDING", SectionDef( 5 ).Name );
-			EXPECT_EQ( 1, SectionDef( 5 ).NumFound );
-
-			ASSERT_EQ( 5, NumIDFSections );
-
-			EXPECT_EQ( "SIMULATION DATA", SectionsOnFile( 1 ).Name );
-			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 1 ).LastRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstLineNo );
-
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionsOnFile( 2 ).Name );
-			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 2 ).LastRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstLineNo );
-
-			EXPECT_EQ( "LEAD INPUT", SectionsOnFile( 3 ).Name );
-			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 3 ).LastRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstLineNo );
-
-			EXPECT_EQ( "SIMULATIONCONTROL", SectionsOnFile( 4 ).Name );
-			EXPECT_EQ( 1, SectionsOnFile( 4 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 4 ).LastRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 4 ).FirstLineNo );
-
-			EXPECT_EQ( "BUILDING", SectionsOnFile( 5 ).Name );
-			EXPECT_EQ( 2, SectionsOnFile( 5 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 5 ).LastRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 5 ).FirstLineNo );
-
-		}
-
-		TEST_F( InputProcessorFixture, processSection )
-		{
-			std::string const idf_objects = delimited_string({
-				"Simulation Data;",
-				"report variable dictionary;",
-				" Lead Input;",
-				"  SimulationControl,",
-				"    No,                      !- Do Zone Sizing Calculation",
-				"    No,                      !- Do System Sizing Calculation",
-				"    No,                      !- Do Plant Sizing Calculation",
-				"    Yes,                     !- Run Simulation for Sizing Periods",
-				"    No;                      !- Run Simulation for Weather File Run Periods",
-				" End Lead Input;",
-			});
-
-			NumIDFRecords = 1;
-			IDFRecords.allocate( 1 );
-
-			auto idf_stream = std::unique_ptr<std::stringstream>( new std::stringstream( idf_objects ) );
-
-			EnergyPlusFixture::use_cached_idd();
-
-			NumLines = 0;
-
-			MaxIDFRecords = ObjectsIDFAllocInc;
-			NumIDFRecords = 0;
-			MaxIDFSections = SectionsIDFAllocInc;
-			NumIDFSections = 0;
-
-			SectionsOnFile.allocate( MaxIDFSections );
-			IDFRecords.allocate( MaxIDFRecords );
-			LineItem.Numbers.allocate( MaxNumericArgsFound );
-			LineItem.NumBlank.allocate( MaxNumericArgsFound );
-			LineItem.Alphas.allocate( MaxAlphaArgsFound );
-			LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
-
-			bool errors_found( false );
-			bool end_of_file( false );
-			bool blank_line( false );
-			std::string::size_type current_pos;
-
-			while ( ! end_of_file ) {
-				ReadInputLine( *idf_stream, current_pos, blank_line, end_of_file );
-				if ( blank_line || end_of_file ) continue;
-				current_pos = scan( InputLine, ",;" );
-				if ( InputLine[ current_pos ] == ';' ) {
-					ValidateSection( InputLine.substr( 0, current_pos ), errors_found );
-					EXPECT_FALSE( errors_found );
-				} else {
-					ValidateObjectandParse( *idf_stream, InputLine.substr( 0, current_pos ), current_pos, end_of_file );
-				}
-			}
-
-			std::string const simulation_control_name( "SIMULATIONCONTROL" );
-
-			auto index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-			if ( index != 0 ) index = iListOfObjects( index );
-
-			index = ObjectStartRecord( index );
-
-			ASSERT_EQ( 1, index );
-
-			EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-			EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-			EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-			EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-			EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "NO" } ), IDFRecords( index ).Alphas ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-			EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-			EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-			ASSERT_EQ( 3, NumSectionDefs );
-
-			EXPECT_EQ( "SIMULATION DATA", SectionDef( 2 ).Name );
-			EXPECT_EQ( 1, SectionDef( 2 ).NumFound );
-
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionDef( 3 ).Name );
-			EXPECT_EQ( 1, SectionDef( 3 ).NumFound );
-
-			EXPECT_EQ( "LEAD INPUT", SectionDef( 1 ).Name );
-			EXPECT_EQ( 1, SectionDef( 1 ).NumFound );
-
-			ASSERT_EQ( 3, NumIDFSections );
-
-			EXPECT_EQ( "SIMULATION DATA", SectionsOnFile( 1 ).Name );
-			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 1 ).FirstLineNo );
-
-			EXPECT_EQ( "REPORT VARIABLE DICTIONARY", SectionsOnFile( 2 ).Name );
-			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 2 ).FirstLineNo );
-
-			EXPECT_EQ( "LEAD INPUT", SectionsOnFile( 3 ).Name );
-			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstRecord );
-			EXPECT_EQ( 0, SectionsOnFile( 3 ).FirstLineNo );
-		}
-
-		TEST_F( InputProcessorFixture, getNumObjectsFound )
-		{
-			std::string const idf_objects = delimited_string({
-				"Version,8.3;",
-				"Output:SQLite,SimpleAndTabular;",
-				"Output:Meter:MeterFileOnly,Electricity:Facility,timestep;",
-				"Output:Meter:MeterFileOnly,Electricity:Facility,hourly;",
-				"Output:Meter:MeterFileOnly,Electricity:Facility,daily;",
-				"Output:Meter:MeterFileOnly,Electricity:Facility,monthly;",
-				"Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;",
-			});
-
-			ASSERT_FALSE( process_idf( idf_objects ) );
-
-			EXPECT_EQ( 1, GetNumObjectsFound( "VERSION" ) );
-			EXPECT_EQ( 1, GetNumObjectsFound( "OUTPUT:SQLITE" ) );
-			EXPECT_EQ( 5, GetNumObjectsFound( "OUTPUT:METER:METERFILEONLY" ) );
-			EXPECT_EQ( 0, GetNumObjectsFound( "OUTPUT:VARIABLE" ) );
-
-			EXPECT_FALSE( has_cout_output() );
-			EXPECT_FALSE( has_cerr_output() );
-
-		}
-
-		TEST_F( InputProcessorFixture, addRecordToOutputVariableStructure )
-		{
-			using namespace DataOutputs;
-
-			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
-			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
-			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
-			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" );
-			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" );
-
-			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" ) );
-			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) );
-			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ) );
-			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" ) );
-			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" ) );
-
-		}
-
-		TEST_F( InputProcessorFixture, addVariablesForMonthlyReport )
-		{
-			auto const results_map = std::map< std::string, std::vector< std::tuple< std::string, std::string > > >({
+			{
+				"BuildingSurface:Detailed",
 				{
-					"ZONECOOLINGSUMMARYMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
-						std::make_tuple( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" ),
-						std::make_tuple( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" ),
-					}
-				},
-				{
-					"ZONEHEATINGSUMMARYMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE HEATING RATE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
-					}
-				},
-				{
-					"ZONEELECTRICSUMMARYMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE LIGHTS ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY" ),
-					}
-				},
-				{
-					"SPACEGAINSMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" ),
-					}
-				},
-				{
-					"PEAKSPACEGAINSMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" ),
-					}
-				},
-				{
-					"SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" ),
-						std::make_tuple( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE GAS EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE HOT WATER EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE STEAM EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE OTHER EQUIPMENT TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" ),
-						std::make_tuple( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" ),
-					}
-				},
-				{
-					"SETPOINTSNOTMETWITHTEMPERATURESMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE HEATING SETPOINT NOT MET TIME" ),
-						std::make_tuple( "*", "ZONE MEAN AIR TEMPERATURE" ),
-						std::make_tuple( "*", "ZONE HEATING SETPOINT NOT MET WHILE OCCUPIED TIME" ),
-						std::make_tuple( "*", "ZONE COOLING SETPOINT NOT MET TIME" ),
-						std::make_tuple( "*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME" ),
-					}
-				},
-				{
-					"COMFORTREPORTSIMPLE55MONTHLY",
-					{
-						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" ),
-						std::make_tuple( "*", "ZONE MEAN AIR TEMPERATURE" ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" ),
-					}
-				},
-				{
-					"UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY",
-					{
-						std::make_tuple( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY" ),
-						std::make_tuple( "*", "SOLAR COLLECTOR OUTSIDE FACE SUCTION VELOCITY" ),
-						std::make_tuple( "*", "SOLAR COLLECTOR SENSIBLE HEATING RATE" ),
-					}
-				},
-				{
-					"OCCUPANTCOMFORTDATASUMMARYMONTHLY",
-					{
-						std::make_tuple( "*", "PEOPLE OCCUPANT COUNT" ),
-						std::make_tuple( "*", "PEOPLE AIR TEMPERATURE" ),
-						std::make_tuple( "*", "PEOPLE AIR RELATIVE HUMIDITY" ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT FANGER MODEL PMV" ),
-						std::make_tuple( "*", "ZONE THERMAL COMFORT FANGER MODEL PPD" ),
-					}
-				},
-				{
-					"CHILLERREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "CHILLER ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "CHILLER ELECTRIC POWER" ),
-						std::make_tuple( "*", "CHILLER EVAPORATOR COOLING ENERGY" ),
-						std::make_tuple( "*", "CHILLER CONDENSER HEAT TRANSFER ENERGY" ),
-						std::make_tuple( "*", "CHILLER COP" ),
-					}
-				},
-				{
-					"TOWERREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "COOLING TOWER FAN ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "COOLING TOWER FAN ELECTRIC POWER" ),
-						std::make_tuple( "*", "COOLING TOWER HEAT TRANSFER RATE" ),
-						std::make_tuple( "*", "COOLING TOWER INLET TEMPERATURE" ),
-						std::make_tuple( "*", "COOLING TOWER OUTLET TEMPERATURE" ),
-						std::make_tuple( "*", "COOLING TOWER MASS FLOW RATE" ),
-					}
-				},
-				{
-					"BOILERREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "BOILER HEATING ENERGY" ),
-						std::make_tuple( "*", "BOILER GAS CONSUMPTION" ),
-						std::make_tuple( "*", "BOILER HEATING RATE" ),
-						std::make_tuple( "*", "BOILER GAS CONSUMPTION RATE" ),
-						std::make_tuple( "*", "BOILER INLET TEMPERATURE" ),
-						std::make_tuple( "*", "BOILER OUTLET TEMPERATURE" ),
-						std::make_tuple( "*", "BOILER MASS FLOW RATE" ),
-						std::make_tuple( "*", "BOILER ANCILLARY ELECTRIC POWER" ),
-					}
-				},
-				{
-					"DXREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING ENERGY" ),
-						std::make_tuple( "*", "COOLING COIL ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING ENERGY" ),
-						std::make_tuple( "*", "COOLING COIL LATENT COOLING ENERGY" ),
-						std::make_tuple( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "COOLING COIL RUNTIME FRACTION" ),
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING RATE" ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING RATE" ),
-						std::make_tuple( "*", "COOLING COIL LATENT COOLING RATE" ),
-						std::make_tuple( "*", "COOLING COIL ELECTRIC POWER" ),
-						std::make_tuple( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC POWER" ),
-					}
-				},
-				{
-					"WINDOWREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE" ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE" ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE" ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT GAIN RATE" ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT LOSS RATE" ),
-						std::make_tuple( "*", "SURFACE WINDOW INSIDE FACE GLAZING CONDENSATION STATUS" ),
-						std::make_tuple( "*", "SURFACE SHADING DEVICE IS ON TIME FRACTION" ),
-						std::make_tuple( "*", "SURFACE STORM WINDOW ON OFF STATUS" ),
-					}
-				},
-				{
-					"WINDOWENERGYREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION ENERGY" ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION ENERGY" ),
-						std::make_tuple( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT GAIN ENERGY" ),
-						std::make_tuple( "*", "SURFACE WINDOW HEAT LOSS ENERGY" ),
-					}
-				},
-				{
-					"WINDOWZONESUMMARYMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE" ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE" ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE" ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" ),
-					}
-				},
-				{
-					"WINDOWENERGYZONESUMMARYMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY" ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY" ),
-						std::make_tuple( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY" ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" ),
-						std::make_tuple( "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" ),
-						std::make_tuple( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" ),
-					}
-				},
-				{
-					"AVERAGEOUTDOORCONDITIONSMONTHLY",
-					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
-						std::make_tuple( "*", "SITE WIND SPEED" ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
-						std::make_tuple( "*", "SITE RAIN STATUS" ),
-					}
-				},
-				{
-					"OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY",
-					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
-						std::make_tuple( "*", "SITE WIND SPEED" ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
-					}
-				},
-				{
-					"OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY",
-					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
-						std::make_tuple( "*", "SITE WIND SPEED" ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
-					}
-				},
-				{
-					"OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY",
-					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
-						std::make_tuple( "*", "SITE WIND SPEED" ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
-					}
-				},
-				{
-					"OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY",
-					{
-						std::make_tuple( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" ),
-						std::make_tuple( "*", "SITE WIND SPEED" ),
-						std::make_tuple( "*", "SITE SKY TEMPERATURE" ),
-						std::make_tuple( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" ),
-						std::make_tuple( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" ),
-					}
-				},
-				{
-					"OUTDOORGROUNDCONDITIONSMONTHLY",
-					{
-						std::make_tuple( "*", "SITE GROUND TEMPERATURE" ),
-						std::make_tuple( "*", "SITE SURFACE GROUND TEMPERATURE" ),
-						std::make_tuple( "*", "SITE DEEP GROUND TEMPERATURE" ),
-						std::make_tuple( "*", "SITE MAINS WATER TEMPERATURE" ),
-						std::make_tuple( "*", "SITE GROUND REFLECTED SOLAR RADIATION RATE PER AREA" ),
-						std::make_tuple( "*", "SITE SNOW ON GROUND STATUS" ),
-					}
-				},
-				{
-					"WINDOWACREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY" ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING ENERGY" ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING ENERGY" ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE" ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE" ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE" ),
-						std::make_tuple( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC POWER" ),
-					}
-				},
-				{
-					"WATERHEATERREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY" ),
-						std::make_tuple( "*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY" ),
-						std::make_tuple( "*", "WATER HEATER BURNER HEATING ENERGY" ),
-						std::make_tuple( "*", "WATER HEATER GAS CONSUMPTION" ),
-						std::make_tuple( "*", "WATER HEATER LOSS DEMAND ENERGY" ),
-						std::make_tuple( "*", "WATER HEATER HEAT LOSS ENERGY" ),
-						std::make_tuple( "*", "WATER HEATER TANK TEMPERATURE" ),
-						std::make_tuple( "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY" ),
-						std::make_tuple( "*", "WATER HEATER SOURCE ENERGY" ),
-					}
-				},
-				{
-					"GENERATORREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "GENERATOR PRODUCED ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "GENERATOR DIESEL CONSUMPTION" ),
-						std::make_tuple( "*", "GENERATOR GAS CONSUMPTION" ),
-						std::make_tuple( "*", "GENERATOR TOTAL HEAT RECOVERY" ),
-						std::make_tuple( "*", "GENERATOR JACKET HEAT RECOVERY ENERGY" ),
-						std::make_tuple( "*", "GENERATOR LUBE HEAT RECOVERY" ),
-						std::make_tuple( "*", "GENERATOR EXHAUST HEAT RECOVERY ENERGY" ),
-						std::make_tuple( "*", "GENERATOR EXHAUST AIR TEMPERATURE" ),
-					}
-				},
-				{
-					"DAYLIGHTINGREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "SITE EXTERIOR BEAM NORMAL ILLUMINANCE" ),
-						std::make_tuple( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 ILLUMINANCE" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 GLARE INDEX SETPOINT EXCEEDED TIME" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 1 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 ILLUMINANCE" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" ),
-						std::make_tuple( "*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" ),
-					}
-				},
-				{
-					"COILREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "HEATING COIL HEATING ENERGY" ),
-						std::make_tuple( "*", "HEATING COIL HEATING RATE" ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING ENERGY" ),
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING ENERGY" ),
-						std::make_tuple( "*", "COOLING COIL TOTAL COOLING RATE" ),
-						std::make_tuple( "*", "COOLING COIL SENSIBLE COOLING RATE" ),
-						std::make_tuple( "*", "COOLING COIL WETTED AREA FRACTION" ),
-					}
-				},
-				{
-					"PLANTLOOPDEMANDREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" ),
-					}
-				},
-				{
-					"FANREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "FAN ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "FAN RISE IN AIR TEMPERATURE" ),
-						std::make_tuple( "*", "FAN ELECTRIC POWER" ),
-					}
-				},
-				{
-					"PUMPREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "PUMP ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "PUMP FLUID HEAT GAIN ENERGY" ),
-						std::make_tuple( "*", "PUMP ELECTRIC POWER" ),
-						std::make_tuple( "*", "PUMP SHAFT POWER" ),
-						std::make_tuple( "*", "PUMP FLUID HEAT GAIN RATE" ),
-						std::make_tuple( "*", "PUMP OUTLET TEMPERATURE" ),
-						std::make_tuple( "*", "PUMP MASS FLOW RATE" ),
-					}
-				},
-				{
-					"CONDLOOPDEMANDREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE INLET TEMPERATURE" ),
-						std::make_tuple( "*", "PLANT SUPPLY SIDE OUTLET TEMPERATURE" ),
-					}
-				},
-				{
-					"ZONETEMPERATUREOSCILLATIONREPORTMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE OSCILLATING TEMPERATURES TIME" ),
-						std::make_tuple( "*", "ZONE PEOPLE OCCUPANT COUNT" ),
-					}
-				},
-				{
-					"AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY",
-					{
-						std::make_tuple( "*", "AIR SYSTEM HOT WATER ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM STEAM ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM CHILLED WATER ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM GAS ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM WATER VOLUME" ),
-					}
-				},
-				{
-					"AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY",
-					{
-						std::make_tuple( "*", "AIR SYSTEM FAN AIR HEATING ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM COOLING COIL TOTAL COOLING ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HEAT EXCHANGER TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HEAT EXCHANGER TOTAL COOLING ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HUMIDIFIER TOTAL HEATING ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM EVAPORATIVE COOLER TOTAL COOLING ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY" ),
-					}
-				},
-				{
-					"AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY",
-					{
-						std::make_tuple( "*", "AIR SYSTEM FAN ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM DX HEATING COIL ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM DX COOLING COIL ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL GAS ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HEATING COIL STEAM ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM HUMIDIFIER ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRIC ENERGY" ),
-						std::make_tuple( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRIC ENERGY" ),
-					}
-				},
-				{
-					"MECHANICALVENTILATIONLOADSMONTHLY",
-					{
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD DECREASE ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT ADDITION ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD INCREASE DUE TO OVERCOOLING ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY" ),
-						std::make_tuple( "*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR" ),
+					{"Zn009:Flr001",
+						{
+							{"surface_type", "value that doesn't exist in the enum"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", 1.000000},
+							{"number_of_vertices", 4},
+							{"vertices",
+								{
+									{
+										{"vertex_z_coordinate", 0}
+									},
+									{
+										{"vertex_x_coordinate", 10},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
+							}
+						}
 					}
 				}
-			});
-
-			for ( auto const result : results_map ) {
-				AddVariablesForMonthlyReport( result.first );
-				for ( auto const result_tuple : result.second ) {
-					EXPECT_TRUE( DataOutputs::FindItemInVariableList( std::get<0>( result_tuple ), std::get<1>( result_tuple ) ) );
+			},
+			{
+				"GlobalGeometryRules",
+				{
+					{
+						"",
+						{
+							{"starting_vertex_position", "UpperLeftCorner"},
+							{"vertex_entry_direction", "Counterclockwise"},
+							{"coordinate_system", "Relative"},
+							{"daylighting_reference_point_coordinate_system", "Relative"},
+							{"rectangular_surface_coordinate_system", "Relative"}
+						}
+					}
 				}
-				DataOutputs::OutputVariablesForSimulation.clear();
-				DataOutputs::NumConsideredOutputVariables = 0;
+			},
+			{
+				"Building",
+				{
+					{
+						"Bldg",
+						{
+							{"north_axis", 0.0},
+							{"terrain", "Suburbs"},
+							{"loads_convergence_tolerance_value", 0.04},
+							{"temperature_convergence_tolerance_value", 0.4000},
+							{"solar_distribution", "FullExterior"},
+							{"maximum_number_of_warmup_days", 25},
+							{"minimum_number_of_warmup_days", 6}
+						}
+					}
+				}
 			}
+		};
 
+		json::parse( root.dump(2) );
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
+		// EXPECT_EQ(errors.size(), 4ul);
+		EXPECT_EQ(warnings.size(), 0ul);
+		if (errors.size() >= 4) {
+			EXPECT_NE(errors[0].find("In object \"BuildingSurface:Detailed\" at line"), std::string::npos);
+			EXPECT_NE(errors[0].find("value that doesn't exist in the enum\" was not found in the enum"), std::string::npos);
+			EXPECT_NE(errors[1].find("Required extensible field \"vertex_y_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("Required extensible field \"vertex_x_coordinate\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+			EXPECT_NE(errors[3].find("Required field \"construction_name\" in object \"BuildingSurface:Detailed\" ending at line"), std::string::npos);
+//            EXPECT_NE(errors[4].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
+//            EXPECT_NE(errors[5].find("Required object \"Building\" was not provided"), std::string::npos);
 		}
+	}
 
-		TEST_F( InputProcessorFixture, preScanReportingVariables )
+
+	TEST_F(InputProcessorFixture, min_and_max_validation) {
+		json root =
 		{
-			std::string const idf_objects = delimited_string({
-				"Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
-				"Output:Variable,,Site Outdoor Air Drybulb Temperature,hourly;",
-			});
-
-			ASSERT_FALSE( process_idf( idf_objects ) );
-
-			// reset global variable since process_idf() calls PreScanReportingVariables()
-			DataOutputs::NumConsideredOutputVariables = 0;
-
-			PreScanReportingVariables();
-
-			EXPECT_FALSE( has_cout_output() );
-			EXPECT_FALSE( has_cerr_output() );
-
-			EXPECT_TRUE( DataOutputs::FindItemInVariableList( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" ) );
-
+			{"BuildingSurface:Detailed",
+				{
+					{"Zn009:Flr001",
+						{
+							{"surface_type", "Floor"},
+							{"construction_name", "super_official_construction_name"},
+							{"zone_name", "SCWINDOW"},
+							{"outside_boundary_condition", "Surface"},
+							{"outside_boundary_condition_object", "Zn009:Flr001"},
+							{"sun_exposure", "NoSun"},
+							{"wind_exposure", "NoWind"},
+							{"view_factor_to_ground", -987.654321},
+							{"number_of_vertices", -98765.4321},
+							{"vertices",
+								{
+									{
+										{"vertex_x_coordinate", "definitely not a number"},
+										{"vertex_y_coordinate", 10},
+										{"vertex_z_coordinate", 0}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{"Building",
+				{
+					{
+						"Ref Bldg Medium Office New2004_v1.3_5.0",
+						{
+							{"north_axis", 0.0000},
+							{"terrain", "City"},
+							{"loads_convergence_tolerance_value", 0.0},
+							{"temperature_convergence_tolerance_value", 0.2000},
+							{"solar_distribution", "FullInteriorAndExterior"},
+							{"maximum_number_of_warmup_days", 20},
+							{"minimum_number_of_warmup_days", 0}
+						},
+					},
+				}
+			},
+			{
+				"GlobalGeometryRules",
+				{
+					{
+						"",
+						{
+							{"starting_vertex_position", "UpperLeftCorner"},
+							{"vertex_entry_direction", "Counterclockwise"},
+							{"coordinate_system", "Relative"},
+							{"daylighting_reference_point_coordinate_system", "Relative"},
+							{"rectangular_surface_coordinate_system", "Relative"}
+						}
+					}
+				}
+			},
+		};
+		json::parse( root.dump(2) );
+		auto const & errors = validationErrors();
+		auto const & warnings = validationWarnings();
+		// EXPECT_EQ(errors.size(), 5ul);
+		EXPECT_EQ(warnings.size(), 0ul);
+		if (errors.size() >= 5) {
+			EXPECT_NE(errors[0].find("Value \"0.000000\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[0].find("is less than or equal to the exclusive minimum"), std::string::npos);
+			EXPECT_NE(errors[1].find("Value \"0.000000\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[1].find("is less than or equal to the exclusive minimum"), std::string::npos);
+			EXPECT_NE(errors[2].find("Value \"-98765.432100\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[2].find("less than the minimum"), std::string::npos);
+			EXPECT_NE(errors[3].find("In object \"BuildingSurface:Detailed\", at line"), std::string::npos);
+			EXPECT_NE(errors[3].find("type needs to be string"), std::string::npos);
+			EXPECT_NE(errors[4].find("Value \"-987.654321\" parsed at line"), std::string::npos);
+			EXPECT_NE(errors[4].find("less than the minimum"), std::string::npos);
+//			EXPECT_NE(errors[5].find("Required object \"GlobalGeometryRules\" was not provided"), std::string::npos);
 		}
+	}
 
-		TEST_F( InputProcessorFixture, initSecretObjects )
-		{
-			InitSecretObjects();
 
-			EXPECT_EQ( 5, NumSecretObjects );
+	TEST_F( InputProcessorFixture, eat_whitespace ) {
+		size_t index = 0;
+		eat_whitespace( "    test", index );
+		EXPECT_EQ( 4ul, index );
 
-			EXPECT_EQ( "SKY RADIANCE DISTRIBUTION", RepObjects( 1 ).OldName );
-			EXPECT_TRUE( RepObjects( 1 ).Deleted );
+		index = 0;
+		eat_whitespace( "t   test", index );
+		EXPECT_EQ( 0ul, index );
+	}
 
-			EXPECT_EQ( "SURFACE:SHADING:DETACHED", RepObjects( 2 ).OldName );
-			EXPECT_EQ( "Shading:Site:Detailed", RepObjects( 2 ).NewName );
 
-			EXPECT_EQ( "AIRFLOW MODEL", RepObjects( 3 ).OldName );
-			EXPECT_TRUE( RepObjects( 3 ).Deleted );
+	TEST_F( InputProcessorFixture, eat_comment ) {
+		size_t index = 0;
+		eat_comment( "!- North Axis {deg}\n", index );
+		EXPECT_EQ( 20ul, index );
 
-			EXPECT_EQ( "AIRFLOWNETWORK:MULTIZONE:SITEWINDCONDITIONS", RepObjects( 4 ).OldName );
-			EXPECT_TRUE( RepObjects( 4 ).Deleted );
+		index = 0;
+		eat_comment( "                    !- Terrain\n", index );
+		EXPECT_EQ( 31ul, index );
 
-			EXPECT_EQ( "OUTPUT:REPORTS", RepObjects( 5 ).OldName );
-			EXPECT_EQ( "various - depends on fields", RepObjects( 5 ).NewName );
-			EXPECT_TRUE( RepObjects( 5 ).Deleted );
-			EXPECT_TRUE( RepObjects( 5 ).TransitionDefer );
-		}
+		index = 0;
+		eat_comment( "  !- Name\n    0.0000", index );
+		EXPECT_EQ( 10ul, index );
+
+		index = 0;
+		eat_comment( "  !- Name\n\r    0.0000", index );
+		EXPECT_EQ( 10ul, index );
+	}
+
+
+	TEST_F( InputProcessorFixture, parse_string ) {
+		size_t index = 0;
+		bool success = true;
+		std::string output_string;
+
+		output_string = parse_string( "test_string", index, success );
+		EXPECT_EQ( "test_string", output_string );
+		EXPECT_EQ( 11ul, index );
+		EXPECT_TRUE( success );
+
+		index = 0;
+		success = true;
+		output_string = parse_string( "-1234.1234", index, success );
+		EXPECT_EQ( "-1234.1234", output_string );
+		EXPECT_EQ( 10ul, index );
+		EXPECT_TRUE( success );
+
+		index = 0;
+		success = true;
+		output_string = parse_string( R"(\b\t/\\\";)", index, success );
+		EXPECT_EQ( "\b\t/\\\"", output_string );
+		EXPECT_EQ( 9ul, index );
+		EXPECT_TRUE( success );
+
+		index = 0;
+		success = true;
+		output_string = parse_string( R"(test \n string)", index, success );
+		EXPECT_EQ( "", output_string );
+		EXPECT_EQ( 7ul, index );
+		EXPECT_FALSE( success );
+
+		index = 0;
+		success = true;
+		output_string = parse_string( R"(! this is a comment \n)", index, success );
+		EXPECT_EQ( "", output_string );
+		EXPECT_EQ( 0ul, index );
+		EXPECT_TRUE( success );
+	}
+
+	TEST_F (InputProcessorFixture, parse_value) {
+		size_t index = 0;
+		bool success = true;
+		json rv;
+
+		rv = parse_value("11th of April,", index, success);
+		EXPECT_EQ(13ul, index);
+		EXPECT_EQ("11th of April", rv.get<std::string>());
+
+		index = 0;
+		rv = parse_value("11.201,", index, success);
+		EXPECT_EQ(6ul, index);
+		EXPECT_EQ(11.201, rv.get<double>());
+
+		index = 0;
+		rv = parse_value("11.201 of April,", index, success);
+		EXPECT_EQ(15ul, index);
+		EXPECT_EQ("11.201 of April", rv.get<std::string>());
+
+		index = 0;
+		EXPECT_NO_THROW(rv = parse_value("4Ee5,", index, success));
+		EXPECT_EQ(4ul, index);
+		EXPECT_EQ("4Ee5", rv.get<std::string>());
+	}
+
+
+	TEST_F( InputProcessorFixture, parse_number) {
+		size_t index = 0;
+		bool success = true;
+		json output;
+
+		output = parse_number("4.5,", index, success);
+		EXPECT_EQ(4.5, output.get<double>());
+		EXPECT_EQ(3ul, index);
+		EXPECT_TRUE(success);
+
+		index = 0;
+		output = parse_number("0.53;", index, success);
+		EXPECT_EQ(0.53, output.get<double>());
+		EXPECT_EQ(4ul, index);
+		EXPECT_TRUE(success);
+
+		index = 0;
+		output = parse_number("1.53  ;", index, success);
+		EXPECT_EQ(1.53, output.get<double>());
+		EXPECT_EQ(4ul, index);
+		EXPECT_TRUE(success);
+
+		index = 0;
+		output = parse_number(" 1.53  ;", index, success);
+		EXPECT_EQ(1.53, output.get<double>());
+		EXPECT_EQ(5ul, index);
+		EXPECT_TRUE(success);
+
+		index = 0;
+		output = parse_number("2.510035e5;", index, success);
+		EXPECT_EQ(251003.5, output.get<double>());
+		EXPECT_EQ(10ul, index);
+		EXPECT_TRUE(success);
+
+		index = 0;
+		output = parse_number("2.510035e-05;", index, success);
+		EXPECT_EQ(0.00002510035, output.get<double>());
+		EXPECT_EQ(12ul, index);
+		EXPECT_TRUE(success);
+
+		index = 0;
+		output = parse_number("1.0E-05;", index, success);
+		EXPECT_EQ(0.000010, output.get<double>());
+		EXPECT_EQ(7ul, index);
+		EXPECT_TRUE(success);
+
+		// handling weird scientific notation
+		index = 0;
+		output = parse_number("5E-5;", index, success);
+		EXPECT_EQ(0.00005, output.get<double>());
+		EXPECT_EQ(4ul, index);
+		EXPECT_TRUE(success);
+
+
+		// handling weird scientific notation
+		index = 0;
+		output = parse_number("5E-05;", index, success);
+		EXPECT_EQ(0.00005, output.get<double>());
+		EXPECT_EQ(5ul, index);
+		EXPECT_TRUE(success);
+
+		// handling weird scientific notation
+		index = 0;
+		output = parse_number("5.E-05;", index, success);
+		EXPECT_EQ(0.00005, output.get<double>());
+		EXPECT_EQ(6ul, index);
+		EXPECT_TRUE(success);
+
+		index = 0;
+		output = parse_number("11th of April,", index, success);
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("-+4,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("4..0,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("++4,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("--4,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("4++,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("4--,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("4ee5,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("4EE5,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("4eE5,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+
+		index = 0;
+		EXPECT_NO_THROW(output = parse_number("4Ee5,", index, success));
+		EXPECT_TRUE(output.is_null());
+		EXPECT_EQ(0ul, index);
+		EXPECT_FALSE(success);
+	}
+
+
+	TEST_F( InputProcessorFixture, look_ahead ) {
+		std::string const test_input( "B , ! t ; `" );
+		size_t index = 0;
+		IdfParser::Token token = look_ahead( test_input, index );
+		EXPECT_EQ( 0ul, index );
+		EXPECT_EQ( IdfParser::Token::STRING, token );
+		index = 2;
+		token = look_ahead( test_input, index );
+		EXPECT_EQ( 2ul, index );
+		EXPECT_EQ( IdfParser::Token::COMMA, token );
+		index = 3;
+		token = look_ahead( test_input, index );
+		EXPECT_EQ( 3ul, index );
+		EXPECT_EQ( IdfParser::Token::EXCLAMATION, token );
+		index = 5;
+		token = look_ahead( test_input, index );
+		EXPECT_EQ( 5ul, index );
+		EXPECT_EQ( IdfParser::Token::STRING, token );
+		index = 7;
+		token = look_ahead( test_input, index );
+		EXPECT_EQ( 7ul, index );
+		EXPECT_EQ( IdfParser::Token::SEMICOLON, token );
+		index = 9;
+		token = look_ahead( test_input, index );
+		EXPECT_EQ( 9ul, index );
+		EXPECT_EQ( IdfParser::Token::NONE, token );
+		index = test_input.size();
+		token = look_ahead( test_input, index );
+		EXPECT_EQ( test_input.size(), index );
+		EXPECT_EQ( IdfParser::Token::END, token );
+	}
+
+	TEST_F( InputProcessorFixture, next_token ) {
+		size_t index = 0;
+
+		std::string const test_input( "B , ! t ; `" );
+		IdfParser::Token token = next_token( test_input, index );
+		EXPECT_EQ( 1ul, index );
+		EXPECT_EQ( IdfParser::Token::STRING, token );
+		token = next_token( test_input, index );
+		EXPECT_EQ( 3ul, index );
+		EXPECT_EQ( IdfParser::Token::COMMA, token );
+		token = next_token( test_input, index );
+		EXPECT_EQ( 5ul, index );
+		EXPECT_EQ( IdfParser::Token::EXCLAMATION, token );
+		token = next_token( test_input, index );
+		EXPECT_EQ( 7ul, index );
+		EXPECT_EQ( IdfParser::Token::STRING, token );
+		token = next_token( test_input, index );
+		EXPECT_EQ( 9ul, index );
+		EXPECT_EQ( IdfParser::Token::SEMICOLON, token );
+		token = next_token( test_input, index );
+		EXPECT_EQ( 10ul, index );
+		EXPECT_EQ( IdfParser::Token::NONE, token );
+		index = test_input.size();
+		token = next_token( test_input, index );
+		EXPECT_EQ( test_input.size() , index );
+		EXPECT_EQ( IdfParser::Token::END, token );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_json1 )
+	{
+		std::string const idf_objects = delimited_string({
+																 "Version,8.3;",
+																 "Output:SQLite,SimpleAndTabular;",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		std::string const CurrentModuleObject = "Output:SQLite";
+
+		int NumSQLite = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, NumSQLite );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SIMPLEANDTABULAR" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Option Type" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), lAlphaBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_EQ( 1, IOStatus );
 
 	}
 
+
+	TEST_F( InputProcessorFixture, getObjectItem_json2 ) {
+		std::string const idf_objects = delimited_string({
+															"Version,8.3;",
+															"Humidifier:Steam:Gas,",
+															"  Main Gas Humidifier,     !- Name",
+															"  ,                        !- Availability Schedule Name",
+															"  autosize,                !- Rated Capacity {m3/s}",
+															"  autosize,                !- Rated Gas Use Rate {W}",
+															"  0.80,                    !- Thermal Efficiency {-}",
+															"  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
+															"  0,                       !- Rated Fan Power {W}",
+															"  0,                       !- Auxiliary Electric Power {W}",
+															"  Mixed Air Node 1,        !- Air Inlet Node Name",
+															"  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
+															"  ;                        !- Water Storage Tank Name",
+														 });
+		ASSERT_TRUE( process_idf ( idf_objects ) );
+		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
+
+		int NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, NumGasSteamHums );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+		inputProcessor->getObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
+//        EXPECT_EQ( 6, NumAlphas ); // TODO: Should be 6, why is it 7? Might be due to name field
+		EXPECT_EQ( 6, NumAlphas );
+		EXPECT_EQ( 5, NumNumbers );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_json3 ) {
+		std::string const idf_objects = delimited_string({
+															"Version,8.3;",
+															"  BuildingSurface:Detailed,",
+															"    Zn001:Wall001,           !- Name",
+															"    Wall,                    !- Surface Type",
+															"    R13WALL,                 !- Construction Name",
+															"    Main Zone,               !- Zone Name",
+															"    Outdoors,                !- Outside Boundary Condition",
+															"    ,                        !- Outside Boundary Condition Object",
+															"    SunExposed,              !- Sun Exposure",
+															"    WindExposed,             !- Wind Exposure",
+															"    0.5000000,               !- View Factor to Ground",
+															"    4,                       !- Number of Vertices",
+															"    0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+															"    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+															"    15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+															"    15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		std::string const CurrentModuleObject = "BuildingSurface:Detailed";
+
+		int numBuildingSurfaceDetailed = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+		ASSERT_EQ(1, numBuildingSurfaceDetailed);
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+		int IOStatus = 0;
+		Array1D_string Alphas(NumAlphas);
+		Array1D<Real64> Numbers(NumNumbers, 0.0);
+		Array1D_bool lNumericBlanks(NumNumbers, true);
+		Array1D_bool lAlphaBlanks(NumAlphas, true);
+		Array1D_string cAlphaFields(NumAlphas);
+		Array1D_string cNumericFields(NumNumbers);
+		inputProcessor->getObjectItem(CurrentModuleObject, numBuildingSurfaceDetailed, Alphas, NumAlphas, Numbers, NumNumbers,
+									  IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
+
+		EXPECT_TRUE(compare_containers(std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED" }), Alphas));
+		EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false }), lNumericBlanks));
+		EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, true, false, false }), lAlphaBlanks));
+		EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572 }), Numbers));
+		EXPECT_EQ(8, NumAlphas);
+		EXPECT_EQ(14, NumNumbers);
+		EXPECT_EQ(1, IOStatus);
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields )
+	{
+		std::string const idf_objects = delimited_string({
+				"FenestrationSurface:Detailed,",
+				"Zn001:Wall001:Win001,    !- Name",
+				"Window,                  !- Surface Type",
+				"DoubleClear,             !- Construction Name",
+				"123456E,           !- Building Surface Name",
+				",                        !- Outside Boundary Condition Object",
+				"0.5000000,               !- View Factor to Ground",
+				",                        !- Shading Control Name",
+				",                        !- Frame and Divider Name",
+				"1.0,                     !- Multiplier",
+				"4,                       !- Number of Vertices",
+				"0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+				"0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+				"5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+				"5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+		});
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
+
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "123456E", "",
+																	 "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 15, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( {0.5000000, 1.0 , 4, 0.548000 , 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5,
+																 5.548, 0, 2.5 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false } ), lNumericBlanks ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2 )
+	{
+		std::string const idf_objects = delimited_string({
+															"FenestrationSurface:Detailed,",
+															"Zn001:Wall001:Win001,    !- Name",
+															"Window,                  !- Surface Type",
+															"DoubleClear,             !- Construction Name",
+															"E123,           !- Building Surface Name",
+															",                        !- Outside Boundary Condition Object",
+															"0.5000000,               !- View Factor to Ground",
+															",                        !- Shading Control Name",
+															",                        !- Frame and Divider Name",
+															"1.0,                     !- Multiplier",
+															"4,                       !- Number of Vertices",
+															"0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+															"0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+															"5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+															"5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+														 });
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "FenestrationSurface:Detailed";
+
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZN001:WALL001:WIN001", "WINDOW", "DOUBLECLEAR", "E123", "",
+																	   "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 15, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( {0.5000000, 1.0 , 4, 0.548000 , 0, 2.5, 0.548, 0, .5, 5.548, 0, 0.5,
+																 5.548, 0, 2.5 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false } ), lNumericBlanks ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults )
+	{
+		std::string const idf_objects = delimited_string({
+															"Version,8.3;",
+															" Curve:Biquadratic,",
+															"  HPACCOOLEIRFT Speed, !- Name",
+															"  0.632475E+00, !- Coefficient1 Constant",
+															"  -0.121321E-01, !- Coefficient2 x",
+															"  0.507773E-03, !- Coefficient3 x**2",
+															"  0.155377E-01, !- Coefficient4 y",
+															"  0.272840E-03, !- Coefficient5 y**2",
+															"  -0.679201E-03, !- Coefficient6 x*y",
+															"  12.77778, !- Minimum Value of x",
+															"  23.88889, !- Maximum Value of x",
+															"  23.88889, !- Minimum Value of y",
+															"  46.11111, !- Maximum Value of y",
+															"  , !- Minimum Curve Output",
+															"  , !- Maximum Curve Output",
+															"  , !- Input Unit Type for X",
+															"  Temperature, !- Input Unit Type for Y",
+															"  Dimensionless;           !- Output Unit Type",
+														 });
+		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
+		// expect Dimensionless to be inserted for Input Unit Type for X, blank field with a default. Expect true for it's alphaBlank value
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLEIRFT SPEED", "DIMENSIONLESS", "TEMPERATURE", "DIMENSIONLESS", } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Input Unit Type for X", "Input Unit Type for Y", "Output Unit Type", } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 12, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Coefficient1 Constant", "Coefficient2 x", "Coefficient3 x**2", "Coefficient4 y", "Coefficient5 y**2", "Coefficient6 x*y",
+																	   "Minimum Value of x", "Maximum Value of x", "Minimum Value of y", "Maximum Value of y", "Minimum Curve Output", "Maximum Curve Output" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.632475E+00, -0.121321E-01 , 0.507773E-03, 0.155377E-01 , 0.272840E-03,
+																  -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0, } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, true, true } ), lNumericBlanks ) );
+
+		EXPECT_EQ( 1, IOStatus );
+
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon )
+	{
+		std::string const idf_objects = delimited_string({
+															"Version,8.3;",
+															" Curve:Biquadratic,",
+															"  HPACCOOLEIRFT Speed, !- Name",
+															"  0.632475E+00, !- Coefficient1 Constant",
+															"  -0.121321E-01, !- Coefficient2 x",
+															"  0.507773E-03, !- Coefficient3 x**2",
+															"  0.155377E-01, !- Coefficient4 y",
+															"  0.272840E-03, !- Coefficient5 y**2",
+															"  -0.679201E-03, !- Coefficient6 x*y",
+															"  12.77778, !- Minimum Value of x",
+															"  23.88889, !- Maximum Value of x",
+															"  23.88889, !- Minimum Value of y",
+															"  46.11111; !- Maximum Value of y",
+														 });
+		// expect 0's to be inserted in for min Curve Output and Max Curve Output and expect true to be their respective NumBlanks value, they are missing fields and have no default
+		// expect "" to be inserted for the missing alpha fields due to the truncation, blank field with a default. Expect true for it's alphaBlank value
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquadratic_objects = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, num_curve_biquadratic_objects );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquadratic_objects, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLEIRFT SPEED", "", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Input Unit Type for X", "Input Unit Type for Y", "Output Unit Type", } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 10, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Coefficient1 Constant", "Coefficient2 x", "Coefficient3 x**2", "Coefficient4 y", "Coefficient5 y**2", "Coefficient6 x*y",
+																	   "Minimum Value of x", "Maximum Value of x", "Minimum Value of y", "Maximum Value of y", "Minimum Curve Output", "Maximum Curve Output" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.632475E+00, -0.121321E-01 , 0.507773E-03, 0.155377E-01 , 0.272840E-03,
+																  -0.679201E-03, 12.77778, 23.88889, 23.88889, 46.11111, 0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false, true, true } ), lNumericBlanks ) );
+
+		EXPECT_EQ( 1, IOStatus );
+
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields )
+	{
+		std::string const idf_objects = delimited_string({
+															"Version,8.3;",
+															"Sizing:System,",
+															"  West Zone Air System,    !- AirLoop Name",
+															"  Sensible,                !- Type of Load to Size On",
+															"  autosize,                !- Design Outdoor Air Flow Rate {m3/s}",
+															"  0.4,                     !- Minimum System Air Flow Ratio",
+															"  7.0,                     !- Preheat Design Temperature {C}",
+															"  0.0085,                  !- Preheat Design Humidity Ratio {kgWater/kgDryAir}",
+															"  11.0,                    !- Precool Design Temperature {C}",
+															"  0.0085,                  !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
+															"  12.8,                    !- Central Cooling Design Supply Air Temperature {C}",
+															"  16.7,                    !- Central Heating Design Supply Air Temperature {C}",
+															"  NonCoincident,           !- Sizing Option",
+															"  Yes,                     !- 100% Outdoor Air in Cooling",
+															"  No,                      !- 100% Outdoor Air in Heating",
+															"  0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+															"  0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+															"  DesignDay,               !- Cooling Design Air Flow Method",
+															"  ,                        !- Cooling Design Air Flow Rate {m3/s}",
+															"  ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}",
+															"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
+															"  ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}",
+															"  DesignDay,               !- Heating Design Air Flow Method",
+															"  ,                        !- Heating Design Air Flow Rate {m3/s}",
+															"  ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}",
+															"  ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}",
+															"  ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}",
+															"  ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}",
+															"  ;                        !- System Outdoor Air Method",
+														 });
+
+
+		ASSERT_TRUE( process_idf( idf_objects, false ) );
+
+		std::string const CurrentModuleObject = "Sizing:System";
+
+		int NumSizingSystem = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, NumSizingSystem );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, NumSizingSystem, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 11, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "WEST ZONE AIR SYSTEM", "SENSIBLE", "NONCOINCIDENT", "YES", "NO", "DESIGNDAY",
+																	   "DESIGNDAY", "ZONESUM", "COOLINGDESIGNCAPACITY", "HEATINGDESIGNCAPACITY", "ONOFF" } ), Alphas ) );
+		// The commented out compare containers is what the original input processor said that alpha blanks should be, even though the last 3 alpha fields are filled
+		// in with defaults. We think the last three fields really should be considered blank, i.e. true
+//        EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, true, false, false, false } ), lAlphaBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, true, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 26, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8, 16.7, 0.0085, 0.0085,
+																  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+																  -99999, 0, 0, -99999, 0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+																true, true, true, true, true, true, true, true, true, true,
+																true, true, true, true, true, true } ), lNumericBlanks ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_autosize )
+	{
+		std::string const idf_objects = delimited_string({
+															"Version,8.3;",
+															"Humidifier:Steam:Gas,",
+															"  Main Gas Humidifier,     !- Name",
+															"  ,                        !- Availability Schedule Name",
+															"  ,                !- Rated Capacity {m3/s}",
+															"  autosize,                !- Rated Gas Use Rate {W}",
+															"  ,                    !- Thermal Efficiency {-}",
+															"  ThermalEfficiencyFPLR,   !- Thermal Efficiency Modifier Curve Name",
+															"  0,                       !- Rated Fan Power {W}",
+															"  ,                       !- Auxiliary Electric Power {W}",
+															"  Mixed Air Node 1,        !- Air Inlet Node Name",
+															"  Main Humidifier Outlet Node,  !- Air Outlet Node Name",
+															"  ,                        !- Water Storage Tank Name",
+															"  ;                        !- InletWaterTemperatureOption",
+														 });
+
+		// Expect the alpha field Inlet Water Temp to be filled in with it's default value
+		// Expect Rated Capacity to be filled in with ZERO, not with the autosize value of -99999. Expect
+		// Auxiliary Electric Power to be filled in with .80 (it's default value)
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
+
+		int NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, NumGasSteamHums );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", "FIXEDINLETWATERTEMPERATURE" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, false, false, false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 5, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, false, true, false, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, -99999, 0.80, 0.0, 0.0 } ), Numbers ) );
+
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_truncated_autosize_fields )
+	{
+		std::string const idf_objects = delimited_string({
+															"Version,8.3;",
+															"Humidifier:Steam:Gas,",
+															"  Main Gas Humidifier,     !- Name",
+															"  ,                        !- Availability Schedule Name",
+															"  autosize;                !- Rated Capacity {m3/s}",
+														 });
+
+		// Expect Rated Capacity to be filled in with the autosize value of -99999. Expect everything else to be empty string and 0
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Humidifier:Steam:Gas";
+
+		int NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1, NumGasSteamHums );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, NumGasSteamHums, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 2, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "MAIN GAS HUMIDIFIER", "", "", "", "", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Name", "Availability Schedule Name", "Thermal Efficiency Modifier Curve Name", "Air Inlet Node Name", "Air Outlet Node Name", "Water Storage Tank Name", "Inlet Water Temperature Option" } ), cAlphaFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 1, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power" } ), cNumericFields ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { -99999, 0, 0, 0, 0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_unitary_system_input )
+	{
+		std::string const idf_objects = delimited_string({
+															"AirLoopHVAC:UnitarySystem,",
+															"  GasHeat DXAC Furnace 1, !- Name",
+															"  Load,                   !- Control Type",
+															"  East Zone,              !- Controlling Zone or Thermostat Location",
+															"  None,                   !- Dehumidification Control Type",
+															"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+															"  Zone Exhaust Node,         !- Air Inlet Node Name",
+															"  Zone 2 Inlet Node,   !- Air Outlet Node Name",
+															"  Fan:OnOff,              !- Supply Fan Object Type",
+															"  Supply Fan 1,           !- Supply Fan Name",
+															"  BlowThrough,            !- Fan Placement",
+															"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
+															"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+															"  Furnace Heating Coil 1, !- Heating Coil Name",
+															"  ,                       !- DX Heating Coil Sizing Ratio",
+															"  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
+															"  Furnace ACDXCoil 1,     !- Cooling Coil Name",
+															"  ,                       !- Use DOAS DX Cooling Coil",
+															"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+															"  ,                       !- Latent Load Control",
+															"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+															"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
+															"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
+															"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+															"  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+															"  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+															"  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation",
+															"  1.6,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+															"  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+															"  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+															"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+															"  1.6,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+															"  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+															"  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+															"  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+															"  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+															"  80;                     !- Maximum Supply Air Temperature{ C }",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "AirLoopHVAC:UnitarySystem";
+
+		int num_unitary_systems = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_unitary_systems );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_unitary_systems, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 22, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "GASHEAT DXAC FURNACE 1", "LOAD", "EAST ZONE", "NONE", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "ZONE 2 INLET NODE",
+																	   "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:GAS", "FURNACE HEATING COIL 1",
+																	   "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:GAS",
+																	   "HUMIDISTAT REHEAT COIL 1", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "", "", "", "", ""} ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, true, true, false, false, false,
+																false, false, true, true, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 17, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true, false, true, true, true, false, true, true, true,
+																false, true, true, true, true, true, false, true, true, true,
+																true, true, true, true, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0,
+																  1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0,
+																  0, 0, 0, 0, 0, 0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_test_numbers_as_strings)
+	{
+		std::string const idf_objects = delimited_string({
+															"  ZoneHVAC:EquipmentConnections,",
+															"    401,                     !- Zone Name",
+															"    Z401 terminal list,      !- Zone Conditioning Equipment List Name",
+															"    Z401 zone inlet,         !- Zone Air Inlet Node or NodeList Name",
+															"    ,                        !- Zone Air Exhaust Node or NodeList Name",
+															"    Z401 air node,           !- Zone Air Node Name",
+															"    Z401 outlet node;        !- Zone Return Air Node Name",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
+
+		int num_eq_connections = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_eq_connections );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_eq_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 6, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "401", "Z401 TERMINAL LIST", "Z401 ZONE INLET", "",
+																	   "Z401 AIR NODE", "Z401 OUTLET NODE", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, true, false, false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_test_zone_input)
+	{
+		std::string const idf_objects = delimited_string({
+															"Zone,",
+															"  EAST ZONE,              !- Name",
+															"  0,                      !- Direction of Relative North{ deg }",
+															"  0,                      !- X Origin{ m }",
+															"  0,                      !- Y Origin{ m }",
+															"  0,                      !- Z Origin{ m }",
+															"  1,                      !- Type",
+															"  1,                      !- Multiplier",
+															"  autocalculate,          !- Ceiling Height{ m }",
+															"  autocalculate;          !- Volume{ m3 }",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Zone";
+
+		int num_zones = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_zones );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_zones, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "EAST ZONE", "", "", ""} ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 8, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, 0, 0, 0, 1, 1, -99999, -99999, 0 } ), Numbers ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_zone_HVAC_input)
+	{
+		std::string const idf_objects = delimited_string({
+															"ZoneHVAC:EquipmentConnections,",
+															"EAST ZONE,                 !- Zone Name",
+															"  Zone2Equipment,          !- Zone Conditioning Equipment List Name",
+															"  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name",
+															"  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name",
+															"  Zone 2 Node,             !- Zone Air Node Name",
+															"  Zone 2 Outlet Node;      !- Zone Return Air Node Name",
+															"  ",
+															"ZoneHVAC:EquipmentList,",
+															"  Zone2Equipment,          !- Name",
+                                                            "  SequentialLoad,          !- Load distribution scheme",
+															"  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type",
+															"  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
+															"  1,                       !- Zone Equipment 1 Cooling Sequence",
+															"  1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
+
+		int num_equipment_connections = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_equipment_connections );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_equipment_connections, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 6, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "EAST ZONE", "ZONE2EQUIPMENT", "ZONE 2 INLET NODE", "ZONE EXHAUST NODE",
+																	   "ZONE 2 NODE", "ZONE 2 OUTLET NODE", "", ""} ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers ) );
+
+		CurrentModuleObject = "ZoneHVAC:EquipmentList";
+
+		int num_equipment_lists = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_equipment_lists );
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_equipment_lists, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 4, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 2, NumNumbers2 );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false } ), lNumericBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 1 } ), Numbers2 ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_coil_heating_fuel)
+	{
+		std::string const idf_objects = delimited_string({
+				"Coil:Heating:Fuel,",
+				"  name number one, ! A1 , \field Name",
+				"  schedule_name1, ! A2 , \field Availability Schedule Name",
+				"  Gas, ! A3 , \field Fuel Type",
+				"  0.45, ! N1 , \field Burner Efficiency",
+				"  0.1, ! N2 , \field Nominal Capacity",
+				"  this_is_an_air_inlet_name, ! A4 , \field Air Inlet Node Name",
+				"  this_is_outlet, ! A5 , \field Air Outlet Node Name",
+				"  other_name, ! A6 , \field Temperature Setpoint Node Name",
+				"  0.3, ! field Parasitic Electric Load",
+				"  curve_blah_name, ! Part Load Fraction Correlation Curve Name",
+				"  0.344; ! field Parasitic Fuel Load",
+				" ",
+				"Coil:Heating:Fuel,",
+				"  the second name, ! A1 , \field Name",
+				"  schedule_name2, ! A2 , \field Availability Schedule Name",
+				"  Gas, ! A3 , \field Fuel Type",
+				"  0.55, ! N1 , \field Burner Efficiency",
+				"  0.2, ! N2 , \field Nominal Capacity",
+				"  this_is_an_air_inlet_name2, ! A4 , \field Air Inlet Node Name",
+				"  this_is_outlet2, ! A5 , \field Air Outlet Node Name",
+				"  other_name2, ! A6 , \field Temperature Setpoint Node Name",
+				"  0.4, ! field Parasitic Electric Load",
+				"  curve_blah_name2, ! Part Load Fraction Correlation Curve Name",
+				"  0.444; ! field Parasitic Fuel Load",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Coil:Heating:Fuel";
+
+		int num_coil_heating_gas = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 2,  num_coil_heating_gas );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NAME NUMBER ONE", "SCHEDULE_NAME1", "GAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 4, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.45, 0.1, 0.30, 0.344 } ), Numbers ) );
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 7, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "THE SECOND NAME", "SCHEDULE_NAME2", "GAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 4, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lNumericBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.55, 0.2, 0.40, 0.444 } ), Numbers2 ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_schedule_objects)
+	{
+		std::string const idf_objects = delimited_string({
+															"ScheduleTypeLimits,",
+															"  Any Number;             !- Name",
+															"  ",
+															"Schedule:Compact,",
+															"  FanAndCoilAvailSched,   !- Name",
+															"  Any Number,             !- Schedule Type Limits Name",
+															"  Through: 12/31,         !- Field 1",
+															"  For: AllDays,           !- Field 2",
+															"  Until: 24:00, 1.0;      !- Field 3",
+															"  ",
+															"Schedule:Compact,",
+															"  ContinuousFanSchedule,  !- Name",
+															"  Any Number,             !- Schedule Type Limits Name",
+															"  Through: 12/31,         !- Field 1",
+															"  For: AllDays,           !- Field 2",
+															"  Until: 24:00, 1.0;      !- Field 3",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string CurrentModuleObject = "ScheduleTypeLimits";
+
+		int num_schedule_type_limits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_schedule_type_limits );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_schedule_type_limits, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "ANY NUMBER", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { true, true } ), lNumericBlanks ) );
+
+
+		CurrentModuleObject = "Schedule:Compact";
+
+		int num_schedule_compact = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 2,  num_schedule_compact );
+
+		TotalArgs = 0;
+		NumAlphas = 0;
+		NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		Array1D_string Alphas2( NumAlphas );
+		Array1D< Real64 > Numbers2( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas, true );
+		Array1D_string cAlphaFields2( NumAlphas );
+		Array1D_string cNumericFields2( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas, Numbers2, NumNumbers, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		// Container size is 4500 here!
+		EXPECT_EQ( 6, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "CONTINUOUSFANSCHEDULE", "ANY NUMBER", "THROUGH: 12/31", "FOR: ALLDAYS", "UNTIL: 24:00", "1.0" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 0, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { } ), Numbers2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { } ), lNumericBlanks2 ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_fan_on_off)
+	{
+		std::string const idf_objects = delimited_string({
+															"Fan:OnOff,",
+															"  Supply Fan 1,           !- Name",
+															"  FanAndCoilAvailSched,   !- Availability Schedule Name",
+															"  0.7,                    !- Fan Total Efficiency",
+															"  600.0,                  !- Pressure Rise{ Pa }",
+															"  1.6,                    !- Maximum Flow Rate{ m3 / s }",
+															"  0.9,                    !- Motor Efficiency",
+															"  1.0,                    !- Motor In Airstream Fraction",
+															"  Zone Exhaust Node,      !- Air Inlet Node Name",
+															"  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+															"  ",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Fan:OnOff";
+
+		int num_fans = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_fans );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_fans, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE",
+																	   "", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 5, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.7, 600, 1.6, 0.9, 1.0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), lNumericBlanks ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_curve_quadratic)
+	{
+		std::string const idf_objects = delimited_string({
+															"Curve:Quadratic,",
+															"  CoolCapFFF,       !- Name",
+															"  0.8,                    !- Coefficient1 Constant",
+															"  0.2,                    !- Coefficient2 x",
+															"  0.0,                    !- Coefficient3 x**2",
+															"  0.5,                    !- Minimum Value of x",
+															"  1.5;                    !- Maximum Value of x",
+															"  ",
+															"Curve:Quadratic,",
+															"  COOLEIRFFF,           !- Name",
+															"  1.1552,                 !- Coefficient1 Constant",
+															"  -0.1808,                !- Coefficient2 x",
+															"  0.0256,                 !- Coefficient3 x**2",
+															"  0.5,                    !- Minimum Value of x",
+															"  1.5;                    !- Maximum Value of x",
+															"  ",
+															"Curve:Quadratic,",
+															"  PLFFPLR,          !- Name",
+															"  0.85,                   !- Coefficient1 Constant",
+															"  0.15,                   !- Coefficient2 x",
+															"  0.0,                    !- Coefficient3 x**2",
+															"  0.0,                    !- Minimum Value of x",
+															"  1.0;                    !- Maximum Value of x",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Quadratic";
+
+		int num_curve_quad = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 3,  num_curve_quad );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 1, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFFF", "", "" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 5, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.8, 0.2, 0, 0.5, 1.5, 0, 0 } ), Numbers ) );
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 1, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFFF", "", "" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 5, NumNumbers2 );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1.1552, -0.1808, 0.0256, 0.5, 1.5, 0, 0 } ), Numbers2 ) );
+
+		int TotalArgs3 = 0;
+		int NumAlphas3 = 0;
+		int NumNumbers3 = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs3, NumAlphas3, NumNumbers3 );
+
+		Array1D_string Alphas3( NumAlphas3 );
+		Array1D< Real64 > Numbers3( NumNumbers3, 0.0 );
+		Array1D_bool lNumericBlanks3( NumNumbers3, true );
+		Array1D_bool lAlphaBlanks3( NumAlphas3, true );
+		Array1D_string cAlphaFields3( NumAlphas3 );
+		Array1D_string cNumericFields3( NumNumbers3 );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 3, Alphas3, NumAlphas3, Numbers3, NumNumbers3, IOStatus, lNumericBlanks3, lAlphaBlanks3, cAlphaFields3, cNumericFields3 );
+
+		EXPECT_EQ( 1, NumAlphas3 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "PLFFPLR", "", "" } ), Alphas3 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, true, true } ), lAlphaBlanks3 ) );
+
+		EXPECT_EQ( 5, NumNumbers3 );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, true, true } ), lNumericBlanks3 ) );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.85, 0.15, 0, 0.0, 1, 0, 0 } ), Numbers3 ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
+	{
+		std::string const idf_objects = delimited_string({
+															"Coil:Cooling:DX:VariableSpeed,",
+															"  Furnace ACDXCoil 1, !- Name",
+															"  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+															"  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+															"  10.0, !- Number of Speeds{ dimensionless }",
+															"  10.0, !- Nominal Speed Level{ dimensionless }",
+															"  32000.0, !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level{ w }",
+															"  1.6, !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }",
+															"  0.0, !- Nominal Time for Condensate to Begin Leaving the Coil{ s }",
+															"  0.0, !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }",
+															"  PLFFPLR, !- Energy Part Load Fraction Curve Name",
+															"  , !- Condenser Air Inlet Node Name",
+															"  AirCooled, !- Condenser Type",
+															"  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
+															"  200.0, !- Crankcase Heater Capacity{ W }",
+															"  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+															"  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation",
+															"  , !- Supply Water Storage Tank Name",
+															"  , !- Condensate Collection Water Storage Tank Name",
+															"  , !- Basin Heater Capacity{ W / K }",
+															"  , !- Basin Heater Setpoint Temperature{ C }",
+															"  , !- Basin Heater Operating Schedule Name",
+															"  1524.1, !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  1877.9, !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  2226.6, !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  2911.3, !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  3581.7, !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  4239.5, !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  4885.7, !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }",
+															"  , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  5520.7, !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  6144.8, !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF, !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+															"  6758.0, !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity{ w }",
+															"  0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }",
+															"  4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }",
+															"  0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }",
+															"  0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }",
+															"  , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }",
+															"  CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name",
+															"  CoolCapFFF, !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+															"  COOLEIRFT, !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+															"  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed";
+
+		int num_coils = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_coils );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_coils, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 49, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "FURNACE ACDXCOIL 1", "DX COOLING COIL AIR INLET NODE", "HEATING COIL AIR INLET NODE", "PLFFPLR", "",
+																	   "AIRCOOLED", "", "", "", "COOLCAPFT",
+																	   "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
+																	   "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
+																	   "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
+																	   "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT",
+																	   "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF",
+																	   "COOLEIRFT", "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT",
+																	   "COOLEIRFFF", "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF",
+																	   "COOLCAPFT", "COOLCAPFFF", "COOLEIRFT", "COOLEIRFFF" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, true, false, true, true, true, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false, false,
+																false, false, false, false, false, false, false, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 72, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 10.0, 10.0, 32000, 1.6, 0, 0, 0, 200, 10.0, -25.0, 0,
+																  2, 1524.1, .75, 4, 0.1359072, 0.26, 0, 1877.9, 0.75, 4.0,
+																  0.151008, 0.30, 0, 2226.6, .75, 4.0, 0.1661088, 0.33, 0, 2911.3,
+																  0.75, 4.0, 0.1963104, 0.38, 0, 3581.7, 0.75, 4.0, 0.226512, 0.44,
+																  0, 4239.5, 0.75, 4.0, 0.2567136, 0.5, 0, 4885.7, 0.75, 4.0,
+																  0.2869152, 0.57, 0, 5520.7, 0.75, 4.0, 0.31711680, 0.63, 0, 6144.8,
+																  .75, 4.0, 0.3473184, 0.69, 0, 6758.0, 0.75, 4.0, 0.37752, 0.74, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, true, false, false, true, true, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true,
+																false, false, false, false, false, true } ), lNumericBlanks ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_curve_biquadratic)
+	{
+		std::string const idf_objects = delimited_string({
+															"Curve:Biquadratic,",
+															"  CoolCapFT,        !- Name",
+															"  0.942587793,            !- Coefficient1 Constant",
+															"  0.009543347,            !- Coefficient2 x",
+															"  0.000683770,            !- Coefficient3 x**2",
+															"  -0.011042676,           !- Coefficient4 y",
+															"  0.000005249,            !- Coefficient5 y**2",
+															"  -0.000009720,           !- Coefficient6 x*y",
+															"  12.77778,               !- Minimum Value of x",
+															"  23.88889,               !- Maximum Value of x",
+															"  18.0,                   !- Minimum Value of y",
+															"  46.11111,               !- Maximum Value of y",
+															"  ,                       !- Minimum Curve Output",
+															"  ,                       !- Maximum Curve Output",
+															"  Temperature,            !- Input Unit Type for X",
+															"  Temperature,            !- Input Unit Type for Y",
+															"  Dimensionless;          !- Output Unit Type",
+															" ",
+															"Curve:Biquadratic,",
+															"  COOLEIRFT,            !- Name",
+															"  0.342414409,            !- Coefficient1 Constant",
+															"  0.034885008,            !- Coefficient2 x",
+															"  -0.000623700,           !- Coefficient3 x**2",
+															"  0.004977216,            !- Coefficient4 y",
+															"  0.000437951,            !- Coefficient5 y**2",
+															"  -0.000728028,           !- Coefficient6 x*y",
+															"  12.77778,               !- Minimum Value of x",
+															"  23.88889,               !- Maximum Value of x",
+															"  18.0,                   !- Minimum Value of y",
+															"  46.11111,               !- Maximum Value of y",
+															"  ,                       !- Minimum Curve Output",
+															"  ,                       !- Maximum Curve Output",
+															"  Temperature,            !- Input Unit Type for X",
+															"  Temperature,            !- Input Unit Type for Y",
+															"  Dimensionless;          !- Output Unit Type",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquad = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 2,  num_curve_biquad );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLCAPFT", "TEMPERATURE", "TEMPERATURE",
+																	   "DIMENSIONLESS" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 12, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.942587793, 0.009543347, 0.000683770, -0.011042676, 0.000005249,
+																  -0.000009720, 12.77778, 23.88889, 18.0, 46.11111,
+																  0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
+																false, false, false, false, true, true } ), lNumericBlanks ) );
+
+
+		int TotalArgs2 = 0;
+		int NumAlphas2 = 0;
+		int NumNumbers2 = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs2, NumAlphas2, NumNumbers2 );
+
+		Array1D_string Alphas2( NumAlphas2 );
+		Array1D< Real64 > Numbers2( NumNumbers2, 0.0 );
+		Array1D_bool lNumericBlanks2( NumNumbers2, true );
+		Array1D_bool lAlphaBlanks2( NumAlphas2, true );
+		Array1D_string cAlphaFields2( NumAlphas2 );
+		Array1D_string cNumericFields2( NumNumbers2 );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, 2, Alphas2, NumAlphas2, Numbers2, NumNumbers2, IOStatus, lNumericBlanks2, lAlphaBlanks2, cAlphaFields2, cNumericFields2 );
+
+		EXPECT_EQ( 4, NumAlphas2 );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "COOLEIRFT", "TEMPERATURE", "TEMPERATURE",
+																	   "DIMENSIONLESS" } ), Alphas2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks2 ) );
+
+		EXPECT_EQ( 12, NumNumbers2 );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 0.342414409, 0.034885008, -0.000623700, 0.004977216, 0.000437951,
+																  -0.000728028, 12.77778, 23.88889, 18.0, 46.11111,
+																  0, 0 } ), Numbers2 ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
+																false, false, false, false, true, true } ), lNumericBlanks2 ) );
+
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+	TEST_F( InputProcessorFixture, getObjectItem_curve_biquadratic2)
+	{
+		std::string const idf_objects = delimited_string({
+															"Curve:Biquadratic,",
+															"  HPACCoolCapFT Speed 1, !- Name",
+															"  1, !- Coefficient1 Constant",
+															"  0, !- Coefficient2 x",
+															"  0, !- Coefficient3 x**2",
+															"  0, !- Coefficient4 y",
+															"  0, !- Coefficient5 y**2",
+															"  0, !- Coefficient6 x*y",
+															"  0, !- Minimum Value of x",
+															"  0, !- Maximum Value of x",
+															"  0, !- Minimum Value of y",
+															"  46.11111, !- Maximum Value of y",
+															"  , !- Minimum Curve Output",
+															"  , !- Maximum Curve Output",
+															"  Temperature, !- Input Unit Type for X",
+															"  Temperature, !- Input Unit Type for Y",
+															"  Dimensionless;           !- Output Unit Type",
+														 });
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		std::string const CurrentModuleObject = "Curve:Biquadratic";
+
+		int num_curve_biquad = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		ASSERT_EQ( 1,  num_curve_biquad );
+
+		int TotalArgs = 0;
+		int NumAlphas = 0;
+		int NumNumbers = 0;
+
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+
+		int IOStatus = 0;
+		Array1D_string Alphas( NumAlphas );
+		Array1D< Real64 > Numbers( NumNumbers, 0.0 );
+		Array1D_bool lNumericBlanks( NumNumbers, true );
+		Array1D_bool lAlphaBlanks( NumAlphas, true );
+		Array1D_string cAlphaFields( NumAlphas );
+		Array1D_string cNumericFields( NumNumbers );
+
+		inputProcessor->getObjectItem( CurrentModuleObject, num_curve_biquad, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+
+		EXPECT_EQ( 4, NumAlphas );
+		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "HPACCOOLCAPFT SPEED 1", "TEMPERATURE", "TEMPERATURE",
+																	   "DIMENSIONLESS" } ), Alphas ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false } ), lAlphaBlanks ) );
+
+		EXPECT_EQ( 12, NumNumbers );
+		EXPECT_TRUE( compare_containers( std::vector< Real64 >( { 1, 0, 0, 0, 0,
+																  0, 0, 0, 0, 46.11111,
+																  0, 0 } ), Numbers ) );
+		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false,
+																false, false, false, false, true, true } ), lNumericBlanks ) );
+		EXPECT_EQ( 1, IOStatus );
+	}
+
+/*
+   TEST_F( InputProcessorFixture, processIDF_json )
+   {
+	  const json schema = initialize();
+	  InputProcessor IP;
+	  IdfParser idf_parser(schema);
+	  State state(schema);
+
+	  std::string const idf = delimited_string({
+															 "Version,",
+															 "8.3;",
+															 "SimulationControl, NO, NO, NO, YES, YES;",
+													   });
+
+	  json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
+											unsigned line_num, unsigned line_index) -> bool {
+		state.traverse(event, parsed, line_num, line_index);
+		return true;
+	  };
+
+	  IP.epJSON = idf_parser.decode(idf, schema);
+	  json::parse(IP.epJSON.dump(2), cb);
+
+	  EXPECT_EQ(2, state.errors + state.warnings);
+
+	  // auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+	  // if ( index != 0 ) index = iListOfObjects( index );
+	  // index = ObjectStartRecord( index );
+	  // EXPECT_EQ( 1, index );
+
+	  json &loc = IP.epJSON["properties"]["Version"];
+
+	  // EXPECT_EQ( "Version", IDFRecords( index ).Name );
+	  EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )
+	  EXPECT_EQ(0, loc['numerics'].size());  // EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	  EXPECT_EQ(1, )  // EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+	  EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.5" } ), IDFRecords( index ).Alphas ) );
+	  EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+	  EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+	  EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+
+	  std::string const simulation_control_name( "SIMULATIONCONTROL" );
+
+	  index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
+	  if ( index != 0 ) index = iListOfObjects( index );
+
+	  index = ObjectStartRecord( index );
+
+	  ASSERT_EQ( 2, index );
+
+	  EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
+	  EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
+	  EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+	  EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+	  EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+	  EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
+	  EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+	  EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+
+   }
+   */
 }

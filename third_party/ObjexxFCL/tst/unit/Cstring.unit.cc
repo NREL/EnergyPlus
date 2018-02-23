@@ -1,8 +1,8 @@
 // ObjexxFCL::Cstring Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -83,7 +83,7 @@ TEST( CstringTest, Construction )
 
 	{ // Length constructors and assignment
 		Cstring s( 5 );
-		EXPECT_EQ( 5U, s.length() );
+		EXPECT_EQ( 5u, s.length() );
 		EXPECT_EQ( "     ", s );
 		EXPECT_TRUE( s.is_blank() );
 		EXPECT_FALSE( s.not_blank() );
@@ -116,13 +116,13 @@ TEST( CstringTest, JustifyTrim )
 	Cstring s( "  Fish " );
 	EXPECT_EQ( 6u, s.len_trim() );
 	EXPECT_EQ( 6u, s.len_trim_whitespace() );
-	s.left_justify();
+	s.ljustify();
 	EXPECT_EQ( "Fish   ", s );
-	s.right_justify();
+	s.rjustify();
 	EXPECT_EQ( "   Fish", s );
-	EXPECT_EQ( "Fish   ", s.left_justified() );
-	s.left_justify();
-	EXPECT_EQ( "   Fish", s.right_justified() );
+	EXPECT_EQ( "Fish   ", s.ljustified() );
+	s.ljustify();
+	EXPECT_EQ( "   Fish", s.rjustified() );
 	s = "Bozo \t ";
 	EXPECT_EQ( 6u, s.len_trim() );
 	EXPECT_EQ( 4u, s.len_trim_whitespace() );

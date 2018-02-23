@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -59,7 +60,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 
 using namespace EnergyPlus;
@@ -132,10 +132,6 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
 
 TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
 
-	int write_stat;
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-
 	std::string const idf_objects = delimited_string( {
 		" Version,8.5;",
 
@@ -169,7 +165,7 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
 			"    Until: 24:00,1.0;        !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -227,6 +223,4 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
 	EXPECT_EQ( 1.0, StandAloneERV( 1 ).DesignHXVolFlowRate );
 	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignSAFanVolFlowRate );
 	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignEAFanVolFlowRate );
-
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 }

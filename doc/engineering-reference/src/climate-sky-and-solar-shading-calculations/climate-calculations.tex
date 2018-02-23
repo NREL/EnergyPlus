@@ -243,6 +243,13 @@ Splitting from global calculated (EnergyPlus) or entered values (WeatherConverte
 
 The solar values on the weather file are average values over the hour. For interpolation of hourly weather data (i.e., when the specified timestep is greater than 1), the average value is assumed to be the value at the midpoint of the hour.~ The reported values in the output are totals for each reporting period. So, hourly reported values will not match the original values in the weather file, but the total solar for a day should agree. Reference (Ellis, Liesen, Pedersen, 2003)
 
+\subsection{Variable Location and Orientation}\label{variable-location-orientation}
+
+EnergyPlus allows for a user to specify that the building is not static for the entire simulation.
+Use of the ``Site:VariableLocation'' object allows for specifying a scheduled building location (by latitude and longitude) and orientation.
+Varying the orientation transforms the vertex locations during a simulation to allow appropriate incident solar on the rotated surfaces.
+Varying the location adjusts the solar calculation terms to account for the changed location.
+
 \subsection{References}\label{references-010}
 
 Walton, G. N. 1983. Thermal Analysis Research Program Reference Manual. NBSSIR 83-2655. National Bureau of Standards, p.~21.

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -338,7 +339,7 @@ TEST_F( EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager )
     "For: AllDays,            !- Field 2",
     "Until: 24:00,30.0;       !- Field 3"
     });
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 	ScheduleManager::ProcessScheduleInput();
@@ -506,13 +507,14 @@ TEST_F( EnergyPlusFixture, CalcScheduledTESSetPoint )
 	SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
 	SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
 
+	// indexes in Schedule
 	int const OnSched  = 1;
 	int const OffSched = 2;
 	std::string const idf_contents( delimited_string( {
 		"Schedule:Constant,MyScheduleOn,,1;",
 		"Schedule:Constant,MyScheduleOff,,0;",
 	} ) );
-	ASSERT_FALSE(process_idf(idf_contents));
+	ASSERT_TRUE(process_idf(idf_contents));
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 	ScheduleManager::ProcessScheduleInput();
@@ -563,7 +565,7 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 
 		} ) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound =  false;
 		DataGlobals::NumOfZones = 1;
 
@@ -598,11 +600,14 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).NumInletNodes = 1;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).IsControlled = true;
 		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode.allocate( 1 );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).AirDistUnitCool.allocate( 1 );
 		DataZoneEquipment::ZoneEquipConfig( 1 ).AirDistUnitHeat.allocate( 1 );
-		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 3;
-		DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = NodeInputManager::GetOnlySingleNode( "KITCHEN AIR NODE", ErrorsFound, "Zone", "SZRHspmTest", DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_ZoneNode, 1, DataLoopNode::ObjectIsNotParent, "Test zone node" );
-		DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
+		int zoneAirNode = NodeInputManager::GetOnlySingleNode( "KITCHEN AIR NODE", ErrorsFound, "Zone", "SZRHspmTest", DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_ZoneNode, 1, DataLoopNode::ObjectIsNotParent, "Test zone node" );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = zoneAirNode;
+		int zoneInletNode = NodeInputManager::GetOnlySingleNode( "KITCHEN DIRECT AIR INLET NODE NAME", ErrorsFound, "Zone", "SZRHspmTest", DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_ZoneInlet, 1, DataLoopNode::ObjectIsNotParent, "Test zone inlet node" );
+		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = zoneInletNode;
+		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
 
 		SetPointManager::GetSetPointManagerInputs();
 		EXPECT_EQ( SetPointManager::SingZoneRhSetPtMgr( 1 ).ControlZoneNum, 1);
@@ -616,9 +621,9 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 		DataAirLoop::AirLoopFlow( 1 ).OAFrac     = 1.0;
 		DataAirLoop::AirLoopFlow( 1 ).OAMinFrac  = 0.8;
 
-		DataLoopNode::Node( 6 ).MassFlowRate     = 1.0; // sent zone inlet mass flwo
-		DataLoopNode::Node( 6 ).HumRat           = 0.0008;
-		DataLoopNode::Node( 6 ).Temp             = 20.0;
+		DataLoopNode::Node( zoneInletNode ).MassFlowRate     = 1.0; // set zone inlet mass flow
+		DataLoopNode::Node( zoneInletNode ).HumRat           = 0.0008;
+		DataLoopNode::Node( zoneInletNode ).Temp             = 20.0;
 
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 0.0;
 		// pick these next values so ExtrRateNoHC doesn't exceed loat to sp
@@ -626,8 +631,8 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).OutputRequiredToHeatingSP = -4000.0;
 		DataZoneEnergyDemands::DeadBandOrSetback( 1 ) = true;
 
-		DataLoopNode::Node( 5 ).Temp = 22.0; // zone air node
-		DataLoopNode::Node( 5 ).HumRat = 0.0008;
+		DataLoopNode::Node( zoneAirNode ).Temp = 22.0; // zone air node
+		DataLoopNode::Node( zoneAirNode ).HumRat = 0.0008;
 
 		DataLoopNode::Node( 2 ).HumRat = 0.0008; // return node
 		DataLoopNode::Node( 2 ).Temp = 22.0;
@@ -650,7 +655,7 @@ TEST_F( EnergyPlusFixture, SZRHOAFractionImpact ) {
 		//  3   OA inlet to Mixer,  Outdoor air supplying OA damper
 		//  4   Fan Outlet Node
 		//  5   Kitchen Air Node
-		//  6   Kitchen Direct Air INlet Node Name
+		//  6   Kitchen Direct Air Inlet Node Name
 		//  7   PSZ-AC_2:2 Supply Equipment Outlet Node
 
 		EXPECT_NEAR( DataLoopNode::Node(7).TempSetPoint , 18.0251495, 0.001);
@@ -783,7 +788,7 @@ TEST_F( EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName )
 		"  AirLoopSetpointNode;     !- Setpoint Node or NodeList Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	// GetInput should fail since reference and set point node names are the same
 	bool ErrorsFound = false;
@@ -858,6 +863,7 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    SPACE1-1 Eq,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1097,10 +1103,10 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 		} ) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound =  false;
-	
-		DataGlobals::NumOfTimeStepInHour = 1; 
+
+		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::MinutesPerTimeStep = 60;
 		ScheduleManager::ProcessScheduleInput();
 
@@ -1118,7 +1124,7 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		DataGlobals::SysSizingCalc = true;
 		SimAirServingZones::GetAirPathData();
 		SimAirServingZones::InitAirLoops( true );
-		// check the number of zones served by single duct or dual duct system 
+		// check the number of zones served by single duct or dual duct system
 		EXPECT_EQ( 1, DataAirLoop::AirToZoneNodeInfo( 1 ).NumZonesCooled ); // cooled and heated zone (served by single-duct)
 		EXPECT_EQ( 0, DataAirLoop::AirToZoneNodeInfo( 1 ).NumZonesHeated ); // no heated only zone (served by dual-duct)
 
@@ -1145,7 +1151,7 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 		EXPECT_DOUBLE_EQ( 16.0, SetPointManager::WarmestSetPtMgr( 1 ).SetPt ); // no cooling load, sets to maximum limit value
 
 		Real64 CpAir( 0.0 );
-		Real64 ZoneSetPointTemp( 0.0 ); 
+		Real64 ZoneSetPointTemp( 0.0 );
 
 		CpAir = Psychrometrics::PsyCpAirFnWTdb( DataLoopNode::Node( 2 ).HumRat, DataLoopNode::Node( 2 ).Temp );
 		ZoneSetPointTemp = DataLoopNode::Node( 5 ).Temp + DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired / ( CpAir * DataLoopNode::Node( 2 ).MassFlowRateMax );
@@ -1156,3 +1162,120 @@ TEST_F( EnergyPlusFixture, ColdestSetPointMgrInSingleDuct ) {
 
 }
 
+TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest )
+{
+	bool ErrorsFound = false;
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.9;",
+
+		"  SetpointManager:OutdoorAirReset,",
+		"    Hot Water Loop Setpoint Manager,  !- Name",
+		"    MaximumTemperature,      !- Control Variable",
+		"    80.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+		"    -17.778,                 !- Outdoor Low Temperature {C}",
+		"    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+		"    21.11,                   !- Outdoor High Temperature {C}",
+		"    HW Supply Outlet Node;   !- Setpoint Node or NodeList Name",
+
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
+
+	SetPointManager::GetSetPointManagerInputs();
+	// check Set Point Manager get inputs
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlVarType, "MAXIMUMTEMPERATURE" );
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlTypeMode, SetPointManager::iCtrlVarType_MaxTemp );
+	EXPECT_EQ( SetPointManager::AllSetPtMgr( 1 ).SPMType, SetPointManager::iSPMType_OutsideAir );
+	EXPECT_EQ( 80.0, SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 );
+	EXPECT_EQ( -17.778, SetPointManager::OutAirSetPtMgr( 1 ).OutLow1 );
+	EXPECT_EQ( 40.0, SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 );
+	EXPECT_EQ( 21.11, SetPointManager::OutAirSetPtMgr( 1 ).OutHigh1 );
+	// set out door dry bukb temp
+	DataEnvironment::OutDryBulbTemp = -20.0;
+	// do init
+	SetPointManager::InitSetPointManagers();
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( 80.0, DataLoopNode::Node( 1 ).TempSetPointHi );
+	// change the low outdoor air setpoint reset value to 60.0C
+	SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 = 60.0;
+	// re simulate OA Reset Set Point Manager
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check the new reset value is set
+	EXPECT_EQ( 60.0, DataLoopNode::Node( 1 ).TempSetPointHi );
+
+	// set out door dry bukb temp
+	DataEnvironment::OutDryBulbTemp = 2.0;
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	//SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
+	Real64 SetPt = 60.0 - ( ( 2.0 - -17.778 ) / ( 21.11 - -17.778 ) ) * ( 60.0 - 40.0 );
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( SetPt, DataLoopNode::Node( 1 ).TempSetPointHi );
+
+}
+
+TEST_F( EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest )
+{
+	bool ErrorsFound = false;
+
+	std::string const idf_objects = delimited_string( {
+		"Version,8.9;",
+
+		"  SetpointManager:OutdoorAirReset,",
+		"    Hot Water Loop Setpoint Manager,  !- Name",
+		"    MinimumTemperature,      !- Control Variable",
+		"    80.0,                    !- Setpoint at Outdoor Low Temperature {C}",
+		"    -17.778,                 !- Outdoor Low Temperature {C}",
+		"    40.0,                    !- Setpoint at Outdoor High Temperature {C}",
+		"    21.11,                   !- Outdoor High Temperature {C}",
+		"    HW Supply Outlet Node;   !- Setpoint Node or NodeList Name",
+
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
+
+	SetPointManager::GetSetPointManagerInputs();
+	// check Set Point Manager get inputs
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlVarType, "MINIMUMTEMPERATURE" );
+	EXPECT_EQ( SetPointManager::OutAirSetPtMgr( 1 ).CtrlTypeMode, SetPointManager::iCtrlVarType_MinTemp );
+	EXPECT_EQ( SetPointManager::AllSetPtMgr( 1 ).SPMType, SetPointManager::iSPMType_OutsideAir );
+	EXPECT_EQ( 80.0, SetPointManager::OutAirSetPtMgr( 1 ).OutLowSetPt1 );
+	EXPECT_EQ( -17.778, SetPointManager::OutAirSetPtMgr( 1 ).OutLow1 );
+	EXPECT_EQ( 40.0, SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 );
+	EXPECT_EQ( 21.11, SetPointManager::OutAirSetPtMgr( 1 ).OutHigh1 );
+	// set out door dry bukb temp
+	DataEnvironment::OutDryBulbTemp = 22.0;
+	// do init
+	SetPointManager::InitSetPointManagers();
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( 40.0, DataLoopNode::Node( 1 ).TempSetPointLo );
+	// change the low outdoor air setpoint reset value to 60.0C
+	SetPointManager::OutAirSetPtMgr( 1 ).OutHighSetPt1 = 35.0;
+	// re simulate OA Reset Set Point Manager
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	// check the new reset value is set
+	EXPECT_EQ( 35.0, DataLoopNode::Node( 1 ).TempSetPointLo );
+
+	// set out door dry bulb temp
+	DataEnvironment::OutDryBulbTemp = 2.0;
+	// check OA Reset Set Point Manager run
+	SetPointManager::SimSetPointManagers();
+	SetPointManager::UpdateSetPointManagers();
+	//SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
+	Real64 SetPt = 80.0 - ( ( 2.0 - -17.778 ) / ( 21.11 - -17.778 ) ) * ( 80.0 - 35.0 );
+	// check OA Reset Set Point Manager sim
+	EXPECT_EQ( SetPt, DataLoopNode::Node( 1 ).TempSetPointLo );
+
+}

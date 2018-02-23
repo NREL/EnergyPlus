@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -53,6 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace EnergyPlus {
 
@@ -94,17 +97,43 @@ namespace GlobalNames {
 	};
 
 	// Object Data
-	extern Array1D< ComponentNameData > ChillerNames;
-	extern Array1D< ComponentNameData > BoilerNames;
-	extern Array1D< ComponentNameData > BaseboardNames;
-	extern Array1D< ComponentNameData > CoilNames;
-	extern Array1D< ComponentNameData > aDUNames;
+	extern std::unordered_map < std::string, std::string > ChillerNames;
+	extern std::unordered_map < std::string, std::string > BoilerNames;
+	extern std::unordered_map < std::string, std::string > BaseboardNames;
+	extern std::unordered_map < std::string, std::string > CoilNames;
+	extern std::unordered_map < std::string, std::string > aDUNames;
 
 	// Functions
 
 	// for unit tests
 	void
 	clear_state();
+
+	void
+	IntraObjUniquenessCheck(
+		std::string & NameToVerify,
+		std::string const & CurrentModuleObject,
+		std::string const & FieldName,
+		std::unordered_set< std::string > & UniqueStrings,
+		bool & ErrorsFound
+	);
+
+	bool
+	VerifyUniqueInterObjectName(
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		std::string const & field_name,
+		bool & ErrorsFound
+	);
+
+	bool
+	VerifyUniqueInterObjectName(
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		bool & ErrorsFound
+	);
 
 	void
 	VerifyUniqueChillerName(
@@ -133,12 +162,12 @@ namespace GlobalNames {
 	void
 	VerifyUniqueCoilName(
 		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
+		std::string & NameToVerify,
 		bool & ErrorFound,
 		std::string const & StringToDisplay
 	);
 
-	void 
+	void
 	VerifyUniqueADUName(
 		std::string const & TypeToVerify,
 		std::string const & NameToVerify,

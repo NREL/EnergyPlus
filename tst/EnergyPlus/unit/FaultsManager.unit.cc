@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -57,7 +58,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
@@ -200,7 +200,7 @@ TEST_F( EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT ) {
 	// PURPOSE OF THIS SUBROUTINE:
 	//     Test the assignment of coil supply air temperature sensor offset fault information
 	//     to the corresponding coil controller
-	
+
 	std::string const idf_objects = delimited_string( {
 		"Version,                                                      ",
 		"   8.6;                !- Version Identifier                  ",
@@ -268,13 +268,13 @@ TEST_F( EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT ) {
 	});
 
 	// Process inputs
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Readin inputs
 	SetPointManager::GetSetPointManagerInputs();
 	HVACControllers::GetControllerInput();
 
-	// Run 
+	// Run
 	CheckAndReadFaults();
 
 	// Check
@@ -289,11 +289,11 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultChillerSWTSensor_CalFaultChillerSW
 {
 	// PURPOSE OF THIS SUBROUTINE:
 	// To check CalFaultChillerSWT which calculates the mass flow rate and supply water temperature of a chiller with faulty SWT sensor.
-	
+
 	bool FlagVariableFlow; // True if chiller is variable flow and false if it is constant flow
 	Real64 FaultyChillerSWTOffset; // Faulty chiller SWT sensor offset
 	Real64 Cp = 4500; // Local fluid specific heat
-	Real64 EvapInletTemp = 12; // Chiller evaporator inlet water temperature 
+	Real64 EvapInletTemp = 12; // Chiller evaporator inlet water temperature
 	Real64 EvapOutletTemp = 7; // Chiller evaporator outlet water temperature, fault free
 	Real64 EvapMassFlowRate = 40; // Chiller mass flow rate, fault free
 	Real64 QEvaporator = 900000; // Chiller evaporator heat transfer rate, fault free
@@ -301,33 +301,33 @@ TEST_F( EnergyPlusFixture, FaultsManager_FaultChillerSWTSensor_CalFaultChillerSW
 
 	//1) offset is 0C
 	FlagVariableFlow = false;
-	Real64 EvapOutletTemp_1 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapOutletTemp_1 = EvapOutletTemp; // Chiller evaporator outlet water temperature
 	Real64 EvapMassFlowRate_1 = EvapMassFlowRate; // Chiller mass flow rate
 	Real64 QEvaporator_1 = QEvaporator; // Chiller evaporator heat transfer rate
 	FaultyChillerSWTOffset = 0;
 	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_1, EvapMassFlowRate_1, QEvaporator_1 );
 	EXPECT_EQ( 1, EvapOutletTemp_1/EvapOutletTemp );
 	EXPECT_EQ( 1, QEvaporator_1/QEvaporator );
-	
+
 	//2) offset is 2C
-	Real64 EvapOutletTemp_2 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapOutletTemp_2 = EvapOutletTemp; // Chiller evaporator outlet water temperature
 	Real64 EvapMassFlowRate_2 = EvapMassFlowRate; // Chiller mass flow rate
 	Real64 QEvaporator_2 = QEvaporator; // Chiller evaporator heat transfer rate
 	FaultyChillerSWTOffset = 2;
 	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_2, EvapMassFlowRate_2, QEvaporator_2 );
 	EXPECT_NEAR( 0.714, EvapOutletTemp_2/EvapOutletTemp, 0.001 );
 	EXPECT_NEAR( 1.400, QEvaporator_2/QEvaporator, 0.001 );
-	
-	
+
+
 	//3) offset is -2C
-	Real64 EvapOutletTemp_3 = EvapOutletTemp; // Chiller evaporator outlet water temperature 
+	Real64 EvapOutletTemp_3 = EvapOutletTemp; // Chiller evaporator outlet water temperature
 	Real64 EvapMassFlowRate_3 = EvapMassFlowRate; // Chiller mass flow rate
 	Real64 QEvaporator_3 = QEvaporator; // Chiller evaporator heat transfer rate
 	FaultyChillerSWTOffset = -2;
 	FaultChiller.CalFaultChillerSWT( FlagVariableFlow, FaultyChillerSWTOffset, Cp, EvapInletTemp, EvapOutletTemp_3, EvapMassFlowRate_3, QEvaporator_3 );
 	EXPECT_NEAR( 1.285, EvapOutletTemp_3/EvapOutletTemp, 0.001 );
 	EXPECT_NEAR( 0.600, QEvaporator_3/QEvaporator, 0.001 );
-	
+
 }
 
 TEST_F( EnergyPlusFixture, FaultsManager_CalFaultOffsetAct )
@@ -341,7 +341,7 @@ TEST_F( EnergyPlusFixture, FaultsManager_CalFaultOffsetAct )
 	Fault.AvaiSchedPtr = -1;
 	Fault.SeveritySchedPtr = -1;
 	Fault.Offset = 10;
-	
+
 	// Run and Check
 	OffsetAct = Fault.CalFaultOffsetAct();
 	EXPECT_EQ( 10, OffsetAct );

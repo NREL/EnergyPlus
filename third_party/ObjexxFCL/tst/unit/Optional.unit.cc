@@ -1,8 +1,8 @@
 // ObjexxFCL::Optional Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/string.functions.hh> // For concatenation operators
 #include "ObjexxFCL.unit.hh"
 
 // C++ Headers
@@ -113,6 +114,14 @@ TEST( OptionalTest, StringAssignment )
 	o = "New string";
 	EXPECT_EQ( "New string", o() ); // Need the () on o() when types don't match exactly
 	EXPECT_EQ( "New string", s );
+}
+
+TEST( OptionalTest, StringConversion )
+{
+	std::string const s( "Dog" );
+	Optional_string_const o( s );
+	EXPECT_EQ( std::string( "Dog Run" ), o + " Run" );
+	EXPECT_EQ( std::string( "Fast Dog" ), "Fast " + o );
 }
 
 TEST( OptionalTest, ConstReference )

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -59,7 +60,6 @@
 #include <DataRoomAirModel.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -94,7 +94,6 @@ namespace MundtSimMgr {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using InputProcessor::SameString;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -371,12 +370,12 @@ namespace MundtSimMgr {
 
 						AirNodeFoundFlag = false;
 						for ( AirNodeNum = AirNodeBeginNum; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum ) {
-							if ( SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
+							if ( UtilityRoutines::SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
 								LineNode( NodeNum, MundtZoneIndex ).ClassType = AirNode( AirNodeNum ).ClassType;
 								LineNode( NodeNum, MundtZoneIndex ).AirNodeName = AirNode( AirNodeNum ).Name;
 								LineNode( NodeNum, MundtZoneIndex ).Height = AirNode( AirNodeNum ).Height;
 								LineNode( NodeNum, MundtZoneIndex ).SurfMask = AirNode( AirNodeNum ).SurfMask;
-								SetupOutputVariable( "Room Air Node Air Temperature [C]", LineNode( NodeNum, MundtZoneIndex ).Temp, "HVAC", "Average", LineNode( NodeNum, MundtZoneIndex ).AirNodeName );
+								SetupOutputVariable( "Room Air Node Air Temperature", OutputProcessor::Unit::C, LineNode( NodeNum, MundtZoneIndex ).Temp, "HVAC", "Average", LineNode( NodeNum, MundtZoneIndex ).AirNodeName );
 
 								AirNodeBeginNum = AirNodeNum + 1;
 								AirNodeFoundFlag = true;
@@ -547,7 +546,7 @@ namespace MundtSimMgr {
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
-			SumAllReturnAirConvectionGains( ZoneNum, RetAirConvGain );
+			SumAllReturnAirConvectionGains( ZoneNum, RetAirConvGain, 0 );
 			ConvIntGain += RetAirConvGain;
 		}
 
