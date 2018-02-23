@@ -178,6 +178,7 @@
 
 // C++ Headers
 #include <iostream>
+#include <fstream>
 #include <exception>
 #ifndef NDEBUG
 #ifdef __unix__
@@ -204,12 +205,16 @@
 #include <DisplayRoutines.hh>
 #include <FileSystem.hh>
 #include <FluidProperties.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/IdfParser.hh>
+#include <InputProcessing/InputValidation.hh>
+#include <InputProcessing/DataStorage.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
+#include <DataIPShortCuts.hh>
 
 #ifdef _WIN32
  #include <stdlib.h>
@@ -253,7 +258,6 @@ EnergyPlusPgm( std::string const & filepath )
 	using DataEnvironment::IgnoreDiffuseRadiation;
 	// routine modules
 	using namespace FileSystem;
-	using namespace InputProcessor;
 	using namespace OutputProcessor;
 	using namespace SimulationManager;
 	using ScheduleManager::ReportOrphanSchedules;
@@ -364,7 +368,7 @@ EnergyPlusPgm( std::string const & filepath )
 	if ( ! cEnvValue.empty() ) SortedIDD = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( MinReportFrequencyEnvVar, cEnvValue );
-	if ( ! cEnvValue.empty() ) cMinReportFrequency = cEnvValue; // turned into value later
+	if ( ! cEnvValue.empty() ) MinReportFrequency = cEnvValue; // turned into value later
 
 	get_environment_variable( cDeveloperFlag, cEnvValue );
 	if ( ! cEnvValue.empty() ) DeveloperFlag = env_var_on( cEnvValue ); // Yes or True
@@ -443,8 +447,8 @@ EnergyPlusPgm( std::string const & filepath )
 	DisplayString( VerString );
 
 	try {
-
-		ProcessInput();
+		EnergyPlus::inputProcessor = InputProcessor::factory();
+		EnergyPlus::inputProcessor->processInput();
 
 		ManageSimulation();
 
@@ -454,7 +458,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 		ShowPsychrometricSummary();
 
-		ReportOrphanRecordObjects();
+		EnergyPlus::inputProcessor->reportOrphanRecordObjects();
 		ReportOrphanFluids();
 		ReportOrphanSchedules();
 
@@ -471,8 +475,8 @@ EnergyPlusPgm( std::string const & filepath )
 				}
 			}
 
-			std::string const RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
-			std::string const MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+			std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
+			std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
 
 			int fileUnitNumber;
 			int iostatus;

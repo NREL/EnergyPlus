@@ -322,6 +322,11 @@ namespace DualDuct {
 	//        End of Reporting subroutines for the Damper Module
 	// *****************************************************************************
 
+	// Clears the global data in DualDuct.
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
+
 } // DualDuct
 
 } // EnergyPlus

@@ -1734,9 +1734,9 @@
 
   Output:Variable,*,Cooling Coil Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,timestep;
+  Output:Variable,*,Heating Coil Heating Energy,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 

@@ -53,16 +53,9 @@ extern "C" {
 #include <FMI/main.h>
 }
 
-
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
 #include <ExternalInterface.hh>
-#include <General.hh>
-#include <InputProcessor.hh>
-#include <UtilityRoutines.hh>
 
 // C++ Standard Library Headers
 #include <string>

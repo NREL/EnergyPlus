@@ -146,6 +146,10 @@ namespace PoweredInductionUnits {
 		Real64 SensCoolRate; // unit sensible heat removal rate from zone [W]
 		Real64 SensCoolEnergy; // unit sensible heat removal from zone [J]
 
+		int CtrlZoneNum; //index for control zone
+		int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+		int AirLoopNum; // index for the air loop that this terminal is connected to.
+
 		// Default Constructor
 		PowIndUnitData() :
 			UnitType_Num( 0 ),
@@ -194,7 +198,10 @@ namespace PoweredInductionUnits {
 			HeatingRate( 0.0 ),
 			HeatingEnergy( 0.0 ),
 			SensCoolRate( 0.0 ),
-			SensCoolEnergy( 0.0 )
+			SensCoolEnergy( 0.0 ),
+			CtrlZoneNum( 0 ), // index for control zone
+			ctrlZoneInNodeIndex( 0 ),
+			AirLoopNum( 0 ) 
 		{}
 
 	};
@@ -203,6 +210,9 @@ namespace PoweredInductionUnits {
 	extern Array1D< PowIndUnitData > PIU;
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimPIU(
@@ -251,9 +261,6 @@ namespace PoweredInductionUnits {
 
 	void
 	PIUInducesPlenumAir( int const NodeNum ); // induced air node number
-
-	void
-	clear_state();
 
 } // PoweredInductionUnits
 

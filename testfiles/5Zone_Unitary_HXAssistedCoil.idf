@@ -2908,7 +2908,7 @@
 
   Output:Variable,*,Fan Electric Power,hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Gas Rate,hourly;
 

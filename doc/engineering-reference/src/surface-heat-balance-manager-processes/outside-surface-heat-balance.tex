@@ -781,6 +781,19 @@ Where \emph{V\(_{z}\)} is the wind velocity in m/s that has been adjusted for he
 
 The conduction term, \({q''_{ko}}\) \(_{,}\) can in theory be calculated using a wide variety of heat conduction formulations. Typically in EnergyPlus, the Conduction Transfer Function (CTF) method is used. The available models are described in this section: Conduction Through The Walls.
 
+\subsection{Additional Heat Balance Source}\label{additonal-heat-balance-source}
+
+EnergyPlus also enables importing the pre-calculated results of other heat transfer processes, such as evaporative cooling envelope. An additional heat source term defined as a surface property would enable the consideration of these processes to be imported as schedules in the exterior surface heat balance calculation in EnergyPlus.
+
+The heat balance on the outside face is then modified as:
+
+\begin{equation}
+{q''_{\alpha sol}} + {q''_{LWR}} + {q''_{conv}} + {q''_{add}} - {q''_{ko}} = 0
+\end{equation}
+
+where:
+\(q''_{add}\) = Pre-calculated results of the heat flux to the outside face from other heat transfer processes.
+
 \subsection{References}\label{references-1-013}
 
 ASHRAE. 1981. 1981 ASHRAE Handbook -- Fundamentals, Atlanta: American Society of Heating, Refrigerating, and Air-Conditioning Engineers, Inc.

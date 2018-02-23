@@ -2200,7 +2200,7 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 

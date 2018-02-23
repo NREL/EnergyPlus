@@ -121,6 +121,15 @@ ValidateComponent(
 	std::string const & CallString // Context of this pair -- for error message
 );
 
+    void
+    ValidateComponent(
+            std::string const & CompType, // Component Type (e.g. Chiller:Electric)
+            std::string const & CompValType, //Component "name" field type
+            std::string const & CompName, // Component Name (e.g. Big Chiller)
+            bool & IsNotOK, // .TRUE. if this component pair is invalid
+            std::string const & CallString // Context of this pair -- for error message
+    );
+
 void
 CalcPassiveExteriorBaffleGap(
 	Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
