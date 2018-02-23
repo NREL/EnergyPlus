@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
+#include "ConfiguredFunctions.hh"
 
 namespace EnergyPlus {
 

@@ -20,6 +20,9 @@
 .directory
 .DS_Store
 
+# ignore Energy+.schema.epJSON while it is auto-generated from IDD
+Energy+.schema.epJSON.in
+
 # now that we have python, ignore some things
 *.pyc
 
