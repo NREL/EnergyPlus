@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,8 @@
 #include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -110,11 +111,11 @@ namespace EnergyPlus {
 
 		// Search through finite diff models here
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_FiniteDiffGroundTemp );
-		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrModels = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( objectName == cAlphaArgs( 1 ) ) {
 				// Read input into object here

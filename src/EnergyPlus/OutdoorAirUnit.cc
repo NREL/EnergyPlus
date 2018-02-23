@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,13 +73,14 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HVACUnitarySystem.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -128,8 +129,6 @@ namespace OutdoorAirUnit {
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::DrawThru;
 	using DataHVACGlobals::BlowThru;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
@@ -191,6 +190,9 @@ namespace OutdoorAirUnit {
 
 	// Object Data
 	Array1D< OAUnitData > OutAirUnit;
+	std::unordered_set< std::string > SupplyFanUniqueNames;
+	std::unordered_set< std::string > ExhaustFanUniqueNames;
+	std::unordered_set< std::string > ComponentListUniqueNames;
 
 	namespace {
 		bool MyOneTimeFlag( true );
@@ -209,6 +211,9 @@ namespace OutdoorAirUnit {
 		CheckEquipName.deallocate();
 		MyOneTimeErrorFlag.deallocate();
 		OutAirUnit.deallocate();
+		SupplyFanUniqueNames.clear();
+		ExhaustFanUniqueNames.clear();
+		ComponentListUniqueNames.clear();
 		MyOneTimeFlag = true;
 		ZoneEquipmentListChecked = false;
 	}
@@ -237,24 +242,8 @@ namespace OutdoorAirUnit {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OAUnitNum; // index of outdoor air unit being simulated
@@ -268,7 +257,7 @@ namespace OutdoorAirUnit {
 		// Find the correct Outdoor Air Unit
 
 		if ( CompIndex == 0 ) {
-			OAUnitNum = FindItemInList( CompName, OutAirUnit );
+			OAUnitNum = UtilityRoutines::FindItemInList( CompName, OutAirUnit );
 			if ( OAUnitNum == 0 ) {
 				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
@@ -322,7 +311,6 @@ namespace OutdoorAirUnit {
 		// Mixed Air.cc
 
 		// Using/Aliasing
-		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
@@ -365,18 +353,8 @@ namespace OutdoorAirUnit {
 		using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetOutdoorAirUnitInputs: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -390,8 +368,6 @@ namespace OutdoorAirUnit {
 		int InListNum;
 		int ListNum;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -411,10 +387,10 @@ namespace OutdoorAirUnit {
 
 		if ( ! GetOutdoorAirUnitInputFlag ) return;
 
-		GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CO_OAUnit ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CO_OAEqList ), TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -427,26 +403,22 @@ namespace OutdoorAirUnit {
 		cAlphaArgs.allocate( NumAlphas );
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
-		NumOfOAUnits = GetNumObjectsFound( CurrentModuleObject );
+		NumOfOAUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
+		SupplyFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
+		ExhaustFanUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
+		ComponentListUniqueNames.reserve(static_cast< unsigned >( NumOfOAUnits ) );
 		MyOneTimeErrorFlag.dimension( NumOfOAUnits, true );
 		CheckEquipName.dimension( NumOfOAUnits, true );
 
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 
-			GetObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OutAirUnit, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, OAUnitNum, cAlphaArgs, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs(1),CurrentModuleObject,ErrorsFound);
+
 			//A1
 			OutAirUnit( OAUnitNum ).Name = cAlphaArgs( 1 );
-			IsNotOK = false;
-			IsBlank = false;
 
 			//A2
 			OutAirUnit( OAUnitNum ).SchedName = cAlphaArgs( 2 );
@@ -462,7 +434,7 @@ namespace OutdoorAirUnit {
 
 			//A3
 			OutAirUnit( OAUnitNum ).ZoneName = cAlphaArgs( 3 );
-			OutAirUnit( OAUnitNum ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
+			OutAirUnit( OAUnitNum ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 
 			if ( OutAirUnit( OAUnitNum ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
@@ -487,11 +459,7 @@ namespace OutdoorAirUnit {
 
 			//A5
 			OutAirUnit( OAUnitNum ).SFanName = cAlphaArgs( 5 );
-			VerifyName( cAlphaArgs( 5 ), OutAirUnit, &OAUnitData::SFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Supply Fan Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 5 ) = "xxxxx";
-			}
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 5 ), CurrentModuleObject, cAlphaFields( 5 ), SupplyFanUniqueNames, ErrorsFound );
 			errFlag = false;
 			if ( HVACFan::checkIfFanNameIsAFanSystem( OutAirUnit( OAUnitNum ).SFanName ) ) { //no object type in input, so check if Fan:SystemModel
 				OutAirUnit( OAUnitNum ).SFanType = DataHVACGlobals::FanType_SystemModelObject;
@@ -512,8 +480,8 @@ namespace OutdoorAirUnit {
 				}
 			}
 			//A6 :Fan Place
-			if ( SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
-			if ( SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "BlowThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "DrawThrough" ) ) OutAirUnit( OAUnitNum ).FanPlace = DrawThru;
 			if ( OutAirUnit( OAUnitNum ).FanPlace == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFields( 6 ) + " = " + cAlphaArgs( 6 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -530,11 +498,7 @@ namespace OutdoorAirUnit {
 				}
 			} else if ( ! lAlphaBlanks( 7 ) ) {
 				OutAirUnit( OAUnitNum ).ExtFanName = cAlphaArgs( 7 );
-				VerifyName( cAlphaArgs( 7 ), OutAirUnit, &OAUnitData::ExtFanName, OAUnitNum - 1, IsNotOK, IsBlank, "OA Unit Exhaust Fan Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 7 ) = "xxxxx";
-				}
+				GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 7 ), CurrentModuleObject, cAlphaFields( 7 ), ExhaustFanUniqueNames, ErrorsFound );
 				errFlag = false;
 				if ( HVACFan::checkIfFanNameIsAFanSystem( OutAirUnit( OAUnitNum ).ExtFanName ) ) { //no object type in input, so check if Fan:SystemModel
 					OutAirUnit( OAUnitNum ).ExtFanType = DataHVACGlobals::FanType_SystemModelObject;
@@ -581,7 +545,6 @@ namespace OutdoorAirUnit {
 			}
 
 			if ( OutAirUnit( OAUnitNum ).ExtFan ) {
-
 				SetUpCompSets( CurrentModuleObject, OutAirUnit( OAUnitNum ).Name, "UNDEFINED", cAlphaArgs( 7 ), "UNDEFINED", "UNDEFINED" );
 			}
 
@@ -652,17 +615,14 @@ namespace OutdoorAirUnit {
 			}
 
 			//A16 : component list
-			VerifyName( cAlphaArgs( 16 ), OutAirUnit, &OAUnitData::ComponentListName, OAUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObjects( CO_OAEqList ) + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 16 ) = "xxxxx";
-			}
+
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 16 ), CurrentModuleObject, cAlphaFields( 16 ), ComponentListUniqueNames, ErrorsFound );
 			ComponentListName = cAlphaArgs( 16 );
 			OutAirUnit( OAUnitNum ).ComponentListName = ComponentListName;
 			if ( ! lAlphaBlanks( 16 ) ) {
-				ListNum = GetObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
+				ListNum = inputProcessor->getObjectItemNum( CurrentModuleObjects( CO_OAEqList ), ComponentListName );
 				if ( ListNum > 0 ) {
-					GetObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+					inputProcessor->getObjectItem( CurrentModuleObjects( CO_OAEqList ), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 					NumInList = ( NumAlphas - 1 ) / 2; // potential problem if puts in type but not name
 					if ( mod( NumAlphas - 1, 2 ) != 0 ) ++NumInList;
 					OutAirUnit( OAUnitNum ).NumComponents = NumInList;
@@ -673,7 +633,7 @@ namespace OutdoorAirUnit {
 						OutAirUnit( OAUnitNum ).OAEquip( InListNum ).ComponentName = AlphArray( InListNum * 2 + 1 );
 						OutAirUnit( OAUnitNum ).OAEquip( InListNum ).ComponentType = AlphArray( InListNum * 2 );
 						CompNum = InListNum;
-						{ auto const SELECT_CASE_var( MakeUPPERCase( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) );
+						{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType ) );
 						// Coil Types
 						if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
 							OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = WaterCoil_Cooling;
@@ -1163,12 +1123,8 @@ namespace OutdoorAirUnit {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using DataEnvironment::StdRhoAir;
 		using DataHVACGlobals::cFanTypes;
 		using DataPlant::PlantLoop;
@@ -1184,17 +1140,8 @@ namespace OutdoorAirUnit {
 		using SteamCoils::SimulateSteamCoilComponents;
 		using WaterCoils::SimulateWaterCoilComponents;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeOutdoorAirUnit" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1301,8 +1248,8 @@ namespace OutdoorAirUnit {
 		if( OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize ) {
 			if ( OutAirUnit( OAUnitNum ).SFanType != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( OutAirUnit( OAUnitNum ).SFanName, true, OutAirUnit( OAUnitNum ).SFan_Index, _, false, false );
-				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );			
-			
+				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( OutAirUnit( OAUnitNum ).SFanType ), OutAirUnit( OAUnitNum ).SFanName, ErrorsFound );
+
 			} else {
 				HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,_,_,_);
 				OutAirUnit( OAUnitNum ).SFanMaxAirVolFlow = HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->designAirVolFlowRate;
@@ -1485,7 +1432,7 @@ namespace OutdoorAirUnit {
 				} else {
 					HVACFan::fanObjs[ OutAirUnit( OAUnitNum ).SFan_Index ]->simulate(_,ZoneCompTurnFansOn,ZoneCompTurnFansOff,_);
 				}
-				
+
 				SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				if ( OutAirUnit( OAUnitNum ).ExtFan ) {
 					if ( OutAirUnit( OAUnitNum ).ExtFanType != DataHVACGlobals::FanType_SystemModelObject ) {
@@ -1701,24 +1648,6 @@ namespace OutdoorAirUnit {
 
 		// PURPOSE OF THIS SUBROUTINE
 		// Simulate the controllers and components in the outside air system.
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
-		// Using/Aliasing
-//		using InputProcessor::FindItemInList;
-//		using DataSizing::AutoSize;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EquipNum;

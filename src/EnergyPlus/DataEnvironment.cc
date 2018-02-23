@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -116,6 +116,7 @@ namespace DataEnvironment {
 	int DSTIndicator; // Daylight Saving Time Indicator (1=yes, 0=no) for Today
 	Real64 Elevation; // Elevation of this building site
 	bool EndMonthFlag; // Set to true on last day of month
+	bool EndYearFlag; // Set to true on the last day of year
 	Real64 GndReflectanceForDayltg; // Ground visible reflectance for use in daylighting calc
 	Real64 GndReflectance; // Ground visible reflectance from input
 	Real64 GndSolarRad; // Current ground reflected radiation

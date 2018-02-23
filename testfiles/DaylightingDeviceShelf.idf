@@ -723,7 +723,7 @@
     10;                      !- Number of Y Grid Points
 
   Output:IlluminanceMap,
-    Daylit Map,              !- Name
+    Daylit Map 2,            !- Name
     Daylit Zone,             !- Zone Name
     0.0,                     !- Z height {m}
     0.1,                     !- X Minimum Coordinate {m}

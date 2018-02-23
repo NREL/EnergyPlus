@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,7 +48,7 @@
 // EnergyPlus Headers
 #include <GlobalNames.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -80,8 +80,6 @@ namespace GlobalNames {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
-	using InputProcessor::FindItemInList;
-	using InputProcessor::MakeUPPERCase;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -103,13 +101,87 @@ namespace GlobalNames {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
 	// Object Data
-	Array1D< ComponentNameData > ChillerNames;
-	Array1D< ComponentNameData > BoilerNames;
-	Array1D< ComponentNameData > BaseboardNames;
-	Array1D< ComponentNameData > CoilNames;
-	Array1D< ComponentNameData > aDUNames;
+	std::unordered_map < std::string, std::string > ChillerNames;
+	std::unordered_map < std::string, std::string > BoilerNames;
+	std::unordered_map < std::string, std::string > BaseboardNames;
+	std::unordered_map < std::string, std::string > CoilNames;
+	std::unordered_map < std::string, std::string > aDUNames;
 
 	// Functions
+
+	void
+	IntraObjUniquenessCheck(
+		std::string & NameToVerify,
+		std::string const & CurrentModuleObject,
+		std::string const & FieldName,
+		std::unordered_set< std::string > & UniqueStrings,
+		bool & ErrorsFound
+	)
+	{
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( "E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field" );
+			ErrorsFound = true;
+			NameToVerify = "xxxxx";
+			return;
+		}
+
+		auto const & find_string = UniqueStrings.find( NameToVerify );
+		if ( find_string == UniqueStrings.end() ) {
+			UniqueStrings.emplace( NameToVerify );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( CurrentModuleObject + " has a duplicate field " + NameToVerify );
+		}
+	}
+
+	bool
+	VerifyUniqueInterObjectName(
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		std::string const & field_name,
+		bool & ErrorsFound
+	) {
+		if ( object_name.empty() ) {
+			ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
+			ErrorsFound = true;
+			object_name = "xxxxx";
+			return true;
+		}
+		auto const & names_iter = names.find( object_name );
+		if ( names_iter == names.end() ) {
+			names.emplace( object_name, object_type );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+			return true;
+		}
+		return false;
+	}
+
+	bool
+	VerifyUniqueInterObjectName(
+		std::unordered_map< std::string, std::string > & names,
+		std::string & object_name,
+		std::string const & object_type,
+		bool & ErrorsFound
+	) {
+		if ( object_name.empty() ) {
+			ShowSevereError("E+ object type " + object_name + " has a blank field");
+			ErrorsFound = true;
+			object_name = "xxxxx";
+			return true;
+		}
+		auto const & names_iter = names.find( object_name );
+		if ( names_iter == names.end() ) {
+			names.emplace( object_name, object_type );
+		} else {
+			ErrorsFound = true;
+			ShowSevereError( object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second );
+			return true;
+		}
+		return false;
+	}
 
 	void
 	VerifyUniqueChillerName(
@@ -130,50 +202,17 @@ namespace GlobalNames {
 		// This subroutine verifys that a new name will be unique in the list of
 		// chillers.  If not found in the list, it is added before returning.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
-
 		ErrorFound = false;
-		int Found = 0;
-		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames, &ComponentNameData::CompName, NumChillers );
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + ChillerNames( Found ).CompType + "\"." );
+		auto const iter = ChillerNames.find( NameToVerify );
+		if ( iter != ChillerNames.end() ) {
+			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\"." );
 			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
 		} else {
-			if ( NumChillers == 0 ) {
-				CurMaxChillers = 4;
-				ChillerNames.allocate( CurMaxChillers );
-			} else if ( NumChillers == CurMaxChillers ) {
-				CurMaxChillers += 4;
-				ChillerNames.redimension( CurMaxChillers );
-			}
-			++NumChillers;
-			ChillerNames( NumChillers ).CompType = MakeUPPERCase( TypeToVerify );
-			ChillerNames( NumChillers ).CompName = NameToVerify;
+			ChillerNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
+			NumChillers = static_cast< int >( ChillerNames.size() );
 		}
+
 	}
 
 	void
@@ -195,52 +234,16 @@ namespace GlobalNames {
 		// This subroutine verifys that a new name will be unique in the list of
 		// Baseboards.  If not found in the list, it is added before returning.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
-
-		ErrorFound = false;
-		int Found = 0;
-
-		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames, &ComponentNameData::CompName, NumBaseboards );
-
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + BaseboardNames( Found ).CompType + "\"." );
-			ShowContinueError( "...Current entry is Baseboard Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			if ( NumBaseboards == 0 ) {
-				CurMaxBaseboards = 4;
-				BaseboardNames.allocate( CurMaxBaseboards );
-			} else if ( NumBaseboards == CurMaxBaseboards ) {
-				CurMaxBaseboards += 4;
-				BaseboardNames.redimension( CurMaxBaseboards );
-			}
-			++NumBaseboards;
-			BaseboardNames( NumBaseboards ).CompType = TypeToVerify;
-			BaseboardNames( NumBaseboards ).CompName = NameToVerify;
-		}
+        ErrorFound = false;
+        auto const iter = BaseboardNames.find( NameToVerify );
+        if ( iter != BaseboardNames.end() ) {
+            ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\"." );
+            ShowContinueError( "...Current entry is Baseboard Type=\"" + TypeToVerify + "\"." );
+            ErrorFound = true;
+        } else {
+            BaseboardNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
+            NumBaseboards = static_cast< int >( BaseboardNames.size() );
+        }
 
 	}
 
@@ -263,59 +266,23 @@ namespace GlobalNames {
 		// This subroutine verifys that a new name will be unique in the list of
 		// Boilers.  If not found in the list, it is added before returning.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
-
-		ErrorFound = false;
-		int Found = 0;
-
-		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames, &ComponentNameData::CompName, NumBoilers );
-
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + BoilerNames( Found ).CompType + "\"." );
-			ShowContinueError( "...Current entry is Boiler Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			if ( NumBoilers == 0 ) {
-				CurMaxBoilers = 4;
-				BoilerNames.allocate( CurMaxBoilers );
-			} else if ( NumBoilers == CurMaxBoilers ) {
-				CurMaxBoilers += 4;
-				BoilerNames.redimension( CurMaxBoilers );
-			}
-			++NumBoilers;
-			BoilerNames( NumBoilers ).CompType = TypeToVerify;
-			BoilerNames( NumBoilers ).CompName = NameToVerify;
-		}
+        ErrorFound = false;
+        auto const iter = BoilerNames.find( NameToVerify );
+        if ( iter != BoilerNames.end() ) {
+            ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\"." );
+            ShowContinueError( "...Current entry is Boiler Type=\"" + TypeToVerify + "\"." );
+            ErrorFound = true;
+        } else {
+            BoilerNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
+            NumBoilers = static_cast< int >( BoilerNames.size() );
+        }
 
 	}
 
 	void
 	VerifyUniqueCoilName(
 		std::string const & TypeToVerify,
-		std::string const & NameToVerify,
+		std::string & NameToVerify,
 		bool & ErrorFound,
 		std::string const & StringToDisplay
 	)
@@ -331,52 +298,23 @@ namespace GlobalNames {
 		// This subroutine verifys that a new name will be unique in the list of
 		// Coils.  If not found in the list, it is added before returning.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
-
-		ErrorFound = false;
-		int Found = 0;
-
-		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames, &ComponentNameData::CompName, NumCoils );
-
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
-			ShowContinueError( "...Current entry is Coil Type=\"" + TypeToVerify + "\"." );
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( "\"" + TypeToVerify + "\" cannot have a blank field" );
 			ErrorFound = true;
-		} else {
-			if ( NumCoils == 0 ) {
-				CurMaxCoils = 4;
-				CoilNames.allocate( CurMaxCoils );
-			} else if ( NumCoils == CurMaxCoils ) {
-				CurMaxCoils += 4;
-				CoilNames.redimension( CurMaxCoils );
-			}
-			++NumCoils;
-			CoilNames( NumCoils ).CompType = MakeUPPERCase( TypeToVerify );
-			CoilNames( NumCoils ).CompName = NameToVerify;
+			NameToVerify = "xxxxx";
+			return;
 		}
+
+        ErrorFound = false;
+        auto const iter = CoilNames.find( NameToVerify );
+        if ( iter != CoilNames.end() ) {
+            ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\"." );
+            ShowContinueError( "...Current entry is Coil Type=\"" + TypeToVerify + "\"." );
+            ErrorFound = true;
+        } else {
+            CoilNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
+            NumCoils = static_cast< int >( CoilNames.size() );
+        }
 
 	}
 
@@ -388,23 +326,16 @@ namespace GlobalNames {
 		std::string const & StringToDisplay
 	)
 	{
-
-		ComponentNameData aDUData;
-		ErrorFound = false;
-		int Found = 0;
-
-		if ( numAirDistUnits > 0 ) Found = FindItemInList( NameToVerify, aDUNames, &ComponentNameData::CompName, numAirDistUnits );
-
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + aDUNames( Found ).CompType + "\"" );
-			ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
-			ErrorFound = true;
-		} else {
-			++numAirDistUnits;
-			aDUData.CompType = MakeUPPERCase( TypeToVerify );
-			aDUData.CompName = NameToVerify;
-			aDUNames.push_back( aDUData );
-		}
+        ErrorFound = false;
+        auto const iter = aDUNames.find( NameToVerify );
+        if ( iter != aDUNames.end() ) {
+            ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\"." );
+            ShowContinueError( "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\"." );
+            ErrorFound = true;
+        } else {
+            aDUNames.emplace( NameToVerify, UtilityRoutines::MakeUPPERCase( TypeToVerify ) );
+            numAirDistUnits = static_cast< int >( aDUNames.size() );
+        }
 
 	}
 
@@ -423,11 +354,11 @@ namespace GlobalNames {
 		CurMaxBaseboards = 0;
 		CurMaxCoils = 0;
 
-		ChillerNames.deallocate();
-		BoilerNames.deallocate();
-		BaseboardNames.deallocate();
-		CoilNames.deallocate();
-		aDUNames.deallocate();
+		ChillerNames.clear();
+		BoilerNames.clear();
+		BaseboardNames.clear();
+		CoilNames.clear();
+		aDUNames.clear();
 	}
 
 } // GlobalNames

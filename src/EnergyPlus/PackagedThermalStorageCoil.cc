@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,7 +73,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -187,27 +187,8 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TESCoilNum;
@@ -218,7 +199,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( CompIndex == 0 ) {
-			TESCoilNum = FindItemInList( CompName, TESCoil );
+			TESCoilNum = UtilityRoutines::FindItemInList( CompName, TESCoil );
 			if ( TESCoilNum == 0 ) {
 				ShowFatalError( "Thermal Energy Storage Cooling Coil not found=" + CompName );
 			}
@@ -271,20 +252,8 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using WaterManager::SetupTankDemandComponent;
 		using WaterManager::SetupTankSupplyComponent;
 		using GlobalNames::VerifyUniqueCoilName;
@@ -299,26 +268,14 @@ namespace PackagedThermalStorageCoil {
 		using DataZoneEquipment::FindControlledZoneIndexFromSystemNodeNumberForZone;
 		using DataHeatBalance::IntGainTypeOf_PackagedTESCoilTank;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetTESCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int item; // do loop counter
 		int NumAlphas; // Number of alphas in input
 		int NumNumbers; // Number of numeric items in input
 		int IOStatus; // Input status returned from GetObjectItem
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool errFlag;
 		Real64 TminRho;
@@ -328,20 +285,15 @@ namespace PackagedThermalStorageCoil {
 		int ZoneIndexTrial;
 
 		cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage";
-		NumTESCoils = GetNumObjectsFound( cCurrentModuleObject );
+		NumTESCoils = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		TESCoil.allocate( NumTESCoils );
 		CheckEquipName.dimension( NumTESCoils, true );
 
 		for ( item = 1; item <= NumTESCoils; ++item ) {
-			GetObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TESCoil, item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -398,7 +350,7 @@ namespace PackagedThermalStorageCoil {
 				ErrorsFound = true;
 			}}
 
-			if ( SameString( cAlphaArgs( 5 ), "USERDEFINEDFLUIDTYPE" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "USERDEFINEDFLUIDTYPE" ) ) {
 				if ( ! ( lAlphaFieldBlanks( 6 ) ) ) {
 					TESCoil( item ).StorageFluidName = cAlphaArgs( 6 );
 					if ( CheckFluidPropertyName( cAlphaArgs( 6 ) ) == 0 ) {
@@ -4692,30 +4644,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine sets an index for a given TES Cooling Coil -- issues error message if that
 		// coil is not a legal TES Cooling Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		// Obtains and allocates TESCoil related parameters from input file
 		if ( GetTESInputFlag ) { // First time subroutine has been called, get input data
 			GetTESCoilInput();
@@ -4723,7 +4651,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4758,27 +4686,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's air inlet node -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4789,7 +4696,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4823,27 +4730,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's air outlet node -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4854,7 +4740,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4888,27 +4774,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's cooling only capacity -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets capacity to 0, otherwise, returns cooling capacity.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4919,7 +4784,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4961,27 +4826,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's evaporator air flow rate -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air flow to 0, otherwise, returns cooling air flow rate.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4992,7 +4836,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}

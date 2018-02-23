@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,7 +89,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 		" Space,                    !- Zone Name",
 		" Space Equipment,          !- Zone Conditioning Equipment List Name",
 		" Space In Node,            !- Zone Air Inlet Node or NodeList Name",
-		" Space Exh Nodes,           !- Zone Air Exhaust Node or NodeList Name",
+		" Space Exh Nodes,          !- Zone Air Exhaust Node or NodeList Name",
 		" Space Node,               !- Zone Air Node Name",
 		" Space Ret Node;           !- Zone Return Air Node Name",
 
@@ -118,7 +118,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -369,7 +369,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output( ) );
 	bool ErrorsFound = false;
 	ScheduleManager::ProcessScheduleInput( );
@@ -404,12 +404,12 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest )
 	DataHeatBalFanSys::ZoneAirHumRat( 5 ) = 0.001;
 
 	DataHeatBalance::AirFlowFlag = 1;
-	ScheduleManager::Schedule( 1 ).CurrentValue = 1.0;
-	ScheduleManager::Schedule( 2 ).CurrentValue = 18.0;
-	ScheduleManager::Schedule( 3 ).CurrentValue = 100.0;
-	ScheduleManager::Schedule( 4 ).CurrentValue = 2.0;
-	ScheduleManager::Schedule( 5 ).CurrentValue = -100.0;
-	ScheduleManager::Schedule( 6 ).CurrentValue = 100.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MIXINGAVAILSCHED") ).CurrentValue = 1.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MININDOORTEMP") ).CurrentValue = 18.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MAXINDOORTEMP") ).CurrentValue = 100.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("DELTATEMP") ).CurrentValue = 2.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MINOUTDOORTEMP") ).CurrentValue = -100.0;
+	ScheduleManager::Schedule( ScheduleManager::GetScheduleIndex("MAXOUTDOORTEMP") ).CurrentValue = 100.0;
 	DataEnvironment::OutBaroPress = 101325.0;
 
 	InitSimpleMixingConvectiveHeatGains( );
@@ -502,7 +502,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2 )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -606,36 +606,57 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad )
 		"ZoneHVAC:EquipmentList,",
 		" Space Equipment,          !- Name",
 		" SequentialLoad,           !- Load Distribution Scheme",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-		" Air Terminal 1,           !- Zone Equipment 1 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		" Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
 		" 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 2,  !- Zone Equipment 2 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
 		" 2,                        !- Zone Equipment 2 Cooling Sequence",
 		" 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 3,           !- Zone Equipment 3 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
 		" 3,                        !- Zone Equipment 3 Cooling Sequence",
 		" 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 1,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 1,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 1 ADU,       !- Name",
+		" Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 1;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 2,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 2 ADU,       !- Name",
+		" Zone Equip Inlet 2,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 2;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 3,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 3,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 3 ADU,       !- Name",
+		" Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 3;           !- Air Terminal Name",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 1,          !- Name",
+		" ,    !- Availability Schedule Name",
+		" Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 1,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 2,          !- Name",
+		" ,    !- Availability Schedule Name",
+		" Zone Equip Inlet 2 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 2,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 3,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 3,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
 
 		"NodeList,",
 		"  Space Inlet Nodes,       !- Name",
@@ -645,7 +666,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -750,37 +771,58 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad )
 
 		"ZoneHVAC:EquipmentList,",
 		" Space Equipment,          !- Name",
-		" UniformLoad,           !- Load Distribution Scheme",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-		" Air Terminal 1,           !- Zone Equipment 1 Name",
+		" UniformLoad,              !- Load Distribution Scheme",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		" Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
 		" 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 2,  !- Zone Equipment 2 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
 		" 2,                        !- Zone Equipment 2 Cooling Sequence",
 		" 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 3,           !- Zone Equipment 3 Name",
-		" 0,                        !- Zone Equipment 3 Cooling Sequence", // Leave this one out for cooling
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
+		" 0,                        !- Zone Equipment 3 Cooling Sequence",
 		" 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 1,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 1,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 1 ADU,       !- Name",
+		" Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 1;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 2,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 2 ADU,       !- Name",
+		" Zone Equip Inlet 2,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 2;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 3,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 3,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 3 ADU,       !- Name",
+		" Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 3;           !- Air Terminal Name",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 1,          !- Name",
+		" ,    !- Availability Schedule Name",
+		" Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 1,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 2,          !- Name",
+		" ,    !- Availability Schedule Name",
+		" Zone Equip Inlet 2 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 2,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 3,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 3,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
 
 		"NodeList,",
 		"  Space Inlet Nodes,       !- Name",
@@ -790,7 +832,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -895,37 +937,58 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR )
 
 		"ZoneHVAC:EquipmentList,",
 		" Space Equipment,          !- Name",
-		" UniformPLR,           !- Load Distribution Scheme",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-		" Air Terminal 1,           !- Zone Equipment 1 Name",
+		" UniformPLR,               !- Load Distribution Scheme",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		" Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
 		" 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 2,  !- Zone Equipment 2 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
 		" 2,                        !- Zone Equipment 2 Cooling Sequence",
 		" 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 3,           !- Zone Equipment 3 Name",
-		" 0,                        !- Zone Equipment 3 Cooling Sequence", // Leave this one out for cooling
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
+		" 0,                        !- Zone Equipment 3 Cooling Sequence",
 		" 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 1,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 1,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 1 ADU,       !- Name",
+		" Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 1;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 2,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 2 ADU,       !- Name",
+		" Zone Equip Inlet 2,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 2;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 3,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 3,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 3 ADU,       !- Name",
+		" Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 3;           !- Air Terminal Name",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 1,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 1,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 2,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 2 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 2,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 3,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 3,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
 
 		"NodeList,",
 		"  Space Inlet Nodes,       !- Name",
@@ -935,7 +998,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
@@ -1058,37 +1121,58 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR )
 
 		"ZoneHVAC:EquipmentList,",
 		" Space Equipment,          !- Name",
-		" SequentialUniformPLR,     !- Load Distribution Scheme",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-		" Air Terminal 1,           !- Zone Equipment 1 Name",
+		" SequentialUniformPLR,               !- Load Distribution Scheme",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		" Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
 		" 1,                        !- Zone Equipment 1 Cooling Sequence",
 		" 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 2,  !- Zone Equipment 2 Name",
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 2 ADU,       !- Zone Equipment 2 Name",
 		" 2,                        !- Zone Equipment 2 Cooling Sequence",
 		" 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
-		" AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type",
-		" Air Terminal 3,           !- Zone Equipment 3 Name",
-		" 0,                        !- Zone Equipment 3 Cooling Sequence", // Leave this one out for cooling
+		" ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+		" Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
+		" 0,                        !- Zone Equipment 3 Cooling Sequence",
 		" 3;                        !- Zone Equipment 3 Heating or No-Load Sequence",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 1,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 1,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 1 ADU,       !- Name",
+		" Zone Equip Inlet 1,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 1;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 2,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 2,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 2 ADU,       !- Name",
+		" Zone Equip Inlet 2,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 2;           !- Air Terminal Name",
 
-		"AirTerminal:SingleDuct:Uncontrolled,",
-		" Air Terminal 3,           !- Name",
-		",                          !- Availability Schedule Name",
-		" Zone Equip Inlet 3,       !- Zone Supply Air Node Name",
-		" 0.2;                      !- Maximum Air Flow Rate {m3/s}",
+		"ZoneHVAC:AirDistributionUnit,",
+		" Air Terminal 3 ADU,       !- Name",
+		" Zone Equip Inlet 3,       !- Air Distribution Unit Outlet Node Name",
+		" AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+		" Air Terminal 3;           !- Air Terminal Name",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 1,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 1 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 1,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 2,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 2 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 2,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
+
+		"AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+		" Air Terminal 3,          !- Name",
+		" ,                        !- Availability Schedule Name",
+		" Zone Equip Inlet 3 2AT,  !- Air Inlet Node Name",
+		" Zone Equip Inlet 3,      !- Air Outlet Node Name",
+		" 0.2;                     !- Maximum Air Flow Rate {m3/s}",
 
 		"NodeList,",
 		"  Space Inlet Nodes,       !- Name",
@@ -1098,7 +1182,7 @@ TEST_F( EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	EXPECT_FALSE( has_err_output() );
 	bool ErrorsFound = false;
 	GetZoneData( ErrorsFound );
