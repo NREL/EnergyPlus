@@ -4362,7 +4362,7 @@ namespace VariableSpeedCoils {
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
-            OnOffFanPartLoadFraction = PLF; // save PLF for fan model
+			if ( CyclingScheme == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -4858,7 +4858,7 @@ namespace VariableSpeedCoils {
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
-            OnOffFanPartLoadFraction = PLF; // save PLF for fan model
+			if ( CyclingScheme == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -5439,7 +5439,7 @@ namespace VariableSpeedCoils {
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
-            OnOffFanPartLoadFraction = PLF; // save PLF for fan model
+			if ( CyclingScheme == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;

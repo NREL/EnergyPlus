@@ -2094,8 +2094,6 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_WaterCoilSPControl ) {
 TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 {
 		std::string const idf_objects = delimited_string( {
-		"Version,8.3;",
-		"  ",
 		"ScheduleTypeLimits,",
 		"  Any Number;             !- Name",
 		"  ",
@@ -2182,7 +2180,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.5, MSHPMassFlowRateHigh );
 
-	// constant fan mode should not drop to idle flow rate as speed = 1
+	// constant fan mode should not drop to idle flow rate at speed = 1
 	UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
 
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
@@ -2228,7 +2226,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	UnitarySystem( UnitarySysNum ).Humidistat = false;
 	UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DataSizing::None;
 
-	// cycling fan mode should drop to idle flow rate only below speed = 1
+	// cycling fan mode should drop to 0 flow rate only below speed = 1
 	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
 
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
@@ -2236,9 +2234,9 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = true;
 	CoolingLoad = false;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
-	EXPECT_EQ( 0.25, CompOffMassFlow );
+	EXPECT_EQ( 0.0, CompOffMassFlow );
 	EXPECT_EQ( 0.25, CompOnMassFlow );
-	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.0, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
 
 	// cooling load at various speeds
@@ -2264,9 +2262,9 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = false;
 	CoolingLoad = true;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
-	EXPECT_EQ( 0.2, CompOffMassFlow ); // CompOffMassFlow equal to idle mass flow rate
+	EXPECT_EQ( 0.0, CompOffMassFlow ); // CompOffMassFlow equal to idle mass flow rate
 	EXPECT_EQ( 0.3, CompOnMassFlow );
-	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.0, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
 
 	// constant fan mode should not drop to idle flow rate at speed = 1
@@ -3650,7 +3648,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 		"  Supply Fan 1,           !- Name",
 		"  FanAndCoilAvailSched,   !- Availability Schedule Name",
 		"  0.7,                    !- Fan Total Efficiency",
-		"  600.0,                  !- Pressure Rise{ Pa }",
+		"  300.0,                  !- Pressure Rise{ Pa }",
 		"  1.6,                    !- Maximum Flow Rate{ m3 / s }",
 		"  0.9,                    !- Motor Efficiency",
 		"  1.0,                    !- Motor In Airstream Fraction",
@@ -3905,8 +3903,9 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	Node( InletNode ).Enthalpy = PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat );
 
 	// set zone temperature
-	Node( ControlZoneNum ).Temp = 20.0; // set zone temperature during heating season used to determine system delivered capacity
-	DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
+	Node( ControlZoneNum ).Temp = Node( InletNode ).Temp; // set zone temperature, used to determine system delivered capacity
+    Node( ControlZoneNum ).HumRat = Node( InletNode ).HumRat; // set zone humidity ratio, used to determine system delivered capacity
+    DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
 	DataEnvironment::OutHumRat = 0.1;
 	DataEnvironment::OutBaroPress = 101325.0;
 	DataEnvironment::OutWetBulbTemp = 30.0;
@@ -3933,8 +3932,9 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	TempControlType( 1 ) = DataHVACGlobals::DualSetPointWithDeadBand;
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
-	Schedule( 1 ).CurrentValue = 1.0;
-	DataGlobals::BeginEnvrnFlag = true;
+	Schedule( 1 ).CurrentValue = 1.0; // FanAndCoilAvailSchedule
+    Schedule( 2 ).CurrentValue = 1.0; // ContinuousFanSchedule
+    DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
 	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).MaxCoolAirVolFlow * StdRhoAir;
 
@@ -3953,7 +3953,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 
 	// test model performance
 	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 0.01 ); // Watts
-	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxHeatAirMassFlow * UnitarySystem( 1 ).PartLoadFrac ); // cycling fan
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).MaxHeatAirMassFlow ); // constant fan
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
 
@@ -4423,8 +4423,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan ) {
 	// compare fan RTF with fan PLR and global PLF
 	FanPLR = Node( InletNode ).MassFlowRate / Fans::Fan( 1 ).MaxAirMassFlowRate;
     // blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
-    // Unitary System also sets OnOffFanPartLoadFraction = 1, maybe too agressive (see end of ReportUnitarySystem) so this variable will = 0
-    // issue with calling blowthru fan again needs to be resolved, seems excessive.
+    // Unitary System also sets OnOffFanPartLoadFraction = 1 (see end of ReportUnitarySystem) so this variable will = 1
 	EXPECT_EQ( 1.0, DataHVACGlobals::OnOffFanPartLoadFraction );
 	EXPECT_GT( Fans::Fan( 1 ).FanRuntimeFraction, FanPLR );
 
