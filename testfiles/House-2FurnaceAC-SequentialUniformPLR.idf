@@ -1627,7 +1627,7 @@ Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;
 Output:Variable,*,Zone Mean Air Temperature,detailed;
 Output:Variable,*,Zone Air Temperature,detailed;
 Output:Variable,*,Fan Electric Power,detailed;
-Output:Variable,*,Heating Coil Air Heating Rate,detailed;
+Output:Variable,*,Heating Coil Heating Rate,detailed;
 Output:Variable,*,Heating Coil Electric Power,detailed;
 Output:Variable,*,Heating Coil Gas Rate,detailed;
 Output:Variable,*,Heating Coil Runtime Fraction,detailed;

@@ -132,13 +132,16 @@ namespace DataSystemVariables {
 	extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
 	extern bool UseScheduledSunlitFrac; // when true, the external shading calculation results will be exported
 	extern bool ReportExtShadingSunlitFrac; // when true, the sunlit fraction for all surfaces are exported as a csv format output
+	extern bool UseImportedSunlitFrac; // when true, the sunlit fraction for all surfaces are imported altogether as a CSV file
+ 
+	extern bool DisableGroupSelfShading; // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+	extern bool DisableAllSelfShading; // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
 	// This update the value during the warmup added for FMI
 	extern Real64 Elapsed_Time; // For showing elapsed time at end of run
 	extern Real64 Time_Start; // Call to CPU_Time for start time of simulation
 	extern Real64 Time_Finish; // Call to CPU_Time for end time of simulation
-	extern std::string cMinReportFrequency; // String for minimum reporting frequency
-	extern int MinReportFrequency; // Frequency var turned into integer during get report var input.
+	extern std::string MinReportFrequency; // String for minimum reporting frequency
 	extern bool SortedIDD; // after processing, use sorted IDD to obtain Defs, etc.
 	extern bool lMinimalShadowing; // TRUE if MinimalShadowing is to override Solar Distribution flag
 	extern std::string TempFullFileName;
@@ -167,6 +170,10 @@ namespace DataSystemVariables {
 		bool & FileFound, // Set to true if file found and is in CheckedFileName
 		std::string & CheckedFileName // Blank if not found.
 	);
+
+	// Needed for unit tests, should not be normally called.
+	void
+	clear_state();
 
 } // DataSystemVariables
 

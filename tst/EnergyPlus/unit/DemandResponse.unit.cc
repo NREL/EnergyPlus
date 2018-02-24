@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
 		" ,",
 		" OA CONTROLLER 1;"});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	NumOAControllers = 1;
 	OAController.allocate( NumOAControllers );

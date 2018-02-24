@@ -198,7 +198,7 @@ TEST_F( EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller )
 
 	});
 
-	EXPECT_FALSE( process_idf( idf_objects, false ) );
+	EXPECT_TRUE( process_idf( idf_objects, false ) );
 
 	DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
 	DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );

@@ -554,7 +554,6 @@ namespace AirflowNetworkSolver {
 
 		// Calculate pressure field in a large opening
 		PStack();
-
 		SOLVZP( IK, AD, AU, ITER );
 
 		// Report element flows and zone pressures.

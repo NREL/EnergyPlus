@@ -1057,9 +1057,8 @@ namespace EnergyPlus {
 		"    UNTIL: 24:00,1.0;        !- Field 3",
 		}) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-			bool ErrorsFound =  false;
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		bool ErrorsFound =  false;
 
 		DataGlobals::BeginSimFlag = true;
 		SimulationManager::GetProjectData();
@@ -1163,14 +1162,15 @@ namespace EnergyPlus {
 		} // ... End environment loop.
 
 
-		EXPECT_NEAR(DataLoopNode::Node(3).Temp, 20.0 , 0.01);
+		EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0 , 0.01);
 
 	}
 
 	TEST_F( EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo ) {
 
 		// this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be met
-		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX still heats up to 20.
+		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.
+        // This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX still heats up to 20.
 
 		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
@@ -2153,9 +2153,8 @@ namespace EnergyPlus {
 		"    UNTIL: 24:00,0.0;        !- Field 3",
 		}) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-			bool ErrorsFound =  false;
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		bool ErrorsFound =  false;
 
 		DataGlobals::BeginSimFlag = true;
 		SimulationManager::GetProjectData();
@@ -2257,10 +2256,11 @@ namespace EnergyPlus {
 			} // ... End day loop.
 
 		} // ... End environment loop.
+        //
 
-
-		EXPECT_NEAR(DataLoopNode::Node(3).Temp, 20.0 , 0.01);
-
+        //Index 4 corresponds to NodeNumOut of "TRANSFER SUPPLY OUTLET PIPE", which is a component of
+        // "TRANSFER SUPPLY OUTLET BRANCH" in "TRANSFER SUPPLY BRANCHES" OF "TRANSFER LOOP" (part of PlantLoop data)
+		EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0 , 0.01);
 	}
 
 	TEST_F( EnergyPlusFixture, PlantHXControlWithFirstHVACIteration ) {

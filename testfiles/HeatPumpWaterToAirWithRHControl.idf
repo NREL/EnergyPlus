@@ -3683,7 +3683,7 @@
 
   Output:Variable,*,Cooling Coil Part Load Ratio,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 

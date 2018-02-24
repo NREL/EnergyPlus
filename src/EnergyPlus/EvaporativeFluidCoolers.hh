@@ -453,6 +453,10 @@ namespace EvaporativeFluidCoolers {
 		int const EvapFluidCoolerNum
 	);
 
+	// Used for clearing global data between Unit Tests, should not be normally called
+	void
+	clear_state();
+
 } // EvaporativeFluidCoolers
 
 } // EnergyPlus

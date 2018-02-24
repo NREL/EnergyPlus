@@ -46,7 +46,7 @@ Operator Symbol & Description & Evaluation Order & Example \tabularnewline
 < ~ & Less than comparison & left-to-right & IF b  <  2 \tabularnewline
 < = & Less than or equal to comparison & left-to-right & IF b  < = f \tabularnewline
 \& \& & Logical AND & right-to-left & IF c  \& \&  d \tabularnewline
-|| & Logical OR & right-to-left & IF c || d \tabularnewline
+${\vert}{\vert}$ & Logical OR & right-to-left & IF c ${\vert}{\vert}$ d \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -62,8 +62,8 @@ In the case of the SET example, the value of ``a'' is set to 1 if ``c'' is less 
 Compound expressions allow multiple operators to be sequenced or nested. For example:
 
 \begin{lstlisting}
-a + b \* 7 / 4.5
-(a \* 3 + 4) ^ 2
+a + b * 7 / 4.5
+(a * 3 + 4) ^ 2
 (a > b) && (c < d)
 \end{lstlisting}
 
