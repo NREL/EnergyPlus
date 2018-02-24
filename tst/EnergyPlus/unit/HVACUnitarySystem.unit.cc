@@ -4422,10 +4422,11 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan ) {
 
 	// compare fan RTF with fan PLR and global PLF
 	FanPLR = Node( InletNode ).MassFlowRate / Fans::Fan( 1 ).MaxAirMassFlowRate;
-	FanRTF = FanPLR / DataHVACGlobals::OnOffFanPartLoadFraction;
-	EXPECT_GT( FanRTF, FanPLR );
-	EXPECT_DOUBLE_EQ( FanRTF, Fans::Fan( 1 ).FanRuntimeFraction );
-	EXPECT_NEAR( DataHVACGlobals::OnOffFanPartLoadFraction, 0.9004014, 0.0000001 );
+    // blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
+    // Unitary System also sets OnOffFanPartLoadFraction = 1, maybe too agressive (see end of ReportUnitarySystem) so this variable will = 0
+    // issue with calling blowthru fan again needs to be resolved, seems excessive.
+	EXPECT_EQ( 1.0, DataHVACGlobals::OnOffFanPartLoadFraction );
+	EXPECT_GT( Fans::Fan( 1 ).FanRuntimeFraction, FanPLR );
 
 }
 
