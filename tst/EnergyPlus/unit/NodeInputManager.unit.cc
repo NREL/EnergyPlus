@@ -94,7 +94,7 @@ namespace EnergyPlus {
 			"System Node Specific Heat;",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutAirNodeManager::SetOutAirNodes();
 

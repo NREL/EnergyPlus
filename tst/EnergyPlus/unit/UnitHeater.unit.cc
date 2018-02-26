@@ -1099,7 +1099,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		"    32.2,                    !- Rated Outlet Air Temperature {C}",
 		"    ;                        !- Rated Ratio for Air and Water Convection",
 	} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
@@ -1274,7 +1274,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 		"    32.2,                    !- Rated Outlet Air Temperature {C}",
 		"    ;                        !- Rated Ratio for Air and Water Convection",
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 	MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
@@ -2416,7 +2416,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 		"    Chilled Water Loop Outside Air Sensor,  !- Name",
 		"    -1;                      !- Height Above Ground {m}",
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;

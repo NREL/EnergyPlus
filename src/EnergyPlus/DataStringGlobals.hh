@@ -79,8 +79,10 @@ namespace DataStringGlobals {
 	extern std::string outputTblTabFileName;
 	extern std::string outputTblTxtFileName;
 	extern std::string outputTblXmlFileName;
-	extern std::string inputIdfFileName;
+	extern std::string inputFileName;
 	extern std::string inputIddFileName;
+	extern std::string inputEpJSONSchemaFileName;
+	extern std::string inputEpJSONSchemaFileName;
 	extern std::string inputWeatherFileName;
 	extern std::string outputAdsFileName;
 	extern std::string outputDfsFileName;
@@ -120,6 +122,9 @@ namespace DataStringGlobals {
 	extern std::string idfDirPathName;
 	extern std::string outDirPathName;
 	extern std::string idfFileNameOnly;
+	extern std::string inputDirPathName;
+	extern std::string outputDirPathName;
+	extern std::string inputFileNameOnly;
 	extern std::string exeDirectory;
 
 	// MODULE PARAMETER DEFINITIONS:

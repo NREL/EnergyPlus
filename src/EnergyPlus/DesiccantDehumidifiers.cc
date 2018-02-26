@@ -72,9 +72,10 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatingCoils.hh>
 #include <HeatRecovery.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -195,6 +196,7 @@ namespace DesiccantDehumidifiers {
 
 	// Object Data
 	Array1D< DesiccantDehumidifierData > DesicDehum;
+	std::unordered_map< std::string, std::string > UniqueDesicDehumNames;
 
 	// Functions
 
@@ -216,27 +218,6 @@ namespace DesiccantDehumidifiers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manage the simulation of an air dehumidifier
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// NA
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DesicDehumNum; // index of solid desiccant unit being simulated
 		Real64 HumRatNeeded; // process air leaving humidity ratio set by controller [kg water/kg air]
@@ -248,7 +229,7 @@ namespace DesiccantDehumidifiers {
 
 		// Get the desiccant dehumidifier unit index
 		if ( CompIndex == 0 ) {
-			DesicDehumNum = FindItemInList( CompName, DesicDehum );
+			DesicDehumNum = UtilityRoutines::FindItemInList( CompName, DesicDehum );
 			if ( DesicDehumNum == 0 ) {
 				ShowFatalError( "SimDesiccantDehumidifier: Unit not found=" + CompName );
 			}
@@ -313,15 +294,7 @@ namespace DesiccantDehumidifiers {
 		// METHODOLOGY EMPLOYED:
 		// Uses InputProcessor "Get" routines to obtain data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
@@ -357,19 +330,9 @@ namespace DesiccantDehumidifiers {
 		using SteamCoils::SetSteamCoilData;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetDesiccantDehumidifierInput: " ); // include trailing blank space
 		static std::string const dehumidifierDesiccantNoFans( "Dehumidifier:Desiccant:NoFans" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DesicDehumIndex; // Loop index
@@ -381,7 +344,6 @@ namespace DesiccantDehumidifiers {
 		static bool ErrorsFound2( false ); // Set to true if errors in input, fatal at end of routine
 		static bool ErrorsFoundGeneric( false ); // Set to true if errors in input, fatal at end of routine
 		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool OANodeError; // Flag for check on outside air node
 		std::string RegenFanInlet; // Desiccant system regeneration air fan inlet node
 		std::string RegenFanOutlet; // Desiccant system regeneration air fan outlet node
@@ -414,16 +376,18 @@ namespace DesiccantDehumidifiers {
 		int SteamIndex; // steam coil Index
 		bool RegairHeatingCoilFlag( false ); // local error flag
 
-		NumSolidDesicDehums = GetNumObjectsFound( dehumidifierDesiccantNoFans );
-		NumGenericDesicDehums = GetNumObjectsFound( "Dehumidifier:Desiccant:System" );
+		NumSolidDesicDehums = inputProcessor->getNumObjectsFound( dehumidifierDesiccantNoFans );
+		NumGenericDesicDehums = inputProcessor->getNumObjectsFound( "Dehumidifier:Desiccant:System" );
 		NumDesicDehums = NumSolidDesicDehums + NumGenericDesicDehums;
 		// allocate the data array
 		DesicDehum.allocate( NumDesicDehums );
+		UniqueDesicDehumNames.reserve( NumDesicDehums );
+		GetInputDesiccantDehumidifier = false;
 
-		GetObjectDefMaxArgs( dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
-		GetObjectDefMaxArgs( "Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
@@ -439,16 +403,10 @@ namespace DesiccantDehumidifiers {
 		for ( DesicDehumIndex = 1; DesicDehumIndex <= NumSolidDesicDehums; ++DesicDehumIndex ) {
 			RegenCoilAirInletNode = 0;
 			RegenCoilAirOutletNode = 0;
-			GetObjectItem( CurrentModuleObject, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
+			inputProcessor->getObjectItem( CurrentModuleObject, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			DesicDehumNum = DesicDehumIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), DesicDehum, DesicDehumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+
+			GlobalNames::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Solid;
@@ -473,14 +431,14 @@ namespace DesiccantDehumidifiers {
 
 			DesicDehum( DesicDehumNum ).RegenFanInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Internal, 2, ObjectIsParent );
 
-			if ( SameString( Alphas( 7 ), "LEAVING HUMRAT:BYPASS" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 7 ), "LEAVING HUMRAT:BYPASS" ) ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + " = " + DesicDehum( DesicDehumNum ).Name );
 				ShowContinueError( "Obsolete " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
 				ShowContinueError( "setting to LeavingMaximumHumidityRatioSetpoint" );
 				DesicDehum( DesicDehumNum ).ControlType = FixedHumratBypass;
 			}
-			if ( SameString( Alphas( 7 ), "LeavingMaximumHumidityRatioSetpoint" ) ) DesicDehum( DesicDehumNum ).ControlType = FixedHumratBypass;
-			if ( SameString( Alphas( 7 ), "SystemNodeMaximumHumidityRatioSetpoint" ) ) DesicDehum( DesicDehumNum ).ControlType = NodeHumratBypass;
+			if ( UtilityRoutines::SameString( Alphas( 7 ), "LeavingMaximumHumidityRatioSetpoint" ) ) DesicDehum( DesicDehumNum ).ControlType = FixedHumratBypass;
+			if ( UtilityRoutines::SameString( Alphas( 7 ), "SystemNodeMaximumHumidityRatioSetpoint" ) ) DesicDehum( DesicDehumNum ).ControlType = NodeHumratBypass;
 			if ( DesicDehum( DesicDehumNum ).ControlType == 0 ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + " = " + DesicDehum( DesicDehumNum ).Name );
 				ShowContinueError( "Invalid " + cAlphaFields( 7 ) + " = " + Alphas( 7 ) );
@@ -496,15 +454,15 @@ namespace DesiccantDehumidifiers {
 			RegenCoilType = Alphas( 8 );
 			RegenCoilName = Alphas( 9 );
 
-			if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) {
-				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
-				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
+			if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) {
+				if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
+				if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
 				ValidateComponent( DesicDehum( DesicDehumNum ).RegenCoilType, DesicDehum( DesicDehumNum ).RegenCoilName, ErrorsFound2, CurrentModuleObject + '=' + Alphas( 1 ) );
 				if ( ErrorsFound2 ) ErrorsFound = true;
 				GetHeatingCoilIndex( DesicDehum( DesicDehumNum ).RegenCoilName, DesicDehum( DesicDehumNum ).RegenCoilIndex, ErrorsFound2 );
 				if ( ErrorsFound2 ) ErrorsFound = true;
 
-			} else if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Water" ) ) {
+			} else if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Water" ) ) {
 				DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingWater;
 				ValidateComponent( RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -554,7 +512,7 @@ namespace DesiccantDehumidifiers {
 					}
 
 				}
-			} else if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Steam" ) ) {
+			} else if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Steam" ) ) {
 				DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingSteam;
 				ValidateComponent( Alphas( 8 ), RegenCoilName, IsNotOK, CurrentModuleObject );
 				if ( IsNotOK ) {
@@ -623,13 +581,13 @@ namespace DesiccantDehumidifiers {
 			// Set up component set for regen fan
 			SetUpCompSets( DesicDehum( DesicDehumNum ).DehumType, DesicDehum( DesicDehumNum ).Name, Alphas( 10 ), Alphas( 11 ), Alphas( 6 ), "UNDEFINED" );
 
-			if ( ( ! SameString( Alphas( 12 ), "Default" ) ) && ( SameString( Alphas( 12 ), "UserCurves" ) ) ) {
+			if ( ( ! UtilityRoutines::SameString( Alphas( 12 ), "Default" ) ) && ( UtilityRoutines::SameString( Alphas( 12 ), "UserCurves" ) ) ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + ": Invalid" + cAlphaFields( 12 ) + " = " + Alphas( 12 ) );
 				ShowContinueError( "resetting to Default" );
 				DesicDehum( DesicDehumNum ).PerformanceModel_Num = PM_Default;
 			}
 
-			if ( SameString( Alphas( 12 ), "UserCurves" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 12 ), "UserCurves" ) ) {
 				DesicDehum( DesicDehumNum ).PerformanceModel_Num = PM_UserCurves;
 				DesicDehum( DesicDehumNum ).ProcDryBulbCurvefTW = GetCurveIndex( Alphas( 13 ) );
 				if ( DesicDehum( DesicDehumNum ).ProcDryBulbCurvefTW == 0 ) {
@@ -678,7 +636,7 @@ namespace DesiccantDehumidifiers {
 				}
 				DesicDehum( DesicDehumNum ).NomRegenTemp = Numbers( 5 );
 				// Validate regen fan type, for user defined curves, can be constant or variable volume
-				if ( ( SameString( DesicDehum( DesicDehumNum ).RegenFanType, "FAN:CONSTANTVOLUME" ) ) || ( SameString( DesicDehum( DesicDehumNum ).RegenFanType, "FAN:VARIABLEVOLUME" ) || SameString( DesicDehum( DesicDehumNum ).RegenFanType, "FAN:SYSTEMMODEL" ) ) ) {
+				if ( ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenFanType, "FAN:CONSTANTVOLUME" ) ) || ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenFanType, "FAN:VARIABLEVOLUME" ) || UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenFanType, "FAN:SYSTEMMODEL" ) ) ) {
 					ValidateComponent( DesicDehum( DesicDehumNum ).RegenFanType, DesicDehum( DesicDehumNum ).RegenFanName, ErrorsFound2, CurrentModuleObject + " = " + Alphas( 1 ) );
 					if ( ErrorsFound2 ) ErrorsFound = true;
 				} else {
@@ -723,7 +681,7 @@ namespace DesiccantDehumidifiers {
 			}
 			// process regen fan
 			ErrorsFound2 = false;
-			if ( SameString(  DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
+			if ( UtilityRoutines::SameString(  DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
 					DesicDehum( DesicDehumNum ).regenFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( DesicDehum( DesicDehumNum ).RegenFanName ) ); // call constructor
 					DesicDehum( DesicDehumNum ).RegenFanIndex = HVACFan::getFanObjectVectorIndex( DesicDehum( DesicDehumNum ).RegenFanName );
@@ -759,16 +717,8 @@ namespace DesiccantDehumidifiers {
 			DesicDehumNum = DesicDehumIndex + NumSolidDesicDehums;
 			DesicDehum( DesicDehumNum ).DehumType = CurrentModuleObject;
 			DesicDehum( DesicDehumNum ).DehumTypeCode = Generic;
-			GetObjectItem( DesicDehum( DesicDehumNum ).DehumType, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), DesicDehum, DesicDehumNum - 1, IsNotOK, IsBlank, DesicDehum( DesicDehumNum ).DehumType + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFoundGeneric = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( DesicDehum( DesicDehumNum ).DehumType, DesicDehumIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueDesicDehumNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFoundGeneric );
 			DesicDehum( DesicDehumNum ).Name = Alphas( 1 );
 
 			ErrorsFound2 = false;
@@ -792,7 +742,7 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).HXType = Alphas( 3 );
 			DesicDehum( DesicDehumNum ).HXName = Alphas( 4 );
 
-			if ( ! SameString( DesicDehum( DesicDehumNum ).HXType, "HeatExchanger:Desiccant:BalancedFlow" ) ) {
+			if ( ! UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).HXType, "HeatExchanger:Desiccant:BalancedFlow" ) ) {
 				ShowWarningError( DesicDehum( DesicDehumNum ).DehumType + " = \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 				ShowContinueError( "Invalid " + cAlphaFields( 3 ) + " = " + DesicDehum( DesicDehumNum ).HXType );
 				ErrorsFoundGeneric = true;
@@ -853,7 +803,7 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).RegenFanType = Alphas( 6 );
 			DesicDehum( DesicDehumNum ).RegenFanName = Alphas( 7 );
 
-			if ( SameString( DesicDehum( DesicDehumNum ).RegenFanType, "Fan:OnOff" ) || SameString( DesicDehum( DesicDehumNum ).RegenFanType, "Fan:ConstantVolume" ) || SameString(  DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
+			if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenFanType, "Fan:OnOff" ) || UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenFanType, "Fan:ConstantVolume" ) || UtilityRoutines::SameString(  DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
 				ErrorsFound2 = false;
 				ValidateComponent( DesicDehum( DesicDehumNum ).RegenFanType, DesicDehum( DesicDehumNum ).RegenFanName, ErrorsFound2, DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 				if ( ErrorsFound2 ) ErrorsFoundGeneric = true;
@@ -863,9 +813,9 @@ namespace DesiccantDehumidifiers {
 				ErrorsFoundGeneric = true;
 			}
 
-			if ( SameString( Alphas( 8 ), "DrawThrough" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 8 ), "DrawThrough" ) ) {
 				DesicDehum( DesicDehumNum ).RegenFanPlacement = DrawThru;
-			} else if ( SameString( Alphas( 8 ), "BlowThrough" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 8 ), "BlowThrough" ) ) {
 				DesicDehum( DesicDehumNum ).RegenFanPlacement = BlowThru;
 			} else {
 				ShowWarningError( DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
@@ -875,7 +825,7 @@ namespace DesiccantDehumidifiers {
 			}
 
 			ErrorsFound2 = false;
-			if ( SameString( DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
+			if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenFanType, "Fan:SystemModel" ) ) {
 					DesicDehum( DesicDehumNum ).regenFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( DesicDehum( DesicDehumNum ).RegenFanName ) ); // call constructor
 					DesicDehum( DesicDehumNum ).RegenFanIndex = HVACFan::getFanObjectVectorIndex( DesicDehum( DesicDehumNum ).RegenFanName );
@@ -906,9 +856,9 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).RegenSetPointTemp = Numbers( 1 );
 
 			if ( ! lAlphaBlanks( 10 ) ) {
-				if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) {
-					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
-					if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
+				if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) || UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) {
+					if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Electric" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingElectric;
+					if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Fuel" ) ) DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingGasOrOtherFuel;
 					ErrorsFound2 = false;
 					ValidateComponent( RegenCoilType, RegenCoilName, ErrorsFound2, DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 					if ( ErrorsFound2 ) ErrorsFoundGeneric = true;
@@ -965,7 +915,7 @@ namespace DesiccantDehumidifiers {
 						ErrorsFoundGeneric = true;
 					}
 
-				} else if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Water" ) ) {
+				} else if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Water" ) ) {
 					DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingWater;
 					ValidateComponent( RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
@@ -1028,7 +978,7 @@ namespace DesiccantDehumidifiers {
 						}
 
 					}
-				} else if ( SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Steam" ) ) {
+				} else if ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).RegenCoilType, "Coil:Heating:Steam" ) ) {
 					DesicDehum( DesicDehumNum ).RegenCoilType_Num = Coil_HeatingSteam;
 					ValidateComponent( RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
@@ -1194,16 +1144,16 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).CoolingCoilName = Alphas( 12 );
 
 			if ( ! lAlphaBlanks( 12 ) ) {
-				if ( ( SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:SINGLESPEED" ) ) || ( SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) ) || ( SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) ) {
+				if ( ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:SINGLESPEED" ) ) || ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) ) || ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) ) {
 					ErrorsFound2 = false;
 					ValidateComponent( DesicDehum( DesicDehumNum ).CoolingCoilType, DesicDehum( DesicDehumNum ).CoolingCoilName, ErrorsFound2, DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
 					if ( ErrorsFound2 ) ErrorsFoundGeneric = true;
 
-					if ( ( SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:SINGLESPEED" ) ) ) {
+					if ( ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:SINGLESPEED" ) ) ) {
 						DesicDehum( DesicDehumNum ).coolingCoil_TypeNum = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-					} else if ( ( SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) ) ) {
+					} else if ( ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) ) ) {
 						DesicDehum( DesicDehumNum ).coolingCoil_TypeNum =  DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
-					} else if ( ( SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) ) {
+					} else if ( ( UtilityRoutines::SameString( DesicDehum( DesicDehumNum ).CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ) ) {
 						DesicDehum( DesicDehumNum ).coolingCoil_TypeNum = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
 					}
 
@@ -1237,11 +1187,11 @@ namespace DesiccantDehumidifiers {
 
 			} //  (DesicDehum(DesicDehumNum)%CoolingCoilName /= Blank)THEN
 
-			if ( SameString( Alphas( 13 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 13 ), "Yes" ) ) {
 				DesicDehum( DesicDehumNum ).CoilUpstreamOfProcessSide = Yes;
 			} else if ( lAlphaBlanks( 13 ) ) {
 				DesicDehum( DesicDehumNum ).CoilUpstreamOfProcessSide = No;
-			} else if ( SameString( Alphas( 13 ), "No" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 13 ), "No" ) ) {
 				DesicDehum( DesicDehumNum ).CoilUpstreamOfProcessSide = No;
 			} else {
 				ShowWarningError( DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\"" );
@@ -1250,9 +1200,9 @@ namespace DesiccantDehumidifiers {
 				DesicDehum( DesicDehumNum ).CoilUpstreamOfProcessSide = No;
 			}
 
-			if ( SameString( Alphas( 14 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 14 ), "Yes" ) ) {
 				DesicDehum( DesicDehumNum ).Preheat = Yes;
-			} else if ( SameString( Alphas( 14 ), "No" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 14 ), "No" ) ) {
 				DesicDehum( DesicDehumNum ).Preheat = No;
 			} else if ( lAlphaBlanks( 14 ) ) {
 				DesicDehum( DesicDehumNum ).Preheat = No;
@@ -1365,7 +1315,7 @@ namespace DesiccantDehumidifiers {
 			DesicDehum( DesicDehumNum ).ExhaustFanMaxPower = Numbers( 3 );
 			DesicDehum( DesicDehumNum ).ExhaustFanCurveIndex = GetCurveIndex( Alphas( 15 ) );
 
-			if ( ! SameString( GetCurveType( DesicDehum( DesicDehumNum ).ExhaustFanCurveIndex ), "" ) ) {
+			if ( ! UtilityRoutines::SameString( GetCurveType( DesicDehum( DesicDehumNum ).ExhaustFanCurveIndex ), "" ) ) {
 				{ auto const SELECT_CASE_var( GetCurveType( DesicDehum( DesicDehumNum ).ExhaustFanCurveIndex ) );
 				if ( SELECT_CASE_var == "CUBIC" ) {
 
@@ -2349,7 +2299,7 @@ namespace DesiccantDehumidifiers {
 				//     condenser waste heat is proportional to DX coil PLR
 				if ( ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed ) || ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl ) ) {
 					CondenserWasteHeat = HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity;
-					HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;				
+					HeatReclaimDXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;
 				} else if ( DesicDehum( DesicDehumNum ).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ) {
 					CondenserWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity;
 					DataHeatBalance::HeatReclaimVS_DXCoil( DesicDehum( DesicDehumNum ).DXCoilIndex ).AvailCapacity = 0.0;
@@ -2489,7 +2439,7 @@ namespace DesiccantDehumidifiers {
 						} else {
 							HVACFan::fanObjs[ DesicDehum( DesicDehumNum ).RegenFanIndex ]->simulate( _,_,_,_ );
 						}
-						
+
 						FanDeltaT = Node( DesicDehum( DesicDehumNum ).RegenFanOutNode ).Temp - Node( DesicDehum( DesicDehumNum ).RegenFanInNode ).Temp;
 						RegenSetPointTemp -= FanDeltaT;
 					}
@@ -3011,8 +2961,9 @@ namespace DesiccantDehumidifiers {
 		NumSolidDesicDehums = 0;
 		NumGenericDesicDehums = 0;
 		GetInputDesiccantDehumidifier = true;
-		InitDesiccantDehumidifierOneTimeFlag = true;	
+		InitDesiccantDehumidifierOneTimeFlag = true;
 		DesicDehum.deallocate();
+		UniqueDesicDehumNames.clear();
 	}
 
 	//        End of Reporting subroutines for the SimAir Module

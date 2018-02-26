@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <DataOutputs.hh>
-#include <InputProcessor.hh>
 #include "UtilityRoutines.hh"
 
 namespace EnergyPlus {
@@ -161,7 +160,7 @@ namespace DataOutputs {
 		// This function looks up a key and variable name value and determines if they are
 		// in the list of required variables for a simulation.
 
-		auto const found_variable = OutputVariablesForSimulation.find( InputProcessor::MakeUPPERCase( VariableName ) );
+		auto const found_variable = OutputVariablesForSimulation.find( VariableName );
 		if ( found_variable == OutputVariablesForSimulation.end() ) return false;
 
 		auto found_key = found_variable->second.find( KeyedValue );

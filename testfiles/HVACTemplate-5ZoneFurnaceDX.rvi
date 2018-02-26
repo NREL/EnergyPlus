@@ -9,7 +9,7 @@ Zone Air Relative Humidity
 Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time
 Zone Air System Sensible Cooling Rate
 Zone Air System Sensible Heating Rate
-Heating Coil Air Heating Rate
+Heating Coil Heating Rate
 Cooling Coil Total Cooling Rate
 Zone Heating Setpoint Not Met While Occupied Time
 Zone Cooling Setpoint Not Met While Occupied Time

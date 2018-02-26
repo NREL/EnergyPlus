@@ -74,7 +74,7 @@ TEST_F( EnergyPlusFixture, XingGroundTempsModelTest )
 		"	30;			!- Phase Shift of Temperature Amplitude 2 {days}",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
 
