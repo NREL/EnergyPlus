@@ -103,6 +103,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
 	TimeStepZone = 0.25;
 	ThermalComfortInASH55.allocate( NumOfZones );
 	ThermalComfortInASH55( 1 ).ZoneIsOccupied = true;
+	Zone.allocate( NumOfZones );
 
 	// SingleHeatingSetPoint thermostat
 
@@ -707,7 +708,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;

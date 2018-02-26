@@ -134,6 +134,9 @@ namespace HVACCooledBeam {
 		int CBLoadReSimIndex;
 		int CBMassFlowReSimIndex;
 		int CBWaterOutletTempReSimIndex;
+		int CtrlZoneNum; //control zone index
+		int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+		int AirLoopNum; //air loop index that terminal is attached to
 
 		// Default Constructor
 		CoolBeamData() :
@@ -180,7 +183,10 @@ namespace HVACCooledBeam {
 			CWCompNum( 0 ),
 			CBLoadReSimIndex( 0 ),
 			CBMassFlowReSimIndex( 0 ),
-			CBWaterOutletTempReSimIndex( 0 )
+			CBWaterOutletTempReSimIndex( 0 ),
+			CtrlZoneNum( 0 ),
+			ctrlZoneInNodeIndex( 0 ),
+			AirLoopNum( 0 )
 		{}
 
 	};

@@ -2255,7 +2255,7 @@ Timoshenko, S., \& Kreiger-Woinowsky, S. 1959. ``Theory of Plates and Shells'' 2
 
 \subsection{Equivalent Layer Fenestration Model}\label{equivalent-layer-fenestration-model}
 
-The section describes the equivalent layer fenestration optical and thermal model. The Equivalent Layer fenestration model can have four types of attachments: drapes, venetian blinds, roller blinds and insect screens. In this model shading layers are assumed to be uniform and can be represented by an equivalent homogenous layer that has spatially-averaged ``effective'' optical and thermal properties (ASHRAE 1311-RP). Likewise, venetian blinds can be characterized using effective optical and thermal properties. When solar radiation strikes a window surface some fraction of the incident solar radiation passes unobstructed through openings in a shading layer and the remaining fraction is intercepted by the structure of the layer. The intercepted radiation is partly absorbed, partly reflected and partly transmitted. These reflected and transmitted components of the scattered solar radiation are assumed to be uniformly diffuse. Shading layers, because of their openness, generally transmit longwave radiation, and the effective infrared properties of shades account for that. Using effective optical properties and a beam/diffuse split of solar radiation at each layer, the equivalent layer approach can represent multi-layer systems. This representation provides virtually unlimited flexibility to combine different types of shading layers in a fenestration. The equivalent layer window model requires a few set of optical data to characterize a particular layer and this set of data is used to calculate effective layer properties. For instance, the effective solar optical properties of a venetian blind can be calculated as a function of slats optical properties and geometry. Also, it is possible to adjust slat angle at each time step in response to the changing angular position of the sun. Moreover, the model provides control strategies as a function of slat angle that can be changed at each time step as needed. Likewise, effective properties of a pleated drape are calculated as a function of fabric properties and a specified value of fullness. The only input data needed to fully characterize drapery fabrics, roller blinds and insect screens are material openness as area fraction, and the transmittance and reflectance at normal incidence. Shade openness area fraction is the same as the beam-beam transmittance at normal incidence. In multilayer fenestration, each layer is separated by a gap. A gap in equivalent layer model is defined by specifying the fill gas and the gap spacing. Currently five gas types are allowed: Air, Argon, Xenon, Krypton and Custom. The convective heat transfer coefficient in a gap is calculated depending on the spacing, the temperatures of the layers and the fill gas properties. Equivalent-layer concept -- offers wide range of multiple glazing and shading layers combination and can simulate multi-layer complex fenestration systems. The effective layer properties of venetian blinds, pleated drapes, roller blinds, and insect screens are calculated from geometric layer models and material properties. A set of empirical correlations for estimating off-normal material properties were developed under ASHRAE research project (ASHRAE 1311-RP).
+The section describes the equivalent layer fenestration optical and thermal model. The Equivalent Layer fenestration model can have four types of attachments: drapes, venetian blinds, roller blinds and insect screens. In this model shading layers are assumed to be uniform and can be represented by an equivalent homogenous layer that has spatially-averaged ``effective'' optical and thermal properties (ASHRAE 1311-RP). Likewise, venetian blinds can be characterized using effective optical and thermal properties. When solar radiation strikes a window surface some fraction of the incident solar radiation passes unobstructed through openings in a shading layer and the remaining fraction is intercepted by the structure of the layer. The intercepted radiation is partly absorbed, partly reflected and partly transmitted. These reflected and transmitted components of the scattered solar radiation are assumed to be uniformly diffuse. Shading layers, because of their openness, generally transmit longwave radiation, and the effective infrared properties of shades account for that. Using effective optical properties and a beam/diffuse split of solar radiation at each layer, the equivalent layer approach can represent multi-layer systems. This representation provides virtually unlimited flexibility to combine different types of shading layers in a fenestration. The equivalent layer window model requires a few set of optical data to characterize a particular layer and this set of data is used to calculate effective layer properties. For instance, the effective solar optical properties of a venetian blind can be calculated as a function of slats optical properties and geometry. Also, it is possible to adjust slat angle at each time step in response to the changing angular position of the sun. Moreover, the model provides control strategies as a function of slat angle that can be changed at each time step as needed. Likewise, effective properties of a pleated drape are calculated as a function of fabric properties and a specified value of fullness. The only input data needed to fully characterize drapery fabrics, roller blinds and insect screens are material openness as area fraction, and the transmittance and reflectance at normal incidence. Shade openness area fraction is the same as the beam-beam transmittance at normal incidence. In multilayer fenestration, each layer is separated by a gap. A gap in equivalent layer model is defined by specifying the fill gas and the gap spacing. Currently five gas types are allowed: Air, Argon, Xenon, Krypton and Custom. The convective heat transfer coefficient in a gap is calculated depending on the spacing, the temperatures of the layers and the fill gas properties. Equivalent-layer concept -- offers wide range of multiple glazing and shading layers combination and can simulate multi-layer complex fenestration systems. The effective layer properties of venetian blinds, pleated drapes, roller blinds, and insect screens are calculated from geometric layer models and material properties. A set of empirical correlations for estimating off-normal material properties were developed under ASHRAE research project (ASHRAE 1311-RP). The equivalent layer window model supports many layers of glazing and shade combination in any order but does not support WindowProperty:ShadingControl. However, the venetian blind model of equivalent layer window model provides three types of blind slate angle control.
 
 \subsubsection{The Equivalent Layer Analysis}\label{the-equivalent-layer-analysis}
 
@@ -2291,17 +2291,17 @@ The beam and diffuse characterization of solar radiation demands an expanded set
 
 Where,
 
-\emph{t} ~~~ = ~~~~~~~~~ transmittance of a glazing or a shading layer, (-)
+$\tau$ ~~~ = ~~~~~~~~~ transmittance of a glazing or a shading layer, (-)
 
-\emph{r} ~~ = ~~~~~~~~~ reflectance of a glazing or a shading layer, (-)
+$\rho$ ~~~ = ~~~~~~~~~ reflectance of a glazing or a shading layer, (-)
 
-\emph{e} ~~~ = ~~~~~~~~~ thermal emissivity of a glazing or a shading layer, (-)
+$\varepsilon$ ~~~ = ~~~~~~~~~ thermal emissivity of a glazing or a shading layer, (-)
 
-\emph{q} ~~ = ~~~~~~~~~ incident angle, (degree)
+$\theta$ ~~ = ~~~~~~~~~ incident angle, (degree)
 
-\emph{f} ~~ = ~~~~~~~~~ slat angle, (degree)
+$\phi$ ~~ = ~~~~~~~~~ slat angle, (degree)
 
-\emph{W} ~~ = ~~~~~~~~~ profile angle, (degree)
+$\Omega$ ~~ = ~~~~~~~~~ profile angle, (degree)
 
 \emph{J}~~~ = ~~~~~~~~~ radiosity of a layer surface, (W/m2)
 
@@ -2357,11 +2357,11 @@ Gaps can be specified as sealed, vented indoors or vented outdoors. The sealed g
 
 \subsubsection{Shade Layer Analysis}\label{shade-layer-analysis}
 
-Equivalent layer fenestration model has a complete set of solar and longwave models for the four shading layer types: drapes, venetian blinds, roller blinds and insect screens developed under ASHRAE 1311-RP. And semi-empirical models are used to evaluate the off-normal properties of drape, roller blind and insect screen materials. The effective layer properties of venetian blinds and the effect of pleating in drapes are determined using a more fundamental net radiation scheme. The openness fraction, A\(_{o}\) and beam-beam solar transmittance at normal incidence, \emph{t}\(_{bb}\) (q = 0) really represent a geometric quantity and it has been confirmed that they can be used interchangeably (ASHRAE 1311-RP). Openness is simply the fraction of a material, by area, that is open. In equivalent layer fenestration model, beam-beam transmittance at normal incidence (i.e., openness fraction), beam-diffuse transmittance and reflectance at normal incidence are required to characterize drapery fabric, roller blind and insect screen material. A conventional venetian blind in equivalent layer model can be characterized by specifying the geometry, solar reflectance and transmittance, and emissivity of the slats. The off-normal solar properties of drape, roller blind and insect screen materials were formulated based on measurements (ASHRAE 1311-RP). The longwave properties of the of the drape fabrics, roller blinds and insect screens can be calculated from the material emissivity and openness of the fabric (ASHRE 1311-RP). The optical model development for venetian blinds is presented by Yahoda and Wright (2004 and 2005), and Kotey et al. (2008).
+Equivalent layer fenestration model has a complete set of solar and longwave models for the four shading layer types: drapes, venetian blinds, roller blinds and insect screens developed under ASHRAE 1311-RP. And semi-empirical models are used to evaluate the off-normal properties of drape, roller blind and insect screen materials. The effective layer properties of venetian blinds and the effect of pleating in drapes are determined using a more fundamental net radiation scheme. The openness fraction, A\(_{o}\) and beam-beam solar transmittance at normal incidence, {$\tau$}\(_{bb}\) ($\theta = 0$), really represent a geometric quantity and it has been confirmed that they can be used interchangeably (ASHRAE 1311-RP). Openness is simply the fraction of a material, by area, that is open. In equivalent layer fenestration model, beam-beam transmittance at normal incidence (i.e., openness fraction), beam-diffuse transmittance and reflectance at normal incidence are required to characterize drapery fabric, roller blind and insect screen material. A conventional venetian blind in equivalent layer model can be characterized by specifying the geometry, solar reflectance and transmittance, and emissivity of the slats. The off-normal solar properties of drape, roller blind and insect screen materials were formulated based on measurements (ASHRAE 1311-RP). The longwave properties of the of the drape fabrics, roller blinds and insect screens can be calculated from the material emissivity and openness of the fabric (ASHRE 1311-RP). The optical model development for venetian blinds is presented by Yahoda and Wright (2004 and 2005), and Kotey et al. (2008).
 
 \subsubsection{Drapes and Curtains}\label{drapes-and-curtains}
 
-The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence (q = 0) using empirical correlations (Kotey et al., 2009a). The input data required to characterize drapery fabric are the beam-beam transmittance of the material at normal incidence \emph{t}\(_{bb}\) (q = 0) = Ao, the beam-diffuse transmittance of the material at normal incidence\emph{t}\(_{bd}\) (q = 0), and the beam-diffuse (total) reflectance of the materialr\(_{bt}\) (q = 0). The off-normal properties are calculated as follows.
+The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence ($\theta = 0$) using empirical correlations (Kotey et al., 2009a). The input data required to characterize drapery fabric are the beam-beam transmittance of the material at normal incidence {$\tau$}\(_{bb}\) ($\theta = 0$) = Ao, the beam-diffuse transmittance of the material at normal incidence {$\tau$}\(_{bd}\) ($\theta = 0$), and the beam-diffuse (total) reflectance of the material {$\rho$}\(_{bt}\) ($\theta = 0$). The off-normal properties are calculated as follows.
 
 Off-normal Transmittance:
 
@@ -2401,7 +2401,7 @@ The apparent yarn reflectance is given by:
 {\rho ^y} = \frac{{\rho_{{\rm{bt}}}^{\rm{m}}\left( {{\rm{\theta }} = {\rm{0}}} \right)}}{{{\rm{1}} - \tau_{{\rm{bb}}}^{\rm{m}}\left( {{\rm{\theta }} = {\rm{0}}} \right)}} = \frac{{\rho_{{\rm{bt}}}^{\rm{m}}\left( {{\rm{\theta }} = {\rm{0}}} \right)}}{{{\rm{1}} - {{\rm{A}}_{\rm{o}}}}}
 \end{equation}
 
-The above set of equations for drapery fabrics are used subject to the condition that the solar absorptance of the fabric, at normal incidence, is not less than 1\% (ASHRE 1311-RP). The diffuse-diffuse material properties, for Equivalent layer window model, are determined using Rhomberg integration with 32 panels covering the range from q = 0 to q = 90° (ASHRAE 1311-RP). The subscript ``X'' stands for either front or back side of the layer.
+The above set of equations for drapery fabrics are used subject to the condition that the solar absorptance of the fabric, at normal incidence, is not less than 1\% (ASHRE 1311-RP). The diffuse-diffuse material properties, for Equivalent layer window model, are determined using Rhomberg integration with 32 panels covering the range from $\theta = 0$ to $\theta = 90^{o}$ (ASHRAE 1311-RP). The subscript ``X'' stands for either front or back side of the layer.
 
 \begin{equation}
   \tau_{x,dd}^{m} = 2\int_{\theta=0}^{\pi/2}\tau_{x,bt}^{m}\PB{\theta}\cos\theta\sin\theta d\theta
@@ -2421,7 +2421,7 @@ The above set of equations for drapery fabrics apply to the full range of A\(_{o
 {\tau ^{\rm{m}}} = {\rm{1}} - {\rm{0}}{\rm{.95}} \cdot \left( {{\rm{1}} - {{\rm{A}}_{\rm{o}}}} \right)
 \end{equation}
 
-The optical and thermal properties determined using the above same sets of equations are equally valid for pleated drape shades (Kotey, et. al., 2009a). For pleated drape, the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle, and interaction with a fabric pleated rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. The solar optical properties of the two different pleat planes are evaluated on the basis of the local solar incidence angle. Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, W\(_{H}\), but also by incidence angle (ASHRAE 1311-RP).
+The optical and thermal properties determined using the above same sets of equations are equally valid for pleated drape shades (Kotey, et. al., 2009a). For pleated drape, the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle, and interaction with a fabric pleated rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. The solar optical properties of the two different pleat planes are evaluated on the basis of the local solar incidence angle. Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, {$\Omega$\(_{H}\), but also by incidence angle (ASHRAE 1311-RP).
 
 \begin{figure}[hbtp] % fig 117
 \centering
@@ -2451,7 +2451,7 @@ The model assumes that venetian blind slats reflect and transmit solar radiation
 
 \subsubsection{Roller Blinds}\label{roller-blinds}
 
-The off-normal properties of roller-blind are determined from solar properties of roller blind fabric measured at normal incidence (q = 0) using correlations (Kotey, et. al., 2009b). The off-normal properties for roller blind shades are calculated using the set equations given below:
+The off-normal properties of roller-blind are determined from solar properties of roller blind fabric measured at normal incidence ($\theta = 0$) using correlations (Kotey, et. al., 2009b). The off-normal properties for roller blind shades are calculated using the set equations given below:
 
 \begin{equation}
 {{\rm{\tau }}_{bb}}\left( {\rm{\theta }} \right) = \left\{ \begin{array}{l}{{\rm{\tau }}_{bb}}{\rm{(\theta }} = {\rm{0)}} \cdot {\rm{co}}{{\rm{s}}^{\rm{b}}}{\kern 1pt} \left( {\frac{{\rm{\theta }}}{{{{\rm{\theta }}_{{\rm{cutoff}}}}}} \cdot \frac{\pi }{2}} \right)\quad \theta  < {\theta_{CutOff}}\\0\quad \quad \quad \theta  \ge {\theta_{CutOff}}\end{array} \right.
@@ -2504,7 +2504,7 @@ The diffuse-diffuse transmittance and reflectance are obtained by Rhomberg numer
 
 \subsubsection{Insect Screens}\label{insect-screens}
 
-The empirical correlations formulated to obtain the effective off-normal solar and longwave properties of insect screens were based on measurements (Kotey et al. (2009a). Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}. The calculation of effective solar properties requires a set of properties measured at normal incidence: \emph{t}\(_{bb}\) (q = 0), \emph{t}\(_{bd}\) (q = 0) and \emph{r}\(_{bt}\) (q = 0).
+The empirical correlations formulated to obtain the effective off-normal solar and longwave properties of insect screens were based on measurements (Kotey et al. (2009a). Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}. The calculation of effective solar properties requires a set of properties measured at normal incidence: $\tau_{bb}$ ($\theta = 0$), $\tau_{bd}$ ($\theta = 0$) and $\rho_{bt}$ ($\theta = 0$).
 
 \begin{figure}[hbtp] % fig 119
 \centering
@@ -2512,13 +2512,13 @@ The empirical correlations formulated to obtain the effective off-normal solar a
 \caption{Geometry used for insect screen analysis \protect \label{fig:geometry-used-for-insect-screen-analysis}}
 \end{figure}
 
-Openness can be determined by optical measurement at normal incidence, A\(_{o}\) = \emph{t}\(_{bb}\) (q = 0), but in the case of insect screens A\(_{o}\) can reliably be calculated knowing wire diameter (\emph{d}), and wire spacing (\emph{s}) as follows:
+Openness can be determined by optical measurement at normal incidence, A\(_{o}\) = $\tau_{bb}$ ($\theta = 0$), but in the case of insect screens A\(_{o}\) can reliably be calculated knowing wire diameter (\emph{d}), and wire spacing (\emph{s}) as follows:
 
 \begin{equation}
 {A_o} = {\left( {1 - {d \mathord{\left/ {\vphantom {d s}} \right. } s}} \right)^2}
 \end{equation}
 
-The incidence angle beyond which direct beam transmission is cut off, \emph{q}\(_{CutOff}\), can also be estimated purely from geometry and is given by:
+The incidence angle beyond which direct beam transmission is cut off, {$\theta$}\(_{CutOff}\), can also be estimated purely from geometry and is given by:
 
 \begin{equation}
 {\theta_{CutOff}} = co{s^{ - 1}}\left( {{d \mathord{\left/ {\vphantom {d S}} \right. } S}} \right)
@@ -2596,7 +2596,7 @@ where
 
 \emph{$\varepsilon$\(_{j}\)~~~ = ~~~~~~~~~} effective emissivity of layer j, (-)
 
-\emph{$\tau$\(_{k}\)~~~ = ~~~~~~~~~} effective infrared transmittance of layer k (\emph{t\(_{1}\)} = 1)
+\emph{$\tau$\(_{k}\)~~~ = ~~~~~~~~~} effective infrared transmittance of layer k (\{$\tau$\(_{1}\)} = 1)
 
 \emph{nl~~~ = ~~~~~~~~~} number of layers in fenestration system (glazing and shade). Layers are numbered outside to inside (layer 1 is outermost, layer \emph{nl} is innermost).
 

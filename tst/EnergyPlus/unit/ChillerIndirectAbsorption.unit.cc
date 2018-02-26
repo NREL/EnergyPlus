@@ -99,7 +99,7 @@ TEST_F( EnergyPlusFixture, ChillerIndirectAbsorption_GetInput )
 		"  12.0;                    !- Degree of Subcooling in Steam Condensate Loop {C}",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::DoWeathSim = true;
 

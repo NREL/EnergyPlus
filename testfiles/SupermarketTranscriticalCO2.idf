@@ -7319,7 +7319,7 @@
 
   Output:Variable,*,Cooling Coil Electric Energy,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 

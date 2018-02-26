@@ -1103,7 +1103,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetProjectControlData( ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
@@ -1437,7 +1437,7 @@ TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
 		"    Until: 24:00,20.0;       !- Field 3",
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Zone.allocate( 2 );
 	Zone( 1 ).Name = "WEST ZONE";
