@@ -8801,6 +8801,17 @@ Label50: ;
 				}}
 			}
 
+			if ( TotCapTempModFac < 0.0 ) {
+				if ( DXCoil( DXCoilNum ).CAPFTErrIndex == 0 ) {
+					ShowWarningMessage( "The TotCapTempModFac curve value for DX heating coil " + DXCoil( DXCoilNum ).Name + " =" + RoundSigDigits( TotCapTempModFac, 2 ) );
+					ShowContinueError( "TotCapTempModFac curve value must be > 0. TotCapTempModFac curve value has been reset to 0.0 and simulation is continuing." );
+					ShowContinueError( "Check the IO reference manual for TotCapTempModFac curve guidance [ " + DXCoil( DXCoilNum ).DXCoilType + " ]." );
+					ShowContinueErrorTimeStamp( "" );
+				}
+				ShowRecurringWarningErrorAtEnd( "DX heating coil TotCapTempModFac curve value < 0 warning continues... ", DXCoil( DXCoilNum ).CAPFTErrIndex, TotCapTempModFac, TotCapTempModFac );
+				TotCapTempModFac = 0.0;
+			}
+
 			//  Get total capacity modifying factor (function of mass flow) for off-rated conditions
 			AirMassFlowRatio = AirMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( Mode ), AirMassFlowRatio );
@@ -8901,6 +8912,18 @@ Label50: ;
 				EIRTempModFac = 1.0;
 				EIRFlowModFac = 1.0;
 			}
+
+			if ( EIRTempModFac < 0.0 ) {
+				if ( DXCoil( DXCoilNum ).EIRFTErrIndex == 0 ) {
+					ShowWarningMessage( "The EIRTempModFac curve value for DX heating coil " + DXCoil( DXCoilNum ).Name + " =" + RoundSigDigits( EIRTempModFac, 2 ) );
+					ShowContinueError( "EIRTempModFac curve value must be > 0.  EIRTempModFac curve value has been reset to 0.0 and simulation is continuing." );
+					ShowContinueError( "Check the IO reference manual for EIRTempModFac curve guidance [ " + DXCoil( DXCoilNum ).DXCoilType + " ]." );
+					ShowContinueErrorTimeStamp( "" );
+				} 
+				ShowRecurringWarningErrorAtEnd( "DX heating coil EIRTempModFac curve value < 0.0 warning continues... ", DXCoil( DXCoilNum ).EIRFTErrIndex, EIRTempModFac, EIRTempModFac );
+				EIRTempModFac = 0.0;
+			}
+
 			EIR = DXCoil( DXCoilNum ).RatedEIR( Mode ) * EIRTempModFac * EIRFlowModFac;
 			// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
 			PLRHeating = min( 1.0, ( PartLoadRatio + ( LoadDueToDefrost * PartLoadRatio ) / TotCapAdj ) );
