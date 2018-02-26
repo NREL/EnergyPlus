@@ -2933,13 +2933,13 @@ namespace ReportSizingManager {
 			}
 		} else if ( SizingType == CoolingWaterflowSizing ) { // used by watercoils.cc
 			//SizingResult is water flow in m3/s
-			coilSelectionReportObj->setCoilWaterFlow( CompName, CompType, SizingResult, IsAutoSize, DataPltSizCoolNum, DataWaterLoopNum );
+			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizCoolNum, DataWaterLoopNum );
 			coilSelectionReportObj->setCoilWaterDeltaT( CompName, CompType , CoilDesWaterDeltaT );
 			coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp );
 			coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp + CoilDesWaterDeltaT );
 		} else if ( SizingType == HeatingWaterflowSizing ) {
 			//SizingResult is water flow in m3/s
-			coilSelectionReportObj->setCoilWaterFlow( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum  );
+			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum  );
 			coilSelectionReportObj->setCoilWaterDeltaT( CompName, CompType , PlantSizData( DataPltSizHeatNum ).DeltaT );
 			coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataGlobals::HWInitConvTemp );
 			coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataGlobals::HWInitConvTemp - PlantSizData( DataPltSizHeatNum ).DeltaT );
@@ -2962,7 +2962,7 @@ namespace ReportSizingManager {
 		} else if ( SizingType == HeatingWaterDesCoilLoadUsedForUASizing ) {
 			coilSelectionReportObj->setCoilHeatingCapacity( CompName, CompType, SizingResult, IsAutoSize,CurSysNum, CurZoneEqNum,CurOASysNum, FanCoolLoad, TotCapTempModFac, DXFlowPerCapMinRatio, DXFlowPerCapMaxRatio );
 		} else if ( SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing ) {
-			coilSelectionReportObj->setCoilWaterFlow( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum  );
+			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum  );
 		} else if ( SizingType == HeatingAirflowSizing ) {
 			if ( coilSelectionReportObj->isCompTypeCoil( CompType ) ) {
 				//SizingResult is airflow in m3/s
@@ -3001,7 +3001,7 @@ namespace ReportSizingManager {
 			}
 		} else if ( SizingType == WaterHeatingCapacitySizing ) {
 			if ( coilSelectionReportObj->isCompTypeCoil( CompType ) ) {
-				coilSelectionReportObj->setCoilWaterHeaterCapacity( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum );
+				coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum );
 			}
 		} else if ( SizingType == WaterHeatingCoilUASizing ) {
 			coilSelectionReportObj->setCoilUA( CompName, CompType, SizingResult, DataCapacityUsedForSizing, IsAutoSize,  CurSysNum, CurZoneEqNum );

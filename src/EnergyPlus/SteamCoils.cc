@@ -870,8 +870,8 @@ namespace SteamCoils {
 		RegisterPlantCompDesignFlow( SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 
 		coilSelectionReportObj->setCoilHeatingCapacity( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, CurSysNum, CurZoneEqNum, CurOASysNum, 0.0, 1.0, -999.0,-999.0 );
-		coilSelectionReportObj->setCoilWaterHeaterCapacity( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, PltSizSteamNum, SteamCoil( CoilNum ).LoopNum );
-		coilSelectionReportObj->setCoilWaterFlow( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", SteamCoil( CoilNum ).MaxSteamVolFlowRate, coilWasAutosized, PltSizSteamNum, SteamCoil( CoilNum ).LoopNum );
+		coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).SteamOutletNodeNum, SteamCoil( CoilNum ).LoopNum );
+		coilSelectionReportObj->setCoilWaterFlowNodeNums( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", SteamCoil( CoilNum ).MaxSteamVolFlowRate, coilWasAutosized, SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).SteamOutletNodeNum, SteamCoil( CoilNum ).LoopNum );
 		coilSelectionReportObj->setCoilEntWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn ); //coil  report
 		coilSelectionReportObj->setCoilLvgWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn - SteamCoil( CoilNum ).DegOfSubcooling ); //coil report
 		coilSelectionReportObj->setCoilWaterDeltaT( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , SteamCoil( CoilNum ).DegOfSubcooling );  //coil report

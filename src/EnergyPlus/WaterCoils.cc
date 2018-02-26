@@ -136,7 +136,6 @@ namespace WaterCoils {
 	using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 	using DataPlant::TypeOf_CoilWaterSimpleHeating;
 	using DataPlant::PlantLoop;
-	using DataPlant::MyPlantSizingIndex;
 	using namespace ScheduleManager;
 
 	// Data
@@ -1409,7 +1408,7 @@ namespace WaterCoils {
 					gio::write( OutputFileInits, fmtA ) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 2 );
 					bool errorsfound;
 					coilSelectionReportObj->setCoilAirFlow(WaterCoil( CoilNum ).Name,"Coil:Heating:Water", WaterCoil( CoilNum ).DesAirVolFlowRate,WaterCoil( CoilNum ).RequestingAutoSize );
-					coilSelectionReportObj->setCoilWaterHeaterCapacity( WaterCoil( CoilNum ).Name,"Coil:Heating:Water",WaterCoil( CoilNum ).TotWaterHeatingCoilRate,WaterCoil( CoilNum ).RequestingAutoSize, MyPlantSizingIndex( "hot water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, errorsfound ), WaterCoil ( CoilNum ).WaterLoopNum ); //coil report
+					coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums( WaterCoil( CoilNum ).Name,"Coil:Heating:Water",WaterCoil( CoilNum ).TotWaterHeatingCoilRate,WaterCoil( CoilNum ).RequestingAutoSize, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, WaterCoil ( CoilNum ).WaterLoopNum ); //coil report
 				} else if ( SELECT_CASE_var == WaterCoil_DetFlatFinCooling ) {
 					if ( RptCoilHeaderFlag( 2 ) ) {
 						gio::write( OutputFileInits, fmtA ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal Sensible Heat Ratio";
@@ -1428,7 +1427,7 @@ namespace WaterCoils {
 					gio::write( OutputFileInits, fmtA ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 );
 					coilSelectionReportObj->setCoilAirFlow( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).DesAirVolFlowRate,WaterCoil( CoilNum ).RequestingAutoSize ); //Coil Report
 					bool errorsFound;
-					coilSelectionReportObj->setCoilWaterCoolingCapacity( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).DesWaterCoolingCoilRate, WaterCoil( CoilNum ).RequestingAutoSize, MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, errorsFound ),WaterCoil( CoilNum ).WaterLoopNum ); //Coil Report
+					coilSelectionReportObj->setCoilWaterCoolingCapacity( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).DesWaterCoolingCoilRate, WaterCoil( CoilNum ).RequestingAutoSize, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, WaterCoil( CoilNum ).WaterLoopNum ); //Coil Report
 				} else if ( SELECT_CASE_var == WaterCoil_Cooling ) {
 					if ( RptCoilHeaderFlag( 2 ) ) {
 						gio::write( OutputFileInits, fmtA ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}";
@@ -1449,7 +1448,7 @@ namespace WaterCoils {
 					gio::write( OutputFileInits, fmtA ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 ) + ',' + RoundSigDigits( UATotal, 2 ) + ',' + RoundSigDigits( SurfaceArea, 2 );
 					coilSelectionReportObj->setCoilAirFlow( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water", WaterCoil( CoilNum ).DesAirVolFlowRate,WaterCoil( CoilNum ).RequestingAutoSize ); // Coil Report
 					bool errorsFound;
-					coilSelectionReportObj->setCoilWaterCoolingCapacity( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water", WaterCoil( CoilNum ).DesWaterCoolingCoilRate, WaterCoil( CoilNum ).RequestingAutoSize, MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, errorsFound ),WaterCoil ( CoilNum ).WaterLoopNum ); //Coil Report
+					coilSelectionReportObj->setCoilWaterCoolingCapacity( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water", WaterCoil( CoilNum ).DesWaterCoolingCoilRate, WaterCoil( CoilNum ).RequestingAutoSize, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum ,WaterCoil ( CoilNum ).WaterLoopNum ); //Coil Report
 				}}
 				if ( WaterCoil( CoilNum ).DesWaterCoolingCoilRate <= 0.0 ) WaterCoil( CoilNum ).DesWaterCoolingCoilRate = WaterCoil( CoilNum ).TotWaterCoolingCoilRate;
 				if ( WaterCoil( CoilNum ).DesWaterHeatingCoilRate <= 0.0 ) WaterCoil( CoilNum ).DesWaterHeatingCoilRate = WaterCoil( CoilNum ).TotWaterHeatingCoilRate;
@@ -1681,7 +1680,6 @@ namespace WaterCoils {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataEnvironment::StdBaroPress;
 		using DataAirSystems::PrimaryAirSystem;
-		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 		using ReportSizingManager::GetCoilDesFlowT;
@@ -1733,7 +1731,7 @@ namespace WaterCoils {
 		// cooling coils
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling && WaterCoil( CoilNum ).RequestingAutoSize ) {
 			// find the appropriate Plant Sizing object
-			PltSizCoolNum = MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
+			PltSizCoolNum = DataPlant::MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
 		}
 
 
@@ -2007,7 +2005,7 @@ namespace WaterCoils {
 		// if this is a heating coil
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Heating && WaterCoil( CoilNum ).RequestingAutoSize ) {
 			// find the appropriate heating Plant Sizing object
-			PltSizHeatNum = MyPlantSizingIndex( "hot water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum,
+			PltSizHeatNum = DataPlant::MyPlantSizingIndex( "hot water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum,
 				WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
 		}
 

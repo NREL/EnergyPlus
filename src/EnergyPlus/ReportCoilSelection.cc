@@ -1044,7 +1044,48 @@ ReportCoilSelection::setCoilAirFlow(
 }
 
 void
-ReportCoilSelection::setCoilWaterFlow(
+ReportCoilSelection::setCoilWaterFlowNodeNums(
+	std::string const & coilName, // user-defined name of the coil
+	std::string const & coilType, // idf input object class name of coil
+	Real64 const waterVdot, // plant fluid flow rate in m3/s
+	bool const isAutoSized, // true if water flow was autosized
+	int const inletNodeNum, // coil chw inlet node num
+	int const outletNodeNum, // coil chw outlet node num
+	int const plantLoopNum // plant loop structure index
+)
+{
+	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
+	auto & c( coilSelectionDataObjs[ index ] );
+	if ( ( DataSizing::NumPltSizInput > 0 ) && ( inletNodeNum > 0 ) && ( outletNodeNum > 0 ) ) {
+		bool errorsfound = false;
+		c->pltSizNum = DataPlant::MyPlantSizingIndex( "water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
+	} else {
+		c->pltSizNum = -999;
+	}
+	c->waterLoopNum = plantLoopNum;
+
+	if ( c->waterLoopNum > 0 && c->pltSizNum > 0 ) {
+		c->plantLoopName = DataPlant::PlantLoop( c->waterLoopNum ).Name;
+		if ( DataSizing::PlantSizData( c->pltSizNum  ).LoopType != DataSizing::SteamLoop ) {
+			c->rhoFluid = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
+
+			c->cpFluid = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );		
+		} else { // steam loop
+			c->rhoFluid = FluidProperties::GetSatDensityRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 1.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
+			c->cpFluid =  FluidProperties::GetSatSpecificHeatRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 0.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
+		}
+
+		c->coilDesWaterMassFlow = waterVdot * c->rhoFluid;
+	}
+	if ( isAutoSized ) {
+		c->coilWaterFlowAutoMsg = "Yes" ;
+	} else {
+		c->coilWaterFlowAutoMsg = "No" ;
+	}
+}
+
+void
+ReportCoilSelection::setCoilWaterFlowPltSizNum(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
 	Real64 const waterVdot, // plant fluid flow rate in m3/s
@@ -1570,7 +1611,8 @@ ReportCoilSelection::setCoilWaterCoolingCapacity(
 	std::string const & coilType, // idf input object class name of coil
 	Real64 const totalCoolingCap, // {W} coil cooling capacity
 	bool const isAutoSize, // true if value was autosized
-	int const dataPltSizNum, // plant sizing structure index
+	int const inletNodeNum, // coil chw inlet node num
+	int const outletNodeNum, // coil chw outlet node num
 	int const dataWaterLoopNum // plant loop structure index
 )
 {
@@ -1578,12 +1620,41 @@ ReportCoilSelection::setCoilWaterCoolingCapacity(
 	auto & c( coilSelectionDataObjs[ index ] );
 	c->coilTotCapAtPeak = totalCoolingCap;
 	c->capIsAutosized = isAutoSize;
-	c->pltSizNum = dataPltSizNum;
+	if ( ( DataSizing::NumPltSizInput > 0 ) && ( inletNodeNum > 0 ) && ( outletNodeNum > 0 ) ) {
+		bool errorsfound = false;
+		c->pltSizNum = DataPlant::MyPlantSizingIndex( "chilled water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
+	} else {
+		c->pltSizNum = -999;
+	}
 	c->waterLoopNum = dataWaterLoopNum;
 }
 
 void
-ReportCoilSelection::setCoilWaterHeaterCapacity(
+ReportCoilSelection::setCoilWaterHeaterCapacityNodeNums(
+	std::string const & coilName, // user-defined name of the coil
+	std::string const & coilType, // idf input object class name of coil
+	Real64 const totalHeatingCap, // {W} coil Heating capacity
+	bool const isAutoSize, // true if value was autosized
+	int const inletNodeNum, // coil chw inlet node num
+	int const outletNodeNum, // coil chw outlet node num
+	int const dataWaterLoopNum // plant loop structure index
+)
+{
+	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
+	auto & c( coilSelectionDataObjs[ index ] );
+	c->coilTotCapAtPeak = totalHeatingCap;
+	c->capIsAutosized = isAutoSize;
+	if ( ( DataSizing::NumPltSizInput > 0 ) && ( inletNodeNum > 0 ) && ( outletNodeNum > 0 ) ) {
+		bool errorsfound = false;
+		c->pltSizNum = DataPlant::MyPlantSizingIndex( "hot water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
+	} else {
+		c->pltSizNum = -999;
+	}
+	c->waterLoopNum = dataWaterLoopNum;
+}
+
+void
+ReportCoilSelection::setCoilWaterHeaterCapacityPltSizNum(
 	std::string const & coilName, // user-defined name of the coil
 	std::string const & coilType, // idf input object class name of coil
 	Real64 const totalHeatingCap, // {W} coil Heating capacity

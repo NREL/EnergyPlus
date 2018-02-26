@@ -278,7 +278,18 @@ public: // methods
 
 
 	void
-	setCoilWaterFlow(  
+	setCoilWaterFlowNodeNums(  
+		std::string const & coilName, // user-defined name of the coil
+		std::string const & coilType, // idf input object class name of coil
+		Real64 const waterVdot, // water flow rate in m3/s
+		bool const isAutoSized, // true if water flow was autosized
+		int const inletNodeNum, // coil chw inlet node num
+		int const outletNodeNum, // coil chw outlet node num
+		int const DataWaterLoopNum // plant loop structure index
+	);
+
+	void
+	setCoilWaterFlowPltSizNum(  
 		std::string const & coilName, // user-defined name of the coil
 		std::string const & coilType, // idf input object class name of coil
 		Real64 const waterVdot, // water flow rate in m3/s
@@ -374,17 +385,29 @@ public: // methods
 		std::string const & coilType, // idf input object class name of coil
 		Real64 const totalCoolingCap, // {W} coil cooling capacity
 		bool const isAutoSize, // true if value was autosized
-		int const dataPltSizNum, // plant sizing structure index
+		int const inletNodeNum, // coil chw inlet node num
+		int const outletNodeNum, // coil chw outlet node num
 		int const dataWaterLoopNum // plant loop structure index
 	);
 
 	void
-	setCoilWaterHeaterCapacity(
+	setCoilWaterHeaterCapacityNodeNums(
 		std::string const & coilName, // user-defined name of the coil
 		std::string const & coilType, // idf input object class name of coil
 		Real64 const totalHeatingCap, // {W} coil Heating capacity
 		bool const isAutoSize, // true if value was autosized
-		int const dataPltSizNum, // plant sizing structure index
+		int const inletNodeNum, // coil chw inlet node num
+		int const outletNodeNum, // coil chw outlet node num
+		int const dataWaterLoopNum // plant loop structure index
+	);
+
+	void
+	setCoilWaterHeaterCapacityPltSizNum(
+		std::string const & coilName, // user-defined name of the coil
+		std::string const & coilType, // idf input object class name of coil
+		Real64 const totalHeatingCap, // {W} coil Heating capacity
+		bool const isAutoSize, // true if value was autosized
+		int const DataPltSizNum, // plant sizing structure index
 		int const dataWaterLoopNum // plant loop structure index
 	);
 
