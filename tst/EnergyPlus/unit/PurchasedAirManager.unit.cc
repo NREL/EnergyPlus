@@ -241,7 +241,7 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 		"; !- Latent Heat Recovery Effectiveness{ dimensionless }",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::DoWeathSim = true;
 
@@ -341,7 +341,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	DataGlobals::DoWeathSim = true;
 
@@ -448,7 +448,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	DataGlobals::DoWeathSim = true;
 

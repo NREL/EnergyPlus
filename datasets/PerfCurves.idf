@@ -271,7 +271,7 @@
 !
 
   HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1,
-    HXDesPerf1,              !- Name
+    HXDesPerf2,              !- Name
     1.32,                    !- Nominal Air Flow Rate {m3/s}
     4.064,                   !- Nominal Air Face Velocity {m/s}
     50.0,                    !- Nominal Electric Power {W}

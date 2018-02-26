@@ -67,7 +67,6 @@
 #include <DaylightingManager.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
 #include <ScheduleManager.hh>
@@ -782,7 +781,6 @@ namespace WindowEquivalentLayer {
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::InterpSlatAng;
 		using General::InterpSw;
-		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
 		using DataGlobals::StefanBoltzmann;
 		using DataEnvironment::SkyTempKelvin;

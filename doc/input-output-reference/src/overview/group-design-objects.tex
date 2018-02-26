@@ -1596,6 +1596,8 @@ The design outdoor air flow rate in cubic meters per second. Generally this shou
 
 The ratio of the maximum system air flow rate for heating to the maximum system air flow rate. The value must be between 0 and 1. For constant volume systems the ratio should be set to 1. This ratio should be set to reflect what the user expects the system flow rate to be when maximum heating demand occurs. This ratio is used in calculating the central system heating capacity. Thus if the system is VAV with the zone VAV dampers held at minimum flow when there is a zone heating demand, this ratio should be set to the minimum flow ratio. If the zone VAV dampers are reverse action and can open to full flow to meet heating demand, this ratio should be set to 1. The default is set to 0.5, reflecting the fact that VAV dampers are typically not allowed to fully open during heating.
 
+This field can be set to \emph{AutoSize}.  When automatically calculated, the ratio is determined from the system heating design flow rate divided by the main (which is usually the max of heating and cooling design flow rates) design flow rate.  The design flow rates are also adjusted to be more accurate by examining each of the air terminals attached to the air system and summing the heating and maximum flow rates. 
+
 \paragraph{Field: Preheat Design Temperature}\label{field-preheat-design-temperature}
 
 The design air temperature exiting the preheat coil (if any) in degrees Celsius.

@@ -94,7 +94,7 @@ TEST_F( EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize )
 		"    2;                       !- Basin Heater Setpoint Temperature {C}",
 		} );
 
-		EXPECT_FALSE( process_idf( idf_objects, false ) );
+		EXPECT_TRUE( process_idf( idf_objects, false ) );
 
 		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
 		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
@@ -110,7 +110,7 @@ TEST_F( EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize )
 		}
 
 		GetConstCOPChillerInput();
-		
+
 		DataPlant::PlantLoop( 1 ).Name = "ChilledWaterLoop";
 		DataPlant::PlantLoop( 1 ).FluidName = "ChilledWater";
 		DataPlant::PlantLoop( 1 ).FluidIndex = 1;
