@@ -4369,24 +4369,12 @@ namespace SimAirServingZones {
 		Real64 HtgSupplyAirAdjustFactor; // temporary variable
 		Real64 SysOAUnc; // uncorrected system OA summing up people and area based OA for all zones for VRP
 		Real64 ZoneOAUnc; // uncorrected zone OA summing up people and area based OA for each zone
-		Real64 TotalPeople; // total number of people in each zone
 		Array1D< Real64 > PzSumBySysCool; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
 		Array1D< Real64 > PzSumBySysHeat; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
-		Real64 PeakPeople; // peak population based on maximum people schedule value
 		Array1D< Real64 > PsBySysCool; // saved value of PeakPeople which is Ps used in 62.1 tabular report
 		Array1D< Real64 > PsBySysHeat; // saved value of PeakPeople which is Ps used in 62.1 tabular report
-		Real64 PopulationDiversity; // ratio of total system co-incident peak population to sum of people for all zones in system
 		Array1D< Real64 > DBySysCool; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
 		Array1D< Real64 > DBySysHeat; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
-		Real64 RpPzSum; // Rp times Pz used for computing the system total Rp value for 62.1 tabular report
-		Real64 RaAzSum; // Ra time Az used for computing the system tota Ra value for 62.1 tabular report
-		Real64 AzSum; // Az sum for system total Az for 62.1 tabular report
-		Real64 VbzSum; // Vbz sum for system total Vbz for 62.1 tabular report
-		Real64 VozClgSum; // Voz-clg sum for system total Voz-clg for 62.1 tabular report
-		Real64 VozHtgSum; // Voz-htg sum for system total Voz-htg for 62.1 tabular report
-		Real64 VdzSum; // Vdz-sum for system total Vbz for 62.1 tabular report
-		Real64 VdzHtgSum; // heating based Vdz-sum for system total Vbz for 62.1 tabular report
-		Real64 VpzMin; // Vpz-min for system total Vbz for 62.1 tabular report
 
 		// allocate arrays used to store values for standard 62.1 tabular report
 		if ( ! allocated( VpzClgByZone ) ) {
