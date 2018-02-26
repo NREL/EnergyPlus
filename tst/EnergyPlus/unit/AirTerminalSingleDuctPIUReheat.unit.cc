@@ -1495,8 +1495,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( "SERIES PIU ELEC RHT AIR DISTRIBUTION UNIT", AirDistUnit( ADUNum ).Name ); // ADU name
 		EXPECT_EQ( "SERIES PIU ELEC RHT", PIU( PIUNum ).Name ); // PIU series name
 		EXPECT_EQ( AirDistUnit( ADUNum ).InletNodeNum, PIU( PIUNum ).PriAirInNode );
-		EXPECT_EQ( AirDistUnit( PIU( PIUNum ).ADUNum ).AirLoopNum, ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).CtrlZoneInNodeIndex ) );
-		ASSERT_TRUE( ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).AirDistUnitCool( PIU( PIUNum ).CtrlZoneInNodeIndex ).SupplyAirPathExists );
+		EXPECT_EQ( AirDistUnit( PIU( PIUNum ).ADUNum ).AirLoopNum, ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).ctrlZoneInNodeIndex ) );
+		ASSERT_TRUE( ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).AirDistUnitCool( PIU( PIUNum ).ctrlZoneInNodeIndex ).SupplyAirPathExists );
 	}
 
 }
