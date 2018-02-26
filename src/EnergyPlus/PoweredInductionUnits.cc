@@ -788,6 +788,7 @@ namespace PoweredInductionUnits {
 			if ( PIU( PIUNum ).AirLoopNum == 0 ) { // fill air loop index
 				if ( PIU( PIUNum ).CtrlZoneNum > 0 && PIU( PIUNum ).ctrlZoneInNodeIndex > 0 ) {
 					PIU( PIUNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).ctrlZoneInNodeIndex );
+					AirDistUnit( PIU( PIUNum ).ADUNum ).AirLoopNum = PIU( PIUNum ).AirLoopNum;
 				}
 			}
 
@@ -917,6 +918,7 @@ namespace PoweredInductionUnits {
 
 		PltSizHeatNum = 0;
 		DesMassFlow = 0.0;
+		DesCoilLoad = 0.0;
 		ErrorsFound = false;
 		IsAutoSize = false;
 		MaxPriAirVolFlowDes = 0.0;
