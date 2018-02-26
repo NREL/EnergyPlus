@@ -2751,7 +2751,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		VariableSpeedCoils::GetVarSpeedCoilInput();
 
@@ -2774,7 +2774,7 @@ namespace EnergyPlus {
 		Real64 SSInletTemp = 24.0;
 		Real64 InletAirPressure = 101320.0;
 
-		VariableSpeedCoils::CalcTotCapSHR_VSWSHP( LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1 );
+		VariableSpeedCoils::CalcTotCapSHR_VSWSHP( LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1, VariableSpeedCoils::VarSpeedCoil( 1 ).capModFacTotal );
 
 		// same calculations as in CalcTotCapSHR_VSWSHP (except CapFTemp term is 1 so no need to add that calc here)
 		Real64 hDelta = MSRatedTotCap / LSMassFlowRate; // Change in air enthalpy across the cooling coil [J/kg]
