@@ -57,6 +57,7 @@
 // Fixtures, etc.
 #include <Fixtures/EnergyPlusFixture.hh>
 #include <ConfiguredFunctions.hh>
+#include <DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -96,6 +97,7 @@ namespace EnergyPlus {
 		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/ExhaustFiredChiller.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, FluidPropertiesRefData ) {
+		DataGlobals::preserveIDFOrder = false;
 		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/FluidPropertiesRefData.idf" ) ) ) );
 	}
 	TEST_F( DataSetFixture, FossilFuelEnvironmentalImpactFactors ) {
