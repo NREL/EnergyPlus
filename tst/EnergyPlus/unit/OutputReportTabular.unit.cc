@@ -74,6 +74,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
@@ -6133,8 +6134,11 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	Zone( 1 ).ListMultiplier = 1;
 	Zone( 1 ).FloorArea = 12.;
 
+	WeatherManager::DesDayInput.allocate( 1 );
+	WeatherManager::DesDayInput( 1 ).Month = 1;
+	WeatherManager::DesDayInput( 1 ).DayOfMonth = 1;
+
 	CoolPeakDateHrMin.allocate( 1 );
-	CoolPeakDateHrMin( 1 ) = "06/30 13:15:00";
 
 	CalcFinalZoneSizing.allocate( 1 );
 	CalcFinalZoneSizing( 1 ).CoolOutTempSeq.allocate( 10 );
@@ -6153,9 +6157,8 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	FinalZoneSizing.allocate( 1 );
 	FinalZoneSizing( 1 ).DesCoolLoad = 600.;
 
-	CollectPeakZoneConditions( compLoad, timeOfMax, zoneIndex, isCooling );
+	CollectPeakZoneConditions( compLoad, 1, timeOfMax, zoneIndex, isCooling );
 
-	EXPECT_EQ( compLoad.peakDateHrMin, "06/30 13:15:00" );
 	EXPECT_EQ( compLoad.outsideDryBulb, 38. );
 	EXPECT_EQ( compLoad.outsideHumRatio, 0.01459 );
 	EXPECT_EQ( compLoad.zoneDryBulb, 24. );
