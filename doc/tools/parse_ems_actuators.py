@@ -14,12 +14,12 @@ any parameters it will default to `../../src/EnergyPlus`,
 
 Known limitations:
 -------------------
-This is a pretty dumb script that only parses lines that
-match a given pattern. There is no semantic analysis, so if a variable is used
-in the call to `SetupEMSActuator` instead of a string literal, this script
-doesn't know what's inside this variable (eg it willreport
-'cCMO_BBRadiator_Electric' for 'Name' when really this variable stores the
-string "ZoneHVAC:Baseboard:Convective:Electric").
+This is a pretty dumb script that only parses lines that match a given pattern.
+There is no semantic analysis, so if a variable is used in the call to
+`SetupEMSActuator` instead of a string literal, this script doesn't know what's
+inside this variable
+(eg: it will report 'cCMO_BBRadiator_Electric' for 'Name' when really this
+variable stores the string "ZoneHVAC:Baseboard:Convective:Electric").
 The only thing of that sort that it tries to do is to parse the list
 of 'cCurrentModuleObject'.
 
