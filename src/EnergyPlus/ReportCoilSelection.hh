@@ -493,7 +493,7 @@ private: // methods
 	);
 
 
-private: // data
+public: // data
 	int numCoilsReported_;
 	std::vector< std::unique_ptr< CoilSelectionData > > coilSelectionDataObjs;
 
