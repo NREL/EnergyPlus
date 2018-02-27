@@ -166,21 +166,6 @@ namespace HVACVariableRefrigerantFlow {
 	extern Array1D< Real64 > SumHeatingLoads; // sum of heating loads
 
 	// Subroutine Specifications for the Module
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Algorithms for the module
-
-	// Update routine to check convergence and update nodes
-	//Private UpdateVRF
-
-	// Reporting routines for module
-
-	// Types
-
 	struct VRFCondenserEquipment
 	{
 		// Members

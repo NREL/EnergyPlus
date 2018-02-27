@@ -246,20 +246,6 @@ namespace HVACVariableRefrigerantFlow {
 	Array1D< Real64 > SumCoolingLoads; // sum of cooling loads
 	Array1D< Real64 > SumHeatingLoads; // sum of heating loads
 
-	// Subroutine Specifications for the Module
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Algorithms for the module
-
-	// Update routine to check convergence and update nodes
-	//Private UpdateVRF
-
-	// Reporting routines for module
-
 	// Object Data
 	Array1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
 	std::unordered_map< std::string, std::string > VrfUniqueNames;
@@ -504,19 +490,11 @@ namespace HVACVariableRefrigerantFlow {
 		static std::string const RoutineName( "VRFCondenser" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TUListNum; // index to TU List
-		int NumTUInList; // number of terminal units is list
 		int NumTU; // loop counter
 		int TUIndex; // Index to terminal unit
 		int CoolCoilIndex; // index to cooling coil in terminal unit
 		int HeatCoilIndex; // index to heating coil in terminal unit
-		int NumTUInCoolingMode; // number of terminal units actually cooling
-		int NumTUInHeatingMode; // number of terminal units actually heating
 
-		Real64 TUCoolingLoad; // DX cooling coil load to be met by condenser (W)
-		Real64 TUHeatingLoad; // DX heating coil load to be met by condenser (W)
-		Real64 TUParasiticPower; // total terminal unit parasitic power (W)
-		Real64 TUFanPower; // total terminal unit fan power (W)
 		Real64 TotCoolCapTempModFac; // cooling CAPFT curve output
 		Real64 TotHeatCapTempModFac; // heating CAPFT curve output
 		Real64 TotCoolEIRTempModFac; // cooling EIRFT curve output
@@ -529,18 +507,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 OutdoorHumRat; // outdoor humidity ratio (kg/kg)
 		Real64 OutdoorPressure; // outdoor pressure (Pa)
 		Real64 OutdoorWetBulb; // outdoor wet-bulb temperature (C)
-		Real64 SumCoolInletWB; // sum of active TU's DX cooling coil inlet air wet-bulb temperature
-		Real64 SumHeatInletDB; // sum of active TU's DX heating coil inlet air dry-bulb temperature
-		Real64 SumHeatInletWB; // sum of active TU's DX heating coil inlet air wet-bulb temperature
 		Real64 CoolOABoundary; // output of cooling boundary curve (outdoor temperature, C)
 		Real64 HeatOABoundary; // output of heating boundary curve (outdoor temperature, C)
-		Real64 TotalTUCoolingCapacity; // sum of TU's cooling capacity (W)
-		Real64 TotalTUHeatingCapacity; // sum of TU's heating capacity (W)
-		Real64 TotalCondCoolingCapacity; // total available condenser cooling capacity (W)
-		Real64 TotalCondHeatingCapacity; // total available condenser heating capacity (W)
-		Real64 CoolingPLR; // condenser cooling PLR
-		Real64 HeatingPLR; // condenser heating PLR
-		Real64 CyclingRatio; // cycling ratio of condenser's compressors
 		Real64 EIRFPLRModFac; // EIRFPLR curve output
 		int Stage; // used for crankcase heater power calculation
 		Real64 UpperStageCompressorRatio; // used for crankcase heater power calculation
@@ -580,24 +548,25 @@ namespace HVACVariableRefrigerantFlow {
 		// FLOW
 
 		// variable initializations
-		TUListNum = VRF( VRFCond ).ZoneTUListPtr;
-		NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
-		TUCoolingLoad = 0.0;
-		TUHeatingLoad = 0.0;
-		TUParasiticPower = 0.0;
-		TUFanPower = 0.0;
-		CoolingPLR = 0.0;
-		HeatingPLR = 0.0;
-		CyclingRatio = 1.0;
-		SumCoolInletWB = 0.0;
-		SumHeatInletDB = 0.0;
-		SumHeatInletWB = 0.0;
-		TotalCondCoolingCapacity = 0.0;
-		TotalCondHeatingCapacity = 0.0;
-		TotalTUCoolingCapacity = 0.0;
-		TotalTUHeatingCapacity = 0.0;
-		NumTUInCoolingMode = 0;
-		NumTUInHeatingMode = 0;
+		int TUListNum = VRF( VRFCond ).ZoneTUListPtr;
+		int NumTUInList = TerminalUnitList( TUListNum ).NumTUInList;
+		int NumTUInCoolingMode = 0; // number of terminal units actually cooling
+		int NumTUInHeatingMode = 0; // number of terminal units actually heating
+		Real64 TUCoolingLoad = 0.0; // sum of TU's cooling coil load {W}
+		Real64 TUHeatingLoad = 0.0; // sum of TU's heating coil load (W)
+		Real64 TUParasiticPower = 0.0; // total terminal unit parasitic power (W)
+		Real64 TUFanPower = 0.0; // total terminal unit fan power (W)
+		Real64 CoolingPLR = 0.0; // condenser cooling PLR
+		Real64 HeatingPLR = 0.0; // condenser heating PLR
+		Real64 CyclingRatio = 1.0; // cycling ratio of condenser's compressors
+		Real64 SumCoolInletWB = 0.0; // sum of active TU's DX cooling coil inlet air wet-bulb temperature
+		Real64 SumHeatInletDB = 0.0; // sum of active TU's DX heating coil inlet air dry-bulb temperature
+		Real64 SumHeatInletWB = 0.0; // sum of active TU's DX heating coil inlet air wet-bulb temperature
+		Real64 TotalCondCoolingCapacity = 0.0; // total available condenser cooling capacity (W)
+		Real64 TotalCondHeatingCapacity = 0.0; // total available condenser heating capacity (W)
+		Real64 TotalTUCoolingCapacity = 0.0; // sum of TU's cooling capacity including piping losses (W)
+		Real64 TotalTUHeatingCapacity = 0.0; // sum of TU's heating capacity including piping losses (W)
+
 		VRF( VRFCond ).ElecCoolingPower = 0.0;
 		VRF( VRFCond ).ElecHeatingPower = 0.0;
 		VRF( VRFCond ).CrankCaseHeaterPower = 0.0;
@@ -649,9 +618,10 @@ namespace HVACVariableRefrigerantFlow {
 		for ( NumTU = 1; NumTU <= NumTUInList; ++NumTU ) {
 			TUCoolingLoad += TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU );
 			TUHeatingLoad += TerminalUnitList( TUListNum ).TotalHeatLoad( NumTU );
-			TUParasiticPower += VRFTU( TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU ) ).ParasiticCoolElecPower + VRFTU( TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU ) ).ParasiticHeatElecPower;
-			TUFanPower += VRFTU( TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU ) ).FanPower;
 		}
+
+		VRF( VRFCond ).TUCoolingLoad = TUCoolingLoad;
+		VRF( VRFCond ).TUHeatingLoad = TUHeatingLoad;
 
 		// no need to do anything else if the terminal units are off
 		if ( TUCoolingLoad == 0.0 && TUHeatingLoad == 0.0 ) {
@@ -659,7 +629,6 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).VRFCondPLR = 0.0;
 			VRF( VRFCond ).VRFCondRTF = 0.0;
 			VRF( VRFCond ).VRFCondCyclingRatio = 0.0;
-			VRF( VRFCond ).DefrostPower = 0.0;
 			VRF( VRFCond ).QCondEnergy = 0.0;
 			VRF( VRFCond ).TotalCoolingCapacity = 0.0;
 			VRF( VRFCond ).TotalHeatingCapacity = 0.0;
@@ -669,10 +638,8 @@ namespace HVACVariableRefrigerantFlow {
 			return;
 		}
 
-
-		VRF( VRFCond ).TUCoolingLoad = TUCoolingLoad;
-		VRF( VRFCond ).TUHeatingLoad = TUHeatingLoad;
-		// switch modes if summed coil capacity above shows opposite operating mode
+		// switch modes if summed coil capacity shows opposite operating mode
+		// if total TU heating exceeds total TU cooling * ( 1 + 1/COP) then system is in heating mode
 		if ( CoolingLoad( VRFCond ) && TUHeatingLoad > ( TUCoolingLoad * ( 1.0 + 1.0 / VRF( VRFCond ).CoolingCOP ) ) ) {
 			HeatingLoad( VRFCond ) = true;
 			CoolingLoad( VRFCond ) = false;
@@ -708,6 +675,8 @@ namespace HVACVariableRefrigerantFlow {
 			TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTU );
 			CoolCoilIndex = VRFTU( TUIndex ).CoolCoilIndex;
 			HeatCoilIndex = VRFTU( TUIndex ).HeatCoilIndex;
+			TUParasiticPower += VRFTU( TUIndex ).ParasiticCoolElecPower + VRFTU( TUIndex ).ParasiticHeatElecPower;
+			TUFanPower += VRFTU( TUIndex ).FanPower;
 
 			if ( TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) > 0.0 ) {
 				SumCoolInletWB += DXCoilCoolInletAirWBTemp( CoolCoilIndex ) * TerminalUnitList( TUListNum ).TotalCoolLoad( NumTU ) / TUCoolingLoad;
@@ -1049,8 +1018,7 @@ namespace HVACVariableRefrigerantFlow {
 				} else {
 					CoolingPLR = 0.0;
 				}
-				HREIRAdjustment = HREIRFTConst + ( HRInitialEIRFrac = HREIRFTConst ) * SUMultiplier;
-				HREIRFTConst *= HREIRAdjustment;
+				HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac ) * SUMultiplier;
 			} else if ( VRF( VRFCond ).HeatRecoveryUsed && VRF( VRFCond ).HRHeatingActive ) {
 				TotalCondHeatingCapacity *= HRCAPFTConst;
 				TotalCondHeatingCapacity = HRInitialCapFrac * TotalCondHeatingCapacity + ( 1.0 - HRInitialCapFrac ) * TotalCondHeatingCapacity * SUMultiplier;
@@ -1060,8 +1028,7 @@ namespace HVACVariableRefrigerantFlow {
 				} else {
 					HeatingPLR = 0.0;
 				}
-				HREIRAdjustment = HREIRFTConst + ( HRInitialEIRFrac = HREIRFTConst ) * SUMultiplier;
-				HREIRFTConst *= HREIRAdjustment;
+				HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac ) * SUMultiplier;
 			}
 			VRF( VRFCond ).VRFCondPLR = max( CoolingPLR, HeatingPLR );
 		}
@@ -1096,7 +1063,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
-			VRF( VRFCond ).ElecCoolingPower = ( VRF( VRFCond ).RatedCoolingPower * TotCoolCapTempModFac ) * TotCoolEIRTempModFac * EIRFPLRModFac * HREIRFTConst * VRFRTF;
+			VRF( VRFCond ).ElecCoolingPower = ( VRF( VRFCond ).RatedCoolingPower * TotCoolCapTempModFac ) * TotCoolEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF;
 		}
 		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
 			VRF( VRFCond ).OperatingMode = ModeHeatingOnly;
@@ -1113,7 +1080,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			VRFRTF = min( 1.0, ( CyclingRatio / PartLoadFraction ) );
 
-			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * HREIRFTConst * VRFRTF * InputPowerMultiplier;
+			VRF( VRFCond ).ElecHeatingPower = ( VRF( VRFCond ).RatedHeatingPower * TotHeatCapTempModFac ) * TotHeatEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF * InputPowerMultiplier;
 
 			// adjust defrost power based on heating RTF
 			VRF( VRFCond ).DefrostPower *= VRFRTF;
@@ -1206,7 +1173,7 @@ namespace HVACVariableRefrigerantFlow {
 		TotPower = TUParasiticPower + TUFanPower + VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower;
 		if ( TotPower > 0.0 ) {
 			VRF( VRFCond ).OperatingCOP = ( VRF( VRFCond ).TUCoolingLoad + VRF( VRFCond ).TUHeatingLoad ) / TotPower;
-			VRF( VRFCond ).SCHE = VRF( VRFCond ).OperatingCOP * 3.412;
+			VRF( VRFCond ).SCHE = VRF( VRFCond ).OperatingCOP * 3.412141633; // see StandardRatings::ConvFromSIToIP
 		}
 
 		// limit the TU capacity when the condenser is maxed out on capacity
