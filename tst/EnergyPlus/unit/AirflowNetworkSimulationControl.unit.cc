@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 		"  0.78;                         !- Discharge Coefficient{ dimensionless }",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetAirflowNetworkInput();
 
@@ -264,7 +264,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 		"  0.78;                         !- Discharge Coefficient{ dimensionless }",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetAirflowNetworkInput();
 

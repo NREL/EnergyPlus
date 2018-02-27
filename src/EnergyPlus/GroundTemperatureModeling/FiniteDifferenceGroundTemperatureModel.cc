@@ -62,7 +62,8 @@
 #include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -110,11 +111,11 @@ namespace EnergyPlus {
 
 		// Search through finite diff models here
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_FiniteDiffGroundTemp );
-		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrModels = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( objectName == cAlphaArgs( 1 ) ) {
 				// Read input into object here

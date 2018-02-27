@@ -87,7 +87,7 @@ namespace EnergyPlus {
 		"1.3;                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 162.5, 0.0001 );
@@ -123,7 +123,7 @@ namespace EnergyPlus {
 		";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 348.7011, 0.0001 );
@@ -159,7 +159,7 @@ namespace EnergyPlus {
 		";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 255.4872, 0.0001 );
@@ -190,7 +190,7 @@ namespace EnergyPlus {
 		"1.3;                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 162.5, 0.0001 );
@@ -220,7 +220,7 @@ namespace EnergyPlus {
 		";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 301.1561, 0.0001 );
@@ -250,7 +250,7 @@ namespace EnergyPlus {
 		";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 255.4872, 0.0001 );
@@ -293,7 +293,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).MinVolFlowRate, DataSizing::AutoSize, 0.000001 );
 		Pumps::SizePump( 1 );
@@ -337,7 +337,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 162.5, 0.0001 );
@@ -379,7 +379,7 @@ namespace EnergyPlus {
 		";                        !- Design Minimum Flow Rate Sizing Factor",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 255.4872, 0.0001 );
@@ -420,7 +420,7 @@ namespace EnergyPlus {
 		",                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		"0.0;                     !- Design Minimum Flow Rate Sizing Factor",
 		} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 348.7011, 0.0001 );
@@ -451,7 +451,7 @@ namespace EnergyPlus {
 		";                        !- Design Shaft Power per Unit Flow Rate per Unit Head",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 301.1561, 0.0001 );
@@ -483,7 +483,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 162.5, 0.0001 );
@@ -515,7 +515,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 255.4872, 0.0001 );
@@ -547,7 +547,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 153.3, 0.1 );
@@ -579,7 +579,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 180.7, 0.1 );
@@ -611,7 +611,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		Pumps::GetPumpInput();
 		Pumps::SizePump( 1 );
 		EXPECT_NEAR( Pumps::PumpEquip( 1 ).NomPowerUse, 97.5, 0.1 );

@@ -67,7 +67,6 @@
 #include <DataZoneEquipment.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
@@ -279,7 +278,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::ZTAV;
-		using InputProcessor::FindItem;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -323,29 +321,11 @@ namespace RoomAirModelUserTempPattern {
 		// figure out which pattern is scheduled and call
 		// appropriate subroutine
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::ZoneMeanAirTemp;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::FindItem;
 		using OutputReportTabular::IntToStr;
 		using General::FindNumberInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused    INTEGER    :: thisZoneInfo
@@ -995,11 +975,6 @@ namespace RoomAirModelUserTempPattern {
 		// METHODOLOGY EMPLOYED:
 		// sets values in Heat balance variables
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using DataLoopNode::Node;
@@ -1017,7 +992,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::TempTstatAir;
 		using DataHeatBalFanSys::SysDepZoneLoads;
 		using DataHeatBalFanSys::ZoneLatentGain;
-		using InputProcessor::FindItem;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1027,18 +1001,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHVACGlobals::RetTempMax;
 		using DataHVACGlobals::RetTempMin;
 		using DataGlobals::ZoneSizingCalc;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SurfFirst; // index number of the first surface in the zone

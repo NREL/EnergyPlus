@@ -107,7 +107,7 @@ TEST_F( EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize )
 			"    LeavingSetpointModulated;!- Chiller Flow Mode",
 		} );
 
-		EXPECT_FALSE( process_idf( idf_objects, false ) );
+		EXPECT_TRUE( process_idf( idf_objects, false ) );
 
 		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
 		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
@@ -123,7 +123,7 @@ TEST_F( EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize )
 		}
 
 		GetElectricChillerInput();
-		
+
 		DataPlant::PlantLoop( 1 ).Name = "ChilledWaterLoop";
 		DataPlant::PlantLoop( 1 ).FluidName = "ChilledWater";
 		DataPlant::PlantLoop( 1 ).FluidIndex = 1;
