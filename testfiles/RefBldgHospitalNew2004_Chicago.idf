@@ -23763,7 +23763,8 @@
     EquipmentSummary,        !- Report 5 Name
     ComponentSizingSummary,  !- Report 6 Name
     HVACSizingSummary,       !- Report 7 Name
-    SystemSummary;           !- Report 8 Name
+    SystemSummary,           !- Report 8 Name
+    CoilSizingDetails;       !- Report 9 Name
 
   Output:Table:Monthly,
     Emissions Data Summary,  !- Name
