@@ -541,7 +541,6 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 CondPower; // condenser power [W]
 		Real64 CondCapacity; // condenser heat rejection [W]
 		Real64 CondOutletTemp; // Outlet temperature from VRF condenser [C]
-		Real64 QCondTmp; // temporary variable for condenser heat rejection [W]
 		Real64 TotPower; // total condenser power use [W]
 		bool HRHeatRequestFlag; // flag indicating VRF TU could operate in heating mode
 		bool HRCoolRequestFlag; // flag indicating VRF TU could operate in cooling mode
@@ -629,12 +628,18 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).VRFCondPLR = 0.0;
 			VRF( VRFCond ).VRFCondRTF = 0.0;
 			VRF( VRFCond ).VRFCondCyclingRatio = 0.0;
-			VRF( VRFCond ).QCondEnergy = 0.0;
+			VRF( VRFCond ).QCondenser = 0.0;
 			VRF( VRFCond ).TotalCoolingCapacity = 0.0;
 			VRF( VRFCond ).TotalHeatingCapacity = 0.0;
 			VRF( VRFCond ).OperatingMode = 0.0;
 			VRF( VRFCond ).HRHeatingActive = false;
 			VRF( VRFCond ).HRCoolingActive = false;
+			if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
+				CondenserWaterMassFlowRate = 0.0;
+				SetComponentFlowRate( CondenserWaterMassFlowRate, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
+				VRF( VRFCond ).WaterCondenserMassFlow = CondenserWaterMassFlowRate;
+				VRF( VRFCond ).CondenserSideOutletTemp = CondInletTemp;
+			}
 			return;
 		}
 
@@ -1138,7 +1143,8 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			SetComponentFlowRate( CondenserWaterMassFlowRate, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
 
-			VRF( VRFCond ).CondenserInletTemp = Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
+			// should be the same as above just entering this function
+//			VRF( VRFCond ).CondenserInletTemp = Node( VRF( VRFCond ).CondenserNodeNum ).Temp;
 			VRF( VRFCond ).WaterCondenserMassFlow = Node( VRF( VRFCond ).CondenserNodeNum ).MassFlowRate;
 
 			CpCond = GetSpecificHeatGlycol( PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidName, VRF( VRFCond ).CondenserInletTemp, PlantLoop( VRF( VRFCond ).SourceLoopNum ).FluidIndex, RoutineName );
@@ -1147,7 +1153,6 @@ namespace HVACVariableRefrigerantFlow {
 			} else {
 				CondOutletTemp = CondInletTemp;
 			}
-			QCondTmp = CondWaterMassFlow * CpCond * ( CondOutletTemp - CondInletTemp );
 			VRF( VRFCond ).CondenserSideOutletTemp = CondOutletTemp;
 
 		}
