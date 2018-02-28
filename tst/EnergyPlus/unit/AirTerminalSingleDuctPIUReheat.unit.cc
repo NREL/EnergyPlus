@@ -221,10 +221,7 @@ namespace EnergyPlus {
 			"    SPACE1-1 PIU Mixer,      !- Zone Mixer Name",
 			"    SPACE1-1 PIU Fan,        !- Fan Name",
 			"    Coil:Heating:Electric,   !- Reheat Coil Object Type",
-			"    SPACE1-1 Zone Coil,      !- Reheat Coil Name",
-			"    autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
-			"    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
-			"    0.0001;                  !- Convergence Tolerance",
+			"    SPACE1-1 Zone Coil;      !- Reheat Coil Name",
 
 			"  Fan:ConstantVolume,",
 			"    SPACE1-1 PIU Fan,        !- Name",
@@ -1087,10 +1084,7 @@ namespace EnergyPlus {
 			"    Series PIU Elec Rht Mixer,  !- Zone Mixer Name",
 			"    Series PIU Fan,          !- Fan Name",
 			"    Coil:Heating:Electric,   !- Reheat Coil Object Type",
-			"    Series PIU Elec Rht Coil,!- Reheat Coil Name",
-			"    Autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
-			"    0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}",
-			"    0.001;                   !- Convergence Tolerance",
+			"    Series PIU Elec Rht Coil;!- Reheat Coil Name",
 
 			"ZoneHVAC:AirDistributionUnit,",
 			"    Series PIU Elec Rht Air Distribution Unit,  !- Name",
