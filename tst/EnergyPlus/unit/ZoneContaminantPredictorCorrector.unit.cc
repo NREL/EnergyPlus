@@ -258,57 +258,6 @@ TEST_F( EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest )
 	DataContaminantBalance::Contaminant.CO2Simulation = false;
 	DataContaminantBalance::Contaminant.GenericContamSimulation = false;
 
-	// Deallocate everything
-	ZoneAirHumRat.deallocate( );
-	ZT.deallocate( );
-	MixingMassFlowZone.deallocate( );
-	ZoneEquipConfig( 1 ).InletNode.deallocate( );
-	ZoneEquipConfig( 1 ).ExhaustNode.deallocate( );
-	ZoneEquipConfig.deallocate( );
-	Node.deallocate( );
-	Zone.deallocate( );
-	ZoneEqSizing.deallocate( );
-	OAMFL.deallocate( );
-	VAMFL.deallocate( );
-	EAMFL.deallocate( );
-	CTMFL.deallocate( );
-	MDotOA.deallocate( );
-	DataContaminantBalance::AZ.deallocate( );
-	DataContaminantBalance::BZ.deallocate( );
-	DataContaminantBalance::CZ.deallocate( );
-	DataContaminantBalance::AZGC.deallocate( );
-	DataContaminantBalance::BZGC.deallocate( );
-	DataContaminantBalance::CZGC.deallocate( );
-	DataContaminantBalance::CO2ZoneTimeMinus1Temp.deallocate( );
-	DataContaminantBalance::CO2ZoneTimeMinus2Temp.deallocate( );
-	DataContaminantBalance::CO2ZoneTimeMinus3Temp.deallocate( );
-	DataContaminantBalance::DSCO2ZoneTimeMinus1.deallocate( );
-	DataContaminantBalance::DSCO2ZoneTimeMinus2.deallocate( );
-	DataContaminantBalance::DSCO2ZoneTimeMinus3.deallocate( );
-	DataContaminantBalance::GCZoneTimeMinus1Temp.deallocate( );
-	DataContaminantBalance::GCZoneTimeMinus2Temp.deallocate( );
-	DataContaminantBalance::GCZoneTimeMinus3Temp.deallocate( );
-	DataContaminantBalance::DSGCZoneTimeMinus1.deallocate( );
-	DataContaminantBalance::DSGCZoneTimeMinus2.deallocate( );
-	DataContaminantBalance::DSGCZoneTimeMinus3.deallocate( );
-	DataContaminantBalance::ZoneAirDensityCO.deallocate( );
-	DataContaminantBalance::ZoneCO2Gain.deallocate( );
-	DataContaminantBalance::ZoneGCGain.deallocate( );
-	DataContaminantBalance::MixingMassFlowCO2.deallocate( );
-	DataContaminantBalance::MixingMassFlowGC.deallocate( );
-	DataContaminantBalance::ZoneAirCO2Temp.deallocate( );
-	DataContaminantBalance::ZoneCO21.deallocate( );
-	DataContaminantBalance::ZoneAirCO2.deallocate( );
-	DataContaminantBalance::ZoneAirGCTemp.deallocate( );
-	DataContaminantBalance::ZoneGC1.deallocate( );
-	DataContaminantBalance::ZoneAirGC.deallocate( );
-	DataContaminantBalance::CO2PredictedRate.deallocate( );
-	DataContaminantBalance::GCPredictedRate.deallocate( );
-	DataContaminantBalance::ZoneSysContDemand.deallocate( );
-	DataContaminantBalance::ContaminantControlledZone.deallocate( );
-	DataContaminantBalance::ZoneGCSetPoint.deallocate( );
-	ScheduleManager::Schedule.deallocate( );
-
 }
 
 TEST_F( EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContaminantsTest )
@@ -443,51 +392,4 @@ TEST_F( EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamin
 	DataContaminantBalance::Contaminant.CO2Simulation = false;
 	DataContaminantBalance::Contaminant.GenericContamSimulation = false;
 
-	// Deallocate everything
-	ZoneAirHumRat.deallocate( );
-	ZT.deallocate( );
-	MixingMassFlowZone.deallocate( );
-	ZoneEquipConfig( 1 ).InletNode.deallocate( );
-	ZoneEquipConfig( 1 ).ExhaustNode.deallocate( );
-	ZoneEquipConfig.deallocate( );
-	Node.deallocate( );
-	Zone.deallocate( );
-	ZoneEqSizing.deallocate( );
-	OAMFL.deallocate( );
-	VAMFL.deallocate( );
-	EAMFL.deallocate( );
-	CTMFL.deallocate( );
-	MDotOA.deallocate( );
-	DataContaminantBalance::AZ.deallocate( );
-	DataContaminantBalance::BZ.deallocate( );
-	DataContaminantBalance::CZ.deallocate( );
-	DataContaminantBalance::AZGC.deallocate( );
-	DataContaminantBalance::BZGC.deallocate( );
-	DataContaminantBalance::CZGC.deallocate( );
-	DataContaminantBalance::CO2ZoneTimeMinus1Temp.deallocate( );
-	DataContaminantBalance::CO2ZoneTimeMinus2Temp.deallocate( );
-	DataContaminantBalance::CO2ZoneTimeMinus3Temp.deallocate( );
-	DataContaminantBalance::DSCO2ZoneTimeMinus1.deallocate( );
-	DataContaminantBalance::DSCO2ZoneTimeMinus2.deallocate( );
-	DataContaminantBalance::DSCO2ZoneTimeMinus3.deallocate( );
-	DataContaminantBalance::GCZoneTimeMinus1Temp.deallocate( );
-	DataContaminantBalance::GCZoneTimeMinus2Temp.deallocate( );
-	DataContaminantBalance::GCZoneTimeMinus3Temp.deallocate( );
-	DataContaminantBalance::DSGCZoneTimeMinus1.deallocate( );
-	DataContaminantBalance::DSGCZoneTimeMinus2.deallocate( );
-	DataContaminantBalance::DSGCZoneTimeMinus3.deallocate( );
-	DataContaminantBalance::ZoneAirDensityCO.deallocate( );
-	DataContaminantBalance::ZoneCO2Gain.deallocate( );
-	DataContaminantBalance::ZoneGCGain.deallocate( );
-	DataContaminantBalance::MixingMassFlowCO2.deallocate( );
-	DataContaminantBalance::MixingMassFlowGC.deallocate( );
-	DataContaminantBalance::ZoneAirCO2Temp.deallocate( );
-	DataContaminantBalance::ZoneCO21.deallocate( );
-	DataContaminantBalance::ZoneAirCO2.deallocate( );
-	DataContaminantBalance::ZoneAirGCTemp.deallocate( );
-	DataContaminantBalance::ZoneGC1.deallocate( );
-	DataContaminantBalance::ZoneAirGC.deallocate( );
-
 }
-
-
