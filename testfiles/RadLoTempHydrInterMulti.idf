@@ -12,8 +12,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3캜
-!                          CHICAGO_IL_USA Annual Cooling DRY (DB=>MWB) 1%, MaxDB=31.5캜 MWB=10캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3째C
+!                          CHICAGO_IL_USA Annual Cooling DRY (DB=>MWB) 1%, MaxDB=31.5째C MWB=10째C
 !
 ! Run Period (Weather File): none
 !
@@ -146,7 +146,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3캜
+ ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
@@ -176,7 +176,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling DRY (DB=>MWB) 1%, MaxDB=31.5캜 MWB=10캜
+ ! CHICAGO_IL_USA Annual Cooling DRY (DB=>MWB) 1%, MaxDB=31.5째C MWB=10째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name

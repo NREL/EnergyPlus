@@ -209,7 +209,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
 		Real64 HPTimeConstant; // Heat pump time constant [s]
 		Real64 FanDelayTime; // Fan delay time, time delay for the HP's fan to
-
+		bool reportCoilFinalSizes; //one time report of sizes to coil report
 		// Default Constructor
 		SimpleWatertoAirHPConditions() :
 			WAHPPlantTypeOfNum( 0 ),
@@ -294,7 +294,8 @@ namespace WaterToAirHeatPumpSimple {
 			Gamma_Rated( 0.0 ),
 			MaxONOFFCyclesperHour( 0.0 ),
 			HPTimeConstant( 0.0 ),
-			FanDelayTime( 0.0 )
+			FanDelayTime( 0.0 ),
+			reportCoilFinalSizes( true )
 		{}
 
 	};

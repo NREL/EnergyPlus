@@ -2175,7 +2175,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio,Hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,Hourly;
+  Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
   Output:Variable,*,Heating Coil Electric Power,Hourly;
 
@@ -2188,8 +2188,6 @@
   Output:Variable,*,Heating Coil Runtime Fraction,Hourly;
 
   Output:Variable,*,Heating Coil Ancillary Gas Rate,Hourly;
-
-  Output:Variable,*,Heating Coil Air Heating Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
 

@@ -8,8 +8,8 @@
 !
 ! Location:                Phoenix, AZ (could be anywhere)
 !
-! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9캜  (Winter design day has solar)
-!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9째C  (Winter design day has solar)
+!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 !
 ! Run Period (Weather File): 1/1 through 12/31, PHOENIX_AZ_USA TMY2
 !
@@ -135,10 +135,10 @@
  !  Data Source=ASHRAE 2005 Annual Design Conditions
  ! Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
  ! PHOENIX_AZ_USA Extreme Annual Wind Speeds, 1%=8.3m/s, 2.5%=7.2m/s, 5%=5.9m/s
- ! PHOENIX_AZ_USA Extreme Annual Temperatures, Max Drybulb=45.8캜 Min Drybulb=0.4캜
+ ! PHOENIX_AZ_USA Extreme Annual Temperatures, Max Drybulb=45.8째C Min Drybulb=0.4째C
  ! PHOENIX_AZ_USA Annual Heating Design Conditions Wind Speed=2m/s Wind Dir=120
  ! Coldest Month=December
- ! PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9캜
+ ! PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9째C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Htg 99.6% Condns DB,  !- Name
@@ -170,7 +170,7 @@
 
  ! PHOENIX Annual Cooling Design Conditions Wind Speed=4.1m/s Wind Dir=270
  ! Hottest Month=July
- ! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+ ! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Clg .4% Condns DB=>MWB,  !- Name

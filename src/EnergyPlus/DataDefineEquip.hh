@@ -75,8 +75,9 @@ namespace DataDefineEquip {
 	extern int const DualDuctConstVolume;
 	extern int const DualDuctVAV;
 	extern int const SingleDuctVAVReheat;
-	extern int const SingleDuctConstVolReheat;
 	extern int const SingleDuctVAVNoReheat;
+	extern int const SingleDuctConstVolReheat;
+	extern int const SingleDuctConstVolNoReheat;
 	extern int const SingleDuct_SeriesPIU_Reheat;
 	extern int const SingleDuct_ParallelPIU_Reheat;
 	extern int const SingleDuct_ConstVol_4PipeInduc;

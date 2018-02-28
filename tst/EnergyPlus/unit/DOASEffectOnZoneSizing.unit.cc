@@ -54,7 +54,7 @@
 
 // EnergyPlus Headers
 #include <ZoneEquipmentManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <DataStringGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataSizing.hh>
@@ -69,7 +69,6 @@
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;
-using namespace InputProcessor;
 using namespace DataLoopNode;
 using namespace DataSizing;
 using namespace DataZoneEquipment;

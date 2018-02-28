@@ -102,7 +102,7 @@
 #include <HeatBalFiniteDiffManager.hh>
 #include <HighTempRadiantSystem.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <LowTempRadiantSystem.hh>
 #include <MoistureBalanceEMPDManager.hh>
@@ -169,8 +169,7 @@ namespace HeatBalanceSurfaceManager {
 	using DataMoistureBalance::HAirFD;
 
 	// Use statements for access to subroutines in other modules
-	using namespace InputProcessor;
-	using namespace ScheduleManager;
+		using namespace ScheduleManager;
 	using namespace SolarShading;
 	using namespace DaylightingManager;
 
@@ -1217,10 +1216,10 @@ namespace HeatBalanceSurfaceManager {
 			}
 		}
 		// for fins and overhangs just add them explicitly since not otherwise classified
-		int totOverhangs = GetNumObjectsFound( "Shading:Overhang" ) + GetNumObjectsFound( "Shading:Overhang:Projection" );
+		int totOverhangs = inputProcessor->getNumObjectsFound( "Shading:Overhang" ) + inputProcessor->getNumObjectsFound( "Shading:Overhang:Projection" );
 		numSurfaces( SurfaceClass_Overhang ) = totOverhangs;
 		numExtSurfaces( SurfaceClass_Overhang ) = totOverhangs;
-		int totFins = GetNumObjectsFound( "Shading:Fin" ) + GetNumObjectsFound( "Shading:Fin:Projection" );
+		int totFins = inputProcessor->getNumObjectsFound( "Shading:Fin" ) + inputProcessor->getNumObjectsFound( "Shading:Fin:Projection" );
 		numSurfaces( SurfaceClass_Fin ) = totFins;
 		numExtSurfaces( SurfaceClass_Fin ) = totFins;
 		// go through all the surfaces again and this time insert the net area results
@@ -5189,7 +5188,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataMoistureBalanceEMPD::HeatFluxLatent;
 	using DataMoistureBalanceEMPD::RVSurfaceOld;
 	using DataMoistureBalanceEMPD::RVSurfLayer;
-
 	using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 	using WindowManager::CalcWindowHeatBalance;
 	using HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff;
@@ -5218,9 +5216,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using WindowEquivalentLayer::EQLWindowOutsideEffectiveEmiss;
 	using SwimmingPool::SimSwimmingPool;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	Real64 const Sigma( 5.6697e-08 ); // Stefan-Boltzmann constant
 	Real64 const IterDampConst( 5.0 ); // Damping constant for inside surface temperature iterations
@@ -5236,12 +5231,6 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static std::string const HBSurfManInsideSurf( "HB,SurfMan:InsideSurf" );
 	static std::string const Inside( "Inside" );
 	static std::string const BlankString;
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	Real64 AbsInt; // Solar absorptance of inside movable insulation

@@ -62,7 +62,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -93,8 +93,6 @@ namespace EarthTube {
 	using namespace DataHeatBalFanSys;
 	using namespace DataHeatBalance; // This is the heat balance super block data module
 	using namespace DataSurfaces;
-
-	// Use statements for access to subroutines in other modules
 	using namespace Psychrometrics;
 
 	// MODULE VARIABLES DECLARATIONS:
@@ -169,16 +167,9 @@ namespace EarthTube {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleValuesForDay;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const EarthTubeTempLimit( 100.0 ); // degrees Celsius
@@ -196,15 +187,15 @@ namespace EarthTube {
 		ZnRptET.allocate( NumOfZones );
 
 		cCurrentModuleObject = "ZoneEarthtube";
-		TotEarthTube = GetNumObjectsFound( cCurrentModuleObject );
+		TotEarthTube = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		EarthTubeSys.allocate( TotEarthTube );
 
 		for ( Loop = 1; Loop <= TotEarthTube; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			// First Alpha is Zone Name
-			EarthTubeSys( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 1 ), Zone );
+			EarthTubeSys( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Zone );
 			if ( EarthTubeSys( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + " not found=" + cAlphaArgs( 1 ) );
 				ErrorsFound = true;

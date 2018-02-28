@@ -71,7 +71,6 @@
 #include <DataZoneControls.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
@@ -487,7 +486,7 @@ void KivaManager::readWeatherData()
 		}
 		if ( Pos != std::string::npos ) Line.erase( 0, Pos + 1 );
 
-		{ auto const SELECT_CASE_var( InputProcessor::MakeUPPERCase( Header( HdLine ) ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( Header( HdLine ) ) );
 
 		if ( SELECT_CASE_var == "DATA PERIODS" ) {
 			bool IOStatus;
@@ -513,11 +512,11 @@ void KivaManager::readWeatherData()
 				{ auto const SELECT_CASE_var1( Count );
 
 				if ( SELECT_CASE_var1 == 1 ) {
-					 int NumDataPeriods = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					 int NumDataPeriods = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 					 NumHdArgs += 4 * NumDataPeriods;
 					 // TODO: Error if more than one period? Less than full year?
 				} else if ( SELECT_CASE_var1 == 2 ) {
-					kivaWeather.intervalsPerHour = InputProcessor::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
+					kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber( Line.substr( 0, Pos ), IOStatus );
 				}}
 				Line.erase( 0, Pos + 1 );
 				++Count;
@@ -637,46 +636,6 @@ bool KivaManager::setupKivaInstances()
 				}
 			}
 
-			// Get combinations of wall constructions and wall heights -- each different
-			// combination gets its own Kiva instance. Combination map points each set
-			// of construction and wall height to the associated exposed perimeter and
-			// list of wall surface numbers.
-			std::map<std::pair<int, Real64>,WallGroup> combinationMap;
-
-			if ( wallSurfaces.size() != 0 ) {
-				for ( auto& wl : wallSurfaces ) {
-
-					auto&v = Surfaces( wl ).Vertex;
-					// Enforce quadrilateralism
-					if ( v.size() != 4) {
-						ErrorsFound = true;
-						ShowSevereError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
-						ShowContinueError( "Surface=\"" + Surfaces( wl ).Name + "\", has " + General::TrimSigDigits( v.size() ) + " vertices." );
-					}
-
-					// sort vertices by Z-value
-					std::vector<int> zs = {0, 1, 2, 3};
-					sort( zs.begin(),zs.end(),[v]( int a, int b ){return v[a].z < v[b].z;} );
-
-					Real64 perimeter = distance( v[zs[0]], v[zs[1]] );
-
-					Real64 surfHeight = ( v[zs[2]].z + v[zs[2]].z )/2.0 - ( v[zs[0]].z + v[zs[1]].z )/2.0;
-					// round to avoid numerical precision differences
-					surfHeight = std::round( ( surfHeight ) * 1000.0 ) / 1000.0;
-
-					if ( combinationMap.count( {Surfaces( wl ).Construction, surfHeight}) == 0) {
-						// create new combination
-						std::vector<int> walls = {wl};
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}] = WallGroup( perimeter, walls );
-					}
-					else {
-						// add to existing combination
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}].exposedPerimeter += perimeter;
-						combinationMap[{Surfaces( wl ).Construction, surfHeight}].wallIDs.push_back( wl );
-					}
-				}
-			}
-
 			// Calculate total exposed perimeter attributes
 			std::vector<bool> isExposedPerimeter;
 
@@ -762,6 +721,46 @@ bool KivaManager::setupKivaInstances()
 			// Remaining exposed perimeter will be alloted to each instance as appropriate
 			Real64 remainingExposedPerimeter = totalExposedPerimeter;
 
+			// Get combinations of wall constructions and wall heights -- each different
+			// combination gets its own Kiva instance. Combination map points each set
+			// of construction and wall height to the associated exposed perimeter and
+			// list of wall surface numbers.
+			std::map<std::pair<int, Real64>,WallGroup> combinationMap;
+
+			if ( wallSurfaces.size() != 0 ) {
+				for ( auto& wl : wallSurfaces ) {
+
+					auto&v = Surfaces( wl ).Vertex;
+					// Enforce quadrilateralism
+					if ( v.size() != 4) {
+						ErrorsFound = true;
+						ShowSevereError( "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\", only quadrilateral wall surfaces are allowed to reference Foundation Outside Boundary Conditions." );
+						ShowContinueError( "Surface=\"" + Surfaces( wl ).Name + "\", has " + General::TrimSigDigits( v.size() ) + " vertices." );
+					}
+
+					// sort vertices by Z-value
+					std::vector<int> zs = {0, 1, 2, 3};
+					sort( zs.begin(),zs.end(),[v]( int a, int b ){return v[a].z < v[b].z;} );
+
+					Real64 perimeter = distance( v[zs[0]], v[zs[1]] );
+
+					Real64 surfHeight = ( v[zs[2]].z + v[zs[2]].z )/2.0 - ( v[zs[0]].z + v[zs[1]].z )/2.0;
+					// round to avoid numerical precision differences
+					surfHeight = std::round( ( surfHeight ) * 1000.0 ) / 1000.0;
+
+					if ( combinationMap.count( {Surfaces( wl ).Construction, surfHeight}) == 0) {
+						// create new combination
+						std::vector<int> walls = {wl};
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}] = WallGroup( perimeter*exposedFraction, walls );
+					}
+					else {
+						// add to existing combination
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}].exposedPerimeter += perimeter*exposedFraction;
+						combinationMap[{Surfaces( wl ).Construction, surfHeight}].wallIDs.push_back( wl );
+					}
+				}
+			}
+
 			// setup map to point floor surface to all related kiva instances
 			std::vector<std::pair<int, Kiva::Surface::SurfaceType>> floorSurfaceMaps;
 
@@ -804,8 +803,8 @@ bool KivaManager::setupKivaInstances()
 				fnd.exposedFraction = exposedFraction;
 
 
-				if ( foundationInputs[surface.OSCPtr].wallConstructionIndex > 0 ) {
-					auto& c = Constructs( foundationInputs[surface.OSCPtr].wallConstructionIndex );
+				if ( constructionNum > 0 ) {
+					auto& c = Constructs( constructionNum );
 
 					// Clear layers
 					fnd.wall.layers.clear();
@@ -980,6 +979,27 @@ bool KivaManager::setupKivaInstances()
 		surfNum++;
 	}
 
+	// Loop through Foundation surfaces and make sure they are all assigned to an instance
+	for ( std::size_t surfNum = 1; surfNum <= Surfaces.size(); ++surfNum ) {
+		if ( Surfaces( surfNum ).ExtBoundCond == DataSurfaces::KivaFoundation ) {
+			if ( surfaceMap[surfNum].size() == 0 ) {
+				ErrorsFound = true;
+				ShowSevereError( "Surface=\""+ Surfaces( surfNum ).Name + "\" has a 'Foundation' Outside Boundary Condition" );
+				ShowContinueError( "  referencing Foundation:Kiva=\"" + foundationInputs[Surfaces( surfNum ).OSCPtr].name + "\"." );
+				if ( Surfaces( surfNum ).Class == DataSurfaces::SurfaceClass_Wall ) {
+					ShowContinueError( "  You must also reference Foundation:Kiva=\"" + foundationInputs[Surfaces( surfNum ).OSCPtr].name + "\"" );
+					ShowContinueError( "  in a floor surface within the same Zone=\"" + DataHeatBalance::Zone( Surfaces( surfNum ).Zone ).Name + "\"." );
+				} else if ( Surfaces( surfNum ).Class == DataSurfaces::SurfaceClass_Floor ) {
+					ShowContinueError( "  However, this floor was never assigned to a Kiva instance." );
+					ShowContinueError( "  This should not occur for floor surfaces. Please report to EnergyPlus Development Team." );
+				} else {
+					ShowContinueError( "  Only floor and wall surfaces are allowed to reference 'Foundation' Outside Boundary Conditions." );
+					ShowContinueError( "  Surface=\"" + Surfaces( surfNum ).Name + "\", is not a floor or wall." );
+				}
+			}
+		}
+	}
+
 	gio::write( DataGlobals::OutputFileInits, "(A)" ) << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed Perimeter, Perimeter Fraction, Wall Height, Wall Construction, Floor Surface, Wall Surface(s)";
 	std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A',',A',',A,A)";
 	for ( auto& kv : kivaInstances ) {
@@ -1046,7 +1066,7 @@ void KivaManager::calcKivaInstances()
 	for ( auto& kv : kivaInstances ) {
 		auto& grnd = kv.ground;
 		kv.setBoundaryConditions();
-		grnd.calculate( kv.bcs,DataGlobals::MinutesPerTimeStep*60. );
+		grnd.calculate( kv.bcs, timestep);
 		grnd.calculateSurfaceAverages();
 		kv.reportKivaSurfaces();
 		if ( DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && DataGlobals::HourOfDay == 1 && DataGlobals::TimeStep == 1 ) {
@@ -1132,6 +1152,7 @@ Real64 KivaManager::getValue(
 	Real64 h = 0.0;
 	Real64 q = 0.0;
 	Real64 Tz = DataHeatBalFanSys::MAT( DataSurfaces::Surface( surfNum ).Zone ) + DataGlobals::KelvinConv;
+	assert(surfaceMap[surfNum].size() > 0);
 	for ( auto& i : surfaceMap[surfNum] ) {
 		auto& kI = kivaInstances[i.first];
 		auto& st = i.second;
