@@ -11987,12 +11987,23 @@ namespace OutputReportTabular {
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceClass_Window;
+		using DataEnvironment::TotDesDays;
+		using DataEnvironment::TotRunDesPersDays;
+
+		static bool initAdjFenDone(false);
+		static Array3D_bool adjFenDone;
 
 		Array1D< Real64 > peopleRadIntoSurf;
 		Array1D< Real64 > equipRadIntoSurf;
 		Array1D< Real64 > hvacLossRadIntoSurf;
 		Array1D< Real64 > powerGenRadIntoSurf;
 		Array1D< Real64 > lightLWRadIntoSurf;
+
+		if ( !initAdjFenDone ) {
+			adjFenDone.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+			adjFenDone = false;
+			initAdjFenDone = true;
+		}
 
 		peopleRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
 		peopleRadIntoSurf = 0.;
@@ -12078,7 +12089,10 @@ namespace OutputReportTabular {
 				lightDelaySeq( kTimeStep ) = lightLWConvIntoZone + lightSWConvIntoZone;
 				feneSolarDelaySeq( kTimeStep ) = feneSolarConvIntoZone;
 				// also remove the net radiant component on the instanteous conduction for fenestration
-				feneCondInstantSeq( desDaySelected, kTimeStep, zoneIndex ) -= adjFeneSurfNetRadSeq;
+				if ( !adjFenDone( desDaySelected, kTimeStep, zoneIndex ) ) {
+					feneCondInstantSeq( desDaySelected, kTimeStep, zoneIndex ) -= adjFeneSurfNetRadSeq;
+					adjFenDone( desDaySelected, kTimeStep, zoneIndex ) = true;
+				}
 			} // for kTimeStep
 
 			decayCurve.deallocate();
