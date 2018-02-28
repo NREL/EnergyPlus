@@ -252,8 +252,8 @@ TEST_F( EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest )
 
 
 	CorrectZoneContaminants( ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep );
-	EXPECT_NEAR( 490.0, Node( 5 ).CO2, 0.00001 );
-	EXPECT_NEAR( 0.0909999, Node( 5 ).GenContam, 0.00001 );
+	EXPECT_NEAR( 489.931000, Node( 5 ).CO2, 0.00001 );
+	EXPECT_NEAR( 0.09093100, Node( 5 ).GenContam, 0.00001 );
 
 	DataContaminantBalance::Contaminant.CO2Simulation = false;
 	DataContaminantBalance::Contaminant.GenericContamSimulation = false;
@@ -410,6 +410,8 @@ TEST_F( EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamin
 	VAMFL.allocate( 1 );
 	EAMFL.allocate( 1 );
 	CTMFL.allocate( 1 );
+	MDotOA.allocate( 1 );
+	MDotOA( 1 ) = 0.0;
 
 	SimulateAirflowNetwork = 0;
 
@@ -455,6 +457,7 @@ TEST_F( EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamin
 	VAMFL.deallocate( );
 	EAMFL.deallocate( );
 	CTMFL.deallocate( );
+	MDotOA.deallocate( );
 	DataContaminantBalance::AZ.deallocate( );
 	DataContaminantBalance::BZ.deallocate( );
 	DataContaminantBalance::CZ.deallocate( );
