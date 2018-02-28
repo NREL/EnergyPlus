@@ -6,6 +6,7 @@
   execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${SOURCE_DIR}/testfiles/${IDF_FILE}" "${BINARY_DIR}/${TEST_DIR}/in.idf" )
   execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${SOURCE_DIR}/weather/${EPW_FILE}" "${BINARY_DIR}/${TEST_DIR}/in.epw" )
   execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${BINARY_DIR}/Products/Energy+.idd" "${BINARY_DIR}/${TEST_DIR}/Energy+.idd" )
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${BINARY_DIR}/Products/Energy+.schema.epJSON" "${BINARY_DIR}/${TEST_DIR}/Energy+.schema.epJSON" )
 
   # Find and execute the test executable, passing the argument of the directory to run in
   if( WIN32 )
@@ -19,7 +20,7 @@
   execute_process(COMMAND ${ECHO_CMD} COMMAND "${TEST_EXE}" "${BINARY_DIR}/${TEST_DIR}")
 
   # Clean up
-  execute_process(COMMAND "${CMAKE_COMMAND}" -E remove "${BINARY_DIR}/${TEST_DIR}/Energy+.idd" "${BINARY_DIR}/${TEST_DIR}/in.epw" )
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E remove "${BINARY_DIR}/${TEST_DIR}/Energy+.idd" "${BINARY_DIR}/${TEST_DIR}/in.epw")
 
   # Check the outputs and return appropriately
   file(READ "${BINARY_DIR}/${TEST_DIR}/eplusout.end" FILE_CONTENT)

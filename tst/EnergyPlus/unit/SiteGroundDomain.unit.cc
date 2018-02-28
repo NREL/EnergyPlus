@@ -79,7 +79,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking )
 			"17.3;						!- Phase shift of minimum surface temperature {days}",
 	});
 
-	EXPECT_FALSE( process_idf( idf_objects ) );
+	EXPECT_TRUE( process_idf( idf_objects ) );
 
 	PipingSystemDomains.allocate( 2 );
 

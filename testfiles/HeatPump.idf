@@ -1507,9 +1507,9 @@
 
   Output:Variable,*,Cooling Coil Electric Power,timestep;
 
-  Output:Variable,*,Heating Coil Total Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Total Heating Energy,timestep;
+  Output:Variable,*,Heating Coil Heating Energy,timestep;
 
   Output:Variable,*,Heating Coil Electric Power,timestep;
 
@@ -1518,10 +1518,6 @@
   Output:Variable,*,Cooling Coil Basin Heater Electric Power,timestep;
 
   Output:Variable,*,Cooling Coil Basin Heater Electric Energy,timestep;
-
-  Output:Variable,*,Heating Coil Air Heating Energy,timestep;
-
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Gas Rate,timestep;
 

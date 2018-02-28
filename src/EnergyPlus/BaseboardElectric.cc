@@ -60,7 +60,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
@@ -151,7 +151,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
 
@@ -180,7 +179,7 @@ namespace BaseboardElectric {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipName );
+			BaseboardNum = UtilityRoutines::FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipName );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimElectricBaseboard: Unit not found=" + EquipName );
 			}
@@ -231,11 +230,6 @@ namespace BaseboardElectric {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::SameString;
 		using GlobalNames::VerifyUniqueBaseboardName;
 		using namespace DataIPShortCuts;
 		using General::TrimSigDigits;
@@ -272,8 +266,6 @@ namespace BaseboardElectric {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		int CtrlZone;   // index to constrolled zone number
@@ -281,7 +273,7 @@ namespace BaseboardElectric {
 
 		cCurrentModuleObject = cCMO_BBRadiator_Electric;
 
-		NumConvElecBaseboards = GetNumObjectsFound( cCurrentModuleObject );
+		NumConvElecBaseboards = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// Calculate total number of baseboard units
 		NumBaseboards = NumConvElecBaseboards;
@@ -295,17 +287,13 @@ namespace BaseboardElectric {
 			BaseboardNum = 0;
 			for ( ConvElecBBNum = 1; ConvElecBBNum <= NumConvElecBaseboards; ++ConvElecBBNum ) {
 
-				GetObjectItem( cCurrentModuleObject, ConvElecBBNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ConvElecBBNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames.allocate( NumNums);
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = "";
 				BaseboardNumericFields( ConvElecBBNum ).FieldNames = cNumericFieldNames;
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipName, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
@@ -314,7 +302,7 @@ namespace BaseboardElectric {
 				}
 				++BaseboardNum;
 				Baseboard( BaseboardNum ).EquipName = cAlphaArgs( 1 ); // name of this baseboard
-				Baseboard( BaseboardNum ).EquipType = MakeUPPERCase( cCurrentModuleObject ); // the type of baseboard-rename change
+				Baseboard( BaseboardNum ).EquipType = UtilityRoutines::MakeUPPERCase( cCurrentModuleObject ); // the type of baseboard-rename change
 				Baseboard( BaseboardNum ).Schedule = cAlphaArgs( 2 );
 				if ( lAlphaFieldBlanks( 2 ) ) {
 					Baseboard( BaseboardNum ).SchedPtr = ScheduleAlwaysOn;
@@ -329,7 +317,7 @@ namespace BaseboardElectric {
 				Baseboard( BaseboardNum ).BaseboardEfficiency = rNumericArgs( 4 );
 
 				// Determine baseboard electric heating design capacity sizing method
-				if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = HeatingDesignCapacity;
 					if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
@@ -344,7 +332,7 @@ namespace BaseboardElectric {
 						ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
 					if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
@@ -365,7 +353,7 @@ namespace BaseboardElectric {
 						ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 					if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );

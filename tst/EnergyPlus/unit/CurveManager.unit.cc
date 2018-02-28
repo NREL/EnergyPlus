@@ -219,7 +219,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndVar_Malformed ) {
 		"                                                                      ",
 		 } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	CurveManager::GetCurveInputData( ErrorsFound );
@@ -253,7 +253,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY
 		"0,                       !- Output Value #1",
 		"1,                       !- X Value #2",
 		"1;                       !- Output Value #2" } );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;
@@ -301,7 +301,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEn
 		"5,                       !- X Value #6",
 		"2;                       !- Output Value #6" } );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
@@ -361,7 +361,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnter
 		"4.93,                    !- X Value #6",
 		"2;                       !- Output Value #6" } );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
@@ -468,7 +468,7 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		"  46.11111,       !- <none>",
 		"  21998.35468;    !- <none>" 	} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
@@ -666,7 +666,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
         "2,                       !- Y Value #12",
         "2;                       !- Output Value #12" });
 
-    ASSERT_FALSE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(idf_objects));
 
     EXPECT_EQ(0, CurveManager::NumCurves);
     CurveManager::GetCurveInput();
@@ -810,7 +810,7 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
         "2,                       !- Y Value #12",
         "2;                       !- Output Value #12"  });
 
-    ASSERT_FALSE(process_idf(idf_objects));
+    ASSERT_TRUE(process_idf(idf_objects));
 
     EXPECT_EQ(0, CurveManager::NumCurves);
     CurveManager::GetCurveInput();
@@ -955,7 +955,7 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Linear_EvaluateCurveTyp
 		"4,                       !- X Value #5",
 		"4;                       !- Output Value #5" } );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		EXPECT_EQ( 0, CurveManager::NumCurves );
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;
@@ -1022,9 +1022,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( 1 ).X1Var.allocate( TableLookup( 1 ).NumX1Vars );
 	TableLookup( 1 ).X1Var( 1 ) = 0.0;
 	TableLookup( 1 ).X1Var( 2 ) = 1.0;
-	TableLookup( 1 ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( 1 ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( 1 ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( 1, 1.0, 0.0 );
 
@@ -1055,9 +1055,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( 2 ).X1Var( 1 ) = 0.0;
 	TableLookup( 2 ).X1Var( 2 ) = 1.0;
 	TableLookup( 2 ).X2Var( 1 ) = 1.0;
-	TableLookup( 2 ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( 2 ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( 2 ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( 2, 1.0, 1.0, 0.0 );
 
@@ -1092,9 +1092,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( Index ).X1Var( 2 ) = 1.0;
 	TableLookup( Index ).X2Var( 1 ) = 1.0;
 	TableLookup( Index ).X3Var( 1 ) = 1.0;
-	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( Index, 1.0, 1.0, 1.0, 0.0 );
 
@@ -1134,9 +1134,9 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 	TableLookup( Index ).X2Var( 1 ) = 1.0;
 	TableLookup( Index ).X3Var( 1 ) = 1.0;
 	TableLookup( Index ).X4Var( 1 ) = 1.0;
-	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 2 );
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1 ) = 0.0;
-	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 2 ) = 1.0;
+	TableLookup( Index ).TableLookupZData.allocate( 1, 1, 1, 1, 1, 2 );
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 1 ) = 0.0;
+	TableLookup( Index ).TableLookupZData( 1, 1, 1, 1, 1, 2 ) = 1.0;
 
 	TableLookupObject( Index, 1.0, 1.0, 1.0, 1.0, 0.0 );
 

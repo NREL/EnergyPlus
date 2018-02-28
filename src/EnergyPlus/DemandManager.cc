@@ -60,7 +60,8 @@
 #include <MixedAir.hh>
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
@@ -137,6 +138,7 @@ namespace DemandManager {
 	// Object Data
 	Array1D< DemandManagerListData > DemandManagerList;
 	Array1D< DemandManagerData > DemandMgr;
+	std::unordered_map< std::string, std::string > UniqueDemandMgrNames;
 
 	// MODULE SUBROUTINES:
 
@@ -155,6 +157,7 @@ namespace DemandManager {
 		GetInput = true;
 		DemandManagerList.deallocate();
 		DemandMgr.deallocate();
+		UniqueDemandMgrNames.clear();
 	}
 
 	void
@@ -410,18 +413,9 @@ namespace DemandManager {
 
 		// Using/Aliasing
 		using DataGlobals::MinutesPerTimeStep;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using OutputProcessor::EnergyMeters;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ListNum;
@@ -431,17 +425,15 @@ namespace DemandManager {
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string AlphArray; // Character string data
 		Array1D< Real64 > NumArray; // Numeric data
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string Units; // String for meter units
 		static bool ErrorsFound( false );
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		// FLOW:
 		CurrentModuleObject = "DemandManagerAssignmentList";
-		GetObjectDefMaxArgs( CurrentModuleObject, ListNum, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, ListNum, NumAlphas, NumNums );
 
-		NumDemandManagerList = GetNumObjectsFound( CurrentModuleObject );
+		NumDemandManagerList = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		if ( NumDemandManagerList > 0 ) {
 			AlphArray.dimension( NumAlphas, BlankString );
@@ -451,15 +443,9 @@ namespace DemandManager {
 
 			for ( ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum ) {
 
-				GetObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty( AlphArray( 1 ), CurrentModuleObject, ErrorsFound );
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandManagerList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
 				DemandManagerList( ListNum ).Name = AlphArray( 1 );
 
 				DemandManagerList( ListNum ).Meter = GetMeterIndex( AlphArray( 2 ) );
@@ -546,7 +532,7 @@ namespace DemandManager {
 						{ auto const SELECT_CASE_var( AlphArray( MgrNum * 2 + 5 ) );
 						if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") || (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
-							DemandManagerList( ListNum ).Manager( MgrNum ) = FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr );
+							DemandManagerList( ListNum ).Manager( MgrNum ) = UtilityRoutines::FindItemInList( AlphArray( MgrNum * 2 + 6 ), DemandMgr );
 
 							if ( DemandManagerList( ListNum ).Manager( MgrNum ) == 0 ) {
 								ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( MgrNum * 2 + 6 ) + "=\"" + AlphArray( MgrNum * 2 + 6 ) + "\" not found." );
@@ -616,11 +602,6 @@ namespace DemandManager {
 
 		// Using/Aliasing
 		using DataGlobals::MinutesPerTimeStep;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using DataHeatBalance::Lights;
@@ -632,10 +613,6 @@ namespace DemandManager {
 		using DataZoneControls::TStatObjects;
 		using General::RoundSigDigits;
 		using MixedAir::GetOAController;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumDemandMgrExtLights;
@@ -656,8 +633,6 @@ namespace DemandManager {
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_string AlphArray; // Character string data
 		Array1D< Real64 > NumArray; // Numeric data
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
 		std::string CurrentModuleObject; // for ease in renaming.
 		int Item;
@@ -667,37 +642,37 @@ namespace DemandManager {
 		MaxAlphas = 0;
 		MaxNums = 0;
 		CurrentModuleObject = "DemandManager:ExteriorLights";
-		NumDemandMgrExtLights = GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrExtLights = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrExtLights > 0 ) {
-			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:Lights";
-		NumDemandMgrLights = GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrLights = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrLights > 0 ) {
-			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:ElectricEquipment";
-		NumDemandMgrElecEquip = GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrElecEquip = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrElecEquip > 0 ) {
-			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:Thermostats";
-		NumDemandMgrThermostats = GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrThermostats = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrThermostats > 0 ) {
-			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
 		CurrentModuleObject = "DemandManager:Ventilation";
-		NumDemandMgrVentilation = GetNumObjectsFound( CurrentModuleObject );
+		NumDemandMgrVentilation = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		if ( NumDemandMgrVentilation > 0 ) {
-			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			MaxAlphas = max( MaxAlphas, NumAlphas );
 			MaxNums = max( MaxNums, NumNums );
 		}
@@ -709,6 +684,7 @@ namespace DemandManager {
 			NumArray.dimension( MaxNums, 0.0 );
 
 			DemandMgr.allocate( NumDemandMgr );
+			UniqueDemandMgrNames.reserve( NumDemandMgr );
 
 			// Get input for DemandManager:ExteriorLights
 			StartIndex = 1;
@@ -718,15 +694,8 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeExtLights;
@@ -794,7 +763,7 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 
 					for ( LoadNum = 1; LoadNum <= DemandMgr( MgrNum ).NumOfLoads; ++LoadNum ) {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ExteriorLights );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), ExteriorLights );
 
 						if ( LoadPtr > 0 ) {
 							DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -823,15 +792,8 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeLights;
@@ -896,11 +858,11 @@ namespace DemandManager {
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), LightsObjects );
+					LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), LightsObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += LightsObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), Lights );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), Lights );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -916,14 +878,14 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = FindItemInList( AlphArray( Item + 4 ), LightsObjects );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), LightsObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= LightsObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LightsObjects( LoadPtr ).StartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = FindItemInList( AlphArray( Item + 4 ), Lights );
+							LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), Lights );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -948,15 +910,8 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeElecEquip;
@@ -1021,11 +976,11 @@ namespace DemandManager {
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectricObjects );
+					LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectricObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += ZoneElectricObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectric );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), ZoneElectric );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -1041,14 +996,14 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = FindItemInList( AlphArray( Item + 4 ), ZoneElectricObjects );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), ZoneElectricObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= ZoneElectricObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = ZoneElectricObjects( LoadPtr ).StartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = FindItemInList( AlphArray( Item + 4 ), ZoneElectric );
+							LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), ZoneElectric );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -1073,15 +1028,9 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeThermostats;
@@ -1154,11 +1103,11 @@ namespace DemandManager {
 				// Count actual pointers to controlled zones
 				DemandMgr( MgrNum ).NumOfLoads = 0;
 				for ( LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum ) {
-					LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), TStatObjects );
+					LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), TStatObjects );
 					if ( LoadPtr > 0 ) {
 						DemandMgr( MgrNum ).NumOfLoads += TStatObjects( LoadPtr ).NumOfZones;
 					} else {
-						LoadPtr = FindItemInList( AlphArray( LoadNum + 4 ), TempControlledZone );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( LoadNum + 4 ), TempControlledZone );
 						if ( LoadPtr > 0 ) {
 							++DemandMgr( MgrNum ).NumOfLoads;
 						} else {
@@ -1172,14 +1121,14 @@ namespace DemandManager {
 					DemandMgr( MgrNum ).Load.allocate( DemandMgr( MgrNum ).NumOfLoads );
 					LoadNum = 0;
 					for ( Item = 1; Item <= NumAlphas - 4; ++Item ) {
-						LoadPtr = FindItemInList( AlphArray( Item + 4 ), TStatObjects );
+						LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), TStatObjects );
 						if ( LoadPtr > 0 ) {
 							for ( Item1 = 1; Item1 <= TStatObjects( LoadPtr ).NumOfZones; ++Item1 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = TStatObjects( LoadPtr ).TempControlledZoneStartPtr + Item1 - 1;
 							}
 						} else {
-							LoadPtr = FindItemInList( AlphArray( Item + 4 ), TempControlledZone );
+							LoadPtr = UtilityRoutines::FindItemInList( AlphArray( Item + 4 ), TempControlledZone );
 							if ( LoadPtr > 0 ) {
 								++LoadNum;
 								DemandMgr( MgrNum ).Load( LoadNum ) = LoadPtr;
@@ -1204,15 +1153,9 @@ namespace DemandManager {
 
 			for ( MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum ) {
 
-				GetObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, MgrNum - StartIndex + 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), DemandMgr, MgrNum - StartIndex, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDemandMgrNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 				DemandMgr( MgrNum ).Name = AlphArray( 1 );
 
 				DemandMgr( MgrNum ).Type = ManagerTypeVentilation;

@@ -157,6 +157,9 @@ namespace SteamCoils {
 		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		bool reportCoilFinalSizes; // one time report of sizes to coil selection report
+		Real64 DesCoilCapacity; //store design load
+		Real64 DesAirVolFlow; // store design air flow
 
 		// Default Constructor
 		SteamCoilEquipConditions() :
@@ -214,7 +217,10 @@ namespace SteamCoils {
 			DesiccantDehumNum( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+			reportCoilFinalSizes( true ),
+			DesCoilCapacity( 0.0 ),
+			DesAirVolFlow( 0.0 )
 		{}
 
 	};

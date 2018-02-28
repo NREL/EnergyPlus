@@ -313,7 +313,7 @@ namespace EnergyPlus {
 			"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 
@@ -395,7 +395,7 @@ namespace EnergyPlus {
 		"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 		// check autosized input fields from idf snippet read
@@ -750,7 +750,7 @@ namespace EnergyPlus {
 			"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 
@@ -827,7 +827,7 @@ namespace EnergyPlus {
 			"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 		// check blank autosizable input fields default to autosize
