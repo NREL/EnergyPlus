@@ -173,7 +173,7 @@
 
 ! Using Design Conditions from "United States Climate Design Data 2001 ASHRAE Handbook"
 ! PHOENIX_INTL_AIRPORT_AZ_USA Extreme Wind Speeds, 1%=   8.50m/s, 2.5%=   7.10m/s, 5%=   6.10m/s
-! PHOENIX_INTL_AIRPORT_AZ_USA Extreme Temperatures, Max Drybulb=  45.40°C, Min Drybulb=  -1.20°C
+! PHOENIX_INTL_AIRPORT_AZ_USA Extreme Temperatures, Max Drybulb=  45.40Â°C, Min Drybulb=  -1.20Â°C
 ! PHOENIX_INTL_AIRPORT_AZ_USA Heating Design Conditions Wind Speed=   2.40 Wind Dir=  90.00
 ! PHOENIX_INTL_AIRPORT_AZ_USA Heating 99.6%, MaxDB=   1.20
 

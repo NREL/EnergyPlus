@@ -38,8 +38,8 @@
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_FL_Miami.Intl.AP_722020_TMY3
 !
@@ -183,10 +183,10 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Miami Intl Ap_FL_USA Extreme Annual Wind Speeds, 1%=9.2m/s, 2.5%=8.4m/s, 5%=7.7m/s
- ! Miami Intl Ap_FL_USA Extreme Annual Temperatures, Max Drybulb=5.1캜 Min Drybulb=35캜
+ ! Miami Intl Ap_FL_USA Extreme Annual Temperatures, Max Drybulb=5.1째C Min Drybulb=35째C
  ! Miami Intl Ap_FL_USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=JAN
- ! Miami Intl Ap_FL_USA Annual Heating 99.6%, MaxDB=8.7캜
+ ! Miami Intl Ap_FL_USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -218,7 +218,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=JUL
- ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+ ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name

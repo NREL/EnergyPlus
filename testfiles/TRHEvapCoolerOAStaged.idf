@@ -14,8 +14,8 @@
 !
 ! Location:                PHOENIX_AZ_USA_WMO_722780
 !
-! Design Days:             PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
-!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) 1%, MaxDB=42.3캜 MWB=21캜
+! Design Days:             PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
+!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) 1%, MaxDB=42.3째C MWB=21째C
 !
 ! Run Period (Weather File): Summer 7/7, PHOENIX_AZ_USA_WMO_722780
 !
@@ -154,7 +154,7 @@
 
 ! PHOENIX Annual Cooling Design Conditions Wind Speed=4.1m/s Wind Dir=270
 ! Hottest Month=July
-! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -184,7 +184,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
 
-! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) 1%, MaxDB=42.3캜 MWB=21캜
+! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) 1%, MaxDB=42.3째C MWB=21째C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Clg 1% Condns DB=>MWB,  !- Name
