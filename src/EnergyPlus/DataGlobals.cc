@@ -265,6 +265,8 @@ namespace DataGlobals {
 		DDOnlySimulation = false;
 		AnnualSimulation = false;
 		outputEpJSONConversion = false;
+		isEpJSON = false;
+		preserveIDFOrder = true;
 		BeginDayFlag = false;
 		BeginEnvrnFlag = false;
 		BeginHourFlag = false;
