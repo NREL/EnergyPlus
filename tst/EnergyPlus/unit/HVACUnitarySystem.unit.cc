@@ -3904,8 +3904,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 
 	// set zone temperature
 	Node( ControlZoneNum ).Temp = Node( InletNode ).Temp; // set zone temperature, used to determine system delivered capacity
-    Node( ControlZoneNum ).HumRat = Node( InletNode ).HumRat; // set zone humidity ratio, used to determine system delivered capacity
-    DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
+	Node( ControlZoneNum ).HumRat = Node( InletNode ).HumRat; // set zone humidity ratio, used to determine system delivered capacity
+	DataEnvironment::OutDryBulbTemp = 35.0; // initialize weather
 	DataEnvironment::OutHumRat = 0.1;
 	DataEnvironment::OutBaroPress = 101325.0;
 	DataEnvironment::OutWetBulbTemp = 30.0;
@@ -3933,8 +3933,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	CurDeadBandOrSetback.allocate( 1 );
 	CurDeadBandOrSetback( 1 ) = false;
 	Schedule( 1 ).CurrentValue = 1.0; // FanAndCoilAvailSchedule
-    Schedule( 2 ).CurrentValue = 1.0; // ContinuousFanSchedule
-    DataGlobals::BeginEnvrnFlag = true;
+	Schedule( 2 ).CurrentValue = 1.0; // ContinuousFanSchedule
+	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
 	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).MaxCoolAirVolFlow * StdRhoAir;
 
@@ -4422,8 +4422,8 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan ) {
 
 	// compare fan RTF with fan PLR and global PLF
 	FanPLR = Node( InletNode ).MassFlowRate / Fans::Fan( 1 ).MaxAirMassFlowRate;
-    // blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
-    // Unitary System also sets OnOffFanPartLoadFraction = 1 (see end of ReportUnitarySystem) so this variable will = 1
+	// blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
+	// Unitary System also sets OnOffFanPartLoadFraction = 1 (see end of ReportUnitarySystem) so this variable will = 1
 	EXPECT_EQ( 1.0, DataHVACGlobals::OnOffFanPartLoadFraction );
 	EXPECT_GT( Fans::Fan( 1 ).FanRuntimeFraction, FanPLR );
 
