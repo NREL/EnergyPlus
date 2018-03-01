@@ -2489,6 +2489,13 @@ namespace ThermalComfort {
 				}
 				useStatData = true;
 			} else if ( epwFileExists ) {
+				//determine number of days in year
+				int DaysInYear;
+				if ( DataEnvironment::CurrentYearIsLeapYear ) {
+					DaysInYear = 366;
+				} else {
+					DaysInYear = 365;
+				}
 				DailyAveOutTemp = 0.0;
 				epwFile = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, DataStringGlobals::inputWeatherFileName, flags ); readStat = flags.ios(); }
@@ -2521,7 +2528,7 @@ namespace ThermalComfort {
 					}
 				} else { // Do special things for wrapping the epw
 					calcEndDay = jStartDay;
-					calcStartDay += 365;
+					calcStartDay += DaysInYear;
 					calcEndHr = 24 * calcEndDay;
 					calcStartHr = 24 * calcStartDay + 1;
 					for ( i = 1; i <= calcEndDay; ++i ) {
