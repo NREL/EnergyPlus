@@ -13,8 +13,8 @@
 !
 ! Location:                San Francisco, CA
 !
-! Design Days:             SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4°C
-!                          SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6°C MWB=16.6°C
+! Design Days:             SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4Â°C
+!                          SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6Â°C MWB=16.6Â°C
 !
 ! Run Period (Weather File): 7/28 - 7/29,  USA_CA_SanFrancisco TMY2-23234
 !
@@ -43,7 +43,7 @@
 ! Detached Shading:               None
 ! Daylight:                       None
 ! Natural Ventilation (AirflowNetwork):    Yes
-!                                 A lower level inflow window is used on the north façade (outlet on the top of the south
+!                                 A lower level inflow window is used on the north faÂ°ade (outlet on the top of the south
 !                                 window, near the shading element). The inflow and outflow apertures have 1.5m2.
 !                                 No wind effects were considered (Cp=0).
 ! Compact Schedules:              Yes
@@ -123,7 +123,7 @@
     -8.00,                   !- Time Zone {hr}
     5.00;                    !- Elevation {m}
 
-! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4°C
+! SAN_FRANCISCO_CA_USA Annual Heating 99%, MaxDB=4.4Â°C
 
   SizingPeriod:DesignDay,
     SAN_FRANCISCO Ann Htg 99% Condns DB,  !- Name
@@ -153,7 +153,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6°C MWB=16.6°C
+! SAN_FRANCISCO_CA_USA Annual Cooling (DB=>MWB) 1%, MaxDB=25.6Â°C MWB=16.6Â°C
 
   SizingPeriod:DesignDay,
     SAN_FRANCISCO Ann Clg 1% Condns DB=>MWB,  !- Name
