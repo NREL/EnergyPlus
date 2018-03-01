@@ -14,8 +14,8 @@
 !
 ! Location:                Tampa, FL
 !
-! Design Days:             TAMPA_INTL_AIRPORT_FL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          TAMPA_INTL_AIRPORT_FL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             TAMPA_INTL_AIRPORT_FL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          TAMPA_INTL_AIRPORT_FL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): 6/15 to 7/15, TAMPA_INTL_AIRPORT_FL_USA
 !
@@ -136,7 +136,7 @@
 
 ! Using Design Conditions from "United States Climate Design Data 2001 ASHRAE Handbook"
 ! TAMPA_INTL_AIRPORT_FL_USA Extreme Wind Speeds, 1%=   8.40m/s, 2.5%=   7.50m/s, 5%=   6.80m/s
-! TAMPA_INTL_AIRPORT_FL_USA Extreme Temperatures, Max Drybulb=  34.90캜, Min Drybulb=  -1.80캜
+! TAMPA_INTL_AIRPORT_FL_USA Extreme Temperatures, Max Drybulb=  34.90째C, Min Drybulb=  -1.80째C
 ! TAMPA_INTL_AIRPORT_FL_USA Heating Design Conditions Wind Speed=   3.50 Wind Dir=  20.00
 ! TAMPA_INTL_AIRPORT_FL_USA Heating 99.6%, MaxDB=   2.20
 

@@ -43,7 +43,7 @@ Site:Location,
      -7.00,     !- Time Zone Relative to GMT {GMT+/-}
     337.00;     !- Elevation {m}
 
-! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating 99%, MaxDB=5.2�C
+! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating 99%, MaxDB=5.2°C
 SizingPeriod:DesignDay,
  Phoenix Sky Harbor Intl Ap Ann Htg 99% Condns DB,     !- Name
         12,      !- Month
@@ -72,7 +72,7 @@ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
           ,      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
       0.00;      !- Clearness {0.0 to 1.1}
 
-! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (DB=>MWB) 1%, MaxDB=42.3�C MWB=21�C
+! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (DB=>MWB) 1%, MaxDB=42.3°C MWB=21°C
 SizingPeriod:DesignDay,
  Phoenix Sky Harbor Intl Ap Ann Clg 1% Condns DB=>MWB,     !- Name
          7,      !- Month
