@@ -634,6 +634,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFCond ).OperatingMode = 0.0;
 			VRF( VRFCond ).HRHeatingActive = false;
 			VRF( VRFCond ).HRCoolingActive = false;
+			CurrentEndTimeLast = double( ( DayOfSim - 1 ) * 24 ) + CurrentTime - TimeStepZone + SysTimeElapsed;
 			if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
 				CondenserWaterMassFlowRate = 0.0;
 				SetComponentFlowRate( CondenserWaterMassFlowRate, VRF( VRFCond ).CondenserNodeNum, VRF( VRFCond ).CondenserOutletNodeNum, VRF( VRFCond ).SourceLoopNum, VRF( VRFCond ).SourceLoopSideNum, VRF( VRFCond ).SourceBranchNum, VRF( VRFCond ).SourceCompNum );
@@ -879,6 +880,7 @@ namespace HVACVariableRefrigerantFlow {
 				// determine operating mode change
 				if ( ! VRF( VRFCond ).HRCoolingActive && ! VRF( VRFCond ).HRHeatingActive ) {
 					VRF( VRFCond ).ModeChange = true;
+					VRF( VRFCond ).HRTimer = 0.0;
 				}
 				if ( CoolingLoad( VRFCond ) ) {
 					if ( VRF( VRFCond ).HRHeatingActive && ! VRF( VRFCond ).HRCoolingActive ) {
