@@ -112,8 +112,6 @@ namespace PlantLoopSolver {
 		bool EstablishedCompPumpIndeces( false );
 	}
 
-	PlantLoopSolverClass loopSolver;
-
 	// Functions
 	void
 	clear_state()
@@ -177,7 +175,7 @@ namespace PlantLoopSolver {
 			PlantCondLoopOperation::InitLoadDistribution( FirstHVACIteration );
 
 			// Now that the op scheme types are updated, do LoopSide validation
-			auto IsLoopSideValid = loopSolver.ValidateFlowControlPaths( LoopNum, ThisSide );
+			auto IsLoopSideValid = DataPlant::PlantLoop( LoopNum ).loopSolver.ValidateFlowControlPaths( LoopNum, ThisSide );
 			if ( ! IsLoopSideValid.Valid ) {
 				ShowFatalError( "ERROR:" + IsLoopSideValid.Reason );
 			}
@@ -196,14 +194,14 @@ namespace PlantLoopSolver {
 		if ( ThisSide == DataPlant::DemandSide ) PlantPressureSystem::SimPressureDropSystem( LoopNum, FirstHVACIteration, DataPlant::PressureCall_Init );
 
 		// Turn on any previously disabled branches due to constant speed branch pump issue
-		loopSolver.TurnOnAllLoopSideBranches( LoopNum, ThisSide );
+		DataPlant::PlantLoop( LoopNum ).loopSolver.TurnOnAllLoopSideBranches( LoopNum, ThisSide );
 
-        loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
+		DataPlant::PlantLoop( LoopNum ).loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
 
         if ( CurrentLoopSideIsConstantSpeedBranchPumped ) {
             // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
-            loopSolver.DisableAnyBranchPumpsConnectedToUnloadedEquipment(LoopNum, ThisSide);
-            loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
+			DataPlant::PlantLoop( LoopNum ).loopSolver.DisableAnyBranchPumpsConnectedToUnloadedEquipment(LoopNum, ThisSide);
+			DataPlant::PlantLoop( LoopNum ).loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
         }
 
 		// A couple things are specific to which LoopSide we are on
@@ -221,12 +219,12 @@ namespace PlantLoopSolver {
 			HVACInterfaceManager::UpdatePlantLoopInterface( LoopNum, LoopSideNum, DataPlant::PlantLoop( LoopNum ).LoopSide( DataPlant::SupplySide ).NodeNumOut, DataPlant::PlantLoop( LoopNum ).LoopSide( DataPlant::DemandSide ).NodeNumIn, ReSimOtherSideNeeded, DataPlant::PlantLoop( LoopNum ).CommonPipeType );
 
 			// Update the loop outlet node conditions
-			loopSolver.CheckLoopExitNode( LoopNum, FirstHVACIteration );
+			DataPlant::PlantLoop( LoopNum ).loopSolver.CheckLoopExitNode( LoopNum, FirstHVACIteration );
 
 		}
 
 		// Update some reporting information at Plant half loop level
-		loopSolver.UpdateLoopSideReportVars( LoopNum, LoopSideNum, InitialDemandToLoopSetPointSAVED, LoadToLoopSetPointThatWasntMet );
+		DataPlant::PlantLoop( LoopNum ).loopSolver.UpdateLoopSideReportVars( LoopNum, LoopSideNum, InitialDemandToLoopSetPointSAVED, LoadToLoopSetPointThatWasntMet );
 
 	}
 
@@ -285,14 +283,14 @@ namespace PlantLoopSolver {
         bool LoopShutDownFlag = false;
 
         // First thing is to setup mass flow request information
-        Real64 ThisLoopSideFlowRequest = loopSolver.SetupLoopFlowRequest( LoopNum, ThisSide, OtherSide );
+        Real64 ThisLoopSideFlowRequest = DataPlant::PlantLoop( LoopNum ).loopSolver.SetupLoopFlowRequest( LoopNum, ThisSide, OtherSide );
 
         // Now we know what the loop would "like" to run at, let's see the pump
         // operation range (min/max avail) to see whether it is possible this time around
-        Real64 ThisLoopSideFlow = loopSolver.DetermineLoopSideFlowRate( LoopNum, ThisSide, ThisSideInletNode, ThisLoopSideFlowRequest );
+        Real64 ThisLoopSideFlow = DataPlant::PlantLoop( LoopNum ).loopSolver.DetermineLoopSideFlowRate( LoopNum, ThisSide, ThisSideInletNode, ThisLoopSideFlowRequest );
 
         // We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
-        InitialDemandToLoopSetPoint = loopSolver.CalcOtherSideDemand( LoopNum, ThisSide );
+        InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide );
         UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
 
         LoadToLoopSetPointThatWasntMet = 0.0;
@@ -302,7 +300,7 @@ namespace PlantLoopSolver {
         // Normal "supply side" components will set a mass flow rate on their outlet node to request flow,
         // while "Demand side" components will set a a mass flow request on their inlet node to request flow.
         DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowUnlocked;
-        loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
+		DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
 
         // DSU? discussion/comments about loop solver/flow resolver interaction
         // At this point, the components have been simulated.  They should have either:
@@ -327,7 +325,7 @@ namespace PlantLoopSolver {
 
         // The flow resolver takes information such as requested flows and min/max available flows and
         //  sets the corrected flow on the inlet to each parallel branch
-        loopSolver.ResolveParallelFlows( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration );
+		DataPlant::PlantLoop( LoopNum ).loopSolver.ResolveParallelFlows( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration );
 
         // Re-Initialize variables for this next pass
         InitialDemandToLoopSetPointSAVED = InitialDemandToLoopSetPoint;
@@ -339,7 +337,7 @@ namespace PlantLoopSolver {
         //  SetFlowRequest routine, but this routine will also set the outlet flow rate
         //  equal to the inlet flow rate, accoridng to flowlock logic.
         DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowLocked;
-        loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
+		DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
 
     }
 
@@ -364,7 +362,7 @@ namespace PlantLoopSolver {
             DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowPumpQuery;
 
             //~ Simulate pumps
-            loopSolver.SimulateAllLoopSidePumps( LoopNum, ThisSide );
+			DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps( LoopNum, ThisSide );
 
             //~ Calculate totals
             for ( auto const & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
@@ -1070,17 +1068,17 @@ namespace PlantLoopSolver {
 			{ auto const SELECT_CASE_var( BranchGroup );
 
 			if ( SELECT_CASE_var == InletBranchOrOneBranchHalfLoop ) { // This group would be the inlet branch, or the single half-loop branch
-				loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, 1, 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag, StartingNewLoopSidePass );
+				DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, 1, 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag, StartingNewLoopSidePass );
 
 			} else if ( SELECT_CASE_var == ParallelBranchSet ) { // This group is the parallel set of branches, or the single branch between the mix/split
 
 				UpdatePlantSplitter( LoopNum, LoopSideNum, 1 );
 
-				loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, 2, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches - 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
+				DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, 2, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches - 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
 				UpdatePlantMixer( LoopNum, LoopSideNum, 1 );
 
 			} else if ( SELECT_CASE_var == OutletBranch ) { // This group is the outlet branch
-				loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
+				DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
 
 			}}
 
@@ -1272,7 +1270,7 @@ namespace PlantLoopSolver {
 				}
 
 				// Update loop demand as needed for changes this component may have made
-				loopSolver.UpdateAnyLoopDemandAlterations( LoopNum, LoopSideNum, BranchCounter, CompCounter );
+				DataPlant::PlantLoop( LoopNum ).loopSolver.UpdateAnyLoopDemandAlterations( LoopNum, LoopSideNum, BranchCounter, CompCounter );
 
 				//~ If we didn't EXIT early, we must have simulated, so update array
 				LastComponentSimulated( BranchIndex ) = CompCounter;
@@ -1508,7 +1506,7 @@ namespace PlantLoopSolver {
 			PumpCompNum = pump.CompNum;
 			PumpOutletNode = pump.PumpOutletNode;
 
-			loopSolver.AdjustPumpFlowRequestByEMSControls( PumpLoopNum, PumpLoopSideNum, PumpBranchNum, PumpCompNum, FlowToRequest );
+			DataPlant::PlantLoop( LoopNum ).loopSolver.AdjustPumpFlowRequestByEMSControls( PumpLoopNum, PumpLoopSideNum, PumpBranchNum, PumpCompNum, FlowToRequest );
 
 			// Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
 			SimPumps( pump.PumpName, PumpLoopNum, FlowToRequest, ThisPumpRunning, loop_side_branch( PumpBranchNum ).PumpIndex, pump.PumpHeatToFluid );
@@ -1560,7 +1558,7 @@ namespace PlantLoopSolver {
 		// FUNCTION PARAMETER DEFINITIONS:
 		static Array1D_int const InitCompArray( 1, 0 );
 
-		Demand = loopSolver.EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, InitCompArray );
+		Demand = DataPlant::PlantLoop( LoopNum ).loopSolver.EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, InitCompArray );
 
 		return Demand;
 
@@ -2011,7 +2009,7 @@ namespace PlantLoopSolver {
 				auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
 				LastNodeOnBranch = this_branch.NodeNumOut;
 				FirstNodeOnBranch = this_branch.NodeNumIn;
-				BranchFlowReq = loopSolver.DetermineBranchFlowRequest( LoopNum, LoopSideNum, BranchNum );
+				BranchFlowReq = DataPlant::PlantLoop( LoopNum ).loopSolver.DetermineBranchFlowRequest( LoopNum, LoopSideNum, BranchNum );
 
 				//now, if we are have branch pumps, here is the situation:
 				// constant speed pumps lock in a flow request on the inlet node
@@ -2086,7 +2084,7 @@ namespace PlantLoopSolver {
 				FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
 				if ( this_loopside.Branch( SplitterBranchOut ).ControlType != ControlType_Active && this_loopside.Branch( SplitterBranchOut ).ControlType != ControlType_SeriesActive ) {
 					Node( FirstNodeOnBranch ).MassFlowRate = 0.0;
-					loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
+					DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 				}
 			}
 
@@ -2116,7 +2114,7 @@ namespace PlantLoopSolver {
 						// branch flow is min of requested flow and remaining flow
 						Node( FirstNodeOnBranch ).MassFlowRate = min( Node( FirstNodeOnBranch ).MassFlowRate, FlowRemaining );
 						if ( Node( FirstNodeOnBranch ).MassFlowRate < MassFlowTolerance ) Node( FirstNodeOnBranch ).MassFlowRate = 0.0;
-						loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
+						DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
 						if ( FlowRemaining < MassFlowTolerance ) FlowRemaining = 0.0;
 					}
@@ -2153,7 +2151,7 @@ namespace PlantLoopSolver {
 								Node( FirstNodeOnBranch ).MassFlowRate = min( Node( FirstNodeOnBranch ).MassFlowRateMaxAvail, FlowRemaining );
 								FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
 							}
-							loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
+							DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						}
 					}
 				} //totalMax <=0 and flow should be assigned to active branches
@@ -2166,7 +2164,7 @@ namespace PlantLoopSolver {
 					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
 					if ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Bypass ) {
 						Node( FirstNodeOnBranch ).MassFlowRate = min( FlowRemaining, Node( FirstNodeOnBranch ).MassFlowRateMaxAvail );
-						loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
+						DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
 					}
 				}
@@ -2185,7 +2183,7 @@ namespace PlantLoopSolver {
 							//set the flow rate to the MIN((MassFlowRate+AvtiveFlowRate), MaxAvail)
 							StartingFlowRate = Node( FirstNodeOnBranch ).MassFlowRate;
 							Node( FirstNodeOnBranch ).MassFlowRate = min( ( Node( FirstNodeOnBranch ).MassFlowRate + ActiveFlowRate ), Node( FirstNodeOnBranch ).MassFlowRateMaxAvail );
-							loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
+							DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 							//adjust the remaining flow
 							FlowRemaining -= ( Node( FirstNodeOnBranch ).MassFlowRate - StartingFlowRate );
 						}
@@ -2203,7 +2201,7 @@ namespace PlantLoopSolver {
 							ActiveFlowRate = min( FlowRemaining, ( Node( FirstNodeOnBranch ).MassFlowRateMaxAvail - StartingFlowRate ) );
 							FlowRemaining -= ActiveFlowRate;
 							Node( FirstNodeOnBranch ).MassFlowRate = StartingFlowRate + ActiveFlowRate;
-							loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
+							DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						}
 					}
 				}
@@ -2265,7 +2263,7 @@ namespace PlantLoopSolver {
 						//    FracFlow = Node(FirstNodeOnBranch)%MassFlowRate/TotParallelBranchFlowReq
 						//    Node(FirstNodeOnBranch)%MassFlowRate = MIN((FracFlow * Node(FirstNodeOnBranch)%MassFlowRate),FlowRemaining)
 						Node( FirstNodeOnBranch ).MassFlowRate = ThisBranchRequestFrac * ThisLoopSideFlow;
-						loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
+						DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
 
 					}
@@ -2286,7 +2284,7 @@ namespace PlantLoopSolver {
 				MixerBranchOut = this_loopside.Mixer( SplitNum ).BranchNumOut;
 				FirstNodeOnBranchOut = this_loopside.Branch( MixerBranchOut ).NodeNumIn;
 				Node( FirstNodeOnBranchOut ).MassFlowRate = TotParallelBranchFlowReq;
-				loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, MixerBranchOut, Node( FirstNodeOnBranchOut ).MassFlowRate, FirstHVACIteration );
+				DataPlant::PlantLoop( LoopNum ).loopSolver.PushBranchFlowCharacteristics( LoopNum, LoopSideNum, MixerBranchOut, Node( FirstNodeOnBranchOut ).MassFlowRate, FirstHVACIteration );
 
 			} // Total flow requested >= or < Total parallel request
 
@@ -2601,7 +2599,7 @@ namespace PlantLoopSolver {
 				this_loop_report.DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
 			}
 
-			loopSolver.CalcUnmetPlantDemand( LoopNum, LoopSide );
+			DataPlant::PlantLoop( LoopNum ).loopSolver.CalcUnmetPlantDemand( LoopNum, LoopSide );
 
 		}
 

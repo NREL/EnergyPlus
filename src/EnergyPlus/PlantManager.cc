@@ -2225,7 +2225,7 @@ namespace PlantManager {
 					SizePlantLoop( LoopNum, FinishSizingFlag );
 				}
 				//pumps are special so call them directly
-				PlantLoopSolver::loopSolver.SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
+				PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
 				for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 						SimPlantEquip( LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip, GetCompSizFac );
@@ -2284,7 +2284,7 @@ namespace PlantManager {
 						} //-CompNum
 					} //-BranchNum
 					//pumps are special so call them directly
-					PlantLoopSolver::loopSolver.SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
+					PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
 			}
 
 

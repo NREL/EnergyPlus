@@ -58,6 +58,7 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <PlantComponent.hh>
+#include <PlantLoopSolver.hh>
 #include <OutputProcessor.hh>
 
 namespace EnergyPlus {
@@ -66,15 +67,6 @@ namespace DataPlant {
 
 	// Using/Aliasing
 	using DataLoopNode::SensedNodeFlagValue;
-
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
-	// Parameters for use in Load Distribution Schemes
-	//extern int const OptimalLoading; // Optimal Load Distribution Scheme
-	//extern int const SequentialLoading; // Seqential Load Distribution Scheme
-	//extern int const UniformLoading; // Uniform Load Distribution Scheme
-	//extern int const UniformPLRLoading; // Uniform PLR Load Distribution Scheme
-	//extern int const SequentialUniformPLRLoading; // Sequential Uniform PLR Load Distribution Scheme
 
 	int const OptimalLoading( 1 ); // Optimal Load Distribution Scheme
 	int const SequentialLoading( 2 ); // Sequential Load Distribution Scheme
@@ -972,8 +964,6 @@ namespace DataPlant {
 		int LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
 		// 2 DualSetPointwithDeadBand
 		int CommonPipeType;
-		//  TYPE(TwoWayCommonPipeData), &
-		//       ALLOCATABLE                 :: TwoWayCommonPipe                ! two-way common pipe data, primary secondary loop model
 		std::string EconomizerHtExchanger; // DSU review, should move these out of here
 		std::string EconPlantSideSensedNodeName; // DSU review, should move these out of here
 		std::string EconCondSideSensedNodeName; // DSU review, should move these out of here
@@ -990,6 +980,7 @@ namespace DataPlant {
 		Real64 PressureDrop;
 		bool UsePressureForPumpCalcs;
 		Real64 PressureEffectiveK;
+		PlantLoopSolver::PlantLoopSolverClass loopSolver;
 
 		// Default Constructor
 		PlantLoopData() :
@@ -1033,7 +1024,9 @@ namespace DataPlant {
 			PressureDrop( 0.0 ),
 			UsePressureForPumpCalcs( false ),
 			PressureEffectiveK( 0.0 )
-		{}
+		{
+			this->loopSolver = PlantLoopSolver::PlantLoopSolverClass();
+		}
 
 	};
 

@@ -248,8 +248,6 @@ namespace PlantLoopSolver {
 
 	};
 
-	extern PlantLoopSolverClass loopSolver;
-
 	void
 	clear_state();
 
