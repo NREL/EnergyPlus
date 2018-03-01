@@ -3940,7 +3940,8 @@ namespace VariableSpeedCoils {
 				WaterMassFlowRatio = 1.0;
 			}
 
-			CalcTotCapSHR_VSWSHP( RatedInletAirTemp, RatedInletAirHumRat, RatedInletEnth, RatedInletWetBulbTemp, AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, CBFRated, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( NormSpeed ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1, VarSpeedCoil( DXCoilNum ).capModFacTotal );
+			Real64 TempInletWetBulb = RatedInletWetBulbTemp;
+			CalcTotCapSHR_VSWSHP( RatedInletAirTemp, RatedInletAirHumRat, RatedInletEnth, TempInletWetBulb, AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, CBFRated, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( NormSpeed ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1, VarSpeedCoil( DXCoilNum ).capModFacTotal );
 
 			RatedCapCoolSensDes = VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal * SHR;
 		} else if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate >= SmallAirVolFlow &&
@@ -4355,13 +4356,14 @@ namespace VariableSpeedCoils {
 		CpAir_Unit = PsyCpAirFnWTdb( LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit );
 
 		RuntimeFrac = 1.0;
-		PLF = 1.0;
+		OnOffFanPartLoadFraction = 1.0;
 		VarSpeedCoil( DXCoilNum ).RunFrac = 1.0;
 		if ( ( SpeedNum == 1 ) && ( PartLoadRatio < 1.0 ) ) {
 			PLF = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, PartLoadRatio );
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
+			if ( CyclingScheme == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -4413,7 +4415,7 @@ namespace VariableSpeedCoils {
 
 				if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
 
-				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1 );
+				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1, VarSpeedCoil( DXCoilNum ).capModFacTotal );
 
 				EIRTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), LoadSideInletWBTemp, SourceSideInletTemp );
 				EIRAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( SpeedCal ), AirMassFlowRatio );
@@ -4430,7 +4432,7 @@ namespace VariableSpeedCoils {
 
 				if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
 
-				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1,VarSpeedCoil( DXCoilNum ).capModFacTotal );
+				CalcTotCapSHR_VSWSHP( LoadSideInletDBTemp, LoadSideInletHumRat, LoadSideInletEnth, LoadSideInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio, LoadSideMassFlowRate, CBFSpeed, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SourceSideInletTemp, VarSpeedCoil( DXCoilNum ).InletAirPressure, 0.0, 1, VarSpeedCoil( DXCoilNum ).capModFacTotal );
 
 				Winput = QLoadTotal * EIR;
 
@@ -4599,7 +4601,6 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).OutletAirHumRat = LoadSideOutletHumRat;
 			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = LoadSideOutletDBTemp;
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate * PartLoadRatio;
-			OnOffFanPartLoadFraction = PLF; // save PLF for fan model only for cycling fan, cont fan always = 1
 		}
 
 		// scale heat transfer rates to PLR and power to RTF
@@ -4857,13 +4858,14 @@ namespace VariableSpeedCoils {
 
 		//part-load calculation
 		RuntimeFrac = 1.0;
-		PLF = 1.0;
+		OnOffFanPartLoadFraction = 1.0;
 		VarSpeedCoil( DXCoilNum ).RunFrac = 1.0;
 		if ( ( SpeedNum == 1 ) && ( PartLoadRatio < 1.0 ) ) {
 			PLF = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, PartLoadRatio );
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
+			if ( CyclingScheme == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -5178,7 +5180,6 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).OutletAirHumRat = LoadSideOutletHumRat;
 			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = LoadSideOutletDBTemp;
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate * PartLoadRatio;
-			OnOffFanPartLoadFraction = PLF; // save PLF for fan model only for cycling fan, cont fan always = 1
 		}
 
 		// scale heat transfer rates to PLR and power to RTF
@@ -5439,12 +5440,13 @@ namespace VariableSpeedCoils {
 
 		RuntimeFrac = 1.0;
 		VarSpeedCoil( DXCoilNum ).RunFrac = 1.0;
-		PLF = 1.0;
+		OnOffFanPartLoadFraction = 1.0;
 		if ( ( SpeedNum == 1 ) && ( PartLoadRatio < 1.0 ) ) {
 			PLF = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, PartLoadRatio );
 			if ( PLF < 0.7 ) {
 				PLF = 0.7;
 			}
+			if ( CyclingScheme == CycFanCycCoil ) OnOffFanPartLoadFraction = PLF; // save PLF for fan model, don't change fan power for constant fan mode if coil is off
 			// calculate the run time fraction
 			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
 			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
@@ -5658,7 +5660,6 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).OutletAirHumRat = LoadSideOutletHumRat;
 			VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = LoadSideOutletDBTemp;
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate * PartLoadRatio;
-			OnOffFanPartLoadFraction = PLF; // save PLF for fan model only for cycling fan, cont fan always = 1
 		}
 
 		// scale heat transfer rates to PLR and power to RTF
