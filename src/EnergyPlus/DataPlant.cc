@@ -97,10 +97,10 @@ namespace DataPlant {
 	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
 	int const LoadRangeBasedMin( 0 );
 	int const LoadRangeBasedMax( 2 );
-	int const TempRangeBasedMin( 3 );
-	int const TempRangeBasedMax( 6 );
-	int const DeltaTempRangeBasedMin( 7 );
-	int const DeltaTempRangeBasedMax( 9 );
+//	int const TempRangeBasedMin( 3 );
+//	int const TempRangeBasedMax( 6 );
+//	int const DeltaTempRangeBasedMin( 7 );
+//	int const DeltaTempRangeBasedMax( 9 );
 
 	// SimFlagCriteriaTypes for use in performing interconnect re-sim checks
 	int const CriteriaType_MassFlowRate( 1 );
@@ -725,73 +725,6 @@ namespace DataPlant {
 			this_loop.LoopSide( DemandSide ).SimLoopSideNeeded = Value;
 			this_loop.LoopSide( SupplySide ).SimLoopSideNeeded = Value;
 		}
-
-	}
-
-	int
-	GetLoopSidePumpIndex(
-		int const LoopNum,
-		int const LoopSideNum,
-		int const BranchNum,
-		int const CompNum
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Edwin Lee
-		//       DATE WRITTEN   April 2010
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-		// PURPOSE OF THIS FUNCTION:
-		// This subroutine scans the plant LoopSide pumps data structure, and returns the index or zero
-		// METHODOLOGY EMPLOYED:
-		// Standard EnergyPlus methodology.
-		// REFERENCES:
-		// na
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		int GetLoopSidePumpIndex;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PumpCtr;
-
-		// Assume it isn't found
-		GetLoopSidePumpIndex = 0;
-
-		// If there aren't any pumps on this loop side then just exit
-		if ( ! allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) {
-			return GetLoopSidePumpIndex;
-		}
-
-		// set up a nice reference
-		auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
-
-		// We can also make use of the TypeOfs to exit early
-		if ( this_loop_side.Branch( BranchNum ).Comp( CompNum ).GeneralEquipType != GenEquipTypes_Pump ) return GetLoopSidePumpIndex;
-
-		// Loop across all the loops on this loop/LoopSide, and check the branch/comp location
-		for ( PumpCtr = 1; PumpCtr <= this_loop_side.TotalPumps; ++PumpCtr ) {
-			if ( ( this_loop_side.Pumps( PumpCtr ).BranchNum == BranchNum ) && ( this_loop_side.Pumps( PumpCtr ).CompNum == CompNum ) ) {
-				GetLoopSidePumpIndex = PumpCtr;
-				break;
-			}
-		}
-
-		return GetLoopSidePumpIndex;
 
 	}
 

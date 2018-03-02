@@ -78,10 +78,10 @@ namespace DataPlant {
 	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
 	extern int const LoadRangeBasedMin;
 	extern int const LoadRangeBasedMax;
-	extern int const TempRangeBasedMin;
-	extern int const TempRangeBasedMax;
-	extern int const DeltaTempRangeBasedMin;
-	extern int const DeltaTempRangeBasedMax;
+//	extern int const TempRangeBasedMin;
+//	extern int const TempRangeBasedMax;
+//	extern int const DeltaTempRangeBasedMin;
+//	extern int const DeltaTempRangeBasedMax;
 
 	// SimFlagCriteriaTypes for use in performing interconnect re-sim checks
 	extern int const CriteriaType_MassFlowRate;
@@ -327,33 +327,6 @@ namespace DataPlant {
 
 	extern int PlantManageSubIterations; // tracks plant iterations to characterize solver
 	extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
-
-
-
-
-
-
-
-//
-//
-//
-//
-//	struct ComponentData
-//	{
-//		// Members
-//		std::string Name; // Name of the component
-//		std::string NodeNameIn; // Name of Node In
-//		std::string NodeNameOut; // Name of Node Out
-//		int NodeNumIn; // Inlet node number
-//		int NodeNumOut; // Outlet node number
-//
-//		// Default Constructor
-//		ComponentData() :
-//			NodeNumIn( 0 ),
-//			NodeNumOut( 0 )
-//		{}
-//
-//	};
 
 	struct PipeData
 	{
@@ -782,14 +755,6 @@ namespace DataPlant {
 
 	void
 	SetAllPlantSimFlagsToValue( bool const Value );
-
-	int
-	GetLoopSidePumpIndex(
-		int const LoopNum,
-		int const LoopSideNum,
-		int const BranchNum,
-		int const CompNum
-	);
 
 	void
 	ShowBranchesOnLoop( int const LoopNum ); // Loop number of loop
