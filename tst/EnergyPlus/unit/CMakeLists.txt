@@ -19,6 +19,7 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
   BranchInputManager.unit.cc
@@ -141,6 +142,7 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  StandardRatings.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
@@ -164,6 +166,7 @@ set( test_src
   WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc

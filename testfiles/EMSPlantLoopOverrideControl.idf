@@ -9,8 +9,8 @@
 !
 ! Location:                Orlando, FL
 !
-! Design Days:             Orlando_FL_USA Annual Heating 99.6%, MaxDB=4캜
-!                          Orlando_FL_USA Annual Cooling (WB=>MDB) .4%, MDB=30.7캜 WB=26.8캜
+! Design Days:             Orlando_FL_USA Annual Heating 99.6%, MaxDB=4째C
+!                          Orlando_FL_USA Annual Cooling (WB=>MDB) .4%, MDB=30.7째C WB=26.8째C
 !
 ! Run Period (Weather File): First part of february ORLANDO FL USA TMY
 !
@@ -182,10 +182,10 @@
 
 ! Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
 ! Orlando_FL_USA Extreme Annual Wind Speeds, 1%=8.5m/s, 2.5%=7.8m/s, 5%=7m/s
-! Orlando_FL_USA Extreme Annual Temperatures, Max Drybulb=35.9캜 Min Drybulb=0.1캜
+! Orlando_FL_USA Extreme Annual Temperatures, Max Drybulb=35.9째C Min Drybulb=0.1째C
 ! Orlando_FL_USA Annual Heating Design Conditions Wind Speed=3.7m/s Wind Dir=330
 ! Coldest Month=JAN
-! Orlando_FL_USA Annual Heating 99.6%, MaxDB=4캜
+! Orlando_FL_USA Annual Heating 99.6%, MaxDB=4째C
 
   SizingPeriod:DesignDay,
     Orlando Ann Htg 99.6% Condns DB,  !- Name
@@ -215,7 +215,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! Orlando_FL_USA Annual Cooling (WB=>MDB) .4%, MDB=30.7캜 WB=26.8캜
+! Orlando_FL_USA Annual Cooling (WB=>MDB) .4%, MDB=30.7째C WB=26.8째C
 
   SizingPeriod:DesignDay,
     Orlando Ann Clg .4% Condns WB=>MDB,  !- Name

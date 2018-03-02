@@ -111,7 +111,7 @@
 
 ! CHICAGO_IL_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
 ! Coldest Month=January
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -143,7 +143,7 @@
 
 ! CHICAGO Annual Cooling Design Conditions Wind Speed=5.3m/s Wind Dir=230
 ! Hottest Month=July
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=23.8°C
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2Â°C MWB=23.8Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name
