@@ -4552,7 +4552,7 @@ namespace SimAirServingZones {
 					if ( ZoneSA > 0.0 ) Ep = ZonePA / ZoneSA;
 					if ( Ep > 1.0 ) Ep = 1.0;
 					TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFraction = Ep;
-					FinalZoneSizing(CtrlZoneNum).ZoneOAFracCooling = ZoneOAFracCooling;
+					FinalZoneSizing( CtrlZoneNum ).ZoneOAFracCooling = ZoneOAFracCooling;
 
 					// determined cooled zone floor area in an airloop
 					for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++zoneInNode ) {
@@ -4561,6 +4561,13 @@ namespace SimAirServingZones {
 						}
 					}
 					TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor = max( ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor );
+
+					// Because Std62 calcs are currently structured by zone rather than airterminal, need to push information back into FinalZoneSizing
+					FinalZoneSizing( CtrlZoneNum ).VozClgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
+					FinalZoneSizing( CtrlZoneNum ).ZpzClgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzClgByZone;
+					FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFraction;
+					FinalZoneSizing( CtrlZoneNum ).ZoneOAFracCooling = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneOAFracCooling;
+					FinalZoneSizing( CtrlZoneNum ).SupplyAirAdjustFactor = TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor;
 				}
 
 				int NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
@@ -4684,6 +4691,14 @@ namespace SimAirServingZones {
 							}
 						}
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor = max( ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor );
+
+						// Because Std62 calcs are currently structured by zone rather than airterminal, need to push information back into FinalZoneSizing
+						FinalZoneSizing( CtrlZoneNum ).VozHtgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
+						FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone;
+						FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg;
+						FinalZoneSizing( CtrlZoneNum ).ZoneOAFracHeating = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneOAFracHeating;
+						FinalZoneSizing( CtrlZoneNum ).SupplyAirAdjustFactor = TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor;
+
 					} // end for loop of heated zones
 
 				} else { // getting heating flow based values for Std 62.1 report for single path systems
@@ -4754,6 +4769,14 @@ namespace SimAirServingZones {
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg = Ep;
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneOAFracHeating = ZoneOAFracHeating;
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor = max( ClgSupplyAirAdjustFactor, HtgSupplyAirAdjustFactor );
+
+						// Because Std62 calcs are currently structured by zone rather than airterminal, need to push information back into FinalZoneSizing
+						FinalZoneSizing( CtrlZoneNum ).VozHtgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
+						FinalZoneSizing( CtrlZoneNum ).ZpzHtgByZone = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZpzHtgByZone;
+						FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZonePrimaryAirFractionHtg;
+						FinalZoneSizing( CtrlZoneNum ).ZoneOAFracHeating = TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneOAFracHeating;
+						FinalZoneSizing( CtrlZoneNum ).SupplyAirAdjustFactor = TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor;
+
 					} // end for loop over cooled zones (for htg calcs though)
 					//CalcZoneSizing( CurOverallSimDay, CtrlZoneNum ).SupplyAirAdjustFactor = TermUnitFinalZoneSizing( TermUnitSizingIndex ).SupplyAirAdjustFactor;
 					FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated = FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
