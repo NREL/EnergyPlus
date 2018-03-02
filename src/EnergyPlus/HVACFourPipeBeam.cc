@@ -325,6 +325,7 @@ namespace FourPipeBeam {
 						ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).InNode = thisBeam->airInNodeNum;
 						ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).OutNode = thisBeam->airOutNodeNum;
 						AirDistUnit( thisBeam->aDUNum ).TermUnitSizingNum = ZoneEquipConfig( ctrlZone ).AirDistUnitCool( supAirIn ).TermUnitSizingIndex;
+						thisBeam->termUnitSizingNum = AirDistUnit( thisBeam->aDUNum ).TermUnitSizingNum;
 						AirDistUnit( thisBeam->aDUNum ).ZoneEqNum = ctrlZone;
 						if ( thisBeam->beamHeatingPresent ) {
 							ZoneEquipConfig( ctrlZone ).AirDistUnitHeat( supAirIn ).InNode = thisBeam->airInNodeNum;
@@ -368,6 +369,12 @@ namespace FourPipeBeam {
 	HVACFourPipeBeam::getPrimAirDesignVolFlow()
 	{
 		return vDotDesignPrimAir;
+	}
+
+	int
+	HVACFourPipeBeam::getTermUnitSizingIndex()
+	{
+		return termUnitSizingNum;
 	}
 
 	void
