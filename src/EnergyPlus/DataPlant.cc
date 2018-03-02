@@ -71,15 +71,6 @@ namespace DataPlant {
 	// This data-only module contains the structures for various parts of the Plant and
 	// Condenser Loops.
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
-	// USE STATEMENTS:
-	// Use statements for data only modules (only modules that should be used here and sparingly)
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::DoingSizing;
@@ -87,20 +78,8 @@ namespace DataPlant {
 	using DataLoopNode::SensedNodeFlagValue;
 	using DataLoopNode::NodeID;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
-	// Parameters for use in Load Distribution Schemes
-
-
-	// Parameters for scheme types
-
-	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
 	int const LoadRangeBasedMin( 0 );
 	int const LoadRangeBasedMax( 2 );
-//	int const TempRangeBasedMin( 3 );
-//	int const TempRangeBasedMax( 6 );
-//	int const DeltaTempRangeBasedMin( 7 );
-//	int const DeltaTempRangeBasedMax( 9 );
 
 	// SimFlagCriteriaTypes for use in performing interconnect re-sim checks
 	int const CriteriaType_MassFlowRate( 1 );
@@ -111,8 +90,6 @@ namespace DataPlant {
 	Real64 const CriteriaDelta_MassFlowRate( 0.001 );
 	Real64 const CriteriaDelta_Temperature( 0.010 );
 	Real64 const CriteriaDelta_HeatTransferRate( 0.100 );
-
-
 
 	int const FreeCoolControlMode_WetBulb( 1 ); // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
 	int const FreeCoolControlMode_DryBulb( 2 ); // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
@@ -125,7 +102,6 @@ namespace DataPlant {
 	// Parameters for loop setpoint reference
 	int const Air( 1 );
 	int const Ground( 2 );
-	int const LoopNode( 3 );
 
 	// Parameters for common pipe
 	int const CommonPipe_No( 0 );
@@ -136,9 +112,8 @@ namespace DataPlant {
 	int const DemandSupply_No( 0 );
 	int const DemandSide( 1 );
 	int const SupplySide( 2 );
-	int const DemandSupply_Yes( 3 ); // DSU
 
-	Array1D_string const cLoopSideLocations( {0,3}, { "DemandSupply_No", "DemandSide", "SupplySide", "DemandSupply_Yes" } );
+	Array1D_string const cLoopSideLocations( {0,2}, { "DemandSupply_No", "DemandSide", "SupplySide" } );
 	// Parameters for economizer
 	int const Integrated( 1 );
 	int const NonIntegrated( 2 );
@@ -149,16 +124,9 @@ namespace DataPlant {
 	Real64 const DeltaTempTol( 0.0001 ); // minimum significant loop temperature difference
 
 	// Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-	int const LoopType_NoLoop( 0 );
 	int const LoopType_Plant( 1 );
 	int const LoopType_Condenser( 2 );
 	int const LoopType_Both( 3 );
-
-	// Parameters for calls to simflag routines
-	int const PlantSupply( -1 );
-	int const PlantDemand( -2 );
-	int const CondSupply( -3 );
-	int const CondDemand( -4 );
 
 	// Parameters for FlowLock standardization
 	int const FlowPumpQuery( -1 ); // Used to ask the pumps for their min/max avail based on no constraints
@@ -331,7 +299,6 @@ namespace DataPlant {
 	int NumPipes( 0 ); // Total number of pipes
 	int NumPlantPipes( 0 ); // Total number of plant pipes
 	int NumCondPipes( 0 ); // Total number of condenser pipes
-	Real64 EconLoadMet( 0.0 ); // Load met by Economizer
 	int TotNumLoops( 0 ); // number of plant and condenser loops
 	int TotNumHalfLoops( 0 ); // number of half loops (2 * TotNumLoops)
 	bool PlantFirstSizeCompleted( false );
@@ -358,7 +325,6 @@ namespace DataPlant {
 	// Routines within this module
 
 	// Object Data
-	Array1D< PipeData > Pipe;
 	Array1D< PlantLoopData > PlantLoop;
 	Array1D< PlantAvailMgrData > PlantAvailMgr;
 	Array1D< ReportVars > PlantReport;
@@ -368,8 +334,6 @@ namespace DataPlant {
 	Array1D< ReportLoopData > VentRepCondDemandSide;
 	Array1D< PlantCallingOrderInfoStruct > PlantCallingOrderInfo;
 
-	// Functions
-
 	// Clears the global data in DataPlant.
 	// Needed for unit tests, should not be normally called.
 	void
@@ -378,7 +342,6 @@ namespace DataPlant {
 		NumPipes = 0;
 		NumPlantPipes = 0;
 		NumCondPipes = 0;
-		EconLoadMet = 0.0 ; // Load met by Economizer
 		TotNumLoops = 0;
 		TotNumHalfLoops = 0;
 		PlantFirstSizeCompleted = false;
@@ -392,7 +355,6 @@ namespace DataPlant {
 		LoadChangeDownStream.deallocate();
 		PlantManageSubIterations = 0;
 		PlantManageHalfLoopCalls = 0;
-		Pipe.deallocate();
 		PlantLoop.deallocate();
 		PlantAvailMgr.deallocate();
 		PlantReport.deallocate();

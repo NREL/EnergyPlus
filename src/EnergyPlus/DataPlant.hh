@@ -75,13 +75,8 @@ namespace DataPlant {
 	int const UniformPLRLoading( 4 ); // Uniform PLR Load Distribution Scheme
 	int const SequentialUniformPLRLoading( 5 ); // Sequential Uniform PLR Load Distribution Scheme
 
-	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
 	extern int const LoadRangeBasedMin;
 	extern int const LoadRangeBasedMax;
-//	extern int const TempRangeBasedMin;
-//	extern int const TempRangeBasedMax;
-//	extern int const DeltaTempRangeBasedMin;
-//	extern int const DeltaTempRangeBasedMax;
 
 	// SimFlagCriteriaTypes for use in performing interconnect re-sim checks
 	extern int const CriteriaType_MassFlowRate;
@@ -105,7 +100,6 @@ namespace DataPlant {
 	// Parameters for loop setpoint reference
 	extern int const Air;
 	extern int const Ground;
-	extern int const LoopNode;
 
 	// Parameters for common pipe
 	extern int const CommonPipe_No;
@@ -116,7 +110,6 @@ namespace DataPlant {
 	extern int const DemandSupply_No;
 	extern int const DemandSide;
 	extern int const SupplySide;
-	extern int const DemandSupply_Yes; // DSU
 
 	extern Array1D_string const cLoopSideLocations;
 	// Parameters for economizer
@@ -129,16 +122,9 @@ namespace DataPlant {
 	extern Real64 const DeltaTempTol; // minimum significant loop temperature difference
 
 	// Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-	extern int const LoopType_NoLoop;
 	extern int const LoopType_Plant;
 	extern int const LoopType_Condenser;
 	extern int const LoopType_Both;
-
-	// Parameters for calls to simflag routines
-	extern int const PlantSupply;
-	extern int const PlantDemand;
-	extern int const CondSupply;
-	extern int const CondDemand;
 
 	// Parameters for FlowLock standardization
 	extern int const FlowPumpQuery; // Used to ask the pumps for their min/max avail based on no constraints
@@ -309,7 +295,6 @@ namespace DataPlant {
 	extern int NumPipes; // Total number of pipes
 	extern int NumPlantPipes; // Total number of plant pipes
 	extern int NumCondPipes; // Total number of condenser pipes
-	extern Real64 EconLoadMet; // Load met by Economizer
 	extern int TotNumLoops; // number of plant and condenser loops
 	extern int TotNumHalfLoops; // number of half loops (2 * TotNumLoops)
 	extern bool PlantFirstSizeCompleted; //true if first-pass sizing is still going on and not finished
@@ -327,31 +312,6 @@ namespace DataPlant {
 
 	extern int PlantManageSubIterations; // tracks plant iterations to characterize solver
 	extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
-
-	struct PipeData
-	{
-		// Members
-		std::string Name; // Pipe name
-		int TypeOf;
-		int EquipNum;
-		int FlowCtrl; // Pipe control (should always be BYPASS)
-		std::string NodeNameIn; // Pipe inlet node name
-		int NodeNumIn; // Pipe inlet node number
-		std::string NodeNameOut; // Pipe outlet node name
-		int NodeNumOut; // Pipe outlet node number
-		int ParentHalfLoop; // Half loop where the pipe is present
-
-		// Default Constructor
-		PipeData() :
-			TypeOf( 0 ),
-			EquipNum( 0 ),
-			FlowCtrl( 0 ),
-			NodeNumIn( 0 ),
-			NodeNumOut( 0 ),
-			ParentHalfLoop( 0 )
-		{}
-
-	};
 
 	struct PlantAvailMgrData
 	{
@@ -690,10 +650,6 @@ namespace DataPlant {
 		// Members
 		int LoopIndex; // plant or condenser loop indexes in calling order
 		int LoopSide; // plant or condenser loop sides in calling order
-		//  INTEGER :: InterAct1LoopIndex     = 0 ! primary interaction dependency reference loop index
-		//  INTEGER :: InterAct1LoopSide      = 0 ! primary interaction dependency reference loop side
-		//  INTEGER :: InterAct2LoopIndex     = 0 ! secondary interaction dependency reference loop index
-		//  INTEGER :: InterAct2LoopSide      = 0 ! secondary interaction dependency reference loop side
 		int LoopPumpSimulationType; // type of pump topology on half loop
 
 		// Default Constructor
@@ -706,7 +662,6 @@ namespace DataPlant {
 	};
 
 	// Object Data
-	extern Array1D< PipeData > Pipe;
 	extern Array1D< PlantLoopData > PlantLoop;
 	extern Array1D< PlantAvailMgrData > PlantAvailMgr;
 	extern Array1D< ReportVars > PlantReport;
@@ -715,8 +670,6 @@ namespace DataPlant {
 	extern Array1D< ReportLoopData > VentRepCondSupplySide;
 	extern Array1D< ReportLoopData > VentRepCondDemandSide;
 	extern Array1D< PlantCallingOrderInfoStruct > PlantCallingOrderInfo;
-
-	// Functions
 
 	// Clears the global data in DataPlant.
 	// Needed for unit tests, should not be normally called.
