@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <Plant/Topology/LoopSide.hh>
 
 namespace EnergyPlus {
 
@@ -163,8 +164,7 @@ namespace PlantLoopSolver {
 
 		void
 		TurnOnAllLoopSideBranches(
-				int LoopNum,
-				int LoopSide
+				DataPlant::HalfLoopData & loop_side
 		);
 
 		void

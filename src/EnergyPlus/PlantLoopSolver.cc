@@ -164,29 +164,34 @@ namespace PlantLoopSolver {
 		UpdatedDemandToLoopSetPoint = 0.0;
 		int ThisSide = LoopSideNum;
 		int OtherSide = 3 - ThisSide; //will give us 1 if thisside is 2, or 2 if thisside is 1
-		int ThisSideInletNode = DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).NodeNumIn;
+
+		auto & thisPlantLoop = DataPlant::PlantLoop( LoopNum );
+		auto & thisLoopSide = thisPlantLoop.LoopSide( ThisSide );
+		auto & otherLoopSide = thisPlantLoop.LoopSide( OtherSide );
+
+		int ThisSideInletNode = thisLoopSide.NodeNumIn;
 
 		// The following block is related to validating the flow control paths of the loop side
 		// Since the control types are scheduled, I think BeginTimeStep should be a decent check frequency
-		if ( DataGlobals::BeginTimeStepFlag && DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).OncePerTimeStepOperations ) {
+		if ( DataGlobals::BeginTimeStepFlag && thisLoopSide.OncePerTimeStepOperations ) {
 
 			// Initialize loop side controls -- could just be done for one loop since this routine inherently
 			//  loops over all plant/condenser loops.  Not sure if the penalty is worth investigating.
 			PlantCondLoopOperation::InitLoadDistribution( FirstHVACIteration );
 
 			// Now that the op scheme types are updated, do LoopSide validation
-			auto IsLoopSideValid = DataPlant::PlantLoop( LoopNum ).loopSolver.ValidateFlowControlPaths( LoopNum, ThisSide );
+			auto IsLoopSideValid = thisPlantLoop.loopSolver.ValidateFlowControlPaths( LoopNum, ThisSide );
 			if ( ! IsLoopSideValid.Valid ) {
 				ShowFatalError( "ERROR:" + IsLoopSideValid.Reason );
 			}
 
 			// Set the flag to false so we won't do these again this time step
-            DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).OncePerTimeStepOperations = false;
+            thisLoopSide.OncePerTimeStepOperations = false;
 
 		} else {
 
 			// Set the flag to true so that it is activated for the next time step
-            DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).OncePerTimeStepOperations = true;
+            thisLoopSide.OncePerTimeStepOperations = true;
 
 		}
 
@@ -194,21 +199,23 @@ namespace PlantLoopSolver {
 		if ( ThisSide == DataPlant::DemandSide ) PlantPressureSystem::SimPressureDropSystem( LoopNum, FirstHVACIteration, DataPlant::PressureCall_Init );
 
 		// Turn on any previously disabled branches due to constant speed branch pump issue
-		DataPlant::PlantLoop( LoopNum ).loopSolver.TurnOnAllLoopSideBranches( LoopNum, ThisSide );
+		thisPlantLoop.loopSolver.TurnOnAllLoopSideBranches( thisLoopSide );
 
-		DataPlant::PlantLoop( LoopNum ).loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
+		// Do the actual simulation here every time
+		thisPlantLoop.loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
 
+		// On constant speed branch pump loop sides we need to resimulate
         if ( CurrentLoopSideIsConstantSpeedBranchPumped ) {
             // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
-			DataPlant::PlantLoop( LoopNum ).loopSolver.DisableAnyBranchPumpsConnectedToUnloadedEquipment(LoopNum, ThisSide);
-			DataPlant::PlantLoop( LoopNum ).loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
+			thisPlantLoop.loopSolver.DisableAnyBranchPumpsConnectedToUnloadedEquipment(LoopNum, ThisSide);
+			thisPlantLoop.loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
         }
 
 		// A couple things are specific to which LoopSide we are on
 		if ( LoopSideNum == DataPlant::DemandSide ) {
 
 			// Pass the loop information via the HVAC interface manager
-			HVACInterfaceManager::UpdatePlantLoopInterface( LoopNum, LoopSideNum, DataPlant::PlantLoop( LoopNum ).LoopSide( DataPlant::DemandSide ).NodeNumOut, DataPlant::PlantLoop( LoopNum ).LoopSide( DataPlant::SupplySide ).NodeNumIn, ReSimOtherSideNeeded, DataPlant::PlantLoop( LoopNum ).CommonPipeType );
+			HVACInterfaceManager::UpdatePlantLoopInterface( LoopNum, LoopSideNum, thisPlantLoop.LoopSide( DataPlant::DemandSide ).NodeNumOut, thisPlantLoop.LoopSide( DataPlant::SupplySide ).NodeNumIn, ReSimOtherSideNeeded, thisPlantLoop.CommonPipeType );
 
 		} else { //LoopSide == SupplySide
 
@@ -216,25 +223,23 @@ namespace PlantLoopSolver {
 			PlantPressureSystem::SimPressureDropSystem( LoopNum, FirstHVACIteration, DataPlant::PressureCall_Update );
 
 			// Pass the loop information via the HVAC interface manager (only the flow)
-			HVACInterfaceManager::UpdatePlantLoopInterface( LoopNum, LoopSideNum, DataPlant::PlantLoop( LoopNum ).LoopSide( DataPlant::SupplySide ).NodeNumOut, DataPlant::PlantLoop( LoopNum ).LoopSide( DataPlant::DemandSide ).NodeNumIn, ReSimOtherSideNeeded, DataPlant::PlantLoop( LoopNum ).CommonPipeType );
+			HVACInterfaceManager::UpdatePlantLoopInterface( LoopNum, LoopSideNum, thisPlantLoop.LoopSide( DataPlant::SupplySide ).NodeNumOut, thisPlantLoop.LoopSide( DataPlant::DemandSide ).NodeNumIn, ReSimOtherSideNeeded, thisPlantLoop.CommonPipeType );
 
 			// Update the loop outlet node conditions
-			DataPlant::PlantLoop( LoopNum ).loopSolver.CheckLoopExitNode( LoopNum, FirstHVACIteration );
+			thisPlantLoop.loopSolver.CheckLoopExitNode( LoopNum, FirstHVACIteration );
 
 		}
 
 		// Update some reporting information at Plant half loop level
-		DataPlant::PlantLoop( LoopNum ).loopSolver.UpdateLoopSideReportVars( LoopNum, LoopSideNum, InitialDemandToLoopSetPointSAVED, LoadToLoopSetPointThatWasntMet );
+		thisPlantLoop.loopSolver.UpdateLoopSideReportVars( LoopNum, LoopSideNum, InitialDemandToLoopSetPointSAVED, LoadToLoopSetPointThatWasntMet );
 
 	}
 
 	void
 	PlantLoopSolverClass::TurnOnAllLoopSideBranches(
-		int LoopNum,
-		int LoopSide
+			DataPlant::HalfLoopData & loop_side
 	)
 	{
-		auto & loop_side = DataPlant::PlantLoop( LoopNum ).LoopSide( LoopSide );
 		for ( int branchNum = 2; branchNum <= loop_side.TotalBranches-1; ++branchNum ) {
 			auto & branch = loop_side.Branch( branchNum );
 			branch.QuickDisableForCSBranchPumping = false;

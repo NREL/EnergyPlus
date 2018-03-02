@@ -54,6 +54,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <General.hh>
+#include <Plant/Operation/PlantConvergencePoint.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -111,29 +112,7 @@ namespace DataPlant {
 	Real64 const CriteriaDelta_Temperature( 0.010 );
 	Real64 const CriteriaDelta_HeatTransferRate( 0.100 );
 
-	// Parameters for loop flow request priority,
-	//     used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
-	int const LoopFlowStatus_Unknown( 21 ); // component's status is not yet set
-	int const LoopFlowStatus_NeedyAndTurnsLoopOn( 22 ); // component is a "winner" for loop flow requests
-	// active valve inside component that modulates flow
-	//  gets the loop going under most conditions
-	int const LoopFlowStatus_NeedyIfLoopOn( 23 ); // component is a "winner" for loop flow requests
-	// but doesn't normally get the loop going to start with
-	//  once loop is going, may increase needs, non-zero minimums
-	int const LoopFlowStatus_TakesWhatGets( 24 ); // component is a "loser" for loop flow requests,
-	// but if the loop is on it
-	// it does make flow requests (for s/m resolution)
 
-	//Parameters for component character wrt how load gets met (or not)
-	//  used in %HowLoadServed to facilitate load dispatch logic
-	int const HowMet_Unknown( 50 ); // not yet set
-	int const HowMet_NoneDemand( 51 ); // does not meet a load, demand component
-	int const HowMet_PassiveCap( 52 ); // Passive machine, does what conditions allow but
-	int const HowMet_ByNominalCap( 53 ); // MaxLoad, MinLoad, OptLoad should work
-	int const HowMet_ByNominalCapLowOutLimit( 54 ); // MaxLoad, MinLoad, OptLoad but with low limit temp on outlet
-	int const HowMet_ByNominalCapHiOutLimit( 55 ); // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
-	int const HowMet_ByNominalCapFreeCoolCntrl( 56 ); // HowMet_ByNominalCap with free cool shutdown
-	int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl( 57 ); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
 
 	int const FreeCoolControlMode_WetBulb( 1 ); // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
 	int const FreeCoolControlMode_DryBulb( 2 ); // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
@@ -333,25 +312,7 @@ namespace DataPlant {
 	int const GenEquipTypes_PlantComponent( 22 );
 	int const GenEquipTypes_CentralHeatPumpSystem( 23 );
 
-	// DERIVED TYPE DEFINITIONS:
-
-	// two-way common pipe variables
-	//TYPE TwoWayCommonPipeData
-	//  LOGICAL   :: SetpointOnSecondarySide  ! true if control point is demand inlet, otherwise supply inlet
-	//  REAL(r64) :: CurSecCPLegFlow    !Mass flow rate in primary common pipe leg
-	//  REAL(r64) :: CurPriCPLegFlow    !Mass flow rate in secondary common pipe leg
-	//  REAL(r64) :: CurSectoPriFlow    !Secondary side to Primary side Mass flow rate
-	//  REAL(r64) :: CurPritoSecFlow    !Primary side to Secondary side Mass flow rate
-	//  REAL(r64) :: CurSecOutTemp      !Secondary outlet temperature
-	//  REAL(r64) :: CurPriOutTemp      !Primary outlet temperature
-	//  REAL(r64) :: CurPriInTemp       !Primary inlet temperature
-	//  REAL(r64) :: CurSecInTemp       !Secondary inlet temperature
-	//  !new/missing?
-	//  REAL(r64) :: mdotPriRequest     ! primary total flow request
-	//END TYPE TwoWayCommonPipeData
-
-	int const NumConvergenceHistoryTerms( 5 );
-	Array1D< Real64 > const ConvergenceHistoryARR( NumConvergenceHistoryTerms, { 0.0, -1.0, -2.0, -3.0, -4.0 } );
+	Array1D< Real64 > const ConvergenceHistoryARR( DataPlant::NumConvergenceHistoryTerms, { 0.0, -1.0, -2.0, -3.0, -4.0 } );
 	Real64 const sum_ConvergenceHistoryARR( sum( ConvergenceHistoryARR ) );
 	Real64 const square_sum_ConvergenceHistoryARR( pow_2( sum_ConvergenceHistoryARR ) );
 	Real64 const sum_square_ConvergenceHistoryARR( sum( pow( ConvergenceHistoryARR, 2 ) ) );
@@ -383,26 +344,10 @@ namespace DataPlant {
 	Array1D_int EconBranchNum; // Branch num on which economizer is placed
 	Array1D_int EconCompNum; // Component num of economizer in the economizer branch
 
-	Array1D_bool CheckLoopEcon; // Flag for initializations
-	Array1D_bool EconOn; // Flag specifying if economizer is ON
-
-	Array1D_bool SimSupplySide; // DSU, sim ctrl flag for plant supply sides
-	Array1D_bool SimDemandSide; // DSU, sim ctrl flag for plant supply sides
-
 	Array1D_bool LoadChangeDownStream; // sim control flag.
 
 	int PlantManageSubIterations( 0 ); // tracks plant iterations to characterize solver
 	int PlantManageHalfLoopCalls( 0 ); // tracks number of half loop calls
-
-	// two-way common pipe variables
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSecCPLegFlow    !Mass flow rate in primary common pipe leg
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPriCPLegFlow    !Mass flow rate in secondary common pipe leg
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSectoPriFlow    !Secondary side to Primary side Mass flow rate
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPritoSecFlow    !Primary side to Secondary side Mass flow rate
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSecOutTemp      !Secondary outlet temperature
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPriOutTemp      !Primary outlet temperature
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPriInTemp       !Primary inlet temperature
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSecInTemp       !Secondary inlet temperature
 
 	// these variables are arrays, allocated for the number of those particular loopsides, containing data for the vent reports
 	// they are operated on like normal in almost all cases currently, except in the routine which actually mines data and sets them up
@@ -444,10 +389,6 @@ namespace DataPlant {
 		AnyEMSPlantOpSchemesInModel = false;
 		EconBranchNum.deallocate();
 		EconCompNum.deallocate();
-		CheckLoopEcon.deallocate();
-		EconOn.deallocate();
-		SimSupplySide.deallocate();
-		SimDemandSide.deallocate();
 		LoadChangeDownStream.deallocate();
 		PlantManageSubIterations = 0;
 		PlantManageHalfLoopCalls = 0;
