@@ -2187,7 +2187,7 @@ namespace CondenserLoopTowers {
 		using DataPlant::TypeOf_CoolingTower_TwoSpd;
 		using DataPlant::TypeOf_CoolingTower_VarSpd;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::TypeOf_CoolingTower_VarSpdMerkel;
 		using PlantUtilities::InitComponentNodes;

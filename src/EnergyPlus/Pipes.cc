@@ -148,7 +148,7 @@ namespace Pipes {
 		if ( this->OneTimeInit ) {
 			int FoundOnLoop = 0;
 			bool errFlag = false;
-			DataPlant::ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, _, _, FoundOnLoop, _, _, errFlag );
+			PlantUtilities::ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, _, _, FoundOnLoop, _, _, errFlag );
 			if ( FoundOnLoop == 0 ) {
 				ShowFatalError( "SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop." );
 			}

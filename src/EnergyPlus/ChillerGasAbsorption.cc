@@ -557,7 +557,7 @@ namespace ChillerGasAbsorption {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;

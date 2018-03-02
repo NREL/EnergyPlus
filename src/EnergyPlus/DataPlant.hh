@@ -676,58 +676,6 @@ namespace DataPlant {
 	void
 	clear_state();
 
-
-	void
-	ScanPlantLoopsForObject(
-		std::string const & CompName,
-		int const CompType,
-		int & LoopNum,
-		int & LoopSideNum,
-		int & BranchNum,
-		int & CompNum,
-		Optional< Real64 const > LowLimitTemp = _,
-		Optional< Real64 const > HighLimitTemp = _,
-		Optional_int CountMatchPlantLoops = _,
-		Optional_int_const InletNodeNumber = _,
-		Optional_int_const SingleLoopSearch = _,
-		Optional_bool errFlag = _
-	);
-
-	void
-	ScanPlantLoopsForNodeNum(
-		std::string const & CallerName, // really used for error messages
-		int const NodeNum, // index in Node structure of node to be scanned
-		int & LoopNum, // return value for plant loop
-		int & LoopSideNum, // return value for plant loop side
-		int & BranchNum,
-		Optional_int CompNum = _
-	);
-
-	bool
-	AnyPlantLoopSidesNeedSim();
-
-	void
-	SetAllPlantSimFlagsToValue( bool const Value );
-
-	void
-	ShowBranchesOnLoop( int const LoopNum ); // Loop number of loop
-
-	int
-	MyPlantSizingIndex(
-		std::string const & CompType, // component description
-		std::string const & CompName, // user name of component
-		int const NodeNumIn, // component water inlet node
-		int const NodeNumOut, // component water outlet node
-		bool & ErrorsFound, // set to true if there's an error
-		Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
-	);
-
-	bool
-	verifyTwoNodeNumsOnSamePlantLoop(
-		int const nodeIndexA,
-		int const nodeIndexB
-	);
-
 } // DataPlant
 
 } // EnergyPlus

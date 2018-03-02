@@ -2614,7 +2614,7 @@ namespace VariableSpeedCoils {
 		using DataGlobals::SysSizingCalc;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -3142,7 +3142,7 @@ namespace VariableSpeedCoils {
 		// Using/Aliasing
 		using namespace Psychrometrics;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using DataHVACGlobals::SmallAirVolFlow;
 		using DataHVACGlobals::SmallLoad;
 		using General::RoundSigDigits;

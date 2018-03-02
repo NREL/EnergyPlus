@@ -590,7 +590,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		if ( MyFlag( CompNum ) ) {
 			// locate the main two connections to the plant loops
 			errFlag = false;
-			ScanPlantLoopsForObject( FluidHX( CompNum ).Name, TypeOf_FluidToFluidPlantHtExchg, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum, _, _, _, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, _, errFlag );
+			PlantUtilities::ScanPlantLoopsForObject( FluidHX( CompNum ).Name, TypeOf_FluidToFluidPlantHtExchg, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum, _, _, _, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, _, errFlag );
 
 			if ( FluidHX( CompNum ).DemandSideLoop.LoopSideNum != DemandSide ) { // throw error
 				ShowSevereError( RoutineName + " Invalid connections for " + ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) + " name = \"" + FluidHX( CompNum ).Name + "\"" );
@@ -598,7 +598,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				errFlag = true;
 			}
 
-			ScanPlantLoopsForObject( FluidHX( CompNum ).Name, TypeOf_FluidToFluidPlantHtExchg, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum, _, _, _, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, _, errFlag );
+			PlantUtilities::ScanPlantLoopsForObject( FluidHX( CompNum ).Name, TypeOf_FluidToFluidPlantHtExchg, FluidHX( CompNum ).SupplySideLoop.LoopNum, FluidHX( CompNum ).SupplySideLoop.LoopSideNum, FluidHX( CompNum ).SupplySideLoop.BranchNum, FluidHX( CompNum ).SupplySideLoop.CompNum, _, _, _, FluidHX( CompNum ).SupplySideLoop.InletNodeNum, _, errFlag );
 
 			if ( FluidHX( CompNum ).SupplySideLoop.LoopSideNum != SupplySide ) { // throw error
 				ShowSevereError( RoutineName + " Invalid connections for " + ccSimPlantEquipTypes( TypeOf_FluidToFluidPlantHtExchg ) + " name = \"" + FluidHX( CompNum ).Name + "\"" );
@@ -619,9 +619,9 @@ namespace PlantHeatExchangerFluidToFluid {
 			//find remote component if control mode is of that type.
 			if ( FluidHX( CompNum ).ControlMode == CoolingSetPointOnOffWithComponentOverride ) {
 
-				ScanPlantLoopsForNodeNum( RoutineName, FluidHX( CompNum ).OtherCompSupplySideLoop.InletNodeNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompSupplySideLoop.BranchNum, FluidHX( CompNum ).OtherCompSupplySideLoop.CompNum );
+				PlantUtilities::ScanPlantLoopsForNodeNum( RoutineName, FluidHX( CompNum ).OtherCompSupplySideLoop.InletNodeNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompSupplySideLoop.BranchNum, FluidHX( CompNum ).OtherCompSupplySideLoop.CompNum );
 
-				ScanPlantLoopsForNodeNum( RoutineName, FluidHX( CompNum ).OtherCompDemandSideLoop.InletNodeNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompDemandSideLoop.BranchNum, FluidHX( CompNum ).OtherCompDemandSideLoop.CompNum );
+				PlantUtilities::ScanPlantLoopsForNodeNum( RoutineName, FluidHX( CompNum ).OtherCompDemandSideLoop.InletNodeNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompDemandSideLoop.BranchNum, FluidHX( CompNum ).OtherCompDemandSideLoop.CompNum );
 
 				// revise how loads served category for other controlled equipment
 				LoopNum2 = FluidHX( CompNum ).OtherCompSupplySideLoop.LoopNum;
@@ -650,10 +650,10 @@ namespace PlantHeatExchangerFluidToFluid {
 			}
 			if ( FluidHX( CompNum ).ControlMode == TrackComponentOnOff ) {
 				if ( FluidHX( CompNum ).OtherCompSupplySideLoop.InletNodeNum > 0 ) {
-					ScanPlantLoopsForObject( FluidHX( CompNum ).ComponentUserName, FluidHX( CompNum ).ComponentTypeOfNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompSupplySideLoop.BranchNum, FluidHX( CompNum ).OtherCompSupplySideLoop.CompNum, _, _, _, FluidHX( CompNum ).OtherCompSupplySideLoop.InletNodeNum, _, errFlag );
+					PlantUtilities::ScanPlantLoopsForObject( FluidHX( CompNum ).ComponentUserName, FluidHX( CompNum ).ComponentTypeOfNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopNum, FluidHX( CompNum ).OtherCompSupplySideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompSupplySideLoop.BranchNum, FluidHX( CompNum ).OtherCompSupplySideLoop.CompNum, _, _, _, FluidHX( CompNum ).OtherCompSupplySideLoop.InletNodeNum, _, errFlag );
 				}
 				if ( FluidHX( CompNum ).OtherCompDemandSideLoop.InletNodeNum > 0 ) {
-					ScanPlantLoopsForObject( FluidHX( CompNum ).ComponentUserName, FluidHX( CompNum ).ComponentTypeOfNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompDemandSideLoop.BranchNum, FluidHX( CompNum ).OtherCompDemandSideLoop.CompNum, _, _, _, FluidHX( CompNum ).OtherCompDemandSideLoop.InletNodeNum, _, errFlag );
+					PlantUtilities::ScanPlantLoopsForObject( FluidHX( CompNum ).ComponentUserName, FluidHX( CompNum ).ComponentTypeOfNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopNum, FluidHX( CompNum ).OtherCompDemandSideLoop.LoopSideNum, FluidHX( CompNum ).OtherCompDemandSideLoop.BranchNum, FluidHX( CompNum ).OtherCompDemandSideLoop.CompNum, _, _, _, FluidHX( CompNum ).OtherCompDemandSideLoop.InletNodeNum, _, errFlag );
 				}
 			}
 

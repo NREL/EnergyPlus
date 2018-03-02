@@ -2057,7 +2057,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			bool errFlag = false;
-			DataPlant::ScanPlantLoopsForObject( thisCircuit.Name, TypeToLookFor, thisCircuit.LoopNum, thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum, _, _, _, _, _, errFlag );
+			PlantUtilities::ScanPlantLoopsForObject( thisCircuit.Name, TypeToLookFor, thisCircuit.LoopNum, thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s)." );
 			}

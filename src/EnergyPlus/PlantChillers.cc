@@ -2080,7 +2080,7 @@ namespace PlantChillers {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Electric;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataPlant::SingleSetPoint;
@@ -2367,7 +2367,7 @@ namespace PlantChillers {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_EngineDriven;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataEnvironment::StdBaroPress;
@@ -2607,7 +2607,7 @@ namespace PlantChillers {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_CombTurbine;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataEnvironment::StdBaroPress;
@@ -2844,7 +2844,7 @@ namespace PlantChillers {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataEnvironment::StdBaroPress;

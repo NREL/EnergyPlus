@@ -319,7 +319,7 @@ namespace PlantComponentTemperatureSources {
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;

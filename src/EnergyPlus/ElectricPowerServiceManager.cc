@@ -78,6 +78,7 @@
 #include <MicroturbineElectricGenerator.hh>
 #include <WindTurbine.hh>
 #include <DataPlant.hh>
+#include <PlantUtilities.hh>
 #include <OutputReportPredefined.hh>
 
 namespace EnergyPlus {
@@ -1895,7 +1896,7 @@ namespace EnergyPlus {
 			bool plantNotFound = false;
 			for ( auto & g : elecGenCntrlObj ) {
 				plantNotFound = false;
-				DataPlant::ScanPlantLoopsForObject( g->name, g->compPlantTypeOf_Num, g->cogenLocation.loopNum, g->cogenLocation.loopSideNum, g->cogenLocation.branchNum, g->cogenLocation.compNum, _, _, _, _, _, plantNotFound );
+				PlantUtilities::ScanPlantLoopsForObject( g->name, g->compPlantTypeOf_Num, g->cogenLocation.loopNum, g->cogenLocation.loopSideNum, g->cogenLocation.branchNum, g->cogenLocation.compNum, _, _, _, _, _, plantNotFound );
 				if ( ! plantNotFound ) g->plantInfoFound = true;
 			}
 		} // cogen setup

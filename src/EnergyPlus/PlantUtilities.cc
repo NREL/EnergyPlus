@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <BranchInputManager.hh>
 #include <PlantUtilities.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataGlobals.hh>
@@ -1067,7 +1068,6 @@ namespace PlantUtilities {
 		using DataPlant::SupplySide;
 		using DataPlant::DemandSide;
 		using DataPlant::PlantReport;
-		using DataPlant::ShowBranchesOnLoop;
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::DoingSizing;
 		using General::RoundSigDigits;
@@ -2528,6 +2528,482 @@ namespace PlantUtilities {
 		return Converged;
 
 	}
+
+
+	void
+	ScanPlantLoopsForObject(
+			std::string const & CompName,
+			int const CompType,
+			int & LoopNum,
+			int & LoopSideNum,
+			int & BranchNum,
+			int & CompNum,
+			Optional< Real64 const > LowLimitTemp,
+			Optional< Real64 const > HighLimitTemp,
+			Optional_int CountMatchPlantLoops,
+			Optional_int_const InletNodeNumber,
+			Optional_int_const SingleLoopSearch,
+			Optional_bool errFlag
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   November 2009
+		//       MODIFIED       B. Griffith, changes to help with single component one multiple plant loops
+		//       RE-ENGINEERED  na
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine scans the plant loop structure trying to find the component by type then name.
+		// If there are more than one match, it counts them up and returns count using an optional output arg
+		// If the option input declaring the component inlet's node name, then the matching is more specific.
+		// An optional input, lowlimittemp, can be passed in to be used in the PlantCondLoopOperation routines
+		//  when distributing loads to components
+		// METHODOLOGY EMPLOYED:
+		// Standard EnergyPlus methodology.
+
+		// Using/Aliasing
+		using namespace DataGlobals;
+		using General::RoundSigDigits;
+		using BranchInputManager::AuditBranches;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int LoopCtr;
+		int LoopSideCtr;
+		int BranchCtr;
+		int CompCtr;
+		bool FoundComponent;
+		int FoundCount;
+		bool FoundCompName;
+		int StartingLoopNum;
+		int EndingLoopNum;
+
+		FoundCount = 0;
+
+		FoundComponent = false;
+		FoundCompName = false;
+		StartingLoopNum = 1;
+		EndingLoopNum = DataPlant::TotNumLoops;
+		if ( present( SingleLoopSearch ) ) {
+			StartingLoopNum = SingleLoopSearch;
+			EndingLoopNum = SingleLoopSearch;
+		}
+
+		for ( LoopCtr = StartingLoopNum; LoopCtr <= EndingLoopNum; ++LoopCtr ) {
+			auto & this_loop( DataPlant::PlantLoop( LoopCtr ) );
+			for ( LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr ) {
+				auto & this_loop_side( this_loop.LoopSide( LoopSideCtr ) );
+				for ( BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr ) {
+					auto & this_branch( this_loop_side.Branch( BranchCtr ) );
+					for ( CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr ) {
+						auto & this_component( this_branch.Comp( CompCtr ) );
+						if ( this_component.TypeOf_Num == CompType ) {
+							if ( UtilityRoutines::SameString( CompName, this_component.Name ) ) {
+								FoundCompName = true;
+								if ( present( InletNodeNumber ) ) {
+									if ( InletNodeNumber > 0 ) {
+										// check if inlet nodes agree
+										if ( InletNodeNumber == this_component.NodeNumIn ) {
+											FoundComponent = true;
+											++FoundCount;
+											LoopNum = LoopCtr;
+											LoopSideNum = LoopSideCtr;
+											BranchNum = BranchCtr;
+											CompNum = CompCtr;
+										}
+									}
+								} else {
+									FoundComponent = true;
+									++FoundCount;
+									LoopNum = LoopCtr;
+									LoopSideNum = LoopSideCtr;
+									BranchNum = BranchCtr;
+									CompNum = CompCtr;
+								}
+								if ( present( LowLimitTemp ) ) {
+									this_component.MinOutletTemp = LowLimitTemp;
+								}
+								if ( present( HighLimitTemp ) ) {
+									this_component.MaxOutletTemp = HighLimitTemp;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ( ! FoundComponent ) {
+			if ( CompType >= 1 && CompType <= DataPlant::NumSimPlantEquipTypes ) {
+				if ( ! present( SingleLoopSearch ) ) {
+					ShowSevereError( "Plant Component " + DataPlant::ccSimPlantEquipTypes( CompType ) + " called \"" + CompName + "\" was not found on any plant loops." );
+					AuditBranches( true, DataPlant::ccSimPlantEquipTypes( CompType ), CompName );
+				} else {
+					ShowSevereError( "Plant Component " + DataPlant::ccSimPlantEquipTypes( CompType ) + " called \"" + CompName + "\" was not found on plant loop=\"" + DataPlant::PlantLoop( SingleLoopSearch ).Name + "\"." );
+				}
+				if ( present( InletNodeNumber ) ) {
+					if ( FoundCompName ) {
+						ShowContinueError( "Looking for matching inlet Node=\"" + DataLoopNode::NodeID( InletNodeNumber ) + "\"." );
+					}
+				}
+				if ( present( SingleLoopSearch ) ) {
+					ShowContinueError( "Look at Operation Scheme=\"" + DataPlant::PlantLoop( SingleLoopSearch ).OperationScheme + "\"." );
+					ShowContinueError( "Look at Branches and Components on the Loop." );
+					ShowBranchesOnLoop( SingleLoopSearch );
+				}
+				if ( present( errFlag ) ) errFlag = true;
+			} else {
+				ShowSevereError( "ScanPlantLoopsForObject: Invalid CompType passed [" + RoundSigDigits( CompType ) + "], Name=" + CompName );
+				ShowContinueError( "Valid CompTypes are in the range [1 - " + RoundSigDigits( DataPlant::NumSimPlantEquipTypes ) + "]." );
+				ShowFatalError( "Previous error causes program termination" );
+			}
+		}
+
+		if ( present( CountMatchPlantLoops ) ) {
+			CountMatchPlantLoops = FoundCount;
+		}
+
+	}
+
+	void
+	ScanPlantLoopsForNodeNum(
+			std::string const & CallerName, // really used for error messages
+			int const NodeNum, // index in Node structure of node to be scanned
+			int & LoopNum, // return value for plant loop
+			int & LoopSideNum, // return value for plant loop side
+			int & BranchNum,
+			Optional_int CompNum
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   Feb. 2010
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Get routine to return plant loop index and plant loop side
+		// based on node number.  for one time init routines only.
+
+		// METHODOLOGY EMPLOYED:
+		// Loop thru plant data structure and find matching node.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataGlobals;
+		using General::RoundSigDigits;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		int LoopCtr;
+		int LoopSideCtr;
+		int BranchCtr;
+		int CompCtr;
+		bool FoundNode;
+		int inFoundCount;
+		int outFoundCount;
+
+		inFoundCount = 0;
+		outFoundCount = 0;
+		if ( present( CompNum ) ) {
+			CompNum = 0;
+		}
+		FoundNode = false;
+
+		for ( LoopCtr = 1; LoopCtr <= DataPlant::TotNumLoops; ++LoopCtr ) {
+			auto & this_loop( DataPlant::PlantLoop( LoopCtr ) );
+			for ( LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr ) {
+				auto & this_loop_side( this_loop.LoopSide( LoopSideCtr ) );
+				for ( BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr ) {
+					auto & this_branch( this_loop_side.Branch( BranchCtr ) );
+					for ( CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr ) {
+						auto & this_comp( this_branch.Comp( CompCtr ) );
+						if ( NodeNum == this_comp.NodeNumIn ) {
+							FoundNode = true;
+							++inFoundCount;
+							LoopNum = LoopCtr;
+							LoopSideNum = LoopSideCtr;
+							BranchNum = BranchCtr;
+							if ( present( CompNum ) ) {
+								CompNum = CompCtr;
+							}
+						}
+
+						if ( NodeNum == this_comp.NodeNumOut ) {
+							++outFoundCount;
+							LoopNum = LoopCtr;
+							LoopSideNum = LoopSideCtr;
+							BranchNum = BranchCtr;
+						}
+
+					}
+				}
+			}
+		}
+
+		if ( ! FoundNode ) {
+			ShowSevereError( "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops" );
+			ShowContinueError( "Node Name=\"" + DataLoopNode::NodeID( NodeNum ) + "\"" );
+			if ( ! DoingSizing ) {
+				ShowContinueError( "called by " + CallerName );
+			} else {
+				ShowContinueError( "during sizing: called by " + CallerName );
+			}
+			if ( outFoundCount > 0 ) ShowContinueError( "Node was found as outlet node (for component) " + RoundSigDigits( outFoundCount ) + " time(s)." );
+			ShowContinueError( "Possible error in Branch inputs.  For more information, look for other error messages related to this node name." );
+			// fatal?
+		}
+
+	}
+
+	bool
+	AnyPlantLoopSidesNeedSim()
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   November 2009
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine scans the plant LoopSide simflags and returns if any of them are still true
+		// METHODOLOGY EMPLOYED:
+		// Standard EnergyPlus methodology.
+		// REFERENCES:
+		// na
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		bool AnyPlantLoopSidesNeedSim;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+		// na
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int LoopCtr;
+		int LoopSideCtr;
+
+		//Assume that there aren't any
+		AnyPlantLoopSidesNeedSim = false;
+
+		//Then check if there are any
+		for ( LoopCtr = 1; LoopCtr <= DataPlant::TotNumLoops; ++LoopCtr ) {
+			for ( LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr ) {
+				if ( DataPlant::PlantLoop( LoopCtr ).LoopSide( LoopSideCtr ).SimLoopSideNeeded ) {
+					AnyPlantLoopSidesNeedSim = true;
+					return AnyPlantLoopSidesNeedSim;
+				}
+			}
+		}
+
+		return AnyPlantLoopSidesNeedSim;
+	}
+
+	void
+	SetAllPlantSimFlagsToValue( bool const Value )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   November 2009
+		//       MODIFIED       na
+		//       RE-ENGINEERED  B. Griffith Feb 2009 DSU3
+		// PURPOSE OF THIS SUBROUTINE:
+		// Quickly sets all sim flags of a certain type (loop type/side) to a value
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int LoopCtr;
+
+		//Loop over all loops
+		for ( LoopCtr = 1; LoopCtr <= DataPlant::TotNumLoops; ++LoopCtr ) {
+			auto & this_loop( DataPlant::PlantLoop( LoopCtr ) );
+			this_loop.LoopSide( DataPlant::DemandSide ).SimLoopSideNeeded = Value;
+			this_loop.LoopSide( DataPlant::SupplySide ).SimLoopSideNeeded = Value;
+		}
+
+	}
+
+	void
+	ShowBranchesOnLoop( int const LoopNum ) // Loop number of loop
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   November 2011
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine will display (with continue error messages) the branch/component
+		// structure of the given loop.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		std::string DemandSupply;
+		int LSN; // LoopSide counter
+		int BrN; // Branch counter
+		int CpN; // Component (on branch) counter
+
+		for ( LSN = DataPlant::DemandSide; LSN <= DataPlant::SupplySide; ++LSN ) {
+			if ( LSN == DataPlant::DemandSide ) {
+				DemandSupply = "Demand";
+			} else if ( LSN == DataPlant::SupplySide ) {
+				DemandSupply = "Supply";
+			} else {
+				DemandSupply = "Unknown";
+			}
+			ShowContinueError( DemandSupply + " Branches:" );
+			for ( BrN = 1; BrN <= DataPlant::PlantLoop( LoopNum ).LoopSide( LSN ).TotalBranches; ++BrN ) {
+				ShowContinueError( "  " + DataPlant::PlantLoop( LoopNum ).LoopSide( LSN ).Branch( BrN ).Name );
+				ShowContinueError( "    Components on Branch:" );
+				for ( CpN = 1; CpN <= DataPlant::PlantLoop( LoopNum ).LoopSide( LSN ).Branch( BrN ).TotalComponents; ++CpN ) {
+					ShowContinueError( "      " + DataPlant::PlantLoop( LoopNum ).LoopSide( LSN ).Branch( BrN ).Comp( CpN ).TypeOf + ':' + DataPlant::PlantLoop( LoopNum ).LoopSide( LSN ).Branch( BrN ).Comp( CpN ).Name );
+				}
+			}
+		}
+
+	}
+
+	int
+	MyPlantSizingIndex(
+			std::string const & CompType, // component description
+			std::string const & CompName, // user name of component
+			int const NodeNumIn, // component water inlet node
+			int const EP_UNUSED( NodeNumOut ), // component water outlet node
+			bool & ErrorsFound, // set to true if there's an error
+			Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   July 2008
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Identify the correct Plant Sizing object for demand-side components such as heating and
+		// cooling coils.
+
+		// METHODOLOGY EMPLOYED:
+		// This function searches all plant loops for a component whose input and
+		// output nodes match the desired input & output nodes. This plant loop index is then used
+		// to search the Plant Sizing array for the matching Plant Sizing object.
+
+		// Using/Aliasing
+		using DataSizing::NumPltSizInput;
+		using DataSizing::PlantSizData;
+		using DataSizing::PlantSizingData;
+		//  USE DataPlant, ONLY: PlantLoop, ScanPlantLoopsForNodeNum
+
+		// Return value
+		int MyPltSizNum; // returned plant sizing index
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+		int MyPltLoopNum;
+		int PlantLoopNum;
+		int DummyLoopSideNum;
+		int DummyBranchNum;
+		bool PrintErrorFlag;
+
+		MyPltLoopNum = 0;
+		MyPltSizNum = 0;
+		ErrorsFound = false;
+		if ( present( SupressErrors ) ) {
+			PrintErrorFlag = SupressErrors;
+		} else {
+			PrintErrorFlag = true;
+		}
+
+		ScanPlantLoopsForNodeNum( "MyPlantSizingIndex", NodeNumIn, PlantLoopNum, DummyLoopSideNum, DummyBranchNum );
+
+		if ( PlantLoopNum > 0 ) {
+			MyPltLoopNum = PlantLoopNum;
+		} else {
+			MyPltLoopNum = 0;
+		}
+
+		if ( MyPltLoopNum > 0 ) {
+			if ( NumPltSizInput > 0 ) {
+				MyPltSizNum = UtilityRoutines::FindItemInList( DataPlant::PlantLoop( MyPltLoopNum ).Name, PlantSizData, &PlantSizingData::PlantLoopName );
+			}
+			if ( MyPltSizNum == 0 ) {
+				if ( PrintErrorFlag ) {
+					ShowSevereError( "MyPlantSizingIndex: Could not find " + DataPlant::PlantLoop( MyPltLoopNum ).Name + " in Sizing:Plant objects." );
+					ShowContinueError( "...reference Component Type=\"" + CompType + "\", Name=\"" + CompName + "\"." );
+				}
+				ErrorsFound = true;
+			}
+		} else {
+			if ( PrintErrorFlag ) {
+				ShowWarningError( "MyPlantSizingIndex: Could not find " + CompType + " with name " + CompName + " on any plant loop" );
+			}
+			ErrorsFound = true;
+		}
+
+		return MyPltSizNum;
+
+	}
+
+	bool
+	verifyTwoNodeNumsOnSamePlantLoop(
+			int const nodeIndexA,
+			int const nodeIndexB
+	)
+	{
+		// this function simply searches across plant loops looking for node numbers
+		// it returns true if the two nodes are found to be on the same loop
+		// it returns false otherwise
+		// because this is a nested loop, there's no reason it should be called except in one-time fashion
+		int matchedIndexA = 0;
+		int matchedIndexB = 0;
+		for ( int loopNum = 1; loopNum <= DataPlant::TotNumLoops; loopNum++ ) {
+			for ( auto & loopSide : DataPlant::PlantLoop( loopNum ).LoopSide ) {
+				for ( auto & branch : loopSide.Branch ) {
+					for ( auto & comp : branch.Comp ) {
+						if ( comp.NodeNumIn == nodeIndexA || comp.NodeNumOut == nodeIndexA ) {
+							matchedIndexA = loopNum;
+						}
+						if ( comp.NodeNumIn == nodeIndexB || comp.NodeNumOut == nodeIndexB ) {
+							matchedIndexB = loopNum;
+						}
+					}
+				}
+			}
+		}
+		return ( matchedIndexA == matchedIndexB ) && ( matchedIndexA != 0 ); // only return true if both are equal and non-zero
+	}
+
 
 } // PlantUtilities
 

@@ -856,7 +856,7 @@ namespace OutdoorAirUnit {
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -1128,7 +1128,7 @@ namespace OutdoorAirUnit {
 		using DataEnvironment::StdRhoAir;
 		using DataHVACGlobals::cFanTypes;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
