@@ -4254,6 +4254,8 @@ namespace SizingManager {
 				Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
 				// Outdoor air
 				thisTUFZSizing.MinOA = thisFZSizing.MinOA * minOAFrac;
+				thisTUFZSizing.TotalOAFromPeople = thisFZSizing.TotalOAFromPeople * minOAFrac;
+				thisTUFZSizing.TotalOAFromArea = thisFZSizing.TotalOAFromArea * minOAFrac;
 				Real64 minOACoolMassFlow = thisTUFZSizing.MinOA * thisFZSizing.DesCoolDens;
 				Real64 minOAHeatMassFlow = thisTUFZSizing.MinOA * thisFZSizing.DesHeatDens;
 				// Cooling

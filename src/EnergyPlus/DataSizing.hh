@@ -1460,12 +1460,6 @@ namespace DataSizing {
 	extern Array1D< std::string > PeakPsOccurrenceDateTimeStringBySys; // string describing date and time when Ps peak occurs
 	extern Array1D< std::string > PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
 
-	//extern Array1D< Real64 > PzSumBySysCool; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
-	//extern Array1D< Real64 > PzSumBySysHeat; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
-	//extern Array1D< Real64 > PsBySysCool; // saved value of PeakPeople which is Ps used in 62.1 tabular report
-	//extern Array1D< Real64 > PsBySysHeat; // saved value of PeakPeople which is Ps used in 62.1 tabular report
-	//extern Array1D< Real64 > DBySysCool; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
-	//extern Array1D< Real64 > DBySysHeat; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
 	extern Array1D< Real64 > VouBySys; // uncorrected system outdoor air requirement, for std 62.1 VRP
 
 	extern Array1D< Real64 > VpsClgBySys; // System primary airflow Vps, for cooling for std 62.1 VRP
