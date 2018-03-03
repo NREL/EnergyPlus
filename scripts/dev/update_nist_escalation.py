@@ -122,8 +122,9 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
                     # delete first item (single space indent)
                     del years[0]
 
-                    # assign start year
-                    escalation_start_year = years[0]
+                    # assign years
+                    encost_year = years[0]
+                    escalation_start_year = years[1]
                     
                 # fuel, non-zero even indices
                 elif idx % 2 == 0:
@@ -203,7 +204,7 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
                     setattr(obj, attribute, escalation[idx])
                 
                 # save as new IDF with start year appended
-                idf.saveas(os.path.join(idf_dir, idf_name.replace('.idf', '%s.idf' % escalation_start_year)))
+                idf.saveas(os.path.join(idf_dir, idf_name.replace('.idf', '%s.idf' % encost_year)))
     
     # delete original idf
     os.remove(idf_name)
