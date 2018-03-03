@@ -22,7 +22,7 @@ VERSION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Commercial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9853,                   !- Year 1 Escalation
     0.9829,                   !- Year 2 Escalation
@@ -58,7 +58,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Commercial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0029,                   !- Year 1 Escalation
     1.0086,                   !- Year 2 Escalation
@@ -94,7 +94,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Commercial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0901,                   !- Year 1 Escalation
     1.1802,                   !- Year 2 Escalation
@@ -130,7 +130,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Commercial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1203,                   !- Year 1 Escalation
     1.1818,                   !- Year 2 Escalation
@@ -166,7 +166,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Commercial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.3402,                   !- Year 1 Escalation
     1.6335,                   !- Year 2 Escalation
@@ -202,7 +202,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Industrial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.3763,                   !- Year 1 Escalation
     1.7137,                   !- Year 2 Escalation
@@ -238,7 +238,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Industrial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0947,                   !- Year 1 Escalation
     1.1778,                   !- Year 2 Escalation
@@ -274,7 +274,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Industrial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9833,                   !- Year 1 Escalation
     0.9818,                   !- Year 2 Escalation
@@ -310,7 +310,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Industrial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1197,                   !- Year 1 Escalation
     1.1837,                   !- Year 2 Escalation
@@ -346,7 +346,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Industrial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0149,                   !- Year 1 Escalation
     1.0261,                   !- Year 2 Escalation
@@ -382,7 +382,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Residential - LPG,    !- LCC Price Escalation Name
     Propane,                  !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.051,                    !- Year 1 Escalation
     1.0689,                   !- Year 2 Escalation
@@ -418,7 +418,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Residential - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1233,                   !- Year 1 Escalation
     1.1882,                   !- Year 2 Escalation
@@ -454,7 +454,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Residential - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9853,                   !- Year 1 Escalation
     0.9853,                   !- Year 2 Escalation
@@ -490,7 +490,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Residential - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0243,                   !- Year 1 Escalation
     1.0353,                   !- Year 2 Escalation
@@ -526,7 +526,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Commercial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9939,                   !- Year 1 Escalation
     0.9939,                   !- Year 2 Escalation
@@ -562,7 +562,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Commercial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0596,                   !- Year 1 Escalation
     1.1325,                   !- Year 2 Escalation
@@ -598,7 +598,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Commercial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.2207,                   !- Year 1 Escalation
     1.3559,                   !- Year 2 Escalation
@@ -634,7 +634,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Commercial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0017,                   !- Year 1 Escalation
     1.0234,                   !- Year 2 Escalation
@@ -670,7 +670,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Commercial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1216,                   !- Year 1 Escalation
     1.189,                    !- Year 2 Escalation
@@ -706,7 +706,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Industrial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9977,                   !- Year 1 Escalation
     1.0023,                   !- Year 2 Escalation
@@ -742,7 +742,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Industrial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.2411,                   !- Year 1 Escalation
     1.4034,                   !- Year 2 Escalation
@@ -778,7 +778,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Industrial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0196,                   !- Year 1 Escalation
     1.0848,                   !- Year 2 Escalation
@@ -814,7 +814,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Industrial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9801,                   !- Year 1 Escalation
     0.9933,                   !- Year 2 Escalation
@@ -850,7 +850,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Industrial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1224,                   !- Year 1 Escalation
     1.1907,                   !- Year 2 Escalation
@@ -886,7 +886,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Residential - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.013,                    !- Year 1 Escalation
     1.0241,                   !- Year 2 Escalation
@@ -922,7 +922,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Residential - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1278,                   !- Year 1 Escalation
     1.205,                    !- Year 2 Escalation
@@ -958,7 +958,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Residential - LPG,    !- LCC Price Escalation Name
     Propane,                  !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.051,                    !- Year 1 Escalation
     1.0689,                   !- Year 2 Escalation
@@ -994,7 +994,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     NorthEast - Residential - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9932,                   !- Year 1 Escalation
     1.0129,                   !- Year 2 Escalation
@@ -1030,7 +1030,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Commercial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0649,                   !- Year 1 Escalation
     1.1344,                   !- Year 2 Escalation
@@ -1066,7 +1066,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Commercial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0109,                   !- Year 1 Escalation
     1.0281,                   !- Year 2 Escalation
@@ -1102,7 +1102,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Commercial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1219,                   !- Year 1 Escalation
     1.1881,                   !- Year 2 Escalation
@@ -1138,7 +1138,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Commercial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0077,                   !- Year 1 Escalation
     1.0232,                   !- Year 2 Escalation
@@ -1174,7 +1174,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Commercial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.2659,                   !- Year 1 Escalation
     1.465,                    !- Year 2 Escalation
@@ -1210,7 +1210,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Industrial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0024,                   !- Year 1 Escalation
     1.0097,                   !- Year 2 Escalation
@@ -1246,7 +1246,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Industrial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0046,                   !- Year 1 Escalation
     1.0239,                   !- Year 2 Escalation
@@ -1282,7 +1282,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Industrial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1275,                   !- Year 1 Escalation
     1.2014,                   !- Year 2 Escalation
@@ -1318,7 +1318,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Industrial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.2944,                   !- Year 1 Escalation
     1.5312,                   !- Year 2 Escalation
@@ -1354,7 +1354,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Industrial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1503,                   !- Year 1 Escalation
     1.3006,                   !- Year 2 Escalation
@@ -1390,7 +1390,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Residential - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1354,                   !- Year 1 Escalation
     1.2214,                   !- Year 2 Escalation
@@ -1426,7 +1426,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Residential - LPG,    !- LCC Price Escalation Name
     Propane,                  !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0504,                   !- Year 1 Escalation
     1.0685,                   !- Year 2 Escalation
@@ -1462,7 +1462,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Residential - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0085,                   !- Year 1 Escalation
     1.0196,                   !- Year 2 Escalation
@@ -1498,7 +1498,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     South - Residential - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0078,                   !- Year 1 Escalation
     1.0246,                   !- Year 2 Escalation
@@ -1534,7 +1534,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Commercial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1213,                   !- Year 1 Escalation
     1.1877,                   !- Year 2 Escalation
@@ -1570,7 +1570,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Commercial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.2351,                   !- Year 1 Escalation
     1.3817,                   !- Year 2 Escalation
@@ -1606,7 +1606,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Commercial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9997,                   !- Year 1 Escalation
     1.0088,                   !- Year 2 Escalation
@@ -1642,7 +1642,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Commercial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0766,                   !- Year 1 Escalation
     1.1532,                   !- Year 2 Escalation
@@ -1678,7 +1678,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Commercial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0,                      !- Year 1 Escalation
     1.0082,                   !- Year 2 Escalation
@@ -1714,7 +1714,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Industrial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9859,                   !- Year 1 Escalation
     0.9898,                   !- Year 2 Escalation
@@ -1750,7 +1750,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Industrial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.2698,                   !- Year 1 Escalation
     1.4905,                   !- Year 2 Escalation
@@ -1786,7 +1786,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Industrial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1094,                   !- Year 1 Escalation
     1.2163,                   !- Year 2 Escalation
@@ -1822,7 +1822,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Industrial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1244,                   !- Year 1 Escalation
     1.1954,                   !- Year 2 Escalation
@@ -1858,7 +1858,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Industrial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.009,                    !- Year 1 Escalation
     1.0209,                   !- Year 2 Escalation
@@ -1894,7 +1894,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Residential - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1287,                   !- Year 1 Escalation
     1.2058,                   !- Year 2 Escalation
@@ -1930,7 +1930,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Residential - LPG,    !- LCC Price Escalation Name
     Propane,                  !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0495,                   !- Year 1 Escalation
     1.0678,                   !- Year 2 Escalation
@@ -1966,7 +1966,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Residential - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0173,                   !- Year 1 Escalation
     1.0279,                   !- Year 2 Escalation
@@ -2002,7 +2002,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     USAvg - Residential - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9951,                   !- Year 1 Escalation
     1.0041,                   !- Year 2 Escalation
@@ -2038,7 +2038,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Commercial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1203,                   !- Year 1 Escalation
     1.1867,                   !- Year 2 Escalation
@@ -2074,7 +2074,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Commercial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0878,                   !- Year 1 Escalation
     1.1557,                   !- Year 2 Escalation
@@ -2110,7 +2110,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Commercial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0091,                   !- Year 1 Escalation
     1.0181,                   !- Year 2 Escalation
@@ -2146,7 +2146,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Commercial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9868,                   !- Year 1 Escalation
     0.9804,                   !- Year 2 Escalation
@@ -2182,7 +2182,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Commercial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1499,                   !- Year 1 Escalation
     1.2315,                   !- Year 2 Escalation
@@ -2218,7 +2218,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Industrial - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9626,                   !- Year 1 Escalation
     0.943,                    !- Year 2 Escalation
@@ -2254,7 +2254,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Industrial - Coal,    !- LCC Price Escalation Name
     Coal,                     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0096,                   !- Year 1 Escalation
     1.0127,                   !- Year 2 Escalation
@@ -2290,7 +2290,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Industrial - Natural gas,    !- LCC Price Escalation Name
     NaturalGas,               !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0877,                   !- Year 1 Escalation
     1.1501,                   !- Year 2 Escalation
@@ -2326,7 +2326,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Industrial - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1257,                   !- Year 1 Escalation
     1.2013,                   !- Year 2 Escalation
@@ -2362,7 +2362,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Industrial - Residual Oil,    !- LCC Price Escalation Name
     FuelOil#2,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.1518,                   !- Year 1 Escalation
     1.2152,                   !- Year 2 Escalation
@@ -2398,7 +2398,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Residential - Electricity,    !- LCC Price Escalation Name
     ElectricityPurchased,     !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     0.9833,                   !- Year 1 Escalation
     0.9777,                   !- Year 2 Escalation
@@ -2434,7 +2434,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Residential - Natural Gas,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0209,                   !- Year 1 Escalation
     1.0236,                   !- Year 2 Escalation
@@ -2470,7 +2470,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Residential - LPG,    !- LCC Price Escalation Name
     Propane,                  !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.0529,                   !- Year 1 Escalation
     1.0713,                   !- Year 2 Escalation
@@ -2506,7 +2506,7 @@ LIFECYCLECOST:USEPRICEESCALATION,
 LIFECYCLECOST:USEPRICEESCALATION,
     West - Residential - Distillate Oil,    !- LCC Price Escalation Name
     FuelOil#1,                !- Resource
-    2017,                     !- Escalation Start Year
+    2018,                     !- Escalation Start Year
     January,                  !- Escalation Start Month
     1.134,                    !- Year 1 Escalation
     1.2139,                   !- Year 2 Escalation
