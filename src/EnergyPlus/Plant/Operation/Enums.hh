@@ -102,8 +102,6 @@ namespace EnergyPlus {
 		int const HowMet_ByNominalCapFreeCoolCntrl( 56 ); // HowMet_ByNominalCap with free cool shutdown
 		int const HowMet_ByNominalCapLowOutLimitFreeCoolCntrl( 57 ); // HowMet_ByNominalCapLowOutLimit with free cool shutdown
 
-
-
 	}
 
 }

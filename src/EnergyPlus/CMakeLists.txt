@@ -402,17 +402,27 @@ SET( SRC
   PipeHeatTransfer.hh
   Pipes.cc
   Pipes.hh
+  Plant/Operation/CallingOrder.hh
   Plant/Operation/Enums.hh
   Plant/Operation/EquipAndOperations.hh
   Plant/Operation/LoopSidePumpInformation.hh
+  Plant/Operation/PlantAvailManager.hh
   Plant/Operation/PlantConvergencePoint.hh
+  Plant/Reporting/LoopSideReportVars.hh
+  Plant/Reporting/MeterData.hh
+  Plant/Reporting/ReportBranchData
+  Plant/Reporting/ReportCompData
+  Plant/Reporting/ReportLoopData.hh
+  Plant/Reporting/ReportVars.hh
   Plant/Topology/Branch.hh
   Plant/Topology/Component.hh
   Plant/Topology/ConnectedLoopData.hh
+  Plant/Topology/Connection.hh
   Plant/Topology/Loop.hh
   Plant/Topology/LoopSide.hh
   Plant/Topology/MixerData.hh
   Plant/Topology/SplitterData.hh
+  Plant/Topology/Subcomponents.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
   PlantChillers.cc

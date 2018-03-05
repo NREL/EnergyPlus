@@ -545,8 +545,34 @@ namespace DataPlant {
 	int const TypeOf_CoolingPanel_Simple( 94 );
 
 	// Parameters for General Equipment Types
-	int const NumGeneralEquipTypes( 23 );
-	Array1D_string const GeneralEquipTypes( NumGeneralEquipTypes, { "BOILER", "CHILLER", "COOLINGTOWER", "GENERATOR", "HEATEXCHANGER", "HEATPUMP", "PIPE", "PUMP", "DISTRICT", "THERMALSTORAGE", "TEMPERINGVALVE", "WATERHEATER", "WATERUSE", "DEMANDCOIL", "SOLARCOLLECTOR", "LOADPROFILE", "FLUIDCOOLER", "EVAPORATIVEFLUIDCOOLER", "GROUNDHEATEXCHANGER", "ZONEHVACDEMAND", "REFRIGERATION", "PLANTCOMPONENT", "CENTRALHEATPUMPSYSTEM" } );
+	int const NumGeneralEquipTypes(23);
+	Array1D_string const GeneralEquipTypes(
+			NumGeneralEquipTypes, {
+					"BOILER",
+					"CHILLER",
+					"COOLINGTOWER",
+					"GENERATOR",
+					"HEATEXCHANGER",
+					"HEATPUMP",
+					"PIPE",
+					"PUMP",
+					"DISTRICT",
+					"THERMALSTORAGE",
+					"TEMPERINGVALVE",
+					"WATERHEATER",
+					"WATERUSE",
+					"DEMANDCOIL",
+					"SOLARCOLLECTOR",
+					"LOADPROFILE",
+					"FLUIDCOOLER",
+					"EVAPORATIVEFLUIDCOOLER",
+					"GROUNDHEATEXCHANGER",
+					"ZONEHVACDEMAND",
+					"REFRIGERATION",
+					"PLANTCOMPONENT",
+					"CENTRALHEATPUMPSYSTEM"
+			}
+	);
 
 	int const GenEquipTypes_Boiler( 1 );
 	int const GenEquipTypes_Chiller( 2 );
@@ -576,17 +602,6 @@ namespace DataPlant {
 	Real64 const sum_ConvergenceHistoryARR( sum( ConvergenceHistoryARR ) );
 	Real64 const square_sum_ConvergenceHistoryARR( pow_2( sum_ConvergenceHistoryARR ) );
 	Real64 const sum_square_ConvergenceHistoryARR( sum( pow( ConvergenceHistoryARR, 2 ) ) );
-
-	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.cc.  A common definition would be nicer.
-
-	// The next three types (all starting with RepReport) are the "shadow"
-	// derived types for the ventilation reports.  It keeps the node and
-	// other connection information and adds variables for the ventilation
-	// reports.  This is the cleanest way to do this and not impact other
-	// data structures.  The actual derived types are defined (as allocatable)
-	// below with the rest of the declarations.
-
-	//MODULE VARIABLE DECLARATIONS:
 
 	int NumPipes( 0 ); // Total number of pipes
 	int NumPlantPipes( 0 ); // Total number of plant pipes
