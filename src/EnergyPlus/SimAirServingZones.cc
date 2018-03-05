@@ -4860,10 +4860,6 @@ namespace SimAirServingZones {
 		static Real64 ZoneEz( 1.0 ); // zone air distribution effectiveness
 		static Real64 Vou( 0.0 ); // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
 		static Real64 Vot( 0.0 ); // Required outdoor air intake at primary AHU per ASHRAE std 62.1
-		static Real64 VotMax( 0.0 ); // Max of required cooling/heating outdoor air intake at primary AHU per ASHRAE std 62.1
-		static Real64 Ratio( 1 ); // Ratio of VozBySys / VotMax
-		// not changing this for the unitary system check in
-		//  REAL(r64) :: Ratio   = 1.0d0           ! Ratio of VozBySys / VotMax
 		Real64 SysHtgPeakAirflow; // Peak heating airflow
 		int NumZonesForHtg; // Number of heating zones for given primary system
 		int MatchingCooledZoneNum; // temporary variable
@@ -5744,45 +5740,27 @@ namespace SimAirServingZones {
 					//this should also be as least as big as is needed for Vot
 				}}
 
-				// If the ventilation was autosized using the ASHRAE VRP method, then the design zone ventilation value
-				// must be based on the larger of the system-level cooling Vot and/or heating Vot
+				// If the ventilation was autosized using the ASHRAE VRP method, then the design zone and system ventilation values
+				// must be based on the larger of the cooling or heating OA
 				if ( FinalSysSizing( AirLoopNum ).OAAutoSized && FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
-					VotMax = max( VotClgBySys( AirLoopNum ), VotHtgBySys( AirLoopNum ) );
+					Real64 VotMax = max( VotClgBySys( AirLoopNum ), VotHtgBySys( AirLoopNum ) );
 
-					//Reset the system level ventilation
+					// Reset the system level ventilation to the larger of the system-level cooling or heating Vot
 					FinalSysSizing( AirLoopNum ).DesOutAirVolFlow = VotMax;
 					CalcSysSizing( AirLoopNum ).DesOutAirVolFlow = VotMax;
 
-					if ( VotClgBySys( AirLoopNum ) >= VotHtgBySys( AirLoopNum ) ) {
-						//**Reset zone min ventilation based on max cooling Vot
-						//The system-level Vot will always be larger than the sum of the zone Voz
-						// and so the zone-level Voz must be prorated so their sum equals the system level Vot
-						Ratio = 1.0;
-						if ( VozSumClgBySys( AirLoopNum ) > 0 ) Ratio = VotClgBySys( AirLoopNum ) / VozSumClgBySys( AirLoopNum );
-						for ( int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) {
-							int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesCooledNum );
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = Ratio * TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone;
-						}
-					} else {
-						//**Reset zone min ventilation based on max heating Vot
-						//What are number of zones attached to this ventilation-fed AHU
-						int NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
-						NumZonesForHtg = NumZonesHeated;
-						if ( NumZonesHeated == 0 ) NumZonesHeated = NumZonesCooled;
-
-						//The system-level Vot will always be larger than the sum of the zone Voz
-						// and so the zone-level Voz must be prorated so their sum equals the system level Vot
-						Ratio = 1.0;
-						if ( VozSumHtgBySys( AirLoopNum ) > 0 ) Ratio = VotHtgBySys( AirLoopNum ) / VozSumHtgBySys( AirLoopNum );
-						for ( int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesForHtg; ++ZonesHeatedNum ) {
-							int TermUnitSizingIndex = 1;
-							if ( NumZonesHeated == 0 ) {
-								TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( ZonesHeatedNum );
-							} else {
-								TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( ZonesHeatedNum );
-							}
-							TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = Ratio * TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone;
-						}
+				
+					// Reset the zone level ventilation to the larger of the zone-level cooling or heating Voz
+					// Loop through cooled zones and heated zones - ok if there's overlap
+					for ( int zoneNum = 1; zoneNum <= NumZonesCooled; ++zoneNum) {
+						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolSizingIndex( zoneNum );
+						Real64 VozMax = max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone, TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = VozMax;
+					}
+					for ( int zoneNum = 1; zoneNum <= NumZonesHeated; ++zoneNum) {
+						int TermUnitSizingIndex = AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatSizingIndex( zoneNum );
+						Real64 VozMax = max( TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozClgByZone, TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone );
+						TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA = VozMax;
 					}
 
 				}
