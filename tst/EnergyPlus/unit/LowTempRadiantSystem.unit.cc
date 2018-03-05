@@ -66,7 +66,7 @@
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Plant/Solution/PlantManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>

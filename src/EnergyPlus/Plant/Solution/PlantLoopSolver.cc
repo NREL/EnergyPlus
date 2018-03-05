@@ -56,7 +56,7 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <PlantLoopSolver.hh>
+#include <Plant/Solution/PlantLoopSolver.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
 #include <DataGlobals.hh>

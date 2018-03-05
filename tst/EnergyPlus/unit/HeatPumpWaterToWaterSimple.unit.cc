@@ -54,7 +54,7 @@
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
-#include <PlantManager.hh>
+#include <Plant/Solution/PlantManager.hh>
 #include <PlantUtilities.hh>
 #include <BranchInputManager.hh>
 #include <WeatherManager.hh>

@@ -62,7 +62,7 @@
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantComponent.hh>
-#include <PlantLocation.hh>
+#include <Plant/Topology/PlantLocation.hh>
 #include <PlantUtilities.hh>
 #include <UtilityRoutines.hh>
 

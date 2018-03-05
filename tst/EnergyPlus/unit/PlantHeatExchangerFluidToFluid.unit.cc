@@ -62,7 +62,7 @@
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
-#include <PlantManager.hh>
+#include <Plant/Solution/PlantManager.hh>
 #include <BranchInputManager.hh>
 #include <WeatherManager.hh>
 #include <DataHVACGlobals.hh>

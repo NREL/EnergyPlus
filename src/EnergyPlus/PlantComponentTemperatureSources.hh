@@ -55,7 +55,7 @@
 #include <EnergyPlus.hh>
 #include <DataPlant.hh>
 #include <DataGlobals.hh>
-#include <PlantLocation.hh>
+#include <Plant/Topology/PlantLocation.hh>
 
 namespace EnergyPlus {
 

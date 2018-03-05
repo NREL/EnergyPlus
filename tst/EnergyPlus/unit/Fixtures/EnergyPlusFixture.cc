@@ -173,8 +173,8 @@
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantLoopSolver.hh>
-#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Plant/Solution/PlantLoopSolver.hh>
+#include <EnergyPlus/Plant/Solution/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>

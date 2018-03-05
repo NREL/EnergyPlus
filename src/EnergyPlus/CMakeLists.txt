@@ -13,7 +13,6 @@ endif()
 SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
-  Timer.h
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
@@ -436,13 +435,13 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
-  PlantLocation.hh
+  Plant/Topology/PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
-  PlantLoopSolver.cc
-  PlantLoopSolver.hh
-  PlantManager.cc
-  PlantManager.hh
+  Plant/Solution/PlantLoopSolver.cc
+  Plant/Solution/PlantLoopSolver.hh
+  Plant/Solution/PlantManager.cc
+  Plant/Solution/PlantManager.hh
   PlantPipingSystemsManager.cc
   PlantPipingSystemsManager.hh
   PlantPressureSystem.cc

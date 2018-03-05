@@ -57,7 +57,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
-#include <PlantLoopSolver.hh>
+#include <Plant/Solution/PlantLoopSolver.hh>
 #include <OutputProcessor.hh>
 #include <Plant/Operation/CallingOrder.hh>
 #include <Plant/Operation/Enums.hh>
