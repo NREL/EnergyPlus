@@ -4537,9 +4537,9 @@ namespace SimAirServingZones {
 								if ( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_ZoneSum ) { // ZoneSum Method
 									MinOAFlow += TermUnitFinalZoneSizing( TermUnitSizingIndex ).MinOA;
 									if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow > 0.0 ) { 
-										ZoneOAFracCooling = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow ; // calculate anyway for use with zone OA max fraction below
+										ZoneOAFracHeating = TermUnitFinalZoneSizing( TermUnitSizingIndex ).VozHtgByZone / TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatVolFlow ; // calculate anyway for use with zone OA max fraction below
 									} else {
-										ZoneOAFracCooling = 0.0;
+										ZoneOAFracHeating = 0.0;
 									}
 
 								} else if( SysSizInput( SysSizNum ).SystemOAMethod == SOAM_VRP ) { // Ventilation Rate Procedure
