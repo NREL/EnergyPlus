@@ -578,18 +578,24 @@ if (UNIX)
   ADD_DEFINITIONS("-fPIC")
 endif()
 
-set(
-        INTELMKL
-        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_lp64.a
-        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.a
-        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_core.a
-        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libiomp5.so
-)
+set(INTEL_ROOT "${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/" CACHE PATH "Folder contains intel libs")
+set(MKL_SDL True)
+set(CMAKE_MODULE_PATH ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/cmake)
+set(MKL_ROOT ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/)
+find_package(MKL REQUIRED)
+
+#set(
+#        INTELMKL
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_lp64.a
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_intel_thread.a
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libmkl_core.a
+#        ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/lib/intel64/libiomp5.so
+#)
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva ${INTELMKL})
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight jsoncpp libkiva ${MKL_LIBRARIES} )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )
