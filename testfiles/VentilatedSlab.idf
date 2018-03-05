@@ -13,8 +13,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3Â°C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5Â°C MCWB=  23.0Â°C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -26,7 +26,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -114,7 +114,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.5,                     !- Loads Convergence Tolerance Value
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -796,19 +796,8 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
     FLOOR-1,                 !- Name
     MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
-    FLOOR-SLAB-1,            !- Name
-    CONCRETE,                !- Outside Layer
-    INS - EXPANDED EXT POLYSTYRENE R12,  !- Layer 2
-    CONC,                    !- Layer 3
-    FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 4
 
   Construction,
     INT-WALL-1,              !- Name
@@ -823,26 +812,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION:INTERNALSOURCE ===========
 
@@ -2180,6 +2151,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type
     Zone1VentSlab,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2187,6 +2159,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type
     Zone2VentSlab,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2194,6 +2167,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type
     Zone3VentSlab,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2201,6 +2175,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type
     Zone4VentSlab,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2208,6 +2183,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone5Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:VentilatedSlab, !- Zone Equipment 1 Object Type
     Zone5VentSlab,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2221,7 +2197,7 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2229,7 +2205,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone2Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2237,7 +2213,7 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2245,7 +2221,7 @@
     Zone4Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone4Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 4 Node,             !- Zone Air Node Name
-    Zone 4 Outlet Node;      !- Zone Return Air Node Name
+    Zone 4 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2253,125 +2229,124 @@
     Zone5Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone5Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 5 Node,             !- Zone Air Node Name
-    Zone 5 Outlet Node;      !- Zone Return Air Node Name
+    Zone 5 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:CONSTANTVOLUME ===========
 
-
   Fan:SystemModel,
-    Zone1VentSlabFan, !- Name
-    VentSlabAvailability , !- Availability Schedule Name
+    Zone1VentSlabFan,        !- Name
+    VentSlabAvailability,    !- Availability Schedule Name
     Zone1VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone1VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone2VentSlabFan, !- Name
-    UnitVentAvailability , !- Availability Schedule Name
+    Zone2VentSlabFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
     Zone2VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone2VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone3VentSlabFan, !- Name
-    VentSlabAvailability , !- Availability Schedule Name
+    Zone3VentSlabFan,        !- Name
+    VentSlabAvailability,    !- Availability Schedule Name
     Zone3VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone3VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone4VentSlabFan, !- Name
-    VentSlabAvailability , !- Availability Schedule Name
+    Zone4VentSlabFan,        !- Name
+    VentSlabAvailability,    !- Availability Schedule Name
     Zone4VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone4VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
   Fan:SystemModel,
-    Zone5VentSlabFan, !- Name
-    UnitVentAvailability , !- Availability Schedule Name
+    Zone5VentSlabFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
     Zone5VentSlabOAMixerOutletNode,  !- Air Inlet Node Name
     Zone5VentSlabFanOutletNode,  !- Air Outlet Node Name
-    0.84  , !- Design Maximum Air Flow Rate
-    Discrete , !- Speed Control Method
-    0.0, !- Electric Power Minimum Flow Rate Fraction
-    75.0, !- Design Pressure Rise
-    0.9 , !- Motor Efficiency
-    1.0 , !- Motor In Air Stream Fraction
-    AUTOSIZE, !- Design Electric Power Consumption
-    TotalEfficiencyAndPressure, !- Design Power Sizing Method
-    , !- Electric Power Per Unit Flow Rate
-    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.5,  !- Fan Total Efficiency 
-    , !- Electric Power Function of Flow Fraction Curve Name
-    , !- Night Ventilation Mode Pressure Rise
-    , !- Night Ventilation Mode Flow Fraction
-    , !- Motor Loss Zone Name
-    , !- Motor Loss Radiative Fraction 
-    General; !- End-Use Subcategory
+    0.84,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.5,                     !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General;                 !- End-Use Subcategory
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:WATER ===========
 

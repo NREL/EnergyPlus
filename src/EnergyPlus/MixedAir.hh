@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -269,7 +270,7 @@ namespace MixedAir {
 		int HeatRecoveryBypassControlType; // User input selects type of heat recovery optimization
 		bool ManageDemand; // Used by demand manager to manage ventilation
 		Real64 DemandLimitFlowRate; //Current demand limit if demand manager is ON
-		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
+		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 		int MixedAirSPMNum; // index of mixed air setpoint manager
 		bool CoolCoilFreezeCheck; // if true, cooling coil freezing is prevented by recalculating the amount of OA
 		bool EconoActive; // if true economizer is active
@@ -398,6 +399,8 @@ namespace MixedAir {
 		int CO2MaxMinLimitErrorIndex; // Index for max CO2 concentration < min CO2 concentration recurring error message for SOAM_ProportionalControlSchOcc
 		int CO2GainErrorCount; // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
 		int CO2GainErrorIndex; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+		int OAMaxMinLimitErrorCount; // Counter when max OA < min OA for SOAM_ProportionalControlDesOARate
+		int OAMaxMinLimitErrorIndex; // Index for max OA < min OA recurring error message for SOAM_ProportionalControlDesOARate
 		Array1D< Real64 > ZoneADEffCooling; // Zone air distribution effectiveness in cooling mode for each zone
 		Array1D< Real64 > ZoneADEffHeating; // Zone air distribution effectiveness in heating mode for each zone
 		Array1D_int ZoneADEffSchPtr; // Pointer to the zone air distribution effectiveness schedule for each zone
@@ -406,6 +409,7 @@ namespace MixedAir {
 		Array1D< Real64 > ZoneSecondaryRecirculation; // zone air secondary recirculation ratio for each zone
 		Array1D_int ZoneOAFlowMethod; // OA flow method for each zone
 		Array1D_int ZoneOASchPtr; // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
+		Array1D< Real64 > OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
 
 		// Default Constructor
 		VentilationMechanicalProps() :
@@ -421,7 +425,9 @@ namespace MixedAir {
 			CO2MaxMinLimitErrorCount( 0 ),
 			CO2MaxMinLimitErrorIndex( 0 ),
 			CO2GainErrorCount( 0 ),
-			CO2GainErrorIndex( 0 )
+			CO2GainErrorIndex( 0 ),
+			OAMaxMinLimitErrorCount( 0 ),
+			OAMaxMinLimitErrorIndex( 0 )
 		{}
 
 		void
@@ -728,11 +734,10 @@ namespace MixedAir {
 
 	void
 	CheckOAControllerName(
-		std::string const & OAControllerName, // proposed name
-		int const NumCurrentOAControllers, // Count on number of controllers
-		bool & IsNotOK, // Pass through to VerifyName
-		bool & IsBlank, // Pass through to VerifyName
-		std::string const & SourceID // Pass through to VerifyName
+		std::string & OAControllerName,
+		std::string const & ObjectType,
+		std::string const & FieldName,
+		bool & ErrorsFound
 	);
 
 	int

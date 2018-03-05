@@ -7,8 +7,8 @@
 !
 ! Location:                Miami, FL
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 2/1, Summer 7/1, Miami Intl Ap FL USA 722020
 !
@@ -20,7 +20,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -93,7 +93,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -113,6 +113,8 @@
 ! Nominal Cooling Power Input = 9.63 (Cooling COP = 3.2917)
 ! Nominal Heating Capacity = 35.2 kW
 ! Nominal Power Input = 9.92 kW (Heating COP = 3.5484)
+! Note: Capacity performance curves are normalized to capacity at 16C indoor wet-bulb temperature
+!       For this reason, the similation will report that capacity as a function of temperature curves are not 1 at the rating point
 
   AirConditioner:VariableRefrigerantFlow,
     VRF Heat Pump,           !- Heat Pump Name
@@ -503,7 +505,7 @@
     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     TU1 VRF Supply Fan,      !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
     TU1 OA Mixer,            !- Outside Air Mixer Object Name
@@ -528,7 +530,7 @@
     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     TU2 VRF Supply Fan,      !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
     TU2 OA Mixer,            !- Outside Air Mixer Object Name
@@ -553,7 +555,7 @@
     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     TU4 VRF Supply Fan,      !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
     TU4 OA Mixer,            !- Outside Air Mixer Object Name
@@ -578,7 +580,7 @@
     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     TU3 VRF Supply Fan,      !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
     TU3 OA Mixer,            !- Outside Air Mixer Object Name
@@ -603,7 +605,7 @@
     autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     TU5 VRF Supply Fan,      !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
     TU5 OA Mixer,            !- Outside Air Mixer Object Name
@@ -649,90 +651,90 @@
     Relief Air Outlet Node 5,!- Relief Air Stream Node Name
     TU5 Inlet Node;          !- Return Air Stream Node Name
 
-Fan:SystemModel,
-  TU1 VRF Supply Fan , !- Name
-  VRFAvailSched , !- Availability Schedule Name
-  TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-  TU1 Outlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  600.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    TU1 VRF Supply Fan,      !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
+    TU1 Outlet Node,         !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    600.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  TU2 VRF Supply Fan, !- Name
-  VRFAvailSched , !- Availability Schedule Name
-  TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-  TU2 Outlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  600.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    TU2 VRF Supply Fan,      !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU2 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
+    TU2 Outlet Node,         !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    600.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  TU3 VRF Supply Fan, !- Name
-  VRFAvailSched , !- Availability Schedule Name
-  TU3 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-  TU3 Outlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  600.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    TU3 VRF Supply Fan,      !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU3 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
+    TU3 Outlet Node,         !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    600.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  TU4 VRF Supply Fan, !- Name
-  VRFAvailSched , !- Availability Schedule Name
-  TU4 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-  TU4 Outlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  600.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    TU4 VRF Supply Fan,      !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU4 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
+    TU4 Outlet Node,         !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    600.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  TU5 VRF Supply Fan, !- Name
-  VRFAvailSched , !- Availability Schedule Name
-  TU5 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-  TU5 Outlet Node,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  600.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    TU5 VRF Supply Fan,      !- Name
+    VRFAvailSched,           !- Availability Schedule Name
+    TU5 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
+    TU5 Outlet Node,         !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    600.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   COIL:Cooling:DX:VariableRefrigerantFlow,
     TU1 VRF DX Cooling Coil, !- Name
@@ -1012,7 +1014,7 @@ Fan:SystemModel,
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -1044,7 +1046,7 @@ Fan:SystemModel,
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -2909,7 +2911,7 @@ Fan:SystemModel,
     SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2917,7 +2919,7 @@ Fan:SystemModel,
     SPACE2-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2925,7 +2927,7 @@ Fan:SystemModel,
     SPACE3-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2933,7 +2935,7 @@ Fan:SystemModel,
     SPACE4-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2941,7 +2943,7 @@ Fan:SystemModel,
     SPACE5-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     SPACE1-1 Control,        !- Name
@@ -3001,6 +3003,7 @@ Fan:SystemModel,
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU1,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3008,6 +3011,7 @@ Fan:SystemModel,
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU2,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3015,6 +3019,7 @@ Fan:SystemModel,
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU3,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3022,6 +3027,7 @@ Fan:SystemModel,
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU4,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3029,6 +3035,7 @@ Fan:SystemModel,
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU5,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3052,7 +3059,7 @@ Fan:SystemModel,
 
   Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Heating Coil Total Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 

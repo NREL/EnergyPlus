@@ -39,6 +39,7 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/surface-heat-balance-manager-processes/undisturbed-ground-temperature-model-xing.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/advanced-surface-concepts/exterior-naturally-vented-cavity.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/advanced-surface-concepts/green-roof-model-ecoroof.tex
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/advanced-surface-concepts/surfaceproperty-underwater.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations/climate-calculations.tex
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/src/climate-sky-and-solar-shading-calculations/design-week-specification.tex
@@ -528,6 +529,8 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure4.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure5.png
   ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/ss-figure6.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/PCMModel.png
+  ${CMAKE_SOURCE_DIR}/doc/engineering-reference/media/IdealLoadsSchematic.png
 )
 
 SET( SOURCE_FILENAME "engineering-reference" )
@@ -536,7 +539,7 @@ SET( OUTPUT_FILENAME "EngineeringReference" )
 FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME})
 
 add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
-	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
+	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
 		    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME}
 		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
                  )

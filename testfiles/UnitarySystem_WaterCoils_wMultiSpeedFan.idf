@@ -14,8 +14,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -25,7 +25,7 @@
 !           There is a single window in the West zone south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -157,7 +157,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3캜
+! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
@@ -187,7 +187,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5캜 MWB=23캜
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5째C MWB=23째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -222,40 +222,40 @@
     GroundCoupledSurface;    !- Type of Modeling
 
   Site:GroundDomain:Slab,
-    IngradeCoupledSlab, !- Name
-    5,                  !- Ground Domain Depth {m}
-    1,                  !- Aspect Ratio
-    5,                  !- Domain Perimeter Offset {m}
-    1.8,                !- Soil Thermal Conductivity {W/m-K}
-    3200,               !- Soil Density {kg/m3}
-    836,                !- Soil Specific Heat {J/kg-K}
-    30,                 !- Soil Moisture Content Volume Fraction {percent}
-    50,                 !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Type of Undisturbed Ground Temperature Model
-    KATemps,            !- Name of Undisturbed Ground Temperature Model
-    1,                  !- Evapotranspiration Ground Cover Parameter
-    GroundCoupledOSCM,  !- Name of Floor Boundary Condition Model
-    InGrade,            !- Slab Location (InGrade/OnGrade)
-    Slab Material-In-grade, !- Slab Material Name
-    Yes,                !- Horizontal Insulation (Yes/No)
-    Slab Insulation, !- Horizontal Insulation Material Name
-    Full,               !- Full Horizontal or Perimeter Only (Full/Perimeter)
-    ,                   !- Perimeter insulation width (m)
-    Yes,                !- Vertical Insulation (Yes/No)
-    Slab Insulation,    !- Vertical Insulation Name
-    2,                  !- Vertical perimeter insulation depth from surface (m)
-    Timestep,           !- Domain Simulation Interval. (Timestep/Hourly)
-    ,                   !- Geometric Mesh Coefficient
-    ;                   !- Mesh Density Parameter
+    IngradeCoupledSlab,      !- Name
+    5,                       !- Ground Domain Depth {m}
+    1,                       !- Aspect Ratio
+    5,                       !- Perimeter Offset {m}
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type
+    KATemps,                 !- Undisturbed Ground Temperature Model Name
+    1,                       !- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM,       !- Slab Boundary Condition Model Name
+    InGrade,                 !- Slab Location
+    Slab Material-In-grade,  !- Slab Material Name
+    Yes,                     !- Horizontal Insulation
+    Slab Insulation,         !- Horizontal Insulation Material Name
+    Full,                    !- Horizontal Insulation Extents
+    ,                        !- Perimeter Insulation Width {m}
+    Yes,                     !- Vertical Insulation
+    Slab Insulation,         !- Vertical Insulation Material Name
+    2,                       !- Vertical Insulation Depth {m}
+    Timestep,                !- Simulation Timestep
+    ,                        !- Geometric Mesh Coefficient
+    ;                        !- Mesh Density Parameter
 
   Site:GroundTemperature:Undisturbed:KusudaAchenbach,
-    KATemps,    !- Name of object
-    1.8,        !- Soil Thermal Conductivity {W/m-K}
-    3200,       !- Soil Density {kg/m3}
-    836,        !- Soil Specific Heat {J/kg-K}
-    15.5,       !- Annual average surface temperature {C}
-    12.8,       !- Annual amplitude of surface temperature {delta C}
-    17.3;       !- Phase shift of minimum surface temperature {days}
+    KATemps,                 !- Name
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    15.5,                    !- Average Soil Surface Temperature {C}
+    12.8,                    !- Average Amplitude of Surface Temperature {deltaC}
+    17.3;                    !- Phase Shift of Minimum Surface Temperature {days}
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
@@ -1395,6 +1395,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1402,6 +1403,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1409,6 +1411,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1422,7 +1425,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1430,7 +1433,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1438,7 +1441,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -1525,7 +1528,7 @@
     Coil:Cooling:Water,      !- Cooling Coil Object Type
     CW Cooling Coil,         !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -1567,6 +1570,7 @@
     4,                       !- Number of Speeds for Heating
     4,                       !- Number of Speeds for Cooling
     No,                      !- Single Mode Operation
+    ,                        !- No Load Supply Air Flow Rate Ratio
     0.25,                    !- Heating Speed 1 Supply Air Flow Ratio
     0.25,                    !- Cooling Speed 1 Supply Air Flow Ratio
     0.50,                    !- Heating Speed 2 Supply Air Flow Ratio

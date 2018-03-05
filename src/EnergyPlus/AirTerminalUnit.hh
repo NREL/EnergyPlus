@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -62,6 +63,7 @@ enum AirTerminalUnitType {
 	dualDuctVAV,
 	singleDuctVAVReheat,
 	singleDuctConstVolReheat,
+	singleDuctConstVolNoReheat,
 	singleDuctVAVNoReheat,
 	singleDuct_SeriesPIU_Reheat,
 	singleDuct_ParallelPIU_Reheat,
@@ -72,8 +74,7 @@ enum AirTerminalUnitType {
 	singleDuctConstVolCooledBeam,
 	dualDuctVAVOutdoorAir,
 	singleDuctUserDefined,
-	singleDuctInletATMixer,
-	singleDuctSupplyATMixer,
+	singleDuctATMixer,
 	singleDuctConstVolFourPipeBeam
 };
 
@@ -94,7 +95,9 @@ protected: // Creation
 		airInNodeNum( 0 ),
 		airOutNodeNum( 0 ),
 		zoneIndex( 0 ),
-		zoneNodeIndex( 0 )
+		zoneNodeIndex( 0 ),
+		ctrlZoneInNodeIndex( 0 ),
+		airLoopNum( 0 )
 	{}
 
 	// Copy Constructor
@@ -134,7 +137,17 @@ public: // Methods
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	) = 0;
 
+	virtual
+	int
+	getZoneIndex() = 0;
 
+	virtual
+	int
+	getAirLoopNum() = 0;
+
+	virtual
+	Real64
+	getPrimAirDesignVolFlow() = 0;
 
 protected: // Data
 
@@ -151,6 +164,8 @@ protected: // Data
 	int airOutNodeNum; // unit air outlet system node number, air enters into zone from air terminal
 	int zoneIndex; // zone index for this air terminal unit
 	int zoneNodeIndex; // index in node structure for the zone node for this air terminal
+	int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+	int airLoopNum; // index to airloop that this terminal unit is connected to
 }; // AirTerminalUnit
 
 } // EnergyPlus

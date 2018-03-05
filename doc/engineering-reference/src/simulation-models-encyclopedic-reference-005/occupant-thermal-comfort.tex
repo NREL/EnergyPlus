@@ -1,22 +1,24 @@
 \section{Occupant Thermal Comfort }\label{occupant-thermal-comfort}
 
-The integration of a sophisticated building thermal analysis tool with thermal comfort models allows one to perform an energy analysis on a zone and simultaneously determine if the environmental control strategy will be sufficient for the occupants to be thermally comfortable. This chapter is intended to provide background on thermal comfort, present an overview of state of the art thermal comfort models and present the mathematical models that have been incorporated into Energy Plus.
+The integration of a sophisticated building thermal analysis tool with thermal comfort models allows one to perform an energy analysis on a zone and simultaneously determine if the environmental control strategy will be sufficient for the occupants to be thermally comfortable. This section is intended to provide background on thermal comfort, present an overview of state of the art thermal comfort models, and present the mathematical models that have been incorporated into EnergyPlus.
 
-Thermal comfort modeling is controlled primarily by the People input object. This includes input for selecting the type of thermal comfort model that is desired by the user as well as parameters that serve as inputs to all of the thermal comfort models. This includes the activity level, the work efficiency, the air velocity, and the clothing insulation level for people within the space.~ All four of these parameters can be scheduled. More information on the People input object can be found in the EnergyPlus Input/Output Reference. More information on how each of these parameters is used and the specific modeling equations for the thermal comfort models can be found below.
+Thermal comfort modeling in EnergyPlus is controlled primarily by the People input object. This includes input for selecting the type of thermal comfort model that is desired by the user as well as parameters that serve as inputs to the thermal comfort models. These parameters include the activity level, the work efficiency, the air velocity and the clothing insulation level for people within the space. All four of these parameters can be scheduled. More information on the People input object can be found in the EnergyPlus Input/Output Reference. More information on how each of these parameters is used and the specific modeling equations for the thermal comfort models can be found below.
 
 \subsection{Background on Thermal Comfort Models}\label{background-on-thermal-comfort-models}
 
-Throughout the last few decades, researchers have been exploring the thermal, physiological and psychological response of people in their environment in order to develop mathematical models to predict these responses. Researchers have empirically debated building occupants' thermal responses to the combined thermal effect of the personal, environmental and physiological variables that influence the condition of thermal comfort.
+Throughout the last few decades, researchers have been exploring the thermal, physiological and psychological response of people in their environment in order to develop mathematical models to predict these responses. Researchers have empirically determined building occupants' thermal responses to the combined thermal effect of the personal, environmental and physiological variables that influence the condition of thermal comfort.
 
-There are two personal variables that influence the condition of thermal comfort: the thermal resistance of the clothing (I\(_{cl}\)), and the metabolic rate (H/A\(_{Du}\)). The thermal resistance of the clothing (I\(_{cl}\)) is measured in units of ``clo.'' The 1985 ASHRAE Handbook of Fundamentals (ASHRAE 1985) suggests multiplying the summation of the individual clothing items clo value by a factor of 0.82 for clothing ensembles.
+There are two personal variables that influence the condition of thermal comfort: the thermal resistance of the clothing (I\(_{cl}\)), and the metabolic rate (H/A\(_{Du}\)).
 
-The metabolic rate (H/A\(_{Du}\)), is a measure of the internal heat production rate of an occupant (H) w/hr. in per unit of ``Dubois'' body surface area (A\(_{Du}\)) in units of m\(^{2}\). The DuBois body surface area is given by :
+The thermal resistance of the clothing (I\(_{cl}\)) is measured in units of ``clo.'' The 1985 ASHRAE Handbook of Fundamentals (ASHRAE 1985) suggests multiplying the summation of the individual clothing items clo value by a factor of 0.82 to determine the overall clo value for clothing ensembles.
+
+The metabolic rate (H/A\(_{Du}\)) is a measure of the internal heat production rate of an occupant (H) in W/hr per unit of ``Dubois'' body surface area (A\(_{Du}\)) in units of m\(^{2}\). The DuBois body surface area is given by :
 
 \begin{equation}
 {A_{Du}} = 0.202{(weight)^{0.425}}{(height)^{0.725}}
 \end{equation}
 
-Using this equation, an area of 1.8 m\(^{2}\) represents the surface area of an average person of weight 70 kg. and height 1.73 m (Fanger 1967). The metabolic rate is measured in mets, where 1 met = 58.2 W/m\(^{2}\).
+Using this equation, an area of 1.8 m\(^{2}\) represents the surface area of an average person of weight 70 kg. and height 1.73 m (Fanger 1967).  In EnergyPlus, this average person area of 1.8 m\(^{2}\) is used for the body surface area all thermal comfort models.  The metabolic rate is measured in mets, where 1 met = 58.2 W/m\(^{2}\).
 
 The environmental variables that influence the conditions of thermal comfort include:
 
@@ -32,7 +34,7 @@ The environmental variables that influence the conditions of thermal comfort inc
   Water vapor pressure in ambient air (P\(_{a}\))
 \end{enumerate}
 
-The Air Temperature (T\(_{a}\)), a direct environmental index, is the dry-bulb temperature of the environment. The Mean Radiant Temperature (T\(_{r}\)) is a rationally derived environmental index defined as the uniform black-body temperature that would result in the same radiant energy exchange as in the actual environment. The Relative air velocity (v) a direct environmental index is a measure of the air motion obtainable via a hot wire or vane anemometers. The Water vapor pressure in ambient air (P\(_{a}\)) is a direct environmental index.
+The Air Temperature (T\(_{a}\)), a direct environmental index, is the dry-bulb temperature of the environment. It is calculated using either the mean air temperature for the zone in question or the air temperature calculated by some of the more detailed zone air models available in EnergyPlus. The Mean Radiant Temperature (T\(_{r}\)) is a rationally derived environmental index defined as the uniform black-body temperature that would result in the same radiant energy exchange as in the actual environment. This value can be calculated in several ways as outlined in the Mean Radiant Temperature Calculation section later in this document.  The Relative air velocity (v) a direct environmental index is a measure of the air motion obtainable via a hot wire or vane anemometers. The Water vapor pressure in ambient air (P\(_{a}\)) is a direct environmental index.
 
 The physiological variables that influence the conditions of thermal comfort include:
 
@@ -50,7 +52,7 @@ The physiological variables that influence the conditions of thermal comfort inc
   Thermal Conductance (K) between the core and skin.
 \end{enumerate}
 
-Where the Skin Temperature (T\(_{sk}\)), the Core Temperature (T\(_{cr}\)) and the Sweat Rate are physiological indices. The Skin Wettedness (w) is a rationally derived physiological index defined as the ratio of the actual sweating rate to the maximum rate of sweating that would occur if the skin were completely wet.
+where the Skin Temperature (T\(_{sk}\)), the Core Temperature (T\(_{cr}\)) and the Sweat Rate are physiological indices. The Skin Wettedness (w) is a rationally derived physiological index defined as the ratio of the actual sweating rate to the maximum rate of sweating that would occur if the skin were completely wet.
 
 One more consideration is important in dealing with thermal comfort - the effect of asymmetrical heating or cooling. This could occur when there is a draft or when there is a radiant flux incident on a person (which is what is of primary interest to us here). Fanger (1967) noted that the human regulatory system is quite tolerant of asymmetrical radiant flux. A reasonable upper limit on the difference in mean radiant temperature (T\(_{r}\)) from one direction to the opposing direction is 15°C. (ASHRAE 1984). This limit is lower if there is a high air velocity in the zone.
 
@@ -58,13 +60,13 @@ One more consideration is important in dealing with thermal comfort - the effect
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
 \caption{General Nomenclature list for Thermal Comfort Models \label{table:general-nomenclature-list-for-thermal-comfort}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range & Source Code Variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{General Nomenclature list for Thermal Comfort Models} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range & Source Code Variable \tabularnewline
 \midrule
 \endhead
 
@@ -143,11 +145,9 @@ Note for all Thermal Comfort reporting:~ Though the published values for thermal
 
 The main similarity of the three models is that all three apply an energy balance to a person and use the energy exchange mechanisms along with experimentally derived physiological parameters to predict the thermal sensation and the physiological response of a person due to their environment. The models differ somewhat in the physiological models that represent the human passive system (heat transfer through and from the body) and the human control system (the neural control of shivering, sweating and skin blood flow). The models also differ in the criteria used to predict thermal sensation. However, all three models use information from the People statement and the thermal comfort model is selected via the People statement in a user's input file. Scheduled parameters such as the activity level, work efficiency, air velocity, and clothing insulation level all have a direct bearing on the thermal comfort models. For more information on the input of these parameters, see the People statement in the EnergyPlus Input/Output Reference. For more information on how each individual thermal comfort model uses these parameters, please consult the next several sections.
 
-The main similarity of the three models is that all three apply an energy balance to a person and use the energy exchange mechanisms along with experimentally derived physiological parameters to predict the thermal sensation and the physiological response of a person due to their environment. The models differ somewhat in the physiological models that represent the human passive system (heat transfer through and from the body) and the human control system (the neural control of shivering, sweating and skin blood flow). The models also differ in the criteria used to predict thermal sensation.
-
 \subsection{Fanger Comfort Model}\label{fanger-comfort-model}
 
-Fanger's Comfort model was the first one developed. It was published first in 1967 (Fanger 1967) and then in 1970 (Fanger 1970), and helped set the stage for the other two models. The mathematical model developed by P.O. Fanger is probably the most well known of the three models and is the easiest to use because it has been put in both chart and graph form.
+Fanger's Comfort model was the first human comfort model that was developed. It was first published in 1967 (Fanger 1967), then updated in 1970 (Fanger 1970), and helped set the stage for the Pierce and KSU models. The mathematical model developed by P.O. Fanger is probably the most well known of the three models and is the easiest to use because it has been put in both chart and graph form.
 
 \subsubsection{Fanger Model Nomenclature List}\label{fanger-model-nomenclature-list}
 
@@ -155,13 +155,13 @@ Fanger's Comfort model was the first one developed. It was published first in 19
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
 \caption{Nomenclature list for Fanger model \label{table:nomenclature-list-for-fanger-model}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & Range & Source Code Variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature list for Fanger model} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units & Range & Source Code Variable \tabularnewline
 \midrule
 \endhead
 
@@ -196,63 +196,91 @@ $\sigma$ & The Stefan-Boltzman constant ( = 5.67×10  ) & W/m\(^{2}\)K\(^{4}\) &
 
 \subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm}
 
-Fanger developed the model based on the research he performed at Kansas State University and the Technical University of Denmark. Fanger used the seven-point form of a thermal sensation scale along with numerous experiments involving human subjects in various environments. He related the subjects in response to the variables, which influence the condition of thermal comfort. Fanger's model is based upon an energy analysis that takes into account all the modes of energy loss (L) from the body, including: the convection and radiant heat loss from the outer surface of the clothing, the heat loss by water vapor diffusion through the skin, the heat loss by evaporation of sweat from the skin surface, the latent and dry respiration heat loss and the heat transfer from the skin to the outer surface of the clothing. The model assumes that the person is thermally at steady state with his environment.
+Fanger developed the model based on the research he performed at Kansas State University and the Technical University of Denmark. Fanger used the seven-point form of a thermal sensation scale along with numerous experiments involving human subjects in various environments. He related the subjects' response to various environmental variables which influence the condition of thermal comfort. Fanger's model is based upon an energy analysis that takes into account all the modes of energy loss (L) from the body, including: the convection and radiant heat loss from the outer surface of the clothing, the heat loss by water vapor diffusion through the skin, the heat loss by evaporation of sweat from the skin surface, the latent and dry respiration heat loss and the heat transfer from the skin to the outer surface of the clothing. The model assumes that the person is thermally at steady state with the interior environment.
 
-\(M = L\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+M = L
+\end{equation}
 
-\(L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+L = {Q_{res}} + {Q_{dry}} + {E_{sk}}
+\end{equation}
 
-\({Q_{res}} = {E_{res}} + {C_{res}} = 0.000017M(5867 - {P_a}) + 0.0014M(34 - {T_a})\) ~~~~ W/m\(^{2}\)
+\begin{equation}
+{Q_{res}} = {E_{res}} + {C_{res}} = 0.000017M(5867 - {P_a}) + 0.0014M(34 - {T_a})
+\end{equation}
+
+In the EnergyPlus source code,  Q\(_{res}\), E\(_{res}\) and C\(_{res}\) are calculated using the following equations, respectively:
+
+RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
 LatRespHeatLoss = 0.000017*ActLevel*(5867. - VapPress)
 
 DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 
-RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
+\begin{equation}
+{Q_{dry}} = {Q_c} + {Q_r}
+\end{equation}
 
-\({Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\) 
+\begin{equation}
+{Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})
+\end{equation}
 
-{Q\(_{r}\) = 3.96*f\(_{l}\)*{[}(0.01*T\(_{a}\))\^{}4 - (0.01*T\(_{a}\))\^{}4{]}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{Q_{r}}=3.96*f\left(_{l}\right)*{[}(0.01*T\left(_{a}\right))\left(^{4}\right)-(0.01*T\left(_{a}\right))\left(^{4}\right){]}}
+\end{equation}
 
-\({Q_{dry}} = {Q_c} + {Q_r}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
-
-ConvHeatLos = CloBodyRat*Hc*(CloSurfTemp - AirTemp)
-
-RadHeatLoss = 3.96*CloBodyRat \&
-
-*{[}(0.01*AbsCloSurfTemp)**4 - (0.01*AbsRadTemp)**4{]}
+In the EnergyPlus source code, Q\(_{dry}\), Q\(_{c}\) and Q\(_{r}\) are calculated using the following equations, respectively:
 
 DryHeatLoss = ConvHeatLoss + RadHeatLoss
 
-For\(H > 58.2\) , \({E_{rsw}} = 0.42(H - 58.2)\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+ConvHeatLos = CloBodyRat*Hc*(CloSurfTemp - AirTemp)
 
-For \(H \le 58.2\) , \({E_{rsw}} = 0\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\) 
+RadHeatLoss = 3.96*CloBodyRat*{[}(0.01*AbsCloSurfTemp)**4 - (0.01*AbsRadTemp)**4{]}
 
-{E\(_{f}\) = 0.00305*(5733.0 - 6.99H - P\(_{a}\))}~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{E_{rsw}} = 0.42(H - 58.2) for \left(H > 58.2\right)
+\end{equation}
 
-\({E_{sk}} = {E_{rsw}} + {E_{diff}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{E_{rsw}} = 0 for \left(H \le 58.2\right)
+\end{equation}
 
-EvapHeatLossRegComf = 0.42*(IntHeatProd - ActLevelConv)
+\begin{equation}
+{E_{f}}=0.00305*(5733.0-6.99H-P\left(_{a}\right))}
+\end{equation}
 
-EvapHeatLossRegComf = 0.0
+\begin{equation}
+{E_{sk}} = {E_{rsw}} + {E_{diff}}
+\end{equation}
+
+In the EnergyPlus source code, E\(_{rsw}\), E\(_{f}\) and E\(_{sk}\) are calculated using the following equations, respectively:
+
+EvapHeatLossRegComf = 0.42*(IntHeatProd - ActLevelConv) or 0.0 depending on H value
 
 EvapHeatLossDiff = 0.00305*(5733.0 - 6.99*IntHeatProd - VapPress)
 
 EvapHeatLoss = EvapHeatLossRegComf + EvapHeatLossDiff
 
-The Fanger model was developed using the thermal sensation votes from subjects at KSU and Denmark, and the Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
+The Fanger model was developed using the thermal sensation votes from subjects at KSU and in Denmark, and the Predicted Mean Vote (PMV) thermal sensation scale is based on how the energy loss (L) deviates from the metabolic rate (M) in the following form:
 
 \begin{equation}
 PMV = (0.303{e^{ - 0.036M}} + 0.028)(H - L)
 \end{equation}
 
-ThermSensTransCoef = 0.303*EXP(-0.036*ActLevel) + 0.028
+In the EnergyPlus source code, PMV is calculated using the following equations in conjunction with the equations shown above:
 
 PMV = ThermSensTransCoef*(IntHeatProd - EvapHeatLoss - RespHeatLoss - DryHeatLoss)
 
+ThermSensTransCoef = 0.303*EXP(-0.036*ActLevel) + 0.028
+
+IntHeatProd = ActLevel - WorkEff
+
 Predicted Percent of Dissatisfied (PPD) people at each PMV is calculated as follows:
 
-PPD = 100.0 - 95.0*EXP(-0.03353*PMV**4 - 0.2179*PMV**2)
+\begin{equation}
+PPD = 100.0 - 95.0*EXP(-0.03353{PMV^{4}} - 0.2179{PMV^{2}})
+\end{equation}
 
 \subsection{Pierce Two-Node Model}\label{pierce-two-node-model}
 
@@ -264,13 +292,13 @@ The Pierce Two-Node model was developed at the John B. Pierce Foundation at Yale
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
 \caption{Nomenclature list for Pierce Two-Node model \label{table:nomenclature-list-for-pierce-two-node-model}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range & Source Code Variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature list for Pierce Two-Node model} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range & Source Code Variable \tabularnewline
 \midrule
 \endhead
 
@@ -336,135 +364,190 @@ $\sigma$ & The Stefan-Boltzman constant ( = 5.67×10  ) & W/m\(^{2}\)K\(^{4}\) &
 
 \subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-1}
 
-The Pierce model thermally lumps the human body as two isothermal, concentric compartments, one representing the internal section or core (where all the metabolic heat is assumed to be generated and the skin comprising the other compartment). This allows the passive heat conduction from the core compartment to the skin to be accounted for. The boundary line between two compartments changes with respect to skin blood flow rate per unit skin surface area (SKBF in L/h•m\(^{2}\)) and is described by alpha -- the fraction of total body mass attributed to the skin compartment (Doherty and Arens 1988).
+The Pierce model thermally lumps the human body as two isothermal, concentric compartments, one representing the internal section or core (where all the metabolic heat is assumed to be generated) and the other representing the skin. This allows the passive heat conduction from the core compartment to the skin to be taken into account. The boundary line between the two compartments changes with the skin blood flow rate per unit skin surface area (SKBF in L/h•m\(^{2}\)) and is described by alpha -- the fraction of total body mass attributed to the skin compartment (Doherty and Arens 1988).
 
 \begin{equation}
 \alpha  = 0.0417737 + 0.7451832/(SKBF + 0.585417)
 \end{equation}
 
+In the EnergyPlus code, \(\alpha\) or SkinMassRat is calculated using the equivalent equation:
+
 SkinMassRat = 0.0417737 + 0.7451832/(SkinBloodFlow + 0.585417)
 
-Furthermore, the model takes into account the deviations of the core, skin, and mean body temperature weighted by alpha from their respective setpoints. Thermoregulatory effector mechanisms (Regulatory sweating, skin blood flow, and shivering) are defined in terms of thermal signals from the core, skin and body (Doherty and Arens 1988).
+Furthermore, the model takes into account the deviations of the core, skin, and mean body temperature weighted by alpha from their respective setpoints. Thermoregulatory effector mechanisms (regulatory sweating, skin blood flow, and shivering) are defined in terms of thermal signals from the core, skin and body in $^{\circ}$C (Doherty and Arens 1988) by the following equations:
 
-\(SI{G_{cr}} = {T_{cr}} - 36.8\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ °C
+\begin{equation}
+SI{G_{cr}} = {T_{cr}} - 36.8
+\end{equation}
 
-\(SI{G_{sk}} = {T_{sk}} - 33.7\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ °C
+\begin{equation}
+SI{G_{sk}} = {T_{sk}} - 33.7
+\end{equation}
 
-\(SI{G_b} = {T_b} - 36.49\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ °C
+\begin{equation}
+SI{G_b} = {T_b} - 36.49
+\end{equation}
 
-SkinThermSigWarm = SkinTemp - SkinTempSet
+In the EnergyPlus code, when SkinTemp is greater than SkinTempSet (33.7$^{\circ}$C), then SkinThermSigWarm = SkinTemp - SkinTempSet and 
+SkinThermSigCold = 0.0. Otherwise, when SkinTemp is less than or equal to SkinTempSet, then SkinThermSigWarm = 0.0 and SkinThermSigCold = SkinTempSet - SkinTemp.
 
-SkinThermSigCold = SkinTempSet - SkinTemp
+In the EnergyPlus code, when CoreTemp is greater than CoreTempSet (36.8$^{\circ}$C), then CoreThermSigWarm = CoreTemp - CoreTempSet and CoreThermSigCold = 0.0. Otherwise, when CoreTemp is less than or equal to CoreTempSet, then CoreThermSigWarm = 0.0 and CoreThermSigCold = CoreTempSet - CoreTemp.
 
-CoreThermSigWarm = CoreTemp - CoreTempSet
+In the EnergyPlus code, when AvgBodyTemp is greater than AvgBodyTempSet(36.49$^{\circ}$C), then BodyThermSigWarm = AvgBodyTemp - AvgBodyTempSet and BodyThermSigCold = 0.0. Otherwise, when AvgBodyTemp is less than or equal to AvgBodyTempSet, then BodyThermSigWarm = 0.0 and BodyThermSigCold = AvgBodyTempSet-AvgBodyTemp.
 
-CoreThermSigCold = CoreTempSet - CoreTemp
+The skin blood flow rate in L/hr$\cdot$m\(^{2}\) is calculated using:
 
-BodyThermSigWarm = AvgBodyTemp - AvgBodyTempSet
+\begin{equation}
+SKBF = (6.3 + C{}_{dil} \times SI{G_{cr}})/(1 + {S_{tr}} \times (SI{G_{sk}}))
+\end{equation}
 
-BodyThermSigCold = AvgBodyTempSet-AvgBodyTemp
+In the EnergyPlus code, this equation is calculated using the following equations:
 
-\(SKBF = (6.3 + C{}_{dil} \times SI{G_{cr}})/(1 + {S_{tr}} \times ( - SI{G_{sk}}))\) ~~~~~~~~~~~~~~~~~~~~~ L/hr•m\(^{2}\)
+SkinBloodFlow = (6.3 + VasodilationFac)/(1. + VasoconstrictFac)
 
 VasodilationFac = SkinBloodFlowConst*CoreWarmDelTemp
 
 VasoconstrictFac = Str*SkinColdDelTemp
 
-SkinBloodFlow = (6.3 + VasodilationFac)/(1. + VasoconstrictFac)
+The rate of regulatory sweating in g/hr•m\(^{2}\) is calculated using:
 
-\(S{W_{reg}} = {C_{sw}}SI{G_b}{e^{(SI{G_{sk}}/10.7)}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ g/hr•m\(^{2}\)
+\begin{equation}
+S{W_{reg}} = {C_{sw}}SI{G_b}{e^{(SI{G_{sk}}/10.7)}}
+\end{equation}
 
-RegSweat = SweatContConst*BodyWarmDelTemp*EXP(SkinWarmDelTemp/10.7)
+and the shivering response in W/m\(^{2}\) is calculated using:
 
-\({M_{shiv}} = 19.4( - SI{G_{cr}})( - SI{G_{sk}})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{M_{shiv}} = 19.4(SI{G_{cr}})(SI{G_{sk}})
+\end{equation}
+
+In the EnergyPlus code, the sweat and shivering response determined by the above two equations are calculated using the follow expressions:
+
+RegSweat = SweatContConst*BodyThermSigWarm*EXP(SkinThermSigWarm/10.7)
 
 ShivResponse = 19.4*SkinThermSigCold*CoreThermSigCold
 
-The latest version of the Pierce model (Fountain and Huizenga 1997) discusses the concepts of SET* and ET*. The Pierce model converts the actual environment into a ``standard environment'' at a Standard Effective Temperature, SET*. SET* is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity for subjects wearing clothing that would be standard for the given activity in the real environment. Furthermore, in this standard environment, the same physiological strain, i.e.~the same skin temperature and skin wettedness and heat loss to the environment, would exist as in the real environment. The Pierce model also converts the actual environment into a environment at an Effective Temperature, ET*, that is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity and uniform temperature (Ta = MRT) where the subjects would experience the same physiological strain as in the real environment.
+The latest version of the Pierce model (Fountain and Huizenga 1997) discusses the concepts of SET* and ET*. The Pierce model converts the actual environment into a ``standard environment'' at a Standard Effective Temperature, SET*. SET* is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity for subjects wearing clothing that would be standard for the given activity in the real environment. Furthermore, in this standard environment, the same physiological strain, i.e.~the same skin temperature, skin wettedness and heat loss to the environment, would exist as in the real environment. The Pierce model also converts the actual environment into a environment at an Effective Temperature, ET*, that is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity and uniform temperature (Ta = MRT) where the subjects would experience the same physiological strain as in the real environment.
 
-In the latest version of the model it is suggested that the classical Fanged PMV be modified by using ET* or SET* instead of the operative temperature. This gives a new index PMV* which is proposed for dry or humid environments. It is also suggested that PMV* is very responsive to the changes in vapor permeation efficiency of the occupants clothing.
+In the latest version of the model, it is suggested that the classical Fanged PMV be modified by using ET* or SET* instead of the operative temperature. This gives a new index PMV* which is proposed for dry or humid environments. It is also suggested that PMV* is very responsive to the changes in vapor permeation efficiency of the occupants clothing.
 
-\(M = {M_{act}} + {M_{shiv}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+M = {M_{act}} + {M_{shiv}}
+\end{equation}
 
-ActLevel = ActLevel + ActShiv
+which in the EnergyPlus code takes on the form ActLevel = ActLevel + ActShiv.
 
-\(L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+L = {Q_{res}} + {Q_{dry}} + {E_{sk}} + W
+\end{equation}
 
-\(\begin{array}{l}{Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a(torr)}}) + 0.0014M(34 - {T_a})\\ = 0.017251M(5.8662 - {P_{a(kPa)}}) + 0.0014M(34 - {T_a})\end{array}\) W/m\(^{2}\)
+\begin{equation}
+\begin{array}{l}{Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a}(torr)}) + 0.0014M(34 - {T_a})\\{Q_{res}} = 0.017251M(5.8662 - {P_{a}(kPa)}) + 0.0014M(34 - {T_a})\end{array}
+\end{equation}
+
+In the EnergyPlus code, the calculation of Q\(_{res}\) or RespHeatLoss is accomplished using the following equations:
+
+RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
 LatRespHeatLoss = 0.017251*ActLevel*(5.8662 - VapPress)
 
 DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 
-RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
+\begin{equation}
+{Q_{dry}} = {Q_c} + {Q_r}
+\end{equation}
 
-\({Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{Q_c} = {h_c} \times {f_{cl}}({T_{cl}} - {T_a})
+\end{equation}
 
-\({Q_r} = {h_r} \times {f_{cl}}({T_{cl}} - {T_r})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{Q_r} = {h_r} \times {f_{cl}}({T_{cl}} - {T_r})
+\end{equation}
 
-\({Q_{dry}} = {Q_c} + {Q_r}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+Q\(_{dry}\) or DryHeatLoss is calculated in the EnergyPlus code using the following equation:
 
 DryHeatLoss = CloBodyRat*(Hc*(CloSurfTemp - AirTemp) + Hr*(CloSurfTemp - RadTemp))
 
-In Pierce model, the convective heat transfer coefficient, h\(_{c}\), varies with the air velocity around body and metabolic rate. The model uses the maximum value of following equations.
+In Pierce model, the convective heat transfer coefficient, h\(_{c}\), varies with the air velocity around body and metabolic rate. The model uses the maximum value of following equations:
 
-\({h_c} = 8.6 \times {v^{_{0.53}}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+\begin{equation}
+{h_c} = 8.6 \times {v^{_{0.53}}}
+\end{equation}
 
-\({h_c} = 5.66{(M/58.2 - 0.85)^{0.39}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+\begin{equation}
+{h_c} = 5.66{(M/58.2 - 0.85)^{0.39}}
+\end{equation}
 
-Hc = 8.6*AirVel**0.53
+In the EnergyPlus code, the following equations are used to calculate h\(_{c}\) or Hc:
 
-HcAct = 5.66*(ActMet - 0.85)**0.39
+Hc = 8.6*AirVel**0.53 where AirVel is reset to 0.137 if it drops below this value
+
+HcAct = 5.66*(ActMet - 0.85)**0.39 when ActMet is greater than 0.9
+
+When ActMet is greater than 0.9, EnergyPlus uses the larger value of Hc and HcAct for h\(_{c}\).
 
 Also, in the model, the radiant heat transfer coefficient, h\(_{r}\), is defined by following equation (Doherty and Arens 1988):
 
-\({h_r} = 4. \times {f_{eff}}\varepsilon \sigma {(({T_{cl}} + {T_r})/2 + 273.15)^3}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+\begin{equation}
+{h_r} = 4. \times {f_{eff}}\varepsilon \sigma {(({T_{cl}} + {T_r})/2 + 273.15)^3}
+\end{equation}
+
+In the EnergyPlus code, h\(_{r}\) or Hr is calculated using the following equation:
 
 Hr = 4.*RadSurfEff*StefanBoltz*((CloSurfTemp + RadTemp)/2. + TAbsConv)**3
 
-In the Pierce model, T\(_{cl}\) is estimated by each iteration using following equation:
+In the Pierce model, T\(_{cl}\) in $^{\circ}$C is estimated by each iteration using following equation:
 
-\({T_{cl}} = ({T_{sk}}/{I_{cl}} + {f_{cl}}({h_c}{T_a} - {h_r}{T_r}))/(1/{I_{cl}} + {f_{cl}}({h_c} + {h_r}))\) ~~~~~~~~~~~~~ °C
+\begin{equation}
+{T_{cl}} = ({T_{sk}}/{I_{cl}} + {f_{cl}}({h_c}{T_a} + {h_r}{T_r}))/(1/{I_{cl}} + {f_{cl}}({h_c} + {h_r}))
+\end{equation}
 
-CloSurfTemp = (CloCond*SkinTemp + CloBodyRat*(Hc*AirTemp \&
+Or as shown in the EnergyPlus code:
 
-\begin{itemize}
-\tightlist
-\item
-  Hr*RadTemp))/(CloCond + CloBodyRat*(Hc + Hr))
-\end{itemize}
+CloSurfTemp = (CloCond*SkinTemp + CloBodyRat*(Hc*AirTemp+Hr*RadTemp))
 
-Total evaporative heat loss from the skin, E\(_{sk}\), includes evaporation of water produced by regulatory sweating, E\(_{rsw}\), and evaporation of water vapor that diffuses through the skin surface, E\(_{diff}\).
+~~~~~~~~~~~~~~~~~~~~~~~/(CloCond + CloBodyRat*(Hc+Hr))
 
-\({E_{sk}} = {E_{rsw}} + {E_{diff}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+The total evaporative heat loss from the skin, E\(_{sk}\), includes evaporation of water produced by regulatory sweating, E\(_{rsw}\), and evaporation of water vapor that diffuses through the skin surface, E\(_{diff}\).
+
+\begin{equation}
+{E_{sk}} = {E_{rsw}} + {E_{diff}}
+\end{equation}
+
+\begin{equation}
+{E_{rsw}} = 0.68 \times S{W_{reg}}
+\end{equation}
+
+\begin{equation}
+{E_{diff}} = {w_{diff}} \times {E_{\max }}
+\end{equation}
+
+Within the EnergyPlus source code, these equations are shown as:
 
 EvapHeatLoss = EvapHeatLossRegSweat + EvapHeatLossRegDiff
-
-\({E_{rsw}} = 0.68 \times S{W_{reg}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
-
-\({E_{diff}} = {w_{diff}} \times {E_{\max }}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
 
 RegHeatLoss = 0.68*RegSweat
 
 DiffHeatLoss = SkinWetDiff*MaxEvapHeatLoss
 
-Where,
-
-0.68 is the passive water vapor diffusion rate in g/h·m\(^{2}\)·Torr
-
-and,
+where 0.68 is the passive water vapor diffusion rate in g/h·m\(^{2}\)·Torr and
 
 \begin{equation}
 {w_{diff}} = 0.06(1 - {w_{rsw}})
 \end{equation}
 
-\({E_{\max }} = {h_e}'({P_{sk}} - {P_a})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{E_{\max }} = {h_e}'({P_{sk}} - {P_a})
+\end{equation}
 
 \begin{equation}
 {w_{rsw}} = {E_{rsw}}/{E_{\max }}
 \end{equation}
 
-SkinWetDiff = (1.-SkinWetSweat)*.06
+These equations within the EnergyPlus source code appear as:
+
+SkinWetDiff = .06*(1.-SkinWetSweat)
 
 MaxEvapHeatLoss = (1./TotEvapHeatResist)*(SatSkinVapPress - VapPress)
 
@@ -472,27 +555,33 @@ SkinWetSweat = EvapHeatLossRegSweat/MaxEvapHeatLoss
 
 The Pierce model has one additional heat flow term describing the heat transfer between the internal core compartment and the outer skin shell (Doherty and Arens 1988).
 
-\({Q_{crsk}} = (5.28 + 1.163SKBF)({T_{cr}} - {T_{sk}})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{Q_{crsk}} = (5.28 + 1.163SKBF)({T_{cr}} - {T_{sk}})
+\end{equation}
+
+or as shown in the EnergyPlus source code:
 
 HeatFlow = (CoreTemp-SkinTemp)*(5.28 + 1.163*SkinBloodFlow)
 
-Where
+where 5.28 is the average body tissue conductance in W/m\(^2 \cdot \) K and 1.163 is the thermal capacity of blood in W \(\cdot\) h/L \(\cdot\) K.
 
-5.28 is the average body tissue conductance in W/m\(^{2}\)•°C
+Thus, individual heat balance equations for core and skin compartments are expressed using this term, Q\(_{c-s}\). New temperatures of core, skin and body are calculated for each iteration from rates of heat storage in the core and skin.
 
-1.163 is the thermal capacity of blood in W•h/L•°C
+\begin{equation}
+{S_{sk}} = {Q_{c - s}} - {Q_c} - {Q_r} - {E_{sk}}
+\end{equation}
 
-Thus, individual heat balance equations for core and skin compartments are expressed using this term, Q\(_{c-s}\). New temperatures of core, skin and body are calculated by each iteration from rates of heat storage in the core and skin.
+\begin{equation}
+{S_{cr}} = M - W - {Q_{res}} - {Q_{c - s}}
+\end{equation}
 
-\({S_{sk}} = {Q_{c - s}} - {Q_c} - {Q_r} - {E_{sk}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+These equations are represented by the following source code lines in EnergyPlus:
 
 SkinHeatStorage = HeatFlow - DryHeatLoss - EvapHeatLoss
 
-\({S_{cr}} = M - W - {Q_{res}} - {Q_{c - s}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+CoreHeatStorage = IntHeatProd - RespHeatLoss - HeatFlow
 
-CoreHeatStorage = IntHeatProd - RespHeatLoss~ - HeatFlow
-
-Thus,
+As a result, PMV evaluated for ET* and SET* can be calculated using:
 
 \begin{equation}
 PMVET = (0.303{e^{ - 0.036M}} + 0.028)(H - {L_{ET*}})
@@ -502,37 +591,47 @@ PMVET = (0.303{e^{ - 0.036M}} + 0.028)(H - {L_{ET*}})
 PMVSET = (0.303{e^{ - 0.036M}} + 0.028)(H - {L_{SET*}})
 \end{equation}
 
+These equations are represented by the following lines of source code in EnergyPlus:
+
 ThermSensTransCoef = 0.303*EXP(-0.036*ActLevel) + 0.028
 
-PMVET = ThermSensTransCoef*(IntHeatProd - EvapHeatLossDiff~ \&
+PMVET = ThermSensTransCoef*(IntHeatProd - EvapHeatLossDiff - EvapHeatLossRegComf
 
-\begin{itemize}
-\tightlist
-\item
-  EvapHeatLossRegComf - RespHeatLoss - DryHeatLossET)
-\end{itemize}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~- RespHeatLoss - DryHeatLossET)
 
-PMVSET = ThermSensTransCoef*(IntHeatProd - EvapHeatLossDiff~ \&
+PMVSET = ThermSensTransCoef*(IntHeatProd - EvapHeatLossDiff
 
-\begin{itemize}
-\tightlist
-\item
-  EvapRegHeatLossReg Comf - RespHeatLoss - DryHeatLossSET)
-\end{itemize}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~- EvapRegHeatLossRegComf - RespHeatLoss - DryHeatLossSET)
 
-Besides PMV*, the Pierce Two Node Model uses the indices TSENS and DISC as predictors of thermal comfort. Where TSENS is the classical index used by the Pierce foundation, and is a function of the mean body temperature. DISC is defined as the relative thermoregulatory strain that is needed to bring about a state of comfort and thermal equilibrium. DISC is a function of the heat stress and heat strain in hot environments and equal to TSENS in cold environments. In summary, the Pierce Model, for our purposes, uses four thermal comfort indices; PMVET-a function of ET*, PMVSET- a function of SET*, TSENS and DISC.
+Besides PMV*, the Pierce Two Node Model uses the indices TSENS and DISC as predictors of thermal comfort. Where TSENS is the classical index used by the Pierce foundation and is a function of the mean body temperature. DISC is defined as the relative thermoregulatory strain that is needed to bring about a state of comfort and thermal equilibrium. DISC is a function of the heat stress and heat strain in hot environments and equal to TSENS in cold environments. In summary, the Pierce Model, for our purposes, uses four thermal comfort indices; PMVET-a function of ET*, PMVSET- a function of SET*, TSENS and DISC.
 
-\({T_{b - c}} = (0.185/58.2)(M - W) + 36.313\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ °C
+\begin{equation}
+{T_{b - c}} = (0.185/58.2)(M - W) + 36.313
+\end{equation}
 
-\({T_{b - h}} = (0.359/58.2)(M - W) + 36.664\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ °C
+\begin{equation}
+{T_{b - h}} = (0.359/58.2)(M - W) + 36.664
+\end{equation}
 
-\(TSEN{S_c} = 0.68175({T_b} - {T_{b - c}})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \({T_b} \le {T_{b - c}}\)
+When \({T_b} \le {T_{b - c}}\), TSENS is calculated using:
 
-\(TSEN{S_h} = 4.7({T_b} - {T_{b - c}})/({T_{b - h}} - {T_{b - c}})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \({T_b} > {T_{b - c}}\)
+\begin{equation}
+TSEN{S_c} = 0.68175({T_b} - {T_{b - c}}) 
+\end{equation}
+
+Otherwise, when \({T_b} > {T_{b - c}}\), TSENS is calculated using:
+
+\begin{equation}
+TSEN{S_h} = 4.7({T_b} - {T_{b - c}})/({T_{b - h}} - {T_{b - c}})
+\end{equation}
+
+Finally, DISC is calculated using the following equation:
 
 \begin{equation}
 DISC = 5.({E_{rsw}} - {E_{rsw - comf}})/({E_{\max }} - {E_{rsw - comf}} - {E_{diff}})
 \end{equation}
+
+These final equations for the Pierce Two Node Model are calculated using the following lines of source code:
 
 AvgBodyTempLow = (0.185/ActLevelConv)*IntHeatProd + 36.313
 
@@ -540,17 +639,15 @@ AvgBodyTempHigh = (0.359/ActLevelConv)*IntHeatProd + 36.664
 
 TSENS = .68175*(AvgBodyTemp-AvgBodyTempLow)
 
-TSENS = 4.7*(AvgBodyTemp - AvgBodyTempLow)/ \&
+TSENS = 4.7*(AvgBodyTemp-AvgBodyTempLow)/(AvgBodyTempHigh-AvgBodyTempLow)
 
-(AvgBodyTempHigh - AvgBodyTempLow)
+DISC = 5.*(EvapHeatLossRegSweat-EvapHeatLossRegComf)
 
-DISC = 5.*(EvapHeatLossRegSweat - EvapHeatLossRegComf)/ \&
-
-(MaxEvapHeatLoss - EvapHeatLossRegComf - DiffHeatLoss)
+~~~~~~~~~~~~~~~~/(MaxEvapHeatLoss-EvapHeatLossRegComf-DiffHeatLoss)
 
 \subsection{KSU Two-Node Model}\label{ksu-two-node-model}
 
-The KSU two-node model, developed at Kansas State University, was published in 1977 (Azer and Hsu 1977). The KSU model is quite similar to that of the Pierce Foundation. The main difference between the two models is that the KSU model predicts thermal sensation (TSV) differently for warm and cold environment.
+The KSU Two-Node Model, developed at Kansas State University, was published in 1977 (Azer and Hsu 1977). The KSU model is quite similar to that of the Pierce Foundation. The main difference between the two models is that the KSU model predicts thermal sensation (TSV) differently for warm and cold environment.
 
 \subsubsection{KSU Two Node Model Nomenclature List}\label{ksu-two-node-model-nomenclature-list}
 
@@ -558,13 +655,13 @@ The KSU two-node model, developed at Kansas State University, was published in 1
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
 \caption{  Nomenclature list for KSU Two-Node model \protect \label{table:nomenclature-list-for-ksu-two-node-model}}\\
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range & Source Code Variable \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature list for KSU Two-Node model} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range & Source Code Variable \tabularnewline
 \midrule
 \endhead
 
@@ -575,7 +672,7 @@ E\(_{dif}\) & The rate of heat loss from the diffusion of water vapor through th
 E\(_{max}\) & Maximum evaporative heat loss & W/m\(^{2}\) & ~ & EvapHeatLossMax \tabularnewline
 E\(_{sk}\) & Total evaporative heat loss from skin & W/m\(^{2}\) & ~ & EvapHeatLoss \tabularnewline
 E\(_{sw}\) & Equivalent evaporation heat loss from the sweat secreted & W/m\(^{2}\) & ~ & EvapHeatLossSweat \tabularnewline
-E\(_{sw.d}\) & Sweat function for warm and dry skin & W/m\(^{2}\) & ~ & DrySweatRate \tabularnewline
+E\(_{sw.d}\) & Sweat function for warm and dry skin & W/m\(^{2}\) & ~ & EvapHeatLossDrySweat \tabularnewline
 E\(_{res}\) & The rate of latent respiratory heat loss & W/m\(^{2}\) & - & LatRespHeatLoss \tabularnewline
 F\(_{cl}\) & The Burton thermal efficiency factor for clothing & ~ & - & CloThermEff \tabularnewline
 F\(_{pcl}\) & Permeation efficiency factor for clothing & ~ & - & CloPermeatEff \tabularnewline
@@ -604,7 +701,7 @@ T\(_{sk}\) & Skin temperature & °C & ~ & SkinTemp \tabularnewline
 TSV & Thermal sensation vote & ~ & (-4)-4 & TSV \tabularnewline
 V & Relative air velocity & m/s & - & AirVel \tabularnewline
 W & The rate of heat loss due to the performance of work & W/m\(^{2}\) & - & WorkEff \tabularnewline
-W & Skin wettedness & - & - & SkinWet \tabularnewline
+w & Skin wettedness & - & - & SkinWetTot \tabularnewline
 W\(_{cr}\) & Mass of body core per unit body surface & kg/m\(^{2}\) & ~ & - \tabularnewline
 w\(_{rsw}\) & Skin wettedness due to regulatory sweating & ~ & ~ & SkinWetSweat \tabularnewline
 w\(_{rsw-o}\) & Skin wettedness at thermal neutrality & ~ & ~ & SkinWetSweatNeut \tabularnewline
@@ -614,53 +711,85 @@ W\(_{sk}\) & Mass of skin per unit body surface & kg/m\(^{2}\) & ~ & - \tabularn
 
 \subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-2}
 
-The KSU two-node model is based on the changes that occur in the thermal conductance between the core and the skin temperature in cold environments, and in warm environments it is based on changes in the skin wettedness.
+The KSU Two-Node Model is based on the changes that occur in the thermal conductance between the core and the skin temperature in cold environments. In warm environments, the thermal conductance of the model is based on changes in the skin wettedness.
 
-In this model metabolic heat production is generated in the core which exchanges energy with the environment by respiration and the skin exchanges energy by convection and radiation. In addition, body heat is dissipated through evaporation of sweat and/or water vapor diffusion through the skin. These principles are used in following passive system equations.
+In this model, metabolic heat production is generated in the core which exchanges energy with the environment by respiration, and the skin exchanges energy with the interior environment by convection and radiation. In addition, body heat is dissipated through the evaporation of sweat and/or water vapor diffusion through the skin. These principles are outlined in the following system of equations.
 
-\({W_{cr}}{C_{cr}}d{T_{cr}}/dt = M - W - {Q_{res}} - KS({T_{cr}} - {T_{sk}})\) ~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{W_{cr}}{C_{cr}}d{T_{cr}}/dt = M - W - {Q_{res}} - KS({T_{cr}} - {T_{sk}})
+\end{equation}
 
-\({W_{sk}}{C_{sk}}d{T_{sk}}/dt = KS({T_{cr}} - {T_{sk}}) - {Q_{dry}} - {E_{sk}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{W_{sk}}{C_{sk}}d{T_{sk}}/dt = KS({T_{cr}} - {T_{sk}}) - {Q_{dry}} - {E_{sk}}
+\end{equation}
 
-Where
+where Q\(_{res}\) and Q\(_{dry}\) are calculated using:
 
-\({Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a(torr)}}) + 0.0014M(34 - {T_a})\) ~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{Q_{res}} = {E_{res}} + {C_{res}} = 0.0023M(44 - {P_{a}(torr)}) + 0.0014M(34 - {T_a})
+\end{equation}
+
+\begin{equation}
+{Q_{dry}} = {Q_c} + {Q_r} = {h_{}}{f_{cl}}{F_{cl}}({T_{sk}} - {T_o})
+\end{equation}
+
+The calculation of Q\(_{res}\) (RespHeatLoss) and Q\(_{dry}\) (DryHeatLoss) in the source code are accomplished through the following equations:
+
+RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
 
 LatRespHeatLoss = 0.0023*ActLevelTot*(44. - VapPress)
 
 DryRespHeatLoss = 0.0014*ActLevelTot*(34. - AirTemp)
 
-RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss
-
-\({Q_{dry}} = {Q_c} + {Q_r} = {h_{}}{f_{cl}}{F_{cl}}({T_{sk}} - {T_o})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
-
 DryHeatLoss = H*CloBodyRat*CloThermEff*(SkinTemp - OpTemp)
 
-\(h = {h_c} + {h_r}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+In the equation for Q\(_{dry}\), h and T\(_{o}\) are calculated using:
 
-\({h_c} = 8.3\sqrt v\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+\begin{equation}
+h = {h_c} + {h_r}
+\end{equation}
 
-\({h_r} = 3.87 + 0.031{T_r}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)°C
+\begin{equation}
+{h_c} = 8.3\sqrt v
+\end{equation}
+
+\begin{equation}
+{h_r} ={\epsilon_{avg}}(3.87 + 0.031{T_r})
+\end{equation}
+
+\begin{equation}
+{T_o} = ({h_c}{T_a} + {h_r}{T_r})/({h_c} + {h_r})
+\end{equation}
+
+These equations are represented by the following source code equations:
 
 H = Hc + Hr
 
-Hc = 8.3*SQRT(AirVel)
+Hc = 8.3*SQRT(AirVel) where AirVel is reset to 0.137 if it drops below this value
 
-Hr = 3.87 + 0.031*RadTemp
-
-\({T_o} = ({h_c}{T_a} + {h_r}{T_r})/({h_c} + {h_r})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ °C
+Hr = EmissAvg*(3.87 + 0.031*RadTemp)
 
 OpTemp = (Hc*AirTemp + Hr*RadTemp)/H
 
-and
+In the KSU Two-Node Model, evaporative heat losses are defined by these equations:
 
-For \({E_{sw}} \le {E_{\max }}\) , \({E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+For \left({E_{sw}} \le {E_{\max }}\right), {E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}
+\end{equation}
 
-For \({E_{sw}} > {E_{\max }}\) , \({E_{sk}} = {E_{\max }}\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+For \left({E_{sw}} > {E_{\max }}\right), {E_{sk}} = {E_{\max }}
+\end{equation}
 
-\({E_{diff}} = 0.408({P_{sk}} - {P_a})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{E_{diff}} = 0.408({P_{sk}} - {P_a})
+\end{equation}
 
-\({E_{\max }} = 2.2{h_c}{F_{pcl}}({P_{sk}} - {P_a})\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+\begin{equation}
+{E_{\max }} = 2.2{h_c}{F_{pcl}}({P_{sk}} - {P_a})
+\end{equation}
+
+These equations are shown in the EnergyPlus source code as:
 
 EvapHeatLoss = SkinWetSweat*EvapHeatLossMax+(1. - SkinWetSweat)*EvapHeatLossDiff
 
@@ -670,97 +799,87 @@ EvapHeatLossDiff = 0.408*(SkinVapPress - VapPress)
 
 EvapHeatLossMax = 2.2*Hc*(SkinVapPress - VapPress)*CloPermeatEff
 
-Here, control signals, based on setpoint temperatures in the skin and core, are introduced into passive system equations and these equations are integrated numerically for small time increments or small increments in core and skin temperature. The control signals modulate the thermoregulatory mechanism and regulate the peripheral blood flow, the sweat rate, and the increase of metabolic heat by active muscle shivering. The development of the controlling functions of skin conductance (KS), sweat rate (E\(_{sw}\)), and shivering (M\(_{shiv}\)) is based on their correlation with the deviations in skin and core temperatures from their setpoints.
+Here, control signals, based on setpoint temperatures in the skin and core, are introduced into the system of equations, and these equations are integrated numerically for small time increments or small increments in core and skin temperature. The control signals modulate the thermoregulatory mechanism and regulate the peripheral blood flow, the sweat rate, and the increase of metabolic heat by active muscle shivering. The development of the controlling functions of skin conductance (KS), sweat rate (E\(_{sw}\)), and shivering (M\(_{shiv}\)) is based on their correlation with the deviations in skin and core temperatures from their setpoints.
 
 \begin{equation}
-  KS = 5.3 + \frac{6.75+42.45\PB{T_{cr}-36.98}+8.15\PB{T_{cr}-35.15}^{0.8}\PB{T_{sk}-33.8}}{1+0.4\PB{32.1-T_{sk}}}
+KS = 5.3 + \frac{\RB{6.75+42.45\PB{T_{cr}-36.98}+8.15\PB{T_{cr}-35.15}^{0.8}\PB{T_{sk}-33.8}}}{1+0.4\PB{32.1-T_{sk}}}
 \end{equation}
 
-SkinCndctDilation = 42.45*CoreSignalWarmMax \&
+\begin{equation}
+E_{sw} = \phi \frac{\RB{260\PB{T_{cr} - 36.9} + 26\PB{T_{sk} - 33.8}} \exp\RB{\PB{T_{sk} - 33.8}/8.5}}{1.0 + 0.05\PB{33.37 - T_{sk}}^{2.4}}
+\end{equation}
 
-\begin{itemize}
-\tightlist
-\item
-  8.15*CoreSignalSkinSens**0.8*SkinSignalWarmMax
-\end{itemize}
+\begin{equation}
+{M_{shiv}} = 20(36.9 - {T_{cr}})(32.5 - {T_{sk}}) + 5(32.5 - {T_{sk}})
+\end{equation}
+
+where \(\phi = 1.0\) for \(w \le 0.4\) and when \(w > 0.4\):
+
+\begin{equation}
+\phi = 0.5 + 0.5\exp [ - 5.6(w - 0.4)]
+\end{equation}
+
+Within EnergyPlus, these variables are calculated using the following source code equations:
+
+SkinCndctDilation = 42.45*CoreSignalWarmMax+8.15*CoreSignalSkinSens**0.8*SkinSignalWarmMax
 
 SkinCndctConstriction = 1.0 + 0.4*SkinSignalColdMax
 
 ThermCndct = 5.3+(6.75+SkinCndctDilation)/SkinCndctConstriction
 
-\begin{equation}
-  E_{sw} = \phi \frac{\RB{260\PB{T_{cr} - 36.9} + 26\PB{T_{sk} - 33.8}} \exp\RB{\PB{T_{sk} - 33.8}/8.5}}{1.0 + 0.05\PB{33.37 - T_{sk}}^{2.4}}
-\end{equation}
-
-WeighFac = 260.+70.*AcclPattern
+WeighFac = 260.+70.*AcclPattern where the pattern of acclimation is assumed to be zero in the equation for E\(_{sw}\) above
 
 SweatCtrlFac = 1. + 0.05*SkinSignalSweatColdMax**2.4
 
-DrySweatRate = ((WeighFac*CoreSignalSweatMax \&
+EvapHeatLossDrySweat = ((WeighFac*CoreSignalSweatMax+0.1*WeighFac*SkinSignalSweatMax)
 
-\begin{itemize}
-\tightlist
-\item
-  0.1*WeighFac*SkinSignalSweatMax) \&
-\end{itemize}
+~~~~~~~~~~~~~~~~~~~~~~~~~*EXP(SkinSignalSweatMax/8.5))/SweatCtrlFac
 
-*EXP(SkinSignalSweatMax/8.5))/SweatCtrlFac
+SweatSuppFac = 1. for \(w \le 0.4\)
 
-Where
-
-\(\phi = 1.0\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \(w \le 0.4\)
-
-\(\phi = 0.5 + 0.5\exp [ - 5.6(w - 0.4)]\) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \(w > 0.4\)
-
-SweatSuppFac = 1.
-
-SweatSuppFac = 0.5 + 0.5*EXP(-5.6*SkinWetSignal)
-
-\({M_{shiv}} = 20(36.9 - {T_{cr}})(32.5 - {T_{sk}}) + 5(32.5 - {T_{sk}})\) ~~~~~~~~~~~~~~~~~~~~ W/m\(^{2}\)
+SweatSuppFac = 0.5 + 0.5*EXP(-5.6*SkinWetSignal) for \(w > 0.4\)
 
 ShivResponse = 20.*CoreSignalShivMax*SkinSignalShivMax + 5.*SkinSignalShivMax
 
-In KSU model, two new parameters are introduced and used in correlating thermal sensations with their associated physiological responses. In stead of correlating warm thermal sensations with skin wettedness, it is here correlated with a wettedness factor defined by
+In the KSU model, two new parameters are introduced and used in correlating thermal sensations with their associated physiological responses. Instead of correlating warm thermal sensations with skin wettedness, it is correlated with a wettedness factor defined by
 
 \begin{equation}
 {\varepsilon_{wsw}} = ({w_{rsw}} - {w_{rsw - o}})/(1.0 - {w_{rsw - o}})
 \end{equation}
 
-SkinWetFac = (SkinWetSweat - SkinWetNeut)/(1. - SkinWetNeut)
-
-Where
+where:
 
 \begin{equation}
 {w_{wsw}} = {E_{sw}}/{E_{\max }}
 \end{equation}
 
 \begin{equation}
-{w_{wsw - o}} = 0.2 + 0.4\{ 1.0 - \exp [ - 0.6(H/58.2 - 1.0)]\}
+{w_{rsw - o}} = 0.2 + 0.4\{ 1.0 - \exp [ - 0.6(H/58.2 - 1.0)]\}
 \end{equation}
+
+The wettedness factor is calculated using the following EnergyPlus equations:
+
+SkinWetFac = (SkinWetSweat - SkinWetNeut)/(1. - SkinWetNeut)
 
 SkinWetSweat = DrySweatRate/EvapHeatLossMax
 
 SkinWetNeut = 0.02 + 0.4*(1.-EXP(-0.6*(IntHeatProdMetMax - 1.)))
 
-and instead of correlating cold thermal sensation with the skin temperature, it is here correlated with a factor identified as vasoconstriction factor defined by
+In addition, instead of correlating cold thermal sensation with the skin temperature in the KSU model, it is correlated with a factor identified as vasoconstriction factor defined by:
 
 \begin{equation}
 {\varepsilon_{vc}} = (K{S_o} - KS)/(K{S_o} - K{S_{( - 4)}})
 \end{equation}
 
-VasoconstrictFac = (ThermCndctNeut - ThermCndct) \&
+or in the source code:
 
-/(ThermCndctNeut - ThermCndctMin)
+VasoconstrictFac=(ThermCndctNeut-ThermCndct)/(ThermCndctNeut-ThermCndctMin)
 
-Thus, TSV in the cold is a function of a vasoconstriction factor (ε\(_{vc}\)) as:
+Thus, for a cold environment, TSV is a function of a vasoconstriction factor (ε\(_{vc}\)):
 
 \begin{equation}
 TSV =  - 1.46 \times {\varepsilon_{vc}} + 3.75 \times {\varepsilon_{vc}}^2 - 6.17 \times {\varepsilon_{vc}}^3
 \end{equation}
-
-TSV = -1.46153*VasoconstrictFac + 3.74721*VasoconstrictFac**2 \&
-
-~~~~~~~~~~~~~~~~ - 6.168856*VasoconstrictFac**3
 
 and for the warm environments, TSV is defined as:
 
@@ -768,9 +887,15 @@ and for the warm environments, TSV is defined as:
 TSV = [5.0 - 6.56(RH - 0.5)] \times {\varepsilon_{wsw}}
 \end{equation}
 
+In EnergyPlus, these two equations for TSV in cold and warm environments, respectively, show up as:
+
+TSV = -1.46153*VasoconstrictFac + 3.74721*VasoconstrictFac**2
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ - 6.168856*VasoconstrictFac**3
+
 TSV = (5. - 6.56*(RelHum - 0.50))*SkinWetFac
 
-The KSU model's TSV was developed from experimental conditions in all temperature ranges and from clo levels between .05 clo to 0.7 clo and from activities levels of 1 to 6 mets (Berglund 1978).
+The KSU model's TSV was developed from experimental conditions in all temperature ranges and for clo levels between 0.05 clo and 0.7 clo and for activities levels ranging from 1 to 6 mets (Berglund 1978).
 
 \textbf{Adaptive Comfort Model}
 
@@ -916,66 +1041,68 @@ Lee KH, Schiavon S. 2013. Influence of three dynamic predictive clothing insulat
 
 \subsection{Mean Radiant Temperature Calculation}\label{mean-radiant-temperature-calculation}
 
-There are three options to calculate mean radiant temperature in the thermal comfort models. One is the zone averaged MRT, another is the surface weighted MRT, and the other is angle factor MRT. The zone averaged MRT is calculated on the assumption that a person is in the center of a space, whereas the surface weighted MRT is calculated in consideration of the surface that a person is closest to, and the angle factor MRT is calculated based on angle factors between a person and the different surfaces in a space. Here, the surface weighted MRT is the average temperature of the selected surface and zone averaged MRT and is intended to represent conditions in the limit as a person gets closer and closer to a particular surface.~ In that limit, half of the person's radiant field will be dominated by that surface and the other half will be exposed to the rest of the zone.~ Note that the surface weighted MRT is only an approximation. The angle factor MRT is the mean temperature of the surrounding surface temperatures weighted according to the magnitude of the respective angle factors and allows the user to more accurately predict thermal comfort at a particular location within a space.
+There are three options to calculate mean radiant temperature in the thermal comfort models. One is the zone averaged MRT, another is the surface weighted MRT, and the other is angle factor MRT. The zone averaged MRT is calculated on the assumption that a person is in the center of a space, whereas the surface weighted MRT is calculated in consideration of the surface that a person is closest to, and the angle factor MRT is calculated based on angle factors between a person and the different surfaces in a space. Here, the surface weighted MRT is the average temperature of the selected surface and zone averaged MRT for the remaining surfaces in the zone and is intended to represent conditions in the limit as a person gets closer and closer to a particular surface.~ In that limit, half of the person's radiant field will be dominated by that surface and the other half will be exposed to the rest of the zone.~ Note that the surface weighted MRT is only an approximation. The angle factor MRT is the mean temperature of the surrounding surface temperatures weighted according to the magnitude of the respective angle factors and allows the user to more accurately predict thermal comfort at a particular location within a space.
 
 % table 84
-\begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
+\begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}}
 \caption{Nomenclature and variable list for MRT calculation \label{table:nomenclature-and-variable-list-for-mrt}} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range
+\tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature and variable list for MRT calculation} \tabularnewline
 \toprule 
-Mathematical variable & Description & Units ~ & Range & FORTRAN variable \tabularnewline
+Mathematical variable & Description & Units ~ & Range  
+\tabularnewline
 \midrule
 \endhead
 
-T\(_{r}\) & Mean radiant temperature & °C & - & RadTemp \tabularnewline
-T\(_{r-avg}\) & Zone averaged radiant temperature & °C & - & ZoneRadTemp \tabularnewline
-T\(_{surf}\) & Surface temperature & °C & - & SurfaceTemp \tabularnewline
-F\(_{surf}\) & Angle factor between person and surface & - & 0-1 & AngleFactor \tabularnewline
+T\(_{r}\) & Mean radiant temperature & °C & - \tabularnewline
+T\(_{r-avg}\) & Zone averaged radiant temperature & °C & -  \tabularnewline
+T\(_{surf}\) & Surface temperature & °C & -  \tabularnewline
+F\(_{surf}\) & Angle factor between person and surface & - & 0-1  \tabularnewline
+A\(_{surf}\) & Area of the surface & m\(^{2}\) & - \tabularnewline
+\(\epsilon_{surf}\) & Emissivity of the surface & - & - \tabularnewline
 \bottomrule
 \end{longtable}
 
 \subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-3}
 
-The zone averaged MRT is calculated without weighting any surface temperature of the space.
+The radiant temperature for the "zone averaged" option is simply calculated from the zone mean radiant temperature (MRT) without weighting any surface temperature of the zone more than the standard MRT calculation.
 
 \begin{equation}
 {T_r} = {T_{r - avg}}
 \end{equation}
 
-RadTemp = MRT(ZoneNum)
-
-The surface weighted MRT is the average temperature of the zone averaged MRT and the temperature of the surface that a person is closest to.
+where the standard MRT is calculated using the following equation summed over all zone surfaces:
 
 \begin{equation}
-{T_r} = ({T_{r - avg}} + {T_{surf}})/2
+{T_{r - avg}} = \frac{\sum{{{\epsilon}_{i}}{{A}_{i}}{{T}_{i}}}}{\sum{{{\epsilon}_{i}}{{A}_{i}}}}
 \end{equation}
 
-ZoneRadTemp = MRT(ZoneNum)
-
-SurfaceTemp = GetSurfaceTemp(People(PeopleNum)\%SurfacePtr)
-
-RadTemp = (ZoneRadTemp + SurfaceTemp)/2.0
-
-The angle factor MRT is the mean value of surrounding surface temperatures weighted by the size of the respective angle factors between a person and each surface.
+In the surface weighted option, the radiant temperature is the average temperature of the modified zone averaged MRT and the temperature of the surface that a person is closest to.
 
 \begin{equation}
-{T_r} = {T_{surf - 1}}{F_{surf - 1}} + {T_{surf - 2}}{F_{surf - 2}} + ......... + {T_{surf - n}}{F_{surf - n}}
+{T_r} = ({T_{r - avg*}} + {T_{surf}})/2
 \end{equation}
 
-SurfTempAngleFacSummed = SurfTempAngleFacSummed \&
+where the modified zone averaged MRT is calculated the same way as the standard MRT except that the surface closest to the person is left out of the summation:
 
-\begin{itemize}
-\tightlist
-\item
-  SurfaceTemp * AngleFactorList(AngleFacNum)\%AngleFactor(SurfNum)
-\end{itemize}
+\begin{equation}
+{T_{r - avg*}} = \frac{\sum{{{\epsilon}_{i*}}{{A}_{i*}}{{T}_{i*}}}}{\sum{{{\epsilon}_{i*}}{{A}_{i*}}}}
+\end{equation}
 
-RadTemp = SurfTempAngleFacSummed
+where when i is equal to the surface being used for weighting it is not included in either summation.
+
+When the angle factor option is requested, the radiant temperature is the mean value of surrounding surface temperatures weighted by the surface emissivity, the size of the respective angle factors between a person and each surface, and the temperature to the fourth power for the surface.
+
+\begin{equation}
+{T_r} = \frac{\sum{{\epsilon_{i}}{F_{i}}{\PB{{T_{i}}}^4}}}{\sum{{\epsilon_{i}}{F_{i}}}}
+\end{equation}
+
+If all surfaces have the same emissivity that is close to unity, the emissivities in the above equation can be ignored.  However, since this is not always the case, the emissivity terms must be included in the above equation.  In addition, the temperatures to the fourth power in the above equation could be simplified to linear temperatures when the temperatures of the surfaces are fairly close.  However, as these temperatures get further apart, this linear approximation becomes increasingly poor.  As a result, since there is no guarantee that inside face surface temperatures will be close, the fourth order temperature terms are used to calculate the radiant temperature.
 
 \subsection{References}\label{references-1-012}
 

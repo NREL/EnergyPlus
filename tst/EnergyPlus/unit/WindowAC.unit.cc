@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	// this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
 	// set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
 	std::string const idf_objects = delimited_string( {
-	" Version,8.7;",
+	" Version,8.9;",
 
 	"  Timestep,6;",
 
@@ -172,8 +173,9 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    ,                        !- Condenser Air Inlet Node Name",
 	"    AirCooled,               !- Condenser Type",
 	"    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
-	"    0.0,                   !- Crankcase Heater Capacity {W}",
+	"    0.0,                     !- Crankcase Heater Capacity {W}",
 	"    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+	"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 	"    ,                        !- Supply Water Storage Tank Name",
 	"    ,                        !- Condensate Collection Water Storage Tank Name",
 	"    ,                        !- Basin Heater Capacity {W/K}",
@@ -197,7 +199,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0.0,                     !- Coefficient3 x**2",
 	"    0.5,                     !- Minimum Value of x",
 	"    1.5;                     !- Maximum Value of x  ",
-   
+
 	"  Curve:Cubic,",
 	"    HPACFFF,                 !- Name",
 	"    1.0,                     !- Coefficient1 Constant",
@@ -206,7 +208,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0.0,                     !- Coefficient4 x**3",
 	"    0.5,                     !- Minimum Value of x",
 	"    1.5;                     !- Maximum Value of x",
-    
+
 	"  Curve:Biquadratic,",
 	"    HPCoolingEIRFTemp4,      !- Name",
 	"    0.0001514017,            !- Coefficient1 Constant",
@@ -253,6 +255,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	"  ZoneHVAC:EquipmentList,",
 	"    Zone1Equipment,          !- Name",
+	"    SequentialLoad,          !- Load Distribution Scheme",
 	"    ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type",
 	"    Zone1WindAC,             !- Zone Equipment 1 Name",
 	"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -261,7 +264,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"  NodeList,",
 	"    Zone1Exhausts,           !- Name",
 	"    Zone1WindACAirInletNode; !- Node 1 Name",
-		
+
 	"  OutdoorAir:NodeList,",
 	"    OutsideAirInletNodes;    !- Node or NodeList Name 1",
 
@@ -368,8 +371,8 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0,                       !- Z Origin {m}",
 	"    1,                       !- Type",
 	"    1,                       !- Multiplier",
-	"    autocalculate,           !- Ceiling Height {m}",
-	"    autocalculate;           !- Volume {m3}",
+	"    3.048,                   !- Ceiling Height {m}",
+	"    40.;                     !- Volume {m3}",
 
 	"  BuildingSurface:Detailed,",
 	"    Zn001:Wall001,           !- Name",
@@ -430,10 +433,10 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
-	DataGlobals::NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
-	DataGlobals::MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+	DataGlobals::NumOfTimeStepInHour = 6; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 10; // must initialize this to get schedules initialized
 	ScheduleManager::ProcessScheduleInput(); // read schedule data
 
 	bool errorsFound( false );
@@ -445,7 +448,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	SimulationManager::GetProjectData();
 	OutputReportPredefined::SetPredefinedTables();
 	HeatBalanceManager::SetPreConstructionInputParameters(); //establish array bounds for constructions early
-	
+
 	DataGlobals::BeginSimFlag = true;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataGlobals::ZoneSizingCalc = true;

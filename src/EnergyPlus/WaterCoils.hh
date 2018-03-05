@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -263,6 +264,9 @@ namespace WaterCoils {
 		int DesiccantDehumNum; // index to desiccant dehumidifier object
 		Real64 DesignWaterDeltaTemp; // water deltaT for coil sizing [K]
 		bool UseDesignWaterDeltaTemp; // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
+		std::string ControllerName; // controller name used by water coil
+		int ControllerIndex; // controller index used by water coil
+		bool reportCoilFinalSizes; // one time report of sizes to coil summary report
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -375,9 +379,11 @@ namespace WaterCoils {
 			DesiccantRegenerationCoil( false ),
 			DesiccantDehumNum( 0 ),
 			DesignWaterDeltaTemp( 0.0 ),
-			UseDesignWaterDeltaTemp( false )
-		{}
-
+			UseDesignWaterDeltaTemp( false ),
+			ControllerName( "" ),
+			ControllerIndex( 0 ),
+			reportCoilFinalSizes( true )
+			{}
 	};
 
 	struct WaterCoilNumericFieldData
@@ -426,6 +432,9 @@ namespace WaterCoils {
 		int const CoilNum,
 		bool const FirstHVACIteration // unused1208
 	);
+
+	void // refactor for coil report
+	CalcAdjustedCoilUA( int const CoilNum  ); //refactor for coil report
 
 	void
 	SizeWaterCoil( int const CoilNum );

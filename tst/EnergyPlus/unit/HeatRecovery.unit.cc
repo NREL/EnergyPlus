@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -65,7 +66,6 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
 using namespace DataEnvironment;
@@ -275,9 +275,6 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
-		int write_stat;
-		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 		std::string const idf_objects = delimited_string( {
 			" Version,8.4;",
@@ -479,24 +476,18 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 			"   AHU OA Controller;         !- Controller 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetReturnAirPathInput();
 		GetAirPathData();
 		ASSERT_EQ( SimAirServingZones::HeatXchngr, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 4 ).CompType_Num );
-		// Close and delete eio output file
-		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }
 
 TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
-	int write_stat;
 	Real64 Qhr_HeatingRateTot( 0.0 );
 	int InletNode( 0 ); // Heat Recovery primary air inlet node number
 	int OutletNode( 0 ); // Heat Recovery primary air outlet node number
-
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 
 	std::string const idf_objects = delimited_string( {
@@ -529,7 +520,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    -6.00,                   !- Time Zone {hr}",
 		"    190.00;                  !- Elevation {m}",
 
-		"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C",
+		"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C",
 		"SizingPeriod:DesignDay,",
 		"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
 		"    7,                       !- Month",
@@ -559,7 +550,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    1.0;                     !- Sky Clearness",
 
 
-		"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C",
+		"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C",
 		"SizingPeriod:DesignDay,",
 		"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 		"    1,                       !- Month",
@@ -2584,6 +2575,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"    SPACE1-1 Equipment,      !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2595,6 +2587,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"    SPACE2-1 Equipment,      !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2606,6 +2599,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"    SPACE3-1 Equipment,      !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2617,6 +2611,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"    SPACE4-1 Equipment,      !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2628,6 +2623,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"    SPACE5-1 Equipment,      !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3801,7 +3797,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 ); //
 	ManageSimulation(); // run the design day
@@ -3819,14 +3815,10 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	Qhr_HeatingRateTot = ExchCond( 1 ).SupInMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 );
 
-	// Close and delete eio output file
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileSysSizing, flags ); }
-
 }
 
 TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
-	
+
 	int ExchNum( 1 );
 	int BalDesDehumPerfDataIndex( 1 );
 	Real64 FaceVelocity;
@@ -3836,7 +3828,7 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 	DataSizing::NumSysSizInput = 1;
 	DataSizing::SysSizInput.allocate( NumSysSizInput );
 	DataSizing::CurSysNum = 1; // primary air system
-	DataSizing::CurOASysNum = 0; // no OA system 
+	DataSizing::CurOASysNum = 0; // no OA system
 	DataSizing::CurZoneEqNum = 0; // size it based on system
 	DataSizing::SysSizInput( CurSysNum ).AirLoopNum = 1;
 
@@ -3870,7 +3862,7 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 
 	// calc heat recovery sizing
 	SizeHeatRecovery( ExchNum );
-	
+
 	// test autosized nominal vol flow rate
 	EXPECT_EQ( 1.0, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow ); // m3/s
 
@@ -3913,7 +3905,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// get heat recovery heat exchanger generic
 	GetHeatRecoveryInput();
@@ -3928,7 +3920,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
 	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 1.0;
 
-	// size the HX nominal supply air volume flow rate 
+	// size the HX nominal supply air volume flow rate
 	SizeHeatRecovery( ExchNum );
 
 	// verify the name and autosized supply air flow rate

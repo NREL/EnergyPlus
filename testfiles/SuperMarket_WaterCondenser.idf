@@ -30,8 +30,8 @@
 !
 ! Location:                Chicago, IL USA
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -16.6캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.6캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -16.6째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.6째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_IL_Chicago-OHare.Intl.AP_725300_TMY3
 !
@@ -43,7 +43,7 @@
 !           block covered with gypsum board on each surface. The roof is a built up roof with 1/2 in slag over 3/8 in
 !           felt and membrane with R-11 insulation over 6 in lightweight concrete, an air gap separates the interior
 !           acoustical tiles. The windows are single pane 6mm clear and double pane 6mm clear with 6mm air gap.
-!           The window to wall ratio is approxomately 0.0016.
+!           The window to wall ratio is approximately 0.0016.
 !
 !           The building is oriented due north with front of building facing east.
 !
@@ -128,7 +128,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -185,8 +185,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.4m/s, 5%=8.6m/s
- ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Temperatures, Max Drybulb=-23.7캜 Min Drybulb=35.9캜
- ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99%, MaxDB=-16.6캜
+ ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Temperatures, Max Drybulb=-23.7째C Min Drybulb=35.9째C
+ ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99%, MaxDB=-16.6째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -216,7 +216,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6캜 MWB=23캜
+ ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6째C MWB=23째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -602,7 +602,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:17,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -614,7 +614,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:22,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -626,7 +626,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:17,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -638,7 +638,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:22,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -650,7 +650,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -662,7 +662,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -912,10 +912,6 @@
     0.0063;                  !- Thickness {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
-
-  Construction,
-    IntFloorConstruction,    !- Name
-    ConcForIntFloor;         !- Outside Layer
 
   Construction,
     FurnitureConstruction,   !- Name
@@ -1399,6 +1395,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1406,6 +1403,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1419,7 +1417,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SalesFloor Node,         !- Zone Air Node Name
-    SalesFloor Outlet Node;  !- Zone Return Air Node Name
+    SalesFloor Outlet Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     BackRoom,                !- Zone Name
@@ -1427,7 +1425,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     BackRoom Node,           !- Zone Air Node Name
-    BackRoom Outlet Node;    !- Zone Return Air Node Name
+    BackRoom Outlet Node;    !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:CONSTANTVOLUME ===========
 
@@ -1460,6 +1458,7 @@
     WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
     WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     1000,                    !- Nominal Time for Condensate Removal to Begin {s}
     1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     3.0,                     !- Maximum Cycling Rate {cycles/hr}
@@ -1939,10 +1938,10 @@
     100000,                  !- Nominal Capacity {W}
     ,                        !- Free Convection Capacity {W}
     ,                        !- Free Convection Nominal Capacity Sizing Factor
-    ,                        !- Design Inlet Air Dry-Bulb Temperature
-    ,                        !- Design Inlet Air Wet-Bulb Temperature
-    ,                        !- Design Approach Temperature
-    ,                        !- Design Range Temperature
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name

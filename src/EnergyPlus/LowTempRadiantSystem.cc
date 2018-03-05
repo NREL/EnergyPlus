@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -75,8 +76,9 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -139,7 +141,6 @@ namespace LowTempRadiantSystem {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
-
 	using DataHeatBalance::Material;
 	using DataHeatBalance::TotMaterials;
 	using DataHeatBalance::MaxLayersInConstruct;
@@ -148,15 +149,12 @@ namespace LowTempRadiantSystem {
 	using DataHeatBalance::TotConstructs;
 	using DataHeatBalance::RegularMaterial;
 	using DataHeatBalance::Air;
-
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataSurfaces::HeatTransferModel_CTF;
 	using DataHeatBalFanSys::QRadSysSource; // Heat source/sink value & temperature for CondFD algo.
 	using DataHeatBalFanSys::TCondFDSourceNode;
 	using DataHVACGlobals::SmallLoad;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyTdpFnWPb;
 
 	// Data
@@ -198,6 +196,7 @@ namespace LowTempRadiantSystem {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
+	bool GetInputFlag = true;
 	int NumOfHydrLowTempRadSys( 0 ); // Number of hydronic low tempererature radiant systems
 	int NumOfCFloLowTempRadSys( 0 ); // Number of constant flow (hydronic) low tempererature radiant systems
 	int NumOfElecLowTempRadSys( 0 ); // Number of electric low tempererature radiant systems
@@ -227,6 +226,7 @@ namespace LowTempRadiantSystem {
 	Array1D< ConstantFlowRadiantSystemData > CFloRadSys;
 	Array1D< ElectricRadiantSystemData > ElecRadSys;
 	Array1D< RadSysTypeData > RadSysTypes;
+	std::unordered_map< std::string, std::string > LowTempRadUniqueNames;
 	Array1D< ElecRadSysNumericFieldData > ElecRadSysNumericFields;
 	Array1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
 
@@ -262,6 +262,8 @@ namespace LowTempRadiantSystem {
 		RadSysTypes.deallocate();
 		ElecRadSysNumericFields.deallocate();
 		HydronicRadiantSysNumericFields.deallocate();
+		LowTempRadUniqueNames.clear();
+		GetInputFlag = true;
 	}
 
 	void
@@ -285,27 +287,10 @@ namespace LowTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Needs description, as appropriate.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int RadSysNum; // Radiant system number/index in local derived types
 		int SystemType; // Type of radiant system: hydronic, constant flow, or electric
 		bool InitErrorFound( false );
@@ -317,15 +302,15 @@ namespace LowTempRadiantSystem {
 		}
 
 		//          ! Get the radiant system index and type
-		//  RadSysNum = FindItemInList(CompName,HydrRadSys%Name,NumOfHydrLowTempRadSys)
+		//  RadSysNum = UtilityRoutines::FindItemInList(CompName,HydrRadSys%Name,NumOfHydrLowTempRadSys)
 		//  IF (RadSysNum > 0) THEN  ! Found it and it is a hydronic system
 		//    SystemType = HydronicSystem
 		//  ELSE ! RadSysNum <= 0 so this CompName was not found among the hydronic systems-->check out electric systems
-		//    RadSysNum = FindItemInList(CompName,ElecRadSys%Name,NumOfElecLowTempRadSys)
+		//    RadSysNum = UtilityRoutines::FindItemInList(CompName,ElecRadSys%Name,NumOfElecLowTempRadSys)
 		//    IF (RadSysNum > 0) THEN  ! Found it and it is an electric system
 		//      SystemType = ElectricSystem
 		//    ELSE    ! RadSysNum <= 0 so this CompName was not found among the hydronic systems-->check out constant flow systems
-		//      RadSysNum = FindItemInList(CompName,CFloRadSys%Name,NumOfCFloLowTempRadSys)
+		//      RadSysNum = UtilityRoutines::FindItemInList(CompName,CFloRadSys%Name,NumOfCFloLowTempRadSys)
 		//      IF (RadSysNum > 0) THEN  ! Found it and it is an electric system
 		//        SystemType = ConstantFlowSystem
 		//      ELSE  ! RadSysNum is still <= 0 so this CompName was not found among either radiant system type-->error
@@ -336,7 +321,7 @@ namespace LowTempRadiantSystem {
 
 		// Find the correct High Temp Radiant System
 		if ( CompIndex == 0 ) {
-			RadSysNum = FindItemInList( CompName, RadSysTypes );
+			RadSysNum = UtilityRoutines::FindItemInList( CompName, RadSysTypes );
 			if ( RadSysNum == 0 ) {
 				ShowFatalError( "SimLowTempRadiantSystem: Unit not found=" + CompName );
 			}
@@ -344,11 +329,11 @@ namespace LowTempRadiantSystem {
 			SystemType = RadSysTypes( RadSysNum ).SystemType;
 			{ auto const SELECT_CASE_var( SystemType );
 			if ( SELECT_CASE_var == HydronicSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, HydrRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = UtilityRoutines::FindItemInList( CompName, HydrRadSys );
 			} else if ( SELECT_CASE_var == ConstantFlowSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, CFloRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = UtilityRoutines::FindItemInList( CompName, CFloRadSys );
 			} else if ( SELECT_CASE_var == ElectricSystem ) {
-				RadSysTypes( RadSysNum ).CompIndex = FindItemInList( CompName, ElecRadSys );
+				RadSysTypes( RadSysNum ).CompIndex = UtilityRoutines::FindItemInList( CompName, ElecRadSys );
 			}}
 		} else {
 			RadSysNum = CompIndex;
@@ -404,9 +389,6 @@ namespace LowTempRadiantSystem {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
@@ -421,23 +403,10 @@ namespace LowTempRadiantSystem {
 		using DataSizing::FractionOfAutosizedCoolingCapacity;
 		using FluidProperties::FindGlycol;
 		using General::TrimSigDigits;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataLoopNode;
 		using namespace DataSurfaceLists;
-
-
-
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		//  REAL(r64),        PARAMETER :: FlowFractionTolerance = 0.0001 ! Smallest deviation from unity for the sum of all fractions
@@ -455,12 +424,6 @@ namespace LowTempRadiantSystem {
 		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to Low Temperature Radiant system electric heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to Low Temperature Radiant system electric heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to Low Temperature Radiant system electric heating capacity sizing as fraction of autozized heating capacity
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentModuleObject; // for ease in getting objects
@@ -485,8 +448,6 @@ namespace LowTempRadiantSystem {
 		int SurfNum; // DO loop counter for surfaces
 		//unused1208  INTEGER    :: ZoneForSurface  ! Zone number that a particular surface is attached to
 		int BaseNum; // Temporary number for creating RadiantSystemTypes structure
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
@@ -495,15 +456,15 @@ namespace LowTempRadiantSystem {
 		MaxAlphas = 0;
 		MaxNumbers = 0;
 
-		GetObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
-		GetObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
-		GetObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:Electric", NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:LowTemperatureRadiant:Electric", NumArgs, NumAlphas, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
@@ -514,12 +475,13 @@ namespace LowTempRadiantSystem {
 		lAlphaBlanks.dimension( MaxAlphas, true );
 		lNumericBlanks.dimension( MaxNumbers, true );
 
-		NumOfHydrLowTempRadSys = GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:VariableFlow" );
-		NumOfCFloLowTempRadSys = GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" );
-		NumOfElecLowTempRadSys = GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:Electric" );
+		NumOfHydrLowTempRadSys = inputProcessor->getNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:VariableFlow" );
+		NumOfCFloLowTempRadSys = inputProcessor->getNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" );
+		NumOfElecLowTempRadSys = inputProcessor->getNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:Electric" );
 
 		TotalNumOfRadSystems = NumOfHydrLowTempRadSys + NumOfElecLowTempRadSys + NumOfCFloLowTempRadSys;
 		RadSysTypes.allocate( TotalNumOfRadSystems );
+		LowTempRadUniqueNames.reserve( static_cast< unsigned >( TotalNumOfRadSystems ) );
 		CheckEquipName.dimension( TotalNumOfRadSystems, true );
 
 		HydrRadSys.allocate( NumOfHydrLowTempRadSys );
@@ -558,20 +520,13 @@ namespace LowTempRadiantSystem {
 		CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
 		for ( Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			HydronicRadiantSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HydronicRadiantSysNumericFields( Item ).FieldNames = "";
 			HydronicRadiantSysNumericFields( Item ).FieldNames = cNumericFields;
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = HydronicSystem;
@@ -591,7 +546,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			HydrRadSys( Item ).ZoneName = Alphas( 3 );
-			HydrRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
+			HydrRadSys( Item ).ZonePtr = UtilityRoutines::FindItemInList( Alphas( 3 ), Zone );
 			if ( HydrRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -606,7 +561,7 @@ namespace LowTempRadiantSystem {
 
 			HydrRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( HydrRadSys( Item ).SurfListName, SurfList );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = UtilityRoutines::FindItemInList( HydrRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				HydrRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				HydrRadSys( Item ).SurfacePtr.allocate( HydrRadSys( Item ).NumOfSurfaces );
@@ -628,7 +583,7 @@ namespace LowTempRadiantSystem {
 				HydrRadSys( Item ).SurfaceFlowFrac.allocate( HydrRadSys( Item ).NumOfSurfaces );
 				HydrRadSys( Item ).NumCircuits.allocate( HydrRadSys( Item ).NumOfSurfaces );
 				HydrRadSys( Item ).SurfaceName( 1 ) = HydrRadSys( Item ).SurfListName;
-				HydrRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( HydrRadSys( Item ).SurfaceName( 1 ), Surface );
+				HydrRadSys( Item ).SurfacePtr( 1 ) = UtilityRoutines::FindItemInList( HydrRadSys( Item ).SurfaceName( 1 ), Surface );
 				HydrRadSys( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				HydrRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
@@ -669,15 +624,15 @@ namespace LowTempRadiantSystem {
 			HydrRadSys( Item ).TubeLength = Numbers( 2 );
 
 			// Process the temperature control type
-			if ( SameString( Alphas( 5 ), MeanAirTemperature ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 5 ), MeanAirTemperature ) ) {
 				HydrRadSys( Item ).ControlType = MATControl;
-			} else if ( SameString( Alphas( 5 ), MeanRadiantTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), MeanRadiantTemperature ) ) {
 				HydrRadSys( Item ).ControlType = MRTControl;
-			} else if ( SameString( Alphas( 5 ), OperativeTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), OperativeTemperature ) ) {
 				HydrRadSys( Item ).ControlType = OperativeControl;
-			} else if ( SameString( Alphas( 5 ), OutsideAirDryBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), OutsideAirDryBulbTemperature ) ) {
 				HydrRadSys( Item ).ControlType = ODBControl;
-			} else if ( SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
 				HydrRadSys( Item ).ControlType = OWBControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFields( 5 ) + " =" + Alphas( 5 ) );
@@ -687,7 +642,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			// Determine Low Temp Radiant heating design capacity sizing method
-			if ( SameString( Alphas( 6 ), "HeatingDesignCapacity" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 6 ), "HeatingDesignCapacity" ) ) {
 				HydrRadSys( Item ).HeatingCapMethod = HeatingDesignCapacity;
 				if ( ! lNumericBlanks( 3 ) ) {
 					HydrRadSys( Item ).ScaledHeatingCapacity = Numbers( 3 );
@@ -704,7 +659,7 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				}
-			} else if ( SameString( Alphas( 6 ), "CapacityPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 6 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( ! lNumericBlanks( 4 ) ) {
 					HydrRadSys( Item ).ScaledHeatingCapacity = Numbers( 4 );
@@ -725,7 +680,7 @@ namespace LowTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( 4 ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( Alphas( 6 ), "FractionOfAutosizedHeatingCapacity" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 6 ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				HydrRadSys( Item ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( ! lNumericBlanks( 5 ) ) {
 					HydrRadSys( Item ).ScaledHeatingCapacity = Numbers( 5 );
@@ -779,7 +734,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			// Determine Low Temp Radiant cooling design capacity sizing method
-			if ( SameString( Alphas( 10 ), "CoolingDesignCapacity" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 10 ), "CoolingDesignCapacity" ) ) {
 				HydrRadSys( Item ).CoolingCapMethod = CoolingDesignCapacity;
 				if ( ! lNumericBlanks( 8 ) ) {
 					HydrRadSys( Item ).ScaledCoolingCapacity = Numbers( 8 );
@@ -796,7 +751,7 @@ namespace LowTempRadiantSystem {
 						ErrorsFound = true;
 					}
 				}
-			} else if ( SameString( Alphas( 10 ), "CapacityPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 10 ), "CapacityPerFloorArea" ) ) {
 				HydrRadSys( Item ).CoolingCapMethod = CapacityPerFloorArea;
 				if ( ! lNumericBlanks( 9 ) ) {
 					HydrRadSys( Item ).ScaledCoolingCapacity = Numbers( 9 );
@@ -817,7 +772,7 @@ namespace LowTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( 9 ) );
 					ErrorsFound = true;
 				}
-			} else if (SameString( Alphas( 10 ), "FractionOfAutosizedCoolingCapacity" ) ) {
+			} else if (UtilityRoutines::SameString( Alphas( 10 ), "FractionOfAutosizedCoolingCapacity" ) ) {
 				HydrRadSys( Item ).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
 				if ( ! lNumericBlanks( 10 ) ) {
 					HydrRadSys( Item ).ScaledCoolingCapacity = Numbers( 10 );
@@ -864,11 +819,11 @@ namespace LowTempRadiantSystem {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( Alphas( 14 ), Off ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 14 ), Off ) ) {
 				HydrRadSys( Item ).CondCtrlType = CondCtrlNone;
-			} else if ( SameString( Alphas( 14 ), SimpleOff ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 14 ), SimpleOff ) ) {
 				HydrRadSys( Item ).CondCtrlType = CondCtrlSimpleOff;
-			} else if ( SameString( Alphas( 14 ), VariableOff ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 14 ), VariableOff ) ) {
 				HydrRadSys( Item ).CondCtrlType = CondCtrlVariedOff;
 			} else {
 				HydrRadSys( Item ).CondCtrlType = CondCtrlSimpleOff;
@@ -876,9 +831,9 @@ namespace LowTempRadiantSystem {
 
 			HydrRadSys( Item ).CondDewPtDeltaT = Numbers( 13 );
 
-			if ( SameString( Alphas( 15 ), OnePerSurf ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 15 ), OnePerSurf ) ) {
 				HydrRadSys( Item ).NumCircCalcMethod = OneCircuit;
-			} else if ( SameString( Alphas( 15 ), CalcFromLength ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 15 ), CalcFromLength ) ) {
 				HydrRadSys( Item ).NumCircCalcMethod = CalculateFromLength;
 			} else {
 				HydrRadSys( Item ).NumCircCalcMethod = OneCircuit;
@@ -900,15 +855,8 @@ namespace LowTempRadiantSystem {
 
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = ConstantFlowSystem;
@@ -928,7 +876,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			CFloRadSys( Item ).ZoneName = Alphas( 3 );
-			CFloRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
+			CFloRadSys( Item ).ZonePtr = UtilityRoutines::FindItemInList( Alphas( 3 ), Zone );
 			if ( CFloRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -943,7 +891,7 @@ namespace LowTempRadiantSystem {
 
 			CFloRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( CFloRadSys( Item ).SurfListName, SurfList );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = UtilityRoutines::FindItemInList( CFloRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				CFloRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				CFloRadSys( Item ).SurfacePtr.allocate( CFloRadSys( Item ).NumOfSurfaces );
@@ -968,7 +916,7 @@ namespace LowTempRadiantSystem {
 				CFloRadSys( Item ).NumCircuits.allocate( CFloRadSys( Item ).NumOfSurfaces );
 				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, CFloRadSys( Item ).NumOfSurfaces );
 				CFloRadSys( Item ).SurfaceName( 1 ) = CFloRadSys( Item ).SurfListName;
-				CFloRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( CFloRadSys( Item ).SurfaceName( 1 ), Surface );
+				CFloRadSys( Item ).SurfacePtr( 1 ) = UtilityRoutines::FindItemInList( CFloRadSys( Item ).SurfaceName( 1 ), Surface );
 				CFloRadSys( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				CFloRadSys( Item ).NumCircuits( 1 ) = 0.0;
 				// Error checking for single surfaces
@@ -1009,15 +957,15 @@ namespace LowTempRadiantSystem {
 			CFloRadSys( Item ).TubeLength = Numbers( 2 );
 
 			// Process the temperature control type
-			if ( SameString( Alphas( 5 ), MeanAirTemperature ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 5 ), MeanAirTemperature ) ) {
 				CFloRadSys( Item ).ControlType = MATControl;
-			} else if ( SameString( Alphas( 5 ), MeanRadiantTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), MeanRadiantTemperature ) ) {
 				CFloRadSys( Item ).ControlType = MRTControl;
-			} else if ( SameString( Alphas( 5 ), OperativeTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), OperativeTemperature ) ) {
 				CFloRadSys( Item ).ControlType = OperativeControl;
-			} else if ( SameString( Alphas( 5 ), OutsideAirDryBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), OutsideAirDryBulbTemperature ) ) {
 				CFloRadSys( Item ).ControlType = ODBControl;
-			} else if ( SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
 				CFloRadSys( Item ).ControlType = OWBControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFields( 5 ) + " =" + Alphas( 5 ) );
@@ -1122,11 +1070,11 @@ namespace LowTempRadiantSystem {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( Alphas( 19 ), Off ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 19 ), Off ) ) {
 				CFloRadSys( Item ).CondCtrlType = CondCtrlNone;
-			} else if ( SameString( Alphas( 19 ), SimpleOff ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 19 ), SimpleOff ) ) {
 				CFloRadSys( Item ).CondCtrlType = CondCtrlSimpleOff;
-			} else if ( SameString( Alphas( 19 ), VariableOff ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 19 ), VariableOff ) ) {
 				CFloRadSys( Item ).CondCtrlType = CondCtrlVariedOff;
 			} else {
 				CFloRadSys( Item ).CondCtrlType = CondCtrlSimpleOff;
@@ -1134,9 +1082,9 @@ namespace LowTempRadiantSystem {
 
 			CFloRadSys( Item ).CondDewPtDeltaT = Numbers( 8 );
 
-			if ( SameString( Alphas( 20 ), OnePerSurf ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 20 ), OnePerSurf ) ) {
 				CFloRadSys( Item ).NumCircCalcMethod = OneCircuit;
-			} else if ( SameString( Alphas( 20 ), CalcFromLength ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 20 ), CalcFromLength ) ) {
 				CFloRadSys( Item ).NumCircCalcMethod = CalculateFromLength;
 			} else {
 				CFloRadSys( Item ).NumCircCalcMethod = OneCircuit;
@@ -1151,20 +1099,13 @@ namespace LowTempRadiantSystem {
 
 		for ( Item = 1; Item <= NumOfElecLowTempRadSys; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			ElecRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			ElecRadSysNumericFields( Item ).FieldNames = "";
 			ElecRadSysNumericFields( Item ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), RadSysTypes, BaseNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( LowTempRadUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			++BaseNum;
 			RadSysTypes( BaseNum ).Name = Alphas( 1 );
 			RadSysTypes( BaseNum ).SystemType = ElectricSystem;
@@ -1184,7 +1125,7 @@ namespace LowTempRadiantSystem {
 			}
 
 			ElecRadSys( Item ).ZoneName = Alphas( 3 );
-			ElecRadSys( Item ).ZonePtr = FindItemInList( Alphas( 3 ), Zone );
+			ElecRadSys( Item ).ZonePtr = UtilityRoutines::FindItemInList( Alphas( 3 ), Zone );
 			if ( ElecRadSys( Item ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -1199,7 +1140,7 @@ namespace LowTempRadiantSystem {
 
 			ElecRadSys( Item ).SurfListName = Alphas( 4 );
 			SurfListNum = 0;
-			if ( NumOfSurfaceLists > 0 ) SurfListNum = FindItemInList( ElecRadSys( Item ).SurfListName, SurfList );
+			if ( NumOfSurfaceLists > 0 ) SurfListNum = UtilityRoutines::FindItemInList( ElecRadSys( Item ).SurfListName, SurfList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				ElecRadSys( Item ).NumOfSurfaces = SurfList( SurfListNum ).NumOfSurfaces;
 				ElecRadSys( Item ).SurfacePtr.allocate( ElecRadSys( Item ).NumOfSurfaces );
@@ -1216,7 +1157,7 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).SurfaceName.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfacePowerFrac.allocate( ElecRadSys( Item ).NumOfSurfaces );
 				ElecRadSys( Item ).SurfaceName( 1 ) = ElecRadSys( Item ).SurfListName;
-				ElecRadSys( Item ).SurfacePtr( 1 ) = FindItemInList( ElecRadSys( Item ).SurfaceName( 1 ), Surface );
+				ElecRadSys( Item ).SurfacePtr( 1 ) = UtilityRoutines::FindItemInList( ElecRadSys( Item ).SurfaceName( 1 ), Surface );
 				ElecRadSys( Item ).SurfacePowerFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( ElecRadSys( Item ).SurfacePtr( 1 ) == 0 ) {
@@ -1253,7 +1194,7 @@ namespace LowTempRadiantSystem {
 
 			// Heating user input data
 			// Determine Low Temp Radiant heating design capacity sizing method
-			if ( SameString( Alphas( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 				ElecRadSys( Item ).HeatingCapMethod = HeatingDesignCapacity;
 				if ( !lNumericBlanks( iHeatDesignCapacityNumericNum ) ) {
 					ElecRadSys( Item ).ScaledHeatingCapacity = Numbers( iHeatDesignCapacityNumericNum );
@@ -1269,7 +1210,7 @@ namespace LowTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatDesignCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( Alphas( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 				ElecRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 					ElecRadSys( Item ).ScaledHeatingCapacity = Numbers( iHeatCapacityPerFloorAreaNumericNum );
@@ -1291,7 +1232,7 @@ namespace LowTempRadiantSystem {
 					ShowContinueError( "Blank field not allowed for " + cNumericFields( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( Alphas( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				ElecRadSys( Item ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericBlanks(iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					ElecRadSys( Item ).ScaledHeatingCapacity = Numbers( iHeatFracOfAutosizedCapacityNumericNum );
@@ -1314,15 +1255,15 @@ namespace LowTempRadiantSystem {
 			}
 
 			// Process the temperature control type
-			if ( SameString( Alphas( 6 ), MeanAirTemperature ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 6 ), MeanAirTemperature ) ) {
 				ElecRadSys( Item ).ControlType = MATControl;
-			} else if ( SameString( Alphas( 6 ), MeanRadiantTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 6 ), MeanRadiantTemperature ) ) {
 				ElecRadSys( Item ).ControlType = MRTControl;
-			} else if ( SameString( Alphas( 6 ), OperativeTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 6 ), OperativeTemperature ) ) {
 				ElecRadSys( Item ).ControlType = OperativeControl;
-			} else if ( SameString( Alphas( 6 ), OutsideAirDryBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 6 ), OutsideAirDryBulbTemperature ) ) {
 				ElecRadSys( Item ).ControlType = ODBControl;
-			} else if ( SameString( Alphas( 6 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( Alphas( 6 ), OutsideAirWetBulbTemperature ) ) {
 				ElecRadSys( Item ).ControlType = OWBControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
@@ -1442,17 +1383,17 @@ namespace LowTempRadiantSystem {
 		// Set up the output variables for low temperature radiant systems
 		// ZoneHVAC:LowTemperatureRadiant:VariableFlow (HydrRadSys)
 		for ( Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item ) {
-			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", HydrRadSys( Item ).HeatPower, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Energy [J]", HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate [W]", HydrRadSys( Item ).CoolPower, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, HydrRadSys( Item ).HeatPower, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).HeatEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, HydrRadSys( Item ).CoolPower, "System", "Average", HydrRadSys( Item ).Name );
 
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Energy [J]", HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate [kg/s]", HydrRadSys( Item ).WaterMassFlowRate, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature [C]", HydrRadSys( Item ).WaterInletTemp, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature [C]", HydrRadSys( Item ).WaterOutletTemp, "System", "Average", HydrRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time [s]", HydrRadSys( Item ).CondCausedTimeOff, "System", "Sum", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Energy", OutputProcessor::Unit::J, HydrRadSys( Item ).CoolEnergy, "System", "Sum", HydrRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate", OutputProcessor::Unit::kg_s, HydrRadSys( Item ).WaterMassFlowRate, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature", OutputProcessor::Unit::C, HydrRadSys( Item ).WaterInletTemp, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature", OutputProcessor::Unit::C, HydrRadSys( Item ).WaterOutletTemp, "System", "Average", HydrRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time", OutputProcessor::Unit::s, HydrRadSys( Item ).CondCausedTimeOff, "System", "Sum", HydrRadSys( Item ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Hydronic Low Temp Radiant Design Water Volume Flow Rate for Heating", HydrRadSys( Item ).Name, "[m3/s]", HydrRadSys( Item ).WaterVolFlowMaxHeat );
 				SetupEMSInternalVariable( "Hydronic Low Temp Radiant Design Water Volume Flow Rate for Cooling", HydrRadSys( Item ).Name, "[m3/s]", HydrRadSys( Item ).WaterVolFlowMaxCool );
@@ -1463,24 +1404,24 @@ namespace LowTempRadiantSystem {
 		// Set up the output variables for low temperature radiant systems
 		// ZoneHVAC:LowTemperatureRadiant:ConstantFlow (CFloRadSys)
 		for ( Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item ) {
-			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", CFloRadSys( Item ).HeatPower, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Heat Transfer Energy [J]", CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate [W]", CFloRadSys( Item ).CoolPower, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy [J]", CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy [J]", CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate [kg/s]", CFloRadSys( Item ).WaterMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Injection Mass Flow Rate [kg/s]", CFloRadSys( Item ).WaterInjectionRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Recirculation Mass Flow Rate [kg/s]", CFloRadSys( Item ).WaterRecircRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature [C]", CFloRadSys( Item ).WaterInletTemp, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature [C]", CFloRadSys( Item ).WaterOutletTemp, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Inlet Temperature [C]", CFloRadSys( Item ).PumpInletTemp, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Power [W]", CFloRadSys( Item ).PumpPower, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Energy [J]", CFloRadSys( Item ).PumpEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "Electric", "Pumps", _, "Plant" );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Mass Flow Rate [kg/s]", CFloRadSys( Item ).PumpMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Rate [W]", CFloRadSys( Item ).PumpHeattoFluid, "System", "Average", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Energy [J]", CFloRadSys( Item ).PumpHeattoFluidEnergy, "System", "Sum", CFloRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time [s]", CFloRadSys( Item ).CondCausedTimeOff, "System", "Sum", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, CFloRadSys( Item ).HeatPower, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Fluid Heat Transfer Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).HeatEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPHEATINGDEMAND", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, CFloRadSys( Item ).CoolPower, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).CoolEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "PLANTLOOPCOOLINGDEMAND", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).WaterMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Injection Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).WaterInjectionRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Recirculation Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).WaterRecircRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Inlet Temperature", OutputProcessor::Unit::C, CFloRadSys( Item ).WaterInletTemp, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Outlet Temperature", OutputProcessor::Unit::C, CFloRadSys( Item ).WaterOutletTemp, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Inlet Temperature", OutputProcessor::Unit::C, CFloRadSys( Item ).PumpInletTemp, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Power", OutputProcessor::Unit::W, CFloRadSys( Item ).PumpPower, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Electric Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).PumpEnergy, "System", "Sum", CFloRadSys( Item ).Name, _, "Electric", "Pumps", _, "Plant" );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Mass Flow Rate", OutputProcessor::Unit::kg_s, CFloRadSys( Item ).PumpMassFlowRate, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Rate", OutputProcessor::Unit::W, CFloRadSys( Item ).PumpHeattoFluid, "System", "Average", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Pump Fluid Heat Gain Energy", OutputProcessor::Unit::J, CFloRadSys( Item ).PumpHeattoFluidEnergy, "System", "Sum", CFloRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Moisture Condensation Time", OutputProcessor::Unit::s, CFloRadSys( Item ).CondCausedTimeOff, "System", "Sum", CFloRadSys( Item ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Constant Flow Low Temp Radiant Design Water Mass Flow Rate", CFloRadSys( Item ).Name, "[m3/s]", CFloRadSys( Item ).WaterVolFlowMax );
 				SetupEMSActuator( "Constant Flow Low Temp Radiant", CFloRadSys( Item ).Name, "Water Mass Flow Rate", "[kg/s]", CFloRadSys( Item ).EMSOverrideOnWaterMdot, CFloRadSys( Item ).EMSWaterMdotOverrideValue );
@@ -1490,10 +1431,10 @@ namespace LowTempRadiantSystem {
 		for ( Item = 1; Item <= NumOfElecLowTempRadSys; ++Item ) {
 			// Set up the output variables for low temperature radiant systems
 			// ZoneHVAC:LowTemperatureRadiant:Electric (ElecRadSys)
-			SetupOutputVariable( "Zone Radiant HVAC Electric Power [W]", ElecRadSys( Item ).ElecPower, "System", "Average", ElecRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Electric Energy [J]", ElecRadSys( Item ).ElecEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Rate [W]", ElecRadSys( Item ).HeatPower, "System", "Average", ElecRadSys( Item ).Name );
-			SetupOutputVariable( "Zone Radiant HVAC Heating Energy [J]", ElecRadSys( Item ).HeatEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Electric Power", OutputProcessor::Unit::W, ElecRadSys( Item ).ElecPower, "System", "Average", ElecRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Electric Energy", OutputProcessor::Unit::J, ElecRadSys( Item ).ElecEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ELECTRICITY", "Heating", _, "System" );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, ElecRadSys( Item ).HeatPower, "System", "Average", ElecRadSys( Item ).Name );
+			SetupOutputVariable( "Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, ElecRadSys( Item ).HeatEnergy, "System", "Sum", ElecRadSys( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 		}
 
 	}
@@ -1565,7 +1506,7 @@ namespace LowTempRadiantSystem {
 		// FLOW:
 
 		InitErrorsFound = false;
-		
+
 		if ( MyOneTimeFlag ) {
 			MyEnvrnFlagHydr.allocate( NumOfHydrLowTempRadSys );
 			MyEnvrnFlagCFlo.allocate( NumOfCFloLowTempRadSys );
@@ -2382,9 +2323,8 @@ namespace LowTempRadiantSystem {
 						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "User-Specified Hydronic Tubing Length [m]", HydrRadSys( RadSysNum ).TubeLength );
 					}
 				} else { // Autosize or hard-size with sizing run
-					// assume tube spacing of 15 cm
 					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-					TubeLengthDes = HydrRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+					TubeLengthDes = SizeRadSysTubeLength( SystemType, RadSysNum );
 					if ( IsAutoSize ) {
 						HydrRadSys( RadSysNum ).TubeLength = TubeLengthDes;
 						ReportSizingOutput( CompType, HydrRadSys( RadSysNum ).Name, "Design Size Hydronic Tubing Length [m]", TubeLengthDes );
@@ -2544,9 +2484,8 @@ namespace LowTempRadiantSystem {
 							"User-Specified Hydronic Tubing Length [m]", CFloRadSys( RadSysNum ).TubeLength );
 					}
 				} else {	// Autosize or hard-size with sizing run
-					// assume tube spacing of 15 cm
 					// CheckZoneSizing is not required here because the tube length calculation is not dependent on zone sizing calculation results
-					TubeLengthDes = CFloRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+					TubeLengthDes = SizeRadSysTubeLength( SystemType, RadSysNum );
 					if (IsAutoSize ) {
 						CFloRadSys( RadSysNum ).TubeLength = TubeLengthDes;
 						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
@@ -2593,6 +2532,68 @@ namespace LowTempRadiantSystem {
 
 	}
 
+	Real64
+	SizeRadSysTubeLength(
+		int const RadSysType, // type of system (hydronic or constant flow)
+		int const RadSysNum   // index number for radiant system
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   August 2017
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine figures out the tube length based on the spacing of tubes.
+		// For single surface systems, this is fairly easy as there is only one spacing
+		// to deal with.  For multi-surface systems, more work is necessary because each
+		// surface could use a different spacing.
+
+		// Return value
+		Real64 SizeRadSysTubeLength;
+		
+		int SurfNum; // index for counting through the surfaces that are part of this radiant system
+		Real64 TubeLength; // temporary holding place for the function calculation
+		
+		// HydrRadSys( RadNum ).TotalSurfaceArea = 0.0;
+		// for ( SurfNum = 1; SurfNum <= HydrRadSys( RadNum ).NumOfSurfaces; ++SurfNum ) {
+		// 	HydrRadSys( RadNum ).TotalSurfaceArea += Surface( HydrRadSys( RadNum ).SurfacePtr( SurfNum ) ).Area;
+		// }
+
+		TubeLength = 0.0;
+		if ( RadSysType == HydronicSystem ) {
+			auto & thisHydrSys( HydrRadSys( RadSysNum ) );
+			for ( SurfNum = 1; SurfNum <= thisHydrSys.NumOfSurfaces; ++ SurfNum ) {
+				auto & thisHydrSysSurf( Surface( thisHydrSys.SurfacePtr( SurfNum ) ) );
+				auto & thisHydrSpacing( Construct( thisHydrSysSurf.Construction ).ThicknessPerpend );
+				if ( ( thisHydrSpacing > 0.005) && ( thisHydrSpacing < 0.5 ) ) { // limit allowable spacing to between 1cm and 1m
+					TubeLength += thisHydrSysSurf.Area / ( 2.0 * thisHydrSpacing );
+				} else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
+					TubeLength += thisHydrSysSurf.Area / 0.15;
+				}
+			}
+		} else if ( RadSysType == ConstantFlowSystem ) {
+			auto & thisCFloSys( CFloRadSys( RadSysNum ) );
+			for ( SurfNum = 1; SurfNum <= thisCFloSys.NumOfSurfaces; ++ SurfNum ) {
+				auto & thisCFloSysSurf( Surface( thisCFloSys.SurfacePtr( SurfNum ) ) );
+				auto & thisCFloSpacing( Construct( thisCFloSysSurf.Construction ).ThicknessPerpend );
+				if ( ( thisCFloSpacing > 0.005) && ( thisCFloSpacing < 0.5 ) ) { // limit allowable spacing to between 1cm and 1m
+					TubeLength += thisCFloSysSurf.Area / ( 2.0 * thisCFloSpacing );
+				} else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
+					TubeLength += thisCFloSysSurf.Area / 0.15;
+				}
+			}
+		} else {
+			// Return value
+			ShowWarningError( "SizeRadSysTubeLength: Illegal system type passed into this routine.  This should never happen." );
+			TubeLength = 60.0; // Assign a length to avoid any divide by zero errors. This length is a 3m by 3m room with 0.15m spacing.
+		}
+			
+		SizeRadSysTubeLength = TubeLength;
+		return SizeRadSysTubeLength;
+		
+	}
+	
 	void
 	CalcLowTempHydrRadiantSystem(
 		int const RadSysNum, // name of the low temperature radiant system
@@ -3349,7 +3350,7 @@ namespace LowTempRadiantSystem {
 			if ( SetPointTemp < OffTempHeat && CFloRadSys( RadSysNum ).HeatingSystem ) { // HEATING MODE
 
 				OperatingMode = HeatingMode;
-				
+
 				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).HotWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).HeatingSystem ) {
@@ -3391,7 +3392,7 @@ namespace LowTempRadiantSystem {
 			} else if ( SetPointTemp > OffTempCool && CFloRadSys( RadSysNum ).CoolingSystem ) { // COOLING MODE
 
 				OperatingMode = CoolingMode;
-				
+
 				CFloRadSys( RadSysNum ).WaterMassFlowRate = CFloRadSys( RadSysNum ).ChWaterMassFlowRate;
 
 				if ( ! CFloRadSys( RadSysNum ).CoolingSystem ) {

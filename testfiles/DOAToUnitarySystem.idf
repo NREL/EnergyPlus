@@ -15,15 +15,17 @@
 !                          side mixer terminal units for zones: SPACE4-1 and SPACE5-1.
 !
 ! Highlights:              DOAS ducted to inlet and supply side of AirLoopHVAC:UnitarySystem as Zone equipment using AirTerminal:SingleDuct:Mixer
-!
+!                          Each AirTerminal:SingleDuct:Mixers specifies outdoor air flow rate for each zone with OutDoor Air Method = either
+!                          ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedonOccupancySchedule in
+!                          DesignSpecification:OutdoorAir.
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
 !                          Run Control executes the design days only.
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7�C
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2�C MWB=25.3�C
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7.
 !
@@ -107,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -129,6 +131,12 @@
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONEAIRCONTAMINANTBALANCE ===========
+
+  ZoneAirContaminantBalance,
+    Yes,                     !- Carbon Dioxide Concentration
+    Outdoor Air CO2 Concentration;  !- Outdoor Carbon Dioxide Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
@@ -158,7 +166,7 @@
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7�C
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7°C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -190,7 +198,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2�C MWB=25.3�C
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -468,6 +476,31 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Constant,Outdoor Air CO2 Concentration,Any Number,400;
+
+  Schedule:Constant,Zone Setpoint CO2 Concentration,Any Number,1200;
+
+  Schedule:Compact,
+    Work Eff Sch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
+
+  Schedule:Compact,
+    Clothing Sch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    Air Velo Sch,            !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.137;      !- Field 3
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
 
@@ -1597,7 +1630,17 @@
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
-    ActSchd;                 !- Activity Level Schedule Name
+    ActSchd,                 !- Activity Level Schedule Name
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Enable ASHRAE 55 Comfort Warnings
+    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    Work Eff Sch,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    Clothing Sch,            !- Clothing Insulation Schedule Name
+    Air Velo Sch,            !- Air Velocity Schedule Name
+    FANGER;                  !- Thermal Comfort Model 1 Type
 
   People,
     SPACE2-1 People 1,       !- Name
@@ -1609,7 +1652,17 @@
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
-    ActSchd;                 !- Activity Level Schedule Name
+    ActSchd,                 !- Activity Level Schedule Name
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Enable ASHRAE 55 Comfort Warnings
+    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    Work Eff Sch,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    Clothing Sch,            !- Clothing Insulation Schedule Name
+    Air Velo Sch,            !- Air Velocity Schedule Name
+    FANGER;                  !- Thermal Comfort Model 1 Type
 
   People,
     SPACE3-1 People 1,       !- Name
@@ -1621,7 +1674,17 @@
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
-    ActSchd;                 !- Activity Level Schedule Name
+    ActSchd,                 !- Activity Level Schedule Name
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Enable ASHRAE 55 Comfort Warnings
+    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    Work Eff Sch,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    Clothing Sch,            !- Clothing Insulation Schedule Name
+    Air Velo Sch,            !- Air Velocity Schedule Name
+    FANGER;                  !- Thermal Comfort Model 1 Type
 
   People,
     SPACE4-1 People 1,       !- Name
@@ -1633,7 +1696,17 @@
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
-    ActSchd;                 !- Activity Level Schedule Name
+    ActSchd,                 !- Activity Level Schedule Name
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Enable ASHRAE 55 Comfort Warnings
+    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    Work Eff Sch,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    Clothing Sch,            !- Clothing Insulation Schedule Name
+    Air Velo Sch,            !- Air Velocity Schedule Name
+    FANGER;                  !- Thermal Comfort Model 1 Type
 
   People,
     SPACE5-1 People 1,       !- Name
@@ -1645,7 +1718,17 @@
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
     ,                        !- Sensible Heat Fraction
-    ActSchd;                 !- Activity Level Schedule Name
+    ActSchd,                 !- Activity Level Schedule Name
+    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
+    ,                        !- Enable ASHRAE 55 Comfort Warnings
+    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    ,                        !- Surface Name/Angle Factor List Name
+    Work Eff Sch,            !- Work Efficiency Schedule Name
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+    ,                        !- Clothing Insulation Calculation Method Schedule Name
+    Clothing Sch,            !- Clothing Insulation Schedule Name
+    Air Velo Sch,            !- Air Velocity Schedule Name
+    FANGER;                  !- Thermal Comfort Model 1 Type
 
 !-   ===========  ALL OBJECTS IN CLASS: LIGHTS ===========
 
@@ -1857,35 +1940,35 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    ProportionalControlBasedOnDesignOccupancy,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    ProportionalControlBasedOnDesignOccupancy,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    ProportionalControlBasedOnDesignOccupancy,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    ProportionalControlBasedonOccupancySchedule,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
-    Sum,                     !- Outdoor Air Method
+    ProportionalControlBasedonOccupancySchedule,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
@@ -2130,6 +2213,43 @@
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     All Zones Dual SP Control;  !- Control 1 Name
 
+!-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:ContaminantController ===========
+
+  ZoneControl:ContaminantController,
+    SPACE1-1 Contaminant Controller,  !- Name
+    SPACE1-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE2-1 Contaminant Controller,  !- Name
+    SPACE2-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE3-1 Contaminant Controller,  !- Name
+    SPACE3-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE4-1 Contaminant Controller,  !- Name
+    SPACE4-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
+  ZoneControl:ContaminantController,
+    SPACE5-1 Contaminant Controller,  !- Name
+    SPACE5-1,                !- Zone Name
+    HVACTemplate-Always 1,   !- Carbon Dioxide Control Availability Schedule Name
+    Zone Setpoint CO2 Concentration,  !- Carbon Dioxide Setpoint Schedule Name
+    Zone Minimum CO2 Concentration;  !- Minimum Carbon Dioxide Concentration Schedule Name
+
 !-   ===========  ALL OBJECTS IN CLASS: THERMOSTATSETPOINT:DUALSETPOINT ===========
 
   ThermostatSetpoint:DualSetpoint,
@@ -2157,7 +2277,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE1-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2293,7 +2413,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE2-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2352,7 +2472,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE3-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2411,7 +2531,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE4-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2470,7 +2590,7 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPACE5-1 PTAC CCoil,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- DOAS DX Cooling Coil Leaving Minimum Air Temperature {C}
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     ,                        !- Supplemental Heating Coil Object Type
     ,                        !- Supplemental Heating Coil Name
@@ -2520,7 +2640,8 @@
     SPACE1-1 PTAC Inlet,     !- Mixer Outlet Node Name
     SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE1-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE2-1 DOAS Air Terminal,  !- Name
@@ -2529,7 +2650,8 @@
     SPACE2-1 PTAC Inlet,     !- Mixer Outlet Node Name
     SPACE2-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE2-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE3-1 DOAS Air Terminal,  !- Name
@@ -2538,7 +2660,8 @@
     SPACE3-1 PTAC Inlet,     !- Mixer Outlet Node Name
     SPACE3-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Mixer Secondary Air Inlet Node Name
-    InletSide;               !- Mixer Connection Type
+    InletSide,               !- Mixer Connection Type
+    SZ DSOA SPACE3-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE4-1 DOAS Air Terminal,  !- Name
@@ -2547,7 +2670,8 @@
     SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE4-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
+    SZ DSOA SPACE4-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
@@ -2556,7 +2680,8 @@
     SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE5-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
+    SZ DSOA SPACE5-1;        !- Design Specification Outdoor Air Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
@@ -2594,6 +2719,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2605,6 +2731,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2616,6 +2743,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2627,6 +2755,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2638,6 +2767,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2655,7 +2785,7 @@
     SPACE1-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE1-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE1-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2663,7 +2793,7 @@
     SPACE2-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE2-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE2-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2671,7 +2801,7 @@
     SPACE3-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Air Terminal Mixer Secondary Inlet,  !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE3-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE3-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2679,7 +2809,7 @@
     SPACE4-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE4-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE4-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2687,7 +2817,7 @@
     SPACE5-1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 PTAC Inlet,     !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Zone Air Node,  !- Zone Air Node Name
-    SPACE5-1 Return Outlet;  !- Zone Return Air Node Name
+    SPACE5-1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -3102,7 +3232,7 @@
 
   Output:Variable,SPACE1-1 PTAC,Unitary System Sensible Cooling Rate,hourly;
 
-  Output:Variable,SPACE1-1 Heating Coil,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,SPACE1-1 Heating Coil,Heating Coil Heating Rate,hourly;
 
   Output:Variable,DOAS Mixed Air Outlet,System Node Mass Flow Rate,hourly;
 
@@ -3125,9 +3255,6 @@
   Output:Variable,DOAS Relief Air Outlet,System Node Temperature,hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DIAGNOSTICS ===========
-
-  Output:Diagnostics,
-    displayallwarnings;      !- Key 1
 
   Output:Variable,DOAS Return Air Outlet,System Node Mass Flow Rate,hourly;
 
@@ -3176,4 +3303,6 @@
   Output:Variable,SPACE4-1 Supply Inlet,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 Supply Inlet,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,*,Zone Air CO2 Concentration,hourly;
 

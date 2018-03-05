@@ -21,8 +21,8 @@
 !
 ! Location:                Newark, NJ
 !
-! Design Days:             NEWARK_NJ_USA Annual Heating 99.6%, MaxDB=-12.1캜
-!                          NEWARK_NJ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=23.8캜
+! Design Days:             NEWARK_NJ_USA Annual Heating 99.6%, MaxDB=-12.1째C
+!                          NEWARK_NJ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=23.8째C
 !
 ! Run Period (Weather File): Winter 1/7 to 1/11 (Newark NJ TMY2-based    )
 !
@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,6;
 
@@ -196,7 +196,7 @@
     -5.000000,               !- Time Zone {hr}
     9.000000;                !- Elevation {m}
 
-! NEWARK_NJ_USA Annual Heating 99.6%, MaxDB=-12.1캜
+! NEWARK_NJ_USA Annual Heating 99.6%, MaxDB=-12.1째C
 
   SizingPeriod:DesignDay,
     NEWARK Ann Htg 99.6% Condns DB,  !- Name
@@ -226,7 +226,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! NEWARK_NJ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1캜 MWB=23.8캜
+! NEWARK_NJ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1째C MWB=23.8째C
 
   SizingPeriod:DesignDay,
     NEWARK Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -787,152 +787,6 @@
     1;                       !- Cost per Area {$/m2}
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    Std MAT-CC05 4  MW CONCRETE,  !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std MAT-CC05 4  MW CONCRETE;  !- Layer 2
-
-  ComponentCost:LineItem,
-    Interior Floor,          !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-UNDERSIDE,     !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    15;                      !- Cost per Area {$/m2}
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    Std MAT-CC05 4  MW CONCRETE;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Interior Floor Slab,     !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-SLAB,          !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    35;                      !- Cost per Area {$/m2}
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Drop Ceiling,            !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    DropCeiling,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    10;                      !- Cost per Area {$/m2}
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    Std 1.5  MW CONCRETE,    !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std 1.5  MW CONCRETE;    !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Std Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Std Clear Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Std Diffusing Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05;                !- Layer 2
-
-  ComponentCost:LineItem,
-    Sloped Metal Roof,       !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Sloped_Metal_Roof,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Gable_Wall,              !- Name
-    Std PW05;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Gable Wall,              !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Gable_Wall,              !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  ComponentCost:LineItem,
-    Air Wall,                !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    AIR-WALL,                !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Swinging Door_con,   !- Name
-    Std Opaque Door panel_con;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_con,   !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Swinging Door_semi,  !- Name
-    Std Opaque Door panel_semi;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Semi-conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_semi,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Overhead Door,       !- Name
-    Std Overhead Door Panel; !- Outside Layer
-
-  ComponentCost:LineItem,
-    Overhead Door,           !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Overhead Door,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
     CBECS_Windows_Single_Pane_Tinted_0_1_fixed_south_window,  !- Name
     Grey 6MM;                !- Outside Layer
 
@@ -983,19 +837,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     1.0000;                  !- Cost per Area {$/m2}
-
-  Construction,
-    ASHRAE 90.1-2004_Sec 5.5-4_0_0.02_All Skylights without Curb_Skylight,  !- Name
-    Theoretical Glass [88];  !- Outside Layer
-
-  ComponentCost:LineItem,
-    SkylightConst:ASHRAE 90.1-2004_Sec 5.5-4_0_0.02_All Skylights without Curb_Skylight,  !- Name
-    ,                        !- Type
-    CONSTRUCTION,            !- Line Item Type
-    ASHRAE 90.1-2004_Sec 5.5-4_0_0.02_All Skylights without Curb_Skylight,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    184.6290;                !- Cost per Area {$/m2}
 
   Construction,
     CBECS_New_Restaurant_North_IEAD_Roof,  !- Name
@@ -1314,7 +1155,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1488.2332,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -1387,7 +1228,7 @@
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_1 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_1 Inlet Nodes,  !- Name
@@ -1400,6 +1241,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_1 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1857,7 +1699,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1297.9068,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -1930,7 +1772,7 @@
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_2 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_2 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_2 Inlet Nodes,  !- Name
@@ -1942,6 +1784,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_2 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2399,7 +2242,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1488.2332,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -2472,7 +2315,7 @@
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_3 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_3 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_3 Inlet Nodes,  !- Name
@@ -2484,6 +2327,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_3 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2941,7 +2785,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1297.9068,               !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -3014,7 +2858,7 @@
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_4 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_4 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_4 Inlet Nodes,  !- Name
@@ -3026,6 +2870,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_4 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3467,7 +3312,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     452.9242,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -3540,7 +3385,7 @@
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ZN_1_FLR_1_SEC_5 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     ZN_1_FLR_1_SEC_5 Air Node,  !- Zone Air Node Name
-    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node Name
+    ZN_1_FLR_1_SEC_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN_1_FLR_1_SEC_5 Inlet Nodes,  !- Name
@@ -3554,6 +3399,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     ZN_1_FLR_1_SEC_5 PTAC,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3873,7 +3719,7 @@
   WaterHeater:Stratified,
     SHWSys1 Water Heater,    !- Name
     tank backup,             !- End-Use Subcategory
-    1.0000,                  !- Tank Volume {m3}
+    1.5000,                  !- Tank Volume {m3}
     0.9697,                  !- Tank Height {m}
     VerticalCylinder,        !- Tank Shape
     ,                        !- Tank Perimeter {m}
@@ -4610,7 +4456,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCharges,     !- Name
+    AnnualEnergyCharges,     !- Utility Cost Charge Simple Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4618,7 +4464,7 @@
     0.1023;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandCharge,      !- Name
+    AnnualDemandCharge,      !- Utility Cost Charge Block Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -4633,7 +4479,7 @@
     16.24;                   !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand10kw,           !- Name
+    MinDemand10kw,           !- Utility Cost Qualify Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -4643,7 +4489,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     ConsEdisCo_No-9_GeneralLarge,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4669,7 +4515,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     ConsEdisCo_No-2_GeneralSmall,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4684,7 +4530,7 @@
     0.1329;                  !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand10kw,           !- Name
+    MaxDemand10kw,           !- Utility Cost Qualify Name
     ConsEdisCo_No-2_GeneralSmall,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -4694,7 +4540,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     ConsEdisCo_No-2_GeneralSmall,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4720,7 +4566,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     NY_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -4745,7 +4591,7 @@
     9.24;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     NY_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -4923,7 +4769,7 @@
     Mythical Wind Turbine Null Input Curve,  !- Heat Recovery Lube Energy Curve Name
     0.02,                    !- Coefficient 1 of U-Factor Times Area Curve
     0.9,                     !- Coefficient 2 of U-Factor Times Area Curve
-    0.0,                     !- Maximum Exhaust Flow per Unit of Power Output {(Kg/s)/W}
+    0.0,                     !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}
     150,                     !- Design Minimum Exhaust Temperature {C}
     25,                      !- Design Air Inlet Temperature {C}
     43500,                   !- Fuel Higher Heating Value {kJ/kg}

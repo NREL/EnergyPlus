@@ -1,10 +1,9 @@
 ! AdaptiveThermostatASH55_5Zone_Miami.idf
-
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !                          (based on 5ZoneEndUses.idf)
 !
-! Highlights:              ASHRAE Standard 55-2010 adaptive comfort model is used in Space3-1 for setting zone thermostat 
-!                          setpoint temperature schedule                
+! Highlights:              ASHRAE Standard 55-2010 adaptive comfort model is used in Space3-1 for setting zone thermostat
+!                          setpoint temperature schedule
 !                          Variety of end uses by subcategory for reporting, including:
 !                              Interior Lighting:   General, Task Lights, Accent Lighting
 !                              Interior Equipment:  Computers, Copy Machines, Fax Machines, People Movers,
@@ -19,8 +18,8 @@
 !
 ! Location:                Miami, FL
 !
-! Design Days:             Miami Intl Ap Ann Htg 99.6% Condns DB, MaxDB=8.7“C
-!                          Miami Intl Ap Ann Clg .4% Condns DB=>MWB .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap Ann Htg 99.6% Condns DB, MaxDB=8.7째째C
+!                          Miami Intl Ap Ann Clg .4% Condns DB=>MWB .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): January 1 - December 31, Miami Intl Ap FL USA WMO=722020
 !
@@ -32,7 +31,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -105,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -168,7 +167,7 @@
     ,                        !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
-    7,                      !- End Month
+    7,                       !- End Month
     31,                      !- End Day of Month
     Sunday,                  !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -193,7 +192,7 @@
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7 캜
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7 째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -225,7 +224,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -254,7 +253,6 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
-
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
@@ -427,14 +425,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03,                    !- Outside Layer
     CP01;                    !- Layer 2
@@ -531,26 +521,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Schedule:Compact,
     Always On Sch,           !- Name
@@ -1207,7 +1179,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1000,                    !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0.3,                     !- Fraction Radiant
     0,                       !- Fraction Lost
@@ -1234,7 +1206,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     300,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.2,                     !- Fraction Latent
     0.1,                     !- Fraction Radiant
     0.5,                     !- Fraction Lost
@@ -1657,7 +1629,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     808,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0.3,                     !- Fraction Radiant
     0,                       !- Fraction Lost
@@ -1684,7 +1656,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1050,                    !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.5,                     !- Fraction Latent
     0.3,                     !- Fraction Radiant
     0,                       !- Fraction Lost
@@ -2521,7 +2493,7 @@
     SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2529,7 +2501,7 @@
     SPACE2-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Exhaust Node,   !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2537,7 +2509,7 @@
     SPACE3-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Exhaust Node,   !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2545,7 +2517,7 @@
     SPACE4-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2553,7 +2525,7 @@
     SPACE5-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneList,
     AllControlledZones,      !- Name
@@ -2576,10 +2548,10 @@
 
   ZoneControl:Thermostat:OperativeTemperature,
     AllControlledZones Thermostat,  !- Thermostat Name
-    CONSTANT,                                !- Radiative Fraction Input Mode
-    0.4,                                     !- Fixed Radiative Fraction
-    ,                                        !- Radiative Fraction Schedule Name
-    AdaptiveASH55CentralLine;               !- Adaptive Comfort Model Type
+    CONSTANT,                !- Radiative Fraction Input Mode
+    0.4,                     !- Fixed Radiative Fraction
+    ,                        !- Radiative Fraction Schedule Name
+    AdaptiveASH55CentralLine;!- Adaptive Comfort Model Type
 
   ThermostatSetpoint:SingleHeating,
     HeatingSetpoint,         !- Name
@@ -2604,6 +2576,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2611,6 +2584,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2632,6 +2606,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2653,6 +2628,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2660,6 +2636,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3075,7 +3052,7 @@
   Output:Variable,*,Fan Electric Power,Hourly;
 
   Output:Variable,*,Heating Coil Gas Rate,Hourly;
-  
+
   Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,Hourly;
 
   Output:Variable,*,Zone Adaptive Comfort Operative Temperature Set Point,Hourly;

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -180,7 +181,6 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
-		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetActuatedBranchFlowRate;
@@ -201,7 +201,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( EquipName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimBaseboard: Unit not found=" + EquipName );
 			}
@@ -282,10 +282,6 @@ namespace BaseboardRadiator {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using namespace DataLoopNode;
@@ -319,13 +315,11 @@ namespace BaseboardRadiator {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
 		cCurrentModuleObject = cCMO_BBRadiator_Water;
 
-		NumConvHWBaseboards = GetNumObjectsFound( cCurrentModuleObject );
+		NumConvHWBaseboards = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// Calculate total number of baseboard units
 		NumBaseboards = NumConvHWBaseboards;
@@ -338,17 +332,13 @@ namespace BaseboardRadiator {
 			BaseboardNum = 0;
 			for ( ConvHWBaseboardNum = 1; ConvHWBaseboardNum <= NumConvHWBaseboards; ++ConvHWBaseboardNum ) {
 
-				GetObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames.allocate(NumNums);
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
 				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Baseboard, &BaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
+				if ( UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound ) ) {
 					continue;
 				}
 				VerifyUniqueBaseboardName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
@@ -376,7 +366,7 @@ namespace BaseboardRadiator {
 				TestCompSet( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Hot Water Nodes" );
 
 				// Determine steam baseboard radiator system heating design capacity sizing method
-				if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity" ) ) {
 					Baseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
 					if ( !lNumericFieldBlanks(iHeatDesignCapacityNumericNum) ) {
 						Baseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
@@ -391,7 +381,7 @@ namespace BaseboardRadiator {
 						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
 					if ( !lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -412,7 +402,7 @@ namespace BaseboardRadiator {
 						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
 						ErrorsFound = true;
 					}
-				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 					if ( !lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -451,23 +441,23 @@ namespace BaseboardRadiator {
 
 			// Setup Report variables for the unit
 			// CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Water'
-			SetupOutputVariable( "Baseboard Total Heating Energy [J]", Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Total Heating Energy", OutputProcessor::Unit::J, Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System" );
 
-			SetupOutputVariable( "Baseboard Hot Water Energy [J]", Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
+			SetupOutputVariable( "Baseboard Hot Water Energy", OutputProcessor::Unit::J, Baseboard( BaseboardNum ).Energy, "System", "Sum", Baseboard( BaseboardNum ).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System" );
 
-			SetupOutputVariable( "Baseboard Total Heating Rate [W]", Baseboard( BaseboardNum ).Power, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Total Heating Rate", OutputProcessor::Unit::W, Baseboard( BaseboardNum ).Power, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Hot Water Mass Flow Rate [kg/s]", Baseboard( BaseboardNum ).WaterMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, Baseboard( BaseboardNum ).WaterMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Air Mass Flow Rate [kg/s]", Baseboard( BaseboardNum ).AirMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Mass Flow Rate", OutputProcessor::Unit::kg_s, Baseboard( BaseboardNum ).AirMassFlowRate, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Air Inlet Temperature [C]", Baseboard( BaseboardNum ).AirInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Inlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).AirInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Air Outlet Temperature [C]", Baseboard( BaseboardNum ).AirOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Air Outlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).AirOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Water Inlet Temperature [C]", Baseboard( BaseboardNum ).WaterInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Water Inlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).WaterInletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 
-			SetupOutputVariable( "Baseboard Water Outlet Temperature [C]", Baseboard( BaseboardNum ).WaterOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
+			SetupOutputVariable( "Baseboard Water Outlet Temperature", OutputProcessor::Unit::C, Baseboard( BaseboardNum ).WaterOutletTemp, "System", "Average", Baseboard( BaseboardNum ).EquipID );
 		}
 
 	}
@@ -622,7 +612,7 @@ namespace BaseboardRadiator {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -678,7 +668,7 @@ namespace BaseboardRadiator {
 		if ( PltSizHeatNum > 0 ) {
 
 			DataScalableCapSizingON = false;
-			
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( Baseboard( BaseboardNum ).WaterVolFlowRateMax == AutoSize ) {
@@ -832,30 +822,61 @@ namespace BaseboardRadiator {
 						// set the lower and upper limits on the UA
 						UA0 = 0.001 * DesCoilLoad;
 						UA1 = DesCoilLoad;
-						// Invert the baseboard model: given the design inlet conditions and the design load,
-						// find the design UA.
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
-						// if the numerical inversion failed, issue error messages.
-						if ( SolFla == -1 ) {
-							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
-							ShowContinueError( "Iteration limit exceeded in calculating coil UA" );
-							if ( UAAutoSize ) {
-								ErrorsFound = true;
-							} else {
-								ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
-								UA = 0.0;
+
+						// before iterating on a design UA check output at lower UA bound 
+						Baseboard( BaseboardNum ).UA = UA0;
+						Real64 LoadMet = 0.0;
+						int BBIndex = BaseboardNum;
+						SimHWConvective( BBIndex, LoadMet );
+						if ( LoadMet < DesCoilLoad ) { // baseboard output should be below design load
+							// now check output at max UA (where UA = design load)
+							Baseboard( BaseboardNum ).UA = UA1;
+							SimHWConvective( BBIndex, LoadMet );
+
+							if ( LoadMet > DesCoilLoad ) { // if the load met is greater than design load, OK to iterate on UA
+								// Invert the baseboard model: given the design inlet conditions and the design load,
+								// find the design UA.
+								SolveRoot( Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par );
+								// if the numerical inversion failed, issue error messages.
+								if ( SolFla == -1 ) {
+									ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Iteration limit exceeded in calculating coil UA" );
+									if ( UAAutoSize ) {
+										ErrorsFound = true;
+									} else {
+										ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
+										UA = 0.0;
+									}
+								} else if ( SolFla == -2 ) {
+									ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Bad starting values for UA" );
+									if ( UAAutoSize ) {
+										ErrorsFound = true;
+									} else {
+										ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
+										UA = 0.0;
+									}
+								}
+								UADes = UA; //Baseboard(BaseboardNum)%UA = UA
+							} else { // baseboard design load is greater than output at UA = design load so set UA = design load
+								UADes = UA1;
+								if ( UAAutoSize ) {
+									ShowWarningError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Design UA set equal to design coil load for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+									ShowContinueError( "Design coil load used during sizing = " + RoundSigDigits( DesCoilLoad, 5 ) + " W." );
+									ShowContinueError( "Inlet water temperature used during sizing = " + RoundSigDigits( Baseboard( BaseboardNum ).WaterInletTemp, 5 ) + " C." );
+								}
 							}
-						} else if ( SolFla == -2 ) {
-							ShowSevereError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
-							ShowContinueError( "Bad starting values for UA" );
+						} else { // baseboard design load is less than output at UA = 0.001 * design load so set UA to minimum value
+							UADes = UA0;
 							if ( UAAutoSize ) {
-								ErrorsFound = true;
-							} else {
-								ShowContinueError( "Could not calculate design value for comparison to user value, and the simulation continues" );
-								UA = 0.0;
+								ShowWarningError( "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+								ShowContinueError( "Design UA set equal to 0.001 * design coil load for " + cCMO_BBRadiator_Water + "=\"" + Baseboard( BaseboardNum ).EquipID + "\"" );
+								ShowContinueError( "Design coil load used during sizing = " + RoundSigDigits( DesCoilLoad, 5 ) + " W." );
+								ShowContinueError( "Inlet water temperature used during sizing = " + RoundSigDigits( Baseboard( BaseboardNum ).WaterInletTemp, 5 ) + " C." );
 							}
 						}
-						UADes = UA; //Baseboard(BaseboardNum)%UA = UA
+
 					} else {
 						UADes = 0.0;
 					}
@@ -1231,7 +1252,6 @@ namespace BaseboardRadiator {
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataGlobals::KickOffSimulation;
 
@@ -1254,7 +1274,7 @@ namespace BaseboardRadiator {
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( BaseboardName, Baseboard, &BaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateBaseboardPlantConnection: Invalid Unit Specified " + cCMO_BBRadiator_Water + "=\"" + BaseboardName + "\"" );
 			}

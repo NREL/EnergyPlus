@@ -19,7 +19,7 @@
 ! System:   Ideal Loads
 ! Plant:    None (simple ideal loads)
 
-  Version,8.7;
+  Version,8.9;
 
   RunPeriod,
     ,                        !- Name
@@ -247,12 +247,6 @@
     CLAY TILE 2 CELL - 10 IN;!- Layer 3
 
   Construction,
-    CEILINGSLAB,             !- Name
-    CLAY TILE 2 CELL - 10 IN,!- Outside Layer
-    C13 - 6 IN HW CONCRETE,  !- Layer 2
-    BOARD INSULATION;        !- Layer 3
-
-  Construction,
     ROOFSLAB,                !- Name
     BOARD INSULATION,        !- Outside Layer
     C5 - 4 IN HW CONCRETE;   !- Layer 2
@@ -262,14 +256,6 @@
     GLASS - CLEAR SHEET 1 / 8 IN,  !- Outside Layer
     AirGap - AIRSPACE RESISTANCE,  !- Layer 2
     GLASS - CLEAR SHEET 1 / 8 IN;  !- Layer 3
-
-  Construction,
-    WOODEN DOOR,             !- Name
-    WOOD - SOFT 4MM;         !- Outside Layer
-
-  Construction,
-    HUNG CEILING,            !- Name
-    AC03 Acoustic Tile 3/4 in;  !- Outside Layer
 
 !Schedules
 
@@ -535,10 +521,10 @@
     NoWind,                  !- Wind Exposure
     0.0000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    4.72440,4.26720,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    4.72440,4.26720,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.72440,0.00000,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.72440,0.00000,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    4.72440,4.4196,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    4.72440,4.4196,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    4.72440,-0.1524,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    4.72440,-0.1524,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Vertices in World Coordinate System, beginning in exterior upper left
 
@@ -553,10 +539,10 @@
     NoWind,                  !- Wind Exposure
     0.0000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    4.72440,0.00000,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    4.72440,0.00000,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.72440,4.26720,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.72440,4.26720,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    4.72440,-0.1524,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    4.72440,-0.1524,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    4.72440,4.4196,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    4.72440,4.4196,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
 ! =========== Exterior Thermal SURFACE Object List ===========
    ! Vertices in World Coordinate System, beginning in exterior upper left
@@ -575,10 +561,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.14400,4.41960,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    9.14400,4.41960,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.87680,4.41960,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.87680,4.41960,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    9.2964,4.41960,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    9.2964,4.41960,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    4.7244,4.41960,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    4.7244,4.41960,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Vertices in World Coordinate System, beginning in exterior upper left
    ! Surface Face Azimuth:     90.00000
@@ -596,10 +582,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.29640,0.00000,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    9.29640,0.00000,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    9.29640,4.26720,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    9.29640,4.26720,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    9.29640,-0.1524,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    9.29640,-0.1524,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    9.29640,4.4196,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    9.29640,4.4196,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Vertices in World Coordinate System, beginning in exterior upper left
    ! Surface Face Azimuth:    180.00000
@@ -617,10 +603,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    4.87680,-0.15240,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    4.87680,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    9.14400,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    9.14400,-0.15240,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    4.7244,-0.15240,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    4.7244,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    9.2964,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    9.2964,-0.15240,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Opening Face Azimuth:    180.00000
    ! Opening Face Tilt:     90.00000
@@ -679,10 +665,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    9.29640,4.41960,-0.10160,  !- X,Y,Z ==> Vertex 1 {m}
-    9.29640,-0.15240,-0.10160,  !- X,Y,Z ==> Vertex 2 {m}
-    4.72440,-0.15240,-0.10160,  !- X,Y,Z ==> Vertex 3 {m}
-    4.72440,4.41960,-0.10160;  !- X,Y,Z ==> Vertex 4 {m}
+    9.29640,4.41960,0,  !- X,Y,Z ==> Vertex 1 {m}
+    9.29640,-0.15240,0,  !- X,Y,Z ==> Vertex 2 {m}
+    4.72440,-0.15240,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.72440,4.41960,0;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Vertices in World Coordinate System, beginning in exterior upper left
    ! Surface Face Azimuth:      0.00000
@@ -700,10 +686,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    4.57200,4.41960,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    4.57200,4.41960,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.30480,4.41960,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.30480,4.41960,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    4.7244,4.41960,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    4.7244,4.41960,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.1524,4.41960,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.1524,4.41960,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Vertices in World Coordinate System, beginning in exterior upper left
    ! Surface Face Azimuth:    180.00000
@@ -721,10 +707,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.30480,-0.15240,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    0.30480,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    4.57200,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    4.57200,-0.15240,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    0.1524,-0.15240,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    0.1524,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    4.7244,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    4.7244,-0.15240,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Opening Face Azimuth:    180.00000
    ! Opening Face Tilt:     90.00000
@@ -762,10 +748,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.15240,4.26720,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
-    0.15240,4.26720,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.15240,0.00000,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.15240,0.00000,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
+    0.15240,4.4196,2.43840,  !- X,Y,Z ==> Vertex 1 {m}
+    0.15240,4.4196,0.00000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.15240,-0.15240,0.00000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.15240,-0.15240,2.43840;  !- X,Y,Z ==> Vertex 4 {m}
 
    ! Vertices in World Coordinate System, beginning in exterior upper left
    ! Roof Face Azimuth:     -1.00000
@@ -804,10 +790,10 @@
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
-    4.72440,-0.15240,-0.10160,  !- X,Y,Z ==> Vertex 1 {m}
-    0.15240,-0.15240,-0.10160,  !- X,Y,Z ==> Vertex 2 {m}
-    0.15240,4.41960,-0.10160,  !- X,Y,Z ==> Vertex 3 {m}
-    4.72440,4.41960,-0.10160;  !- X,Y,Z ==> Vertex 4 {m}
+    4.72440,-0.15240,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.15240,-0.15240,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.15240,4.41960,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.72440,4.41960,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   ZoneControl:Thermostat,
     DElight Zone Thermostat, !- Name
@@ -841,7 +827,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_5,                  !- Zone Air Node Name
-    NODE_6;                  !- Zone Return Air Node Name
+    NODE_6;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
@@ -849,10 +835,11 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_3,                  !- Zone Air Node Name
-    NODE_4;                  !- Zone Return Air Node Name
+    NODE_4;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone2Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -860,6 +847,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -870,6 +858,7 @@
     ,                        !- Availability Schedule Name
     NODE_2,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -898,6 +887,7 @@
     ,                        !- Availability Schedule Name
     NODE_1,                  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

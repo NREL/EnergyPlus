@@ -26,7 +26,7 @@
 !           Overhang depth also design parameter (for West and East window separately)
 !           Solar, visible, and thermal transmittance of shading device also design parameter
 
-  Version,8.7;
+  Version,8.9;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
@@ -50,7 +50,7 @@
     yes,                     !- Use Weather File Rain Indicators
     yes;                     !- Use Weather File Snow Indicators
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3�C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -80,7 +80,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5�C MCWB=  23.0�C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -362,10 +362,10 @@
   Building,
     office zone,             !- Name
     0,                       !- North Axis {deg}
-    1,                       !- Terrain
+    Country,                       !- Terrain // changed from '1', no enum indices allowed
     4.0000000E-02,           !- Loads Convergence Tolerance Value
     4.0000000E-01,           !- Temperature Convergence Tolerance Value {deltaC}
-    1,                       !- Solar Distribution
+    FullExteriorWithReflections,                       !- Solar Distribution // changed from '1', no enum indices allowed
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
@@ -1190,7 +1190,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1,                       !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost
@@ -1205,7 +1205,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     1,                       !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     1,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost

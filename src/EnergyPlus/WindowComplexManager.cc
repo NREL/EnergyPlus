@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -70,7 +71,6 @@
 #include <DataSystemVariables.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <PierceSurface.hh>
 #include <Psychrometrics.hh>
 #include <TARCOGGassesParams.hh>
@@ -78,6 +78,7 @@
 #include <TARCOGParams.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
+#include <ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -2078,7 +2079,8 @@ namespace WindowComplexManager {
 		}
 
 		//Set the nominal diffuse transmittance so the surface isn't mistaken as opaque
-		Construct( IConst ).TransDiff = SurfaceWindow( ISurf ).ComplexFen.State( IState ).WinDiffTrans;
+		// Simon: Commented this out. We are not using TransDiff and it is already set to 0.1 in input routines.
+		// Construct( IConst ).TransDiff = SurfaceWindow( ISurf ).ComplexFen.State( IState ).WinDiffTrans;
 		//Calculate Window Sky Transmittance (transmitted radiation assumed diffuse)
 		//and Sky Absorptance (by layer)
 		Sum1 = 0.0;
@@ -2604,32 +2606,45 @@ namespace WindowComplexManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		UnitVect = Vector( 0.0, 0.0, 0.0 );
+
+		Real64 const sin_Phi = std::sin( Phi );
+		Real64 const cos_Phi = std::cos( Phi );
+
+		Real64 const sin_Gamma = std::sin( Gamma );
+		Real64 const cos_Gamma = std::cos( Gamma );
+
+		Real64 const sin_Alpha = std::sin( Alpha );
+		Real64 const cos_Alpha = std::cos( Alpha );
+
+		Real64 const sin_Theta = std::sin( Theta );
+		Real64 const cos_Theta = std::cos( Theta );
+
 		{ auto const SELECT_CASE_var( RadType );
 		if ( SELECT_CASE_var == Front_Incident ) { //W6 vector will point in direction of propagation, must reverse to get world vector
 			//  after the W6 vector has been rotated into the world CS
-			UnitVect.x = std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha );
-			UnitVect.z = -( std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma ) );
+			UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha;
+			UnitVect.z = -( sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma );
 		} else if ( SELECT_CASE_var == Front_Transmitted ) {
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = -( std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = -( sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha );
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Front_Reflected ) {
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) + std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Back_Incident ) {
-			UnitVect.x = std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha );
-			UnitVect.z = -std::cos( Theta ) * std::cos( Gamma ) - std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma );
+			UnitVect.x = sin_Theta * sin_Phi * cos_Gamma * sin_Alpha - sin_Theta * cos_Phi * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * cos_Alpha;
+			UnitVect.z = -cos_Theta * cos_Gamma - sin_Theta * sin_Phi * sin_Gamma;
 		} else if ( SELECT_CASE_var == Back_Transmitted ) { //This is same as front reflected
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::sin( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) - std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) + std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * sin_Alpha + cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = cos_Theta * sin_Gamma * cos_Alpha - sin_Theta * cos_Phi * sin_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha;
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma + cos_Theta * cos_Gamma;
 		} else if ( SELECT_CASE_var == Back_Reflected ) { //This is same as front transmitted
-			UnitVect.x = std::sin( Theta ) * std::cos( Phi ) * std::cos( Alpha ) - std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) - std::cos( Theta ) * std::sin( Gamma ) * std::sin( Alpha );
-			UnitVect.y = -( std::sin( Theta ) * std::cos( Phi ) * std::sin( Alpha ) + std::sin( Theta ) * std::sin( Phi ) * std::cos( Gamma ) * std::cos( Alpha ) + std::cos( Theta ) * std::sin( Gamma ) * std::cos( Alpha ) );
-			UnitVect.z = std::sin( Theta ) * std::sin( Phi ) * std::sin( Gamma ) - std::cos( Theta ) * std::cos( Gamma );
+			UnitVect.x = sin_Theta * cos_Phi * cos_Alpha - sin_Theta * sin_Phi * cos_Gamma * cos_Alpha - cos_Theta * sin_Gamma * sin_Alpha;
+			UnitVect.y = -( sin_Theta * cos_Phi * sin_Alpha + sin_Theta * sin_Phi * cos_Gamma * cos_Alpha + cos_Theta * sin_Gamma * cos_Alpha );
+			UnitVect.z = sin_Theta * sin_Phi * sin_Gamma - cos_Theta * cos_Gamma;
 		}}
 
 		// Remove small numbers from evaluation (due to limited decimal points for pi)
@@ -2976,7 +2991,6 @@ namespace WindowComplexManager {
 		using Psychrometrics::PsyTdpFnWPb;
 		using General::InterpSlatAng; // Function for slat angle interpolation
 		using General::InterpSw;
-		using InputProcessor::SameString;
 		using DataHeatBalSurface::HcExtSurf;
 		using DataGlobals::StefanBoltzmann;
 		using TARCOGGassesParams::maxgas;
@@ -2985,6 +2999,8 @@ namespace WindowComplexManager {
 		using DataHeatBalance::GasCoeffsAir;
 		using DataHeatBalance::SupportPillar;
 		using TARCOGMain::TARCOG90;
+		using ScheduleManager::GetCurrentScheduleValue;
+		using DataGlobals::AnyLocalEnvironmentsInModel;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3195,13 +3211,6 @@ namespace WindowComplexManager {
 		//   (sum of solid layers and gap layers)
 		int Lay; // Layer number
 		int LayPtr; // Material number for a layer
-		int ShadingLayPtr; // Shading layer pointer for effective temperature calculations
-		int GlassLayPtr; // Glass layer pointer for effective temperature calculations
-		Real64 EpsGlassIR;
-		Real64 RhoGlassIR;
-		Real64 TauShadeIR;
-		Real64 EpsShadeIR;
-		Real64 RhoShadeIR;
 		int IGlass; // glass layer number (1,2,3,...)
 		int IGap; // Gap layer number (1,2,...)
 		int TotGlassLay; // Total number of glass layers in a construction
@@ -3218,8 +3227,6 @@ namespace WindowComplexManager {
 		int ZoneNumAdj; // An interzone surface's adjacent zone number
 		int ShadeFlag; // Flag indicating whether shade or blind is on, and shade/blind position
 		int IMix;
-		Real64 EffShBlEmiss; // Effective interior shade or blind emissivity
-		Real64 EffGlEmiss; // Effective inside glass emissivity when interior shade or blind
 
 		Real64 IncidentSolar; // Solar incident on outside of window (W)
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
@@ -3277,6 +3284,13 @@ namespace WindowComplexManager {
 		Real64 outir;
 		Real64 Ebout;
 		Real64 dominantGapWidth; // store value for dominant gap width.  Used for airflow calculations
+		Real64 edgeGlCorrFac;
+
+		int SrdSurfsNum; // Surrounding surfaces list number
+		int SrdSurfNum; // Surrounding surface number DO loop counter
+		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
+		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+		Real64 OutSrdIR;
 
 		// fill local vars
 
@@ -3347,7 +3361,11 @@ namespace WindowComplexManager {
 					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 				}
 				// a weighted average of the inlet temperatures.
-				RefAirTemp = SumSysMCpT / SumSysMCp;
+				if ( SumSysMCp > 0.0 ) {
+					RefAirTemp = SumSysMCpT / SumSysMCp;
+				} else {
+					RefAirTemp = MAT( ZoneNum );
+				}
 			} else {
 				// currently set to mean air temp but should add error warning here
 				RefAirTemp = MAT( ZoneNum );
@@ -3385,7 +3403,11 @@ namespace WindowComplexManager {
 						SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
 					}
 					// a weighted average of the inlet temperatures.
-					RefAirTemp = SumSysMCpT / SumSysMCp;
+					if ( SumSysMCp > 0.0 ) {
+						RefAirTemp = SumSysMCpT / SumSysMCp;
+					} else {
+						RefAirTemp = MAT( ZoneNumAdj );
+					}
 				} else {
 					// currently set to mean air temp but should add error warning here
 					RefAirTemp = MAT( ZoneNumAdj );
@@ -3402,7 +3424,24 @@ namespace WindowComplexManager {
 				outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QCoolingPanelSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
-
+				// Calculate LWR from surrounding surfaces if defined for an exterior window
+				OutSrdIR = 0;
+				if ( AnyLocalEnvironmentsInModel ) {
+					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
+						}
+						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
+							Surface( SurfNum ).ViewFactorGroundIR = SurroundingSurfsProperty( SrdSurfsNum ).GroundViewFactor;
+						}					
+						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+							OutSrdIR += StefanBoltzmann * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+						}
+					}
+				}
 				if ( Surface( SurfNum ).ExtWind ) { // Window is exposed to wind (and possibly rain)
 					if ( IsRain ) { // Raining: since wind exposed, outside window surface gets wet
 						tout = Surface( SurfNum ).OutWetBulbTemp + KelvinConv;
@@ -3415,7 +3454,7 @@ namespace WindowComplexManager {
 				//tsky = SkyTemp + TKelvin
 				tsky = SkyTempKelvin;
 				Ebout = sigma * pow_4( tout );
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout + OutSrdIR;
 
 			}
 
@@ -3500,10 +3539,6 @@ namespace WindowComplexManager {
 				YoungsMod( IGlass ) = Material( LayPtr ).YoungModulus;
 				PoissonsRat( IGlass ) = Material( LayPtr ).PoissonsRatio;
 			} else if ( Material( LayPtr ).Group == ComplexWindowShade ) {
-				if ( CalcCondition == noCondition ) {
-					if ( Lay == 1 ) SurfaceWindow( SurfNum ).ShadingFlag = ExtShadeOn;
-					if ( Lay == TotLay ) SurfaceWindow( SurfNum ).ShadingFlag = IntShadeOn;
-				}
 				++IGlass;
 				TempInt = Material( LayPtr ).ComplexShadePtr;
 				LayerType( IGlass ) = ComplexShade( TempInt ).LayerType;
@@ -3677,8 +3712,13 @@ namespace WindowComplexManager {
 			theta = 273.15;
 		}
 
+		if ( SurfNum != 0 )
+			edgeGlCorrFac = SurfaceWindow( SurfNum ).EdgeGlCorrFac;
+		else
+			edgeGlCorrFac = 1;
+
 		//  call TARCOG
-		TARCOG90( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CalcDeflection, Pa, Pini, Tini, gap, GapDefMax, thick, scon, YoungsMod, PoissonsRat, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, gcon, gvis, gcp, wght, gama, nmix, SupportPlr, PillarSpacing, PillarRadius, theta, LayerDef, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgap, hrgap, shgc, nperr, tarcogErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, hg, hr, hs, he, hi, Ra, Nu, standard, ThermalMod, Debug_mode, Debug_dir, Debug_file, Window_ID, IGU_ID, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, CalcSHGC, NumOfIterations );
+		TARCOG90( nlayer, iwd, tout, tind, trmin, wso, wsi, dir, outir, isky, tsky, esky, fclr, VacuumPressure, VacuumMaxGapThickness, CalcDeflection, Pa, Pini, Tini, gap, GapDefMax, thick, scon, YoungsMod, PoissonsRat, tir, emis, totsol, tilt, asol, height, heightt, width, presure, iprop, frct, gcon, gvis, gcp, wght, gama, nmix, SupportPlr, PillarSpacing, PillarRadius, theta, LayerDef, q, qv, ufactor, sc, hflux, hcin, hcout, hrin, hrout, hin, hout, hcgap, hrgap, shgc, nperr, tarcogErrorMessage, shgct, tamb, troom, ibc, Atop, Abot, Al, Ar, Ah, SlatThick, SlatWidth, SlatAngle, SlatCond, SlatSpacing, SlatCurve, vvent, tvent, LayerType, nslice, LaminateA, LaminateB, sumsol, hg, hr, hs, he, hi, Ra, Nu, standard, ThermalMod, Debug_mode, Debug_dir, Debug_file, Window_ID, IGU_ID, ShadeEmisRatioOut, ShadeEmisRatioIn, ShadeHcRatioOut, ShadeHcRatioIn, HcUnshadedOut, HcUnshadedIn, Keff, ShadeGapKeffConv, SDScalar, CalcSHGC, NumOfIterations, edgeGlCorrFac );
 
 		// process results from TARCOG
 		if ( ( nperr > 0 ) && ( nperr < 1000 ) ) { // process error signal from tarcog
@@ -3865,32 +3905,12 @@ namespace WindowComplexManager {
 			if ( ShadeFlag == IntShadeOn ) {
 				SurfInsideTemp = theta( 2 * ngllayer + 2 ) - KelvinConv;
 
-				// Get properties of inside shading layer
-				ShadingLayPtr = Construct( ConstrNum ).LayerPoint( TotLay );
-				ShadingLayPtr = Material( ShadingLayPtr ).ComplexShadePtr;
-				TauShadeIR = ComplexShade( ShadingLayPtr ).IRTransmittance;
-				EpsShadeIR = ComplexShade( ShadingLayPtr ).FrontEmissivity;
-				RhoShadeIR = max( 0.0, 1.0 - TauShadeIR - EpsShadeIR );
+				// // Get properties of inside shading layer
 
-				// Get properties of glass next to inside shading layer
-				GlassLayPtr = Construct( ConstrNum ).LayerPoint( TotLay - 2 );
-				EpsGlassIR = Material( GlassLayPtr ).AbsorpThermalBack;
-				RhoGlassIR = 1 - EpsGlassIR;
-
-				EffShBlEmiss = EpsShadeIR * ( 1.0 + RhoGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR ) );
-				SurfaceWindow( SurfNum ).EffShBlindEmiss = EffShBlEmiss;
-				EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR );
-				SurfaceWindow( SurfNum ).EffGlassEmiss = EffGlEmiss;
-				//  EffShBlEmiss = InterpSlatAng(SurfaceWindow(SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum)%MovableSlats, &
-				//                    SurfaceWindow(SurfNum)%EffShBlindEmiss)
-				//  EffGlEmiss   = InterpSlatAng(SurfaceWindow(SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum)%MovableSlats, &
-				//                    SurfaceWindow(SurfNum)%EffGlassEmiss)
+				Real64 EffShBlEmiss = SurfaceWindow( SurfNum ).EffShBlindEmiss[ 0 ];
+				Real64 EffGlEmiss = SurfaceWindow( SurfNum ).EffGlassEmiss[ 0 ];
 				SurfaceWindow( SurfNum ).EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( theta( 2 * ngllayer ) - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
-				//ELSE
-				//  SurfInsideTemp = theta(2*ngllayer) - TKelvin
-				//END IF
-				//IF(ShadeFlag == ExtShadeOn .OR. ShadeFlag == ExtBlindOn .OR. ShadeFlag == ExtScreenOn) THEN
-				//SurfOutsideTemp = theta(2*ngllayer+1) - TKelvin  !this looks wrong.
+
 			} else {
 				SurfOutsideTemp = theta( 1 ) - KelvinConv;
 			}

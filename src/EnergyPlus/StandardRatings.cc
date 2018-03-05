@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -182,13 +183,13 @@ namespace StandardRatings {
 	// Test H3 (low and High Speed) Std. AHRI 210/240
 
 	// ANSI/ASHRAE Standard 127-2012 -- Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
-	//  Class 1 23.9°C( 75.0°F ) 23.9°C( 75.0°F ) 23.9°C( 75.0°F ) 23.9°C( 75.0°F )
-	//	Class 2 29.4°C( 85.0°F ) 29.4°C( 85.0°F ) 29.4°C( 85.0°F ) 29.4°C( 85.0°F )
-	//	Class 3 35.0°C( 95.0°F ) 35.0°C( 95.0°F ) 35.0°C( 95.0°F ) 35.0°C( 95.0°F )
-	//	Class 4 40.5°C( 105°F ) 40.5°C( 105°F ) 40.5°C( 105°F ) 40.5°C( 105°F )
+	//  Class 1 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F )
+	//	Class 2 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F )
+	//	Class 3 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F )
+	//	Class 4 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F )
 	Array1D < Real64 > const IndoorDBTempClassI2IV( 4, { 23.9, 29.4, 35.0, 40.5 } );
 	Real64 const IndoorTDPA2D( 11.1 );
-	//35.0°C( 95.0°F ) 26.7°C( 80.0°F ) 18.3°C( 65.0°F ) 4.4°C( 40.0°F )
+	//35.0C( 95.0F ) 26.7C( 80.0F ) 18.3C( 65.0F ) 4.4C( 40.0F )
 	Array1D < Real64 > const OutdoorDBTempAllClassA2D( 4, { 35.0, 26.7, 18.3, 4.4 } );
 
 	// Functions
@@ -237,7 +238,7 @@ namespace StandardRatings {
 		// Using/Aliasing
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 		using General::RoundSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
@@ -384,7 +385,7 @@ namespace StandardRatings {
 				Par( 11 ) = OpenMotorEff;
 				CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
 				CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-				SolveRegulaFalsi( Acc, IterMax, SolFla, CondenserOutletTemp, ReformEIRChillerCondInletTempResidual, CondenserOutletTemp0, CondenserOutletTemp1, Par );
+				SolveRoot( Acc, IterMax, SolFla, CondenserOutletTemp, ReformEIRChillerCondInletTempResidual, CondenserOutletTemp0, CondenserOutletTemp1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating Reform Chiller IPLV" );
 					ShowContinueError( "Reformulated Chiller IPLV calculation failed for " + ChillerName );
@@ -1023,6 +1024,8 @@ namespace StandardRatings {
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveMinMaxValues;
 		using CurveManager::GetCurveType;
+		using CurveManager::GetCurveName;
+		using General::RoundSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1145,6 +1148,41 @@ namespace StandardRatings {
 		TotalHeatingCapH3Test = RatedTotalCapacity * CapTempModFacH3Test * TotCapFlowModFac;
 		NetHeatingCapH3Test = TotalHeatingCapH3Test + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
 
+		// check curves value
+		if ( TotCapTempModFacRated < 0.0 || CapTempModFacH2Test < 0.0 || CapTempModFacH3Test < 0.0 || EIRTempModFacRated < 0.0 || EIRTempModFacH2Test < 0.0 || EIRTempModFacH3Test < 0.0 ) {
+			if ( TotCapTempModFacRated < 0.0 ) {
+				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( TotCapTempModFacRated, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
+				ShowContinueError( " ...Net heating capacity at high temperature is set to zero. The curve value must be > 0. Check the curve." );
+				NetHeatingCapRated = 0.0;
+			}
+			if ( CapTempModFacH3Test < 0.0 ) {
+				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( CapTempModFacH3Test, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
+				ShowContinueError( " ...Net heating capacity at low temperature is set to zero. The curve value must be > 0. Check the curve." );
+				NetHeatingCapH3Test = 0.0;
+			}
+			if ( CapTempModFacH2Test < 0.0 ) {
+				ShowSevereError( " Invalid Total Heating Capacity Function of Temperature Curve value = " + RoundSigDigits( CapTempModFacH2Test, 2 ) + ", Curve Type = " + GetCurveType( CapFTempCurveIndex ) + ", Curve Name = " + GetCurveName( CapFTempCurveIndex ) );
+				ShowContinueError( " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve." );
+				NetHeatingCapH3Test = 0.0;
+			}
+			// check EIR curve values
+			if ( EIRTempModFacRated < 0.0 ) {
+				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacRated, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
+				ShowContinueError( " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve." );
+			}
+			if ( EIRTempModFacH2Test < 0.0 ) {
+				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacH2Test, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
+				ShowContinueError( " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve." );
+			}
+			if ( EIRTempModFacH3Test < 0.0 ) {
+				ShowSevereError( " Invalid EIR Function of Temperature Curve value = " + RoundSigDigits( EIRTempModFacH3Test, 2 ) + ", Curve Type = " + GetCurveType( EIRFTempCurveIndex ) + ", Curve Name = " + GetCurveName( EIRFTempCurveIndex ) );
+				ShowContinueError( " ...HSPF calculation is incorrect. The curve value must be > 0. Check the curve." );
+			}
+			ShowContinueError( " ...HSPF value has been reset to 0.0 and simulation is continuing." );
+			HSPF = 0.0;
+			return;
+		}
+
 		if ( RatedCOP > 0.0 ) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
 
 			EIRRated = EIRTempModFacRated * EIRFlowModFac / RatedCOP;
@@ -1262,7 +1300,6 @@ namespace StandardRatings {
 		if ( TotalElectricalEnergy != 0.0 ) {
 			HSPF = TotalBuildingLoad * DemandDeforstCredit / TotalElectricalEnergy;
 		}
-
 	}
 
 	void

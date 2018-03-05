@@ -13,7 +13,7 @@
 ! System:   None.
 ! Plant:    A chain of 5 plant loops that connect LoadProfile:Plant objects to DistrictCooling and DistrictHeating by heat exchangers
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -39,7 +39,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5Â°C MWB=23Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -69,7 +69,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+ ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
@@ -232,7 +232,7 @@
     USE Heat Supply Heating Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowSupplyUnMixedDemandMixed,  !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     HeatingSetpointModulated,!- Control Type
     Use heat Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -430,7 +430,7 @@
     USE Cool Supply Cooling Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     CrossFlowBothUnMixed,    !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     CoolingSetpointModulated,!- Control Type
     Use Cool Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -640,7 +640,7 @@
     TRANSFER Supply Heating Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     ParallelFlow,            !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     HeatingSetpointModulated,!- Control Type
     TRANSFER Supply Heating Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -670,7 +670,7 @@
     TRANSFER Supply Cooling Outlet Node,  !- Loop Supply Side Outlet Node Name
     0.003,                   !- Loop Supply Side Design Flow Rate {m3/s}
     ParallelFlow,            !- Heat Exchange Model Type
-    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/k}
+    15000,                   !- Heat Exchanger U-Factor Times Area Value {W/K}
     CoolingSetpointModulated,!- Control Type
     TRANSFER Supply Cooling Outlet Node,  !- Heat Exchanger Setpoint Node Name
     0.2,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}

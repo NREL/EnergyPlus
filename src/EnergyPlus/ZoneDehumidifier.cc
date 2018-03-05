@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -62,7 +63,7 @@
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -196,7 +197,6 @@ namespace ZoneDehumidifier {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 
 		// Locals
@@ -222,7 +222,7 @@ namespace ZoneDehumidifier {
 
 		// Find the correct zone dehumidifier
 		if ( CompIndex == 0 ) {
-			ZoneDehumidNum = FindItemInList( CompName, ZoneDehumid );
+			ZoneDehumidNum = UtilityRoutines::FindItemInList( CompName, ZoneDehumid );
 			if ( ZoneDehumidNum == 0 ) {
 				ShowFatalError( "SimZoneDehumidifier: Unit not found= " + CompName );
 			}
@@ -272,10 +272,6 @@ namespace ZoneDehumidifier {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
@@ -308,8 +304,6 @@ namespace ZoneDehumidifier {
 		static int NumNumbers( 0 ); // Number of Numbers to allocate arrays, then used for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Array1D_string Alphas; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
 		Array1D_string cNumericFields; // Numeric field names
@@ -319,12 +313,12 @@ namespace ZoneDehumidifier {
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max)
 		Real64 CurveVal; // Output from curve object (water removal or energy factor curves)
 
-		NumDehumidifiers = GetNumObjectsFound( CurrentModuleObject );
+		NumDehumidifiers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		ZoneDehumid.allocate( NumDehumidifiers );
 		CheckEquipName.dimension( NumDehumidifiers, true );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -335,15 +329,8 @@ namespace ZoneDehumidifier {
 
 		for ( ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex ) {
 
-			GetObjectItem( CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), ZoneDehumid, ZoneDehumidIndex - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, ZoneDehumidIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			// A1,  \field Name
 			ZoneDehumid( ZoneDehumidIndex ).Name = Alphas( 1 );
@@ -526,21 +513,21 @@ namespace ZoneDehumidifier {
 
 		for ( ZoneDehumidIndex = 1; ZoneDehumidIndex <= NumDehumidifiers; ++ZoneDehumidIndex ) {
 			// Set up report variables for the dehumidifiers
-			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Rate [W]", ZoneDehumid( ZoneDehumidIndex ).SensHeatingRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Energy [J]", ZoneDehumid( ZoneDehumidIndex ).SensHeatingEnergy, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass Flow Rate [kg/s]", ZoneDehumid( ZoneDehumidIndex ).WaterRemovalRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass [kg]", ZoneDehumid( ZoneDehumidIndex ).WaterRemoved, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Electric Power [W]", ZoneDehumid( ZoneDehumidIndex ).ElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Electric Energy [J]", ZoneDehumid( ZoneDehumidIndex ).ElecConsumption, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "Electric", "COOLING", _, "System" );
-			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Power [W]", ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Energy [J]", ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecCons, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Part Load Ratio []", ZoneDehumid( ZoneDehumidIndex ).DehumidPLR, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Runtime Fraction []", ZoneDehumid( ZoneDehumidIndex ).DehumidRTF, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-			SetupOutputVariable( "Zone Dehumidifier Outlet Air Temperature [C]", ZoneDehumid( ZoneDehumidIndex ).OutletAirTemp, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Rate", OutputProcessor::Unit::W, ZoneDehumid( ZoneDehumidIndex ).SensHeatingRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Sensible Heating Energy", OutputProcessor::Unit::J, ZoneDehumid( ZoneDehumidIndex ).SensHeatingEnergy, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass Flow Rate", OutputProcessor::Unit::kg_s, ZoneDehumid( ZoneDehumidIndex ).WaterRemovalRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Removed Water Mass", OutputProcessor::Unit::kg, ZoneDehumid( ZoneDehumidIndex ).WaterRemoved, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Electric Power", OutputProcessor::Unit::W, ZoneDehumid( ZoneDehumidIndex ).ElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Electric Energy", OutputProcessor::Unit::J, ZoneDehumid( ZoneDehumidIndex ).ElecConsumption, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "Electric", "COOLING", _, "System" );
+			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Power", OutputProcessor::Unit::W, ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecPower, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Off Cycle Parasitic Electric Energy", OutputProcessor::Unit::J, ZoneDehumid( ZoneDehumidIndex ).OffCycleParasiticElecCons, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Part Load Ratio", OutputProcessor::Unit::None, ZoneDehumid( ZoneDehumidIndex ).DehumidPLR, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Runtime Fraction", OutputProcessor::Unit::None, ZoneDehumid( ZoneDehumidIndex ).DehumidRTF, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+			SetupOutputVariable( "Zone Dehumidifier Outlet Air Temperature", OutputProcessor::Unit::C, ZoneDehumid( ZoneDehumidIndex ).OutletAirTemp, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
 
 			if ( ZoneDehumid( ZoneDehumidIndex ).CondensateCollectMode == CondensateToTank ) {
-				SetupOutputVariable( "Zone Dehumidifier Condensate Volume Flow Rate [m3/s]", ZoneDehumid( ZoneDehumidIndex ).DehumidCondVolFlowRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
-				SetupOutputVariable( "Zone Dehumidifier Condensate Volume [m3]", ZoneDehumid( ZoneDehumidIndex ).DehumidCondVol, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "OnSiteWater", "Condensate", _, "System" );
+				SetupOutputVariable( "Zone Dehumidifier Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneDehumid( ZoneDehumidIndex ).DehumidCondVolFlowRate, "System", "Average", ZoneDehumid( ZoneDehumidIndex ).Name );
+				SetupOutputVariable( "Zone Dehumidifier Condensate Volume", OutputProcessor::Unit::m3, ZoneDehumid( ZoneDehumidIndex ).DehumidCondVol, "System", "Sum", ZoneDehumid( ZoneDehumidIndex ).Name, _, "OnSiteWater", "Condensate", _, "System" );
 			}
 
 		}

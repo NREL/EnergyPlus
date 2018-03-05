@@ -49,7 +49,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,8.7;
+  Version,8.9;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -231,7 +231,7 @@
     -7.00,                   !- Time Zone {hr}
     1634;                    !- Elevation {m}
 
-! BOULDER_CO_USA Annual Heating 99.6%, MaxDB=-18.6°C
+! BOULDER_CO_USA Annual Heating 99.6%, MaxDB=-18.6Â°C
 
   SizingPeriod:DesignDay,
     BOULDER Ann Htg 99.6% Condns DB,  !- Name
@@ -261,7 +261,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! BOULDER_CO_USA Annual Cooling (WB=>MDB) .4%, MDB=27.4°C WB=18.6°C
+! BOULDER_CO_USA Annual Cooling (WB=>MDB) .4%, MDB=27.4Â°C WB=18.6Â°C
 
   SizingPeriod:DesignDay,
     BOULDER Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -3320,6 +3320,7 @@
 
   ZoneHVAC:EquipmentList,
     LGstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     LGstore1 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3331,6 +3332,7 @@
 
   ZoneHVAC:EquipmentList,
     LGstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     LGstore2 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3342,6 +3344,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore1 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3353,6 +3356,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore2 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3364,6 +3368,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore3 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore3 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3375,6 +3380,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore4 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore4 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3386,6 +3392,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore5 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore5 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3397,6 +3404,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore6 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore6 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3408,6 +3416,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore7 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore7 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3419,6 +3428,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore8 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:EvaporativeCoolerUnit,  !- Zone Equipment 1 Object Type
     SMstore8 Zone Evap Unit, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3868,7 +3878,7 @@
     LGstore1 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     LGstore1 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     LGstore1 Air Node,       !- Zone Air Node Name
-    LGstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     LGstore2,                !- Zone Name
@@ -3876,7 +3886,7 @@
     LGstore2 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     LGstore2 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     LGstore2 Air Node,       !- Zone Air Node Name
-    LGstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore1,                !- Zone Name
@@ -3884,7 +3894,7 @@
     SMstore1 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore1 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore1 Air Node,       !- Zone Air Node Name
-    SMstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore2,                !- Zone Name
@@ -3892,7 +3902,7 @@
     SMstore2 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore2 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore2 Air Node,       !- Zone Air Node Name
-    SMstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore3,                !- Zone Name
@@ -3900,7 +3910,7 @@
     SMstore3 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore3 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore3 Air Node,       !- Zone Air Node Name
-    SMstore3 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore4,                !- Zone Name
@@ -3908,7 +3918,7 @@
     SMstore4 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore4 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore4 Air Node,       !- Zone Air Node Name
-    SMstore4 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore5,                !- Zone Name
@@ -3916,7 +3926,7 @@
     SMstore5 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore5 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore5 Air Node,       !- Zone Air Node Name
-    SMstore5 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore5 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore6,                !- Zone Name
@@ -3924,7 +3934,7 @@
     SMstore6 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore6 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore6 Air Node,       !- Zone Air Node Name
-    SMstore6 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore6 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore7,                !- Zone Name
@@ -3932,7 +3942,7 @@
     SMstore7 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore7 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore7 Air Node,       !- Zone Air Node Name
-    SMstore7 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore7 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SMstore8,                !- Zone Name
@@ -3940,7 +3950,7 @@
     SMstore8 Inlet Node,     !- Zone Air Inlet Node or NodeList Name
     SMstore8 Relief Node,    !- Zone Air Exhaust Node or NodeList Name
     SMstore8 Air Node,       !- Zone Air Node Name
-    SMstore8 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore8 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EvaporativeCoolerUnit,
     LGstore1 Zone Evap Unit, !- Name
@@ -4184,7 +4194,7 @@
     LGstore2 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     LGstore2 Inlet Node,     !- Cooler Outlet Node Name
     LGstore2 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,               !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     LGstore2 Supply Fan,     !- Supply Air Fan Name
     1.0,                     !- Design Supply Air Flow Rate {m3/s}
     BlowThrough,             !- Fan Placement
@@ -4199,22 +4209,22 @@
   OutdoorAir:Node,
     LGstore2 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  LGstore2 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  LGstore2 Cooler Unit OA Inlet,  !- Air Inlet Node Name
-  LGstore2 Fan outlet,  !- Air Outlet Node Name
-  1.0 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    LGstore2 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    LGstore2 Cooler Unit OA Inlet,  !- Air Inlet Node Name
+    LGstore2 Fan outlet,     !- Air Outlet Node Name
+    1.0,                     !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   EvaporativeCooler:Direct:CelDekPad,
     LGstore2 Evaporative Cooler,  !- Name
@@ -4233,7 +4243,7 @@ Fan:SystemModel,
     SMstore1 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore1 Inlet Node,     !- Cooler Outlet Node Name
     SMstore1 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore1 Supply Fan,     !- Supply Air Fan Name
     0.65,                    !- Design Supply Air Flow Rate {m3/s}
     DrawThrough,             !- Fan Placement
@@ -4248,22 +4258,22 @@ Fan:SystemModel,
   OutdoorAir:Node,
     SMstore1 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore1 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore1 Fan Inlet Node,  !- Air Inlet Node Name
-  SMstore1 Inlet Node,  !- Air Outlet Node Name
-  0.65 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    SMstore1 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore1 Fan Inlet Node, !- Air Inlet Node Name
+    SMstore1 Inlet Node,     !- Air Outlet Node Name
+    0.65,                    !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   EvaporativeCooler:Direct:CelDekPad,
     SMstore1 Evaporative Cooler,  !- Name
@@ -4282,7 +4292,7 @@ Fan:SystemModel,
     SMstore2 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore2 Inlet Node,     !- Cooler Outlet Node Name
     SMstore2 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore2 Supply Fan,     !- Supply Air Fan Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
     DrawThrough,             !- Fan Placement
@@ -4297,22 +4307,22 @@ Fan:SystemModel,
   OutdoorAir:Node,
     SMstore2 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore2 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore2 Fan Inlet Node,  !- Air Inlet Node Name
-  SMstore2 Inlet Node,  !- Air Outlet Node Name
-  Autosize , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    SMstore2 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore2 Fan Inlet Node, !- Air Inlet Node Name
+    SMstore2 Inlet Node,     !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   EvaporativeCooler:Direct:CelDekPad,
     SMstore2 Evaporative Cooler,  !- Name
@@ -4331,7 +4341,7 @@ Fan:SystemModel,
     SMstore3 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore3 Inlet Node,     !- Cooler Outlet Node Name
     SMstore3 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore3 Supply Fan,     !- Supply Air Fan Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
     DrawThrough,             !- Fan Placement
@@ -4346,37 +4356,37 @@ Fan:SystemModel,
   OutdoorAir:Node,
     SMstore3 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore3 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore3 Fan Inlet Node,  !- Air Inlet Node Name
-  SMstore3 Inlet Node,  !- Air Outlet Node Name
-  Autosize , !- Design Maximum Air Flow Rate
-  Continuous , !- Speed Control Method
-  0.25, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70,  !- Fan Total Efficiency
-  VAV Fan Curve ;!-  Electric Power Function of Flow Fraction Curve Name
+  Fan:SystemModel,
+    SMstore3 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore3 Fan Inlet Node, !- Air Inlet Node Name
+    SMstore3 Inlet Node,     !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.25,                    !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70,                    !- Fan Total Efficiency
+    VAV Fan Curve;           !- Electric Power Function of Flow Fraction Curve Name
 
-Curve:Quartic,
-  VAV Fan Curve , !- Name
-  0.0015302446, !- Coefficient1 Constant
-  0.0052080574 , !- Coefficient2 x
-  1.1086242 , !- Coefficient3 x**2
-  -0.11635563 , !- Coefficient4 x**3
-  0.0 , !- Coefficient5 x**4
-  0.0 , !- Minimum Value of x
-  1.0, !- Maximum Value of x
-  0.0 , !- Minimum Curve Output
-  1.0 , !- Maximum Curve Output
-  Dimensionless , !- Input Unit Type for X
-  Dimensionless ; !- Output Unit Type
+  Curve:Quartic,
+    VAV Fan Curve,           !- Name
+    0.0015302446,            !- Coefficient1 Constant
+    0.0052080574,            !- Coefficient2 x
+    1.1086242,               !- Coefficient3 x**2
+    -0.11635563,             !- Coefficient4 x**3
+    0.0,                     !- Coefficient5 x**4
+    0.0,                     !- Minimum Value of x
+    1.0,                     !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    1.0,                     !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
 
   EvaporativeCooler:Direct:CelDekPad,
     SMstore3 Evaporative Cooler,  !- Name
@@ -4395,7 +4405,7 @@ Curve:Quartic,
     SMstore4 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore4 Inlet Node,     !- Cooler Outlet Node Name
     SMstore4 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore4 Supply Fan,     !- Supply Air Fan Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
     BlowThrough,             !- Fan Placement
@@ -4410,24 +4420,23 @@ Curve:Quartic,
   OutdoorAir:Node,
     SMstore4 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore4 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore4 Cooler Unit OA Inlet,  !- Air Inlet Node Name
-  SMstore4 Fan outlet,  !- Air Outlet Node Name
-  Autosize , !- Design Maximum Air Flow Rate
-  Continuous , !- Speed Control Method
-  0.25, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70,  !- Fan Total Efficiency
-  VAV Fan Curve ;!-  Electric Power Function of Flow Fraction Curve Name
-
+  Fan:SystemModel,
+    SMstore4 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore4 Cooler Unit OA Inlet,  !- Air Inlet Node Name
+    SMstore4 Fan outlet,     !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.25,                    !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70,                    !- Fan Total Efficiency
+    VAV Fan Curve;           !- Electric Power Function of Flow Fraction Curve Name
 
   EvaporativeCooler:Direct:ResearchSpecial,
     SMstore4 Evaporative Cooler,  !- Name
@@ -4452,7 +4461,7 @@ Fan:SystemModel,
     SMstore5 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore5 Inlet Node,     !- Cooler Outlet Node Name
     SMstore5 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore5 Supply Fan,     !- Supply Air Fan Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
     BlowThrough,             !- Fan Placement
@@ -4467,23 +4476,23 @@ Fan:SystemModel,
   OutdoorAir:Node,
     SMstore5 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore5 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore5 Cooler Unit OA Inlet,  !- Air Inlet Node Name
-  SMstore5 Fan outlet,  !- Air Outlet Node Name
-  Autosize , !- Design Maximum Air Flow Rate
-  Continuous , !- Speed Control Method
-  0.25, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70,  !- Fan Total Efficiency
-  VAV Fan Curve ;!-  Electric Power Function of Flow Fraction Curve Name
+  Fan:SystemModel,
+    SMstore5 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore5 Cooler Unit OA Inlet,  !- Air Inlet Node Name
+    SMstore5 Fan outlet,     !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.25,                    !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70,                    !- Fan Total Efficiency
+    VAV Fan Curve;           !- Electric Power Function of Flow Fraction Curve Name
 
   EvaporativeCooler:Indirect:ResearchSpecial,
     SMstore5 Evaporative Cooler,  !- Name
@@ -4522,7 +4531,7 @@ Fan:SystemModel,
     SMstore6 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore6 Inlet Node,     !- Cooler Outlet Node Name
     SMstore6 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore6 Supply Fan,     !- Supply Air Fan Name
     0.65,                    !- Design Supply Air Flow Rate {m3/s}
     DrawThrough,             !- Fan Placement
@@ -4537,22 +4546,22 @@ Fan:SystemModel,
   OutdoorAir:Node,
     SMstore6 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore6 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore6 Fan Inlet Node,  !- Air Inlet Node Name
-  SMstore6 Inlet Node,  !- Air Outlet Node Name
-  0.5 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    SMstore6 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore6 Fan Inlet Node, !- Air Inlet Node Name
+    SMstore6 Inlet Node,     !- Air Outlet Node Name
+    0.5,                     !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   EvaporativeCooler:Indirect:WetCoil,
     SMstore6 Evaporative Cooler,  !- Name
@@ -4579,7 +4588,7 @@ Fan:SystemModel,
     SMstore7 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore7 Inlet Node,     !- Cooler Outlet Node Name
     SMstore7 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore7 Supply Fan,     !- Supply Air Fan Name
     0.65,                    !- Design Supply Air Flow Rate {m3/s}
     DrawThrough,             !- Fan Placement
@@ -4594,22 +4603,22 @@ Fan:SystemModel,
   OutdoorAir:Node,
     SMstore7 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore7 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore7 Fan Inlet Node,  !- Air Inlet Node Name
-  SMstore7 Inlet Node,  !- Air Outlet Node Name
-  0.5 , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    SMstore7 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore7 Fan Inlet Node, !- Air Inlet Node Name
+    SMstore7 Inlet Node,     !- Air Outlet Node Name
+    0.5,                     !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70;                    !- Fan Total Efficiency
 
   EvaporativeCooler:Indirect:WetCoil,
     SMstore7 Indirect Evaporative Cooler,  !- Name
@@ -4646,7 +4655,7 @@ Fan:SystemModel,
     SMstore8 Cooler Unit OA Inlet,  !- Outdoor Air Inlet Node Name
     SMstore8 Inlet Node,     !- Cooler Outlet Node Name
     SMstore8 Relief Node,    !- Zone Relief Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     SMstore8 Supply Fan,     !- Supply Air Fan Name
     autosize,                !- Design Supply Air Flow Rate {m3/s}
     BlowThrough,             !- Fan Placement
@@ -4661,23 +4670,23 @@ Fan:SystemModel,
   OutdoorAir:Node,
     SMstore8 Cooler Unit OA Inlet;  !- Name
 
-Fan:SystemModel,
-  SMstore8 Supply Fan, !- Name
-  ALWAYS_ON , !- Availability Schedule Name
-  SMstore8 Cooler Unit OA Inlet,  !- Air Inlet Node Name
-  SMstore8 Fan outlet,  !- Air Outlet Node Name
-  Autosize , !- Design Maximum Air Flow Rate
-  Continuous , !- Speed Control Method
-  0.25, !- Electric Power Minimum Flow Rate Fraction
-  300.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.70,  !- Fan Total Efficiency
-  VAV Fan Curve ;!-  Electric Power Function of Flow Fraction Curve Name
+  Fan:SystemModel,
+    SMstore8 Supply Fan,     !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    SMstore8 Cooler Unit OA Inlet,  !- Air Inlet Node Name
+    SMstore8 Fan outlet,     !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.25,                    !- Electric Power Minimum Flow Rate Fraction
+    300.0,                   !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.70,                    !- Fan Total Efficiency
+    VAV Fan Curve;           !- Electric Power Function of Flow Fraction Curve Name
 
   EvaporativeCooler:Indirect:ResearchSpecial,
     SMstore8 Indirect Evaporative Cooler,  !- Name
@@ -4781,6 +4790,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4789,6 +4799,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4797,6 +4808,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4805,6 +4817,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4813,6 +4826,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4821,6 +4835,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4829,6 +4844,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4837,6 +4853,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4845,6 +4862,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   AvailabilityManager:NightCycle,
@@ -4853,6 +4871,7 @@ Fan:SystemModel,
     HVACOperationSchd,       !- Fan Schedule Name
     CycleOnAny,              !- Control Type
     1.0,                     !- Thermostat Tolerance {deltaC}
+    FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -5032,7 +5051,7 @@ Fan:SystemModel,
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5040,7 +5059,7 @@ Fan:SystemModel,
     0.0165;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualIncentiveCostCharge,  !- Name
+    AnnualIncentiveCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5048,7 +5067,7 @@ Fan:SystemModel,
     0.0021;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCostCharge,  !- Name
+    AnnualEnergyCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5056,7 +5075,7 @@ Fan:SystemModel,
     0.0083;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCostCharge,  !- Name
+    AnnualEnergyCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5064,7 +5083,7 @@ Fan:SystemModel,
     12.55;                   !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand25kw,           !- Name
+    MinDemand25kw,           !- Utility Cost Qualify Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5074,7 +5093,7 @@ Fan:SystemModel,
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    taxoffourPtNinePercent,  !- Name
+    taxoffourPtNinePercent,  !- Utility Cost Charge Simple Name
     PubServColorado_SG_SecondaryGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5100,7 +5119,7 @@ Fan:SystemModel,
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5108,7 +5127,7 @@ Fan:SystemModel,
     0.0602;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualIncentiveCharge,   !- Name
+    AnnualIncentiveCharge,   !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5116,7 +5135,7 @@ Fan:SystemModel,
     0.0021;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualEnergyCostCharge,  !- Name
+    AnnualEnergyCostCharge,  !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5124,7 +5143,7 @@ Fan:SystemModel,
     0.0082;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand25kw,           !- Name
+    MaxDemand25kw,           !- Utility Cost Qualify Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5134,7 +5153,7 @@ Fan:SystemModel,
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    taxoffourPtNinePercent,  !- Name
+    taxoffourPtNinePercent,  !- Utility Cost Charge Simple Name
     PubServColorado_C_CommercialService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

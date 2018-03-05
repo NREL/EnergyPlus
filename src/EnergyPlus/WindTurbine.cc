@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -64,7 +65,7 @@
 #include <DataHVACGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -151,28 +152,8 @@ namespace WindTurbine {
 		// This subroutine manages the simulation of wind turbine component.
 		// This drivers manages the calls to all of the other drivers and simulation algorithms.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true );
@@ -185,7 +166,7 @@ namespace WindTurbine {
 		}
 
 		if ( GeneratorIndex == 0 ) {
-			WindTurbineNum = FindItemInList( GeneratorName, WindTurbineSys );
+			WindTurbineNum = UtilityRoutines::FindItemInList( GeneratorName, WindTurbineSys );
 			if ( WindTurbineNum == 0 ) {
 				ShowFatalError( "SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators " + GeneratorName );
 			}
@@ -272,24 +253,9 @@ namespace WindTurbine {
 		// This subroutine gets input data for wind turbine components
 		// and stores it in the wind turbine data structure.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using ScheduleManager::GetScheduleIndex;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "Generator:WindTurbine" );
@@ -299,16 +265,8 @@ namespace WindTurbine {
 		Real64 const MaxPowerCoeff( 0.59 ); // Maximum power coefficient
 		Real64 const DefaultH( 50.0 ); // Default of height for local wind speed
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int WindTurbineNum; // Wind turbine number
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
@@ -322,7 +280,7 @@ namespace WindTurbine {
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// Initializations and allocations
-		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -330,21 +288,15 @@ namespace WindTurbine {
 		lAlphaBlanks.dimension( NumAlphas, true );
 		lNumericBlanks.dimension( NumNumbers, true );
 
-		NumWindTurbines = GetNumObjectsFound( CurrentModuleObject );
+		NumWindTurbines = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		WindTurbineSys.allocate( NumWindTurbines );
 
 		// Flow
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
 
-			GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WindTurbineSys, WindTurbineNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound);
 
 			WindTurbineSys( WindTurbineNum ).Name = cAlphaArgs( 1 ); // Name of wind turbine
 
@@ -592,19 +544,19 @@ namespace WindTurbine {
 		if ( ErrorsFound ) ShowFatalError( CurrentModuleObject + " errors occurred in input.  Program terminates." );
 
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
-			SetupOutputVariable( "Generator Produced Electric Power [W]", WindTurbineSys( WindTurbineNum ).Power, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-			SetupOutputVariable( "Generator Produced Electric Energy [J]", WindTurbineSys( WindTurbineNum ).Energy, "System", "Sum", WindTurbineSys( WindTurbineNum ).Name, _, "ElectricityProduced", "WINDTURBINE", _, "Plant" );
-			SetupOutputVariable( "Generator Turbine Local Wind Speed [m/s]", WindTurbineSys( WindTurbineNum ).LocalWindSpeed, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-			SetupOutputVariable( "Generator Turbine Local Air Density [kg/m3]", WindTurbineSys( WindTurbineNum ).LocalAirDensity, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-			SetupOutputVariable( "Generator Turbine Tip Speed Ratio []", WindTurbineSys( WindTurbineNum ).TipSpeedRatio, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, WindTurbineSys( WindTurbineNum ).Power, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, WindTurbineSys( WindTurbineNum ).Energy, "System", "Sum", WindTurbineSys( WindTurbineNum ).Name, _, "ElectricityProduced", "WINDTURBINE", _, "Plant" );
+			SetupOutputVariable( "Generator Turbine Local Wind Speed", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).LocalWindSpeed, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Turbine Local Air Density", OutputProcessor::Unit::kg_m3, WindTurbineSys( WindTurbineNum ).LocalAirDensity, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+			SetupOutputVariable( "Generator Turbine Tip Speed Ratio", OutputProcessor::Unit::None, WindTurbineSys( WindTurbineNum ).TipSpeedRatio, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 			{ auto const SELECT_CASE_var( WindTurbineSys( WindTurbineNum ).RotorType );
 			if ( SELECT_CASE_var == HAWT ) {
-				SetupOutputVariable( "Generator Turbine Power Coefficient []", WindTurbineSys( WindTurbineNum ).PowerCoeff, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Power Coefficient", OutputProcessor::Unit::None, WindTurbineSys( WindTurbineNum ).PowerCoeff, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 			} else if ( SELECT_CASE_var == VAWT ) {
-				SetupOutputVariable( "Generator Turbine Chordal Component Velocity [m/s]", WindTurbineSys( WindTurbineNum ).ChordalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-				SetupOutputVariable( "Generator Turbine Normal Component Velocity [m/s]", WindTurbineSys( WindTurbineNum ).NormalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-				SetupOutputVariable( "Generator Turbine Relative Flow Velocity [m/s]", WindTurbineSys( WindTurbineNum ).RelFlowVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
-				SetupOutputVariable( "Generator Turbine Attack Angle [deg]", WindTurbineSys( WindTurbineNum ).AngOfAttack, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Chordal Component Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).ChordalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Normal Component Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).NormalVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Relative Flow Velocity", OutputProcessor::Unit::m_s, WindTurbineSys( WindTurbineNum ).RelFlowVel, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
+				SetupOutputVariable( "Generator Turbine Attack Angle", OutputProcessor::Unit::deg, WindTurbineSys( WindTurbineNum ).AngOfAttack, "System", "Average", WindTurbineSys( WindTurbineNum ).Name );
 			}}
 		}
 

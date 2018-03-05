@@ -81,7 +81,7 @@ Begin VB.Form About
       Begin VB.Label lblVersion 
          Alignment       =   1  'Right Justify
          AutoSize        =   -1  'True
-         Caption         =   "Version 1.49a"
+         Caption         =   "Version 1.50a"
          BeginProperty Font 
             Name            =   "Arial"
             Size            =   12

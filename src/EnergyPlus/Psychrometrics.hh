@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -745,7 +746,7 @@ namespace Psychrometrics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Int64 const Tdb_tag( bit::bit_shift( TRANSFER( T, Grid_Shift ), -Grid_Shift ) ); // Note that 2nd arg to TRANSFER is not used: Only type matters
+		Int64 const Tdb_tag( bit::bit_shift( bit::bit_transfer( T, Grid_Shift ), -Grid_Shift ) ); // Note that 2nd arg to TRANSFER is not used: Only type matters
 //		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
 		Int64 const hash( Tdb_tag & psatcache_mask );
 		auto & cPsat( cached_Psat( hash ) );
@@ -753,7 +754,7 @@ namespace Psychrometrics {
 		if ( cPsat.iTdb != Tdb_tag ) {
 			cPsat.iTdb = Tdb_tag;
 			Real64 Tdb_tag_r;
-			Tdb_tag_r = TRANSFER( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
+			Tdb_tag_r = bit::bit_transfer( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
 			cPsat.Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
 		}
 

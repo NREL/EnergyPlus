@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -104,6 +105,8 @@ namespace OutputReportPredefined {
 	int pdchFanEndUse;
 	int pdchFanPwr;
 	int pdchFanPwrPerFlow;
+	int pdchFanDesDay;
+	int pdchFanPkTime;
 	// Pump subtable
 	int pdstPump;
 	int pdchPumpType;
@@ -327,6 +330,11 @@ namespace OutputReportPredefined {
 	int pdchSysSizUserClAir;
 	int pdchSysSizCalcHtAir;
 	int pdchSysSizUserHtAir;
+	int pdchSysSizAdjustedClAir;
+	int pdchSysSizAdjustedHtAir;
+	int pdchSysSizAdjustedMainAir;
+	int pdchSysSizCalcHeatFlowRatio;
+	int pdchSysSizUserHeatFlowRatio;
 	int pdstPlantSize;
 	int pdchPlantSizCalcVdot;
 	int pdchPlantSizMeasVdot;
@@ -337,6 +345,150 @@ namespace OutputReportPredefined {
 	int pdchPlantSizPkTimeHour;
 	int pdchPlantSizPkTimeDayOfSim;
 	int pdchPlantSizPkTimeMin;
+
+	// Coil Selection Table
+	int pdrCoilSizingDetailsTable;
+	int pdstCoilSummaryCoilSelection;
+	int pdchCoilLocation;
+	int pdchCoilHVACType;
+	int pdchCoilHVACName;
+	int pdchCoilZoneName;
+	int pdchCoilName;
+	int pdchCoilType;
+	int pdchSysSizingMethCoinc;
+	int pdchSysSizingMethCap;
+	int pdchSysSizingMethAir;
+
+	int pdchCoilIsCapAutosized;
+	int pdchCoilIsAirFlowAutosized;
+	int pdchCoilIsWaterFlowAutosized;
+	int pdchCoilIsOATreated;
+	int pdchCoilFinalTotalCap;
+	int pdchCoilFinalSensCap;
+	int pdchCoilFinalAirVolFlowRate;
+	int pdchCoilFinalPlantVolFlowRate;
+
+	int pdchCoilDDnameSensIdealPeak;
+	int pdchCoilDateTimeSensIdealPeak;
+	int pdchCoilDDnameTotIdealPeak;
+	int pdchCoilDateTimeTotIdealPeak;
+	int pdchCoilDDnameAirFlowIdealPeak;
+	int pdchCoilDateTimeAirFlowIdealPeak;
+	int pdchCoilTotalCapIdealPeak;
+	int pdchCoilSensCapIdealPeak;
+	int pdchCoilAirMassFlowIdealPeak;
+	int pdchCoilAirVolumeFlowIdealPeak;
+	int pdchCoilEntDryBulbIdealPeak;
+	int pdchCoilEntWetBulbIdealPeak;
+	int pdchCoilEntHumRatIdealPeak;
+	int pdchCoilEntEnthalpyIdealPeak;
+	int pdchCoilLvgDryBulbIdealPeak;
+	int pdchCoilLvgWetBulbIdealPeak;
+	int pdchCoilLvgHumRatIdealPeak;
+	int pdchCoilLvgEnthalpyIdealPeak;
+	int pdchCoilWaterMassFlowIdealPeak;
+	int pdchCoilEntWaterTempIdealPeak;
+	int pdchCoilLvgWaterTempIdealPeak;
+	int pdchCoilWaterDeltaTempIdealPeak;
+	int pdchCoilRatedTotalCap;
+	int pdchCoilRatedSensCap;
+	int pdchCoilOffRatingCapacityModifierIdealPeak;
+	int pdchCoilOffRatingCapacityModifierSimPeak;
+	int pdchCoilRatedAirMass;
+	int pdchCoilRatedEntDryBulb;
+	int pdchCoilRatedEntWetBulb;
+	int pdchCoilRatedEntHumRat;
+	int pdchCoilRatedEntEnthalpy;
+	int pdchCoilRatedLvgDryBulb;
+	int pdchCoilRatedLvgWetBulb;
+	int pdchCoilRatedLvgHumRat;
+	int pdchCoilRatedLvgEnthalpy;
+	int pdchCoilRatedWaterMass;
+	int pdchCoilRatedEntWaterTemp;
+	int pdchCoilRatedLvgWaterTemp;
+	int pdchCoilRatedWaterDeltaTemp;
+
+	int pdchFanAssociatedWithCoilName;
+	int pdchFanAssociatedWithCoilType;
+	int pdchFanAssociatedVdotSize;
+	int pdchFanAssociatedMdotSize;
+
+	int pdchFanHeatGainIdealPeak;
+	int pdchCoilNetTotalCapacityIdealPeak;
+
+	int pdchCoilPlantLoopName;
+
+	int pdchPlantMassFlowMaximum;
+	int pdchPlantRetTempDesign;
+	int pdchPlantSupTempDesign;
+	int pdchPlantDeltaTempDesign;
+	int pdchPlantCapacity;
+	int pdchCoilCapPrcntPlantCapacity;
+	int pdchCoilFlowPrcntPlantFlow;
+	int pdchOADryBulbIdealPeak;
+	int pdchOAHumRatIdealPeak;
+	int pdchOAWetBulbatIdealPeak;
+	int pdchOAVolFlowIdealPeak;
+	int pdchOAFlowPrcntIdealPeak;
+	int pdchOABarometricPressureIdealPeak;
+
+	int pdchAirSysRADryBulbIdealPeak;
+	int pdchAirSysRAHumRatIdealPeak;
+	int pdchZoneAirDryBulbIdealPeak;
+	int pdchZoneAirHumRatIdealPeak;
+	int pdchZoneAirRelHumIdealPeak;
+	int pdchCoilUA;
+	int pdchZoneSensibleLoadIdealPeak;
+	int pdchZoneLatentLoadIdealPeak;
+	int pdchCoilIdealSizCapOverSimPeak;
+	int pdchCoilIdealSizCapUnderSimPeak;
+	int pdchReheatCoilMultiplier;
+	int pdchFlowCapRatioLowCapIncreaseRatio;
+	int pdchFlowCapRatioHiCapDecreaseRatio;
+	int pdchPlantFluidSpecificHeat;
+	int pdchPlantFluidDensity;
+	int pdchMoistAirSpecificHeat;
+	int pdchDryAirSpecificHeat;
+	int pdchStandRhoAir;
+
+	// Coil Sizing Summary (subset of Coil Selection Table)
+	int pdst2CoilSummaryCoilSelection;
+	int pdch2CoilName;
+	int pdch2CoilType;
+	int pdch2CoilHVACType;
+	int pdch2CoilHVACName;
+
+	int pdch2CoilFinalTotalCap;
+	int pdch2CoilFinalSensCap;
+	int pdch2CoilFinalAirVolFlowRate;
+	int pdch2CoilFinalPlantVolFlowRate;
+	int pdch2CoilUA;
+
+	int pdch2CoilDDnameSensIdealPeak;
+	int pdch2CoilDateTimeSensIdealPeak;
+	int pdch2CoilDDnameAirFlowIdealPeak;
+	int pdch2CoilDateTimeAirFlowIdealPeak;
+	int pdch2CoilTotalCapIdealPeak;
+	int pdch2CoilSensCapIdealPeak;
+	int pdch2CoilAirVolumeFlowIdealPeak;
+	int pdch2CoilEntDryBulbIdealPeak;
+	int pdch2CoilEntWetBulbIdealPeak;
+	int pdch2CoilEntHumRatIdealPeak;
+	int pdch2CoilLvgDryBulbIdealPeak;
+	int pdch2CoilLvgWetBulbIdealPeak;
+	int pdch2CoilLvgHumRatIdealPeak;
+	int pdch2CoilRatedTotalCap;
+	int pdch2CoilRatedSensCap;
+
+	int pdch2OADryBulbIdealPeak;
+	int pdch2OAHumRatIdealPeak;
+	int pdch2OAWetBulbatIdealPeak;
+	int pdch2OAFlowPrcntIdealPeak;
+	int pdch2ZoneAirDryBulbIdealPeak;
+	int pdch2ZoneAirHumRatIdealPeak;
+	int pdch2ZoneAirRelHumIdealPeak;
+	int pdch2ZoneSensibleLoadIdealPeak;
+	int pdch2ZoneLatentLoadIdealPeak;
 
 	//System summary
 	int pdrSystem;
@@ -539,6 +691,9 @@ namespace OutputReportPredefined {
 	int pdchS62svrClEv;
 	int pdchS62svrClVot;
 	int pdchS62svrClPercOA;
+	int pdchS62svrClEnvironmentOfPs;
+	int pdchS62svrClTimeOfPs;
+
 
 	int pdstS62sysVentReqHeat;
 	int pdchS62svrHtSumVpz;
@@ -551,6 +706,8 @@ namespace OutputReportPredefined {
 	int pdchS62svrHtEv;
 	int pdchS62svrHtVot;
 	int pdchS62svrHtPercOA;
+	int pdchS62svrHtEnvironmentOfPs;
+	int pdchS62svrHtTimeOfPs;
 
 	int pdstS62znVentPar;
 	int pdchS62zvpAlN;
@@ -653,8 +810,12 @@ namespace OutputReportPredefined {
 	int pdchLeedPerfElDem;
 	int pdchLeedPerfGasEneUse;
 	int pdchLeedPerfGasDem;
-	int pdchLeedPerfOthEneUse;
-	int pdchLeedPerfOthDem;
+	int pdchLeedPerfAddFuelEneUse;
+	int pdchLeedPerfAddFuelDem;
+	int pdchLeedPerfDisClEneUse;
+	int pdchLeedPerfDisClDem;
+	int pdchLeedPerfDisHtEneUse;
+	int pdchLeedPerfDisHtDem;
 
 	int pdstLeedEneUseSum;
 	int pdchLeedEusUnt;
@@ -682,6 +843,18 @@ namespace OutputReportPredefined {
 
 	int pdstLeedEneUsePerc;
 	int pdchLeedEupPerc;
+
+	int pdstLeedEqFlLdHrs;
+	int pdchLeedEflhEflh;
+	int pdchLeedEflhNonZerHrs;
+
+	int pdstLeedSchedSetPts;
+	int pdChLeedSchStPtFirstObjUsed;
+	int pdChLeedSchStPtMonthUsed;
+	int pdchLeedSchStPt11amWednesday;
+	int pdchLeedSchStPt11amWedCnt;
+	int pdchLeedSchStPt11pmWednesday;
+	int pdchLeedSchStPt11pmWedCnt;
 
 	// Internal data structures to store information provided by calls
 
@@ -750,6 +923,8 @@ namespace OutputReportPredefined {
 		pdchFanEndUse = 0;
 		pdchFanPwr = 0;
 		pdchFanPwrPerFlow = 0;
+		pdchFanDesDay = 0;
+		pdchFanPkTime = 0;
 		pdstPump = 0;
 		pdchPumpType = 0;
 		pdchPumpControl = 0;
@@ -941,6 +1116,11 @@ namespace OutputReportPredefined {
 		pdchSysSizUserClAir = 0;
 		pdchSysSizCalcHtAir = 0;
 		pdchSysSizUserHtAir = 0;
+		pdchSysSizAdjustedClAir = 0;
+		pdchSysSizAdjustedHtAir = 0;
+		pdchSysSizAdjustedMainAir = 0;
+		pdchSysSizCalcHeatFlowRatio = 0;
+		pdchSysSizUserHeatFlowRatio = 0;
 		pdstPlantSize = 0;
 		pdchPlantSizCalcVdot = 0;
 		pdchPlantSizMeasVdot = 0;
@@ -950,6 +1130,145 @@ namespace OutputReportPredefined {
 		pdchPlantSizPkTimeHour = 0;
 		pdchPlantSizPkTimeDayOfSim = 0;
 		pdchPlantSizPkTimeMin = 0;
+
+		pdrCoilSizingDetailsTable = 0;
+		pdstCoilSummaryCoilSelection = 0;
+		pdchCoilLocation = 0;
+		pdchCoilHVACType = 0;
+		pdchCoilHVACName = 0;
+		pdchCoilZoneName = 0;
+		pdchCoilName = 0;
+		pdchCoilType = 0;
+		pdchSysSizingMethCoinc = 0;
+		pdchSysSizingMethCap = 0;
+		pdchSysSizingMethAir = 0;
+		pdchCoilIsCapAutosized = 0;
+		pdchCoilIsAirFlowAutosized = 0;
+		pdchCoilIsWaterFlowAutosized = 0;
+		pdchCoilIsOATreated = 0;
+		pdchCoilFinalTotalCap = 0;
+		pdchCoilFinalSensCap = 0;
+		pdchCoilFinalAirVolFlowRate = 0;
+		pdchCoilFinalPlantVolFlowRate = 0;
+		pdchCoilDDnameSensIdealPeak = 0;
+		pdchCoilDateTimeSensIdealPeak = 0;
+		pdchCoilDDnameTotIdealPeak = 0;
+		pdchCoilDateTimeTotIdealPeak = 0;
+		pdchCoilDDnameAirFlowIdealPeak = 0;
+		pdchCoilDateTimeAirFlowIdealPeak = 0;
+		pdchCoilTotalCapIdealPeak = 0;
+		pdchCoilSensCapIdealPeak = 0;
+		pdchCoilAirMassFlowIdealPeak = 0;
+		pdchCoilAirVolumeFlowIdealPeak = 0;
+		pdchCoilEntDryBulbIdealPeak = 0;
+		pdchCoilEntWetBulbIdealPeak = 0;
+		pdchCoilEntHumRatIdealPeak = 0;
+		pdchCoilEntEnthalpyIdealPeak = 0;
+		pdchCoilLvgDryBulbIdealPeak = 0;
+		pdchCoilLvgWetBulbIdealPeak = 0;
+		pdchCoilLvgHumRatIdealPeak = 0;
+		pdchCoilLvgEnthalpyIdealPeak = 0;
+		pdchCoilWaterMassFlowIdealPeak = 0;
+		pdchCoilEntWaterTempIdealPeak = 0;
+		pdchCoilLvgWaterTempIdealPeak = 0;
+		pdchCoilWaterDeltaTempIdealPeak = 0;
+		pdchCoilRatedTotalCap = 0;
+		pdchCoilRatedSensCap = 0;
+		pdchCoilOffRatingCapacityModifierIdealPeak = 0;
+
+		pdchCoilRatedAirMass = 0;
+		pdchCoilRatedEntDryBulb = 0;
+		pdchCoilRatedEntWetBulb = 0;
+		pdchCoilRatedEntHumRat = 0;
+		pdchCoilRatedEntEnthalpy = 0;
+		pdchCoilRatedLvgDryBulb = 0;
+		pdchCoilRatedLvgWetBulb = 0;
+		pdchCoilRatedLvgHumRat = 0;
+		pdchCoilRatedLvgEnthalpy = 0;
+		pdchCoilRatedWaterMass = 0;
+		pdchCoilRatedEntWaterTemp = 0;
+		pdchCoilRatedLvgWaterTemp = 0;
+		pdchCoilRatedWaterDeltaTemp = 0;
+
+		pdchFanAssociatedWithCoilName = 0;
+		pdchFanAssociatedWithCoilType = 0;
+		pdchFanAssociatedVdotSize = 0;
+		pdchFanAssociatedMdotSize = 0;
+
+		pdchFanHeatGainIdealPeak = 0;
+		pdchCoilNetTotalCapacityIdealPeak = 0;
+	
+		pdchCoilPlantLoopName = 0;
+
+		pdchPlantMassFlowMaximum = 0;
+		pdchPlantRetTempDesign = 0;
+		pdchPlantSupTempDesign = 0;
+		pdchPlantDeltaTempDesign = 0;
+		pdchPlantCapacity = 0;
+		pdchCoilCapPrcntPlantCapacity = 0;
+		pdchCoilFlowPrcntPlantFlow = 0;
+		pdchOADryBulbIdealPeak = 0;
+		pdchOAWetBulbatIdealPeak = 0;
+		pdchOAHumRatIdealPeak = 0;
+		pdchOAVolFlowIdealPeak = 0;
+		pdchOAFlowPrcntIdealPeak = 0;
+		pdchAirSysRADryBulbIdealPeak = 0;
+		pdchAirSysRAHumRatIdealPeak = 0;
+		pdchZoneAirDryBulbIdealPeak = 0;
+		pdchZoneAirHumRatIdealPeak = 0;
+		pdchZoneAirRelHumIdealPeak = 0;
+		pdchCoilUA = 0;
+		pdchZoneSensibleLoadIdealPeak = 0;
+		pdchZoneLatentLoadIdealPeak = 0;
+
+		pdchReheatCoilMultiplier = 0;
+		pdchFlowCapRatioLowCapIncreaseRatio = 0;
+		pdchFlowCapRatioHiCapDecreaseRatio = 0;
+		pdchPlantFluidSpecificHeat = 0;
+		pdchPlantFluidDensity = 0;
+		pdchMoistAirSpecificHeat = 0;
+		pdchDryAirSpecificHeat = 0;
+		pdchStandRhoAir = 0;
+
+		// Coil Sizing Summary (subset of Coil Selection Table)
+		pdst2CoilSummaryCoilSelection = 0;
+		pdch2CoilName = 0;
+		pdch2CoilType = 0;
+		pdch2CoilHVACType = 0;
+		pdch2CoilHVACName = 0;
+
+		pdch2CoilFinalTotalCap = 0;
+		pdch2CoilFinalSensCap = 0;
+		pdch2CoilFinalAirVolFlowRate = 0;
+		pdch2CoilFinalPlantVolFlowRate = 0;
+		pdch2CoilUA = 0;
+
+		pdch2CoilDDnameSensIdealPeak = 0;
+		pdch2CoilDateTimeSensIdealPeak = 0;
+		pdch2CoilDDnameAirFlowIdealPeak = 0;
+		pdch2CoilDateTimeAirFlowIdealPeak = 0;
+		pdch2CoilTotalCapIdealPeak = 0;
+		pdch2CoilSensCapIdealPeak = 0;
+		pdch2CoilAirVolumeFlowIdealPeak = 0;
+		pdch2CoilEntDryBulbIdealPeak = 0;
+		pdch2CoilEntWetBulbIdealPeak = 0;
+		pdch2CoilEntHumRatIdealPeak = 0;
+		pdch2CoilLvgDryBulbIdealPeak = 0;
+		pdch2CoilLvgWetBulbIdealPeak = 0;
+		pdch2CoilLvgHumRatIdealPeak = 0;
+		pdch2CoilRatedTotalCap = 0;
+		pdch2CoilRatedSensCap = 0;
+
+		pdch2OADryBulbIdealPeak = 0;
+		pdch2OAHumRatIdealPeak = 0;
+		pdch2OAWetBulbatIdealPeak = 0;
+		pdch2OAFlowPrcntIdealPeak = 0;
+		pdch2ZoneAirDryBulbIdealPeak = 0;
+		pdch2ZoneAirHumRatIdealPeak = 0;
+		pdch2ZoneAirRelHumIdealPeak = 0;
+		pdch2ZoneSensibleLoadIdealPeak = 0;
+		pdch2ZoneLatentLoadIdealPeak = 0;
+
 		pdrSystem = 0;
 		pdstEconomizer = 0;
 		pdchEcoKind = 0;
@@ -1121,6 +1440,9 @@ namespace OutputReportPredefined {
 		pdchS62svrClEv = 0;
 		pdchS62svrClVot = 0;
 		pdchS62svrClPercOA = 0;
+		pdchS62svrClEnvironmentOfPs = 0;
+		pdchS62svrClTimeOfPs = 0;
+
 		pdstS62sysVentReqHeat = 0;
 		pdchS62svrHtSumVpz = 0;
 		pdchS62svrHtPs = 0;
@@ -1132,6 +1454,9 @@ namespace OutputReportPredefined {
 		pdchS62svrHtEv = 0;
 		pdchS62svrHtVot = 0;
 		pdchS62svrHtPercOA = 0;
+		pdchS62svrHtEnvironmentOfPs = 0;
+		pdchS62svrHtTimeOfPs = 0;
+
 		pdstS62znVentPar = 0;
 		pdchS62zvpAlN = 0;
 		pdchS62zvpRp = 0;
@@ -1222,8 +1547,12 @@ namespace OutputReportPredefined {
 		pdchLeedPerfElDem = 0;
 		pdchLeedPerfGasEneUse = 0;
 		pdchLeedPerfGasDem = 0;
-		pdchLeedPerfOthEneUse = 0;
-		pdchLeedPerfOthDem = 0;
+		pdchLeedPerfAddFuelEneUse = 0;
+		pdchLeedPerfAddFuelDem = 0;
+		pdchLeedPerfDisClEneUse = 0;
+		pdchLeedPerfDisClDem = 0;
+		pdchLeedPerfDisHtEneUse = 0;
+		pdchLeedPerfDisHtDem = 0;
 		pdstLeedEneUseSum = 0;
 		pdchLeedEusUnt = 0;
 		pdchLeedEusProc = 0;
@@ -1548,6 +1877,8 @@ namespace OutputReportPredefined {
 		pdchFanPwrPerFlow = newPreDefColumn( pdstFan, "Rated Power Per Max Air Flow Rate [W-s/m3]" );
 		pdchFanMotorIn = newPreDefColumn( pdstFan, "Motor Heat In Air Fraction" );
 		pdchFanEndUse = newPreDefColumn( pdstFan, "End Use" );
+		pdchFanDesDay = newPreDefColumn( pdstFan, "Design Day Name for Fan Sizing Peak" );
+		pdchFanPkTime = newPreDefColumn( pdstFan, "Date/Time for Fan Sizing Peak" );
 
 		pdstPump = newPreDefSubTable( pdrEquip, "Pumps" );
 		pdchPumpType = newPreDefColumn( pdstPump, "Type" );
@@ -1608,6 +1939,11 @@ namespace OutputReportPredefined {
 		pdchSysSizUserClAir = newPreDefColumn( pdstSystemSize, "User cooling [m3/s]" );
 		pdchSysSizCalcHtAir = newPreDefColumn( pdstSystemSize, "Calculated heating [m3/s]" );
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
+		pdchSysSizAdjustedClAir = newPreDefColumn( pdstSystemSize, "Adjusted cooling [m3/s]" );
+		pdchSysSizAdjustedHtAir = newPreDefColumn( pdstSystemSize, "Adjusted heating [m3/s]" );
+		pdchSysSizAdjustedMainAir = newPreDefColumn( pdstSystemSize, "Adjusted main [m3/s]" );
+		pdchSysSizCalcHeatFlowRatio = newPreDefColumn( pdstSystemSize, "Calculated Heating Air Flow Ratio []" );
+		pdchSysSizUserHeatFlowRatio = newPreDefColumn( pdstSystemSize, "User Heating Air Flow Ratio []" );
 
 		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments" );
 //		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
@@ -1619,6 +1955,156 @@ namespace OutputReportPredefined {
 		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period {TIMESTAMP}[day]" );
 		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day {TIMESTAMP}[hr]" );
 		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute {TIMESTAMP}[min]" );
+
+		pdst2CoilSummaryCoilSelection = newPreDefSubTable( pdrSizing, "Coil Sizing Summary" );
+		// coil meta data information
+		//	the first column will be the coil name, the unique user name from input. It has no header or column definition
+		pdch2CoilType = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Type" );
+		pdch2CoilHVACType = newPreDefColumn( pdst2CoilSummaryCoilSelection, "HVAC Type" );
+		pdch2CoilHVACName = newPreDefColumn( pdst2CoilSummaryCoilSelection, "HVAC Name" );
+
+		//coil Final size summary, regardless of how determined (
+		pdch2CoilFinalTotalCap = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Final Gross Total Capacity [W]" );
+		pdch2CoilFinalSensCap = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Final Gross Sensible Capacity [W]" );
+		pdch2CoilFinalAirVolFlowRate = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Final Reference Air Volume Flow Rate [m3/s]" );
+		pdch2CoilFinalPlantVolFlowRate = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]" );
+		pdch2CoilUA = newPreDefColumn(pdst2CoilSummaryCoilSelection, "Coil U-value Times Area Value [W/K]");
+
+		//results from regular zone and system sizing calcs, "At Ideal Loads Peak"
+		pdch2CoilDDnameSensIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Design Day Name at Sensible Ideal Loads Peak" );
+		pdch2CoilDateTimeSensIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Date/Time at Sensible Ideal Loads Peak" );
+		pdch2CoilDDnameAirFlowIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Design Day Name at Air Flow Ideal Loads Peak" );
+		pdch2CoilDateTimeAirFlowIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Date/Time at Air Flow Ideal Loads Peak" );
+
+		pdch2CoilTotalCapIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Total Capacity at Ideal Loads Peak [W]" );
+		pdch2CoilSensCapIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Sensible Capacity at Ideal Loads Peak [W]" );
+		pdch2CoilAirVolumeFlowIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]" );
+		pdch2CoilEntDryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]" );
+		pdch2CoilEntWetBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]" );
+		pdch2CoilEntHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
+		pdch2CoilLvgDryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]" );
+		pdch2CoilLvgWetBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]" );
+		pdch2CoilLvgHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]" );
+		pdch2OADryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]" );
+		pdch2OAHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
+		pdch2OAWetBulbatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection,"Outdoor Air Wetbulb at Ideal Loads Peak [C]" );
+		pdch2OAFlowPrcntIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]" );
+		pdch2ZoneAirDryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]" );
+		pdch2ZoneAirHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
+		pdch2ZoneAirRelHumIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]" );
+		pdch2ZoneSensibleLoadIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]" );
+		pdch2ZoneLatentLoadIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]" );
+		//results for coil at Rated Conditions
+		pdch2CoilRatedTotalCap = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Total Capacity at Rating Conditions [W]" );
+		pdch2CoilRatedSensCap = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Sensible Capacity at Rating Conditions [W]" );
+
+
+		pdrCoilSizingDetailsTable = newPreDefReport( "CoilSizingDetails", "Coil", "Coil Sizing Details" );
+		pdstCoilSummaryCoilSelection = newPreDefSubTable( pdrCoilSizingDetailsTable, "Coils" );
+		// coil meta data information
+		//	the first column will be the coil name, the unique user name from input. It has no header or column definition
+		pdchCoilType = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Type" );
+		pdchCoilLocation = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Location"  );
+		pdchCoilHVACType = newPreDefColumn( pdstCoilSummaryCoilSelection, "HVAC Type" );
+		pdchCoilHVACName = newPreDefColumn( pdstCoilSummaryCoilSelection, "HVAC Name" );
+		pdchCoilZoneName = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Name(s)" );
+
+		pdchSysSizingMethCoinc = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Sizing Method Concurrence" );
+		pdchSysSizingMethCap = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Sizing Method Capacity" );
+		pdchSysSizingMethAir = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Sizing Method Air Flow" );
+
+		pdchCoilIsCapAutosized = newPreDefColumn( pdstCoilSummaryCoilSelection, "Autosized Coil Capacity?" );
+		pdchCoilIsAirFlowAutosized = newPreDefColumn( pdstCoilSummaryCoilSelection, "Autosized Coil Airflow?" );
+		pdchCoilIsWaterFlowAutosized = newPreDefColumn( pdstCoilSummaryCoilSelection, "Autosized Coil Water Flow?" );
+		pdchCoilIsOATreated = newPreDefColumn( pdstCoilSummaryCoilSelection, "OA Pretreated prior to coil inlet?" );
+
+		//coil Final size summary, regardless of how determined (
+// get rid of these, this will be the same as At Rating Conditions. 
+		pdchCoilFinalTotalCap = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Final Gross Total Capacity [W]" );
+		pdchCoilFinalSensCap = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Final Gross Sensible Capacity [W]" );
+		pdchCoilFinalAirVolFlowRate = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Final Reference Air Volume Flow Rate [m3/s]" );
+		pdchCoilFinalPlantVolFlowRate = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]" );
+
+		//Misc Design output
+		pdchCoilUA = newPreDefColumn(pdstCoilSummaryCoilSelection, "Coil U-value Times Area Value [W/K]");
+		pdchReheatCoilMultiplier = newPreDefColumn(pdstCoilSummaryCoilSelection, "Terminal Unit Reheat Coil Multiplier");
+		pdchFlowCapRatioLowCapIncreaseRatio = newPreDefColumn(pdstCoilSummaryCoilSelection, "DX Coil Capacity Increase Ratio from Too Low Flow/Capacity Ratio");
+		pdchFlowCapRatioHiCapDecreaseRatio = newPreDefColumn(pdstCoilSummaryCoilSelection, "DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio");
+
+		pdchMoistAirSpecificHeat = newPreDefColumn(pdstCoilSummaryCoilSelection, "Moist Air Heat Capacity [J/kg-K]"); // standard? for ideal sizing calcs?
+		pdchDryAirSpecificHeat = newPreDefColumn(pdstCoilSummaryCoilSelection, "Dry Air Heat Capacity [J/kg-K]"); // standard? for ideal sizing calcs?
+		pdchStandRhoAir = newPreDefColumn(pdstCoilSummaryCoilSelection, "Standard Air Density Adjusted for Elevation [kg/m3]");
+
+		//Fan info for coil
+		pdchFanAssociatedWithCoilName = newPreDefColumn( pdstCoilSummaryCoilSelection, "Supply Fan Name for Coil" );
+		pdchFanAssociatedWithCoilType = newPreDefColumn( pdstCoilSummaryCoilSelection, "Supply Fan Type for Coil" );
+		pdchFanAssociatedVdotSize = newPreDefColumn( pdstCoilSummaryCoilSelection, "Supply Fan Maximum Air Volume Flow Rate [m3/s]" );
+		pdchFanAssociatedMdotSize = newPreDefColumn( pdstCoilSummaryCoilSelection, "Supply Fan Maximum Air Mass Flow Rate [kg/s]" );
+
+		//Plant info for coil
+		pdchCoilPlantLoopName = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Name for Coil" );
+		pdchPlantFluidSpecificHeat = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Fluid Specific Heat Capacity [J/kg-K]" );// standard/inits ?
+		pdchPlantFluidDensity = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Fluid Density [kg/m3]" );// standard/inits ? for ideal sizing calcs?
+		pdchPlantMassFlowMaximum = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Maximum Fluid Mass Flow Rate [kg/s]" );
+		pdchPlantRetTempDesign = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Design Fluid Return Temperature [C]" );
+		pdchPlantSupTempDesign = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Design Fluid Supply Temperature [C]" );
+		pdchPlantDeltaTempDesign = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Design Fluid Temperature Difference [deltaC]" );
+		pdchPlantCapacity = newPreDefColumn( pdstCoilSummaryCoilSelection, "Plant Design Capacity [W]" );
+		pdchCoilCapPrcntPlantCapacity = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Capacity Percentage of Plant Design Capacity [%]" ); 
+		pdchCoilFlowPrcntPlantFlow = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Fluid Flow Rate Percentage of Plant Design Flow Rate [%]" );
+
+		//results from regular zone and system sizing calcs, "At Ideal Loads Peak"
+		pdchCoilDDnameSensIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Design Day Name at Sensible Ideal Loads Peak" );
+		pdchCoilDateTimeSensIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Sensible Ideal Loads Peak" );
+		pdchCoilDDnameTotIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Design Day Name at Total Ideal Loads Peak" );
+		pdchCoilDateTimeTotIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Total Ideal Loads Peak" );
+		pdchCoilDDnameAirFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Design Day Name at Air Flow Ideal Loads Peak" );
+		pdchCoilDateTimeAirFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Air Flow Ideal Loads Peak" );
+
+		pdchCoilTotalCapIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Total Capacity at Ideal Loads Peak [W]" );
+		pdchCoilSensCapIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Sensible Capacity at Ideal Loads Peak [W]" );
+		pdchCoilOffRatingCapacityModifierIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Off-Rating Capacity Modifier at Ideal Loads Peak [ ]" );
+		pdchCoilAirMassFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Air Mass Flow Rate at Ideal Loads Peak [kg/s]" );
+		pdchCoilAirVolumeFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]" );
+		pdchCoilEntDryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]" );
+		pdchCoilEntWetBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]" );
+		pdchCoilEntHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
+		pdchCoilEntEnthalpyIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Ideal Loads Peak [J/KG-K]" );
+		pdchCoilLvgDryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]" );
+		pdchCoilLvgWetBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]" );
+		pdchCoilLvgHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]" );
+		pdchCoilLvgEnthalpyIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Ideal Loads Peak [J/KG-K]" );
+		pdchCoilWaterMassFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Plant Fluid Mass Flow Rate at Ideal Loads Peak [kg/s]" );
+		pdchCoilEntWaterTempIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Plant Fluid Temperature at Ideal Loads Peak [C]" );
+		pdchCoilLvgWaterTempIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Plant Fluid Temperature at Ideal Loads Peak [C]" );
+		pdchCoilWaterDeltaTempIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Plant Fluid Temperature Difference at Ideal Loads Peak [deltaC]" );
+		pdchFanHeatGainIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Supply Fan Air Heat Gain at Ideal Loads Peak [W]" );
+		pdchCoilNetTotalCapacityIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil and Fan Net Total Capacity at Ideal Loads Peak [W]" );
+		pdchOADryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]" );
+		pdchOAHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
+		pdchOAWetBulbatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection,"Outdoor Air Wetbulb at Ideal Loads Peak [C]" );
+		pdchOAVolFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Volume Flow Rate at Ideal Loads Peak [m3/s]" );
+		pdchOAFlowPrcntIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]" );
+		pdchAirSysRADryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Return Air Drybulb at Ideal Loads Peak [C]" );
+		pdchAirSysRAHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Return Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
+		pdchZoneAirDryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]" );
+		pdchZoneAirHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
+		pdchZoneAirRelHumIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]" );
+		pdchZoneSensibleLoadIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]" );
+		pdchZoneLatentLoadIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]" );
+		//results for coil at Rated Conditions
+		pdchCoilRatedTotalCap = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Total Capacity at Rating Conditions [W]" );
+		pdchCoilRatedSensCap = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Sensible Capacity at Rating Conditions [W]" );
+
+		pdchCoilRatedAirMass = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Air Mass Flow Rate at Rating Conditions [kg/s]" );
+		pdchCoilRatedEntDryBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Drybulb at Rating Conditions [C]" );
+		pdchCoilRatedEntWetBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Rating Conditions [C]" );
+		pdchCoilRatedEntHumRat = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Rating Conditions [KGWATER/KGDRYAIR]" );
+		pdchCoilRatedEntEnthalpy = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Rating Conditions [J/KG-K]" );
+		pdchCoilRatedLvgDryBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Rating Conditions [C]" );
+		pdchCoilRatedLvgWetBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Rating Conditions [C]" );
+		pdchCoilRatedLvgHumRat = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Rating Conditions [KGWATER/KGDRYAIR]" );
+		pdchCoilRatedLvgEnthalpy = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]" );
 
 		// System Summary Report
 
@@ -1857,6 +2343,8 @@ namespace OutputReportPredefined {
 			pdchS62svrClEv = newPreDefColumn( pdstS62sysVentReqCool, "System Ventilation Efficiency - Ev" );
 			pdchS62svrClVot = newPreDefColumn( pdstS62sysVentReqCool, "Outdoor Air Intake Flow - Vot [m3/s]" );
 			pdchS62svrClPercOA = newPreDefColumn( pdstS62sysVentReqCool, "Percent Outdoor Air - %OA" );
+			pdchS62svrClEnvironmentOfPs =  newPreDefColumn( pdstS62sysVentReqCool, "Environment Name of Peak System Population - Ps" );
+			pdchS62svrClTimeOfPs =  newPreDefColumn( pdstS62sysVentReqCool, "Date and Time of Last Peak System Population - Ps" );
 
 			pdstS62sysVentReqHeat = newPreDefSubTable( pdrStd62, "System Ventilation Requirements for Heating" );
 
@@ -1870,6 +2358,8 @@ namespace OutputReportPredefined {
 			pdchS62svrHtEv = newPreDefColumn( pdstS62sysVentReqHeat, "System Ventilation Efficiency - Ev" );
 			pdchS62svrHtVot = newPreDefColumn( pdstS62sysVentReqHeat, "Outdoor Air Intake Flow Vot [m3/s]" );
 			pdchS62svrHtPercOA = newPreDefColumn( pdstS62sysVentReqHeat, "Percent Outdoor Air - %OA" );
+			pdchS62svrHtEnvironmentOfPs =  newPreDefColumn( pdstS62sysVentReqHeat, "Environment Name of Peak System Population - Ps" );
+			pdchS62svrHtTimeOfPs =  newPreDefColumn( pdstS62sysVentReqHeat, "Date and Time of Last Peak System Population - Ps" );
 
 			pdstS62znVentPar = newPreDefSubTable( pdrStd62, "Zone Ventilation Parameters" );
 
@@ -2013,8 +2503,12 @@ namespace OutputReportPredefined {
 		pdchLeedPerfElDem = newPreDefColumn( pdstLeedPerf, "Electric Demand [W]" );
 		pdchLeedPerfGasEneUse = newPreDefColumn( pdstLeedPerf, "Natural Gas Energy Use [GJ]" );
 		pdchLeedPerfGasDem = newPreDefColumn( pdstLeedPerf, "Natural Gas Demand [W]" );
-		pdchLeedPerfOthEneUse = newPreDefColumn( pdstLeedPerf, "Additional Energy Use [GJ]" );
-		pdchLeedPerfOthDem = newPreDefColumn( pdstLeedPerf, "Additional Demand [W]" );
+		pdchLeedPerfAddFuelEneUse = newPreDefColumn( pdstLeedPerf, "Additional Fuel Use [GJ]" );
+		pdchLeedPerfAddFuelDem = newPreDefColumn( pdstLeedPerf, "Additional Fuel Demand [W]" );
+		pdchLeedPerfDisClEneUse = newPreDefColumn( pdstLeedPerf, "District Cooling Use [GJ]" );
+		pdchLeedPerfDisClDem = newPreDefColumn( pdstLeedPerf, "District Cooling Demand [W]" );
+		pdchLeedPerfDisHtEneUse = newPreDefColumn( pdstLeedPerf, "District Heating Use [GJ]" );
+		pdchLeedPerfDisHtDem = newPreDefColumn( pdstLeedPerf, "District Heating Demand [W]" );
 
 		pdstLeedEneUseSum = newPreDefSubTable( pdrLeed, "EAp2-6. Energy Use Summary" );
 		// Multiple columns with rows of:
@@ -2075,6 +2569,18 @@ namespace OutputReportPredefined {
 		//    Receptacle Equipment
 		//    Miscellaneous
 		pdchLeedEupPerc = newPreDefColumn( pdstLeedEneUsePerc, "Percent [%]" );
+
+		pdstLeedEqFlLdHrs = newPreDefSubTable( pdrLeed, "Schedules-Equivalent Full Load Hours (Schedule Type=Fraction)" );
+		pdchLeedEflhEflh = newPreDefColumn( pdstLeedEqFlLdHrs, "Equivalent Full Load Hours of Operation Per Year [hr]" );
+		pdchLeedEflhNonZerHrs = newPreDefColumn( pdstLeedEqFlLdHrs, "Hours > 1% [hr]" );
+
+		pdstLeedSchedSetPts = newPreDefSubTable( pdrLeed, "Schedules-SetPoints (Schedule Type=Temperature)" );
+		pdChLeedSchStPtFirstObjUsed = newPreDefColumn( pdstLeedSchedSetPts, "First Object Used" );
+		pdChLeedSchStPtMonthUsed = newPreDefColumn( pdstLeedSchedSetPts, "Month Assumed" );
+		pdchLeedSchStPt11amWednesday = newPreDefColumn( pdstLeedSchedSetPts, "11am First Wednesday [C]" );
+		pdchLeedSchStPt11amWedCnt = newPreDefColumn( pdstLeedSchedSetPts, "Days with Same 11am Value" );
+		pdchLeedSchStPt11pmWednesday = newPreDefColumn( pdstLeedSchedSetPts, "11pm First Wednesday [C]" );
+		pdchLeedSchStPt11pmWedCnt = newPreDefColumn( pdstLeedSchedSetPts, "Days with Same 11pm Value" );
 
 	}
 
@@ -2137,7 +2643,7 @@ namespace OutputReportPredefined {
 		// convert the integer to a string for the number of digits
 		gio::write( digitString, fmtI1 ) << sigDigitCount;
 		// build up the format string
-		if ( tableEntryReal < 1e10 ) {
+		if ( tableEntryReal < 1e8 ) { // change from 1e10 for more robust entry writing
 			formatConvert = "(F12." + digitString + ')';
 		} else {
 			formatConvert = "(E12." + digitString + ')';
@@ -2253,7 +2759,7 @@ namespace OutputReportPredefined {
 	{
 		for ( int iTableEntry = 1; iTableEntry <= numTableEntry; ++iTableEntry ) {
 			if ( tableEntry( iTableEntry ).indexColumn == columnIndex && tableEntry( iTableEntry ).objectName == objName ){
-				return trimmed( left_justified(tableEntry( iTableEntry ).charEntry) );
+				return trimmed( ljustified(tableEntry( iTableEntry ).charEntry) );
 				break;
 			}
 		}

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -71,11 +72,12 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -137,8 +139,6 @@ namespace WindowAC {
 	using DataHVACGlobals::DrawThru;
 	using DataHVACGlobals::BlowThru;
 	using DataHVACGlobals::SingleHeatingSetPoint;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
@@ -221,7 +221,6 @@ namespace WindowAC {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataHeatBalFanSys::TempControlType;
 
@@ -252,7 +251,7 @@ namespace WindowAC {
 
 		// Find the correct Window AC Equipment
 		if ( CompIndex == 0 ) {
-			WindACNum = FindItemInList( CompName, WindAC );
+			WindACNum = UtilityRoutines::FindItemInList( CompName, WindAC );
 			if ( WindACNum == 0 ) {
 				ShowFatalError( "SimWindowAC: Unit not found=" + CompName );
 			}
@@ -317,12 +316,6 @@ namespace WindowAC {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using Fans::GetFanIndex;
@@ -369,8 +362,6 @@ namespace WindowAC {
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool errFlag( false ); // Local error flag for GetOAMixerNodeNums
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool FanErrFlag( false ); // Error flag used in GetFanIndex call
 		Real64 FanVolFlow; // Fan volumetric flow rate
 		bool CoilNodeErrFlag; // Used in error messages for mining coil outlet node number
@@ -390,14 +381,14 @@ namespace WindowAC {
 		// find the number of each type of window AC unit
 		CurrentModuleObject = "ZoneHVAC:WindowAirConditioner";
 
-		NumWindACCyc = GetNumObjectsFound( CurrentModuleObject );
+		NumWindACCyc = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumWindAC = NumWindACCyc;
 		// allocate the data structures
 		WindAC.allocate( NumWindAC );
 		CheckEquipName.dimension( NumWindAC, true );
 		WindACNumericFields.allocate( NumWindAC );
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
@@ -409,21 +400,15 @@ namespace WindowAC {
 		// loop over window AC units; get and load the input data
 		for ( WindACIndex = 1; WindACIndex <= NumWindACCyc; ++WindACIndex ) {
 
-			GetObjectItem( CurrentModuleObject, WindACIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, WindACIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WindACNum = WindACIndex;
 
 			WindACNumericFields( WindACNum ).FieldNames.allocate( NumNumbers );
 			WindACNumericFields( WindACNum ).FieldNames = "";
 			WindACNumericFields( WindACNum ).FieldNames = cNumericFields;
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), WindAC, WindACNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
 			WindAC( WindACNum ).Name = Alphas( 1 );
 			WindAC( WindACNum ).UnitType = WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'
 			WindAC( WindACNum ).Sched = Alphas( 2 );
@@ -475,7 +460,7 @@ namespace WindowAC {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( UtilityRoutines::SameString(  WindAC( WindACNum ).FanType, "Fan:SystemModel" ) ) {
 					WindAC( WindACNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( WindAC( WindACNum ).FanName ) ); // call constructor
 					WindAC( WindACNum ).FanIndex = HVACFan::getFanObjectVectorIndex( WindAC( WindACNum ).FanName );
@@ -525,16 +510,16 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).DXCoilName = Alphas( 10 );
 
-			if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
+			if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) || UtilityRoutines::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) || UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" ) ) {
 				WindAC( WindACNum ).DXCoilType = Alphas( 9 );
 				CoilNodeErrFlag = false;
-				if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:SingleSpeed" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
-				} else if ( SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 9 ), "CoilSystem:Cooling:DX:HeatExchangerAssisted" ) ) {
 					WindAC( WindACNum ).DXCoilType_Num = CoilDX_CoolingHXAssisted;
 					WindAC( WindACNum ).CoilOutletNodeNum = GetDXHXAsstdCoilOutletNode( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
-				} else if ( SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 9 ), "Coil:Cooling:DX:VariableSpeed" )  ) {
 					WindAC( WindACNum ).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
 					WindAC( WindACNum ).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed( WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).DXCoilName, CoilNodeErrFlag );
 					WindAC( WindACNum ).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds( WindAC( WindACNum ).DXCoilName, ErrorsFound );
@@ -559,8 +544,8 @@ namespace WindowAC {
 				WindAC( WindACNum ).OpMode = CycFanCycCoil;
 			}
 
-			if ( SameString( Alphas( 12 ), "BlowThrough" ) ) WindAC( WindACNum ).FanPlace = BlowThru;
-			if ( SameString( Alphas( 12 ), "DrawThrough" ) ) WindAC( WindACNum ).FanPlace = DrawThru;
+			if ( UtilityRoutines::SameString( Alphas( 12 ), "BlowThrough" ) ) WindAC( WindACNum ).FanPlace = BlowThru;
+			if ( UtilityRoutines::SameString( Alphas( 12 ), "DrawThrough" ) ) WindAC( WindACNum ).FanPlace = DrawThru;
 			if ( WindAC( WindACNum ).FanPlace == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFields( 12 ) + " = " + Alphas( 12 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
@@ -575,7 +560,7 @@ namespace WindowAC {
 
 			WindAC( WindACNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 14 ) ) {
-				WindAC( WindACNum ).HVACSizingIndex = FindItemInList( Alphas( 14 ), ZoneHVACSizing );
+				WindAC( WindACNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 14 ), ZoneHVACSizing );
 				if ( WindAC( WindACNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 14 ) + " = " + Alphas( 14 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
@@ -690,21 +675,28 @@ namespace WindowAC {
 
 		for ( WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum ) {
 			// Setup Report variables for the Fan Coils
-			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Rate [W]", WindAC( WindACNum ).TotCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Energy [J]", WindAC( WindACNum ).TotCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Rate [W]", WindAC( WindACNum ).SensCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Energy [J]", WindAC( WindACNum ).SensCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Rate [W]", WindAC( WindACNum ).LatCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Energy [J]", WindAC( WindACNum ).LatCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Electric Power [W]", WindAC( WindACNum ).ElecPower, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Electric Energy [J]", WindAC( WindACNum ).ElecConsumption, "System", "Sum", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Fan Part Load Ratio []", WindAC( WindACNum ).FanPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Compressor Part Load Ratio []", WindAC( WindACNum ).CompPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
-			SetupOutputVariable( "Zone Window Air Conditioner Fan Availability Status []", WindAC( WindACNum ).AvailStatus, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Rate", OutputProcessor::Unit::W, WindAC( WindACNum ).TotCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Total Cooling Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).TotCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Rate", OutputProcessor::Unit::W, WindAC( WindACNum ).SensCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Sensible Cooling Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).SensCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Rate", OutputProcessor::Unit::W, WindAC( WindACNum ).LatCoolEnergyRate, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Latent Cooling Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).LatCoolEnergy, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Electric Power", OutputProcessor::Unit::W, WindAC( WindACNum ).ElecPower, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Electric Energy", OutputProcessor::Unit::J, WindAC( WindACNum ).ElecConsumption, "System", "Sum", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Fan Part Load Ratio", OutputProcessor::Unit::None, WindAC( WindACNum ).FanPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Compressor Part Load Ratio", OutputProcessor::Unit::None, WindAC( WindACNum ).CompPartLoadRatio, "System", "Average", WindAC( WindACNum ).Name );
+			SetupOutputVariable( "Zone Window Air Conditioner Fan Availability Status", OutputProcessor::Unit::None, WindAC( WindACNum ).AvailStatus, "System", "Average", WindAC( WindACNum ).Name );
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Window Air Conditioner", WindAC( WindACNum ).Name, "Part Load Ratio", "[fraction]", WindAC( WindACNum ).EMSOverridePartLoadFrac, WindAC( WindACNum ).EMSValueForPartLoadFrac );
 			}
 
+		}
+		for ( WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum ) {
+			if ( WindAC( WindACNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				coilSelectionReportObj->setCoilSupplyFanInfo( WindAC( WindACNum ).DXCoilName , WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel , WindAC( WindACNum ).FanIndex );
+			} else {
+				coilSelectionReportObj->setCoilSupplyFanInfo( WindAC( WindACNum ).DXCoilName , WindAC( WindACNum ).DXCoilType, WindAC( WindACNum ).FanName, DataAirSystems::structArrayLegacyFanModels , WindAC( WindACNum ).FanIndex );
+			}
 		}
 
 	}
@@ -914,12 +906,8 @@ namespace WindowAC {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
@@ -928,17 +916,8 @@ namespace WindowAC {
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MaxAirVolFlowDes; // Autosized maximum air flow for reporting
@@ -1079,7 +1058,7 @@ namespace WindowAC {
 		}
 
 		DataScalableCapSizingON = false;
-		
+
 	}
 
 	void
@@ -1311,7 +1290,6 @@ namespace WindowAC {
 		using MixedAir::SimOAMixer;
 		using DXCoils::SimDXCoil;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-		using InputProcessor::SameString;
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 
@@ -1371,7 +1349,7 @@ namespace WindowAC {
 			Real64 OnOffAirFlowRatio( 1.0 ); // ratio of compressor on flow to average flow over time step
 
 			VariableSpeedCoils::SimVariableSpeedCoils( WindAC( WindACNum ).DXCoilName, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, 1.0, PartLoadFrac, WindAC( WindACNum ).DXCoilNumOfSpeeds, 1.0, QZnReq, QLatReq, OnOffAirFlowRatio );
-		
+
 		} else {
 			SimDXCoil( WindAC( WindACNum ).DXCoilName, On, FirstHVACIteration, WindAC( WindACNum ).DXCoilIndex, WindAC( WindACNum ).OpMode, PartLoadFrac );
 		}

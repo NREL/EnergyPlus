@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -84,26 +85,103 @@ namespace EnergyPlus {
 		DataHeatBalance::Zone( 1 ).OutWetBulbTemp = 5.0;
 		
 		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::MATControl;
-		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SetCoolingPanelControlTemp( ControlTemp, ZoneNum );
 		EXPECT_EQ( ControlTemp, 22.0 );
 
 		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::MRTControl;
-		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SetCoolingPanelControlTemp( ControlTemp, ZoneNum );
 		EXPECT_EQ( ControlTemp, 20.0 );
 
 		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::OperativeControl;
-		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SetCoolingPanelControlTemp( ControlTemp, ZoneNum );
 		EXPECT_EQ( ControlTemp, 21.0 );
 
 		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::ODBControl;
-		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SetCoolingPanelControlTemp( ControlTemp, ZoneNum );
 		EXPECT_EQ( ControlTemp, 10.0 );
 
 		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).ControlType = CoolingPanelSimple::OWBControl;
-		SetCoolingPanelControlTemp( ControlTemp, CoolingPanelNum, ZoneNum );
+		CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SetCoolingPanelControlTemp( ControlTemp, ZoneNum );
 		EXPECT_EQ( ControlTemp, 5.0 );
 				
 	}
 
+	TEST_F( EnergyPlusFixture, SizeCoolingPanelUA )
+	{
+		
+		int CoolingPanelNum; // Cooling panel number
+		bool SizeCoolingPanelUASuccess;
+		
+		CoolingPanelNum = 1;
+		SizeCoolingPanelUASuccess = true;
+
+		CoolingPanelSimple::CoolingPanel.allocate( CoolingPanelNum );
+
+		// Valid input combination
+		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
+		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 4000.0;
+		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
+		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 21.0;
+		SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SizeCoolingPanelUA( );
+		EXPECT_EQ( SizeCoolingPanelUASuccess, true );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).UA, 14569.0, 1.0 );
+
+		// Capacity slightly high case--code fixes this and moves on
+		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
+		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 4200.0;
+		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
+		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 21.0;
+		SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SizeCoolingPanelUA( );
+		EXPECT_EQ( SizeCoolingPanelUASuccess, true );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).UA, 37947.0, 1.0 );
+
+		// Temperatures too close--code fixes this and moves on
+		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
+		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 2000.0;
+		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
+		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 20.4;
+		SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SizeCoolingPanelUA( );
+		EXPECT_EQ( SizeCoolingPanelUASuccess, true );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).UA, 14569.0, 1.0 );
+		
+		// Capacity too high case
+		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
+		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 5000.0;
+		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 20.0;
+		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 21.0;
+		SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SizeCoolingPanelUA( );
+		EXPECT_EQ( SizeCoolingPanelUASuccess, false );
+
+		// Water temperature higher than zone temperature (not cooling) case
+		CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate = 1.0;
+		CoolingPanel( CoolingPanelNum ).ScaledCoolingCapacity = 4000.0;
+		CoolingPanel( CoolingPanelNum ).RatedWaterTemp = 21.0;
+		CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp = 20.0;
+		SizeCoolingPanelUASuccess = CoolingPanelSimple::CoolingPanel( CoolingPanelNum ).SizeCoolingPanelUA( );
+		EXPECT_EQ( SizeCoolingPanelUASuccess, false );
+		
+	}
+	
+	TEST_F( EnergyPlusFixture, ReportCoolingPanel )
+	{
+		int CoolingPanelNum; // Cooling panel number
+		
+		CoolingPanelNum = 1;
+		
+		CoolingPanelSimple::CoolingPanel.allocate( CoolingPanelNum );
+		
+		// Test the new output for running the values through the Report subroutine
+		CoolingPanel( CoolingPanelNum ).TotPower  = -10.0;
+		CoolingPanel( CoolingPanelNum ).Power = -9.0;
+		CoolingPanel( CoolingPanelNum ).ConvPower = -4.0;
+		CoolingPanel( CoolingPanelNum ).RadPower  = -5.0;
+		CoolingPanel( CoolingPanelNum ).ReportCoolingPanel( );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).TotPower, 10.0, 1.0 );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).Power, 9.0, 1.0 );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).ConvPower, 4.0, 1.0 );
+		EXPECT_NEAR( CoolingPanel( CoolingPanelNum ).RadPower, 5.0, 1.0 );
+		
+	}
 
 }
+

@@ -59,7 +59,7 @@
 !
 !   The model also contains an under floor zone and a suspended ceiling zone
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -111,7 +111,7 @@
 
 ! CHICAGO_IL_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
 ! Coldest Month=January
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -143,7 +143,7 @@
 
 ! CHICAGO Annual Cooling Design Conditions Wind Speed=5.3m/s Wind Dir=230
 ! Hottest Month=July
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=23.8°C
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2Â°C MWB=23.8Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -523,7 +523,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    SummerEnergyCharge,      !- Name
+    SummerEnergyCharge,      !- Utility Cost Charge Block Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -538,7 +538,7 @@
     0.0196;                  !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerBasicEnergyCharge, !- Name
+    SummerBasicEnergyCharge, !- Utility Cost Charge Simple Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     TotalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -546,7 +546,7 @@
     0.0110;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Block Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -561,7 +561,7 @@
     0.0196;                  !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterBasicEnergyCharge, !- Name
+    WinterBasicEnergyCharge, !- Utility Cost Charge Simple Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     TotalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -569,7 +569,7 @@
     0.0060;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    WinterDemandCharge,      !- Name
+    WinterDemandCharge,      !- Utility Cost Charge Block Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     totalDemand,             !- Source Variable
     Winter,                  !- Season
@@ -582,7 +582,7 @@
     4.75;                    !- Block 2 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    SummerDemandCharge,      !- Name
+    SummerDemandCharge,      !- Utility Cost Charge Block Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     totalDemand,             !- Source Variable
     Summer,                  !- Season
@@ -595,7 +595,7 @@
     6.51;                    !- Block 2 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand200kw,          !- Name
+    MinDemand200kw,          !- Utility Cost Qualify Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -605,7 +605,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSevenPercent,       !- Name
+    TaxofSevenPercent,       !- Utility Cost Charge Simple Name
     MidAmericEnerg_GeneralServiceDemand,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -631,7 +631,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    SummerEnergyCharge,      !- Name
+    SummerEnergyCharge,      !- Utility Cost Charge Block Name
     MidAmericEnerg_GeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -644,7 +644,7 @@
     0.0561;                  !- Block 2 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Block Name
     MidAmericEnerg_GeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -657,7 +657,7 @@
     0.0481;                  !- Block 2 Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand200kw,          !- Name
+    MaxDemand200kw,          !- Utility Cost Qualify Name
     MidAmericEnerg_GeneralService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -667,7 +667,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSevenPercent,       !- Name
+    TaxofSevenPercent,       !- Utility Cost Charge Simple Name
     MidAmericEnerg_GeneralService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -731,7 +731,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IA_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -756,7 +756,7 @@
     8.13;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofSevenPercent,       !- Name
+    TaxofSevenPercent,       !- Utility Cost Charge Simple Name
     IA_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -976,20 +976,6 @@
     Wood 6inch;              !- Outside Layer
 
   Construction,
-    INT-FLOOR-TOPSIDE,       !- Name
-    MAT-CC05 4  MW CONCRETE, !- Outside Layer
-    CP02 CARPET PAD;         !- Layer 2
-
-  Construction,
-    INT-FLOOR-UNDERSIDE,     !- Name
-    CP02 CARPET PAD,         !- Outside Layer
-    MAT-CC05 4  MW CONCRETE; !- Layer 2
-
-  Construction,
-    INT-FLOOR-SLAB,          !- Name
-    MAT-CC05 4  MW CONCRETE; !- Outside Layer
-
-  Construction,
     DropCeiling,             !- Name
     AC02;                    !- Outside Layer
 
@@ -1002,18 +988,6 @@
     Raised-Floor-UnderSide,  !- Name
     CP02 CARPET PAD,         !- Outside Layer
     1.5  MW CONCRETE;        !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Clear Acrylic Plastic;   !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Diffusing Acrylic Plastic;  !- Outside Layer
 
   Material,
     ASHRAE 90.1-1999_Table B-17_ROOFING - BUILT UP ROOFING - 3 /,  !- Name
@@ -1172,12 +1146,6 @@
     ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37)_1,  !- Outside Layer
     ASHRAE 90.1-1999_Table B-17_AIR 6MM(37),  !- Layer 2
     ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37)_1;  !- Layer 3
-
-  Construction,
-    North_window,            !- Name
-    ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37),  !- Outside Layer
-    ASHRAE 90.1-1999_Table B-17_AIR 6MM(37),  !- Layer 2
-    ASHRAE 90.1-1999_Table B-17_CLEAR 3MM(37);  !- Layer 3
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -8986,10 +8954,11 @@
     ZN1_SW_1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN1_SW_1 Zone Air Node,  !- Zone Air Node Name
-    ZN1_SW_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN1_SW_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN1_SW_1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN1_SW_1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9087,10 +9056,11 @@
     ZN2_S_1 Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN2_S_1 Zone Air Node,   !- Zone Air Node Name
-    ZN2_S_1 Return Outlet;   !- Zone Return Air Node Name
+    ZN2_S_1 Return Outlet;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN2_S_1 Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN2_S_1 ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9188,10 +9158,11 @@
     ZN3_SE_1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN3_SE_1 Zone Air Node,  !- Zone Air Node Name
-    ZN3_SE_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN3_SE_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN3_SE_1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN3_SE_1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9289,10 +9260,11 @@
     ZN4_E_1 Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN4_E_1 Zone Air Node,   !- Zone Air Node Name
-    ZN4_E_1 Return Outlet;   !- Zone Return Air Node Name
+    ZN4_E_1 Return Outlet;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN4_E_1 Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN4_E_1 ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9390,10 +9362,11 @@
     ZN5_NE_1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN5_NE_1 Zone Air Node,  !- Zone Air Node Name
-    ZN5_NE_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN5_NE_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN5_NE_1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN5_NE_1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9491,10 +9464,11 @@
     ZN6_N_1 Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN6_N_1 Zone Air Node,   !- Zone Air Node Name
-    ZN6_N_1 Return Outlet;   !- Zone Return Air Node Name
+    ZN6_N_1 Return Outlet;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN6_N_1 Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN6_N_1 ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9592,10 +9566,11 @@
     ZN7_NW_1 Inlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN7_NW_1 Zone Air Node,  !- Zone Air Node Name
-    ZN7_NW_1 Return Outlet;  !- Zone Return Air Node Name
+    ZN7_NW_1 Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN7_NW_1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN7_NW_1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9693,10 +9668,11 @@
     ZN8_W_1 Inlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZN8_W_1 Zone Air Node,   !- Zone Air Node Name
-    ZN8_W_1 Return Outlet;   !- Zone Return Air Node Name
+    ZN8_W_1 Return Outlet;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZN8_W_1 Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZN8_W_1 ATU,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9794,7 +9770,7 @@
     ZN9_Core_1 Inlets,       !- Zone Air Inlet Node or NodeList Name
     ZN9_Core_1 Exhausts,     !- Zone Air Exhaust Node or NodeList Name
     ZN9_Core_1 Zone Air Node,!- Zone Air Node Name
-    ZN9_Core_1 Return Outlet;!- Zone Return Air Node Name
+    ZN9_Core_1 Return Outlet;!- Zone Return Air Node or NodeList Name
 
   NodeList,
     ZN9_Core_1 Exhausts,     !- Name
@@ -9821,6 +9797,7 @@
 
   ZoneHVAC:EquipmentList,
     ZN9_Core_1 Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
     Zone 9 Exhaust Fan 1,    !- Zone Equipment 1 Name
     3,                       !- Zone Equipment 1 Cooling Sequence
@@ -10992,7 +10969,7 @@
 ! Slope of temperature change in vertical direction
 
   RoomAir:TemperaturePattern:ConstantGradient,
-    two tenths C per Meter,  !- Name
+    two tenths C per Meter,  !- Room Air Temperature Pattern Constant Gradient Name
     10002,                   !- Control Integer for Pattern Control Schedule Name
     0.0,                     !- Thermostat Offset {deltaC}
     0.5,                     !- Return Air Offset {deltaC}
@@ -11077,7 +11054,7 @@
 ! Slope of temperature change in vertical direction
 
   RoomAir:TemperaturePattern:ConstantGradient,
-    One C per Meter,         !- Name
+    One C per Meter,         !- Room Air Temperature Pattern Constant Gradient Name
     1001,                    !- Control Integer for Pattern Control Schedule Name
     0.0,                     !- Thermostat Offset {deltaC}
     1.0,                     !- Return Air Offset {deltaC}
@@ -11104,7 +11081,7 @@
     Until: 24:00,2002;       !- Field 3
 
   RoomAir:TemperaturePattern:TwoGradient,
-    Mixed to one C per M by Outdoor DB,  !- Name
+    Mixed to one C per M by Outdoor DB,  !- Room Air Temperature Pattern Two Gradient Name
     2002,                    !- Control Integer for Pattern Control Schedule Name
     1.1,                     !- Thermostat Height {m}
     4.5,                     !- Return Air Height {m}
@@ -11135,7 +11112,7 @@
     Until: 24:00,2003;       !- Field 3
 
   RoomAir:TemperaturePattern:TwoGradient,
-    Mixed to one C per M by Delta DB,  !- Name
+    Mixed to one C per M by Delta DB,  !- Room Air Temperature Pattern Two Gradient Name
     2003,                    !- Control Integer for Pattern Control Schedule Name
     1.1,                     !- Thermostat Height {m}
     4.5,                     !- Return Air Height {m}
@@ -11166,7 +11143,7 @@
     Until: 24:00,2004;       !- Field 3
 
   RoomAir:TemperaturePattern:TwoGradient,
-    Mixed to one C per M by Cooling Load,  !- Name
+    Mixed to one C per M by Cooling Load,  !- Room Air Temperature Pattern Two Gradient Name
     2004,                    !- Control Integer for Pattern Control Schedule Name
     1.1,                     !- Thermostat Height {m}
     4.5,                     !- Return Air Height {m}
@@ -11199,7 +11176,7 @@
     Until: 24:00,2005;       !- Field 3
 
   RoomAir:TemperaturePattern:TwoGradient,
-    Mixed to one C per M by Cooling Load,  !- Name
+    Mixed to one C per M by Cooling Load,  !- Room Air Temperature Pattern Two Gradient Name
     2005,                    !- Control Integer for Pattern Control Schedule Name
     1.1,                     !- Thermostat Height {m}
     4.5,                     !- Return Air Height {m}
@@ -11232,7 +11209,7 @@
     Until: 24:00,2001;       !- Field 3
 
   RoomAir:TemperaturePattern:TwoGradient,
-    Mixed from one C per M by Zone DB,  !- Name
+    Mixed from one C per M by Zone DB,  !- Room Air Temperature Pattern Two Gradient Name
     2001,                    !- Control Integer for Pattern Control Schedule Name
     1.1,                     !- Thermostat Height {m}
     4.5,                     !- Return Air Height {m}
@@ -11279,7 +11256,7 @@
 ! Slope of temperature change in vertical direction
 
   RoomAir:TemperaturePattern:ConstantGradient,
-    Null Gradient,           !- Name
+    Null Gradient,           !- Room Air Temperature Pattern Constant Gradient Name
     1000,                    !- Control Integer for Pattern Control Schedule Name
     0.0,                     !- Thermostat Offset {deltaC}
     0.0,                     !- Return Air Offset {deltaC}
@@ -11289,7 +11266,7 @@
 ! Slope of temperature change in vertical direction
 
   RoomAir:TemperaturePattern:ConstantGradient,
-    half C per Meter,        !- Name
+    half C per Meter,        !- Room Air Temperature Pattern Constant Gradient Name
     10005,                   !- Control Integer for Pattern Control Schedule Name
     0.0,                     !- Thermostat Offset {deltaC}
     1.0,                     !- Return Air Offset {deltaC}
@@ -11299,7 +11276,7 @@
 ! Slope of temperature change in vertical direction
 
   RoomAir:TemperaturePattern:ConstantGradient,
-    Two C per Meter,         !- Name
+    Two C per Meter,         !- Room Air Temperature Pattern Constant Gradient Name
     1002,                    !- Control Integer for Pattern Control Schedule Name
     -.2,                     !- Thermostat Offset {deltaC}
     1.2,                     !- Return Air Offset {deltaC}

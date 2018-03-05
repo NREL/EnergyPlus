@@ -9,8 +9,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, CHICAGO_IL_USA TMY2-94846
 !
@@ -20,7 +20,7 @@
 !           There is a single window in West Zone's south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -93,7 +93,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,6;
 
@@ -140,7 +140,7 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
- ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+ ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -170,7 +170,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+ ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -1420,10 +1420,11 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     Zone1UnitHeat,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1442,33 +1443,33 @@
     UnitHeatAvailability,    !- Availability Schedule Name
     Zone1UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone1UnitHeatAirOutletNode,  !- Air Outlet Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone1UnitHeatFan,        !- Supply Air Fan Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone1UnitHeatHeatingCoil,!- Heating Coil Name
-    ON,                        !- Supply Air Fan Operating Mode Schedule Name
+    ON,                      !- Supply Air Fan Operating Mode Schedule Name
     Yes,                     !- Supply Air Fan Operation During No Heating
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
   Fan:SystemModel,
-    Zone1UnitHeatFan ,          !- Name
-    UnitHeatAvailability ,      !- Availability Schedule Name
+    Zone1UnitHeatFan,        !- Name
+    UnitHeatAvailability,    !- Availability Schedule Name
     Zone1UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone1UnitHeatFanOutletNode,  !- Air Outlet Node Name
-    AUTOSIZE ,                   !- Design Maximum Air Flow Rate
-    Discrete ,                   !- Speed Control Method
-    0.0,                         !- Electric Power Minimum Flow Rate Fraction
-    75.0,                        !- Design Pressure Rise
-    0.9 ,                        !- Motor Efficiency
-    1.0 ,                        !- Motor In Air Stream Fraction
-    AUTOSIZE,                    !- Design Electric Power Consumption
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
-    ,                            !- Electric Power Per Unit Flow Rate
-    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.50;                        !- Fan Total Efficiency
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Heating:Water,
     Zone1UnitHeatHeatingCoil,!- Name
@@ -1493,10 +1494,11 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone2Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     Zone2UnitHeat,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1515,33 +1517,33 @@
     UnitHeatAvailability,    !- Availability Schedule Name
     Zone2UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone2UnitHeatAirOutletNode,  !- Air Outlet Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone2UnitHeatFan,        !- Supply Air Fan Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone2UnitHeatHeatingCoil,!- Heating Coil Name
-    ON,                        !- Supply Air Fan Operating Mode Schedule Name
+    ON,                      !- Supply Air Fan Operating Mode Schedule Name
     No,                      !- Supply Air Fan Operation During No Heating
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-Fan:SystemModel,
-  Zone2UnitHeatFan , !- Name
-  UnitHeatAvailability , !- Availability Schedule Name
-  Zone2UnitHeatAirInletNode,  !- Air Inlet Node Name
-  Zone2UnitHeatFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone2UnitHeatFan,        !- Name
+    UnitHeatAvailability,    !- Availability Schedule Name
+    Zone2UnitHeatAirInletNode,  !- Air Inlet Node Name
+    Zone2UnitHeatFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Heating:Water,
     Zone2UnitHeatHeatingCoil,!- Name
@@ -1566,10 +1568,11 @@ Fan:SystemModel,
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone3Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     Zone3UnitHeat,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1588,34 +1591,33 @@ Fan:SystemModel,
     UnitHeatAvailability,    !- Availability Schedule Name
     Zone3UnitHeatAirInletNode,  !- Air Inlet Node Name
     Zone3UnitHeatAirOutletNode,  !- Air Outlet Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone3UnitHeatFan,        !- Supply Air Fan Name
     autosize,                !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone3UnitHeatHeatingCoil,!- Heating Coil Name
-    ON ,                        !- Supply Air Fan Operating Mode Schedule Name
+    ON,                      !- Supply Air Fan Operating Mode Schedule Name
     Yes,                     !- Supply Air Fan Operation During No Heating
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-Fan:SystemModel,
-  Zone3UnitHeatFan , !- Name
-  UnitHeatAvailability , !- Availability Schedule Name
-  Zone3UnitHeatAirInletNode,  !- Air Inlet Node Name
-  Zone3UnitHeatFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
-
+  Fan:SystemModel,
+    Zone3UnitHeatFan,        !- Name
+    UnitHeatAvailability,    !- Availability Schedule Name
+    Zone3UnitHeatAirInletNode,  !- Air Inlet Node Name
+    Zone3UnitHeatFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Coil:Heating:Water,
     Zone3UnitHeatHeatingCoil,!- Name

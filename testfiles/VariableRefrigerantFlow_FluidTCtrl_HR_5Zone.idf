@@ -4,12 +4,12 @@
 ! Highlights:              New physics based VRF Heat Recovery (HR) model applicable for Fluid Temperature Control.
 !                          The system is able to provide simultaneous heating and cooling.
 !
-! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
+! Simulation Location/Run: Miami Intl Ap FL USA TMY3 722020, 2 design days, 2 run periods,
 !
 ! Location:                Miami, FL
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 2/1, Summer 7/1, Miami Intl Ap FL USA 722020
 !
@@ -22,7 +22,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -96,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -772,7 +772,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:SATURATED ===========
 
   FluidProperties:Saturated,
-    R410a,                   !- Name
+    R410a,                   !- Fluid Name
     Pressure,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R410aSaturatedTemperatures,  !- Temperature Values Name
@@ -785,7 +785,7 @@
     3.3552E+06,3.5886E+06,3.8348E+06,4.0949E+06,4.3697E+06,4.6607E+06;
 
   FluidProperties:Saturated,
-    R410a,                   !- Name
+    R410a,                   !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R410aSaturatedTemperatures,  !- Temperature Values Name
@@ -798,7 +798,7 @@
     2.9441E+05,3.0120E+05,3.0848E+05,3.1650E+05,3.2578E+05,3.3815E+05;
 
   FluidProperties:Saturated,
-    R410a,                   !- Name
+    R410a,                   !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R410aSaturatedTemperatures,  !- Temperature Values Name
@@ -811,7 +811,7 @@
     4.1941E+05,4.1692E+05,4.1370E+05,4.0942E+05,4.0343E+05,3.9373E+05;
 
   FluidProperties:Saturated,
-    R410a,                   !- Name
+    R410a,                   !- Fluid Name
     Density,                 !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R410aSaturatedTemperatures,  !- Temperature Values Name
@@ -824,7 +824,7 @@
     8.7429E+02,8.4672E+02,8.1537E+02,7.7825E+02,7.3095E+02,6.5903E+02;
 
   FluidProperties:Saturated,
-    R410a,                   !- Name
+    R410a,                   !- Fluid Name
     Density,                 !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R410aSaturatedTemperatures,  !- Temperature Values Name
@@ -837,7 +837,7 @@
     1.6135E+02,1.7940E+02,2.0095E+02,2.2766E+02,2.6301E+02,3.1759E+02;
 
   FluidProperties:Saturated,
-    R410a,                   !- Name
+    R410a,                   !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R410aSaturatedTemperatures,  !- Temperature Values Name
@@ -850,7 +850,7 @@
     2.4924E+03,2.7507E+03,3.1534E+03,3.8723E+03,5.5190E+03,1.2701E+04;
 
   FluidProperties:Saturated,
-    R410a,                   !- Name
+    R410a,                   !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R410aSaturatedTemperatures,  !- Temperature Values Name
@@ -2114,7 +2114,7 @@
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -2146,7 +2146,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -4011,7 +4011,7 @@
     SPACE1-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE1-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE1-1 Out Node;       !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -4019,7 +4019,7 @@
     SPACE2-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE2-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Out Node;       !- Zone Return Air Node Name
+    SPACE2-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -4027,7 +4027,7 @@
     SPACE3-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE3-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE3-1 Node,           !- Zone Air Node Name
-    SPACE3-1 Out Node;       !- Zone Return Air Node Name
+    SPACE3-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -4035,7 +4035,7 @@
     SPACE4-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE4-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE4-1 Node,           !- Zone Air Node Name
-    SPACE4-1 Out Node;       !- Zone Return Air Node Name
+    SPACE4-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -4043,7 +4043,7 @@
     SPACE5-1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
     SPACE5-1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
-    SPACE5-1 Out Node;       !- Zone Return Air Node Name
+    SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     SPACE1-1 Control,        !- Name
@@ -4103,6 +4103,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE1-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU1,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4110,6 +4111,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU2,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4117,6 +4119,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU3,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4124,6 +4127,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU4,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4131,6 +4135,7 @@
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU5,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4159,7 +4164,7 @@
 
 ! Coil
 
-  Output:Variable,*,Heating Coil Total Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 

@@ -12,7 +12,7 @@
 !  Location:                CHAMPAIGN_URBANA_IL_USA
 !
 !  Design Days:             CHAMPAIGN_URBANA_IL_USA Annual Heating Wind 99% Design Conditions WS=>MCDB, WS=12.8m/s
-!                           CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9캜 MWB=25캜
+!                           CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9째C MWB=25째C
 !
 !  Run Period (Weather File): 6/1 - 6/2, USA_IL_University.of.Illinois-Willard.AP_TMY3
 !
@@ -23,7 +23,7 @@
 !
 !
 
-  Version,8.7;
+  Version,8.9;
 
 !=============================
 !  Building North Axis,{Deg}
@@ -151,7 +151,7 @@
 
 ! CHAMPAIGN_URBANA Annual Cooling Design Conditions Wind Speed=5.2m/s Wind Dir=240
 ! Hottest Month=July
-! CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9캜 MWB=25캜
+! CHAMPAIGN_URBANA_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.9째C MWB=25째C
 
   SizingPeriod:DesignDay,
     CHAMPAIGN_URBANA Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -969,7 +969,7 @@
     Bottom-Inlets,           !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Bottom-ZoneAirNode,      !- Zone Air Node Name
-    Bottom-ReturnAirNode;    !- Zone Return Air Node Name
+    Bottom-ReturnAirNode;    !- Zone Return Air Node or NodeList Name
 
 ! =========================
 
@@ -979,7 +979,7 @@
     SecondLevel-Inlets,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SecondLevel-ZoneAirNode, !- Zone Air Node Name
-    SecondLevel-ReturnAirNode;  !- Zone Return Air Node Name
+    SecondLevel-ReturnAirNode;  !- Zone Return Air Node or NodeList Name
 
 ! =========================
 
@@ -989,7 +989,7 @@
     ThirdLevel-Inlets,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ThirdLevel-ZoneAirNode,  !- Zone Air Node Name
-    ThirdLevel-ReturnAirNode;!- Zone Return Air Node Name
+    ThirdLevel-ReturnAirNode;!- Zone Return Air Node or NodeList Name
 
 ! =========================
 !Cooling Priority (Highest)
@@ -997,6 +997,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-Bottom,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Bottom-Air,              !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1008,6 +1009,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-SecondLevel,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     SecondLevel-Air,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1019,6 +1021,7 @@
 
   ZoneHVAC:EquipmentList,
     Equipment-ThirdLevel,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ThirdLevel-Air,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1033,6 +1036,7 @@
     ,                        !- Availability Schedule Name
     Bottom-Inlet,            !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     35,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1065,6 +1069,7 @@
     ,                        !- Availability Schedule Name
     SecondLevel-Inlet,       !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     35,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -1097,6 +1102,7 @@
     ,                        !- Availability Schedule Name
     ThirdLevel-Inlet,        !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     35,                      !- Maximum Heating Supply Air Temperature {C}
     12.77778,                !- Minimum Cooling Supply Air Temperature {C}
     8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -55,10 +56,12 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SwimmingPool;
 using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::DataPlant;
 
 TEST_F( EnergyPlusFixture, SwimmingPool_MakeUpWaterVolFlow )
 {
@@ -119,5 +122,69 @@ TEST_F( EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap )
 	EXPECT_NEAR( 3570.0, Pool( PoolNum ).SatPressPoolWaterTemp, 10.0 );
 	EXPECT_NEAR( 1600.0, Pool( PoolNum ).PartPressZoneAirTemp, 10.0 );
 	
+	
+}
+
+TEST_F( EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex )
+{
+
+	bool MyPlantScanFlagPool;
+	
+	// Tests for CalcSwimmingPoolEvap--Evaporate Rate Calculation for Swimming Pools
+	SwimmingPool::clear_state();
+	DataPlant::clear_state();
+
+
+	NumSwimmingPools = 2;
+	TotNumLoops = 2;
+	Pool.allocate( NumSwimmingPools );
+	MyPlantScanFlagPool	= true;
+	Pool( 1 ).Name = "FirstPool";
+	Pool( 2 ).Name = "SecondPool";
+	Pool( 1 ).WaterInletNode = 1;
+	Pool( 2 ).WaterInletNode = 11;
+	PlantLoop.allocate( TotNumLoops );
+	PlantLoop( 1 ).LoopSide.allocate( 2 );
+	PlantLoop( 2 ).LoopSide.allocate( 2 );
+	PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
+	PlantLoop( 1 ).LoopSide( 2 ).Branch.allocate( 1 );
+	PlantLoop( 2 ).LoopSide( 1 ).Branch.allocate( 1 );
+	PlantLoop( 2 ).LoopSide( 2 ).Branch.allocate( 1 );
+	PlantLoop( 1 ).LoopSide( 1 ).TotalBranches = 1;
+	PlantLoop( 1 ).LoopSide( 2 ).TotalBranches = 1;
+	PlantLoop( 2 ).LoopSide( 1 ).TotalBranches = 1;
+	PlantLoop( 2 ).LoopSide( 2 ).TotalBranches = 1;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 1;
+	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).TotalComponents = 1;
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 1;
+	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).TotalComponents = 1;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
+	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
+	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
+	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_SwimmingPool_Indoor;
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).Name = "FirstPool";
+	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
+	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = TypeOf_SwimmingPool_Indoor;
+	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).Name = "SecondPool";
+	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 11;
+	
+	// Test 1
+	InitSwimmingPoolPlantLoopIndex( 1, MyPlantScanFlagPool );
+	EXPECT_EQ( Pool( 1 ).HWLoopNum, 1 );
+	EXPECT_EQ( Pool( 1 ).HWLoopSide, 1 );
+	EXPECT_EQ( Pool( 1 ).HWBranchNum, 1 );
+	EXPECT_EQ( Pool( 1 ).HWCompNum, 1 );
+	EXPECT_EQ( MyPlantScanFlagPool, false );
+	
+	// Test 2
+	MyPlantScanFlagPool	= true;
+	InitSwimmingPoolPlantLoopIndex( 2, MyPlantScanFlagPool );
+	EXPECT_EQ( Pool( 2 ).HWLoopNum, 2 );
+	EXPECT_EQ( Pool( 2 ).HWLoopSide, 2 );
+	EXPECT_EQ( Pool( 2 ).HWBranchNum, 1 );
+	EXPECT_EQ( Pool( 2 ).HWCompNum, 1 );
+	EXPECT_EQ( MyPlantScanFlagPool, false );
 	
 }

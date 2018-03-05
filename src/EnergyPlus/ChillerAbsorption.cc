@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -67,7 +68,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -139,7 +140,7 @@ namespace ChillerAbsorption {
 	Real64 EvaporatorEnergy( 0.0 ); // J - heat transfer to the evaporator coil
 	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
-	
+
 	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	static std::string const BlankString;
@@ -193,27 +194,10 @@ namespace ChillerAbsorption {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide;
 		using DataPlant::TypeOf_Chiller_Absorption;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ChillNum; // Chiller number pointer
@@ -226,7 +210,7 @@ namespace ChillerAbsorption {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, BLASTAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, BLASTAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimBLASTAbsorber: Specified Absorber not one of Valid Absorption Chillers=" + AbsorberName );
 			}
@@ -310,14 +294,7 @@ namespace ChillerAbsorption {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -339,15 +316,13 @@ namespace ChillerAbsorption {
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		//  CHARACTER(len=MaxNameLength) :: CurrentModuleObject  ! for ease in renaming.
 
 		//FLOW
 		cCurrentModuleObject = moduleObjectType;
 
-		NumBLASTAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
+		NumBLASTAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBLASTAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -365,15 +340,8 @@ namespace ChillerAbsorption {
 
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum ) {
-			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), BLASTAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -402,9 +370,9 @@ namespace ChillerAbsorption {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser (not tested) Nodes" );
 
 			if ( NumAlphas > 8 ) {
-				if ( SameString( cAlphaArgs( 9 ), "HotWater" ) || SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "HotWater" ) || UtilityRoutines::SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
-				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
@@ -517,34 +485,34 @@ namespace ChillerAbsorption {
 		}
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum ) {
-			SetupOutputVariable( "Chiller Electric Power [W]", BLASTAbsorberReport( AbsorberNum ).PumpingPower, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", BLASTAbsorberReport( AbsorberNum ).PumpingEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
-			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", BLASTAbsorberReport( AbsorberNum ).QEvap, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", BLASTAbsorberReport( AbsorberNum ).EvapEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
-			SetupOutputVariable( "Chiller Evaporator Inlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).EvapInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Outlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).EvapOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate [kg/s]", BLASTAbsorberReport( AbsorberNum ).Evapmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Electric Power", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).PumpingPower, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Electric Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).PumpingEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QEvap, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Cooling Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).EvapEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
+			SetupOutputVariable( "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).EvapInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).EvapOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, BLASTAbsorberReport( AbsorberNum ).Evapmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
 
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate [W]", BLASTAbsorberReport( AbsorberNum ).QCond, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy [J]", BLASTAbsorberReport( AbsorberNum ).CondEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
-			SetupOutputVariable( "Chiller Condenser Inlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).CondInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Outlet Temperature [C]", BLASTAbsorberReport( AbsorberNum ).CondOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Mass Flow Rate [kg/s]", BLASTAbsorberReport( AbsorberNum ).Condmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QCond, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).CondEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
+			SetupOutputVariable( "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).CondInletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, BLASTAbsorberReport( AbsorberNum ).CondOutletTemp, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, BLASTAbsorberReport( AbsorberNum ).Condmdot, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
 
 			if ( BLASTAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
-				SetupOutputVariable( "Chiller Hot Water Consumption Rate [W]", BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-				SetupOutputVariable( "Chiller Source Hot Water Energy [J]", BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
+				SetupOutputVariable( "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+				SetupOutputVariable( "Chiller Source Hot Water Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
 			} else {
 				if ( GenInputOutputNodesUsed( AbsorberNum ) ) {
-					SetupOutputVariable( "Chiller Source Steam Rate [W]", BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-					SetupOutputVariable( "Chiller Source Steam Energy [J]", BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
+					SetupOutputVariable( "Chiller Source Steam Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+					SetupOutputVariable( "Chiller Source Steam Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "PLANTLOOPHEATINGDEMAND", "CHILLERS", _, "Plant" );
 				} else {
-					SetupOutputVariable( "Chiller Source Steam Rate [W]", BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
-					SetupOutputVariable( "Chiller Source Steam Energy [J]", BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "Steam", "Cooling", _, "Plant" );
+					SetupOutputVariable( "Chiller Source Steam Rate", OutputProcessor::Unit::W, BLASTAbsorberReport( AbsorberNum ).QGenerator, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+					SetupOutputVariable( "Chiller Source Steam Energy", OutputProcessor::Unit::J, BLASTAbsorberReport( AbsorberNum ).GeneratorEnergy, "System", "Sum", BLASTAbsorber( AbsorberNum ).Name, _, "Steam", "Cooling", _, "Plant" );
 				}
 			}
 
-			SetupOutputVariable( "Chiller COP [W/W]", BLASTAbsorberReport( AbsorberNum ).ActualCOP, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
+			SetupOutputVariable( "Chiller COP", OutputProcessor::Unit::W_W, BLASTAbsorberReport( AbsorberNum ).ActualCOP, "System", "Average", BLASTAbsorber( AbsorberNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Chiller Nominal Capacity", BLASTAbsorber( AbsorberNum ).Name, "[W]", BLASTAbsorber( AbsorberNum ).NomCap );
@@ -587,7 +555,6 @@ namespace ChillerAbsorption {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-		using InputProcessor::SameString;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -1281,17 +1248,8 @@ namespace ChillerAbsorption {
 		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcBLASTAbsorberModel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D< Real64 > SteamLoadFactor( 3 ); // coefficients to poly curve fit
@@ -1380,18 +1338,18 @@ namespace ChillerAbsorption {
 		LoopSideNum = BLASTAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( BLASTAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset ));
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		// If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
@@ -1522,7 +1480,7 @@ namespace ChillerAbsorption {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -1666,22 +1624,8 @@ namespace ChillerAbsorption {
 		// PURPOSE OF THIS SUBROUTINE:
 		// reporting
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
 		// Using/Aliasing
 		using PlantUtilities::SafeCopyPlantNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapInletNode; // evaporator inlet node number, water side

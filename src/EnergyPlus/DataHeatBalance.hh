@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -63,6 +64,7 @@
 #include <DataSurfaces.hh>
 #include <DataVectorTypes.hh>
 #include <DataWindowEquivalentLayer.hh>
+#include <PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 
@@ -329,7 +331,7 @@ namespace DataHeatBalance {
 	//                           !       Taking the still gas thermal conductivity for air at 0.0267 W/m-K (at 300K), then
 	//                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
 	//                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
-	extern Real64 HighHConvLimit; // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
+	extern Real64 HighHConvLimit; // upper limit for HConv, mostly used for user input limits in practice. !W/m2-K
 	extern Real64 MaxAllowedDelTempCondFD; // Convergence criteria for inside surface temperatures for CondFD
 
 	extern std::string BuildingName; // Name of building
@@ -424,6 +426,10 @@ namespace DataHeatBalance {
 	extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
 	extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
 	extern bool AdaptiveComfortRequested_ASH55; // true if people objects have adaptive comfort requests. ASH55
+
+	extern bool NoFfactorConstructionsUsed;
+	extern bool NoCfactorConstructionsUsed;
+
 	extern int NumRefrigeratedRacks; // Total number of refrigerated case compressor racks in input
 	extern int NumRefrigSystems; // Total number of detailed refrigeration systems in input
 	extern int NumRefrigCondensers; // Total number of detailed refrigeration condensers in input
@@ -701,7 +707,7 @@ namespace DataHeatBalance {
 		Real64 MoistBCoeff; // Moisture Equation Coefficient b
 		Real64 MoistCCoeff; // Moisture Equation Coefficient c
 		Real64 MoistDCoeff; // Moisture Equation Coefficient d
-		Real64 EMPDSurfaceDepth; // Surface-layer penetrtion depth (m)
+		Real64 EMPDSurfaceDepth; // Surface-layer penetration depth (m)
 		Real64 EMPDDeepDepth; // Deep-layer penetration depth (m)
 		Real64 EMPDCoatingThickness; // Coating Layer Thickness (m)
 		Real64 EMPDmuCoating; // Coating Layer water vapor diffusion resistance factor (dimensionless)
@@ -742,7 +748,7 @@ namespace DataHeatBalance {
 		Real64 SpecTemp; // Temperature corresponding to the specified material properties
 		int TCParent; // Reference to the parent object WindowMaterial:Glazing:Thermochromic
 		// Simple Glazing System
-		Real64 SimpleWindowUfactor; // user input for simple window U-factor with film coefs (W/m2-k)
+		Real64 SimpleWindowUfactor; // user input for simple window U-factor with film coeffs (W/m2-k)
 		Real64 SimpleWindowSHGC; // user input for simple window Solar Heat Gain Coefficient (non-dimensional)
 		Real64 SimpleWindowVisTran; // (optional) user input for simple window Visual Transmittance (non-dimensional)
 		bool SimpleWindowVTinputByUser; // false means not input, true means user provide VT input
@@ -780,12 +786,17 @@ namespace DataHeatBalance {
 		Real64 ScreenWireSpacing; // insect screen wire spacing
 		Real64 ScreenWireDiameter; // insect screen wire diameter
 		Real64 SlatWidth; // slat width
-		Real64 SlatSeparation; // slat seperation
+		Real64 SlatSeparation; // slat separation
 		Real64 SlatCrown; // slat crown
 		Real64 SlatAngle; // slat angle
 		int SlatAngleType; // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
-		int SlatOrientation; // horizontal or veritical
+		int SlatOrientation; // horizontal or vertical
 		std::string GasName; // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
+		HysteresisPhaseChange::HysteresisPhaseChange * phaseChange = nullptr;
+		bool GlassSpectralAndAngle; // if SpectralAndAngle is an entered choice
+		int GlassSpecAngTransDataPtr; // Data set index of transmittance as a function of spectral and angle associated with a window glass material
+		int GlassSpecAngFRefleDataPtr; // Data set index of front reflectance as a function of spectral and angle associated with a window glass material
+		int GlassSpecAngBRefleDataPtr; // Data set index of back reflectance as a function of spectral and angle associated with a window glass material
 
 		// Default Constructor
 		MaterialProperties() :
@@ -941,7 +952,11 @@ namespace DataHeatBalance {
 			SlatCrown( 0.0 ),
 			SlatAngle( 0.0 ),
 			SlatAngleType( 0 ),
-			SlatOrientation( 0 )
+			SlatOrientation( 0 ),
+			GlassSpectralAndAngle( false ),
+			GlassSpecAngTransDataPtr( 0 ),
+			GlassSpecAngFRefleDataPtr( 0 ),
+			GlassSpecAngBRefleDataPtr( 0 )
 		{}
 
 	};
@@ -952,7 +967,7 @@ namespace DataHeatBalance {
 		std::string Name; // Name
 		int NumGlzMat; // Number of TC glazing materials
 		Array1D_int LayerPoint; // Layer pointer
-		Array1D< Real64 > SpecTemp; // Temperature corresponding to the specified TC glaing optical data
+		Array1D< Real64 > SpecTemp; // Temperature corresponding to the specified TC glazing optical data
 		Array1D_string LayerName; // Name of the referenced WindowMaterial:Glazing object
 
 		// Default Constructor
@@ -1114,7 +1129,7 @@ namespace DataHeatBalance {
 		//For CFactor underground walls
 		Real64 CFactor;
 		Real64 Height;
-		//For FFactor slabs-on-grade or undeerground floors
+		//For FFactor slabs-on-grade or underground floors
 		Real64 FFactor;
 		Real64 Area;
 		Real64 PerimeterExposed;
@@ -1291,6 +1306,7 @@ namespace DataHeatBalance {
 		// Calculated after input
 		Real64 FloorArea; // Floor area used for this zone
 		Real64 CalcFloorArea; // Calculated floor area used for this zone
+		Real64 CeilingArea; // Ceiling area for the zone
 		bool HasFloor; // Has "Floor" surface
 		bool HasRoof; // Has "Roof" or "Ceiling" Surface
 		bool HasInterZoneWindow; // Interzone Window(s) present in this zone
@@ -1309,6 +1325,10 @@ namespace DataHeatBalance {
 		Real64 ExtGrossGroundWallArea_Multiplied; // Ground contact Wall Area for Zone (Gross) with multipliers
 		int SystemZoneNodeNumber; // This is the zone node number for the system for a controlled zone
 		bool IsControlled; // True when this is a controlled zone.
+		bool IsSupplyPlenum; // True when this zone is a supply plenum
+		bool IsReturnPlenum; // True when this zone is a return plenum
+		int ZoneEqNum; // Controlled zone equip config number
+		int PlenumCondNum; // Supply or return plenum conditions number, 0 if this is not a plenum zone
 		int TempControlledZoneIndex; // this is the index number for TempControlledZone structure for lookup
 		//            Pointers to Surface Data Structure
 		int SurfaceFirst; // First Surface in Zone
@@ -1325,9 +1345,23 @@ namespace DataHeatBalance {
 		Real64 MaximumY; // Maximum Y value for entire zone
 		Real64 MinimumZ; // Minimum Z value for entire zone
 		Real64 MaximumZ; // Maximum Z value for entire zone
+
 		Real64 OutDryBulbTemp; // Zone outside dry bulb air temperature (C)
+		bool OutDryBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor air temp
+		Real64 OutDryBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air drybulb temp (C)
 		Real64 OutWetBulbTemp; // Zone outside wet bulb air temperature (C)
+		bool OutWetBulbTempEMSOverrideOn; // if true, EMS is calling to override the surface's outdoor wetbulb
+		Real64 OutWetBulbTempEMSOverrideValue; // value to use for EMS override of outdoor air wetbulb temp (C)
 		Real64 WindSpeed; // Zone outside wind speed (m/s)
+		bool WindSpeedEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind speed
+		Real64 WindSpeedEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+		Real64 WindDir; // Zone outside wind direction (degree)
+		bool WindDirEMSOverrideOn; // if true, EMS is calling to override the surface's outside wind direction
+		Real64 WindDirEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
+
+		bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
+		int LinkedOutAirNode; // Index of the an OutdoorAir:Node
+
 		bool isPartOfTotalArea; // Count the zone area when determining the building total floor area
 		bool isNominalOccupied; // has occupancy nominally specified
 		bool isNominalControlled; // has Controlled Zone Equip Configuration reference
@@ -1336,14 +1370,20 @@ namespace DataHeatBalance {
 		int AirHBimBalanceErrIndex; // error management counter
 		bool NoHeatToReturnAir; // TRUE means that heat to return air should be added to the zone load
 		bool RefrigCaseRA; // TRUE means there is potentially heat removal from return air
+		bool HasAdjustedReturnTempByITE; // TRUE means that return temp to return air is adjusted by return temperature of ITE object
+		Real64 AdjustedReturnTempByITE; // Diff of the return temp from the zone mixed air temp adjusted by ITE object
+
+		bool HasLtsRetAirGain; // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature 
+		bool HasAirFlowWindowReturn; // TRUE means that zone has return air flow from windows
 		// from refrigeration cases for this zone
 		Real64 InternalHeatGains; // internal loads (W)
-		Real64 NominalInfilVent; // internal infiltration/ventilaton
+		Real64 NominalInfilVent; // internal infiltration/ventilation
 		Real64 NominalMixing; // internal mixing/cross mixing
 		bool TempOutOfBoundsReported; // if any temp out of bounds errors, first will show zone details.
 		bool EnforcedReciprocity; // if zone required forced reciprocity --
 		//   less out of bounds temperature errors allowed
 		int ZoneMinCO2SchedIndex; // Index for the schedule the schedule which determines minimum CO2 concentration
+		int ZoneMaxCO2SchedIndex; // Index for the schedule the schedule which determines maximum CO2 concentration
 		int ZoneContamControllerSchedIndex; // Index for this schedule
 		bool FlagCustomizedZoneCap; // True if customized Zone Capacitance Multiplier is used
 		// Hybrid Modeling
@@ -1353,11 +1393,11 @@ namespace DataHeatBalance {
 		Real64 ZoneVolCapMultpCO2; // Zone carbon dioxide capacity multiplier
 		Real64 ZoneVolCapMultpGenContam; // Zone generic contaminant capacity multiplier
 		Real64 ZoneVolCapMultpSensHM; // Calculated temperature capacity multiplier by hybrid model
-		Real64 ZoneVolCapMultpSensHMSum; // for temperature capacity multiplier average calcualtion
-		Real64 ZoneVolCapMultpSensHMCountSum; // for temperature capacity multiplier average calcualtion
+		Real64 ZoneVolCapMultpSensHMSum; // for temperature capacity multiplier average calculation
+		Real64 ZoneVolCapMultpSensHMCountSum; // for temperature capacity multiplier average calculation
 		Real64 ZoneVolCapMultpSensHMAverage; // Temperature capacity multiplier average
-		Real64 MCPIHM; // Calcualted mass flow rate by hybrid model
-		Real64 InfilOAAirChangeRateHM; // Calcualted infilgration air change per hour by hybrid model
+		Real64 MCPIHM; // Calculated mass flow rate by hybrid model
+		Real64 InfilOAAirChangeRateHM; // Calculated infiltration air change per hour by hybrid model
 
 		// Default Constructor
 		ZoneData() :
@@ -1374,6 +1414,7 @@ namespace DataHeatBalance {
 			UserEnteredFloorArea( AutoCalculate ),
 			FloorArea( 0.0 ),
 			CalcFloorArea( 0.0 ),
+			CeilingArea( 0.0 ),
 			HasFloor( false ),
 			HasRoof( false ),
 			HasInterZoneWindow( false ),
@@ -1391,6 +1432,10 @@ namespace DataHeatBalance {
 			ExtGrossGroundWallArea_Multiplied( 0.0 ),
 			SystemZoneNodeNumber( 0 ),
 			IsControlled( false ),
+			IsSupplyPlenum( false ),
+			IsReturnPlenum( false ),
+			ZoneEqNum ( 0 ),
+			PlenumCondNum( 0 ),
 			TempControlledZoneIndex( 0 ),
 			SurfaceFirst( 0 ),
 			SurfaceLast( 0 ),
@@ -1406,9 +1451,21 @@ namespace DataHeatBalance {
 			MaximumY( 0.0 ),
 			MinimumZ( 0.0 ),
 			MaximumZ( 0.0 ),
+
 			OutDryBulbTemp( 0.0 ),
+			OutDryBulbTempEMSOverrideOn( false ),
+			OutDryBulbTempEMSOverrideValue( 0.0 ),
 			OutWetBulbTemp( 0.0 ),
+			OutWetBulbTempEMSOverrideOn( false ),
+			OutWetBulbTempEMSOverrideValue( 0.0 ),
 			WindSpeed( 0.0 ),
+			WindSpeedEMSOverrideOn( false ),
+			WindSpeedEMSOverrideValue( 0.0 ),
+			WindDir( 0.0 ),
+			WindDirEMSOverrideOn( false ),
+			WindDirEMSOverrideValue( 0.0 ),
+			HasLinkedOutAirNode( false ),
+			LinkedOutAirNode( 0.0 ),
 			isPartOfTotalArea( true ),
 			isNominalOccupied( false ),
 			isNominalControlled( false ),
@@ -1416,12 +1473,17 @@ namespace DataHeatBalance {
 			AirHBimBalanceErrIndex( 0 ),
 			NoHeatToReturnAir( false ),
 			RefrigCaseRA( false ),
+			HasAdjustedReturnTempByITE( false ),
+			AdjustedReturnTempByITE( 0.0 ),
+			HasLtsRetAirGain( false ),
+			HasAirFlowWindowReturn( false ),
 			InternalHeatGains( 0.0 ),
 			NominalInfilVent( 0.0 ),
 			NominalMixing( 0.0 ),
 			TempOutOfBoundsReported( false ),
 			EnforcedReciprocity( false ),
 			ZoneMinCO2SchedIndex( 0 ),
+			ZoneMaxCO2SchedIndex( 0 ),
 			ZoneContamControllerSchedIndex( 0 ),
 			FlagCustomizedZoneCap( false ),
 			// Hybrid Modeling
@@ -1443,6 +1505,10 @@ namespace DataHeatBalance {
 
 		void
 		SetWindSpeedAt( Real64 const fac );
+
+		void
+		SetWindDirAt( Real64 const fac );
+
 
 	};
 
@@ -1626,6 +1692,7 @@ namespace DataHeatBalance {
 		bool FractionReturnAirIsCalculated;
 		Real64 FractionReturnAirPlenTempCoeff1;
 		Real64 FractionReturnAirPlenTempCoeff2;
+		int ZoneReturnNum; // zone return index (not the node number) for return heat gain
 		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
 		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
 		bool ManageDemand; // Flag to indicate whether to use demand limiting
@@ -1662,6 +1729,7 @@ namespace DataHeatBalance {
 			FractionReturnAirIsCalculated( false ),
 			FractionReturnAirPlenTempCoeff1( 0.0 ),
 			FractionReturnAirPlenTempCoeff2( 0.0 ),
+			ZoneReturnNum( 1 ),
 			NomMinDesignLevel( 0.0 ),
 			NomMaxDesignLevel( 0.0 ),
 			ManageDemand( false ),
@@ -1761,6 +1829,7 @@ namespace DataHeatBalance {
 		// Members
 		std::string Name; // EQUIPMENT object name
 		int ZonePtr; // Which zone internal gain is in
+		bool FlowControlWithApproachTemps; // True if using supply and return approach temperature for ITE object.
 		Real64 DesignTotalPower; // Design level for internal gain [W]
 		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
 		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
@@ -1793,6 +1862,11 @@ namespace DataHeatBalance {
 		Real64 EMSFanPower; // Value EMS is directing to use for override of Fan power [W]
 		bool EMSUPSPowerOverrideOn; // EMS actuating UPS power if .TRUE.
 		Real64 EMSUPSPower; // Value EMS is directing to use for override of UPS power [W]
+		Real64 SupplyApproachTemp; // The difference of the IT inlet temperature from the AHU supply air temperature
+		int SupplyApproachTempSch; // The difference schedule of the IT inlet temperature from the AHU supply air temperature
+		Real64 ReturnApproachTemp; // The difference of the unit outlet temperature from the well mixed zone temperature
+		int ReturnApproachTempSch; // The difference schedule of the unit outlet temperature from the well mixed zone temperature
+
 		// Report variables
 		Real64 CPUPower; // ITE CPU Electric Power [W]
 		Real64 FanPower; // ITE Fan Electric Power [W]
@@ -1812,7 +1886,7 @@ namespace DataHeatBalance {
 		Real64 AirVolFlowCurDensity; // Air volume flow rate at current density [m3/s]
 		Real64 AirMassFlow; // Air mass flow rate [kg/s]
 		Real64 AirInletDryBulbT; // Air inlet dry-bulb temperature [C]
-		Real64 AirInletDewpointT; // Air inlet dewpoit temperature [C]
+		Real64 AirInletDewpointT; // Air inlet dewpoint temperature [C]
 		Real64 AirInletRelHum; // Air inlet relative humidity [%]
 		Real64 AirOutletDryBulbT; // Air outlet dry-bulb temperature [C]
 		Real64 SHI; // Supply Heat Index []
@@ -1833,6 +1907,7 @@ namespace DataHeatBalance {
 		// Default Constructor
 		ITEquipData() :
 			ZonePtr( 0 ),
+			FlowControlWithApproachTemps( false ),
 			DesignTotalPower( 0.0 ),
 			NomMinDesignLevel( 0.0 ),
 			NomMaxDesignLevel( 0.0 ),
@@ -1862,6 +1937,10 @@ namespace DataHeatBalance {
 			EMSFanPower( 0.0 ),
 			EMSUPSPowerOverrideOn( false ),
 			EMSUPSPower( 0.0 ),
+			SupplyApproachTemp( 0.0 ),
+			SupplyApproachTempSch( 0 ),
+			ReturnApproachTemp( 0.0 ),
+			ReturnApproachTempSch( 0 ),
 			CPUPower( 0.0 ),
 			FanPower( 0.0 ),
 			UPSPower( 0.0 ),
@@ -2117,11 +2196,11 @@ namespace DataHeatBalance {
 		int InducedAirSchedPtr; // Induced Outdoor Air Fraction Schedule
 		Real64 BalMassFlowRate; // balanced mass flow rate
 		Real64 InfMassFlowRate; // unbalanced mass flow rate from infiltration
-		Real64 NatMassFlowRate; // unbalanced mass flow rate from natural ventilaton
-		Real64 ExhMassFlowRate; // unbalanced mass flow rate from exhaust ventilaton
-		Real64 IntMassFlowRate; // unbalanced mass flow rate from intake ventilaton
-		Real64 ERVMassFlowRate; // unbalanced mass flow rate from stand-alond ERV
-		bool OneTimeFlag; // One time flag to get nodes of stand alond ERV
+		Real64 NatMassFlowRate; // unbalanced mass flow rate from natural ventilation
+		Real64 ExhMassFlowRate; // unbalanced mass flow rate from exhaust ventilation
+		Real64 IntMassFlowRate; // unbalanced mass flow rate from intake ventilation
+		Real64 ERVMassFlowRate; // unbalanced mass flow rate from stand-alone ERV
+		bool OneTimeFlag; // One time flag to get nodes of stand alone ERV
 		int NumOfERVs; // Number of zone stand alone ERVs
 		Array1D_int ERVInletNode; // Stand alone ERV supply air inlet nodes
 		Array1D_int ERVExhaustNode; // Stand alone ERV air exhaust nodes
@@ -2227,7 +2306,7 @@ namespace DataHeatBalance {
 		bool EnforceZoneMassBalance;     // flag to enforce zone air mass conservation
 		bool BalanceMixing;              // flag to allow mixing to be adjusted for zone mass balance
 		int InfiltrationTreatment;       // determines how infiltration is treated for zone mass balance
-		int InfiltrationZoneType;        // specifies which types of zones allo infiltration to be changed
+		int InfiltrationZoneType;        // specifies which types of zones allow infiltration to be changed
 		//Note, unique global object
 
 		// Default Constructor
@@ -2289,7 +2368,7 @@ namespace DataHeatBalance {
 		Reference< Real64 > PtrConvectGainRate; // fortan POINTER to value of convection heat gain rate for device, watts
 		Real64 ConvectGainRate; // current timestep value of convection heat gain rate for device, watts
 		Reference< Real64 > PtrReturnAirConvGainRate; // fortan POINTER to value of return air convection heat gain rate for device, W
-		Real64 ReturnAirConvGainRate; // urrent timestep value of return air convection heat gain rate for device, W
+		Real64 ReturnAirConvGainRate; // current timestep value of return air convection heat gain rate for device, W
 		Reference< Real64 > PtrRadiantGainRate; // fortan POINTER to value of thermal radiation heat gain rate for device, watts
 		Real64 RadiantGainRate; // current timestep value of thermal radiation heat gain rate for device, watts
 		Reference< Real64 > PtrLatentGainRate; // fortan POINTER to value of moisture gain rate for device, Watts
@@ -2300,6 +2379,7 @@ namespace DataHeatBalance {
 		Real64 CarbonDioxideGainRate; // current timestep value of carbon dioxide gain rate for device
 		Reference< Real64 > PtrGenericContamGainRate; // fortan POINTER to value of generic contaminant gain rate for device
 		Real64 GenericContamGainRate; // current timestep value of generic contaminant gain rate for device
+		int ReturnAirNodeNum; // return air node number for retrun air convection heat gain
 
 		// Default Constructor
 		GenericComponentZoneIntGainStruct() :
@@ -2310,7 +2390,8 @@ namespace DataHeatBalance {
 			LatentGainRate( 0.0 ),
 			ReturnAirLatentGainRate( 0.0 ),
 			CarbonDioxideGainRate( 0.0 ),
-			GenericContamGainRate( 0.0 )
+			GenericContamGainRate( 0.0 ),
+			ReturnAirNodeNum( 0 )
 		{}
 
 	};
@@ -2330,7 +2411,7 @@ namespace DataHeatBalance {
 		Real64 QLTCRA; // ENERGY CONVECTED TO RETURN AIR FROM LIGHTS
 		Real64 QLTSW; // VISIBLE ENERGY FROM LIGHTS
 		Real64 QEECON; // ENERGY CONVECTED FROM ELECTRIC EQUIPMENT
-		Real64 QEERAD; // ENERCY RADIATED FROM ELECTRIC EQUIPMENT
+		Real64 QEERAD; // ENERGY RADIATED FROM ELECTRIC EQUIPMENT
 		Real64 QEELost; // Energy from Electric Equipment (lost)
 		Real64 QEELAT; // LATENT ENERGY FROM Electric Equipment
 		Real64 QGECON; // ENERGY CONVECTED FROM GAS EQUIPMENT
@@ -2789,7 +2870,7 @@ namespace DataHeatBalance {
 		Real64 VentilVolumeCurDensity; // Volume of Air {m3} due to ventilation at current zone air density
 		Real64 VentilVolumeStdDensity; // Volume of Air {m3} due to ventilation at standard density (adjusted for elevation)
 		Real64 VentilVdotCurDensity; // Volume flow rate of Air {m3/s} due to ventilation at current zone air density
-		Real64 VentilVdotStdDensity; // Volume flowr of Air {m3/s} due to ventilation at standard density (adjusted elevation)
+		Real64 VentilVdotStdDensity; // Volume flow rate of Air {m3/s} due to ventilation at standard density (adjusted elevation)
 		Real64 VentilMass; // Mass of Air {kg} due to ventilation
 		Real64 VentilMdot; // Mass flow rate of Air {kg/s} due to ventilation
 		Real64 VentilAirChangeRate; // Ventilation air change rate (ach)
@@ -2834,7 +2915,8 @@ namespace DataHeatBalance {
 		Real64 OABalanceMdot; // Mass flow rate of Air {kg/s} due to OA air balance
 		Real64 OABalanceAirChangeRate; // OA air balance air change rate (ach)
 		Real64 OABalanceFanElec; // Fan Electricity {W} due to OA air balance
-
+		Real64 SumEnthalpyM = 0.0; // Zone sum of EnthalpyM
+		Real64 SumEnthalpyH = 0.0; // Zone sum of EnthalpyH
 		// Default Constructor
 		AirReportVars() :
 			MeanAirTemp( 0.0 ),
@@ -2902,7 +2984,9 @@ namespace DataHeatBalance {
 			OABalanceMass( 0.0 ),
 			OABalanceMdot( 0.0 ),
 			OABalanceAirChangeRate( 0.0 ),
-			OABalanceFanElec( 0.0 )
+			OABalanceFanElec( 0.0 ),
+			SumEnthalpyM( 0.0 ),
+			SumEnthalpyH( 0.0 )
 		{}
 
 	};
@@ -2914,9 +2998,9 @@ namespace DataHeatBalance {
 		Real64 NumOccAccum; // number of occupants accumulating for entire simulation
 		Real64 NumOccAccumTime; // time that the number of occupants is accumulating to compute average
 		//  - zone time step
-		Real64 TotTimeOcc; // time occuped (and the mechnical ventilation volume is accumulating)
+		Real64 TotTimeOcc; // time occupied (and the mechanical ventilation volume is accumulating)
 		//  - system time step
-		Real64 MechVentVolTotal; // volume for mechnical ventilation of outside air for entire simulation
+		Real64 MechVentVolTotal; // volume for mechanical ventilation of outside air for entire simulation
 		Real64 MechVentVolMin; // a large number since finding minimum volume
 		Real64 InfilVolTotal; // volume for infiltration of outside air for entire simulation
 		Real64 InfilVolMin; // a large number since finding minimum volume
@@ -2929,11 +3013,11 @@ namespace DataHeatBalance {
 		Real64 SHGSAnHvacHt; // hvac air heating
 		Real64 SHGSAnHvacCl; // hvac air cooling
 		Real64 SHGSAnHvacATUHt; // heating by Air Terminal Unit [J]
-		Real64 SHGSAnHvacATUCl; // coolinging by Air Terminal Unit [J]
+		Real64 SHGSAnHvacATUCl; // cooling by Air Terminal Unit [J]
 		Real64 SHGSAnSurfHt; // heated surface heating
 		Real64 SHGSAnSurfCl; // cooled surface cooling
 		Real64 SHGSAnPeoplAdd; // people additions
-		Real64 SHGSAnLiteAdd; // lighing addition
+		Real64 SHGSAnLiteAdd; // lighting addition
 		Real64 SHGSAnEquipAdd; // equipment addition
 		Real64 SHGSAnWindAdd; // window addition
 		Real64 SHGSAnIzaAdd; // inter zone air addition
@@ -2954,7 +3038,7 @@ namespace DataHeatBalance {
 		Real64 SHGSClSurfHt; // heated surface heating
 		Real64 SHGSClSurfCl; // cooled surface cooling
 		Real64 SHGSClPeoplAdd; // people additions
-		Real64 SHGSClLiteAdd; // lighing addition
+		Real64 SHGSClLiteAdd; // lighting addition
 		Real64 SHGSClEquipAdd; // equipment addition
 		Real64 SHGSClWindAdd; // window addition
 		Real64 SHGSClIzaAdd; // inter zone air addition
@@ -2975,7 +3059,7 @@ namespace DataHeatBalance {
 		Real64 SHGSHtSurfHt; // heated surface heating
 		Real64 SHGSHtSurfCl; // cooled surface cooling
 		Real64 SHGSHtPeoplAdd; // people additions
-		Real64 SHGSHtLiteAdd; // lighing addition
+		Real64 SHGSHtLiteAdd; // lighting addition
 		Real64 SHGSHtEquipAdd; // equipment addition
 		Real64 SHGSHtWindAdd; // window addition
 		Real64 SHGSHtIzaAdd; // inter zone air addition
@@ -3059,6 +3143,21 @@ namespace DataHeatBalance {
 			SHGSHtIzaRem( 0.0 ),
 			SHGSHtInfilRem( 0.0 ),
 			SHGSHtOtherRem( 0.0 )
+		{}
+
+	};
+
+	struct ZoneLocalEnvironmentData
+	{
+		// Members
+		std::string Name;
+		int ZonePtr; // surface pointer
+		int OutdoorAirNodePtr; // schedule pointer
+
+		// Default Constructor
+		ZoneLocalEnvironmentData() :
+			ZonePtr( 0 ),
+			OutdoorAirNodePtr( 0 )
 		{}
 
 	};
@@ -3171,14 +3270,14 @@ namespace DataHeatBalance {
 		Real64 ITEqUPSPower; // Zone ITE UPS Electric Power [W]
 		Real64 ITEqCPUPowerAtDesign; // Zone ITE CPU Electric Power at Design Inlet Conditions [W]
 		Real64 ITEqFanPowerAtDesign; // Zone ITE Fan Electric Power at Design Inlet Conditions [W]
-		Real64 ITEqUPSGainRateToZone; // Zone ITE UPS Heat Gain toZone Rate [W] - convective gain
+		Real64 ITEqUPSGainRateToZone; // Zone ITE UPS Heat Gain to Zone Rate [W] - convective gain
 		Real64 ITEqConGainRateToZone; // Zone ITE Total Heat Gain toZone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
 		Real64 ITEqCPUConsumption; // Zone ITE CPU Electric Energy [J]
 		Real64 ITEqFanConsumption; // Zone ITE Fan Electric Energy [J]
 		Real64 ITEqUPSConsumption; // Zone ITE UPS Electric Energy [J]
 		Real64 ITEqCPUEnergyAtDesign; // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
 		Real64 ITEqFanEnergyAtDesign; // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
-		Real64 ITEqUPSGainEnergyToZone; // Zone ITE UPS Heat Gain toZone Energy [J] - convective gain
+		Real64 ITEqUPSGainEnergyToZone; // Zone ITE UPS Heat Gain to Zone Energy [J] - convective gain
 		Real64 ITEqConGainEnergyToZone; // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
 		Real64 ITEqAirVolFlowStdDensity; // Zone Air volume flow rate at standard density [m3/s]
 		Real64 ITEqAirMassFlow; // Zone Air mass flow rate [kg/s]
@@ -3190,6 +3289,7 @@ namespace DataHeatBalance {
 		Real64 ITEqTimeBelowDewpointT; // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
 		Real64 ITEqTimeAboveRH; // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
 		Real64 ITEqTimeBelowRH; // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+		Real64 ITEAdjReturnTemp; // Zone ITE Adjusted Return Air Temperature
 		// Overall Zone Variables
 		Real64 TotRadiantGain;
 		Real64 TotVisHeatGain;
@@ -3322,6 +3422,7 @@ namespace DataHeatBalance {
 			ITEqTimeBelowDewpointT( 0.0 ),
 			ITEqTimeAboveRH( 0.0 ),
 			ITEqTimeBelowRH( 0.0 ),
+			ITEAdjReturnTemp( 0.0 ),
 			TotRadiantGain( 0.0 ),
 			TotVisHeatGain( 0.0 ),
 			TotConvectiveGain( 0.0 ),
@@ -3350,6 +3451,7 @@ namespace DataHeatBalance {
 	extern Array1D< ZoneData > Zone;
 	extern Array1D< ZoneListData > ZoneList;
 	extern Array1D< ZoneGroupData > ZoneGroup;
+	extern Array1D< ZoneListData > ShadingZoneGroup;
 	extern Array1D< PeopleData > People;
 	extern Array1D< LightsData > Lights;
 	extern Array1D< ZoneEquipData > ZoneElectric;
@@ -3390,6 +3492,7 @@ namespace DataHeatBalance {
 	extern Array1D< GlobalInternalGainMiscObject > VentilationObjects;
 	extern Array1D< ZoneReportVars > ZnRpt;
 	extern Array1D< ZoneMassConservationData > MassConservation;
+	extern Array1D< ZoneLocalEnvironmentData > ZoneLocalEnvironment;
 	extern ZoneAirMassFlowConservation ZoneAirMassFlow;
 
 	// Functions
@@ -3407,6 +3510,9 @@ namespace DataHeatBalance {
 
 	void
 	SetZoneWindSpeedAt();
+
+	void
+	SetZoneWindDirAt();
 
 	void
 	CheckAndSetConstructionProperties(

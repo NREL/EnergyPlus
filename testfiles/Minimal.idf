@@ -13,7 +13,7 @@
 ! HVAC: None.
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -41,7 +41,7 @@
 
  ! DENVER_STAPLETON_CO_USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
  ! Coldest Month=December
- ! DENVER_STAPLETON_CO_USA Annual Heating 99.6%, MaxDB=-20°C
+ ! DENVER_STAPLETON_CO_USA Annual Heating 99.6%, MaxDB=-20Â°C
 
   SizingPeriod:DesignDay,
     DENVER_STAPLETON Ann Htg 99.6% Condns DB,  !- Name
@@ -73,7 +73,7 @@
 
  ! DENVER_STAPLETON Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
- ! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1°C MWB=15.8°C
+ ! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1Â°C MWB=15.8Â°C
 
   SizingPeriod:DesignDay,
     DENVER_STAPLETON Ann Clg .4% Condns DB=>MWB,  !- Name

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,14 +55,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <DataHeatBalance.hh>
 
 namespace EnergyPlus {
 
 namespace HeatBalFiniteDiffManager {
 
-	// Using/Aliasing
-
-	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	extern Real64 const Lambda;
 	extern Real64 const smalldiff; // Used in places where "equality" tests should not be used.
@@ -74,56 +73,19 @@ namespace HeatBalFiniteDiffManager {
 	extern Real64 const RhovInitValue; // Initialization value for Rhov
 	extern Real64 const EnthInitValue; // Initialization value for Enthalpy
 
-	// DERIVED TYPE DEFINITIONS:
-
 	// MODULE VARIABLE DECLARATIONS:
-
-	//REAL(r64) :: TFDout   =0.0d0
-	//REAL(r64) :: TFDin    =0.0d0
-	//REAL(r64) :: rhovFDout=0.0d0
-	//REAL(r64) :: rhovFDin =0.0d0
-	//REAL(r64) :: TDryout  =0.0d0
-	//REAL(r64) :: Tdryin   =0.0d0
-	//REAL(r64) :: RHOut    =0.0d0
-	//REAL(r64) :: RHIn     =0.0d0
 	extern Array1D< Real64 > SigmaR; // Total Resistance of construction layers
 	extern Array1D< Real64 > SigmaC; // Total Capacitance of construction layers
-
-	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: WSurfIn         !Humidity Ratio of the inside surface for reporting
-	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QMassInFlux     !MassFlux on Surface for reporting
-	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QMassOutFlux    !MassFlux on Surface for reporting
 	extern Array1D< Real64 > QHeatInFlux; // HeatFlux on Surface for reporting
 	extern Array1D< Real64 > QHeatOutFlux; // HeatFlux on Surface for reporting
-	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxZoneToInSurf !sum of Heat flows at the surface to air interface,
-	//                                 ! zone-side boundary conditions W/m2 before CR 8280 was not reported, but was calculated.
-	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxOutsideToOutSurf !sum of Heat flows at the surface to air interface, Out-side boundary conditions W/m2
-	//                                                           ! before CR 8280 was
-	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxInArrivSurfCond !conduction between surface node and first node into the surface (sensible)
-	//                                                           ! before CR 8280 was -- Qdryin    !HeatFlux on Surface for reporting for Sensible only
-	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxOutArrivSurfCond  !HeatFlux on Surface for reporting for Sensible only
-	//                                                                 ! before CR 8280 -- Qdryout         !HeatFlux on Surface for reporting for Sensible only
-
 	extern int CondFDSchemeType; // solution scheme for CondFD - default
 	extern Real64 SpaceDescritConstant; // spatial descritization constant,
 	extern Real64 MinTempLimit; // lower limit check, degree C
 	extern Real64 MaxTempLimit; // upper limit check, degree C
-	//feb2012 INTEGER   :: MaxGSiter = 200  ! maximum number of Gauss Seidel iterations
 	extern int MaxGSiter; // maximum number of Gauss Seidel iterations
 	extern Real64 fracTimeStepZone_Hour;
 	extern bool GetHBFiniteDiffInputFlag;
 	extern int WarmupSurfTemp;
-	// Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
-
-	// Initialization routines for module
-
-	// Algorithms for the module
-
-	// Reporting routines for module
-
-	// Update Data Routine
-
-	// Types
 
 	struct ConstructionDataFD
 	{
@@ -133,7 +95,6 @@ namespace HeatBalFiniteDiffManager {
 		Array1D< Real64 > TempStability;
 		Array1D< Real64 > MoistStability;
 		Array1D_int NodeNumPoint;
-		//  INTEGER, ALLOCATABLE, DIMENSION(:) :: InterfaceNodeNums   ! Layer interfaces occur at these nodes
 		Array1D< Real64 > Thickness;
 		Array1D< Real64 > NodeXlocation; // sized to TotNode, contains X distance in m from outside face
 		int TotNodes;
@@ -175,6 +136,12 @@ namespace HeatBalFiniteDiffManager {
 		int GSloopCounter; // count of inner loop iterations
 		int GSloopErrorCount; // recurring error counter
 		Real64 MaxNodeDelTemp; // largest change in node temps after calc
+		Real64 EnthalpyM; // Melting enthalpy at a particular temperature
+		Real64 EnthalpyF; // Freezing enthalpy at a particular temperature
+		Array1D< int > PhaseChangeState;
+		Array1D< int > PhaseChangeStateOld;
+		Array1D< int > PhaseChangeStateOldOld;
+		Array1D< Real64 > PhaseChangeTemperatureReverse;
 
 		// Default Constructor
 		SurfaceDataFD() :
@@ -182,7 +149,10 @@ namespace HeatBalFiniteDiffManager {
 			QSource( 0.0 ),
 			GSloopCounter( 0 ),
 			GSloopErrorCount( 0 ),
-			MaxNodeDelTemp( 0.0 )
+			MaxNodeDelTemp( 0.0 ),
+			EnthalpyM( 0.0 ),
+			EnthalpyF( 0.0 ),
+			PhaseChangeState( 0 )
 		{}
 
 		inline
@@ -221,6 +191,7 @@ namespace HeatBalFiniteDiffManager {
 	};
 
 	// Object Data
+
 	extern Array1D< ConstructionDataFD > ConstructFD;
 	extern Array1D< SurfaceDataFD > SurfaceFD;
 	extern Array1D< MaterialDataFD > MaterialFD;
@@ -236,9 +207,6 @@ namespace HeatBalFiniteDiffManager {
 		Real64 & TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
 		Real64 & TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
 	);
-
-	// Get Input Section of the Module
-	//******************************************************************************
 
 	void
 	GetCondFDInput();
@@ -256,9 +224,6 @@ namespace HeatBalFiniteDiffManager {
 		Real64 & TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
 	);
 
-	// Beginning of Reporting subroutines
-	// *****************************************************************************
-
 	void
 	ReportFiniteDiffInits();
 
@@ -268,9 +233,6 @@ namespace HeatBalFiniteDiffManager {
 		int const TotNodes // number of nodes in surface
 	);
 
-	// Utility Interpolation Function for the Module
-	//******************************************************************************
-
 	Real64
 	terpld(
 		Array2< Real64 > const & a,
@@ -278,9 +240,6 @@ namespace HeatBalFiniteDiffManager {
 		int const nind,
 		int const ndep
 	);
-
-	// Equation Types of the Module
-	//******************************************************************************
 
 	void
 	ExteriorBCEqns(
@@ -358,6 +317,18 @@ namespace HeatBalFiniteDiffManager {
 	CheckFDSurfaceTempLimits(
 		int const SurfNum, // surface number
 		Real64 const CheckTemperature // calculated temperature, not reset
+	);
+
+	void
+	adjustPropertiesForPhaseChange(
+		int finiteDifferenceLayerIndex,
+		int surfaceIndex,
+		const DataHeatBalance::MaterialProperties & materialDefinition,
+		Real64 temperaturePrevious,
+		Real64 temperatureUpdated,
+		Real64 & updatedSpecificHeat,
+		Real64 & updatedDensity,
+		Real64 & updatedThermalConductivity
 	);
 
 } // HeatBalFiniteDiffManager

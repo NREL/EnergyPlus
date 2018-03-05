@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -64,7 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -232,12 +233,8 @@ namespace IceThermalStorage {
 
 		// PURPOSE OF THIS SUBROUTINE:
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataGlobals::BeginEnvrnFlag;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -258,11 +255,6 @@ namespace IceThermalStorage {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SimIceStorage" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool firstTime( true );
@@ -290,7 +282,7 @@ namespace IceThermalStorage {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
+			IceStorageNum = UtilityRoutines::FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
 				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
 			}
@@ -847,13 +839,8 @@ namespace IceThermalStorage {
 		//arrays associated with the type PlantLoopProps.
 
 		// METHODOLOGY EMPLOYED: to be determined...
-		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using namespace ScheduleManager;
 		using BranchNodeConnections::TestCompSet;
@@ -863,29 +850,18 @@ namespace IceThermalStorage {
 		// Locals
 		int IceNum;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		bool ErrorsFound;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		// FLOW:
 
 		ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
 		//LOAD ARRAYS WITH IceStorage DATA
-		NumIceStorages = GetNumObjectsFound( cIceStorageSimple ); // by ZG
-		NumDetIceStorages = GetNumObjectsFound( cIceStorageDetailed );
+		NumIceStorages = inputProcessor->getNumObjectsFound( cIceStorageSimple ); // by ZG
+		NumDetIceStorages = inputProcessor->getNumObjectsFound( cIceStorageDetailed );
 
 		IceStorageTypeMap.allocate( NumIceStorages + NumDetIceStorages );
 		CheckEquipName.allocate( NumIceStorages + NumDetIceStorages );
@@ -898,14 +874,8 @@ namespace IceThermalStorage {
 		cCurrentModuleObject = cIceStorageSimple;
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
-			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IceStorage, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -919,9 +889,9 @@ namespace IceThermalStorage {
 
 			// Get Ice Thermal Storage Type
 			IceStorage( IceNum ).ITSType = cAlphaArgs( 2 );
-			if ( SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
+			if ( UtilityRoutines::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilInternal;
-			} else if ( SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
+			} else if ( UtilityRoutines::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilExternal;
 			} else {
 				ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -969,19 +939,19 @@ namespace IceThermalStorage {
 		//********************************************
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
-			SetupOutputVariable( "Ice Thermal Storage Requested Load [W]", IceStorageReport( IceNum ).MyLoad, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Requested Load", OutputProcessor::Unit::W, IceStorageReport( IceNum ).MyLoad, "System", "Average", IceStorage( IceNum ).Name );
 
 			// Ice fraction
-			SetupOutputVariable( "Ice Thermal Storage End Fraction []", IceStorageReport( IceNum ).IceFracRemain, "Zone", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, IceStorageReport( IceNum ).IceFracRemain, "Zone", "Average", IceStorage( IceNum ).Name );
 
 			// Discharge: ITS Information
-			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate [kg/s]", IceStorageReport( IceNum ).ITSmdot, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Inlet Temperature [C]", IceStorageReport( IceNum ).ITSInletTemp, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Outlet Temperature [C]", IceStorageReport( IceNum ).ITSOutletTemp, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate [W]", IceStorageReport( IceNum ).ITSCoolingRate, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy [J]", IceStorageReport( IceNum ).ITSCoolingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate [W]", IceStorageReport( IceNum ).ITSChargingRate, "System", "Average", IceStorage( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy [J]", IceStorageReport( IceNum ).ITSChargingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, IceStorageReport( IceNum ).ITSmdot, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, IceStorageReport( IceNum ).ITSInletTemp, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, IceStorageReport( IceNum ).ITSOutletTemp, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, IceStorageReport( IceNum ).ITSCoolingRate, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, IceStorageReport( IceNum ).ITSCoolingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, IceStorageReport( IceNum ).ITSChargingRate, "System", "Average", IceStorage( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, IceStorageReport( IceNum ).ITSChargingEnergy, "System", "Sum", IceStorage( IceNum ).Name );
 
 		} // IceNum
 
@@ -994,14 +964,8 @@ namespace IceThermalStorage {
 
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
-			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DetIceStor, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -1097,9 +1061,9 @@ namespace IceThermalStorage {
 			}
 
 			DetIceStor( IceNum ).ThawProcessIndicator = cAlphaArgs( 9 );
-			if ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
+			if ( UtilityRoutines::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt;
-			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
+			} else if ( ( UtilityRoutines::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
 				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );
@@ -1176,26 +1140,26 @@ namespace IceThermalStorage {
 		//********************************************
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
-			SetupOutputVariable( "Ice Thermal Storage Cooling Rate [W]", DetIceStor( IceNum ).CompLoad, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Rate", OutputProcessor::Unit::W, DetIceStor( IceNum ).CompLoad, "System", "Average", DetIceStor( IceNum ).Name );
 
 			// Ice fraction
-			SetupOutputVariable( "Ice Thermal Storage Change Fraction []", DetIceStor( IceNum ).IceFracChange, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage End Fraction []", DetIceStor( IceNum ).IceFracRemaining, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage On Coil Fraction []", DetIceStor( IceNum ).IceFracOnCoil, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Change Fraction", OutputProcessor::Unit::None, DetIceStor( IceNum ).IceFracChange, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, DetIceStor( IceNum ).IceFracRemaining, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage On Coil Fraction", OutputProcessor::Unit::None, DetIceStor( IceNum ).IceFracOnCoil, "System", "Average", DetIceStor( IceNum ).Name );
 
 			// Discharge: ITS Information
-			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate [kg/s]", DetIceStor( IceNum ).MassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Bypass Mass Flow Rate [kg/s]", DetIceStor( IceNum ).BypassMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Tank Mass Flow Rate [kg/s]", DetIceStor( IceNum ).TankMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Fluid Inlet Temperature [C]", DetIceStor( IceNum ).InletTemp, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Blended Outlet Temperature [C]", DetIceStor( IceNum ).OutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Tank Outlet Temperature [C]", DetIceStor( IceNum ).TankOutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate [W]", DetIceStor( IceNum ).DischargingRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy [J]", DetIceStor( IceNum ).DischargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate [W]", DetIceStor( IceNum ).ChargingRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy [J]", DetIceStor( IceNum ).ChargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Power [W]", DetIceStor( IceNum ).ParasiticElecRate, "System", "Average", DetIceStor( IceNum ).Name );
-			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Energy [J]", DetIceStor( IceNum ).ParasiticElecEnergy, "System", "Sum", DetIceStor( IceNum ).Name, _, "ELECTRICITY", _, _, "System" );
+			SetupOutputVariable( "Ice Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, DetIceStor( IceNum ).MassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Bypass Mass Flow Rate", OutputProcessor::Unit::kg_s, DetIceStor( IceNum ).BypassMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Tank Mass Flow Rate", OutputProcessor::Unit::kg_s, DetIceStor( IceNum ).TankMassFlowRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Fluid Inlet Temperature", OutputProcessor::Unit::C, DetIceStor( IceNum ).InletTemp, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Blended Outlet Temperature", OutputProcessor::Unit::C, DetIceStor( IceNum ).OutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Tank Outlet Temperature", OutputProcessor::Unit::C, DetIceStor( IceNum ).TankOutletTemp, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, DetIceStor( IceNum ).DischargingRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, DetIceStor( IceNum ).DischargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, DetIceStor( IceNum ).ChargingRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, DetIceStor( IceNum ).ChargingEnergy, "System", "Sum", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Power", OutputProcessor::Unit::W, DetIceStor( IceNum ).ParasiticElecRate, "System", "Average", DetIceStor( IceNum ).Name );
+			SetupOutputVariable( "Ice Thermal Storage Ancillary Electric Energy", OutputProcessor::Unit::J, DetIceStor( IceNum ).ParasiticElecEnergy, "System", "Sum", DetIceStor( IceNum ).Name, _, "ELECTRICITY", _, _, "System" );
 
 		} // ...over detailed ice storage units
 

@@ -12,8 +12,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -25,7 +25,7 @@
 !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
 !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
 !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
-!           13mm argon or air gap.  The window to wall ratio is approxomately 0.29.
+!           13mm argon or air gap.  The window to wall ratio is approximately 0.29.
 !           The south wall and door have overhangs.
 !
 !           The building is oriented 30 degrees east of north.
@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -126,7 +126,7 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    Jan14,                        !- Name
+    Jan14,                   !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     1,                       !- End Month
@@ -139,7 +139,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    July7,                        !- Name
+    July7,                   !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     7,                       !- End Month
@@ -151,7 +151,6 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
     41.78,                   !- Latitude {deg}
@@ -159,7 +158,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -189,7 +188,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1;                       !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -469,14 +468,6 @@
     MAT-CLNG-1;              !- Outside Layer
 
   Construction,
-    SB-U,                    !- Name
-    MAT-SB-U;                !- Outside Layer
-
-  Construction,
-    FLOOR-1,                 !- Name
-    MAT-FLOOR-1;             !- Outside Layer
-
-  Construction,
     FLOOR-SLAB-1,            !- Name
     CC03;                    !- Outside Layer
 
@@ -493,26 +484,8 @@
     CLEAR 3MM;               !- Layer 3
 
   Construction,
-    Dbl Clr 3mm/13mm Arg,    !- Name
-    CLEAR 3MM,               !- Outside Layer
-    ARGON 13MM,              !- Layer 2
-    CLEAR 3MM;               !- Layer 3
-
-  Construction,
     Sgl Grey 3mm,            !- Name
     GREY 3MM;                !- Outside Layer
-
-  Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
-    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
-    LoE CLEAR 6MM,           !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
 
   Zone,
     PLENUM-1,                !- Name
@@ -2339,7 +2312,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2347,7 +2320,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone2Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE3-1,                !- Zone Name
@@ -2355,7 +2328,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone3Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE4-1,                !- Zone Name
@@ -2363,7 +2336,7 @@
     Zone4Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone4Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 4 Node,             !- Zone Air Node Name
-    Zone 4 Outlet Node;      !- Zone Return Air Node Name
+    Zone 4 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE5-1,                !- Zone Name
@@ -2371,10 +2344,11 @@
     Zone5Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone5Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 5 Node,             !- Zone Air Node Name
-    Zone 5 Outlet Node;      !- Zone Return Air Node Name
+    Zone 5 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone1UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2382,6 +2356,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone2UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2389,6 +2364,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone3UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2396,6 +2372,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone4UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2403,6 +2380,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone5Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:UnitVentilator, !- Zone Equipment 1 Object Type
     Zone5UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2422,10 +2400,10 @@
     Zone1UnitVentOAInNode,   !- Outdoor Air Node Name
     Zone1UnitVentExhNode,    !- Exhaust Air Node Name
     Zone1UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone1UnitVentFan,        !- Supply Air Fan Name
     HeatingAndCooling,       !- Coil Option
-    always_1,                        !- Supply Air Fan Operating Mode Schedule Name
+    always_1,                !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone1UnitVentHeatingCoil,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance
@@ -2433,10 +2411,7 @@
     Zone1UnitVentCoolingCoil,!- Cooling Coil Name
     0.001;                   !- Cooling Convergence Tolerance
 
-Schedule:Constant,
-   always_1,
-   ,
-   1.0;
+  Schedule:Constant,always_1,,1.0;
 
   OutdoorAir:Node,
     Zone1UnitVentOAInNode,   !- Name
@@ -2456,10 +2431,10 @@ Schedule:Constant,
     Zone2UnitVentOAInNode,   !- Outdoor Air Node Name
     Zone2UnitVentExhNode,    !- Exhaust Air Node Name
     Zone2UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone2UnitVentFan,        !- Supply Air Fan Name
     HEATING,                 !- Coil Option
-    always_1,                        !- Supply Air Fan Operating Mode Schedule Name
+    always_1,                !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone2UnitVentHeatingCoil,!- Heating Coil Name
     0.001;                   !- Heating Convergence Tolerance
@@ -2482,10 +2457,10 @@ Schedule:Constant,
     Zone3UnitVentOAInNode,   !- Outdoor Air Node Name
     Zone3UnitVentExhNode,    !- Exhaust Air Node Name
     Zone3UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone3UnitVentFan,        !- Supply Air Fan Name
     HEATING,                 !- Coil Option
-    always_1,                        !- Supply Air Fan Operating Mode Schedule Name
+    always_1,                !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone3UnitVentHeatingCoil,!- Heating Coil Name
     0.001;                   !- Heating Convergence Tolerance
@@ -2508,10 +2483,10 @@ Schedule:Constant,
     Zone4UnitVentOAInNode,   !- Outdoor Air Node Name
     Zone4UnitVentExhNode,    !- Exhaust Air Node Name
     Zone4UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone4UnitVentFan,        !- Supply Air Fan Name
     HeatingAndCooling,       !- Coil Option
-    always_1,                        !- Supply Air Fan Operating Mode Schedule Name
+    always_1,                !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Zone4UnitVentHeatingCoil,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance
@@ -2537,10 +2512,10 @@ Schedule:Constant,
     Zone5UnitVentOAInNode,   !- Outdoor Air Node Name
     Zone5UnitVentExhNode,    !- Exhaust Air Node Name
     Zone5UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
-    Fan:SystemModel,      !- Supply Air Fan Object Type
+    Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone5UnitVentFan,        !- Supply Air Fan Name
     Heating,                 !- Coil Option
-    always_1,                        !- Supply Air Fan Operating Mode Schedule Name
+    always_1,                !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Zone5UnitVentHeatingCoil,!- Heating Coil Name
     0.001;                   !- Heating Convergence Tolerance
@@ -2748,90 +2723,90 @@ Schedule:Constant,
     Zone5UnitVentFanOutletNode,  !- Air Inlet Node Name
     Zone5UnitVentAirOutletNode;  !- Air Outlet Node Name
 
-Fan:SystemModel,
-  Zone1UnitVentFan , !- Name
-  UnitVentAvailability , !- Availability Schedule Name
-  Zone1UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone1UnitVentFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone1UnitVentFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
+    Zone1UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone1UnitVentFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone2UnitVentFan , !- Name
-  UnitVentAvailability , !- Availability Schedule Name
-  Zone2UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone2UnitVentFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone2UnitVentFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
+    Zone2UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone2UnitVentFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone3UnitVentFan , !- Name
-  UnitVentAvailability , !- Availability Schedule Name
-  Zone3UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone3UnitVentFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone3UnitVentFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
+    Zone3UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone3UnitVentFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone4UnitVentFan , !- Name
-  UnitVentAvailability , !- Availability Schedule Name
-  Zone4UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone4UnitVentFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone4UnitVentFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
+    Zone4UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone4UnitVentFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
-Fan:SystemModel,
-  Zone5UnitVentFan , !- Name
-  UnitVentAvailability , !- Availability Schedule Name
-  Zone5UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
-  Zone5UnitVentFanOutletNode,  !- Air Outlet Node Name
-  AUTOSIZE , !- Design Maximum Air Flow Rate
-  Discrete , !- Speed Control Method
-  0.0, !- Electric Power Minimum Flow Rate Fraction
-  75.0, !- Design Pressure Rise
-  0.9 , !- Motor Efficiency
-  1.0 , !- Motor In Air Stream Fraction
-  AUTOSIZE, !- Design Electric Power Consumption
-  TotalEfficiencyAndPressure, !- Design Power Sizing Method
-  , !- Electric Power Per Unit Flow Rate
-  , !- Electric Power Per Unit Flow Rate Per Unit Pressure
-  0.50;  !- Fan Total Efficiency 
+  Fan:SystemModel,
+    Zone5UnitVentFan,        !- Name
+    UnitVentAvailability,    !- Availability Schedule Name
+    Zone5UnitVentOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone5UnitVentFanOutletNode,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
+    Discrete,                !- Speed Control Method
+    0.0,                     !- Electric Power Minimum Flow Rate Fraction
+    75.0,                    !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Air Stream Fraction
+    AUTOSIZE,                !- Design Electric Power Consumption {W}
+    TotalEfficiencyAndPressure,  !- Design Power Sizing Method
+    ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.50;                    !- Fan Total Efficiency
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 

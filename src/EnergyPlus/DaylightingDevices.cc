@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -66,7 +67,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
@@ -357,15 +358,15 @@ namespace DaylightingDevices {
 				TDDPipe( PipeNum ).ExtLength = TDDPipe( PipeNum ).TotLength - SumTZoneLengths;
 
 				// Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
-				SetupOutputVariable( "Tubular Daylighting Device Transmitted Solar Radiation Rate [W]", TDDPipe( PipeNum ).TransmittedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate [W]", TDDPipe( PipeNum ).PipeAbsorbedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Heat Gain Rate [W]", TDDPipe( PipeNum ).HeatGain, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Heat Loss Rate [W]", TDDPipe( PipeNum ).HeatLoss, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Transmitted Solar Radiation Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).TransmittedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).PipeAbsorbedSolar, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Heat Gain Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).HeatGain, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Heat Loss Rate", OutputProcessor::Unit::W, TDDPipe( PipeNum ).HeatLoss, "Zone", "Average", TDDPipe( PipeNum ).Name );
 
-				SetupOutputVariable( "Tubular Daylighting Device Beam Solar Transmittance []", TDDPipe( PipeNum ).TransSolBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Beam Visible Transmittance []", TDDPipe( PipeNum ).TransVisBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Diffuse Solar Transmittance []", TDDPipe( PipeNum ).TransSolDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
-				SetupOutputVariable( "Tubular Daylighting Device Diffuse Visible Transmittance []", TDDPipe( PipeNum ).TransVisDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Beam Solar Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransSolBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Beam Visible Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransVisBeam, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Diffuse Solar Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransSolDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
+				SetupOutputVariable( "Tubular Daylighting Device Diffuse Visible Transmittance", OutputProcessor::Unit::None, TDDPipe( PipeNum ).TransVisDiff, "Zone", "Average", TDDPipe( PipeNum ).Name );
 
 			} // PipeNum
 
@@ -437,27 +438,16 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using General::RoundSigDigits;
 		using General::SafeDivide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  CHARACTER(len=MaxNameLength), &
 		//                   DIMENSION(20) :: Alphas                ! Alpha items for object
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		//unused1208  REAL(r64), DIMENSION(9)             :: Numbers               ! Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -469,25 +459,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Tubular";
-		NumOfTDDPipes = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfTDDPipes = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfTDDPipes > 0 ) {
 			TDDPipe.allocate( NumOfTDDPipes );
 
 			for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
-				GetObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Pipe name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), TDDPipe, PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				TDDPipe( PipeNum ).Name = cAlphaArgs( 1 );
 
 				// Get TDD:DOME object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " not found." );
@@ -532,7 +516,7 @@ namespace DaylightingDevices {
 				}
 
 				// Get TDD:DIFFUSER object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " not found." );
@@ -591,7 +575,7 @@ namespace DaylightingDevices {
 				}
 
 				// Construction
-				TDDPipe( PipeNum ).Construction = FindItemInList( cAlphaArgs( 4 ), Construct );
+				TDDPipe( PipeNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), Construct );
 
 				if ( TDDPipe( PipeNum ).Construction == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe construction " + cAlphaArgs( 4 ) + " not found." );
@@ -652,7 +636,7 @@ namespace DaylightingDevices {
 
 					for ( TZoneNum = 1; TZoneNum <= TDDPipe( PipeNum ).NumOfTZones; ++TZoneNum ) {
 						TZoneName = cAlphaArgs( TZoneNum + 4 );
-						TDDPipe( PipeNum ).TZone( TZoneNum ) = FindItemInList( TZoneName, Zone );
+						TDDPipe( PipeNum ).TZone( TZoneNum ) = UtilityRoutines::FindItemInList( TZoneName, Zone );
 						if ( TDDPipe( PipeNum ).TZone( TZoneNum ) == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Transition zone " + TZoneName + " not found." );
 							ErrorsFound = true;
@@ -689,23 +673,12 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int ShelfNum; // Daylighting shelf object number
@@ -714,25 +687,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Shelf";
-		NumOfShelf = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfShelf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfShelf > 0 ) {
 			Shelf.allocate( NumOfShelf );
 
 			for ( ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum ) {
-				GetObjectItem( "DaylightingDevice:Shelf", ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject , ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Shelf name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Shelf, ShelfNum - 1, IsNotOK, IsBlank, "DaylightingDevice:Shelf" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				Shelf( ShelfNum ).Name = cAlphaArgs( 1 );
 
 				// Get window object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " not found." );
@@ -773,7 +740,7 @@ namespace DaylightingDevices {
 
 				// Get inside shelf heat transfer surface (optional)
 				if ( cAlphaArgs( 3 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
+					SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Inside shelf " + cAlphaArgs( 3 ) + " not found." );
@@ -797,7 +764,7 @@ namespace DaylightingDevices {
 
 				// Get outside shelf attached shading surface (optional)
 				if ( cAlphaArgs( 4 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 4 ), Surface );
+					SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf " + cAlphaArgs( 4 ) + " not found." );
@@ -822,7 +789,7 @@ namespace DaylightingDevices {
 
 						// Get outside shelf construction (required if outside shelf is specified)
 						if ( cAlphaArgs( 5 ) != "" ) {
-							ConstrNum = FindItemInList( cAlphaArgs( 5 ), Construct );
+							ConstrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Construct );
 
 							if ( ConstrNum == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " not found." );
@@ -913,7 +880,7 @@ namespace DaylightingDevices {
 		Real64 const N( 100000.0 ); // Number of integration points
 		Real64 const xTol( 150.0 ); // Tolerance factor to skip iterations where dT is approximately 0
 		// Must be >= 1.0, increase this number to decrease the execution time
-		Real64 const myLocalTiny( tiny( 1.0 ) );
+		Real64 const myLocalTiny( TINY( 1.0 ) );
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 i; // Integration interval between points
@@ -992,28 +959,21 @@ namespace DaylightingDevices {
 		int const NPH( 1000 ); // Number of altitude integration points
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 FluxInc; // Incident solar flux
-		Real64 FluxTrans; // Transmitted solar flux
-		Real64 trans; // Total beam solar transmittance of TDD
-		int N; // Loop counter
-		Real64 PH; // Altitude angle of sky element
-		Real64 dPH; // Altitude angle increment
+		Real64 FluxInc = 0.0;    // Incident solar flux
+		Real64 FluxTrans = 0.0 ; // Transmitted solar flux
+		Real64 trans;            // Total beam solar transmittance of TDD
 		Real64 COSI; // Cosine of incident angle
 		Real64 SINI; // Sine of incident angle
-		Real64 P; // Angular distribution function
 
-		// FLOW:
-		FluxInc = 0.0;
-		FluxTrans = 0.0;
+		Real64 const dPH = 90.0 * DegToRadians / NPH; // Altitude angle of sky element
+		Real64 PH = 0.5 * dPH;                        // Altitude angle increment
 
 		// Integrate from 0 to Pi/2 altitude
-		dPH = 90.0 * DegToRadians / NPH;
-		PH = 0.5 * dPH;
-		for ( N = 1; N <= NPH; ++N ) {
+		for ( int N = 1; N <= NPH; ++N ) {
 			COSI = std::cos( PiOvr2 - PH );
 			SINI = std::sin( PiOvr2 - PH );
 
-			P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
+			Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
 			// Calculate total TDD transmittance for given angle
 			trans = TransTDD( PipeNum, COSI, SolarBeam );
@@ -1066,37 +1026,27 @@ namespace DaylightingDevices {
 		int const NTH( 18 ); // Number of azimuth integration points
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 FluxInc; // Incident solar flux
-		Real64 FluxTrans; // Transmitted solar flux
-		Real64 trans; // Total beam solar transmittance of TDD
-		int N; // Loop counter
-		Real64 TH; // Azimuth angle of sky horizon element
-		Real64 dTH; // Azimuth angle increment
-		Real64 THMIN; // Minimum azimuth integration limit
-		Real64 THMAX; // Maximum azimuth integration limit
+		Real64 FluxInc = 0.0;   // Incident solar flux
+		Real64 FluxTrans = 0.0; // Transmitted solar flux
 		Real64 CosPhi; // Cosine of TDD:DOME altitude angle
 		Real64 Theta; // TDD:DOME azimuth angle
-		Real64 COSI; // Cosine of the incident angle
-
-		// FLOW:
-		FluxInc = 0.0;
-		FluxTrans = 0.0;
 
 		CosPhi = std::cos( PiOvr2 - Surface( TDDPipe( PipeNum ).Dome ).Tilt * DegToRadians );
 		Theta = Surface( TDDPipe( PipeNum ).Dome ).Azimuth * DegToRadians;
 
 		if ( CosPhi > 0.01 ) { // Dome has a view of the horizon
 			// Integrate over the semicircle
-			THMIN = Theta - PiOvr2;
-			THMAX = Theta + PiOvr2;
-			dTH = 180.0 * DegToRadians / NTH;
-			TH = THMIN + 0.5 * dTH;
-			for ( N = 1; N <= NTH; ++N ) {
+			Real64 const THMIN = Theta - PiOvr2;            // Minimum azimuth integration limit
+			// Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
+			Real64 const dTH = 180.0 * DegToRadians / NTH;  // Azimuth angle increment
+			Real64 TH = THMIN + 0.5 * dTH;                  // Azimuth angle of sky horizon element
+
+			for ( int N = 1; N <= NTH; ++N ) {
 				// Calculate incident angle between dome outward normal and horizon element
-				COSI = CosPhi * std::cos( TH - Theta );
+				Real64 COSI = CosPhi * std::cos( TH - Theta );  // Cosine of the incident angle
 
 				// Calculate total TDD transmittance for given angle
-				trans = TransTDD( PipeNum, COSI, SolarBeam );
+				Real64 trans = TransTDD( PipeNum, COSI, SolarBeam ); // Total beam solar transmittance of TDD
 
 				FluxInc += COSI * dTH;
 				FluxTrans += trans * COSI * dTH;
@@ -1353,7 +1303,7 @@ namespace DaylightingDevices {
 		// Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
 
 		// METHODOLOGY EMPLOYED:
-		// Similar to FindItemInList defined in InputProcessor.
+		// Similar to UtilityRoutines::FindItemInList( defined in InputProcessor.
 
 		// REFERENCES: na
 		// Using/Aliasing

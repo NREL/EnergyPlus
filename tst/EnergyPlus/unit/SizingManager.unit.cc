@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -213,3 +214,31 @@ TEST_F( EnergyPlusFixture, GetOARequirementsTest_DSOA1 )
 	cNumericFields.deallocate();
 
 }
+
+TEST( SizingManagerTest, TimeIndexToHrMinString_test )
+{
+	ShowMessage( "Begin Test: SizingManagerTest, TimeIndexToHrMinString_test" );
+
+	DataGlobals::MinutesPerTimeStep = 15;
+
+	EXPECT_EQ( "00:00:00", TimeIndexToHrMinString( 0 ) );
+	EXPECT_EQ( "00:15:00", TimeIndexToHrMinString( 1 ) );
+	EXPECT_EQ( "01:45:00", TimeIndexToHrMinString( 7 ) );
+	EXPECT_EQ( "07:45:00", TimeIndexToHrMinString( 31 ) );
+	EXPECT_EQ( "19:45:00", TimeIndexToHrMinString( 79 ) );
+	EXPECT_EQ( "24:00:00", TimeIndexToHrMinString( 96  ) );
+
+	DataGlobals::MinutesPerTimeStep = 3;
+
+	EXPECT_EQ( "00:00:00", TimeIndexToHrMinString( 0 ) );
+	EXPECT_EQ( "00:03:00", TimeIndexToHrMinString( 1 ) );
+	EXPECT_EQ( "00:21:00", TimeIndexToHrMinString( 7 ) );
+	EXPECT_EQ( "01:33:00", TimeIndexToHrMinString( 31 ) );
+	EXPECT_EQ( "03:57:00", TimeIndexToHrMinString( 79 ) );
+	EXPECT_EQ( "04:48:00", TimeIndexToHrMinString( 96 ) );
+	EXPECT_EQ( "16:39:00", TimeIndexToHrMinString( 333 ) );
+	EXPECT_EQ( "24:00:00", TimeIndexToHrMinString( 480 ) );
+
+}
+
+

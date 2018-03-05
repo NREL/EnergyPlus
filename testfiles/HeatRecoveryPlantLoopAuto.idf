@@ -12,8 +12,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/1 - 2/5, Summer 11/25 - 12/31, CHICAGO_IL_USA TMY2-94846
 !
@@ -23,7 +23,7 @@
 !           There is a single window in West Zone's south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -110,7 +110,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     NONE,                    !- Name
@@ -181,7 +181,7 @@
     1.15,                    !- Cooling Sizing Factor
     6;                       !- Timesteps in Averaging Window
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -211,7 +211,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -2159,12 +2159,12 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Chilled Water Loop,      !- Plant or Condenser Loop Name
@@ -2191,12 +2191,12 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -2223,12 +2223,12 @@
     Heat Recovery Demand Outlet Node,  !- Demand Side Outlet Node Name
     Heat Recovery Demand Side Branches,  !- Demand Side Branch List Name
     Heat Recovery Demand Side Connectors,  !- Demand Side Connector List Name
-    Optimal,                     !- Load Distribution Scheme
-    ,                          !- Availability Manager List Name
-    SingleSetpoint, !- Plant Loop Demand Calculation Scheme
-    None,  !- Common Pipe Simulation
-    None,  !- field Pressure Simulation Type
-    2.0;  !- field Loop Circulation Time
+    Optimal,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
+    None,                    !- Common Pipe Simulation
+    None,                    !- Pressure Simulation Type
+    2.0;                     !- Loop Circulation Time {minutes}
 
   Sizing:Plant,
     Heat Recovery Water Loop,!- Plant or Condenser Loop Name
@@ -2541,7 +2541,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -2549,7 +2549,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -2557,10 +2557,11 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2568,6 +2569,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2575,6 +2577,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2689,7 +2692,7 @@
   Chiller:EngineDriven,
     Big Chiller,             !- Name
     WaterCooled,             !- Condenser Type
-    autosize,                  !- Nominal Capacity {W}
+    autosize,                !- Nominal Capacity {W}
     2.75,                    !- Nominal COP {W/W}
     Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
     Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
@@ -2701,8 +2704,8 @@
     35.0,                    !- Design Condenser Inlet Temperature {C}
     2.778,                   !- Temperature Rise Coefficient
     6.67,                    !- Design Chilled Water Outlet Temperature {C}
-    autosize,                  !- Design Chilled Water Flow Rate {m3/s}
-    autosize,                  !- Design Condenser Water Flow Rate {m3/s}
+    autosize,                !- Design Chilled Water Flow Rate {m3/s}
+    autosize,                !- Design Condenser Water Flow Rate {m3/s}
     0.9949,                  !- Coefficient 1 of Capacity Ratio Curve
     -0.045954,               !- Coefficient 2 of Capacity Ratio Curve
     -0.0013543,              !- Coefficient 3 of Capacity Ratio Curve
@@ -2724,17 +2727,17 @@
     150,                     !- Design Minimum Exhaust Temperature {C}
     DIESEL,                  !- Fuel Type
     45500,                   !- Fuel Higher Heating Value {kJ/kg}
-    autosize,                 !- Design Heat Recovery Water Flow Rate {m3/s}
+    autosize,                !- Design Heat Recovery Water Flow Rate {m3/s}
     Big Chiller Heat Rec Inlet Node,  !- Heat Recovery Inlet Node Name
     Big Chiller Heat Rec Outlet Node,  !- Heat Recovery Outlet Node Name
     LeavingSetpointModulated,!- Chiller Flow Mode
     80.0,                    !- Maximum Temperature for Heat Recovery at Heat Recovery Outlet Node {C}
     ,                        !- Sizing Factor
-    ,                        !- Basin Heater Capacity
-    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
     1.0;                     !- Condenser Heat Recovery Relative Capacity Fraction
-    
+
   SetpointManager:Scheduled,
     Big Chiller Setpoint Manager,  !- Name
     Temperature,             !- Control Variable
@@ -3013,7 +3016,7 @@
     BG Tur Recovery Lube Heat Curve,  !- Heat Recovery Lube Energy Curve Name
     0.01907045,              !- Coefficient 1 of U-Factor Times Area Curve
     0.9,                     !- Coefficient 2 of U-Factor Times Area Curve
-    0.00000504,              !- Maximum Exhaust Flow per Unit of Power Output {(Kg/s)/W}
+    0.00000504,              !- Maximum Exhaust Flow per Unit of Power Output {(kg/s)/W}
     150,                     !- Design Minimum Exhaust Temperature {C}
     25,                      !- Design Air Inlet Temperature {C}
     43500,                   !- Fuel Higher Heating Value {kJ/kg}

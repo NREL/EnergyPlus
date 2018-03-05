@@ -11,8 +11,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
-!                          CHICAGO_IL_USA Annual Cooling (DB=>MWB) 2%, MaxDB=29.9캜 MWB=22.1캜
+! Design Days:             CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
+!                          CHICAGO_IL_USA Annual Cooling (DB=>MWB) 2%, MaxDB=29.9째C MWB=22.1째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -22,7 +22,7 @@
 !           There is a single window in West Zone's south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -110,7 +110,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,6;
 
@@ -165,7 +165,7 @@
 
  ! CHICAGO_IL_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
  ! Coldest Month=January
- ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6캜
+ ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -195,7 +195,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+ ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -225,7 +225,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 2%, MaxDB=29.9캜 MWB=22.1캜
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 2%, MaxDB=29.9째C MWB=22.1째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 2% Condns DB=>MWB,  !- Name
@@ -1452,7 +1452,7 @@
     Free Cooler Outlet Node, !- Loop Supply Side Outlet Node Name
     0.0086,                  !- Loop Supply Side Design Flow Rate {m3/s}
     IDEAL,                   !- Heat Exchange Model Type
-    150000.0,                !- Heat Exchanger U-Factor Times Area Value {W/k}
+    150000.0,                !- Heat Exchanger U-Factor Times Area Value {W/K}
     CoolingSetpointOnOffWithComponentOverride,  !- Control Type
     Free Cooler Outlet Node, !- Heat Exchanger Setpoint Node Name
     0.0,                     !- Minimum Temperature Difference to Activate Heat Exchanger {deltaC}
@@ -2026,7 +2026,7 @@
     WestZoneInlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     West Zone Node,          !- Zone Air Node Name
-    West Zone Outlet Node;   !- Zone Return Air Node Name
+    West Zone Outlet Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -2034,7 +2034,7 @@
     EastZoneInlets,          !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     East Zone Node,          !- Zone Air Node Name
-    East Zone Outlet Node;   !- Zone Return Air Node Name
+    East Zone Outlet Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -2042,10 +2042,11 @@
     NorthZoneInlets,         !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     North Zone Node,         !- Zone Air Node Name
-    North Zone Outlet Node;  !- Zone Return Air Node Name
+    North Zone Outlet Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     WestZoneEquipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     WestZoneTermReheat,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2053,6 +2054,7 @@
 
   ZoneHVAC:EquipmentList,
     EastZoneEquipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     EastZoneTermReheat,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2060,6 +2062,7 @@
 
   ZoneHVAC:EquipmentList,
     NorthZoneEquipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     NorthZoneTermReheat,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

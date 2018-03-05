@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,6 +55,7 @@
 // EnergyPlus Headers
 #include <UnitVentilator.hh>
 #include <BranchNodeConnections.hh>
+#include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -71,12 +73,13 @@
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SingleDuct.hh>
@@ -127,7 +130,6 @@ namespace UnitVentilator {
 	using DataHVACGlobals::ATMixer_InletSide;
 	using DataHVACGlobals::ATMixer_SupplySide;
 
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
@@ -215,25 +217,9 @@ namespace UnitVentilator {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqUnitVent;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitVentNum; // index of unit ventilator being simulated
@@ -246,7 +232,7 @@ namespace UnitVentilator {
 
 		// Find the correct Unit Ventilator Equipment
 		if ( CompIndex == 0 ) {
-			UnitVentNum = FindItemInList( CompName, UnitVent );
+			UnitVentNum = UtilityRoutines::FindItemInList( CompName, UnitVent );
 			if ( UnitVentNum == 0 ) {
 				ShowFatalError( "SimUnitVentilator: Unit not found=" + CompName );
 			}
@@ -300,12 +286,6 @@ namespace UnitVentilator {
 		// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using OutAirNodeManager::CheckAndAddAirNodeNumber;
@@ -338,23 +318,12 @@ namespace UnitVentilator {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using SingleDuct::GetATMixer;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUnitVentilatorInput: " ); // include trailing blank
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
 		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumFields; // Total number of fields in object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -382,8 +351,8 @@ namespace UnitVentilator {
 		// Figure out how many unit ventilators there are in the input file
 
 		CurrentModuleObject = cMO_UnitVentilator;
-		NumOfUnitVents = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfUnitVents = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -402,19 +371,12 @@ namespace UnitVentilator {
 
 		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) { // Begin looping over all of the unit ventilators found in the input file...
 
-			GetObjectItem( CurrentModuleObject, UnitVentNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, UnitVentNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			UnitVentNumericFields( UnitVentNum ).FieldNames.allocate (NumNumbers );
 			UnitVentNumericFields( UnitVentNum ).FieldNames = "";
 			UnitVentNumericFields( UnitVentNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), UnitVent, UnitVentNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitVent( UnitVentNum ).Name = Alphas( 1 );
 			UnitVent( UnitVentNum ).SchedName = Alphas( 2 );
@@ -487,12 +449,6 @@ namespace UnitVentilator {
 				ShowContinueError( "Illegal " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
 			}}
 
-			// Get AirTerminal mixer data
-			GetATMixer( UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).ATMixerName, UnitVent( UnitVentNum ).ATMixerIndex, UnitVent( UnitVentNum ).ATMixerType, UnitVent( UnitVentNum ).ATMixerPriNode, UnitVent( UnitVentNum ).ATMixerSecNode, UnitVent( UnitVentNum ).ATMixerOutNode );
-			if (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide || UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide) {
-				UnitVent( UnitVentNum ).ATMixerExists = true;
-			}
-
 			// Main air nodes (except outside air node):
 			// For node connections, this object is both a parent and a non-parent, because the
 			// OA mixing box is not called out as a separate component, its nodes must be connected
@@ -502,14 +458,18 @@ namespace UnitVentilator {
 			// non-parent OA mixing box within the unit ventilator.
 			// Because there is overlap between the nodes that are parent and non-parent, use a different
 			// object type for the non parent nodes
-			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
-				UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-				UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			} else { 
-				UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-			}
+			UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 			UnitVent( UnitVentNum ).AirOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
+			// Get AirTerminal mixer data
+			GetATMixer( UnitVent( UnitVentNum ).Name, UnitVent( UnitVentNum ).ATMixerName, UnitVent( UnitVentNum ).ATMixerIndex, UnitVent( UnitVentNum ).ATMixerType, UnitVent( UnitVentNum ).ATMixerPriNode, UnitVent( UnitVentNum ).ATMixerSecNode, UnitVent( UnitVentNum ).ATMixerOutNode, UnitVent( UnitVentNum ).AirOutNode );
+			if (UnitVent( UnitVentNum ).ATMixerType == ATMixer_InletSide || UnitVent( UnitVentNum ).ATMixerType == ATMixer_SupplySide) {
+				UnitVent( UnitVentNum ).ATMixerExists = true;
+			}
+
+			if ( !UnitVent( UnitVentNum ).ATMixerExists ) {
+				UnitVent( UnitVentNum ).AirInNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			}
 
 			UnitVent( UnitVentNum ).FanType = Alphas( 11 );
 			UnitVent( UnitVentNum ).FanName = Alphas( 12 );
@@ -519,7 +479,7 @@ namespace UnitVentilator {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitVent( UnitVentNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( ! InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+				if ( ! UtilityRoutines::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
 					GetFanType( UnitVent( UnitVentNum ).FanName, UnitVent( UnitVentNum ).FanType_Num, errFlag, CurrentModuleObject, UnitVent( UnitVentNum ).Name );
 
 					{ auto const SELECT_CASE_var( UnitVent( UnitVentNum ).FanType_Num );
@@ -562,7 +522,7 @@ namespace UnitVentilator {
 						ShowContinueError( "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume." );
 						ErrorsFound = true;
 					}}
-				} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
+				} else if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
 					UnitVent( UnitVentNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitVent( UnitVentNum ).FanName ) ); // call constructor
 					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName ); //zero-based
@@ -641,7 +601,7 @@ namespace UnitVentilator {
 
 			UnitVent( UnitVentNum ).HVACSizingIndex = 0;
 			if (!lAlphaBlanks( 20 )) {
-				UnitVent( UnitVentNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing );
+				UnitVent( UnitVentNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 20 ), ZoneHVACSizing );
 				if (UnitVent( UnitVentNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found.");
 					ShowContinueError( "Occurs in " + cMO_UnitVentilator + " = " + UnitVent(UnitVentNum).Name );
@@ -815,9 +775,9 @@ namespace UnitVentilator {
 					} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 						UnitVent( UnitVentNum ).CCoilType = Cooling_CoilHXAssisted;
 						GetHXCoilTypeAndName( cCoolingCoilType, Alphas( 18 ), ErrorsFound, UnitVent( UnitVentNum ).CCoilPlantType, UnitVent( UnitVentNum ).CCoilPlantName );
-						if ( SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
+						if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						} else if ( SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+						} else if ( UtilityRoutines::SameString( UnitVent( UnitVentNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 							UnitVent( UnitVentNum ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\", invalid" );
@@ -1007,21 +967,55 @@ namespace UnitVentilator {
 
 		// Setup Report variables for the Unit Ventilators, CurrentModuleObject='ZoneHVAC:UnitVentilator'
 		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) {
-			SetupOutputVariable( "Zone Unit Ventilator Heating Rate [W]", UnitVent( UnitVentNum ).HeatPower, "System", "Average", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Heating Energy [J]", UnitVent( UnitVentNum ).HeatEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Rate [W]", UnitVent( UnitVentNum ).TotCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Energy [J]", UnitVent( UnitVentNum ).TotCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Rate [W]", UnitVent( UnitVentNum ).SensCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Energy [J]", UnitVent( UnitVentNum ).SensCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Power [W]", UnitVent( UnitVentNum ).ElecPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Heating Rate", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).HeatPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Heating Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).HeatEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Rate", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).TotCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Total Cooling Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).TotCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Rate", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).SensCoolPower, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Sensible Cooling Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).SensCoolEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Power", OutputProcessor::Unit::W, UnitVent( UnitVentNum ).ElecPower, "System", "Average", UnitVent( UnitVentNum ).Name );
 			// Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
-			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Energy [J]", UnitVent( UnitVentNum ).ElecEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
-			SetupOutputVariable( "Zone Unit Ventilator Fan Availability Status []", UnitVent( UnitVentNum ).AvailStatus, "System", "Average", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Fan Electric Energy", OutputProcessor::Unit::J, UnitVent( UnitVentNum ).ElecEnergy, "System", "Sum", UnitVent( UnitVentNum ).Name );
+			SetupOutputVariable( "Zone Unit Ventilator Fan Availability Status", OutputProcessor::Unit::None, UnitVent( UnitVentNum ).AvailStatus, "System", "Average", UnitVent( UnitVentNum ).Name );
 			if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff ) {
-				SetupOutputVariable( "Zone Unit Ventilator Fan Part Load Ratio []", UnitVent( UnitVentNum ).FanPartLoadRatio, "System", "Average", UnitVent( UnitVentNum ).Name );
+				SetupOutputVariable( "Zone Unit Ventilator Fan Part Load Ratio", OutputProcessor::Unit::None, UnitVent( UnitVentNum ).FanPartLoadRatio, "System", "Average", UnitVent( UnitVentNum ).Name );
 			}
 		}
 
+		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) {
+			if ( UnitVent( UnitVentNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			} else {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			}
+		}
+		for ( UnitVentNum = 1; UnitVentNum <= NumOfUnitVents; ++UnitVentNum ) {
+			if ( UnitVent( UnitVentNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			} else {
+				if ( UnitVent( UnitVentNum ).HCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).HCoilName, UnitVent( UnitVentNum ).HCoilTypeCh,  UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+				if ( UnitVent( UnitVentNum ).CCoilPresent ) {
+					coilSelectionReportObj->setCoilSupplyFanInfo( UnitVent( UnitVentNum ).CCoilName , UnitVent( UnitVentNum ).CCoilTypeCh , UnitVent( UnitVentNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitVent( UnitVentNum ).Fan_Index );
+				}
+			}
+		}
 	}
 
 	void
@@ -1341,12 +1335,8 @@ namespace UnitVentilator {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using WaterCoils::SetCoilDesFlow;
@@ -1371,17 +1361,8 @@ namespace UnitVentilator {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeUnitVentilator" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -2180,7 +2161,7 @@ namespace UnitVentilator {
 		using DataHVACGlobals::ZoneCompTurnFansOff;
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRegulaFalsi;
+		using General::SolveRoot;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2536,7 +2517,7 @@ namespace UnitVentilator {
 								if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 								Par( 3 ) = double( OpMode );
 								// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-								SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
+								SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
 							}
 						}
 
@@ -2740,7 +2721,7 @@ namespace UnitVentilator {
 								if ( FirstHVACIteration ) Par( 2 ) = 1.0;
 								Par( 3 ) = double( OpMode );
 								// Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-								SolveRegulaFalsi( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
+								SolveRoot( 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par );
 							}
 						}
 						CalcUnitVentilatorComponents( UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac );
@@ -2887,7 +2868,7 @@ namespace UnitVentilator {
 			} else {
 				SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 			}
-			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
@@ -2961,7 +2942,7 @@ namespace UnitVentilator {
 			} else {
 				SimUnitVentOAMixer( UnitVentNum, FanOpMode );
 			}
-			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
 				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate( _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
@@ -3440,7 +3421,7 @@ namespace UnitVentilator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the part-load ratio for the unit ventilator.
 		// METHODOLOGY EMPLOYED:
-		// Use SolveRegulaFalsi to call this Function to converge on a solution
+		// Use SolveRoot to call this Function to converge on a solution
 		// REFERENCES:
 		// na
 		// USE STATEMENTS:

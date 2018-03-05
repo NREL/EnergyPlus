@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -51,15 +52,21 @@
 // EnergyPlus Headers
 #include <DataZoneEquipment.hh>
 #include <BranchNodeConnections.hh>
+#include <DataContaminantBalance.hh>
+#include <DataDefineEquip.hh>
+#include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
+#include <DirectAirManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -108,30 +115,35 @@ namespace DataZoneEquipment {
 	int const VRFTerminalUnit_Num( 11 );
 	int const PurchasedAir_Num( 12 );
 	int const ZoneEvaporativeCoolerUnit_Num( 13 );
-	int const AirDistUnit_Num( 14 );
-	int const DirectAir_Num( 15 );
-	int const BBWaterConvective_Num( 16 );
-	int const BBElectricConvective_Num( 17 );
-	int const HiTempRadiant_Num( 18 );
-	int const LoTempRadiant_Num( 19 );
-	int const ZoneExhaustFan_Num( 20 );
-	int const HeatXchngr_Num( 21 );
-	int const HPWaterHeater_Num( 22 );
-	int const BBWater_Num( 23 );
-	int const ZoneDXDehumidifier_Num( 24 );
-	int const BBSteam_Num( 25 );
-	int const BBElectric_Num( 26 );
-	int const RefrigerationAirChillerSet_Num( 27 );
-	int const UserDefinedZoneHVACForcedAir_Num( 28 );
-	int const ZoneUnitarySystem_Num( 29 ); // AirloopHVAC:UnitarySystem configured as zone equipment
-	int const CoolingPanel_Num( 30 );
-	int const TotalNumZoneEquipType( 30 );
+	int const ZoneHybridEvaporativeCooler_Num(14);
+	int const AirDistUnit_Num( 15 );
+	int const DirectAir_Num( 16 );
+	int const BBWaterConvective_Num( 17 );
+	int const BBElectricConvective_Num( 18 );
+	int const HiTempRadiant_Num( 19 );
+	int const LoTempRadiant_Num(20);
+	int const ZoneExhaustFan_Num(21);
+	int const HeatXchngr_Num(22);
+	int const HPWaterHeater_Num(23);
+	int const BBWater_Num(24);
+	int const ZoneDXDehumidifier_Num(25);
+	int const BBSteam_Num(26);
+	int const BBElectric_Num(27);
+	int const RefrigerationAirChillerSet_Num(28);
+	int const UserDefinedZoneHVACForcedAir_Num(29);
+	int const ZoneUnitarySystem_Num(30); // AirloopHVAC:UnitarySystem configured as zone equipment
+	int const CoolingPanel_Num( 31 );
+	int const TotalNumZoneEquipType( 31 );
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
 
-	int const NumValidSysAvailZoneComponents( 13 );
-	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit" } );
+	int const NumValidSysAvailZoneComponents( 14 );
+	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit","ZoneHVAC:HybridUnitaryHVAC" } );
+	
+	// Per Person Ventilation Rate Mode
+	int const PerPersonDCVByCurrentLevel( 1 );
+	int const PerPersonByDesignLevel( 2 );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -159,6 +171,7 @@ namespace DataZoneEquipment {
 
 	// Object Data
 	Array1D< EquipConfiguration > ZoneEquipConfig;
+	std::unordered_set< std::string > UniqueZoneEquipListNames;
 	Array1D< EquipList > ZoneEquipList;
 	Array1D< ControlList > HeatingControlList;
 	Array1D< ControlList > CoolingControlList;
@@ -190,7 +203,7 @@ namespace DataZoneEquipment {
 		CoolingControlList.deallocate();
 		SupplyAirPath.deallocate();
 		ReturnAirPath.deallocate();
-
+		UniqueZoneEquipListNames.clear();
 	}
 
 	void
@@ -249,21 +262,7 @@ namespace DataZoneEquipment {
 		// Get all the system related equipment which may be attached to
 		// a zone
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::SameString;
 		using DataHeatBalance::Zone;
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::GetNodeNums;
@@ -279,17 +278,8 @@ namespace DataZoneEquipment {
 		using DataGlobals::ScheduleAlwaysOn;
 		using namespace ScheduleManager;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneEquipmentData1: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -304,6 +294,7 @@ namespace DataZoneEquipment {
 		int IOStat;
 		std::string InletNodeListName;
 		std::string ExhaustNodeListName;
+		std::string ReturnNodeListName;
 		std::string ReturnFlowBasisNodeListName;
 		Array1D_string AlphArray;
 		Array1D< Real64 > NumArray;
@@ -317,8 +308,7 @@ namespace DataZoneEquipment {
 		// static bool ErrorsFound( false ); // If errors detected in input // GetZoneEquipmentDataErrorsFound
 		// static int found( 0 );
 		////////////////////////////////////////////////////////////////////////////////////
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
+		bool IsNotOK; // Flag to verify nam
 		bool NodeListError;
 		bool UniqueNodeError;
 		int NumOfControlledZones; // The number of Controlled Zone Equip Configuration objects
@@ -353,25 +343,26 @@ namespace DataZoneEquipment {
 
 		ExhaustNodeListName = "";
 		InletNodeListName = "";
+		ReturnNodeListName = "";
 		ReturnFlowBasisNodeListName = "";
 
 		// Look in the input file for zones with air loop and zone equipment attached
 
-		NumOfControlledZones = GetNumObjectsFound( "ZoneHVAC:EquipmentConnections" );
-		NumOfZoneEquipLists = GetNumObjectsFound( "ZoneHVAC:EquipmentList" ); // Look for lists of equipment data - there should
+		NumOfControlledZones = inputProcessor->getNumObjectsFound( "ZoneHVAC:EquipmentConnections" );
+		NumOfZoneEquipLists = inputProcessor->getNumObjectsFound( "ZoneHVAC:EquipmentList" ); // Look for lists of equipment data - there should
 		// be as many of these as there are controlled zones
-		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 		NodeNums.dimension( NumParams, 0 );
-		GetObjectDefMaxArgs( "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums );
 		MaxAlphas = NumAlphas;
 		MaxNums = NumNums;
-		GetObjectDefMaxArgs( "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
 		AlphArray.allocate( MaxAlphas );
@@ -384,14 +375,14 @@ namespace DataZoneEquipment {
 		if ( ! allocated( SupplyAirPath ) ) {
 			// Look for and read in the air supply path
 			// component (splitters) information for each zone
-			NumSupplyAirPaths = GetNumObjectsFound( "AirLoopHVAC:SupplyPath" );
+			NumSupplyAirPaths = inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPath" );
 			SupplyAirPath.allocate( NumSupplyAirPaths );
 		}
 
 		if ( ! allocated( ReturnAirPath ) ) {
 			// Look for and read in the air return path
 			// component (mixers & plenums) information for each zone
-			NumReturnAirPaths = GetNumObjectsFound( "AirLoopHVAC:ReturnPath" );
+			NumReturnAirPaths = inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPath" );
 			ReturnAirPath.allocate( NumReturnAirPaths );
 		}
 
@@ -401,6 +392,7 @@ namespace DataZoneEquipment {
 		// be the same as the number of zones in the building
 		ZoneEquipList.allocate( NumOfZones );
 		ZoneEquipAvail.dimension( NumOfZones, NoAction );
+		UniqueZoneEquipListNames.reserve( NumOfZones );
 
 		if ( NumOfZoneEquipLists != NumOfControlledZones ) {
 			ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );
@@ -416,14 +408,15 @@ namespace DataZoneEquipment {
 		InitUniqueNodeCheck( "ZoneHVAC:EquipmentConnections" );
 
 		overallEquipCount = 0;
+		int locTermUnitSizingCounter = 0; // will increment for every zone inlet node
 
 		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop ) {
 
 			CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-			GetObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
+			inputProcessor->getObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
 
-			ControlledZoneNum = FindItemInList( AlphArray( 1 ), Zone );
+			ControlledZoneNum = UtilityRoutines::FindItemInList( AlphArray( 1 ), Zone );
 
 			if ( ControlledZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\"" );
@@ -439,18 +432,17 @@ namespace DataZoneEquipment {
 					continue;
 				}
 				Zone( ControlledZoneNum ).IsControlled = true;
+				Zone( ControlledZoneNum ).ZoneEqNum = ControlledZoneNum;
 				ZoneEquipConfig( ControlledZoneNum ).IsControlled = true;
 				ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum = ControlledZoneNum;
 			}
 			ZoneEquipConfig( ControlledZoneNum ).ZoneName = AlphArray( 1 ); // for x-referencing with the geometry data
 
 			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::EquipListName, ControlledZoneLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + cAlphaFields( 2 ) );
+			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), UniqueZoneEquipListNames, IsNotOK );
 			if ( IsNotOK ) {
 				ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
 				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 2 ) = "xxxxx";
 			}
 			ZoneEquipConfig( ControlledZoneNum ).EquipListName = AlphArray( 2 ); // the name of the list containing all the zone eq.
 			InletNodeListName = AlphArray( 3 );
@@ -473,16 +465,7 @@ namespace DataZoneEquipment {
 				Zone( ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum ).SystemZoneNodeNumber = ZoneEquipConfig( ControlledZoneNum ).ZoneNode;
 			} // This error already detected and program will be terminated.
 
-			ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode = GetOnlySingleNode( AlphArray( 6 ), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_ZoneReturn, 1, ObjectIsNotParent ); // all return air state variables are
-			// assigned to this node
-			if ( ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode != 0 ) {
-				UniqueNodeError = false;
-				CheckUniqueNodes( cAlphaFields( 6 ), "NodeName", UniqueNodeError, AlphArray( 6 ), _, AlphArray( 1 ) );
-				if ( UniqueNodeError ) {
-					//ShowContinueError( "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
-					GetZoneEquipmentDataErrorsFound = true;
-				}
-			}
+			ReturnNodeListName = AlphArray( 6 );
 			if ( lAlphaBlanks( 7 ) ) {
 				ZoneEquipConfig( ControlledZoneNum ).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
 			} else {
@@ -499,27 +482,33 @@ namespace DataZoneEquipment {
 
 			CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-			ZoneEquipListNum = GetObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
+			ZoneEquipListNum = inputProcessor->getObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
 			if ( ZoneEquipListNum > 0 ) {
 
-				GetObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), ZoneEquipList, ControlledZoneNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowContinueError( "Bad Zone Equipment name in " + CurrentModuleObject + "=\"" + ZoneEquipConfig( ControlledZoneNum ).EquipListName + "\"" );
-					ShowContinueError( "For Zone=\"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\"." );
-					GetZoneEquipmentDataErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
+				inputProcessor->getObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
+				if ( !lAlphaBlanks( 2 ) ){
+					if ( UtilityRoutines::SameString( AlphArray( 2 ), "SequentialLoad" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialLoading;
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "UniformLoad" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformLoading;
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "UniformPLR" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformPLRLoading;
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "SequentialUniformPLR" ) ) {
+						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLRLoading;
+					} else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\", Invalid choice." );
+						ShowContinueError( "..." + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\"." );
+						GetZoneEquipmentDataErrorsFound = true;
+					}
+				}
 				maxEquipCount = 0;
-				numEquipCount = ( NumAlphas - 1 ) / 2;
-				if ( numEquipCount * 2 != ( NumAlphas - 1 ) ) ++numEquipCount;
+				numEquipCount = ( NumAlphas - 2 ) / 2;
+				if ( numEquipCount * 2 != ( NumAlphas - 2 ) ) ++numEquipCount;
 				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= numEquipCount; ++ZoneEquipTypeNum ) {
-					if ( ! lAlphaBlanks( 2 * ZoneEquipTypeNum ) && ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 1 ) ) {
+					if ( ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 1 ) && ! lAlphaBlanks( 2 * ZoneEquipTypeNum + 2 ) ) {
 						++maxEquipCount;
 						continue;
 					}
@@ -536,25 +525,30 @@ namespace DataZoneEquipment {
 				ZoneEquipList( ControlledZoneNum ).EquipData.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+				ZoneEquipList( ControlledZoneNum ).CoolingCapacity.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
+				ZoneEquipList( ControlledZoneNum ).HeatingCapacity.allocate( ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes );
 				ZoneEquipList( ControlledZoneNum ).EquipType = "";
 				ZoneEquipList( ControlledZoneNum ).EquipType_Num = 0;
 				ZoneEquipList( ControlledZoneNum ).EquipName = "";
 				ZoneEquipList( ControlledZoneNum ).EquipIndex = 0;
 				ZoneEquipList( ControlledZoneNum ).CoolingPriority = 0;
 				ZoneEquipList( ControlledZoneNum ).HeatingPriority = 0;
+				ZoneEquipList( ControlledZoneNum ).CoolingCapacity = 0;
+				ZoneEquipList( ControlledZoneNum ).HeatingCapacity = 0;
 
 				IdealLoadsOnEquipmentList = false;
+				int countAirTermsInZone = 0;
 
 				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
-					ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum );
-					ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 1 );
+					ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 1 );
+					ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ) = AlphArray( 2 * ZoneEquipTypeNum + 2 );
 					ValidateComponent( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ), ZoneEquipList( ControlledZoneNum ).EquipName( ZoneEquipTypeNum ), IsNotOK, CurrentModuleObject );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + CurrentModuleObject + '=' + ZoneEquipList( ControlledZoneNum ).Name );
 						GetZoneEquipmentDataErrorsFound = true;
 					}
 					ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) = nint( NumArray( 2 * ZoneEquipTypeNum - 1 ) );
-					if ( ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) <= 0 ) || ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
+					if ( ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) < 0 ) || ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "invalid " + cNumericFields( 2 * ZoneEquipTypeNum - 1 ) + "=[" + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) ) + "]." );
 						ShowContinueError( "equipment sequence must be > 0 and <= number of equipments in the list." );
@@ -563,7 +557,7 @@ namespace DataZoneEquipment {
 					}
 
 					ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) = nint( NumArray( 2 * ZoneEquipTypeNum ) );
-					if ( ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) <= 0 ) || ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
+					if ( ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) < 0 ) || ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\"." );
 						ShowContinueError( "invalid " + cNumericFields( 2 * ZoneEquipTypeNum ) + "=[" + RoundSigDigits( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) ) + "]." );
 						ShowContinueError( "equipment sequence must be > 0 and <= number of equipments in the list." );
@@ -571,13 +565,19 @@ namespace DataZoneEquipment {
 						GetZoneEquipmentDataErrorsFound = true;
 					}
 
-					{ auto const SELECT_CASE_var( MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
+					// do this here for initial prototype, but later will call all the equipment in a separate function to see who is on - maybe
+					if ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailHeatEquip;
+					if ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailCoolEquip;
+
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
 
 					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
+						++countAirTermsInZone;
 
 					} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = DirectAir_Num;
+						++countAirTermsInZone;
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER" ) { // Window Air Conditioner
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = WindowAC_Num;
@@ -620,7 +620,7 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" ) { // Simple Cooling Panel
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = CoolingPanel_Num;
-					
+
 					} else if ( SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT" ) { // High Temperature Radiators
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HiTempRadiant_Num;
 
@@ -671,13 +671,20 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneEvaporativeCoolerUnit_Num;
-					} else {
+
+					} else if (SELECT_CASE_var == "ZONEHVAC:HYBRIDUNITARYHVAC") {
+						ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneHybridEvaporativeCooler_Num;
+
+					}else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
 						ShowContinueError( "..Invalid Equipment Type = " + ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) );
 						GetZoneEquipmentDataErrorsFound = true;
 
 					}}
 				}
+				// If there are two or more air terminals in a zone, then set minimum iterations to number of air terminals
+				DataHVACGlobals::MinAirLoopIterationsAfterFirst = max ( MinAirLoopIterationsAfterFirst, countAirTermsInZone );
+
 				for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
 					if ( count_eq( ZoneEquipList( ControlledZoneNum ).CoolingPriority, ZoneEquipTypeNum ) > 1 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
@@ -712,6 +719,9 @@ namespace DataZoneEquipment {
 				ZoneEquipConfig( ControlledZoneNum ).NumInletNodes = NumNodes;
 
 				ZoneEquipConfig( ControlledZoneNum ).InletNode.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).InletNodeSDUNum.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool.allocate( NumNodes );
 				ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat.allocate( NumNodes );
 
@@ -720,16 +730,21 @@ namespace DataZoneEquipment {
 					UniqueNodeError = false;
 					CheckUniqueNodes( "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 					if ( UniqueNodeError ) {
-						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
 						GetZoneEquipmentDataErrorsFound = true;
 					}
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeAirLoopNum( NodeNum ) = 0;
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeADUNum( NodeNum ) = 0;
+					ZoneEquipConfig( ControlledZoneNum ).InletNodeSDUNum( NodeNum ) = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).InNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).OutNode = 0;
 					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).OutNode = 0;
+					++locTermUnitSizingCounter;
+					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitCool( NodeNum ).TermUnitSizingIndex = locTermUnitSizingCounter;
+					ZoneEquipConfig( ControlledZoneNum ).AirDistUnitHeat( NodeNum ).TermUnitSizingIndex = locTermUnitSizingCounter;
 				}
 			} else {
-				ShowContinueError( "Invalid inlet node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ShowContinueError( "Invalid Zone Air Inlet Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				GetZoneEquipmentDataErrorsFound = true;
 			}
 
@@ -751,7 +766,36 @@ namespace DataZoneEquipment {
 					}
 				}
 			} else {
-				ShowContinueError( "Invalid exhaust node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ShowContinueError( "Invalid Zone Air Exhaust Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				GetZoneEquipmentDataErrorsFound = true;
+			}
+
+			NodeListError = false;
+			GetNodeNums( ReturnNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections", ZoneEquipConfig( ControlledZoneNum ).ZoneName, NodeConnectionType_ZoneReturn, 1, ObjectIsNotParent );
+
+			if ( !NodeListError ) {
+				ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes = NumNodes;
+
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNode.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodePlenumNum.allocate( NumNodes );
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNode = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeAirLoopNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodeInletNum = 0; // initialize to zero here
+				ZoneEquipConfig( ControlledZoneNum ).ReturnNodePlenumNum = 0; // initialize to zero here
+
+				for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
+					ZoneEquipConfig( ControlledZoneNum ).ReturnNode( NodeNum ) = NodeNums( NodeNum );
+					UniqueNodeError = false;
+					CheckUniqueNodes( "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums( NodeNum ), ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+					if ( UniqueNodeError ) {
+						//ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
+						GetZoneEquipmentDataErrorsFound = true;
+					}
+				}
+			} else {
+				ShowContinueError( "Invalid Zone Return Air Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				GetZoneEquipmentDataErrorsFound = true;
 			}
 
@@ -767,12 +811,23 @@ namespace DataZoneEquipment {
 					ZoneEquipConfig( ControlledZoneNum ).ReturnFlowBasisNode( NodeNum ) = NodeNums( NodeNum );
 				}
 			} else {
-				ShowContinueError( "Invalid return air flow rate basis node or NodeList name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
+				ShowContinueError( "Invalid Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" + ZoneEquipConfig( ControlledZoneNum ).ZoneName );
 				GetZoneEquipmentDataErrorsFound = true;
 			}
 
 		} // end loop over controlled zones
 
+		// Allocate TermUnitSizing array and set zone number
+		if ( locTermUnitSizingCounter > 0 ) {
+			DataSizing::NumAirTerminalUnits = locTermUnitSizingCounter;
+			DataSizing::TermUnitSizing.allocate( DataSizing::NumAirTerminalUnits );
+			for ( int loopZoneNum = 1; loopZoneNum <= NumOfZones; ++loopZoneNum ) {
+				{ auto & thisZoneEqConfig( ZoneEquipConfig( loopZoneNum ) );
+				for ( int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum ) {
+					DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( loopNodeNum ).TermUnitSizingIndex ).CtrlZoneNum = loopZoneNum;
+				}}
+			}
+		}
 		if ( GetZoneEquipmentDataErrorsFound ) {
 			ShowWarningError( RoutineName + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors." );
 			overallEquipCount = 0;
@@ -806,7 +861,7 @@ namespace DataZoneEquipment {
 		//map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
 
 		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfZones; ++ControlledZoneLoop ) {
-			GetZoneEquipmentDataFound = FindItemInList( ZoneEquipList( ControlledZoneLoop ).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName );
+			GetZoneEquipmentDataFound = UtilityRoutines::FindItemInList( ZoneEquipList( ControlledZoneLoop ).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName );
 			if ( GetZoneEquipmentDataFound > 0 ) ZoneEquipConfig( GetZoneEquipmentDataFound ).EquipListIndex = ControlledZoneLoop;
 		} // end loop over controlled zones
 
@@ -815,14 +870,8 @@ namespace DataZoneEquipment {
 		CurrentModuleObject = "AirLoopHVAC:SupplyPath";
 		for ( PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum ) {
 
-			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SupplyAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			SupplyAirPath( PathNum ).Name = AlphArray( 1 );
 			SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 
@@ -870,15 +919,8 @@ namespace DataZoneEquipment {
 		CurrentModuleObject = "AirLoopHVAC:ReturnPath";
 		for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
-			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			ReturnAirPath( PathNum ).Name = AlphArray( 1 );
 			ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 
@@ -997,29 +1039,8 @@ namespace DataZoneEquipment {
 		// PURPOSE OF THIS FUNCTION:
 		// Provides a way to check if a component name is listed on a zone equipment list.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
 		// Return value
 		bool IsOnList; // True if item is on a list, false if not.
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -1031,13 +1052,13 @@ namespace DataZoneEquipment {
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) { // NumOfZoneEquipLists
 			if ( ZoneEquipList( Loop ).Name == "" ) continue; // dimensioned by NumOfZones.  Only valid ones have names.
 			for ( ListLoop = 1; ListLoop <= ZoneEquipList( Loop ).NumOfEquipTypes; ++ListLoop ) {
-				if ( ! SameString( ZoneEquipList( Loop ).EquipType( ListLoop ), ComponentType ) ) continue;
+				if ( ! UtilityRoutines::SameString( ZoneEquipList( Loop ).EquipType( ListLoop ), ComponentType ) ) continue;
 				if ( ComponentName == "*" ) {
 					IsOnList = true;
 					CtrlZoneNumLocal = Loop;
 					goto EquipList_exit;
 				}
-				if ( ! SameString( ZoneEquipList( Loop ).EquipName( ListLoop ), ComponentName ) ) continue;
+				if ( ! UtilityRoutines::SameString( ZoneEquipList( Loop ).EquipName( ListLoop ), ComponentName ) ) continue;
 				IsOnList = true;
 				CtrlZoneNumLocal = Loop;
 				goto EquipList_exit;
@@ -1065,38 +1086,15 @@ namespace DataZoneEquipment {
 		// This function returns the index into the Controlled Zone Equipment structure
 		// of the indicated zone.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int ControlledZoneIndex; // Index into Controlled Zone structure
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( ! ZoneEquipInputsFilled ) {
 			GetZoneEquipmentData1();
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 
 		return ControlledZoneIndex;
 
@@ -1116,29 +1114,8 @@ namespace DataZoneEquipment {
 		// This function returns the zone number for the indicated
 		// zone node num.  Returns 0 if did not find zone node in any Zone
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int ControlledZoneIndex; // Index into Controlled Zone structure
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool FoundIt;
@@ -1179,29 +1156,8 @@ namespace DataZoneEquipment {
 		// This function returns the system node number for the indicated
 		// zone.  Returns 0 if the Zone is not a controlled zone.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int SystemZoneNodeNumber; // System node number for controlled zone
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlledZoneIndex;
@@ -1211,7 +1167,7 @@ namespace DataZoneEquipment {
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		SystemZoneNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
 			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
@@ -1224,44 +1180,26 @@ namespace DataZoneEquipment {
 	}
 
 	int
-	GetReturnAirNodeForZone( std::string const & ZoneName ) // Zone name to match into Controlled Zone structure
+	GetReturnAirNodeForZone(
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName,  // Return air node name to match (may be blank)
+		std::string const & calledFromDescription  // String identifying the calling function and object
+	)
 	{
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   March 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       MODIFIED       Feb 2017 expanded for multiple return nodes in a zone
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the return air node number for the indicated
-		// zone.  Returns 0 if the Zone is not a controlled zone.
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+		// zone and node name.  If NodeName is blank, return the first return node number,
+		// otherwise return the node number of the matching return node name.
+		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
 
 		// Return value
 		int ReturnAirNodeNumber; // Return Air node number for controlled zone
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlledZoneIndex;
 
 		if ( ! ZoneEquipInputsFilled ) {
@@ -1269,15 +1207,75 @@ namespace DataZoneEquipment {
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		ReturnAirNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
-			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
-				ReturnAirNodeNumber = ZoneEquipConfig( ControlledZoneIndex ).ReturnAirNode;
-			}
+			{ auto const & thisZoneEquip( ZoneEquipConfig( ControlledZoneIndex ) );
+			if ( thisZoneEquip.ActualZoneNum > 0 ) {
+				if ( NodeName == "" ) {
+					// If NodeName is blank, return first return node number, but warn if there are multiple return nodes for this zone
+					ReturnAirNodeNumber = thisZoneEquip.ReturnNode( 1 );
+					if ( thisZoneEquip.NumReturnNodes > 1 ){
+						ShowWarningError( "GetReturnAirNodeForZone: " + calledFromDescription + ", request for zone return node is ambiguous." );
+						ShowContinueError( "Zone=" + thisZoneEquip.ZoneName + " has "+ General::RoundSigDigits(thisZoneEquip.NumReturnNodes ) + " return nodes. First return node will be used." );
+					}
+				} else {
+					for ( int nodeCount = 1; nodeCount <= thisZoneEquip.NumReturnNodes; ++nodeCount ) {
+						int curNodeNum = thisZoneEquip.ReturnNode( nodeCount );
+						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
+							ReturnAirNodeNumber = curNodeNum;
+						}
+					}
+				}
+			}}
 		}
 
 		return ReturnAirNodeNumber;
+
+	}
+
+	int
+	GetReturnNumForZone(
+		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
+		std::string const & NodeName  // Return air node name to match (may be blank)
+	)
+	{
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function returns the zone return number (not the node number) for the indicated
+		// zone and node name.  If NodeName is blank, return 1 (the first return node)
+		// otherwise return the index of the matching return node name.
+		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
+
+		// Return value
+		int ReturnIndex; // Return number for the given zone (not the node number)
+
+		int ControlledZoneIndex;
+
+		if ( ! ZoneEquipInputsFilled ) {
+			GetZoneEquipmentData1();
+			ZoneEquipInputsFilled = true;
+		}
+
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ReturnIndex = 0; // default if not found
+		if ( ControlledZoneIndex > 0 ) {
+			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
+				if ( NodeName == "" ) {
+					// If NodeName is blank, return first return node number
+					ReturnIndex = 1;
+				} else {
+					for ( int nodeCount = 1; nodeCount <= ZoneEquipConfig( ControlledZoneIndex ).NumReturnNodes; ++nodeCount ) {
+						int curNodeNum = ZoneEquipConfig( ControlledZoneIndex ).ReturnNode( nodeCount );
+						if ( NodeName == DataLoopNode::NodeID( curNodeNum ) ) {
+							ReturnIndex = nodeCount;
+						}
+					}
+				}
+			}
+		}
+
+		return ReturnIndex;
 
 	}
 
@@ -1318,12 +1316,22 @@ namespace DataZoneEquipment {
 		using DataSizing::OAFlowACH;
 		using DataSizing::OAFlowSum;
 		using DataSizing::OAFlowMax;
+		using DataSizing::ZOAM_IAQP;
+		using DataSizing::ZOAM_ProportionalControlSchOcc;
+		using DataSizing::ZOAM_ProportionalControlDesOcc;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleMaxValue;
 		using DataHeatBalance::Zone;
 		using DataHeatBalance::ZoneIntGain;
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
+		using DataContaminantBalance::ZoneSysContDemand;
+		using DataEnvironment::StdRhoAir;
+		using DataContaminantBalance::ZoneCO2GainFromPeople;
+		using DataContaminantBalance::OutdoorCO2;
+		using General::RoundSigDigits;
+		using DataContaminantBalance::ZoneAirCO2;
+		using DataGlobals::DisplayExtraWarnings;
 
 		// Return value
 		Real64 OAVolumeFlowRate; // Return value for calculated outdoor air volume flow rate [m3/s]
@@ -1349,9 +1357,28 @@ namespace DataZoneEquipment {
 		int Loop; // index counter in LOOP
 		bool PerPersonModeNotSet;
 		bool MaxOAFlag;
+		Real64 ZoneOAPeople; // Zone OA flow rate based on number of occupants [m3/s]
+		Real64 ZoneOAArea; // Zone OA flow rate based on space floor area [m3/s]
+		Real64 ZoneOAMin; // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
+						  // used for "ProportionalControl" System outdoor air method
+		Real64 ZoneOAMax; // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOAArea)
+						  // used for "ProportionalControl" System outdoor air method
+		Real64 ZoneMaxCO2; // Breathing-zone CO2 concentartion
+		Real64 ZoneMinCO2; // Minimum CO2 concentration in zone
+		Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
+		Real64 CO2PeopleGeneration; // CO2 generation from people at design level
+		int PeopleNum;
+		static Array1D_bool MyEnvrnFlag;
+		static bool OneTimeFlag( true );
 
 		OAVolumeFlowRate = 0.0;
 		if ( DSOAPtr == 0 ) return OAVolumeFlowRate;
+
+		if ( OneTimeFlag ) {
+			MyEnvrnFlag.allocate( DataSizing::NumOARequirements );
+			MyEnvrnFlag = true;
+			OneTimeFlag = false;
+		}
 
 		if ( present( PerPersonNotSet ) ) {
 			PerPersonModeNotSet = PerPersonNotSet;
@@ -1363,6 +1390,31 @@ namespace DataZoneEquipment {
 			MaxOAFlag = MaxOAVolFlowFlag;
 		} else {
 			MaxOAFlag = false;
+		}
+
+		if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_IAQP && MyEnvrnFlag( DSOAPtr ) ) {
+			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
+				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" IndoorAirQualityProcedure\" requires CO2 simulation." );
+				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+			}
+			MyEnvrnFlag( DSOAPtr ) = false;
+		}
+		if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlSchOcc && MyEnvrnFlag( DSOAPtr ) ) {
+			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
+				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" ProportionalControlBasedOnDesignOccupancy\" requires CO2 simulation." );
+				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+			}
+			MyEnvrnFlag( DSOAPtr ) = false;
+		}
+		if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc && MyEnvrnFlag( DSOAPtr ) ) {
+			if ( !DataContaminantBalance::Contaminant.CO2Simulation ) {
+				ShowSevereError( "DesignSpecification:OutdoorAir=\"" + OARequirements( DSOAPtr ).Name + "\" valid Outdoor Air Method =\" ProportionalControlBasedonOccupancySchedule\" requires CO2 simulation." );
+				ShowContinueError( "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance" );
+				ShowFatalError( "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination." );
+			}
+			MyEnvrnFlag( DSOAPtr ) = false;
 		}
 
 		// Calculate people outdoor air flow rate as needed
@@ -1414,7 +1466,6 @@ namespace DataZoneEquipment {
 		} else if ( SELECT_CASE_var == OAFlowACH ) {
 			// Multiplied by zone volume
 			OAVolumeFlowRate = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
-
 		} else if ( ( SELECT_CASE_var == OAFlowSum ) || ( SELECT_CASE_var == OAFlowMax ) ) {
 			// Use sum or max of per person and the following
 			DSOAFlowPerZone = OARequirements( DSOAPtr ).OAFlowPerZone;
@@ -1424,6 +1475,135 @@ namespace DataZoneEquipment {
 				OAVolumeFlowRate = max( DSOAFlowPeople, DSOAFlowPerZone, DSOAFlowPerArea, DSOAFlowACH );
 			} else {
 				OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
+			}
+		} else if ( SELECT_CASE_var == ZOAM_IAQP ) {
+			if ( DataGlobals::DoingSizing ) {
+				DSOAFlowPeople = Zone( ActualZoneNum ).TotOccupants * OARequirements( DSOAPtr ).OAFlowPerPerson;
+				DSOAFlowPerZone = OARequirements( DSOAPtr ).OAFlowPerZone;
+				DSOAFlowPerArea = OARequirements( DSOAPtr ).OAFlowPerArea * Zone( ActualZoneNum ).FloorArea;
+				DSOAFlowACH = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
+				OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
+			} else {
+				OAVolumeFlowRate = ZoneSysContDemand( ActualZoneNum ).OutputRequiredToCO2SP / StdRhoAir;
+			}
+
+		} else if ( SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc ) {
+			Real64 ZoneEz = 1.0;
+			ZoneOAPeople = 0.0;
+			if ( OARequirements( DSOAPtr ).OAFlowMethod != ZOAM_ProportionalControlDesOcc ) {
+				ZoneOAPeople = ZoneIntGain( ActualZoneNum ).NOFOCC * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * OARequirements( DSOAPtr ).OAFlowPerPerson;
+			} else {
+				ZoneOAPeople = Zone( ActualZoneNum ).TotOccupants * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * OARequirements( DSOAPtr ).OAFlowPerPerson;
+				CO2PeopleGeneration = 0.0;
+				if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+					// Accumulate CO2 generation from people at design occupancy and current activity level
+					for ( PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum ) {
+						if ( People( PeopleNum ).ZonePtr != ActualZoneNum ) continue;
+						CO2PeopleGeneration += People( PeopleNum ).NumberOfPeople * People( PeopleNum ).CO2RateFactor * GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr );
+					}
+				}
+			}
+			ZoneOAArea = Zone( ActualZoneNum ).FloorArea * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * OARequirements( DSOAPtr ).OAFlowPerArea;
+			ZoneOAMin = ZoneOAArea / ZoneEz;
+			ZoneOAMax = ( ZoneOAArea + ZoneOAPeople ) / ZoneEz;
+			if ( Zone( ActualZoneNum ).ZoneContamControllerSchedIndex > 0.0 ) {
+				// Check the availability schedule value for ZoneControl:ContaminantController
+				ZoneContamControllerSched = GetCurrentScheduleValue( Zone( ActualZoneNum ).ZoneContamControllerSchedIndex );
+				if ( ZoneContamControllerSched > 0.0 ) {
+					if ( ZoneOAPeople > 0.0 ) {
+						if ( ZoneCO2GainFromPeople( ActualZoneNum ) > 0.0 ) {
+							if ( Zone( ActualZoneNum ).ZoneMinCO2SchedIndex > 0.0 ) {
+								// Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
+								// in the ZoneControl:ContaminantController
+								ZoneMinCO2 = GetCurrentScheduleValue( Zone( ActualZoneNum ).ZoneMinCO2SchedIndex );
+							} else {
+								ZoneMinCO2 = OutdoorCO2;
+							}
+
+							// Calculate zone maximum target CO2 concentration in PPM
+							if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+								ZoneMaxCO2 = OutdoorCO2 + ( CO2PeopleGeneration * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+							} else {
+								ZoneMaxCO2 = OutdoorCO2 + ( ZoneCO2GainFromPeople( ActualZoneNum ) * Zone( ActualZoneNum ).Multiplier * Zone( ActualZoneNum ).ListMultiplier * 1.0e6 ) / ZoneOAMax;
+							}
+
+							if ( ZoneMaxCO2 <= ZoneMinCO2 ) {
+								++OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount;
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlSchOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+										ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", OARequirements( DSOAPtr ).CO2MaxMinLimitErrorIndex );
+									}
+								}
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2MaxMinLimitErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+										ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", OARequirements( DSOAPtr ).CO2MaxMinLimitErrorIndex );
+									}
+								}
+
+								OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+							} else {
+
+								if ( ZoneAirCO2( ActualZoneNum ) <= ZoneMinCO2 ) {
+									// Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow rate to
+									// minimum Zone OA flow rate when the zone is unoccupied
+									OAVolumeFlowRate = ZoneOAMin;
+								} else if ( ZoneAirCO2( ActualZoneNum ) >= ZoneMaxCO2 ) {
+									// Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow rate to
+									// maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
+									OAVolumeFlowRate = ZoneOAMax;
+								} else {
+									// Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
+									// set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
+									OAVolumeFlowRate = ZoneOAMin + ( ZoneOAMax - ZoneOAMin ) * ( ( ZoneAirCO2( ActualZoneNum ) - ZoneMinCO2 ) / ( ZoneMaxCO2 - ZoneMinCO2 ) );
+								}
+							}
+						} else {
+							if ( DisplayExtraWarnings ) {
+								++OARequirements( DSOAPtr ).CO2GainErrorCount;
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlSchOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2GainErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ActualZoneNum ).Name + "\". " );
+										ShowContinueError( "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 generation from people is not greater than zero. Error continues...", OARequirements( DSOAPtr ).CO2GainErrorIndex );
+									}
+								}
+								if ( OARequirements( DSOAPtr ).OAFlowMethod == ZOAM_ProportionalControlDesOcc ) {
+									if ( OARequirements( DSOAPtr ).CO2GainErrorCount < 2 ) {
+										ShowSevereError( "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\"." );
+										ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ActualZoneNum ).Name + "\". " );
+										ShowContinueError( "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues..." );
+										ShowContinueErrorTimeStamp( "" );
+									} else {
+										ShowRecurringWarningErrorAtEnd( "DesignSpecification:OutdoorAir = \"" + OARequirements( DSOAPtr ).Name + "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 generation from people is not greater than zero. Error continues...", OARequirements( DSOAPtr ).CO2GainErrorIndex );
+									}
+								}
+							}
+							OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+						}
+					} else {
+						// ZoneOAPeople is less than or equal to zero
+						OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+					}
+				} else {
+					// ZoneControl:ContaminantController is scheduled off (not available)
+					OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+				}
+			} else {
+				// "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController not found
+				OAVolumeFlowRate = ZoneOAMax / ZoneEz;
 			}
 
 		} else {
@@ -1444,6 +1624,32 @@ namespace DataZoneEquipment {
 		}
 
 		return OAVolumeFlowRate;
+	}
+
+	void
+	EquipList::getPrioritiesforInletNode(
+		int const inletNodeNum, // Zone inlet node number to match
+		int & coolingPriority, // Cooling priority num for matching equipment
+		int & heatingPriority // Heating priority num for matching equipment
+	)
+	{
+		bool equipFound = false;
+		for ( int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum ) {
+			if ( this->EquipType_Num( equipNum ) == AirDistUnit_Num ) {
+				if ( inletNodeNum == DataDefineEquip::AirDistUnit( this->EquipIndex( equipNum ) ).OutletNodeNum ) {
+					equipFound = true;
+				}
+			} else if (this->EquipType_Num( equipNum ) == DirectAir_Num ) {
+				if ( inletNodeNum == DirectAirManager::DirectAir( this->EquipIndex( equipNum ) ).ZoneSupplyAirNode ) {
+					equipFound = true;
+				}
+			}
+			if ( equipFound ) {
+				coolingPriority = this->CoolingPriority( equipNum );
+				heatingPriority = this->HeatingPriority( equipNum );
+				break;
+			}
+		}
 	}
 
 } // DataZoneEquipment

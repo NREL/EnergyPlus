@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -64,7 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <UtilityRoutines.hh>
@@ -184,31 +185,9 @@ namespace MoistureBalanceEMPDManager {
 		// This subroutine is the main driver for initializations within the
 		// heat balance using the EMPD model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using DataSurfaces::HeatTransferModel_EMPD;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine
@@ -230,7 +209,7 @@ namespace MoistureBalanceEMPDManager {
 
 		// Load the additional EMPD Material properties
 		cCurrentModuleObject = "MaterialProperty:MoisturePenetrationDepth:Settings";
-		EMPDMat = GetNumObjectsFound( cCurrentModuleObject );
+		EMPDMat = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( EMPDMat == 0 ) {
 			ShowSevereError( "EMPD Solution requested, but no \"" + cCurrentModuleObject + "\" objects were found." );
@@ -240,10 +219,10 @@ namespace MoistureBalanceEMPDManager {
 		for ( Loop = 1; Loop <= EMPDMat; ++Loop ) {
 
 			//Call Input Get routine to retrieve material data
-			GetObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, MaterialNames, MaterialNumAlpha, MaterialProps, MaterialNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			//Load the material derived type from the input data.
-			MaterNum = FindItemInList( MaterialNames( 1 ), Material );
+			MaterNum = UtilityRoutines::FindItemInList( MaterialNames( 1 ), Material );
 			if ( MaterNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered=" + MaterialNames( 1 ) + ", must match to a valid Material name." );
 				ErrorsFound = true;
@@ -423,15 +402,15 @@ namespace MoistureBalanceEMPDManager {
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) continue;
 			EMPDReportVarsData & rvd = EMPDReportVars( SurfNum );
 			const std::string surf_name = Surface( SurfNum ).Name;
-			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density [kg/m3]", rvd.rv_surface, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Moisture Content [kg/m3]", rvd.u_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Content [kg/m3]", rvd.u_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity [%]", rvd.RH_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity [%]", rvd.RH_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_surface_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio [kgWater/kgDryAir]", rvd.w_deep_layer, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone [kg/m2-s]", rvd.mass_flux_zone, "Zone", "State", surf_name );
-			SetupOutputVariable( "EMPD Deep Layer Moisture Flux [kg/m2-s]", rvd.mass_flux_deep, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Inside Face Water Vapor Density", OutputProcessor::Unit::kg_m3, rvd.rv_surface, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Relative Humidity", OutputProcessor::Unit::Perc, rvd.RH_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Layer Equivalent Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, rvd.w_surface_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Equivalent Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, rvd.w_deep_layer, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Surface Moisture Flux to Zone", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_zone, "Zone", "State", surf_name );
+			SetupOutputVariable( "EMPD Deep Layer Moisture Flux", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_deep, "Zone", "State", surf_name );
 		}
 
 		if ( InitEnvrnFlag ) InitEnvrnFlag = false;

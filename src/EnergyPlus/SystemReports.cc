@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -78,7 +79,6 @@
 #include <FanCoilUnits.hh>
 #include <HVACStandAloneERV.hh>
 #include <HVACVariableRefrigerantFlow.hh>
-#include <InputProcessor.hh>
 #include <OutdoorAirUnit.hh>
 #include <OutputProcessor.hh>
 #include <PackagedTerminalHeatPump.hh>
@@ -267,23 +267,13 @@ namespace SystemReports {
 		// Once all compsets have been established (second iteration) find all components
 		// subcomponents, etc.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using namespace DataGlobalConstants;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const EnergyTransfer( 1 );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
 
 		int AirDistUnitNum;
 		int MatchLoop;
@@ -342,10 +332,10 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
+					AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
 					for ( CompNum = 1; CompNum <= ZoneEquipList( ListNum ).NumOfEquipTypes; ++CompNum ) {
 						for ( NodeCount = 1; NodeCount <= ZoneEquipList( ListNum ).EquipData( CompNum ).NumOutlets; ++NodeCount ) {
 							if ( ZoneEquipList( ListNum ).EquipData( CompNum ).OutletNodeNums( NodeCount ) == ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInletNodeNum ).OutNode ) {
@@ -456,11 +446,11 @@ namespace SystemReports {
 
 			for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 				if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
+				ZoneEquipConfig( CtrlZoneNum ).EquipListIndex = UtilityRoutines::FindItemInList( ZoneEquipConfig( CtrlZoneNum ).EquipListName, ZoneEquipList );
 				ListNum = ZoneEquipConfig( CtrlZoneNum ).EquipListIndex;
 				//loop over the zone supply air path inlet nodes
 				for ( ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInletNodeNum ) {
+				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInletNodeNum );
 
 					// 1. Find HVAC component plant loop connections
 					MainBranchNum = ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInletNodeNum ).MainBranchIndex;
@@ -2034,72 +2024,72 @@ namespace SystemReports {
 
 				//CurrentModuleObject='AirloopHVAC'
 				//SYSTEM LOADS REPORT
-				SetupOutputVariable( "Air System Total Heating Energy [J]", SysTotHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Total Heating Energy", OutputProcessor::Unit::J, SysTotHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Total Cooling Energy [J]", SysTotCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Total Cooling Energy", OutputProcessor::Unit::J, SysTotCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				//SYSTEM ENERGY USE REPORT
-				SetupOutputVariable( "Air System Hot Water Energy [J]", SysTotH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Hot Water Energy", OutputProcessor::Unit::J, SysTotH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Steam Energy [J]", SysTotSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Steam Energy", OutputProcessor::Unit::J, SysTotSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Chilled Water Energy [J]", SysTotH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Chilled Water Energy", OutputProcessor::Unit::J, SysTotH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Electric Energy [J]", SysTotElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Electric Energy", OutputProcessor::Unit::J, SysTotElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Gas Energy [J]", SysTotGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Gas Energy", OutputProcessor::Unit::J, SysTotGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Water Volume [m3]", SysDomesticH20( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Water Volume", OutputProcessor::Unit::m3, SysDomesticH20( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				//SYSTEM COMPONENT LOAD REPORT
-				SetupOutputVariable( "Air System Fan Air Heating Energy [J]", SysFANCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Fan Air Heating Energy", OutputProcessor::Unit::J, SysFANCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Cooling Coil Total Cooling Energy [J]", SysCCCompCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, SysCCCompCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Total Heating Energy [J]", SysHCCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Total Heating Energy", OutputProcessor::Unit::J, SysHCCompHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heat Exchanger Total Heating Energy [J]", SysHeatExHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heat Exchanger Total Heating Energy", OutputProcessor::Unit::J, SysHeatExHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heat Exchanger Total Cooling Energy [J]", SysHeatExCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heat Exchanger Total Cooling Energy", OutputProcessor::Unit::J, SysHeatExCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Solar Collector Total Heating Energy [J]", SysSolarCollectHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Solar Collector Total Heating Energy", OutputProcessor::Unit::J, SysSolarCollectHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Solar Collector Total Cooling Energy [J]", SysSolarCollectCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Solar Collector Total Cooling Energy", OutputProcessor::Unit::J, SysSolarCollectCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System User Defined Air Terminal Total Heating Energy [J]", SysUserDefinedTerminalHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System User Defined Air Terminal Total Heating Energy", OutputProcessor::Unit::J, SysUserDefinedTerminalHeating( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System User Defined Air Terminal Total Cooling Energy [J]", SysUserDefinedTerminalCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System User Defined Air Terminal Total Cooling Energy", OutputProcessor::Unit::J, SysUserDefinedTerminalCooling( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Humidifier Total Heating Energy [J]", SysHumidHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Humidifier Total Heating Energy", OutputProcessor::Unit::J, SysHumidHTNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Evaporative Cooler Total Cooling Energy [J]", SysEvapCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Evaporative Cooler Total Cooling Energy", OutputProcessor::Unit::J, SysEvapCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Desiccant Dehumidifier Total Cooling Energy [J]", DesDehumidCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Desiccant Dehumidifier Total Cooling Energy", OutputProcessor::Unit::J, DesDehumidCLNG( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				//SYSTEM COMPONENT ENERGY REPORT
-				SetupOutputVariable( "Air System Fan Electric Energy [J]", SysFANCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Fan Electric Energy", OutputProcessor::Unit::J, SysFANCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Hot Water Energy [J]", SysHCCompH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Hot Water Energy", OutputProcessor::Unit::J, SysHCCompH2OHOT( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Cooling Coil Chilled Water Energy [J]", SysCCCompH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Cooling Coil Chilled Water Energy", OutputProcessor::Unit::J, SysCCCompH2OCOLD( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System DX Heating Coil Electric Energy [J]", SysHCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System DX Heating Coil Electric Energy", OutputProcessor::Unit::J, SysHCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System DX Cooling Coil Electric Energy [J]", SysCCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System DX Cooling Coil Electric Energy", OutputProcessor::Unit::J, SysCCCompElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Electric Energy [J]", SysHCCompElecRes( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Electric Energy", OutputProcessor::Unit::J, SysHCCompElecRes( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Gas Energy [J]", SysHCCompGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Gas Energy", OutputProcessor::Unit::J, SysHCCompGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Heating Coil Steam Energy [J]", SysHCCompSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Heating Coil Steam Energy", OutputProcessor::Unit::J, SysHCCompSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Humidifier Electric Energy [J]", SysHumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Humidifier Electric Energy", OutputProcessor::Unit::J, SysHumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Humidifier Gas Energy [J]", SysHumidGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Humidifier Gas Energy", OutputProcessor::Unit::J, SysHumidGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Evaporative Cooler Electric Energy [J]", SysEvapElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Evaporative Cooler Electric Energy", OutputProcessor::Unit::J, SysEvapElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
-				SetupOutputVariable( "Air System Desiccant Dehumidifier Electric Energy [J]", DesDehumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+				SetupOutputVariable( "Air System Desiccant Dehumidifier Electric Energy", OutputProcessor::Unit::J, DesDehumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 			}
 		}
@@ -2109,36 +2099,36 @@ namespace SystemReports {
 			// CurrentModuleObject='Zones(Controlled)'
 			if ( VentLoadsReportEnabled ) {
 				//Cooling Loads
-				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Removal Energy [J]", MaxNoLoadCoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Removal Energy", OutputProcessor::Unit::J, MaxNoLoadCoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Energy [J]", MaxCoolingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Energy", OutputProcessor::Unit::J, MaxCoolingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy [J]", MaxOverheatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy", OutputProcessor::Unit::J, MaxOverheatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Decrease Energy [J]", MaxCoolingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Cooling Load Decrease Energy", OutputProcessor::Unit::J, MaxCoolingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 				//Heating Loads
-				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Addition Energy [J]", MaxNoLoadHeatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation No Load Heat Addition Energy", OutputProcessor::Unit::J, MaxNoLoadHeatingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Energy [J]", MaxHeatingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Energy", OutputProcessor::Unit::J, MaxHeatingLoadAddedByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy [J]", MaxOvercoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy", OutputProcessor::Unit::J, MaxOvercoolingByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Decrease Energy [J]", MaxHeatingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+				SetupOutputVariable( "Zone Mechanical Ventilation Heating Load Decrease Energy", OutputProcessor::Unit::J, MaxHeatingLoadMetByVent( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 			}
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Mass Flow Rate [kg/s]", ZoneOAMassFlow( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ZoneOAMassFlow( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Mass [kg]", ZoneOAMass( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Mass", OutputProcessor::Unit::kg, ZoneOAMass( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume Flow Rate [m3/s]", ZoneOAVolFlowStdRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneOAVolFlowStdRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume [m3]", ZoneOAVolStdRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Standard Density Volume", OutputProcessor::Unit::m3, ZoneOAVolStdRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume Flow Rate [m3/s]", ZoneOAVolFlowCrntRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneOAVolFlowCrntRho( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume [m3]", ZoneOAVolCrntRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Current Density Volume", OutputProcessor::Unit::m3, ZoneOAVolCrntRho( ZoneIndex ), "HVAC", "Sum", ZoneEquipConfig( ZoneIndex ).ZoneName );
 
-			SetupOutputVariable( "Zone Mechanical Ventilation Air Changes per Hour [ach]", ZoneMechACH( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
+			SetupOutputVariable( "Zone Mechanical Ventilation Air Changes per Hour", OutputProcessor::Unit::ach, ZoneMechACH( ZoneIndex ), "HVAC", "Average", ZoneEquipConfig( ZoneIndex ).ZoneName );
 		}
 
 	}
@@ -2218,6 +2208,7 @@ namespace SystemReports {
 		Array1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
 		Array1D_int IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
 		Array1D_string UnitsStrings; // UnitsStrings for each variable
+		Array1D < OutputProcessor::Unit> unitsForVar; // units from enum for each variable
 		Array1D_int ResourceTypes; // ResourceTypes for each variable
 		Array1D_string EndUses; // EndUses for each variable
 		Array1D_string Groups; // Groups for each variable
@@ -2338,7 +2329,7 @@ namespace SystemReports {
 						VarIndexes.allocate( NumVariables );
 						VarTypes.allocate( NumVariables );
 						IndexTypes.allocate( NumVariables );
-						UnitsStrings.allocate( NumVariables );
+						unitsForVar.allocate( NumVariables );
 						ResourceTypes.allocate( NumVariables );
 						EndUses.allocate( NumVariables );
 						Groups.allocate( NumVariables );
@@ -2346,12 +2337,12 @@ namespace SystemReports {
 						thisComp.MeteredVar.allocate( NumVariables );
 
 						thisComp.NumMeteredVars = NumVariables;
-						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 						ModeFlagOn = true;
 						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 							{ auto & thisVar( thisComp.MeteredVar( VarNum ) );
 							thisVar.ReportVarName = Names( VarNum );
-							thisVar.ReportVarUnits = UnitsStrings( VarNum );
+							thisVar.ReportVarUnits = unitsForVar( VarNum );
 							thisVar.ReportVarIndex = VarIndexes( VarNum );
 							thisVar.ReportVarIndexType = IndexTypes( VarNum );
 							thisVar.ReportVarType = VarTypes( VarNum );
@@ -2377,7 +2368,7 @@ namespace SystemReports {
 						VarIndexes.deallocate();
 						VarTypes.deallocate();
 						IndexTypes.deallocate();
-						UnitsStrings.deallocate();
+						unitsForVar.deallocate();
 						ResourceTypes.deallocate();
 						EndUses.deallocate();
 						Groups.deallocate();
@@ -2392,20 +2383,20 @@ namespace SystemReports {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
-							UnitsStrings.allocate( NumVariables );
+							unitsForVar.allocate( NumVariables );
 							ResourceTypes.allocate( NumVariables );
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
 							Names.allocate( NumVariables );
 							thisComp.SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
 
-							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 								{ auto & thisVar( thisComp.SubComp( SubCompNum ).MeteredVar( VarNum ) );
 								thisVar.ReportVarName = Names( VarNum );
-								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarUnits = unitsForVar( VarNum );
 								thisVar.ReportVarIndex = VarIndexes( VarNum );
 								thisVar.ReportVarIndexType = IndexTypes( VarNum );
 								thisVar.ReportVarType = VarTypes( VarNum );
@@ -2431,7 +2422,7 @@ namespace SystemReports {
 							VarIndexes.deallocate();
 							VarTypes.deallocate();
 							IndexTypes.deallocate();
-							UnitsStrings.deallocate();
+							unitsForVar.deallocate();
 							ResourceTypes.deallocate();
 							EndUses.deallocate();
 							Groups.deallocate();
@@ -2449,20 +2440,20 @@ namespace SystemReports {
 								VarIndexes.allocate( NumVariables );
 								VarTypes.allocate( NumVariables );
 								IndexTypes.allocate( NumVariables );
-								UnitsStrings.allocate( NumVariables );
+								unitsForVar.allocate( NumVariables );
 								ResourceTypes.allocate( NumVariables );
 								EndUses.allocate( NumVariables );
 								Groups.allocate( NumVariables );
 								Names.allocate( NumVariables );
 								thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar.allocate( NumVariables );
 
-								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 								ModeFlagOn = true;
 								for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 									{ auto & thisVar( thisComp.SubComp( SubCompNum ).SubSubComp( SubSubCompNum ).MeteredVar( VarNum ) );
 									thisVar.ReportVarName = Names( VarNum );
-									thisVar.ReportVarUnits = UnitsStrings( VarNum );
+									thisVar.ReportVarUnits = unitsForVar( VarNum );
 									thisVar.ReportVarIndex = VarIndexes( VarNum );
 									thisVar.ReportVarIndexType = IndexTypes( VarNum );
 									thisVar.ReportVarType = VarTypes( VarNum );
@@ -2488,7 +2479,7 @@ namespace SystemReports {
 								VarIndexes.deallocate();
 								VarTypes.deallocate();
 								IndexTypes.deallocate();
-								UnitsStrings.deallocate();
+								unitsForVar.deallocate();
 								ResourceTypes.deallocate();
 								EndUses.deallocate();
 								Groups.deallocate();
@@ -2533,20 +2524,20 @@ namespace SystemReports {
 					VarIndexes.allocate( NumVariables );
 					VarTypes.allocate( NumVariables );
 					IndexTypes.allocate( NumVariables );
-					UnitsStrings.allocate( NumVariables );
+					unitsForVar.allocate( NumVariables );
 					ResourceTypes.allocate( NumVariables );
 					EndUses.allocate( NumVariables );
 					Groups.allocate( NumVariables );
 					Names.allocate( NumVariables );
 					thisEquipData.MeteredVar.allocate( NumVariables );
 
-					GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+					GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 					ModeFlagOn = true;
 					for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 						{ auto & thisVar( thisEquipData.MeteredVar( VarNum ) );
 						thisVar.ReportVarName = Names( VarNum );
-						thisVar.ReportVarUnits = UnitsStrings( VarNum );
+						thisVar.ReportVarUnits = unitsForVar( VarNum );
 						thisVar.ReportVarIndex = VarIndexes( VarNum );
 						thisVar.ReportVarIndexType = IndexTypes( VarNum );
 						thisVar.ReportVarType = VarTypes( VarNum );
@@ -2572,7 +2563,7 @@ namespace SystemReports {
 					VarIndexes.deallocate();
 					VarTypes.deallocate();
 					IndexTypes.deallocate();
-					UnitsStrings.deallocate();
+					unitsForVar.deallocate();
 					ResourceTypes.deallocate();
 					EndUses.deallocate();
 					Groups.deallocate();
@@ -2659,20 +2650,20 @@ namespace SystemReports {
 						VarIndexes.allocate( NumVariables );
 						VarTypes.allocate( NumVariables );
 						IndexTypes.allocate( NumVariables );
-						UnitsStrings.allocate( NumVariables );
+						unitsForVar.allocate( NumVariables );
 						ResourceTypes.allocate( NumVariables );
 						EndUses.allocate( NumVariables );
 						Groups.allocate( NumVariables );
 						Names.allocate( NumVariables );
 						thisSubEquipData.MeteredVar.allocate( NumVariables );
 
-						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+						GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 						ModeFlagOn = true;
 						for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 							{ auto & thisVar( thisSubEquipData.MeteredVar( VarNum ) );
 							thisVar.ReportVarName = Names( VarNum );
-							thisVar.ReportVarUnits = UnitsStrings( VarNum );
+							thisVar.ReportVarUnits = unitsForVar( VarNum );
 							thisVar.ReportVarIndex = VarIndexes( VarNum );
 							thisVar.ReportVarIndexType = IndexTypes( VarNum );
 							thisVar.ReportVarType = VarTypes( VarNum );
@@ -2698,7 +2689,7 @@ namespace SystemReports {
 						VarIndexes.deallocate();
 						VarTypes.deallocate();
 						IndexTypes.deallocate();
-						UnitsStrings.deallocate();
+						unitsForVar.deallocate();
 						ResourceTypes.deallocate();
 						EndUses.deallocate();
 						Groups.deallocate();
@@ -2715,20 +2706,20 @@ namespace SystemReports {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
-							UnitsStrings.allocate( NumVariables );
+							unitsForVar.allocate( NumVariables );
 							ResourceTypes.allocate( NumVariables );
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
 							Names.allocate( NumVariables );
 							thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar.allocate( NumVariables );
 
-							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 								{ auto & thisVar( thisSubEquipData.SubSubEquipData( SubSubCompNum ).MeteredVar( VarNum ) );
 								thisVar.ReportVarName = Names( VarNum );
-								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarUnits = unitsForVar( VarNum );
 								thisVar.ReportVarIndex = VarIndexes( VarNum );
 								thisVar.ReportVarIndexType = IndexTypes( VarNum );
 								thisVar.ReportVarType = VarTypes( VarNum );
@@ -2754,7 +2745,7 @@ namespace SystemReports {
 							VarIndexes.deallocate();
 							VarTypes.deallocate();
 							IndexTypes.deallocate();
-							UnitsStrings.deallocate();
+							unitsForVar.deallocate();
 							ResourceTypes.deallocate();
 							EndUses.deallocate();
 							Groups.deallocate();
@@ -2933,7 +2924,7 @@ namespace SystemReports {
 							VarIndexes.allocate( NumVariables );
 							VarTypes.allocate( NumVariables );
 							IndexTypes.allocate( NumVariables );
-							UnitsStrings.allocate( NumVariables );
+							unitsForVar.allocate( NumVariables );
 							ResourceTypes.allocate( NumVariables );
 							EndUses.allocate( NumVariables );
 							Groups.allocate( NumVariables );
@@ -2941,13 +2932,13 @@ namespace SystemReports {
 							thisComp.MeteredVar.allocate( NumVariables );
 
 							thisComp.NumMeteredVars = NumVariables;
-							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+							GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 							ModeFlagOn = true;
 							for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 								{ auto & thisVar( thisComp.MeteredVar( VarNum ) );
 								thisVar.ReportVarName = Names( VarNum );
-								thisVar.ReportVarUnits = UnitsStrings( VarNum );
+								thisVar.ReportVarUnits = unitsForVar( VarNum );
 								thisVar.ReportVarIndex = VarIndexes( VarNum );
 								thisVar.ReportVarIndexType = IndexTypes( VarNum );
 								thisVar.ReportVarType = VarTypes( VarNum );
@@ -2973,7 +2964,7 @@ namespace SystemReports {
 							VarIndexes.deallocate();
 							VarTypes.deallocate();
 							IndexTypes.deallocate();
-							UnitsStrings.deallocate();
+							unitsForVar.deallocate();
 							ResourceTypes.deallocate();
 							EndUses.deallocate();
 							Groups.deallocate();
@@ -2988,20 +2979,20 @@ namespace SystemReports {
 								VarIndexes.allocate( NumVariables );
 								VarTypes.allocate( NumVariables );
 								IndexTypes.allocate( NumVariables );
-								UnitsStrings.allocate( NumVariables );
+								unitsForVar.allocate( NumVariables );
 								ResourceTypes.allocate( NumVariables );
 								EndUses.allocate( NumVariables );
 								Groups.allocate( NumVariables );
 								Names.allocate( NumVariables );
 								thisComp.SubComp( SubCompNum ).MeteredVar.allocate( NumVariables );
 
-								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
+								GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound );
 
 								ModeFlagOn = true;
 								for ( VarNum = 1; VarNum <= NumVariables; ++VarNum ) {
 									{ auto & thisVar( thisComp.SubComp( SubCompNum ).MeteredVar( VarNum ) );
 									thisVar.ReportVarName = Names( VarNum );
-									thisVar.ReportVarUnits = UnitsStrings( VarNum );
+									thisVar.ReportVarUnits = unitsForVar( VarNum );
 									thisVar.ReportVarIndex = VarIndexes( VarNum );
 									thisVar.ReportVarIndexType = IndexTypes( VarNum );
 									thisVar.ReportVarType = VarTypes( VarNum );
@@ -3027,7 +3018,7 @@ namespace SystemReports {
 								VarIndexes.deallocate();
 								VarTypes.deallocate();
 								IndexTypes.deallocate();
-								UnitsStrings.deallocate();
+								unitsForVar.deallocate();
 								ResourceTypes.deallocate();
 								EndUses.deallocate();
 								Groups.deallocate();
@@ -3241,21 +3232,21 @@ namespace SystemReports {
 			//if system operating in deadband reset zone load
 			if ( DeadBandOrSetback( ActualZoneNum ) ) ZoneLoad = 0.0;
 
-			// retrieve air loop indexes
-			AirLoopNum = zecCtrlZone.AirLoopNum;
-			if ( AirLoopNum == 0 ) continue;
-
-			//Zone cooling load
-			if ( ZoneLoad < -SmallLoad ) {
-				SysTotZoneLoadCLNG( AirLoopNum ) += std::abs( ZoneLoad );
-
-				//Zone heating load
-			} else if ( ZoneLoad > SmallLoad ) {
-				SysTotZoneLoadHTNG( AirLoopNum ) += std::abs( ZoneLoad );
-			}
 
 			//loop over the zone supply air path inlet nodes
 			for ( ZoneInNum = 1; ZoneInNum <= zecCtrlZone.NumInletNodes; ++ZoneInNum ) {
+				// retrieve air loop indexes
+				AirLoopNum = zecCtrlZone.InletNodeAirLoopNum( ZoneInNum );
+				if ( AirLoopNum == 0 ) continue;
+
+				//Zone cooling load - this will double count if there is more than one airloop serving the same zone - but not sure how to apportion
+				if ( ZoneLoad < -SmallLoad ) {
+					SysTotZoneLoadCLNG( AirLoopNum ) += std::abs( ZoneLoad );
+
+					//Zone heating load
+				} else if ( ZoneLoad > SmallLoad ) {
+					SysTotZoneLoadHTNG( AirLoopNum ) += std::abs( ZoneLoad );
+				}
 				auto const & zecCtrlZoneCool = zecCtrlZone.AirDistUnitCool( ZoneInNum );
 				auto const & zecCtrlZoneHeat = zecCtrlZone.AirDistUnitHeat( ZoneInNum );
 
@@ -3392,7 +3383,6 @@ namespace SystemReports {
 		using Psychrometrics::PsyHFnTdbW;
 		using namespace DataZoneEnergyDemands;
 		using namespace DataGlobalConstants;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3422,6 +3412,7 @@ namespace SystemReports {
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEBEAM,
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION,
 			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT,
+			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT,
 			AIRTERMINAL_SINGLEDUCT_MIXER,
 			AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT,
 			AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT,
@@ -3510,6 +3501,7 @@ namespace SystemReports {
 			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEBEAM },
 			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION },
 			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT },
+			{ "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT", AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT },
 			{ "AIRTERMINAL:SINGLEDUCT:MIXER", AIRTERMINAL_SINGLEDUCT_MIXER },
 			{ "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT },
 			{ "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT },
@@ -3822,6 +3814,7 @@ namespace SystemReports {
 		case AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_RECIRCULATEDAIR:
 		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION:
 		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT:
+		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT:
 		case AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT:
 		case AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT:
 		case AIRTERMINAL_SINGLEDUCT_UNCONTROLLED:
@@ -3893,7 +3886,7 @@ namespace SystemReports {
 		default:
 			found = 0;
 			if ( NumCompTypes > 0 ) {
-				found = FindItemInList( CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes );
+				found = UtilityRoutines::FindItemInList( CompType, CompTypeErrors, &CompTypeError::CompType, NumCompTypes );
 			}
 			if ( found == 0 ) {
 				CompTypeErrors( ++NumCompTypes ).CompType = CompType;
@@ -3921,9 +3914,6 @@ namespace SystemReports {
 		// calculate energy contribution of outside air through mixing box and pro-rate to
 		// zones according to zone mass flow rates.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3936,7 +3926,6 @@ namespace SystemReports {
 		using DataHeatBalFanSys::ZoneAirHumRatAvg;
 		using DataEnvironment::StdRhoAir;
 		using DataEnvironment::OutBaroPress;
-
 		using WindowAC::GetWindowACOutAirNode;
 		using WindowAC::GetWindowACMixedAirNode;
 		using WindowAC::GetWindowACZoneInletAirNode;
@@ -3969,18 +3958,8 @@ namespace SystemReports {
 		using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
 		using HVACStandAloneERV::GetStandAloneERVZoneInletAirNode;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const SmallLoad( 0.1 ); // (W)
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CtrlZoneNum; // ZONE counter
@@ -3990,14 +3969,6 @@ namespace SystemReports {
 		int AirLoopNum; // index to AirloopHVAC
 		int AirDistCoolInletNodeNum; // Air distribution unit inlet node number
 		int AirDistHeatInletNodeNum; // Air distribution unit outlet node number
-
-		Real64 AirSysEnthReturnAir; // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
-		Real64 AirSysEnthMixedAir; // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
-		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system [J]
-		Real64 ADUCoolFlowrate; // Air distribution unit cooling air mass flow rate [kg/s]
-		Real64 ADUHeatFlowrate; // Air distribution unit heating air mass flow rate [kg/s]
-		Real64 AirSysTotalMixFlowRate; // Mixed air mass flow rate [kg/s]
-		Real64 AirSysOutAirFlow; // outside air flow rate for zone from primary air system [kg/s]
 
 		Real64 ZFAUEnthReturnAir; // Zone forced Air unit enthalpy of the return air [kJ/kgK]
 		Real64 ZFAUTempMixedAir; // Zone forced Air unit dry-bulb temperature of the mixed air [C]
@@ -4042,14 +4013,9 @@ namespace SystemReports {
 
 		for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 			if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
+			Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
+			Real64 ZAirSysOutAirFlow = 0.0; // outside air flow rate for zone from all primary air systems serving thezone [kg/s]
 			// first clear out working variables from previous zone.
-			AirDistCoolInletNodeNum = 0;
-			AirDistHeatInletNodeNum = 0;
-			ADUCoolFlowrate = 0.0;
-			ADUHeatFlowrate = 0.0;
-			AirSysTotalMixFlowRate = 0.0;
-			AirSysZoneVentLoad = 0.0;
-			AirSysOutAirFlow = 0.0;
 			ZFAUFlowRate = 0.0;
 			ZFAUZoneVentLoad = 0.0;
 			ZFAUOutAirFlow = 0.0;
@@ -4216,7 +4182,7 @@ namespace SystemReports {
 
 				} else if ( SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
 					//	ZoneHVAC:EvaporativeCoolerUnit ?????
-					SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num || SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == DirectAir_Num ||
+					SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num || ZoneEvaporativeCoolerUnit_Num || SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == DirectAir_Num ||
 					SELECT_CASE_var == BBWaterConvective_Num || SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
 					//	not sure how HeatExchanger:* could be used as zone equipment ?????
 					SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num ||
@@ -4234,34 +4200,44 @@ namespace SystemReports {
 
 			}
 
-			// retrieve air loop indexes
-			AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).AirLoopNum;
-			if ( AirLoopNum != 0 ) { // deal with primary air system
-				//loop over the zone supply air path inlet nodes
-
-				for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
+			//loop over the zone supply air path inlet nodes
+			for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
+				Real64 AirSysEnthReturnAir = 0.0; // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
+				Real64 AirSysEnthMixedAir = 0.0; // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
+				Real64 AirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from primary air system [J]
+				Real64 ADUCoolFlowrate = 0.0; // Air distribution unit cooling air mass flow rate [kg/s]
+				Real64 ADUHeatFlowrate = 0.0; // Air distribution unit heating air mass flow rate [kg/s]
+				Real64 AirSysTotalMixFlowRate = 0.0; // Mixed air mass flow rate [kg/s]
+				Real64 AirSysOutAirFlow = 0.0; // outside air flow rate for zone from primary air system [kg/s]
+				// retrieve air loop index
+				AirLoopNum = ZoneEquipConfig( CtrlZoneNum ).InletNodeAirLoopNum( ZoneInNum );
+				MixedAirNode = 0;
+				ReturnAirNode = 0;
+				AirDistCoolInletNodeNum = 0;
+				AirDistHeatInletNodeNum = 0;
+				if ( AirLoopNum != 0 ) { // deal with primary air system
 					AirDistCoolInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode, 0 );
 					AirDistHeatInletNodeNum = max( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode, 0 );
 					// Set for cooling or heating path
 					if ( AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum == 0 ) {
-						ADUCoolFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUCoolFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else if ( AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum == 0 ) {
-						ADUHeatFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUHeatFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else if ( AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum != AirDistHeatInletNodeNum ) {
 						// dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-						ADUHeatFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
-						ADUCoolFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUHeatFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitHeat( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUCoolFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else if ( AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0 ) {
 						// dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-						ADUCoolFlowrate += max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
+						ADUCoolFlowrate = max( Node( ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).InNode ).MassFlowRate, 0.0 ); // CR7244 need to accumulate flow across multiple inlets
 					} else {
 						// do nothing (already inits)
 					}
+					//Find the mixed air node and return air node of the system that supplies the zone
+					MixedAirNode = PrimaryAirSystem( AirLoopNum ).OASysOutletNodeNum;
+					ReturnAirNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
 				}
 
-				//Find the mixed air node and return air node of the system that supplies the zone
-				MixedAirNode = PrimaryAirSystem( AirLoopNum ).OASysOutletNodeNum;
-				ReturnAirNode = PrimaryAirSystem( AirLoopNum ).OASysInletNodeNum;
 				if ( MixedAirNode == 0 || ReturnAirNode == 0 ) {
 					AirSysZoneVentLoad = 0.0;
 					AirSysOutAirFlow = 0.0;
@@ -4289,11 +4265,12 @@ namespace SystemReports {
 					//Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
 					AirSysZoneVentLoad = ( ADUCoolFlowrate + ADUHeatFlowrate ) * ( AirSysEnthMixedAir - AirSysEnthReturnAir ) * TimeStepSys * SecInHour; //*KJperJ
 				}
-
+				ZAirSysZoneVentLoad += AirSysZoneVentLoad;
+				ZAirSysOutAirFlow += AirSysOutAirFlow;
 			} // primary air system present
 
 			//now combine OA flow from zone forced air units with primary air system
-			OutAirFlow = AirSysOutAirFlow + ZFAUOutAirFlow;
+			OutAirFlow = ZAirSysOutAirFlow + ZFAUOutAirFlow;
 			// assign report variables
 			ZoneOAMassFlow( CtrlZoneNum ) = OutAirFlow;
 			ZoneOAMass( CtrlZoneNum ) = ZoneOAMassFlow( CtrlZoneNum ) * TimeStepSys * SecInHour;
@@ -4330,7 +4307,7 @@ namespace SystemReports {
 			}
 
 			//now combine Vent load from zone forced air units with primary air system
-			ZoneVentLoad = AirSysZoneVentLoad + ZFAUZoneVentLoad;
+			ZoneVentLoad = ZAirSysZoneVentLoad + ZFAUZoneVentLoad;
 			//cycle if ZoneVentLoad is small
 			if ( std::abs( ZoneVentLoad ) < SmallLoad ) continue; // orig. had RETURN here, BG changed to CYCLE for next controlled zone in do loop.
 
@@ -4505,21 +4482,6 @@ namespace SystemReports {
 		// Simply cycles through the plant and condenser demand sides until
 		// a component is found that matches the component type and name
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PassBranchNum; // DO loop counter for branches
 		int PassCompNum; // DO loop counter for components
@@ -4541,7 +4503,7 @@ namespace SystemReports {
 			for ( PassLoopNum = 1; PassLoopNum <= NumPlantLoops; ++PassLoopNum ) {
 				for ( PassBranchNum = 1; PassBranchNum <= VentRepPlantDemandSide( PassLoopNum ).TotalBranches; ++PassBranchNum ) {
 					for ( PassCompNum = 1; PassCompNum <= VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).TotalComponents; ++PassCompNum ) {
-						if ( SameString( CompType, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && SameString( CompName, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
+						if ( UtilityRoutines::SameString( CompType, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && UtilityRoutines::SameString( CompName, VentRepPlantDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
 							// Found a match on the plant demand side--increment the counter
 							MatchFound = true;
 							MatchLoopType = 1;
@@ -4561,7 +4523,7 @@ namespace SystemReports {
 			for ( PassLoopNum = 1; PassLoopNum <= NumCondLoops; ++PassLoopNum ) {
 				for ( PassBranchNum = 1; PassBranchNum <= VentRepCondDemandSide( PassLoopNum ).TotalBranches; ++PassBranchNum ) {
 					for ( PassCompNum = 1; PassCompNum <= VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).TotalComponents; ++PassCompNum ) {
-						if ( SameString( CompType, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && SameString( CompName, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
+						if ( UtilityRoutines::SameString( CompType, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).TypeOf ) && UtilityRoutines::SameString( CompName, VentRepCondDemandSide( PassLoopNum ).Branch( PassBranchNum ).Comp( PassCompNum ).Name ) ) {
 							// Found a match on the plant demand side--increment the counter
 							MatchFound = true;
 							MatchLoopType = 2;

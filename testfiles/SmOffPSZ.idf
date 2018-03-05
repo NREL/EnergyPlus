@@ -69,7 +69,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     Building,                !- Name
@@ -116,7 +116,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -146,7 +146,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5Â°C MCWB=  23.0Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -336,12 +336,6 @@
     .0063;                   !- Thickness {m}
 
   Construction,
-    Dbl Clr 6mm/6mm Air,     !- Name
-    CLEAR 6MM,               !- Outside Layer
-    AIR 6MM,                 !- Layer 2
-    CLEAR 6MM;               !- Layer 3
-
-  Construction,
     Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
     LoE CLEAR 6MM,           !- Outside Layer
     AIR 6MM,                 !- Layer 2
@@ -377,8 +371,18 @@
     CC15;                    !- Outside Layer
 
   Construction,
+    UNDRWALL,                !- Name
+    CC24;                    !- Outside Layer
+
+  Construction,
     FURNITURE,               !- Name
     WD10;                    !- Outside Layer
+
+  Construction,
+    INTWALL-1,               !- Name
+    GP02,                    !- Outside Layer
+    AL21,                    !- Layer 2
+    GP02;                    !- Layer 3
 
 ! original origin (0,0,0)
 
@@ -390,8 +394,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,8.794457436,0)
 
@@ -403,8 +407,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,0,3.352800369)
 
@@ -416,8 +420,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,8.794457436,0)
 
@@ -429,8 +433,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    3.048000336,             !- Ceiling Height {m}
-    453.119995117;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
 ! original origin (0,0,-2.438400269)
 
@@ -442,8 +446,8 @@
     0,                       !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
-    2.438400269,             !- Ceiling Height {m}
-    724.992004395;           !- Volume {m3}
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
 
   GlobalGeometryRules,
     LowerLeftCorner,         !- Starting Vertex Position
@@ -513,6 +517,38 @@
     17.588914871,17.588914871,0,  !- X,Y,Z ==> Vertex 2 {m}
     17.588914871,17.588914871,3.352800369,  !- X,Y,Z ==> Vertex 3 {m}
     17.588914871,8.794457436,3.352800369;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    IntWall-F1,              !- Name
+    Wall,                    !- Surface Type
+    INTWALL-1,               !- Construction Name
+    ZNF1,                    !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    ZSF1,                    !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,8.794457436,3.352800369,  !- X,Y,Z ==> Vertex 1 {m}
+    0,8.794457436,0,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,8.794457436,0,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,8.794457436,3.352800369;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    IntWall-F2,              !- Name
+    Wall,                    !- Surface Type
+    INTWALL-1,               !- Construction Name
+    ZNF2,                    !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    ZSF2,                    !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,8.794457436,6.705600738,  !- X,Y,Z ==> Vertex 1 {m}
+    0,8.794457436,3.352800369,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,8.794457436,3.352800369,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,8.794457436,6.705600738;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     NWall,                   !- Name
@@ -817,6 +853,70 @@
     17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
     17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,-2.4384;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-1,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-2,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    17.588914871,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    17.588914871,0,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    17.588914871,17.588914871,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-3,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    17.588914871,17.588914871,0,  !- X,Y,Z ==> Vertex 1 {m}
+    17.588914871,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    0,17.588914871,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    BSMT-WALL-4,             !- Name
+    WALL,                    !- Surface Type
+    UNDRWALL,                !- Construction Name
+    BASE-1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,17.588914871,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,17.588914871,-2.4384,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,-2.4384,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     EWWndw,                  !- Name
@@ -1367,7 +1467,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     726,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0.7,                     !- Fraction Radiant
     0;                       !- Fraction Lost
@@ -1915,7 +2015,7 @@
     ZSF1Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZSF1 Node,               !- Zone Air Node Name
-    ZSF1 Outlet Node;        !- Zone Return Air Node Name
+    ZSF1 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZNF1,                    !- Zone Name
@@ -1923,7 +2023,7 @@
     ZNF1Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZNF1 Node,               !- Zone Air Node Name
-    ZNF1 Outlet Node;        !- Zone Return Air Node Name
+    ZNF1 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZSF2,                    !- Zone Name
@@ -1931,7 +2031,7 @@
     ZSF2Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZSF2 Node,               !- Zone Air Node Name
-    ZSF2 Outlet Node;        !- Zone Return Air Node Name
+    ZSF2 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     ZNF2,                    !- Zone Name
@@ -1939,7 +2039,7 @@
     ZNF2Inlet,               !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZNF2 Node,               !- Zone Air Node Name
-    ZNF2 Outlet Node;        !- Zone Return Air Node Name
+    ZNF2 Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneControl:Thermostat,
     South zone1,             !- Name
@@ -1976,6 +2076,7 @@
 
   ZoneHVAC:EquipmentList,
     ZSF1Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZSF1DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1983,6 +2084,7 @@
 
   ZoneHVAC:EquipmentList,
     ZNF1Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZNF1DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1990,6 +2092,7 @@
 
   ZoneHVAC:EquipmentList,
     ZSF2Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZSF2DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1997,6 +2100,7 @@
 
   ZoneHVAC:EquipmentList,
     ZNF2Equipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZNF2DirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2490,7 +2594,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly,ReportSch;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly,ReportSch;
+  Output:Variable,*,Heating Coil Heating Rate,hourly,ReportSch;
 
   Output:Meter,Cooling:Electricity,monthly;
 

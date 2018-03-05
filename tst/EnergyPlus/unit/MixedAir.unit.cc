@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -67,6 +68,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -131,7 +133,7 @@ namespace EnergyPlus {
 			"    ProportionalMinimum;     !- Minimum Limit Type",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 		int ControllerNum( 0 ); // Controller number
@@ -141,7 +143,7 @@ namespace EnergyPlus {
 		int IOStat( 0 );
 		std::string const CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 
 		Array1D< Real64 > NumArray( NumNums, 0.0 );
 		Array1D_string AlphArray( NumAlphas );
@@ -150,12 +152,12 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_bool lNumericBlanks( NumNums, true );
 
-		NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOAControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OAController.allocate( NumOAControllers );
 
 		ControllerNum = 1;
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 
@@ -164,7 +166,7 @@ namespace EnergyPlus {
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
 
 		ControllerNum = 2;
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ErrorsFound = false;
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
@@ -443,7 +445,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		GetOAControllerInputs();
 		EXPECT_EQ( 2, OAController( 1 ).OANode );
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
@@ -681,7 +683,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
 		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
@@ -750,7 +752,46 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.0194359, OAController( 1 ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( 0.009527, OAController( 1 ).MinOAFracLimit, 0.00001 );
 
-		ZoneAirCO2.deallocate();
+		OARequirements( 1 ).OAFlowMethod = 9;
+		VentilationMechanical( 1 ).ZoneOAFlowMethod( 1 ) = OARequirements( 1 ).OAFlowMethod;
+		DataAirLoop::NumOASystems = 1;
+
+		OutsideAirSys.allocate( 1 );
+		OutsideAirSys( 1 ).Name = "AIRLOOP OASYSTEM";
+		OutsideAirSys( 1 ).NumControllers = 1;
+		OutsideAirSys( 1 ).ControllerName.allocate( 1 );
+		OutsideAirSys( 1 ).ControllerName( 1 ) = "OA CONTROLLER 1";
+		OutsideAirSys( 1 ).ComponentType.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentType( 1 ) = "OutdoorAir:Mixer";
+		OutsideAirSys( 1 ).ComponentName.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentName( 1 ) = "OAMixer";
+		OAMixer.allocate( 1 );
+		OAMixer( 1 ).Name = "OAMixer";
+		OAMixer( 1 ).InletNode = 2;
+
+		DataHVACGlobals::NumPrimaryAirSys = 1;
+		PrimaryAirSystem.allocate( 1 );
+		PrimaryAirSystem( 1 ).Name = "PrimaryAirLoop";
+		PrimaryAirSystem( 1 ).NumBranches = 1;
+		PrimaryAirSystem( 1 ).Branch.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = OutsideAirSys( 1 ).Name;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+
+		AirLoopZoneInfo.allocate( 1 );
+		AirLoopZoneInfo( 1 ).NumZones = 1;
+		AirLoopZoneInfo( 1 ).ActualZoneNumber.allocate( 1 );
+		AirLoopZoneInfo( 1 ).ActualZoneNumber( 1 ) = 1;
+
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( "ProportionalControlBasedOnDesignOccupancy", DataSizing::cOAFlowMethodTypes( VentilationMechanical( 1 ).ZoneOAFlowMethod( 1 ) ) );
+
+		OutsideAirSys.deallocate( );
+		OAMixer.deallocate( );
+		AirLoopZoneInfo.deallocate( );
+		PrimaryAirSystem.deallocate( );
+		ZoneAirCO2.deallocate( );
 		ZoneCO2GainFromPeople.deallocate();
 	}
 
@@ -856,7 +897,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
 		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
@@ -979,7 +1020,7 @@ namespace EnergyPlus {
 			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetOASysInputFlag = true;
 		DataGlobals::BeginEnvrnFlag = true;
@@ -1125,7 +1166,7 @@ namespace EnergyPlus {
 			"    DOAS OA Controller;      !- Controller 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
@@ -1223,7 +1264,7 @@ namespace EnergyPlus {
 			"    OAFractionSched;                        !- Minimum Outdoor Air Schedule Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetOAControllerInputs( );
 
@@ -1359,7 +1400,7 @@ namespace EnergyPlus {
 			"    1;                        !- High Humidity Outdoor Air Flow Ratio",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		compare_err_stream( "" ); // just for debugging
 
@@ -1371,7 +1412,7 @@ namespace EnergyPlus {
 		int IOStat( 0 );
 		std::string const CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 
 		Array1D< Real64 > NumArray( NumNums, 0.0 );
 		Array1D_string AlphArray( NumAlphas );
@@ -1380,7 +1421,7 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_bool lNumericBlanks( NumNums, true );
 
-		NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOAControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OAController.allocate( NumOAControllers );
 
 		ControllerNum = 1;
@@ -1390,7 +1431,9 @@ namespace EnergyPlus {
 		ZoneEquipConfig.allocate( 1 );
 		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 		ZoneEquipConfig( 1 ).ZoneNode = 2;
-		ZoneEquipConfig( 1 ).AirLoopNum = 1;
+		ZoneEquipConfig( 1 ).NumInletNodes = 1;
+		ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
 		PrimaryAirSystem.allocate( 1 );
 		PrimaryAirSystem( 1 ).NumBranches = 1;
 		PrimaryAirSystem( 1 ).Branch.allocate( 1 );
@@ -1410,7 +1453,7 @@ namespace EnergyPlus {
 		HumidityControlZone( 1 ).ActualZoneNum = 1;
 		NumHumidityControlZones = 1;
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 		//compare_err_stream( "" ); // just for debugging
@@ -1463,7 +1506,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopFlow.allocate( 1 );
 		AirLoopControlInfo.allocate( 1 );
@@ -1614,7 +1657,7 @@ namespace EnergyPlus {
 			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		GetOAControllerInputs();
 
 		EXPECT_EQ( 1, GetNumOAMixers() );
@@ -1655,7 +1698,7 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-			"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C",
+			"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C",
 			"SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
 			"    7,                       !- Month",
@@ -1685,7 +1728,7 @@ namespace EnergyPlus {
 			"    1.0;                     !- Sky Clearness",
 
 
-			"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C",
+			"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C",
 			"SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -3710,6 +3753,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE1-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3721,6 +3765,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3732,6 +3777,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE3-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3743,6 +3789,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3754,6 +3801,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE5-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -4927,12 +4975,14 @@ namespace EnergyPlus {
 		} );
 
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 			GetOAControllerInputs();
 
 			EXPECT_EQ( 6, GetNumOAMixers() );
 			EXPECT_EQ( 1, GetNumOAControllers() );
 			EXPECT_EQ( 18, GetOAMixerReliefNodeNumber( 1 ) );
+
+			//indexes can be found in  OAMixer array for these feild names
 			EXPECT_EQ( 1, GetOAMixerIndex( "SPACE1-1 OA Mixing Box" ) );
 			EXPECT_EQ( 2, GetOAMixerIndex( "SPACE2-1 OA Mixing Box" ) );
 			EXPECT_EQ( 3, GetOAMixerIndex( "SPACE3-1 OA Mixing Box" ) );
@@ -4966,7 +5016,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );
@@ -5158,7 +5208,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );
@@ -5235,6 +5285,181 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.0, OAMassFlow );
 
 		DataHeatBalance::ZoneIntGain.deallocate();
+	}
+
+	TEST_F( EnergyPlusFixture, CO2ControlDesignOARateTest )
+	{
+		// Test a new feature: Proportional Demand Control Ventilation (DCV) Enhancements
+		Contaminant.CO2Simulation = true;
+		Contaminant.CO2OutdoorSchedPtr = 1;
+
+		std::string const idf_objects = delimited_string( {
+			"Version,8.3;",
+			"  OutdoorAir:Node,",
+			"    Outside Air Inlet Node; !- Name",
+			"  Schedule:Constant,",
+			"    VentSchedule, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     1; !- Hourly value",
+			"  Schedule:Constant,",
+			"    ZoneADEffSch, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     1; !- Hourly value",
+			"  Schedule:Constant,",
+			"    OAFractionSched, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     1; !- Hourly value",
+			"  Schedule:Constant,",
+			"    CO2AvailSchedule, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     1.0; !- Hourly value",
+			"  Schedule:Constant,",
+			"    CO2SetpointSchedule, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     900.0; !- Hourly value",
+			"  Schedule:Constant,",
+			"    CO2MinSchedule, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     300.0; !- Hourly value",
+			"  Schedule:Constant,",
+			"    CO2MaxSchedule, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     900.0; !- Hourly value",
+			"  Schedule:Constant,",
+			"    Minimum Outdoor Air Flow Rate Schedule, !- Name",
+			"     , !- Schedule Type Limits Name",
+			"     0.001; !- Hourly value",
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1, !- Name",
+			"    Relief Air Outlet Node, !- Relief Air Outlet Node Name",
+			"    Outdoor Air Mixer Inlet Node, !- Return Air Node Name",
+			"    Mixed Air Node, !- Mixed Air Node Name",
+			"    Outside Air Inlet Node, !- Actuator Node Name",
+			"    0.0, !- Minimum Outdoor Air Flow Rate{ m3 / s }",
+			"    1.7, !- Maximum Outdoor Air Flow Rate{ m3 / s }",
+			"    NoEconomizer, !- Economizer Control Type",
+			"    ModulateFlow, !- Economizer Control Action Type",
+			"    , !- Economizer Maximum Limit Dry - Bulb Temperature{ C }",
+			"    , !- Economizer Maximum Limit Enthalpy{ J / kg }",
+			"    , !- Economizer Maximum Limit Dewpoint Temperature{ C }",
+			"    , !- Electronic Enthalpy Limit Curve Name",
+			"    , !- Economizer Minimum Limit Dry - Bulb Temperature{ C }",
+			"    NoLockout, !- Lockout Type",
+			"    FixedMinimum, !- Minimum Limit Type",
+			"    OAFractionSched, !- Minimum Outdoor Air Schedule Name",
+			"    , !- Minimum Fraction of Outdoor Air Schedule Name",
+			"    , !- Maximum Fraction of Outdoor Air Schedule Name",
+			"    DCVObject;               !- Mechanical Ventilation Controller Name",
+			"  Controller:MechanicalVentilation,",
+			"    DCVObject, !- Name",
+			"    VentSchedule, !- Availability Schedule Name",
+			"    Yes, !- Demand Controlled Ventilation",
+			"    ProportionalControlBasedOnDesignOARate, !- System Outdoor Air Method",
+			"     , !- Zone Maximum Outdoor Air Fraction{ dimensionless }",
+			"    West Zone, !- Zone 1 Name",
+			"    CM DSOA West Zone, !- Design Specification Outdoor Air Object Name 1",
+			"    CM DSZAD West Zone; !- Design Specification Zone Air Distribution Object Name 1",
+		} );
+
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		ContaminantControlledZone.allocate( 1 );
+		ContaminantControlledZone( 1 ).AvaiSchedPtr = 4;
+		ContaminantControlledZone( 1 ).SPSchedIndex = 5;
+		ContaminantControlledZone( 1 ).ZoneMinCO2SchedIndex = 6;
+		ContaminantControlledZone( 1 ).ZoneMaxCO2SchedIndex = 7;
+
+		AirLoopControlInfo.allocate( 1 );
+		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
+		OARequirements.allocate( 1 );
+		OARequirements( 1 ).Name = "CM DSOA WEST ZONE";
+		OARequirements( 1 ).OAFlowMethod = OAFlowSum;
+		OARequirements( 1 ).OAFlowPerPerson = 0.003149;
+		OARequirements( 1 ).OAFlowPerArea = 0.000407;
+		OARequirements( 1 ).OAPropCtlMinRateSchPtr = 8;
+
+		ZoneAirDistribution.allocate( 1 );
+		ZoneAirDistribution( 1 ).Name = "CM DSZAD WEST ZONE";
+		ZoneAirDistribution( 1 ).ZoneADEffSchPtr = 4;
+
+		Zone.allocate( 1 );
+		Zone( 1 ).Name = "WEST ZONE";
+		Zone( 1 ).FloorArea = 10.0;
+		Zone( 1 ).ZoneContamControllerSchedIndex = 4;
+
+		AirLoopFlow.allocate( 1 );
+		AirLoopFlow( 1 ).OAFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
+		AirLoopFlow( 1 ).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
+
+		GetOAControllerInputs( );
+
+		EXPECT_EQ( 8, VentilationMechanical( 1 ).SystemOAMethod );
+		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
+		EXPECT_NEAR( 0.00314899, VentilationMechanical( 1 ).ZoneOAPeopleRate( 1 ), 0.00001 );
+		EXPECT_NEAR( 0.000407, VentilationMechanical( 1 ).ZoneOAAreaRate( 1 ), 0.00001 );
+
+		StdRhoAir = 1.2;
+		OAController( 1 ).MixMassFlow = 1.7 * StdRhoAir;
+		OAController( 1 ).MaxOAMassFlowRate = 1.7 * StdRhoAir;
+		AirLoopFlow( 1 ).DesSupply = 1.7;
+		VentilationMechanical( 1 ).SchPtr = 1;
+		Schedule( 1 ).CurrentValue = 1.0;
+
+		VentilationMechanical( 1 ).ZoneADEffSchPtr( 1 ) = 2;
+		Schedule( 2 ).CurrentValue = 1.0;
+		TotPeople = 1;
+		People.allocate( 1 );
+		People( 1 ).Name = "WestPeople";
+		People( 1 ).ZonePtr = 1;
+		People( 1 ).NumberOfPeople = 3;
+		Zone( 1 ).TotOccupants = 3;
+		Schedule( 3 ).CurrentValue = 0.1;
+		Schedule( 4 ).CurrentValue = 1.0;
+		ZoneCO2GainFromPeople.allocate( 1 );
+		ZoneCO2GainFromPeople( 1 ) = 3.82E-8;
+		OutdoorCO2 = 400;
+		ZoneAirCO2.allocate( 1 );
+		ZoneAirCO2( 1 ) = 600.0;
+		ZoneEquipConfig.allocate( 1 );
+		ZoneEquipConfig( 1 ).NumInletNodes = 1;
+		ZoneEquipConfig( 1 ).AirDistUnitCool.allocate( 1 );
+		ZoneEquipConfig( 1 ).AirDistUnitCool( 1 ).InNode = 10;
+		ZoneEquipConfig( 1 ).InletNode.allocate( 1 );
+		ZoneEquipConfig( 1 ).InletNode( 1 ) = 10;
+		Node.allocate( 10 );
+		Node( 10 ).Temp = 13.00;
+		Node( 10 ).HumRat = 0.008;
+		Node( 10 ).MassFlowRate = 1.7 * StdRhoAir;
+		OutBaroPress = 101325;
+		ZoneSysEnergyDemand.allocate( 1 );
+		ZoneIntGain.allocate( 1 );
+		ZoneIntGain( 1 ).NOFOCC = 0.1;
+		Schedule( 5 ).CurrentValue = 900.0;
+		Schedule( 6 ).CurrentValue = 300.0;
+		Schedule( 7 ).CurrentValue = 900.0;
+		Zone( 1 ).ZoneMinCO2SchedIndex = 6;
+		Zone( 1 ).ZoneMaxCO2SchedIndex = 7;
+		Schedule( 8 ).CurrentValue = 0.01;
+
+		OAController( 1 ).CalcOAController( 1, true );
+
+		EXPECT_NEAR( 0.003183055786, OAController( 1 ).OAMassFlow, 0.00001 );
+		EXPECT_NEAR( 0.001560321463, OAController( 1 ).MinOAFracLimit, 0.00001 );
+
+		AirLoopControlInfo.deallocate( );
+		OARequirements.deallocate( );
+		ZoneAirDistribution.deallocate( );
+		Zone.deallocate( );
+		AirLoopFlow.deallocate( );
+		People.deallocate( );
+		ZoneAirCO2.deallocate( );
+		ZoneEquipConfig.deallocate( );
+		Node.deallocate( );
+		ZoneSysEnergyDemand.deallocate( );
+		ZoneCO2GainFromPeople.deallocate( );
+		ContaminantControlledZone.deallocate( );
+		ZoneIntGain.deallocate( );
 	}
 
 }

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -62,6 +63,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -102,11 +104,44 @@ namespace OutputReportTabular {
 	extern int const unitsStyleInchPound;
 	extern int const unitsStyleNotFound;
 
-	extern int const isAverage;
-	extern int const isSum;
-
 	extern int const stepTypeZone;
 	extern int const stepTypeHVAC;
+
+	extern int const cSensInst;
+	extern int const cSensDelay;
+	extern int const cSensRA;
+	extern int const cLatent;
+	extern int const cTotal;
+	extern int const cPerc;
+	extern int const cArea;
+	extern int const cPerArea;
+
+	extern int const rPeople;
+	extern int const rLights;
+	extern int const rEquip;
+	extern int const rRefrig;
+	extern int const rWaterUse;
+	extern int const rHvacLoss;
+	extern int const rPowerGen;
+	extern int const rDOAS;
+	extern int const rInfil;
+	extern int const rZoneVent;
+	extern int const rIntZonMix;
+	extern int const rRoof;
+	extern int const rIntZonCeil;
+	extern int const rOtherRoof;
+	extern int const rExtWall;
+	extern int const rIntZonWall;
+	extern int const rGrdWall;
+	extern int const rOtherWall;
+	extern int const rExtFlr;
+	extern int const rIntZonFlr;
+	extern int const rGrdFlr;
+	extern int const rOtherFlr;
+	extern int const rFeneCond;
+	extern int const rFeneSolr;
+	extern int const rOpqDoor;
+	extern int const rGrdTot;
 
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
@@ -170,6 +205,8 @@ namespace OutputReportTabular {
 	extern bool displayAdaptiveComfort;
 	extern bool displaySourceEnergyEndUseSummary;
 	extern bool displayZoneComponentLoadSummary;
+	extern bool displayAirLoopComponentLoadSummary;
+	extern bool displayFacilityComponentLoadSummary;
 	extern bool displayLifeCycleCostReport;
 	extern bool displayTariffReport;
 	extern bool displayEconomicResultSummary;
@@ -202,7 +239,9 @@ namespace OutputReportTabular {
 	// arrays the hold the demand values
 	extern Array1D< Real64 > gatherDemandTotal;
 	extern Array2D< Real64 > gatherDemandEndUse;
+	extern Array2D< Real64 > gatherDemandIndEndUse;
 	extern Array3D< Real64 > gatherDemandEndUseSub;
+	extern Array3D< Real64 > gatherDemandIndEndUseSub;
 	extern Array1D_int gatherDemandTimeStamp;
 	// to keep track of hours for the BEPS report gathering
 	extern Real64 gatherElapsedTimeBEPS;
@@ -369,9 +408,9 @@ namespace OutputReportTabular {
 		int resIndex; // result index - pointer to BinResults array
 		int numTables;
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
-		int avgSum; // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
-		std::string units; // the units string, may be blank
+		OutputProcessor::Unit units; // the units enumeration
 		std::string ScheduleName; // the name of the schedule
 		int scheduleIndex; // index to the schedule specified - if no schedule use zero
 
@@ -383,7 +422,7 @@ namespace OutputReportTabular {
 			resIndex( 0 ),
 			numTables( 0 ),
 			typeOfVar( 0 ),
-			avgSum( 0 ),
+			avgSum( OutputProcessor::StoreType::Averaged ),
 			stepType( 0 ),
 			scheduleIndex( 0 )
 		{}
@@ -477,11 +516,11 @@ namespace OutputReportTabular {
 		std::string variMeter; // the name of the variable or meter
 		std::string colHead; // the column header to use instead of the variable name (only for predefined)
 		int aggregate; // the type of aggregation for the variable (see aggType parameters)
-		std::string varUnits; // Units sting, may be blank
+		OutputProcessor::Unit varUnits; // Units enumeration
 		std::string variMeterUpper; // the name of the variable or meter uppercased
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int keyCount; // noel
-		int varAvgSum; // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType varAvgSum; // Variable  is Averaged=1 or Summed=2
 		int varStepType; // Variable time step is Zone=1 or HVAC=2
 		Array1D_string NamesOfKeys; // keyNames !noel
 		Array1D_int IndexesForKeyVar; // keyVarIndexes !noel
@@ -489,9 +528,10 @@ namespace OutputReportTabular {
 		// Default Constructor
 		MonthlyFieldSetInputType() :
 			aggregate( 0 ),
+			varUnits( OutputProcessor::Unit::None ),
 			typeOfVar( 0 ),
 			keyCount( 0 ),
-			varAvgSum( 1 ),
+			varAvgSum( OutputProcessor::StoreType::Averaged ),
 			varStepType( 1 )
 		{}
 
@@ -519,9 +559,9 @@ namespace OutputReportTabular {
 		std::string colHead; // column header (not used for user defined monthly)
 		int varNum; // variable or meter number
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
-		int avgSum; // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
-		std::string units; // the units string, may be blank
+		OutputProcessor::Unit units; // the units string, may be blank
 		int aggType; // index to the type of aggregation (see list of parameters)
 		Array1D< Real64 > reslt; // monthly results
 		Array1D< Real64 > duration; // the time during which results are summed for use in averages
@@ -533,8 +573,9 @@ namespace OutputReportTabular {
 		MonthlyColumnsType() :
 			varNum( 0 ),
 			typeOfVar( 0 ),
-			avgSum( 0 ),
+			avgSum( OutputProcessor::StoreType::Averaged ),
 			stepType( 0 ),
+			units( OutputProcessor::Unit::None ),
 			aggType( 0 ),
 			reslt( 12, 0.0 ),
 			duration( 12, 0.0 ),
@@ -577,6 +618,106 @@ namespace OutputReportTabular {
 			is_default( false )
 		{}
 
+	};
+
+	struct CompLoadTablesType
+	{
+		// members
+		int desDayNum; // design day number
+		int timeStepMax; // times step of the day that the maximum occurs
+		Array2D < Real64 > cells; // main component table results (column, row)
+		Array2D_bool cellUsed; // flag if the cell is used for the table of results (column, row)
+		std::string peakDateHrMin; // string containing peak timestamp
+		Real64 outsideDryBulb;   // outside dry bulb temperature at peak
+		Real64 outsideWebBulb;   // outside web bulb temperature at peak
+		Real64 outsideHumRatio;  // outside humidity ratio at peak
+		Real64 zoneDryBulb;   // zone dry bulb temperature at peak
+		Real64 zoneRelHum;   // zone relative humidity at peak
+		Real64 zoneHumRatio;  // zone humidity ratio at peak
+
+		Real64 supAirTemp;  // supply air temperature
+		Real64 mixAirTemp;  // mixed air temperature
+		Real64 mainFanAirFlow;  // main fan air flow
+		Real64 outsideAirFlow;  // outside air flow
+		Real64 designPeakLoad;  // design peak load
+		Real64 diffDesignPeak;  // difference between Design and Peak Load
+
+		Real64 peakDesSensLoad; // peak design sensible load
+		Real64 estInstDelSensLoad; // estimated instant plus delayed sensible load
+		Real64 diffPeakEst; // difference between the peak design sensible load and the estimated instant plus delayed sensible load
+		Array1D_int zoneIndices; // the zone numbers covered by the report
+
+		Real64 outsideAirRatio;  // outside Air
+		Real64 floorArea; // floor area
+		Real64 airflowPerFlrArea;  // airflow per floor area
+		Real64 airflowPerTotCap;  // airflow per total capacity
+		Real64 areaPerTotCap;  // area per total capacity
+		Real64 totCapPerArea;  // total capacity per area
+		Real64 chlPumpPerFlow;  // chiller pump power per flow
+		Real64 cndPumpPerFlow;  // condenser pump power per flow
+		Real64 numPeople;  // number of people
+
+		// default constructor
+		CompLoadTablesType() :
+			desDayNum( 0 ),
+			timeStepMax( 0 ),
+			outsideDryBulb( 0. ),
+			outsideWebBulb( 0. ),
+			outsideHumRatio( 0. ),
+			zoneDryBulb( 0. ),
+			zoneRelHum( 0. ),
+			supAirTemp( 0. ),
+			mixAirTemp( 0. ),
+			mainFanAirFlow( 0. ),
+			outsideAirFlow( 0. ),
+			designPeakLoad( 0. ),
+			diffDesignPeak( 0. ),
+			peakDesSensLoad( 0. ),
+			estInstDelSensLoad( 0. ),
+			diffPeakEst( 0. ),
+			outsideAirRatio( 0.),
+			floorArea( 0. ),
+			airflowPerFlrArea( 0. ),
+			airflowPerTotCap( 0. ),
+			areaPerTotCap( 0. ),
+			totCapPerArea( 0. ),
+			chlPumpPerFlow( 0. ),
+			cndPumpPerFlow( 0. ),
+			numPeople( 0. )
+
+		{}
+
+	};
+
+	struct ZompComponentAreasType
+	{
+		// members
+		Real64 floor;
+		Real64 roof;
+		Real64 ceiling;
+		Real64 extWall;
+		Real64 intZoneWall;
+		Real64 grndCntWall;
+		Real64 extFloor;
+		Real64 intZoneFloor;
+		Real64 grndCntFloor;
+		Real64 fenestration;
+		Real64 door;
+
+		// default constructor
+		ZompComponentAreasType() :
+			floor( 0. ),
+			roof( 0. ),
+			ceiling( 0. ),
+			extWall( 0. ),
+			intZoneWall( 0. ),
+			grndCntWall( 0. ),
+			extFloor( 0. ),
+			intZoneFloor( 0. ),
+			grndCntFloor( 0. ),
+			fenestration( 0. ),
+			door( 0. )
+		{}
 	};
 
 	// Object Data
@@ -775,8 +916,8 @@ namespace OutputReportTabular {
 	splitCommaString (std::string const & inputString );
 	
 	void
-	AddTOCZoneLoadComponentTable();
-
+	AddTOCLoadComponentTableSummaries();
+ 
 	void
 	AllocateLoadComponentArrays();
 
@@ -793,16 +934,123 @@ namespace OutputReportTabular {
 	GatherComponentLoadsHVAC();
 
 	void
-	ComputeDelayedComponents();
+	WriteLoadComponentSummaryTables();
 
 	void
-	WriteZoneLoadComponentTable();
+	GetDelaySequences(
+		int const & desDaySelected,
+		bool const & isCooling,
+		int const & zoneIndex,
+		Array1D< Real64 > & peopleDelaySeq,
+		Array1D< Real64 > & equipDelaySeq,
+		Array1D< Real64 > & hvacLossDelaySeq,
+		Array1D< Real64 > & powerGenDelaySeq,
+		Array1D< Real64 > & lightDelaySeq,
+		Array1D< Real64 > & feneSolarDelaySeq,
+		Array3D< Real64 > & feneCondInstantSeq,
+		Array2D< Real64 > & surfDelaySeq
+	);
+
+	Real64
+	MovingAvgAtMaxTime(
+		Array1S< Real64 > const & dataSeq,
+		int const & numTimeSteps,
+		int const & maxTimeStep
+	);
+
+	void
+	ComputeTableBodyUsingMovingAvg(
+		Array2D < Real64 > & resultCells,
+		Array2D_bool & resultCellsUsed,
+		int const & desDaySelected,
+		int const & timeOfMax,
+		int const & zoneIndex,
+		Array1D< Real64 > const & peopleDelaySeq,
+		Array1D< Real64 > const & equipDelaySeq,
+		Array1D< Real64 > const & hvacLossDelaySeq,
+		Array1D< Real64 > const & powerGenDelaySeq,
+		Array1D< Real64 > const & lightDelaySeq,
+		Array1D< Real64 > const & feneSolarDelaySeq,
+		Array3D< Real64 > const & feneCondInstantSeqLoc,
+		Array2D< Real64 > const & surfDelaySeq
+	);
+
+	void
+	CollectPeakZoneConditions(
+		CompLoadTablesType & compLoad,
+		int const & timeOfMax,
+		int const & zoneIndex,
+		bool const & isCooling
+	);
+
+	void
+	CollectPeakAirLoopConditions(
+		CompLoadTablesType & compLoad,
+		int const & airLoopIndex,
+		bool const & isCooling
+	);
+
+	void
+	ComputeEngineeringChecks(
+		CompLoadTablesType & compLoad
+	);
+
+
+	void
+	GetZoneComponentAreas(
+		Array1D< ZompComponentAreasType > & areas
+	);
+
+	void
+	AddAreaColumnForZone(
+		int const & zoneNum,
+		Array1D< ZompComponentAreasType > const & compAreas,
+		CompLoadTablesType & compLoadTotal
+	);
+
+	void
+	CombineLoadCompResults(
+		CompLoadTablesType & compLoadTotal,
+		CompLoadTablesType const & compLoadPartial,
+		Real64 const & multiplier
+	);
+
+	void
+	AddTotalRowsForLoadSummary(
+		CompLoadTablesType & compLoadTotal
+	);
+
+	void
+	ComputePeakDifference(
+		CompLoadTablesType & compLoad
+	);
+
+	void
+	LoadSummaryUnitConversion(
+		CompLoadTablesType & compLoadTotal
+    );
+
+	void
+	CreateListOfZonesForAirLoop(
+		CompLoadTablesType  & compLoad,
+		Array1D_int const & zoneToAirLoop,
+		int const & curAirLoop
+	);
+
+	void
+	OutputCompLoadSummary(
+		int const & kind, // zone=1, airloop=2, facility=3
+		CompLoadTablesType const & compLoadCool,
+		CompLoadTablesType const & compLoadHeat,
+		int const & zoneOrAirLoopIndex
+	);
+
 
 	void
 	WriteReportHeaders(
 		std::string const & reportName,
 		std::string const & objectName,
-		int const averageOrSum
+		OutputProcessor::StoreType const averageOrSum
 	);
 
 	void

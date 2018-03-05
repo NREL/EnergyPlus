@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -192,6 +193,9 @@ namespace HeatBalanceManager {
 	GetZoneData( bool & ErrorsFound ); // If errors found in input
 
 	void
+	GetZoneLocalEnvData( bool & ErrorsFound ); // If errors found in input
+
+	void
 	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,
@@ -243,6 +247,10 @@ namespace HeatBalanceManager {
 	ReportHeatBalance();
 
 	//        End of Reporting subroutines for the HB Module
+
+
+	void
+	OpenShadingFile();
 
 	void
 	GetFrameAndDividerData( bool & ErrorsFound ); // set to true if errors found in input

@@ -25,8 +25,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16캜
-!                          DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=15.5캜 (modified 1.05 clearness)
+! Design Days:             DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16째C
+!                          DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=15.5째C (modified 1.05 clearness)
 !
 ! Run Period (Weather File): DENVER_STAPLETON_CO_USA_WMO_724690, January (full month) and July (full month)
 !
@@ -119,7 +119,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -174,8 +174,8 @@
 
   Site:Location,
     Denver Centennial CO USA WMO=724666,  !- Name
-    39.57,                   !- Latitude {deg}
-    -104.85,                 !- Longitude {deg}
+    39.74,                   !- Latitude {deg}
+    -105.18,                 !- Longitude {deg}
     -7.00,                   !- Time Zone {hr}
     1793.00;                 !- Elevation {m}
 
@@ -183,10 +183,10 @@
  !  Data Source=ASHRAE 2009 Annual Design Conditions
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Denver Centennial CO USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.5m/s, 5%=8.4m/s
- ! Denver Centennial CO USA Extreme Annual Temperatures, Max Drybulb=-22.9캜 Min Drybulb=36.1캜
+ ! Denver Centennial CO USA Extreme Annual Temperatures, Max Drybulb=-22.9째C Min Drybulb=36.1째C
  ! Denver Centennial CO USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
  ! Coldest Month=December
- ! Denver Centennial CO USA Annual Heating 99.6%, MaxDB=-18.8캜
+ ! Denver Centennial CO USA Annual Heating 99.6%, MaxDB=-18.8째C
 
   SizingPeriod:DesignDay,
     Denver Centennial Ann Htg 99.6% Condns DB,  !- Name
@@ -218,7 +218,7 @@
 
  ! Denver Centennial Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=July
- ! Denver Centennial CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32캜 MWB=15.5캜
+ ! Denver Centennial CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32째C MWB=15.5째C
 
   SizingPeriod:DesignDay,
     Denver Centennial Ann Clg 1% Condns DB=>MWB,  !- Name

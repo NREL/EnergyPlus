@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -231,6 +232,12 @@ namespace SwimmingPool {
 		int const PoolNum // Index of the swimming pool under consideration within the derived types
 	);
 
+	void
+	InitSwimmingPoolPlantLoopIndex(
+		int const PoolNum, // number of the swimming pool
+		bool & MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+	);
+	
 	void
 	CalcSwimmingPool(
 		int const PoolNum // Index of the swimming pool under consideration within the derived types

@@ -5,7 +5,7 @@
 ! AirflowNetwork_SIMPLE_House.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
-! Highlights:             This file does the basic test of an air distribution system in a residetial home.
+! Highlights:             This file does the basic test of an air distribution system in a residential home.
 !                         It provides forced ventilation during system on period and natural ventilation via
 !                         SIMPLE airflow model during system off period.
 !
@@ -15,8 +15,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -103,7 +103,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -165,7 +165,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -195,7 +195,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -414,10 +414,6 @@
     IN05;                    !- Layer 2
 
   Construction,
-    CEILING:ATTIC,           !- Name
-    GP01;                    !- Outside Layer
-
-  Construction,
     GABLE,                   !- Name
     PW03;                    !- Outside Layer
 
@@ -432,11 +428,6 @@
   Construction,
     Garage:SteelDoor,        !- Name
     HF-A3;                   !- Outside Layer
-
-  Construction,
-    FLOOR:ATTICLIVING,       !- Name
-    GP01,                    !- Outside Layer
-    IN05;                    !- Layer 2
 
   Construction,
     CEILING:Garage,          !- Name
@@ -1311,7 +1302,7 @@
     ,                        !- Height Selection for Local Wind Pressure Calculation
     LOWRISE,                 !- Building Type
     500,                     !- Maximum Number of Iterations {dimensionless}
-    1,                       !- Initialization Type
+    ZeroNodePressures,                       !- Initialization Type, changed from '1', because we are not allowing this anymore
     1.0E-04,                 !- Relative Airflow Convergence Tolerance {dimensionless}
     1.0E-06,                 !- Absolute Airflow Convergence Tolerance {kg/s}
     -0.5,                    !- Convergence Acceleration Limit {dimensionless}
@@ -1740,10 +1731,11 @@
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone Node,               !- Zone Air Node Name
-    Zone Outlet Node;        !- Zone Return Air Node Name
+    Zone Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1875,7 +1867,7 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep,ReportSch;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,TimeStep,ReportSch;
+  Output:Variable,*,Heating Coil Heating Energy,TimeStep,ReportSch;
 
   Output:Variable,*,Zone Air Temperature,TimeStep,ReportSch;
 

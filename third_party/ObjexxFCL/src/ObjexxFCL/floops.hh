@@ -3,9 +3,9 @@
 
 // Fortran-Compatible DO Loop Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
@@ -58,14 +58,14 @@ floops( I & i, B const & b, E const & e, S const & s ) // DO i = b, e, s
 			return 0;
 		} else { // n3 > 0
 			assert( n3 > ZERO );
-			return ( ( n2 - n1 ) + n3 ) / n3;
+			return std::size_t( ( ( n2 - n1 ) + n3 ) / n3 );
 		}
 	} else if ( n1 > n2 ) {
 		if ( n3 > ZERO ) {
 			return 0;
 		} else { // n3 < 0
 			assert( n3 < ZERO );
-			return ( ( n1 - n2 ) - n3 ) / -n3;
+			return std::size_t( ( ( n1 - n2 ) - n3 ) / -n3 );
 		}
 	} else { // n1 == n2
 		// Allow n3 == 0 in this case but Fortran doesn't

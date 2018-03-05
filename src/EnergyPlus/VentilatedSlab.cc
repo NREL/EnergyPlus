@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -74,7 +75,7 @@
 #include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -120,14 +121,11 @@ namespace VentilatedSlab {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DisplayExtraWarnings;
-
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataHeatBalFanSys::QRadSysSource;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using namespace Psychrometrics;
 	using namespace FluidProperties;
@@ -248,25 +246,9 @@ namespace VentilatedSlab {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqVentedSlab;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // index of ventilated slab being simulated
@@ -280,7 +262,7 @@ namespace VentilatedSlab {
 
 		// Find the correct VentilatedSlabInput
 		if ( CompIndex == 0 ) {
-			Item = FindItemInList( CompName, VentSlab );
+			Item = UtilityRoutines::FindItemInList( CompName, VentSlab );
 			if ( Item == 0 ) {
 				ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );
 			}
@@ -334,12 +316,6 @@ namespace VentilatedSlab {
 		// Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.cc)
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		auto & GetWaterCoilMaxFlowRate( WaterCoils::GetCoilMaxWaterFlowRate );
@@ -360,10 +336,6 @@ namespace VentilatedSlab {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataSizing::ZoneHVACSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const MeanAirTemperature( "MeanAirTemperature" );
 		static std::string const MeanRadiantTemperature( "MeanRadiantTemperature" );
@@ -374,16 +346,9 @@ namespace VentilatedSlab {
 		static std::string const SlabSurfaceDewPointTemperature( "ZoneAirDewPointTemperature" );
 		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
 		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
@@ -407,7 +372,7 @@ namespace VentilatedSlab {
 		// Figure out how many Ventilated Slab Systems there are in the input file
 
 		SteamMessageNeeded = true;
-		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNumbers );
@@ -418,7 +383,7 @@ namespace VentilatedSlab {
 		// make sure data is gotten for surface lists
 		BaseNum = GetNumberOfSurfListVentSlab();
 
-		NumOfVentSlabs = GetNumObjectsFound( CurrentModuleObject );
+		NumOfVentSlabs = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		// Allocate the local derived type and do one-time initializations for all parts of it
 
 		VentSlab.allocate( NumOfVentSlabs );
@@ -427,18 +392,11 @@ namespace VentilatedSlab {
 
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) { // Begin looping over the entire ventilated slab systems found in the input file...
 
-			GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			VentSlabNumericFields( Item ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentSlab, Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), CurrentModuleObject, ErrorsFound);
 
 			VentSlab( Item ).Name = cAlphaArgs( 1 );
 			VentSlab( Item ).SchedName = cAlphaArgs( 2 );
@@ -453,7 +411,7 @@ namespace VentilatedSlab {
 			}
 
 			VentSlab( Item ).ZoneName = cAlphaArgs( 3 );
-			VentSlab( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone );
+			VentSlab( Item ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( VentSlab( Item ).ZonePtr == 0 ) {
 				if ( lAlphaBlanks( 3 ) ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
@@ -465,8 +423,8 @@ namespace VentilatedSlab {
 
 			VentSlab( Item ).SurfListName = cAlphaArgs( 4 );
 			SurfListNum = 0;
-			//    IF (NumOfSlabLists > 0) SurfListNum = FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
-			if ( NumOfSurfListVentSlab > 0 ) SurfListNum = FindItemInList( VentSlab( Item ).SurfListName, SlabList );
+			//    IF (NumOfSlabLists > 0) SurfListNum = UtilityRoutines::FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
+			if ( NumOfSurfListVentSlab > 0 ) SurfListNum = UtilityRoutines::FindItemInList( VentSlab( Item ).SurfListName, SlabList );
 			if ( SurfListNum > 0 ) { // Found a valid surface list
 				VentSlab( Item ).NumOfSurfaces = SlabList( SurfListNum ).NumOfSurfaces;
 				VentSlab( Item ).ZName.allocate( VentSlab( Item ).NumOfSurfaces );
@@ -502,7 +460,7 @@ namespace VentilatedSlab {
 				VentSlab( Item ).SurfaceFlowFrac.allocate( VentSlab( Item ).NumOfSurfaces );
 				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, VentSlab( Item ).NumOfSurfaces );
 				VentSlab( Item ).SurfaceName( 1 ) = VentSlab( Item ).SurfListName;
-				VentSlab( Item ).SurfacePtr( 1 ) = FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface );
+				VentSlab( Item ).SurfacePtr( 1 ) = UtilityRoutines::FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface );
 				VentSlab( Item ).SurfaceFlowFrac( 1 ) = 1.0;
 				// Error checking for single surfaces
 				if ( VentSlab( Item ).SurfacePtr( 1 ) == 0 ) {
@@ -608,11 +566,11 @@ namespace VentilatedSlab {
 			}
 
 			// System Configuration:
-			if ( SameString( cAlphaArgs( 8 ), "SlabOnly" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "SlabOnly" ) ) {
 				VentSlab( Item ).SysConfg = SlabOnly;
-			} else if ( SameString( cAlphaArgs( 8 ), "SlabAndZone" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "SlabAndZone" ) ) {
 				VentSlab( Item ).SysConfg = SlabAndZone;
-			} else if ( SameString( cAlphaArgs( 8 ), "SeriesSlabs" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "SeriesSlabs" ) ) {
 				VentSlab( Item ).SysConfg = SeriesSlabs;
 			} else {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
@@ -625,21 +583,21 @@ namespace VentilatedSlab {
 			VentSlab( Item ).CoreLength = rNumericArgs( 5 );
 			VentSlab( Item ).CoreNumbers = rNumericArgs( 6 );
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 4 ) ) {
 					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Diameter is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 5 ) ) {
 					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Length is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 6 ) ) {
 					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Numbers is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
@@ -647,19 +605,19 @@ namespace VentilatedSlab {
 			}
 
 			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 9 ), OutsideAirDryBulbTemperature ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), OutsideAirDryBulbTemperature ) ) {
 				VentSlab( Item ).ControlType = ODBControl;
-			} else if ( SameString( cAlphaArgs( 9 ), OutsideAirWetBulbTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), OutsideAirWetBulbTemperature ) ) {
 				VentSlab( Item ).ControlType = OWBControl;
-			} else if ( SameString( cAlphaArgs( 9 ), OperativeTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), OperativeTemperature ) ) {
 				VentSlab( Item ).ControlType = OPTControl;
-			} else if ( SameString( cAlphaArgs( 9 ), MeanAirTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), MeanAirTemperature ) ) {
 				VentSlab( Item ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 9 ), MeanRadiantTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), MeanRadiantTemperature ) ) {
 				VentSlab( Item ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), SlabSurfaceTemperature ) ) {
 				VentSlab( Item ).ControlType = SURControl;
-			} else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceDewPointTemperature ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), SlabSurfaceDewPointTemperature ) ) {
 				VentSlab( Item ).ControlType = DPTZControl;
 			} else {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
@@ -980,9 +938,9 @@ namespace VentilatedSlab {
 					} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
 						VentSlab( Item ).CCoilType = Cooling_CoilHXAssisted;
 						GetHXCoilTypeAndName( cAlphaArgs( 30 ), cAlphaArgs( 31 ), ErrorsFound, VentSlab( Item ).CCoilPlantType, VentSlab( Item ).CCoilPlantName );
-						if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
+						if ( UtilityRoutines::SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 							VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						} else if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
+						} else if ( UtilityRoutines::SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 							VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
 						} else {
 							ShowSevereError( "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" + VentSlab( Item ).Name + "\", invalid" );
@@ -1038,7 +996,7 @@ namespace VentilatedSlab {
 
 			VentSlab( Item ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 34 )) {
-				VentSlab( Item ).HVACSizingIndex = FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing );
+				VentSlab( Item ).HVACSizingIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing );
 				if (VentSlab( Item ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 34 ) + " = " + cAlphaArgs( 34 ) + " not found." );
 					ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " = " + VentSlab( Item ).Name );
@@ -1093,28 +1051,28 @@ namespace VentilatedSlab {
 			//   CALL SetupOutputVariable('Ventilated Slab Direct Heat Gain [J]',        &
 			//                           VentSlab(Item)%DirectHeatGain,'System', &
 			//                             'Sum', VentSlab(Item)%Name)
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Rate [W]", VentSlab( Item ).RadHeatingPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Energy [J]", VentSlab( Item ).RadHeatingEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Rate [W]", VentSlab( Item ).RadCoolingPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Energy [J]", VentSlab( Item ).RadCoolingEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Rate [W]", VentSlab( Item ).HeatCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Energy [J]", VentSlab( Item ).HeatCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Rate [W]", VentSlab( Item ).TotCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Energy [J]", VentSlab( Item ).TotCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Rate [W]", VentSlab( Item ).SensCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Energy [J]", VentSlab( Item ).SensCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Rate [W]", VentSlab( Item ).LateCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Energy [J]", VentSlab( Item ).LateCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Air Mass Flow Rate [kg/s]", VentSlab( Item ).AirMassFlowRate, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Power [W]", VentSlab( Item ).ElecFanPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Rate", OutputProcessor::Unit::W, VentSlab( Item ).RadHeatingPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Energy", OutputProcessor::Unit::J, VentSlab( Item ).RadHeatingEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).RadCoolingPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).RadCoolingEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Rate", OutputProcessor::Unit::W, VentSlab( Item ).HeatCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Energy", OutputProcessor::Unit::J, VentSlab( Item ).HeatCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).TotCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).TotCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).SensCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).SensCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Rate", OutputProcessor::Unit::W, VentSlab( Item ).LateCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Energy", OutputProcessor::Unit::J, VentSlab( Item ).LateCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Air Mass Flow Rate", OutputProcessor::Unit::kg_s, VentSlab( Item ).AirMassFlowRate, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Power", OutputProcessor::Unit::W, VentSlab( Item ).ElecFanPower, "System", "Average", VentSlab( Item ).Name );
 			//! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
-			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Energy [J]", VentSlab( Item ).ElecFanEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Inlet Air Temperature [C]", VentSlab( Item ).SlabInTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Outlet Air Temperature [C]", VentSlab( Item ).SlabOutTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Zone Inlet Air Temperature [C]", VentSlab( Item ).ZoneInletTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Return Air Temperature [C]", VentSlab( Item ).ReturnAirTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Outlet Air Temperature [C]", VentSlab( Item ).FanOutletTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Availability Status []", VentSlab( Item ).AvailStatus, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Energy", OutputProcessor::Unit::J, VentSlab( Item ).ElecFanEnergy, "System", "Sum", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Inlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).SlabInTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Outlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).SlabOutTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Zone Inlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).ZoneInletTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Return Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).ReturnAirTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Outlet Air Temperature", OutputProcessor::Unit::C, VentSlab( Item ).FanOutletTemp, "System", "Average", VentSlab( Item ).Name );
+			SetupOutputVariable( "Zone Ventilated Slab Fan Availability Status", OutputProcessor::Unit::None, VentSlab( Item ).AvailStatus, "System", "Average", VentSlab( Item ).Name );
 
 		}
 
@@ -1453,12 +1411,8 @@ namespace VentilatedSlab {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays and plant sizing data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
@@ -1468,7 +1422,6 @@ namespace VentilatedSlab {
 		using SteamCoils::GetCoilSteamOutletNode;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
 		using HVACHXAssistedCoolingCoil::GetHXCoilType;
-		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
@@ -1483,17 +1436,8 @@ namespace VentilatedSlab {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeVentilatedSlab" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -3004,24 +2948,6 @@ namespace VentilatedSlab {
 		// METHODOLOGY EMPLOYED:
 		// Calculates the sensible and total enthalpy change from the fan outlet node to the slab inlet node.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AirMassFlow; // total mass flow through the system
 		int FanOutletNode; // system fan outlet node
@@ -3087,9 +3013,6 @@ namespace VentilatedSlab {
 		// that a cooling coil must be present in order to call a cooling coil
 		// simulation.  Other than that, the subroutine is very straightforward.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using General::RoundSigDigits;
@@ -3112,21 +3035,12 @@ namespace VentilatedSlab {
 		using DataSurfaces::Surface;
 		using NodeInputManager::GetOnlySingleNode;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const CondDeltaTemp( 0.001 ); // How close the surface temperatures can get to the dewpoint temperature
 		// of a space before the radiant cooling system shuts off the flow.
 		Real64 const ZeroSystemResp( 0.1 ); // Response below which the system response is really zero
 		Real64 const TempCheckLimit( 0.1 ); // Maximum allowed temperature difference between outlet temperature calculations
 		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ConstrNum; // Index for construction number in Construct derived type

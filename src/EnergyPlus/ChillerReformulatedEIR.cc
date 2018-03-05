@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -70,7 +71,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -211,27 +212,10 @@ namespace ChillerReformulatedEIR {
 		//  models, initializes simulation variables, calls the appropriate model and sets
 		//  up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Chiller_ElectricReformEIR;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EIRChillNum;
@@ -244,7 +228,7 @@ namespace ChillerReformulatedEIR {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			EIRChillNum = FindItemInList( EIRChillerName, ElecReformEIRChiller );
+			EIRChillNum = UtilityRoutines::FindItemInList( EIRChillerName, ElecReformEIRChiller );
 			if ( EIRChillNum == 0 ) {
 				ShowFatalError( "SimReformulatedEIRChiller: Specified Chiller not one of Valid Reformulated EIR Electric Chillers=" + EIRChillerName );
 			}
@@ -309,15 +293,7 @@ namespace ChillerReformulatedEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the Reformulated Electric EIR Chiller model
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -342,8 +318,6 @@ namespace ChillerReformulatedEIR {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // True when input errors found
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag; // Error flag, used to tell if a unique chiller name has been specified
 		static bool AllocatedFlag( false ); // True when arrays are allocated
 		std::string PartLoadCurveType; // Part load curve type
@@ -353,7 +327,7 @@ namespace ChillerReformulatedEIR {
 		if ( AllocatedFlag ) return;
 
 		cCurrentModuleObject = "Chiller:Electric:ReformulatedEIR";
-		NumElecReformEIRChillers = GetNumObjectsFound( cCurrentModuleObject );
+		NumElecReformEIRChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElecReformEIRChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -367,14 +341,8 @@ namespace ChillerReformulatedEIR {
 
 		// Load arrays with reformulated electric EIR chiller data
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElecReformEIRChillers; ++EIRChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElecReformEIRChiller, EIRChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -413,9 +381,9 @@ namespace ChillerReformulatedEIR {
 			}
 
 			//Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift    zrp_Aug2014
-			if ( SameString( PartLoadCurveType, "LeavingCondenserWaterTemperature" ) && SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "BICUBIC" ) ) {
+			if ( UtilityRoutines::SameString( PartLoadCurveType, "LeavingCondenserWaterTemperature" ) && UtilityRoutines::SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "BICUBIC" ) ) {
 				ElecReformEIRChiller( EIRChillerNum ).PartLoadCurveType = PLR_LeavingCondenserWaterTemperature;
-			} else if ( SameString( PartLoadCurveType, "Lift" ) && SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "CHILLERPARTLOADWITHLIFT" ) ) {
+			} else if ( UtilityRoutines::SameString( PartLoadCurveType, "Lift" ) && UtilityRoutines::SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "CHILLERPARTLOADWITHLIFT" ) ) {
 				ElecReformEIRChiller( EIRChillerNum ).PartLoadCurveType = PLR_Lift;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
@@ -632,6 +600,12 @@ namespace ChillerReformulatedEIR {
 				}
 			}
 
+			if ( NumAlphas > 14 ) {
+				ElecReformEIRChiller( EIRChillerNum ).EndUseSubcategory = cAlphaArgs( 15 );
+			} else {
+				ElecReformEIRChiller( EIRChillerNum ).EndUseSubcategory = "General";
+			}
+
 		}
 
 		if ( ErrorsFound ) {
@@ -639,39 +613,39 @@ namespace ChillerReformulatedEIR {
 		}
 
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElecReformEIRChillers; ++EIRChillerNum ) {
-			SetupOutputVariable( "Chiller Part Load Ratio []", ElecReformEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Cycling Ratio []", ElecReformEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Power [W]", ElecReformEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Electric Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Chiller Part Load Ratio", OutputProcessor::Unit::None, ElecReformEIRChillerReport( EIRChillerNum ).ChillerPartLoadRatio, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Cycling Ratio", OutputProcessor::Unit::None, ElecReformEIRChillerReport( EIRChillerNum ).ChillerCyclingRatio, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Electric Power", OutputProcessor::Unit::W, ElecReformEIRChillerReport( EIRChillerNum ).Power, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Electric Energy", OutputProcessor::Unit::J, ElecReformEIRChillerReport( EIRChillerNum ).Energy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ELECTRICITY", "Cooling", ElecReformEIRChiller( EIRChillerNum ).EndUseSubcategory, "Plant" );
 
-			SetupOutputVariable( "Chiller Evaporator Cooling Rate [W]", ElecReformEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Cooling Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
-			SetupOutputVariable( "Chiller False Load Heat Transfer Rate [W]", ElecReformEIRChillerReport( EIRChillerNum ).ChillerFalseLoadRate, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller False Load Heat Transfer Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).ChillerFalseLoad, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Inlet Temperature [C]", ElecReformEIRChillerReport( EIRChillerNum ).EvapInletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Outlet Temperature [C]", ElecReformEIRChillerReport( EIRChillerNum ).EvapOutletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate [kg/s]", ElecReformEIRChillerReport( EIRChillerNum ).Evapmdot, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, ElecReformEIRChillerReport( EIRChillerNum ).QEvap, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Cooling Energy", OutputProcessor::Unit::J, ElecReformEIRChillerReport( EIRChillerNum ).EvapEnergy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "CHILLERS", _, "Plant" );
+			SetupOutputVariable( "Chiller False Load Heat Transfer Rate", OutputProcessor::Unit::W, ElecReformEIRChillerReport( EIRChillerNum ).ChillerFalseLoadRate, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller False Load Heat Transfer Energy", OutputProcessor::Unit::J, ElecReformEIRChillerReport( EIRChillerNum ).ChillerFalseLoad, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, ElecReformEIRChillerReport( EIRChillerNum ).EvapInletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, ElecReformEIRChillerReport( EIRChillerNum ).EvapOutletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, ElecReformEIRChillerReport( EIRChillerNum ).Evapmdot, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate [W]", ElecReformEIRChillerReport( EIRChillerNum ).QCond, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).CondEnergy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
-			SetupOutputVariable( "Chiller COP [W/W]", ElecReformEIRChillerReport( EIRChillerNum ).ActualCOP, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, ElecReformEIRChillerReport( EIRChillerNum ).QCond, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy", OutputProcessor::Unit::J, ElecReformEIRChillerReport( EIRChillerNum ).CondEnergy, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
+			SetupOutputVariable( "Chiller COP", OutputProcessor::Unit::W_W, ElecReformEIRChillerReport( EIRChillerNum ).ActualCOP, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 
-			SetupOutputVariable( "Chiller Capacity Temperature Modifier Multiplier []", ElecReformEIRChillerReport( EIRChillerNum ).ChillerCapFT, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller EIR Temperature Modifier Multiplier []", ElecReformEIRChillerReport( EIRChillerNum ).ChillerEIRFT, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller EIR Part Load Modifier Multiplier []", ElecReformEIRChillerReport( EIRChillerNum ).ChillerEIRFPLR, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Capacity Temperature Modifier Multiplier", OutputProcessor::Unit::None, ElecReformEIRChillerReport( EIRChillerNum ).ChillerCapFT, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller EIR Temperature Modifier Multiplier", OutputProcessor::Unit::None, ElecReformEIRChillerReport( EIRChillerNum ).ChillerEIRFT, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller EIR Part Load Modifier Multiplier", OutputProcessor::Unit::None, ElecReformEIRChillerReport( EIRChillerNum ).ChillerEIRFPLR, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 
-			SetupOutputVariable( "Chiller Condenser Inlet Temperature [C]", ElecReformEIRChillerReport( EIRChillerNum ).CondInletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Outlet Temperature [C]", ElecReformEIRChillerReport( EIRChillerNum ).CondOutletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-			SetupOutputVariable( "Chiller Condenser Mass Flow Rate [kg/s]", ElecReformEIRChillerReport( EIRChillerNum ).Condmdot, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, ElecReformEIRChillerReport( EIRChillerNum ).CondInletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, ElecReformEIRChillerReport( EIRChillerNum ).CondOutletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+			SetupOutputVariable( "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, ElecReformEIRChillerReport( EIRChillerNum ).Condmdot, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 
 			// If heat recovery is active then setup report variables
 			if ( ElecReformEIRChiller( EIRChillerNum ).HeatRecActive ) {
-				SetupOutputVariable( "Chiller Total Recovered Heat Rate [W]", ElecReformEIRChillerReport( EIRChillerNum ).QHeatRecovery, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-				SetupOutputVariable( "Chiller Total Recovered Heat Energy [J]", ElecReformEIRChillerReport( EIRChillerNum ).EnergyHeatRecovery, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
-				SetupOutputVariable( "Chiller Heat Recovery Inlet Temperature [C]", ElecReformEIRChillerReport( EIRChillerNum ).HeatRecInletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-				SetupOutputVariable( "Chiller Heat Recovery Outlet Temperature [C]", ElecReformEIRChillerReport( EIRChillerNum ).HeatRecOutletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-				SetupOutputVariable( "Chiller Heat Recovery Mass Flow Rate [kg/s]", ElecReformEIRChillerReport( EIRChillerNum ).HeatRecMassFlow, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
-				SetupOutputVariable( "Chiller Effective Heat Rejection Temperature [C]", ElecReformEIRChillerReport( EIRChillerNum ).ChillerCondAvgTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, ElecReformEIRChillerReport( EIRChillerNum ).QHeatRecovery, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Total Recovered Heat Energy", OutputProcessor::Unit::J, ElecReformEIRChillerReport( EIRChillerNum ).EnergyHeatRecovery, "System", "Sum", ElecReformEIRChiller( EIRChillerNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, ElecReformEIRChillerReport( EIRChillerNum ).HeatRecInletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, ElecReformEIRChillerReport( EIRChillerNum ).HeatRecOutletTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, ElecReformEIRChillerReport( EIRChillerNum ).HeatRecMassFlow, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
+				SetupOutputVariable( "Chiller Effective Heat Rejection Temperature", OutputProcessor::Unit::C, ElecReformEIRChillerReport( EIRChillerNum ).ChillerCondAvgTemp, "System", "Average", ElecReformEIRChiller( EIRChillerNum ).Name );
 			}
 
 			if ( AnyEnergyManagementSystemInModel ) {
@@ -1383,7 +1357,7 @@ namespace ChillerReformulatedEIR {
 
 		// METHODOLOGY EMPLOYED:
 		// Use empirical curve fits to model performance at off-design conditions. This subroutine
-		// calls Subroutines CalcReformEIRChillerModel and SolveRegulaFalsi to obtain solution.
+		// calls Subroutines CalcReformEIRChillerModel and SolveRoot to obtain solution.
 		// The actual chiller performance calculations are in Subroutine CalcReformEIRChillerModel.
 
 		// REFERENCES:
@@ -1395,15 +1369,12 @@ namespace ChillerReformulatedEIR {
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
 		using CurveManager::GetCurveMinMaxValues;
-		using General::SolveRegulaFalsi;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		using General::SolveRoot;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRegulaFalsi
-		int const MaxIter( 500 ); // Iteration control for SolveRegulaFalsi
+		Real64 const Acc( 0.0001 ); // Accuracy control for SolveRoot
+		int const MaxIter( 500 ); // Iteration control for SolveRoot
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na
@@ -1423,7 +1394,7 @@ namespace ChillerReformulatedEIR {
 		Real64 Tmax( -99 ); // Maximum condenser leaving temperature allowed by curve objects [C]
 		Array1D< Real64 > Par( 6 ); // Pass parameters for RegulaFalsi solver
 		Real64 FalsiCondOutTemp; // RegulaFalsi condenser outlet temperature result [C]
-		int SolFla; // Feedback flag from SolveRegulaFalsi
+		int SolFla; // Feedback flag from SolveRoot
 		Real64 CondTempMin; // Condenser outlet temperature when using Tmin as input to CalcReformEIRChillerModel [C]
 		Real64 CondTempMax; // Condenser outlet temperature when using Tmax as input to CalcReformEIRChillerModel [C]
 
@@ -1475,7 +1446,7 @@ namespace ChillerReformulatedEIR {
 				//Par(5) = FlowLock !DSU
 				Par( 6 ) = EquipFlowCtrl;
 
-				SolveRegulaFalsi( Acc, MaxIter, SolFla, FalsiCondOutTemp, CondOutTempResidual, Tmin, Tmax, Par );
+				SolveRoot( Acc, MaxIter, SolFla, FalsiCondOutTemp, CondOutTempResidual, Tmin, Tmax, Par );
 
 				if ( SolFla == -1 ) {
 					if ( ! WarmupFlag ) {
@@ -1642,27 +1613,10 @@ namespace ChillerReformulatedEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Reporting
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS
-		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapInletNode; // Evaporator inlet node number
@@ -2028,20 +1982,20 @@ namespace ChillerReformulatedEIR {
 		TempLowLimitEout = ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElecReformEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
 		PartLoadCurveType = ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType; //zrp_Aug2014
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerRefCap;
 			Real64 ReferenceCOP_ff = ReferenceCOP;
-		
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerRefCap = NomCap_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 			ReferenceCOP = ReferenceCOP_ff * ElecReformEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
-			
+
 		}
 
 		// Set mass flow rates
@@ -2074,18 +2028,18 @@ namespace ChillerReformulatedEIR {
 		} else {
 			assert( false );
 		}}
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the EvapOutletTempSetPoint
 			EvapOutletTempSetPoint = max( ElecReformEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
 			ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
-			
+
 		}
 
 		// correct temperature if using heat recovery
@@ -2285,7 +2239,7 @@ namespace ChillerReformulatedEIR {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ElecReformEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

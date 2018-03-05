@@ -8,8 +8,8 @@
 !
 ! Location:                Phoenix, AZ (could be anywhere)
 !
-! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9캜  (Winter design day has solar)
-!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9째C  (Winter design day has solar)
+!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 !
 ! Run Period (Weather File): 1/1 through 12/31, PHOENIX_AZ_USA TMY2
 !
@@ -82,7 +82,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -131,10 +131,10 @@
  !  Data Source=ASHRAE 2005 Annual Design Conditions
  ! Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
  ! PHOENIX_AZ_USA Extreme Annual Wind Speeds, 1%=8.3m/s, 2.5%=7.2m/s, 5%=5.9m/s
- ! PHOENIX_AZ_USA Extreme Annual Temperatures, Max Drybulb=45.8캜 Min Drybulb=0.4캜
+ ! PHOENIX_AZ_USA Extreme Annual Temperatures, Max Drybulb=45.8째C Min Drybulb=0.4째C
  ! PHOENIX_AZ_USA Annual Heating Design Conditions Wind Speed=2m/s Wind Dir=120
  ! Coldest Month=December
- ! PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9캜
+ ! PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=2.9째C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Htg 99.6% Condns DB with Sun,  !- Name
@@ -166,7 +166,7 @@
 
  ! PHOENIX Annual Cooling Design Conditions Wind Speed=4.1m/s Wind Dir=270
  ! Hottest Month=July
- ! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+ ! PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 
   SizingPeriod:DesignDay,
     PHOENIX Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -1129,10 +1129,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    12.19200,6.401000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    12.19200,6.401000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,0.3050000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,0.3050000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    12.19200,6.096,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
+    12.19200,6.096,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19200,0.,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    12.19200,0.,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     Zn003:Wall007:Win001,    !- Name
@@ -1161,10 +1161,10 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    12.19200,12.49700,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
-    12.19200,12.49700,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    12.19200,6.401000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    12.19200,6.401000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+    12.19200,12.19200,3.048000,  !- X,Y,Z ==> Vertex 1 {m}
+    12.19200,12.19200,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19200,6.096,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    12.19200,6.096,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn003:Flr001,            !- Name
@@ -1535,8 +1535,8 @@
     4,                       !- Number of Vertices
     6.096000,6.096000,6.096000,  !- X,Y,Z ==> Vertex 1 {m}
     6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}
-    6.096000,12.22200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}
-    6.096000,12.22200,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
+    6.096000,12.19200,3.048000,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096000,12.19200,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn005:Flr001,            !- Name
@@ -2151,8 +2151,8 @@
     4,                       !- Number of Vertices
     24.38400,6.126000,6.096000,  !- X,Y,Z ==> Vertex 1 {m}
     24.38400,6.126000,3.048000,  !- X,Y,Z ==> Vertex 2 {m}
-    24.38400,2.9999999E-02,3.048000,  !- X,Y,Z ==> Vertex 3 {m}
-    24.38400,2.9999999E-02,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
+    24.38400,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}
+    24.38400,0,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     Zn009:Wall005:Win001,    !- Name
@@ -2283,10 +2283,11 @@
     ZONE 1 @ 200 601 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 1 @ 200 601 0 T NODE,  !- Zone Air Node Name
-    ZONE 1 @ 200 601 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 1 @ 200 601 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 1 @ 200 601 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 1 @ 200 601 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2297,6 +2298,7 @@
     ,                        !- Availability Schedule Name
     ZONE 1 @ 200 601 0 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2356,10 +2358,11 @@
     ZONE 2 @ 200 200 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 2 @ 200 200 0 T NODE,  !- Zone Air Node Name
-    ZONE 2 @ 200 200 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 2 @ 200 200 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 2 @ 200 200 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 2 @ 200 200 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2370,6 +2373,7 @@
     ,                        !- Availability Schedule Name
     ZONE 2 @ 200 200 0 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2429,10 +2433,11 @@
     ZONE 3 @ 200 610 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 3 @ 200 610 0 T NODE,  !- Zone Air Node Name
-    ZONE 3 @ 200 610 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 3 @ 200 610 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 3 @ 200 610 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 3 @ 200 610 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2443,6 +2448,7 @@
     ,                        !- Availability Schedule Name
     ZONE 3 @ 200 610 0 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2502,10 +2508,11 @@
     ZONE 4 @ 200 600 0 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 4 @ 200 600 0 T NODE,  !- Zone Air Node Name
-    ZONE 4 @ 200 600 0 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 4 @ 200 600 0 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 4 @ 200 600 0 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 4 @ 200 600 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2516,6 +2523,7 @@
     ,                        !- Availability Schedule Name
     ZONE 4 @ 200 600 0 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2575,10 +2583,11 @@
     ZONE 5 @ 200 601 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 5 @ 200 601 1 T NODE,  !- Zone Air Node Name
-    ZONE 5 @ 200 601 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 5 @ 200 601 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 5 @ 200 601 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 5 @ 200 601 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2589,6 +2598,7 @@
     ,                        !- Availability Schedule Name
     ZONE 5 @ 200 601 1 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2648,10 +2658,11 @@
     ZONE 6 @ 200 200 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 6 @ 200 200 1 T NODE,  !- Zone Air Node Name
-    ZONE 6 @ 200 200 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 6 @ 200 200 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 6 @ 200 200 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 6 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2662,6 +2673,7 @@
     ,                        !- Availability Schedule Name
     ZONE 6 @ 200 200 1 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2721,10 +2733,11 @@
     ZONE 7 @ 200 610 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 7 @ 200 610 1 T NODE,  !- Zone Air Node Name
-    ZONE 7 @ 200 610 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 7 @ 200 610 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 7 @ 200 610 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 7 @ 200 610 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2735,6 +2748,7 @@
     ,                        !- Availability Schedule Name
     ZONE 7 @ 200 610 1 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2794,10 +2808,11 @@
     ZONE 8 @ 200 200 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 8 @ 200 200 1 T NODE,  !- Zone Air Node Name
-    ZONE 8 @ 200 200 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 8 @ 200 200 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 8 @ 200 200 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 8 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2808,6 +2823,7 @@
     ,                        !- Availability Schedule Name
     ZONE 8 @ 200 200 1 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2867,10 +2883,11 @@
     ZONE 9 @ 200 600 1 T INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE 9 @ 200 600 1 T NODE,  !- Zone Air Node Name
-    ZONE 9 @ 200 600 1 T OUTLET;  !- Zone Return Air Node Name
+    ZONE 9 @ 200 600 1 T OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE 9 @ 200 600 1 T EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 9 @ 200 600 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2881,6 +2898,7 @@
     ,                        !- Availability Schedule Name
     ZONE 9 @ 200 600 1 T INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

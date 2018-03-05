@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -49,7 +50,7 @@
 // EnergyPlus Headers
 #include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
-#include <InputProcessor.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -265,6 +266,7 @@ namespace DataGlobalConstants {
 	int const iGeneratorMicroCHP( 5 );
 	int const iGeneratorMicroturbine( 6 );
 	int const iGeneratorWindTurbine( 7 );
+	int const iGeneratorPVWatts( 8 );
 
 	int const iEvapCoolerDirectCELDEKPAD( 1001 );
 	int const iEvapCoolerInDirectCELDEKPAD( 1002 );
@@ -295,36 +297,12 @@ namespace DataGlobalConstants {
 		// PURPOSE OF THIS FUNCTION:
 		// Assists in assigning proper numeric resource types to data structures.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::MakeUPPERCase;
-
 		// Return value
 		int ResourceTypeNum;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		ResourceTypeNum = 0;
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( ResourceTypeChar ) );
+		{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ResourceTypeChar ) );
 
 		if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) ) {
 			ResourceTypeNum = iRT_Electricity;
@@ -486,32 +464,8 @@ namespace DataGlobalConstants {
 		// PURPOSE OF THIS FUNCTION:
 		// Shows the resource type character string, given the resource type numeric.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
 		// Return value
 		std::string ResourceTypeChar;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// na
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		{ auto const SELECT_CASE_var( ResourceTypeNum );
 

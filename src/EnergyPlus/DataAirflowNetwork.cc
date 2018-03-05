@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -204,11 +205,6 @@ namespace DataAirflowNetwork {
 	Array1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
 	Array1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
 	Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
-	Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
-	Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	Array1D< MultizoneCPValueProp > MultizoneCPValueData;
-	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modification factor
 	Array1D< DeltaCpProp > DeltaCp;
 	Array1D< DeltaCpProp > EPDeltaCP;
 	Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
@@ -279,11 +275,6 @@ namespace DataAirflowNetwork {
 		MultizoneSurfaceCrackData.deallocate();
 		MultizoneSurfaceELAData.deallocate();
 		MultizoneExternalNodeData.deallocate();
-		MultizoneCPArrayData.deallocate();
-		MultizoneCPArrayDataSingleSided.deallocate();
-		MultizoneCPValueData.deallocate();
-		MultizoneCPValueDataTemp.deallocate();
-		MultizoneCPValueDataTempUnMod.deallocate();
 		DeltaCp.deallocate();
 		EPDeltaCP.deallocate();
 		MultizoneCompExhaustFanData.deallocate();

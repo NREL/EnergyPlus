@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -49,7 +49,7 @@
 
  ! Denver Stapleton Intl Arpt CO USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
  ! Coldest Month=December
- ! Denver Stapleton Intl Arpt CO USA Annual Heating 99%, MaxDB=-16°C
+ ! Denver Stapleton Intl Arpt CO USA Annual Heating 99%, MaxDB=-16Â°C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Htg 99% Condns DB,  !- Name
@@ -81,7 +81,7 @@
 
  ! Denver Stapleton Intl Arpt Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
  ! Hottest Month=July
- ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6°C MWB=15.6°C
+ ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6Â°C MWB=15.6Â°C
 
   SizingPeriod:DesignDay,
     Denver Stapleton Intl Arpt Ann Clg 1% Condns DB=>MWB,  !- Name

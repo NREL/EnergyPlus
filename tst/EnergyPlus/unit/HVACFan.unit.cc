@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -61,11 +62,11 @@ namespace EnergyPlus {
 TEST_F( EnergyPlusFixture, SystemFanObj_TestGetFunctions1 )
 {
 	// this unit test checks some get functions
-	// the idea is to set up a fan and run its sizing routine 
+	// the idea is to set up a fan and run its sizing routine
 	// the size is filled by the value in DataSizing::DataNonZoneNonAirloopValue
 	// then check three getter functions
 	std::string const idf_objects = delimited_string( {
-	
+
 		"  Fan:SystemModel,",
 		"    Test Fan ,                   !- Name",
 		"    ,                            !- Availability Schedule Name",
@@ -84,7 +85,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TestGetFunctions1 )
 		"    0.50;                        !- Fan Total Efficiency",
 		} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string fanName = "TEST FAN";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
@@ -105,11 +106,11 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TestGetFunctions1 )
 
 TEST_F( EnergyPlusFixture, SystemFanObj_FanSizing1 )
 {
-	// this unit test mimics "EnergyPlusFixture.Fans_FanSizing" 
-	// the idea is to set up a fan and run its sizing routine 
+	// this unit test mimics "EnergyPlusFixture.Fans_FanSizing"
+	// the idea is to set up a fan and run its sizing routine
 	// the size is filled by the value in DataSizing::DataNonZoneNonAirloopValue
 	std::string const idf_objects = delimited_string( {
-	
+
 		"  Fan:SystemModel,",
 		"    Test Fan ,                   !- Name",
 		"    ,                            !- Availability Schedule Name",
@@ -128,7 +129,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_FanSizing1 )
 		"    0.50;                        !- Fan Total Efficiency",
 		} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string fanName = "TEST FAN";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
@@ -148,7 +149,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1 )
 	// this unit test checks the power averaging when cycling between a hi and low speed
 	// this uses discrete power fractions at the speed levels
 	std::string const idf_objects = delimited_string( {
-	
+
 		"  Fan:SystemModel,",
 		"    Test Fan ,                   !- Name",
 		"    ,                            !- Availability Schedule Name",
@@ -178,7 +179,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1 )
 		"  1.0; !- Speed 2 Electric Power Fraction",
 		} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string fanName = "TEST FAN";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
@@ -186,11 +187,11 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1 )
 	DataSizing::CurSysNum = 0;
 	DataSizing::CurOASysNum = 0;
 	DataEnvironment::StdRhoAir = 1.2;
-	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ );
 	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate; // get function
 	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
 
-	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75 
+	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75
 	Real64 locFanElecPower = HVACFan::fanObjs[ 0 ]->fanPower();
 	Real64 locExpectPower = (0.5 * 0.125 * 100.0) + (0.5 * 1.0 * 100.0);
 	EXPECT_NEAR( locFanElecPower, locExpectPower, 0.01);
@@ -208,7 +209,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2 )
 	// this uses fan power curve instead of speed level power fractions
 
 	std::string const idf_objects = delimited_string( {
-	
+
 		"  Fan:SystemModel,",
 		"    Test Fan ,                   !- Name",
 		"    ,                            !- Availability Schedule Name",
@@ -236,7 +237,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2 )
 		"  , !- Speed 1 Electric Power Fraction",
 		"  1.0, !- Speed 2 Flow Fraction",
 		"  ; !- Speed 2 Electric Power Fraction",
-		
+
 		"  Curve:Cubic,",
 		"    simple cubic,  !- Name",
 		"    0.0,                    !- Coefficient1 Constant",
@@ -251,7 +252,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2 )
 		"    Dimensionless;           !- Output Unit Type",
 		} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	CurveManager::GetCurveInput();
 	std::string fanName = "TEST FAN";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
@@ -259,11 +260,11 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2 )
 	DataSizing::CurSysNum = 0;
 	DataSizing::CurOASysNum = 0;
 	DataEnvironment::StdRhoAir = 1.2;
-	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ );
 	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate;
 	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
 
-	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75 
+	HVACFan::fanObjs[ 0 ]->simulate( 0.75 ,_,_,_ ); // call for flow fraction of 0.75
 	Real64 locFanElecPower = HVACFan::fanObjs[ 0 ]->fanPower();
 	Real64 locExpectPower = (0.5 * 0.125 * 100.0) + (0.5 * 1.0 * 100.0);
 	EXPECT_NEAR( locFanElecPower, locExpectPower, 0.01);
@@ -280,7 +281,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3 )
 	// this uses discrete power fractions at the speed levels
 	// this unit test uses the optional two-mode arguments
 	std::string const idf_objects = delimited_string( {
-	
+
 		"  Fan:SystemModel,",
 		"    Test Fan ,                   !- Name",
 		"    ,                            !- Availability Schedule Name",
@@ -310,7 +311,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3 )
 		"  1.0; !- Speed 2 Electric Power Fraction",
 		} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string fanName = "TEST FAN";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
@@ -318,7 +319,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3 )
 	DataSizing::CurSysNum = 0;
 	DataSizing::CurOASysNum = 0;
 	DataEnvironment::StdRhoAir = 1.2;
-	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ );
 	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate; // get function
 	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
 
@@ -394,7 +395,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4 )
 		"    ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure",
 		"    ,                        !- Fan Total Efficiency",
 		"  simple cubic; !- Electric Power Function of Flow Fraction Curve Name",
-		
+
 		"  Curve:Cubic,",
 		"    simple cubic,  !- Name",
 		"    0.0,                    !- Coefficient1 Constant",
@@ -409,7 +410,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4 )
 		"    Dimensionless;           !- Output Unit Type",
 		} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	CurveManager::GetCurveInput();
 	std::string fanName = "TEST FAN";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
@@ -417,7 +418,7 @@ TEST_F( EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4 )
 	DataSizing::CurSysNum = 0;
 	DataSizing::CurOASysNum = 0;
 	DataEnvironment::StdRhoAir = 1.2;
-	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ ); 
+	HVACFan::fanObjs[ 0 ]->simulate( _,_,_,_ );
 	Real64 locFanSizeVdot = HVACFan::fanObjs[ 0 ]->designAirVolFlowRate;
 	EXPECT_NEAR( 1.00, locFanSizeVdot, 0.00001 );
 

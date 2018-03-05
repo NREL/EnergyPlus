@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -44,10 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <cmath>
-#include <string>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -59,6 +56,8 @@
 #include <TARCOGGasses90.hh>
 #include <TARCOGGassesParams.hh>
 #include <TARCOGParams.hh>
+
+#include <DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -125,6 +124,7 @@ namespace TarcogShading {
 		Array1_int const & LayerType,
 		Array1< Real64 > & Tgaps,
 		Array1< Real64 > & qv,
+		Array1< Real64 > & hcv,      // Heat transfer coeefficient in gaps including airlow
 		int & nperr,
 		std::string & ErrorMessage,
 		Array1< Real64 > & vfreevent
@@ -211,6 +211,7 @@ namespace TarcogShading {
 
 		// init vectors:
 		qv = 0.0;
+		hcv = 0.0;
 		//hhatv = 0.0d0
 		//Ebgap = 0.0d0
 		//hcv = 0.0d0
@@ -258,6 +259,7 @@ namespace TarcogShading {
 
 					hcgas( 2 ) = hcvs / 2.0;
 					hgas( 2 ) = hcgas( 2 ) + hrgas( 2 );
+					hcv( 2 ) = hcvs;
 					qv( 2 ) = qvs;
 
 					//bi.........Add free ventilation velocity
@@ -287,6 +289,7 @@ namespace TarcogShading {
 					Tgaps( nlayer ) = Tgap;
 					hcgas( nlayer ) = hcvs / 2.0;
 					hgas( nlayer ) = hcgas( nlayer ) + hrgas( nlayer );
+					hcv( nlayer ) = hcvs;
 					qv( nlayer ) = qvs;
 
 					//bi.........Add free ventilation velocity
@@ -329,6 +332,8 @@ namespace TarcogShading {
 					hcgas( i + 1 ) = hcv2 / 2.0;
 					hgas( i ) = hcgas( i ) + hrgas( i );
 					hgas( i + 1 ) = hcgas( i + 1 ) + hrgas( i + 1 );
+					hcv( i ) = hcv1;
+					hcv( i + 1 ) = hcv2;
 					qv( i ) = qv1;
 					qv( i + 1 ) = qv2;
 					Tgaps( i ) = Tgap1;
@@ -478,7 +483,7 @@ namespace TarcogShading {
 		//  Output:
 		//  Tgap1, Tgap2  Temperature of vented gap
 		//  hcv1, hcv2    Convective/conductive coefficient for vented gap
-		//  qv1, qv2    Heat transfer to the gap by vetilation [W/m^2]
+		//  qv1, qv2    Heat transfer to the gap by ventilation [W/m^2]
 		//  speed1, speed2  Air/gas velocities in gaps around SD layer
 		//  nperr      Error flag
 		//**************************************************************************************************************
@@ -585,9 +590,10 @@ namespace TarcogShading {
 
 		converged = false;
 		iter = 0;
-		Real64 const s1_2( pow_2( s1 ) );
-		Real64 const s2_2( pow_2( s2 ) );
-		Real64 const s1_s2_2( pow_2( s1 / s2 ) );
+		Real64 const s1_2 = pow_2( s1 );
+		Real64 const s2_2 = pow_2( s2 );
+		Real64 const s1_s2_2 = pow_2( s1 / s2 );
+		Real64 const cos_Tilt = std::cos( tilt );
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap1, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, nperr, ErrorMessage );
@@ -596,7 +602,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * GravityConstant * ABS(cos(tilt)) * ABS(Tgap1 - Tgap2) / (Tgap1 * Tgap2)
 
 			//bi...Bug fix #00005:
-			A = dens0 * T0 * GravityConstant * H * std::abs( std::cos( tilt ) ) * std::abs( Tgap1 - Tgap2 ) / ( Tgap1 * Tgap2 );
+			A = dens0 * T0 * GravityConstant * H * std::abs( cos_Tilt ) * std::abs( Tgap1 - Tgap2 ) / ( Tgap1 * Tgap2 );
 
 			if ( A == 0.0 ) {
 				qv1 = 0.0;
@@ -862,7 +868,9 @@ namespace TarcogShading {
 
 		converged = false;
 		iter = 0;
-		Real64 const s_2( pow_2( s ) );
+		Real64 const s_2 = pow_2( s );
+		Real64 const abs_cos_tilt = std::abs( std::cos( tilt ) );
+
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage );
@@ -872,7 +880,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * gravity * ABS(cos(tilt)) * ABS(Tgap - Tenv) / (Tgap * Tenv)
 
 			//bi...Bug fix #00005:
-			A = dens0 * T0 * GravityConstant * H * std::abs( std::cos( tilt ) ) * std::abs( Tgap - Tenv ) / ( Tgap * Tenv );
+			A = dens0 * T0 * GravityConstant * H * abs_cos_tilt * std::abs( Tgap - Tenv ) / ( Tgap * Tenv );
 			//  A = dens0 * T0 * GravityConstant * H * ABS(cos(tilt)) * (Tgap - Tenv) / (Tgap * Tenv)
 
 			B1 = dens2 / 2;
@@ -938,7 +946,53 @@ namespace TarcogShading {
 		hcv = 2.0 * hc + 4.0 * speed;
 
 		qv = dens2 * cp2 * speed * s * L * ( Tenv - Tgapout ) / ( H * L );
+	}
 
+	void
+	updateEffectiveMultipliers(
+		int const nlayer,                  // Number of layers
+		Real64 const width,                // IGU width [m]
+		Real64 const height,               // IGU height [m]
+		Array1A< Real64 > const Atop,      // Top openning area [m2]
+		Array1A< Real64 > const Abot,      // Bottom openning area [m2]
+		Array1A< Real64 > const Al,        // Left side openning area [m2]
+		Array1A< Real64 > const Ar,        // Right side openning area [m2]
+		Array1A< Real64 > const Ah,        // Front side openning area [m2]
+		Array1D< Real64 > & Atop_eff,      // Output - Effective top openning area [m2]
+		Array1D< Real64 > & Abot_eff,      // Output - Effective bottom openning area [m2]
+		Array1D< Real64 > & Al_eff,        // Output - Effective left side openning area [m2]
+		Array1D< Real64 > & Ar_eff,        // Output - Effective right side openning area [m2]
+		Array1D< Real64 > & Ah_eff,        // Output - Effective front side openning area [m2]
+		Array1A_int const LayerType,       // Layer type
+		Array1A< Real64 > const SlatAngle  // Venetian layer slat angle [deg]
+	)
+	{
+		for ( int i = 1; i <= nlayer; ++i ) {
+			if ( LayerType( i ) == VENETBLIND ) {
+				double slatAngRad = SlatAngle( i ) * 2 * DataGlobals::Pi / 360;
+				Ah_eff( i ) = width * height * C1_VENET *
+					pow( ( Ah( i ) / ( width * height ) ) * pow( cos( slatAngRad ), C2_VENET ), C3_VENET );
+				Al_eff( i ) = 0.0;
+				Ar_eff( i ) = 0.0;
+				Atop_eff( i ) = Atop( i );
+				Abot_eff( i ) = Abot( i );
+			} else if ( ( LayerType( i ) == PERFORATED ) ||
+				( LayerType( i ) == DIFFSHADE ) ||
+				( LayerType( i ) == BSDF ) ||
+				( LayerType( i ) == WOVSHADE ) ) {
+				Ah_eff( i ) = width * height * C1_SHADE * pow( ( Ah( i ) / ( width * height ) ), C2_SHADE );
+				Al_eff( i ) = Al( i ) * C3_SHADE;
+				Ar_eff( i ) = Ar( i ) * C3_SHADE;
+				Atop_eff( i ) = Atop( i ) * C4_SHADE;
+				Abot_eff( i ) = Abot( i ) * C4_SHADE;
+			} else {
+				Ah_eff( i ) = Ah( i );
+				Al_eff( i ) = Al( i );
+				Ar_eff( i ) = Ar( i );
+				Atop_eff( i ) = Atop( i );
+				Abot_eff( i ) = Abot( i );
+			}
+		}
 	}
 
 } // TarcogShading

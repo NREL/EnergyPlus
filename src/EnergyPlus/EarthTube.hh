@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -98,6 +99,8 @@ namespace EarthTube {
 		Real64 GroundTempz1z2t; // ground temp between z1 and z2 at time t
 		Real64 InsideAirTemp;
 		Real64 AirTemp;
+		Real64 HumRat; // Humidity ratio of air leaving EarthTube and entering zone
+		Real64 WetBulbTemp; // Humidity ratio of air leaving EarthTube and entering zone
 		Real64 r1; // Inner Pipe Radius (m)
 		Real64 r2; // Pipe Thickness (m)
 		Real64 r3; // Distance between Pipe Outer Surface and Undistubed Soil (m)
@@ -129,6 +132,8 @@ namespace EarthTube {
 			GroundTempz1z2t( 0.0 ),
 			InsideAirTemp( 0.0 ),
 			AirTemp( 0.0 ),
+			HumRat( 0.0 ),
+			WetBulbTemp( 0.0 ),
 			r1( 0.0 ),
 			r2( 0.0 ),
 			r3( 0.0 ),
@@ -158,9 +163,12 @@ namespace EarthTube {
 		Real64 EarthTubeVolFlowRateStd; // Volume flow rate of air (m3/s) due to EarthTube at standard air conditions
 		Real64 EarthTubeMass; // Mass of Air {kg} due to EarthTube
 		Real64 EarthTubeMassFlowRate; // Mass flow rate of air (kg/s) due to EarthTube
+		Real64 EarthTubeWaterMassFlowRate; // Mass flow rate of water vapor (kg/s) due to EarthTube
 		Real64 EarthTubeFanElec; // [J] Fan Electricity consumed by EarthTube
 		Real64 EarthTubeFanElecPower; // [W] Fan Electric power for EarthTube
 		Real64 EarthTubeAirTemp; // Air Temp {C} of EarthTube, air leaving tube and entering zone
+		Real64 EarthTubeWetBulbTemp; // Wet Bulb Temperature {C} of EarthTube, air leaving tube and entering zone
+		Real64 EarthTubeHumRat; // Humidity Ratio {kg/kg} of EarthTube, air leaving tube and entering zone
 
 		// Default Constructor
 		EarthTubeZoneReportVars() :
@@ -174,9 +182,12 @@ namespace EarthTube {
 			EarthTubeVolFlowRateStd( 0.0 ),
 			EarthTubeMass( 0.0 ),
 			EarthTubeMassFlowRate( 0.0 ),
+			EarthTubeWaterMassFlowRate( 0.0 ),
 			EarthTubeFanElec( 0.0 ),
 			EarthTubeFanElecPower( 0.0 ),
-			EarthTubeAirTemp( 0.0 )
+			EarthTubeAirTemp( 0.0 ),
+			EarthTubeWetBulbTemp( 0.0 ),
+			EarthTubeHumRat( 0.0 )
 		{}
 
 	};
@@ -186,16 +197,38 @@ namespace EarthTube {
 	extern Array1D< EarthTubeZoneReportVars > ZnRptET;
 
 	// Functions
+	void
+	clear_state();
 
 	void
 	ManageEarthTube();
 
 	void
 	GetEarthTube( bool & ErrorsFound ); // If errors found in input
-
+	
+	void
+	CheckEarthTubesInZones
+		( std::string const ZoneName, // name of zone for error reporting
+	 	  std::string const FieldName, // name of earth tube in input
+		  bool & ErrorsFound // Found a problem
+		);
+	
+	void
+	CheckEarthTubesInZones
+		( std::string const ZoneName, // name of zone for error reporting
+	 	  std::string const FieldName, // name of earth tube in input
+		  bool & ErrorsFound // Found a problem
+		);
+	
 	void
 	CalcEarthTube();
 
+	void
+	CalcEarthTubeHumRat(
+			int const Loop, // EarthTube number (index)
+			int const NZ // Zone number (index)
+	);
+	
 	void
 	ReportEarthTube();
 

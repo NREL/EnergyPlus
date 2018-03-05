@@ -8,8 +8,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): 1/1 through 12/31, CHICAGO_IL_USA TMY2-94846
 !
@@ -59,7 +59,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Building,
     LBuilding-G090,          !- Name
@@ -138,7 +138,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+ ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -248,7 +248,7 @@
     Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3
 
-  Output:Variable,*,Heating Coil Air Heating Rate,hourly;
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
@@ -293,10 +293,6 @@
     0.65,                    !- Solar Absorptance
     0.65;                    !- Visible Absorptance
 
-  Construction,
-    IntFloorConstruction,    !- Name
-    ConcForIntFloor;         !- Outside Layer
-
   Material,
     FurnitureMaterial,       !- Name
     MediumSmooth,            !- Roughness
@@ -337,10 +333,6 @@
     0.9,                     !- Thermal Absorptance
     0.78,                    !- Solar Absorptance
     0.78;                    !- Visible Absorptance
-
-  Construction,
-    DoorConstruction,        !- Name
-    WoodForDoor;             !- Outside Layer
 
   Material,
     GypForInterior,          !- Name
@@ -1278,6 +1270,105 @@
 
                              !- Name
                              !- Construction Name
+! ========== ADDD INTERIOR WALLS ==========
+
+  BuildingSurface:Detailed,
+    Main_IntWall_a_l,        !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    Main_Zone_a_b_g_l,       !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    Main_Zone_l_k_f_a,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,3.047851,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    4.571777,4.571777,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.571777,4.571777,3.047851;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_IntWall_b_g,        !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    Main_Zone_b_c_h_g,       !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    Main_Zone_a_b_g_l,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    4.571777,44.19384,3.047851,  !- X,Y,Z ==> Vertex 1 {m}
+    4.571777,44.19384,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,48.76562,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,48.76562,3.047851;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_IntWall_c_h,        !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    Main_Zone_c_d_i_h,       !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    Main_Zone_b_c_h_g,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    15.23926,48.76562,3.047851,  !- X,Y,Z ==> Vertex 1 {m}
+    15.23926,48.76562,0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.66748,44.19384,0,  !- X,Y,Z ==> Vertex 3 {m}
+    10.66748,44.19384,3.047851;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_IntWall_d_i,        !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    Main_Zone_d_e_j_i,       !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    Main_Zone_c_d_i_h,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    10.66748,10.66748,3.047851,  !- X,Y,Z ==> Vertex 1 {m}
+    10.66748,10.66748,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.23926,15.23926,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.23926,15.23926,3.047851;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_IntWall_e_j,        !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    Main_Zone_e_f_k_j,       !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    Main_Zone_d_e_j_i,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.47851,15.23926,3.047851,  !- X,Y,Z ==> Vertex 1 {m}
+    30.47851,15.23926,0,  !- X,Y,Z ==> Vertex 2 {m}
+    25.90674,10.66748,0,  !- X,Y,Z ==> Vertex 3 {m}
+    25.90674,10.66748,3.047851;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_IntWall_k_f,        !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    Main_Zone_l_k_f_a,       !- Zone Name
+    Zone,                    !- Outside Boundary Condition
+    Main_Zone_e_f_k_j,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    25.90674,4.571777,3.047851,  !- X,Y,Z ==> Vertex 1 {m}
+    25.90674,4.571777,0,  !- X,Y,Z ==> Vertex 2 {m}
+    30.47851,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    30.47851,0,3.047851;  !- X,Y,Z ==> Vertex 4 {m}
+
+! ===========================================
 
   BuildingSurface:Detailed,
     RoofAbove_Main_Zone_a_b_g_l,  !- Name

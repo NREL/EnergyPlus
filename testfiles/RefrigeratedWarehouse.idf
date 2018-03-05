@@ -193,7 +193,7 @@
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.7;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -297,7 +297,7 @@
 
   Site:GroundTemperature:BuildingSurface,5.79,3.71,3.25,3.88,7.01,10.37,13.46,15.61,16.11,14.89,12.22,8.95;
 
- ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6캜
+ ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -329,7 +329,7 @@
 
  ! CHICAGO Annual Cooling Design Conditions Wind Speed=5.3m/s Wind Dir=230
  ! Hottest Month=JUL
- ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=23.8캜
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=23.8째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -1029,7 +1029,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:20,1,           !- Field 6
     Until: 22:00,0,          !- Field 8
@@ -1041,7 +1041,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:30,1,           !- Field 6
     Until: 22:00,0,          !- Field 8
@@ -1053,7 +1053,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:20,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1065,7 +1065,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:30,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1077,7 +1077,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:20,1,           !- Field 6
     Until: 7:00,0,           !- Field 8
@@ -1089,7 +1089,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:30,1,           !- Field 6
     Until: 7:00,0,           !- Field 8
@@ -1101,7 +1101,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:20,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1113,7 +1113,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:30,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1125,7 +1125,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:20,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1137,7 +1137,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:30,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1149,7 +1149,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:20,0,           !- Field 4
     Until: 5:40,1,           !- Field 6
     Until: 22:30,0,          !- Field 8
@@ -1161,7 +1161,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:20,0,           !- Field 4
     Until: 5:50,1,           !- Field 6
     Until: 22:30,0,          !- Field 8
@@ -1173,7 +1173,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:20,0,           !- Field 4
     Until: 6:50,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1185,7 +1185,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:20,0,           !- Field 4
     Until: 7:00,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1197,7 +1197,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:20,0,           !- Field 4
     Until: 0:40,1,           !- Field 6
     Until: 7:40,0,           !- Field 8
@@ -1209,7 +1209,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:20,0,           !- Field 4
     Until: 0:50,1,           !- Field 6
     Until: 7:40,0,           !- Field 8
@@ -1221,7 +1221,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:20,0,           !- Field 4
     Until: 1:40,1,           !- Field 6
     Until: 8:40,0,           !- Field 8
@@ -1233,7 +1233,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:20,0,           !- Field 4
     Until: 1:50,1,           !- Field 6
     Until: 8:40,0,           !- Field 8
@@ -1245,7 +1245,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:40,1,           !- Field 6
     Until: 9:40,0,           !- Field 8
@@ -1257,7 +1257,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:50,1,           !- Field 6
     Until: 9:40,0,           !- Field 8
@@ -1269,7 +1269,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:30,1,           !- Field 6
     Until: 10:00,0,          !- Field 8
@@ -1285,7 +1285,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:40,1,           !- Field 6
     Until: 10:00,0,          !- Field 8
@@ -1301,7 +1301,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:30,1,           !- Field 6
     Until: 11:00,0,          !- Field 8
@@ -1317,7 +1317,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:40,1,           !- Field 6
     Until: 11:00,0,          !- Field 8
@@ -1333,7 +1333,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:30,1,           !- Field 6
     Until: 7:01,0,           !- Field 8
@@ -1349,7 +1349,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:40,1,           !- Field 6
     Until: 7:01,0,           !- Field 8
@@ -1365,7 +1365,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:30,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1381,7 +1381,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:40,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1397,7 +1397,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:30,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1413,7 +1413,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:40,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1429,7 +1429,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:30,0,           !- Field 4
     Until: 6:00,1,           !- Field 6
     Until: 10:30,0,          !- Field 8
@@ -1445,7 +1445,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:30,0,           !- Field 4
     Until: 6:10,1,           !- Field 6
     Until: 10:30,0,          !- Field 8
@@ -1461,7 +1461,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:30,0,           !- Field 4
     Until: 2:00,1,           !- Field 6
     Until: 4:30,0,           !- Field 8
@@ -1483,7 +1483,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:30,0,           !- Field 4
     Until: 2:10,1,           !- Field 6
     Until: 4:30,0,           !- Field 8
@@ -1505,7 +1505,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:50,1,           !- Field 6
     Until: 5:20,0,           !- Field 8
@@ -1529,7 +1529,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 3:00,1,           !- Field 6
     Until: 5:20,0,           !- Field 8
@@ -1552,7 +1552,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 3:30,0,           !- Field 4
     Until: 4:00,1,           !- Field 6
     Until: 6:30,0,           !- Field 8
@@ -1574,7 +1574,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 3:30,0,           !- Field 4
     Until: 4:10,1,           !- Field 6
     Until: 6:30,0,           !- Field 8
@@ -2341,21 +2341,21 @@
     77.419200000000,137.160000000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
     0.000000000000,137.160000000000,0.000000000000;  !- X,Y,Z ==> Vertex 4 {m}
 
-  BuildingSurface:Detailed,
-    Cooler_1_Wall_4,         !- Name
-    Wall,                    !- Surface Type
-    Cooler Wall Const,       !- Construction Name
-    Cooler_1,                !- Zone Name
-    Outdoors,                !- Outside Boundary Condition
-    ,                        !- Outside Boundary Condition Object
-    SunExposed,              !- Sun Exposure
-    WindExposed,             !- Wind Exposure
-    ,                        !- View Factor to Ground
-    4,                       !- Number of Vertices
-    77.419200000000,171.297600000000,10.693400000000,  !- X,Y,Z ==> Vertex 1 {m}
-    77.419200000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
-    0.000000000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
-    0.000000000000,171.297600000000,10.693400000000;  !- X,Y,Z ==> Vertex 4 {m}
+!  BuildingSurface:Detailed,
+!    Cooler_1_Wall_4,         !- Name
+!    Wall,                    !- Surface Type
+!    Cooler Wall Const,       !- Construction Name
+!    Cooler_1,                !- Zone Name
+!    Outdoors,                !- Outside Boundary Condition
+!    ,                        !- Outside Boundary Condition Object
+!    SunExposed,              !- Sun Exposure
+!    WindExposed,             !- Wind Exposure
+!    ,                        !- View Factor to Ground
+!    4,                       !- Number of Vertices
+!    77.419200000000,171.297600000000,10.693400000000,  !- X,Y,Z ==> Vertex 1 {m}
+!    77.419200000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
+!    0.000000000000,171.297600000000,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
+!    0.000000000000,171.297600000000,10.693400000000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Cooler_1_Wall_1,         !- Name
@@ -5348,10 +5348,11 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_144,                !- Zone Air Node Name
-    NODE_145;                !- Zone Return Air Node Name
+    NODE_145;                !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     SubFreezerEquipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     SubFreezerChillerSet,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5382,10 +5383,11 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_4,                  !- Zone Air Node Name
-    NODE_5;                  !- Zone Return Air Node Name
+    NODE_5;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Freezer_1Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Freezer_1ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5425,10 +5427,11 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_24,                 !- Zone Air Node Name
-    NODE_25;                 !- Zone Return Air Node Name
+    NODE_25;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Freezer_2Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Freezer_2ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5459,10 +5462,11 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_34,                 !- Zone Air Node Name
-    NODE_35;                 !- Zone Return Air Node Name
+    NODE_35;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Freezer_3Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Freezer_3ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5493,10 +5497,11 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_44,                 !- Zone Air Node Name
-    NODE_45;                 !- Zone Return Air Node Name
+    NODE_45;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Freezer_4Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Freezer_4ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5527,10 +5532,11 @@
     ,                        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_54,                 !- Zone Air Node Name
-    NODE_55;                 !- Zone Return Air Node Name
+    NODE_55;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Freezer_5Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Freezer_5ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5567,10 +5573,11 @@
     Cooler_1UnitHeatAirOutletNode,  !- Zone Air Inlet Node or NodeList Name
     Cooler_1UnitHeatAirInletNode,  !- Zone Air Exhaust Node or NodeList Name
     NODE_64,                 !- Zone Air Node Name
-    NODE_65;                 !- Zone Return Air Node Name
+    NODE_65;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Cooler_1Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Cooler_1ChillerSet,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5643,10 +5650,11 @@
     Cooler_2UnitHeatAirOutletNode,  !- Zone Air Inlet Node or NodeList Name
     Cooler_2UnitHeatAirInletNode,  !- Zone Air Exhaust Node or NodeList Name
     NODE_74,                 !- Zone Air Node Name
-    NODE_75;                 !- Zone Return Air Node Name
+    NODE_75;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Cooler_2Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Cooler_2ChillerSet,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5715,10 +5723,11 @@
     Cooler_3UnitHeatAirOutletNode,  !- Zone Air Inlet Node or NodeList Name
     Cooler_3UnitHeatAirInletNode,  !- Zone Air Exhaust Node or NodeList Name
     NODE_84,                 !- Zone Air Node Name
-    NODE_85;                 !- Zone Return Air Node Name
+    NODE_85;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Cooler_3Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     Cooler_3ChillerSet,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5789,10 +5798,11 @@
     DockUnitHeatAirOutletNode,  !- Zone Air Inlet Node or NodeList Name
     DockUnitHeatAirInletNode,!- Zone Air Exhaust Node or NodeList Name
     NODE_94,                 !- Zone Air Node Name
-    NODE_95;                 !- Zone Return Air Node Name
+    NODE_95;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     DockEquipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:RefrigerationChillerSet,  !- Zone Equipment 1 Object Type
     DockChillerSet,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5901,10 +5911,11 @@
     Office1_LowerInlets,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_14,                 !- Zone Air Node Name
-    NODE_15;                 !- Zone Return Air Node Name
+    NODE_15;                 !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Office1_LowerEquipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Office1_LowerAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5915,6 +5926,7 @@
     ,                        !- Availability Schedule Name
     NODE_11,                 !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -5957,10 +5969,11 @@
     Office1_UpperInlets,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_111,                !- Zone Air Node Name
-    NODE_112;                !- Zone Return Air Node Name
+    NODE_112;                !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Office1_UpperEquipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Office1_UpperAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5971,6 +5984,7 @@
     ,                        !- Availability Schedule Name
     NODE_110,                !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6013,10 +6027,11 @@
     Office2_LowerInlets,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_121,                !- Zone Air Node Name
-    NODE_122;                !- Zone Return Air Node Name
+    NODE_122;                !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Office2_LowerEquipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Office2_LowerAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6027,6 +6042,7 @@
     ,                        !- Availability Schedule Name
     NODE_120,                !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6069,10 +6085,11 @@
     Office2_UpperInlets,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_131,                !- Zone Air Node Name
-    NODE_132;                !- Zone Return Air Node Name
+    NODE_132;                !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Office2_UpperEquipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Office2_UpperAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6083,6 +6100,7 @@
     ,                        !- Availability Schedule Name
     NODE_130,                !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     22.,                     !- Maximum Heating Supply Air Temperature {C}
     13.,                     !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6269,6 +6287,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.35,                    !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -6276,6 +6296,7 @@
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     18,                      !- Number of Values for Independent Variable X1
@@ -9903,11 +9924,11 @@
 !Detailed Compressor: Bitzer OSNA7461-K,  Cooling capacity 55 kW
 !  Power input 39 kW , COP/EER 1.4
 !  Operating mode ECO , Mass flow LP 150 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) -19.25 캜, Mass flow ECO 193 kg/h
-!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 캜
-!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m�/h, Oil cooler outlet 48.7 캜
+!  Liquid temp. (sc) -19.25 째C, Mass flow ECO 193 kg/h
+!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 째C
+!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m째/h, Oil cooler outlet 48.7 째C
 !  Oil cooler load 29.8 kW , Necces. driving motor 75.0 kW
-!  DG w/o cooling 292 캜
+!  DG w/o cooling 292 째C
 !Detailed Compressor: Bitzer OSNA7461-K,   !cooling capacity = 79 KW, power input 73 kW at Tevap = -33C Tcond = 45C
 
   Refrigeration:Compressor,
@@ -9944,11 +9965,11 @@
 !Detailed Compressor: Bitzer OSKA8561-K,  Cooling capacity 295 kW
 !  Power input 90.2 kW , COP/EER 3.27
 !  Operating mode ECO , Mass flow LP 876 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) 12.32 캜, Mass flow ECO 124.8 kg/h
-!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 캜
-!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m�/h, Oil cooler outlet 41.9 캜
+!  Liquid temp. (sc) 12.32 째C, Mass flow ECO 124.8 kg/h
+!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 째C
+!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m째/h, Oil cooler outlet 41.9 째C
 !  Oil cooler load 55.4 kW , Necces. driving motor 110.0 kW
-!  DG w/o cooling 153.9 캜
+!  DG w/o cooling 153.9 째C
 
   Refrigeration:Compressor,
     MedTemp001Bitzer_OSKA8561_K,  !- Name
@@ -10306,14 +10327,14 @@
 
 ! For Dock compressors:Compressor model OSKA8591_K
 ! Input Values: Refrigerant R717 [NH3], Reference temperature Dew point temp.
-!               Evaporating SST 0캜, Condensing SDT 45캜, Operating mode Standard
-!               Liquid subcooling 0K, Discharge gas temp. 80캜
+!               Evaporating SST 0째C, Condensing SDT 45째C, Operating mode Standard
+!               Liquid subcooling 0K, Discharge gas temp. 80째C
 !               Suct. gas superheat 5K, Useful superheat 100%, Speed 2900 /min, Capacity Control 100%
 ! Output:       Cooling capacity 476 kW, Power input 127.6 kW, Condensing capacity 532 kW
 !               COP/EER 3.73, Mass flow LP 1616 kg/h, Mass flow HP 1616 kg/h
-!               Operating mode Standard, Liquid temp. 45.0 캜
-!               Oil volume flow 3.23 m�/h, Oil cooler outlet 33.7 캜, Oil cooler load 71.6 kW
-!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 캜
+!               Operating mode Standard, Liquid temp. 45.0 째C
+!               Oil volume flow 3.23 m째/h, Oil cooler outlet 33.7 째C, Oil cooler load 71.6 kW
+!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 째C
 !Detailed Compressor: Bitzer OSKA8591_K,   !nominal cooling capacity = 476 KW, !nominal power input 127.6 kW
 
   Refrigeration:Compressor,
@@ -10779,11 +10800,11 @@
 !Detailed Compressor: Bitzer OSKA8561-K,  Cooling capacity 295 kW
 !  Power input 90.2 kW , COP/EER 3.27
 !  Operating mode ECO , Mass flow LP 876 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) 12.32 캜, Mass flow ECO 124.8 kg/h
-!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 캜
-!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m�/h, Oil cooler outlet 41.9 캜
+!  Liquid temp. (sc) 12.32 째C, Mass flow ECO 124.8 kg/h
+!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 째C
+!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m째/h, Oil cooler outlet 41.9 째C
 !  Oil cooler load 55.4 kW , Necces. driving motor 110.0 kW
-!  DG w/o cooling 153.9 캜
+!  DG w/o cooling 153.9 째C
 ! Capacity Curve for Bitzer OSKA8561-K,   !nominal cooling capacity = 295 KW at -4C/45C conditions
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -10827,11 +10848,11 @@
 !Detailed Compressor: Bitzer OSNA7461-K,  Cooling capacity 55 kW
 !  Power input 39 kW , COP/EER 1.4
 !  Operating mode ECO , Mass flow LP 150 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) -19.25 캜, Mass flow ECO 193 kg/h
-!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 캜
-!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m�/h, Oil cooler outlet 48.7 캜
+!  Liquid temp. (sc) -19.25 째C, Mass flow ECO 193 kg/h
+!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 째C
+!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m째/h, Oil cooler outlet 48.7 째C
 !  Oil cooler load 29.8 kW , Necces. driving motor 75.0 kW
-!  DG w/o cooling 292 캜
+!  DG w/o cooling 292 째C
 ! Capacity Curve for Bitzer OSNA7461-K,   !nominal cooling capacity = 295 KW at -4C/45C conditions
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -10874,14 +10895,14 @@
 
 ! For Dock compressors:Compressor model OSKA8591_K
 ! Input Values: Refrigerant R717 [NH3], Reference temperature Dew point temp.
-!               Evaporating SST 0캜, Condensing SDT 45캜, Operating mode Standard
-!               Liquid subcooling 0K, Discharge gas temp. 80캜
+!               Evaporating SST 0째C, Condensing SDT 45째C, Operating mode Standard
+!               Liquid subcooling 0K, Discharge gas temp. 80째C
 !               Suct. gas superheat 5K, Useful superheat 100%, Speed 2900 /min, Capacity Control 100%
 ! Output:       Cooling capacity 476 kW, Power input 127.6 kW, Condensing capacity 532 kW
 !               COP/EER 3.73, Mass flow LP 1616 kg/h, Mass flow HP 1616 kg/h
-!               Operating mode Standard, Liquid temp. 45.0 캜
-!               Oil volume flow 3.23 m�/h, Oil cooler outlet 33.7 캜, Oil cooler load 71.6 kW
-!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 캜
+!               Operating mode Standard, Liquid temp. 45.0 째C
+!               Oil volume flow 3.23 m째/h, Oil cooler outlet 33.7 째C, Oil cooler load 71.6 kW
+!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 째C
 ! Capacity Curve for Bitzer OSKA8591-K,   !nominal cooling capacity = 476 KW
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -10956,7 +10977,7 @@
     118.000,120.000,122.000,124.000,132.250;
 
   FluidProperties:Saturated,
-    NH3,                     !- Name
+    NH3,                     !- Fluid Name
     Pressure,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     NH3SaturatedTemperatures,!- Temperature Values Name
@@ -10977,7 +10998,7 @@
     0.8787E+07,0.9112E+07,0.9448E+07,0.9793E+07,0.1133E+08;
 
   FluidProperties:Saturated,
-    NH3,                     !- Name
+    NH3,                     !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     NH3SaturatedTemperatures,!- Temperature Values Name
@@ -10998,7 +11019,7 @@
     0.8524E+06,0.8699E+06,0.8886E+06,0.9088E+06,0.1119E+07;
 
   FluidProperties:Saturated,
-    NH3,                     !- Name
+    NH3,                     !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     NH3SaturatedTemperatures,!- Temperature Values Name
@@ -11019,7 +11040,7 @@
     0.1363E+07,0.1350E+07,0.1336E+07,0.1319E+07,0.1119E+07;
 
   FluidProperties:Saturated,
-    NH3,                     !- Name
+    NH3,                     !- Fluid Name
     Density,                 !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     NH3SaturatedTemperatures,!- Temperature Values Name
@@ -11040,7 +11061,7 @@
     0.3947E+03,0.3855E+03,0.3754E+03,0.3641E+03,0.2250E+03;
 
   FluidProperties:Saturated,
-    NH3,                     !- Name
+    NH3,                     !- Fluid Name
     Density,                 !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     NH3SaturatedTemperatures,!- Temperature Values Name
@@ -11061,7 +11082,7 @@
     0.9361E+02,0.1001E+03,0.1074E+03,0.1159E+03,0.2250E+03;
 
   FluidProperties:Saturated,
-    NH3,                     !- Name
+    NH3,                     !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     NH3SaturatedTemperatures,!- Temperature Values Name
@@ -11082,7 +11103,7 @@
     0.1082E+05,0.1194E+05,0.1352E+05,0.1592E+05,0.0000E+00;
 
   FluidProperties:Saturated,
-    NH3,                     !- Name
+    NH3,                     !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     NH3SaturatedTemperatures,!- Temperature Values Name

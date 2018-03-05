@@ -14,8 +14,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             Denver Centennial Golden_CO_USA Annual Heating 99%, MaxDB=-16°C
-!                          Denver Centennial Golden_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6°C MWB=15.5°C
+! Design Days:             Denver Centennial Golden_CO_USA Annual Heating 99%, MaxDB=-16Â°C
+!                          Denver Centennial Golden_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6Â°C MWB=15.5Â°C
 !                          Then, these design days with changes for relative humidity (schedule) and
 !                          range changes.  Also the two design days are duplicated for the solar model:
 !                          Zhang Huang aka IWEC2.  Then, the ability to add a Sky Temperature modifier is added.
@@ -91,7 +91,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -567,7 +567,7 @@
   Schedule:Day:Interval,
     DaySchedule5,            !- Name
     Temperature,             !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     until: 24:00,            !- Time 1
     5;                       !- Value Until Time 1
 
@@ -1041,8 +1041,8 @@
     6,                       !- Month
     9,                       !- Day of Month
     Wednesday,               !- Day Type
-    24.225,                  !- Maximum Dry-Bulb Temperature {C}
-    5.225,                   !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Maximum Dry-Bulb Temperature {C}
+    ,                        !- Daily Dry-Bulb Temperature Range {deltaC}
     TemperatureProfileSchedule,  !- Dry-Bulb Temperature Range Modifier Type
     Example Weather Temp,    !- Dry-Bulb Temperature Range Modifier Day Schedule Name
     RelativeHumiditySchedule,!- Humidity Condition Type
@@ -1064,7 +1064,7 @@
   Schedule:Day:List,
     Example Weather Temp,    !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     19.55,                   !- Value 1
     20.1,                    !- <none>
@@ -1166,7 +1166,7 @@
   Schedule:Day:List,
     Example Weather Direct Solar,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     0,                       !- Value 1
     0,                       !- <none>
@@ -1268,7 +1268,7 @@
   Schedule:Day:List,
     Example Weather Diffuse Solar,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     0,                       !- Value 1
     0,                       !- <none>
@@ -1370,7 +1370,7 @@
   Schedule:Day:List,
     Example Weather Relative Humidity,  !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     15,                      !- Minutes per Item
     82,                      !- Value 1
     81,                      !- <none>
@@ -1505,7 +1505,7 @@
   Schedule:Day:List,
     ListScheduleExample_int, !- Name
     Any Number,              !- Schedule Type Limits Name
-    Yes,                     !- Interpolate to Timestep
+    Average,                 !- Interpolate to Timestep
     60,                      !- Minutes per Item
     1,                       !- Value 1
     2,                       !- <none>
@@ -1540,9 +1540,75 @@
     0.7500000,               !- Solar Absorptance
     0.7500000;               !- Visible Absorptance
 
+  Material,
+    C10 - 8 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    0.2033016,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Name
+    Rough,                   !- Roughness
+    1.2710161E-02,           !- Thickness {m}
+    1.435549,                !- Conductivity {W/m-K}
+    881.0155,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5500000,               !- Solar Absorptance
+    0.5500000;               !- Visible Absorptance
+
+  Material,
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
+    Rough,                   !- Roughness
+    9.5402403E-03,           !- Thickness {m}
+    0.1902535,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material,
+    B5 - 1 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    2.5E-02,                 !- Thickness {m}
+    4.0E-02,                 !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material,
+    C12 - 2 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    5.0901599E-02,           !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
   Construction,
     R13WALL,                 !- Name
     R13LAYER;                !- Outside Layer
+
+  Construction,
+    FLOOR SLAB 8 IN,         !- Name
+    C10 - 8 IN HW CONCRETE;  !- Outside Layer
+
+  Construction,
+    ROOF34,                  !- Name
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
+    B5 - 1 IN DENSE INSULATION,  !- Layer 3
+    C12 - 2 IN HW CONCRETE;  !- Layer 4
 
   Zone,
     ZONE ONE,                !- Name
@@ -1645,6 +1711,38 @@
     0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}
     0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR SLAB 8 IN,         !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn001:Flr001,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,15.24,0,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,15.24,0,  !- X,Y,Z ==> Vertex 3 {m}
+    15.24,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF34,                  !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    15.24,0,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+    15.24,15.24,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+    0,15.24,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 

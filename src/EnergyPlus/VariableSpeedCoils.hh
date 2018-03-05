@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -228,6 +229,7 @@ namespace VariableSpeedCoils {
 		int CompanionHeatingCoilNum; // Cooling coil companion heating coil index
 		Real64 FanDelayTime; // Fan delay time, time delay for the HP's fan to
 		// beginning for multispeed coil type
+		int MSHPDesignSpecIndex; // index to UnitarySystemPerformance:Multispeed object
 		Array1D_int MSErrIndex; // index flag for num speeds/recurring messages
 		Array1D< Real64 > MSRatedPercentTotCap; // Percentage to the total cooling capacity for MS heat pump at the highest speed [dimensionless]
 		Array1D< Real64 > MSRatedTotCap; // Rated cooling capacity for MS heat pump [W]
@@ -358,6 +360,8 @@ namespace VariableSpeedCoils {
 		Real64 TotalHeatingEnergyRate;//total WH energy rate
 		bool bIsDesuperheater;//whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
 		//end variables for HPWH
+		bool reportCoilFinalSizes; // one time report of sizes to coil selection report
+		Real64 capModFacTotal; // coil  TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac, for result for simulation peak reporting
 
 		// Default Constructor
 		VariableSpeedCoilData();
@@ -486,6 +490,12 @@ namespace VariableSpeedCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	int
+	GetVSCoilCapFTCurveIndex(
+		int const & CoilIndex, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
 	Real64
 	GetVSCoilMinOATCompressor(
 		std::string const & CoilName, // must match coil names for the coil type
@@ -503,7 +513,8 @@ namespace VariableSpeedCoils {
 		int const WSHPNum, // Number of OA Controller
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
-		Optional_int CompanionHeatingCoilNum = _ // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int CompanionHeatingCoilNum = _, // Index to heating coil for cooling coil = SimpleWSHPNum
+		Optional_int MSHPDesignSpecIndex = _ // index to UnitarySystemPerformance:Multispeed object
 	);
 
 	void
@@ -546,25 +557,8 @@ namespace VariableSpeedCoils {
 		Real64 const CondInletTemp, // Condenser inlet temperature [C]
 		Real64 const Pressure, // air pressure [Pa]
 		Real64 const SpeedRatio, // from 0.0 to 1.0
-		int const NumSpeeds // number of speeds for input
-	);
-
-	Real64
-	AdjustCBF(
-		Real64 const CBFNom, // nominal coil bypass factor
-		Real64 const AirMassFlowRateNom, // nominal air mass flow rate [kg/s]
-		Real64 const AirMassFlowRate // actual air mass flow rate [kg/s]
-	);
-
-	Real64
-	CalcCBF(
-		std::string const & UnitType,
-		std::string const & UnitName,
-		Real64 const InletAirTemp, // inlet air temperature [C]
-		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
-		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
-		Real64 const SHR // sensible heat ratio at the given capacity and flow rate
+		int const NumSpeeds, // number of speeds for input
+		Real64 & TotCapModFac // capacity modification factor, func of temp and func of flow
 	);
 
 	void
@@ -589,6 +583,14 @@ namespace VariableSpeedCoils {
 	setVarSpeedHPWHFanIndex(
 		int const dXCoilNum,
 		int const fanIndex
+	);
+
+	void
+	setVarSpeedFanInfo(
+		int const dXCoilNum,
+		std::string const fanName,
+		int const fanIndex,
+		int const fanTypeNum
 	);
 
 } // VariableSpeedCoils

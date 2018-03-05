@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -84,6 +85,7 @@ namespace DXCoils {
 	extern Real64 const RatedOutdoorAirTemp; // 35 C or 95F
 	extern Real64 const RatedInletAirTempHeat; // 21.11C or 70F
 	extern Real64 const RatedOutdoorAirTempHeat; // 8.33 C or 47F
+	extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
 	extern Real64 const RatedInletWetBulbTempHeat; // 15.55 or 60F
 
 	extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
@@ -449,6 +451,7 @@ namespace DXCoils {
 		Real64 FuelUsed; // Energy used, in addition to electricity [W]
 		Real64 FuelConsumed; // Energy consumed, in addition to electricity [J]
 		bool MSHPHeatRecActive; // True when entered Heat Rec Vol Flow Rate > 0
+		int MSHPDesignSpecIndex; // index to MSHPDesignSpecification object used for variable speed coils
 		// End of multispeed DX coil input
 		// VRF system variables used for sizing
 		bool CoolingCoilPresent; // FALSE if coil not present
@@ -511,6 +514,10 @@ namespace DXCoils {
 		Real64 ActualSC; // Actual subcooling degrees [C]
 		Real64 RateBFVRFIUEvap; // VRF Iutdoor Unit Evaporator Rated Bypass Factor
 		Real64 RateBFVRFIUCond; // VRF Iutdoor Unit Condenser Rated Bypass Factor
+		int CAPFTErrIndex; // index/pointer to recurring error structure for CAPFT curve value <= 0.0
+		int EIRFTErrIndex; // index/pointer to recurring error structure for EIRFT curve value <= 0.0
+		bool reportCoilFinalSizes; // one time report of sizes to coil selection report
+		Real64 capModFacTotal; // current coil capacity modification factor
 
 		// Default Constructor
 		DXCoilData() :
@@ -697,6 +704,7 @@ namespace DXCoils {
 			PLRImpact( false ),
 			LatentImpact( false ),
 			MSHPHeatRecActive( false ),
+			MSHPDesignSpecIndex( 0 ),
 			CoolingCoilPresent( true ),
 			HeatingCoilPresent( true ),
 			ISHundredPercentDOASDXCoil( false ),
@@ -749,7 +757,11 @@ namespace DXCoils {
 			ActualSH( 0.0 ),
 			ActualSC( 0.0 ),
 			RateBFVRFIUEvap( 0.0592 ),
-			RateBFVRFIUCond( 0.1360 )
+			RateBFVRFIUCond( 0.1360 ),
+			CAPFTErrIndex( 0 ),
+			EIRFTErrIndex( 0 ),
+			reportCoilFinalSizes( true ),
+			capModFacTotal( 0.0 )
 		{}
 
 	};
@@ -898,10 +910,9 @@ namespace DXCoils {
 		Real64 const InletAirTemp, // inlet air temperature [C]
 		Real64 const InletAirHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const TotCap, // total cooling  capacity [Watts]
-		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
+		Real64 const AirVolFlowRate, // the air volume flow rate at the given capacity [m3/s]
 		Real64 const SHR, // sensible heat ratio at the given capacity and flow rate
-		bool const PrintFlag = true, // flag used to print warnings if desired
-		Real64 const BaroPress=StdBaroPress // Barometric pressure [Pa]
+		bool const PrintFlag = true // flag used to print warnings if desired
 	);
 
 	Real64
@@ -944,7 +955,8 @@ namespace DXCoils {
 		Real64 & TotCap, // total capacity at the given conditions [W]
 		Real64 & SHR, // sensible heat ratio at the given conditions
 		Real64 const CondInletTemp, // Condenser inlet temperature [C]
-		Real64 const Pressure // air pressure [Pa]
+		Real64 const Pressure, // air pressure [Pa]
+		Real64 & TotCapModFac // capacity modification factor, func of temp and func of flow
 	);
 
 	void
@@ -1002,6 +1014,14 @@ namespace DXCoils {
 		Optional_bool_const SuppressWarning = _
 	);
 
+	std::string
+	GetDXCoilName(
+		int & DXCoilIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType = _,
+		Optional_bool_const SuppressWarning = _
+	);
+
 	Real64
 	GetCoilCapacity(
 		std::string const & CoilType, // must match coil types in this module
@@ -1028,6 +1048,12 @@ namespace DXCoils {
 	GetMinOATCompressor(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
+	Real64
+	GetMinOATCompressorUsingIndex(
+		int const CoilIndex, // index to coil
 		bool & ErrorsFound // set to true if problem
 	);
 

@@ -8,8 +8,8 @@
 !
 ! Location:                Colorado Springs, CO
 !
-! Design Days:             COLORADO_SPRGS_CO_USA Annual Heating 99.6%, MaxDB=-18.4캜
-!                          COLORADO_SPRGS_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=32.1캜 MWB=14.6캜
+! Design Days:             COLORADO_SPRGS_CO_USA Annual Heating 99.6%, MaxDB=-18.4째C
+!                          COLORADO_SPRGS_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=32.1째C MWB=14.6째C
 !
 ! Run Period (Weather File): 5/1 through 5/10, COLORADO_SPRGS_CO_USA TMY2
 !
@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.7;
+  Version,8.9;
 
   Timestep,4;
 
@@ -152,10 +152,10 @@
  !  Data Source=ASHRAE 2005 Annual Design Conditions
  ! Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
  ! COLORADO_SPRGS_CO_USA Extreme Annual Wind Speeds, 1%=12.4m/s, 2.5%=10.9m/s, 5%=9.2m/s
- ! COLORADO_SPRGS_CO_USA Extreme Annual Temperatures, Max Drybulb=34.8캜 Min Drybulb=-22.6캜
+ ! COLORADO_SPRGS_CO_USA Extreme Annual Temperatures, Max Drybulb=34.8째C Min Drybulb=-22.6째C
  ! COLORADO_SPRGS_CO_USA Annual Heating Design Conditions Wind Speed=2.8m/s Wind Dir=20
  ! Coldest Month=January
- ! COLORADO_SPRGS_CO_USA Annual Heating 99.6%, MaxDB=-18.4캜
+ ! COLORADO_SPRGS_CO_USA Annual Heating 99.6%, MaxDB=-18.4째C
 
   SizingPeriod:DesignDay,
     COLORADO_SPRGS Ann Htg 99.6% Condns DB,  !- Name
@@ -187,7 +187,7 @@
 
  ! COLORADO_SPRGS Annual Cooling Design Conditions Wind Speed=5.3m/s Wind Dir=180
  ! Hottest Month=July
- ! COLORADO_SPRGS_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=32.1캜 MWB=14.6캜
+ ! COLORADO_SPRGS_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=32.1째C MWB=14.6째C
 
   SizingPeriod:DesignDay,
     COLORADO_SPRGS Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -616,7 +616,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     5857.501,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
     0.3000000,               !- Fraction Radiant
     0.0000000E+00;           !- Fraction Lost
@@ -715,7 +715,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     29287.51,                !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
     0.3000000,               !- Fraction Radiant
     0.0000000E+00;           !- Fraction Lost
@@ -814,7 +814,7 @@
     Watts/Area,              !- Design Level Calculation Method
     ,                        !- Design Level {W}
     197,                     !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000000E+00,           !- Fraction Latent
     0.3000000,               !- Fraction Radiant
     0.0000000E+00;           !- Fraction Lost
@@ -1037,10 +1037,10 @@
     WindExposed,             !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    16.24583,-4.754909,6.096000,  !- X,Y,Z ==> Vertex 1 {m}
-    16.24583,-4.754909,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    31.60779,15.72763,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    31.60779,15.72763,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
+    16.33727,-4.632988,6.096000,  !- X,Y,Z ==> Vertex 1 {m}
+    16.33727,-4.632988,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    31.69923,15.84955,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    31.69923,15.84955,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
 
   FenestrationSurface:Detailed,
     Zn002:Wall001:Win001,    !- Name
@@ -1389,10 +1389,10 @@
     NoWind,                  !- Wind Exposure
     0.5000000,               !- View Factor to Ground
     4,                       !- Number of Vertices
-    3.566169,4.754874,6.096000,  !- X,Y,Z ==> Vertex 1 {m}
-    3.566169,4.754874,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
-    16.24583,-4.754908,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
-    16.24583,-4.754908,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
+    3.657609,4.876794,6.096000,  !- X,Y,Z ==> Vertex 1 {m}
+    3.657609,4.876794,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    16.33727,-4.632988,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    16.33727,-4.632988,6.096000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn002:Wall004,           !- Name
@@ -2239,10 +2239,11 @@
     PSI FOYER INLETS,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PSI FOYER NODE,          !- Zone Air Node Name
-    PSI FOYER OUTLET;        !- Zone Return Air Node Name
+    PSI FOYER OUTLET;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     PSI FOYER EQUIPMENT,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     PSI FOYER PURCHASED AIR, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2253,6 +2254,7 @@
     ,                        !- Availability Schedule Name
     PSI FOYER INLETS,        !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2312,10 +2314,11 @@
     DORM ROOMS AND COMMON AREAS INLETS,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     DORM ROOMS AND COMMON AREAS NODE,  !- Zone Air Node Name
-    DORM ROOMS AND COMMON AREAS OUTLET;  !- Zone Return Air Node Name
+    DORM ROOMS AND COMMON AREAS OUTLET;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     DORM ROOMS AND COMMON AREAS EQUIPMENT,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     DORM ROOMS AND COMMON AREAS PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2326,6 +2329,7 @@
     ,                        !- Availability Schedule Name
     DORM ROOMS AND COMMON AREAS INLETS,  !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2385,10 +2389,11 @@
     LEFT FORK INLETS,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LEFT FORK NODE,          !- Zone Air Node Name
-    LEFT FORK OUTLET;        !- Zone Return Air Node Name
+    LEFT FORK OUTLET;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     LEFT FORK EQUIPMENT,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     LEFT FORK PURCHASED AIR, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2399,6 +2404,7 @@
     ,                        !- Availability Schedule Name
     LEFT FORK INLETS,        !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2458,10 +2464,11 @@
     MIDDLE FORK INLETS,      !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     MIDDLE FORK NODE,        !- Zone Air Node Name
-    MIDDLE FORK OUTLET;      !- Zone Return Air Node Name
+    MIDDLE FORK OUTLET;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     MIDDLE FORK EQUIPMENT,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     MIDDLE FORK PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2472,6 +2479,7 @@
     ,                        !- Availability Schedule Name
     MIDDLE FORK INLETS,      !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -2531,10 +2539,11 @@
     RIGHT FORK INLETS,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     RIGHT FORK NODE,         !- Zone Air Node Name
-    RIGHT FORK OUTLET;       !- Zone Return Air Node Name
+    RIGHT FORK OUTLET;       !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     RIGHT FORK EQUIPMENT,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     RIGHT FORK PURCHASED AIR,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2545,6 +2554,7 @@
     ,                        !- Availability Schedule Name
     RIGHT FORK INLETS,       !- Zone Supply Air Node Name
     ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
     50,                      !- Maximum Heating Supply Air Temperature {C}
     13,                      !- Minimum Cooling Supply Air Temperature {C}
     0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}

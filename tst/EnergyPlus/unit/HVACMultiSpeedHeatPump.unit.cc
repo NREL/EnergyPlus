@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -64,7 +65,10 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::BranchInputManager;
@@ -80,7 +84,9 @@ using namespace EnergyPlus::HVACMultiSpeedHeatPump;
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SimAirServingZones;
+using namespace EnergyPlus::SingleDuct;
 using namespace EnergyPlus::SplitterComponent;
+using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 
 
@@ -128,35 +134,53 @@ namespace EnergyPlus {
 			"    402HeatingSP,            !- Heating Setpoint Temperature Schedule Name",
 			"    402CoolingSP;            !- Cooling Setpoint Temperature Schedule Name",
 
-			"!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========",
+			"!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========",
 
-			"  AirTerminal:SingleDuct:Uncontrolled,",
+			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
 			"    401directair,            !- Name",
 			"    AC-24sched,              !- Availability Schedule Name",
-			"    Z401 zone inlet,         !- Zone Supply Air Node Name",
+			"    Z401 zone inlet 2AT,     !- Air Inlet Node Name",
+			"    Z401 zone inlet,         !- Air Outlet Node Name",
 			"    3.209;                   !- Maximum Air Flow Rate {m3/s}",
 
-			"  AirTerminal:SingleDuct:Uncontrolled,",
+			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
 			"    402directair,            !- Name",
 			"    AC-25 sched,             !- Availability Schedule Name",
-			"    Z402 zone inlet,         !- Zone Supply Air Node Name",
+			"    Z402 zone inlet 2AT,     !- Air Inlet Node Name",
+			"    Z402 zone inlet,         !- Air Outlet Node Name",
 			"    3.209;                   !- Maximum Air Flow Rate {m3/s}",
 
 			"!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========",
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Z401 terminal list,      !- Name",
-			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-			"    401directair,            !- Zone Equipment 1 Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    401directairADU,         !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
 			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
 
 			"  ZoneHVAC:EquipmentList,",
 			"    Z402 terminal list,      !- Name",
-			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-			"    402directair,            !- Zone Equipment 1 Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    402directairADU,         !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
 			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+			"!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========",
+
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    401directairADU,         !- Name",
+			"    Z401 zone inlet,         !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+			"    401directair;            !- Air Terminal Name",
+
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    402directairADU,         !- Name",
+			"    Z402 zone inlet,         !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+			"    402directair;            !- Air Terminal Name",
 
 			"!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========",
 
@@ -210,6 +234,7 @@ namespace EnergyPlus {
 			"    AC-24 HC inlet node,     !- Air Outlet Node Name",
 			"    ,                        !- Condenser Air Inlet Node Name",
 			"    AirCooled,               !- Condenser Type",
+			"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    ,                        !- Supply Water Storage Tank Name",
 			"    ,                        !- Condensate Collection Water Storage Tank Name",
 			"    No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -302,6 +327,7 @@ namespace EnergyPlus {
 			"    AC-25 HC inlet node,     !- Air Outlet Node Name",
 			"    ,                        !- Condenser Air Inlet Node Name",
 			"    AirCooled,               !- Condenser Type",
+			"    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
 			"    ,                        !- Supply Water Storage Tank Name",
 			"    ,                        !- Condensate Collection Water Storage Tank Name",
 			"    No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
@@ -819,12 +845,12 @@ namespace EnergyPlus {
 			"  AirLoopHVAC:ZoneSplitter,",
 			"    Z401 SA splitter,        !- Name",
 			"    Z401 splitter inlet,     !- Inlet Node Name",
-			"    Z401 zone inlet;         !- Outlet 1 Node Name",
+			"    Z401 zone inlet 2AT;     !- Outlet 1 Node Name",
 
 			"  AirLoopHVAC:ZoneSplitter,",
 			"    Z402 SA splitter,        !- Name",
 			"    Z402 splitter inlet,     !- Inlet Node Name",
-			"    Z402 zone inlet;         !- Outlet 1 Node Name",
+			"    Z402 zone inlet 2AT;     !- Outlet 1 Node Name",
 
 			"!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========",
 
@@ -1220,8 +1246,7 @@ namespace EnergyPlus {
 
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
-
+			ASSERT_TRUE( process_idf( idf_objects ) );
 			NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 			MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 			ProcessScheduleInput();
@@ -1229,14 +1254,18 @@ namespace EnergyPlus {
 			HeatBalanceManager::GetZoneData( ErrorsFound ); // read zone data
 			EXPECT_FALSE( ErrorsFound ); // zones are specified in the idf snippet
 
-			// Get Zone Equipment Configuration ata
+			// Get Zone Equipment Configuration data
 			DataZoneEquipment::GetZoneEquipmentData();
+			DataZoneEquipment::ZoneEquipList( 1 ).EquipIndex( 1 ) = 2; // 1st zone is 402, so this is 2nd direct air unit
+			DataZoneEquipment::ZoneEquipList( 2 ).EquipIndex( 1 ) = 1; // 2nd zone is 401, so this is 1st direct air unit
 			MixedAir::GetOutsideAirSysInputs();
 			MixedAir::GetOAControllerInputs();
 			SplitterComponent::GetSplitterInput();
 			BranchInputManager::GetMixerInput();
 			BranchInputManager::ManageBranchInput();
-			DirectAirManager::GetDirectAirInput();
+			GetZoneAirLoopEquipment();
+			SingleDuct::GetSysInput();
+
 			// Get Air Loop HVAC Data
 			SimAirServingZones::GetAirPathData();
 			SimAirServingZones::InitAirLoops( FirstHVACIteration );
