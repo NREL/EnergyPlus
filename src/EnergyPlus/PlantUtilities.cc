@@ -2240,29 +2240,8 @@ namespace PlantUtilities {
 		//   Pick up the LoopSide inlet and outlet temp and flow rate
 		//   Store this in the history array of each node using EOSHIFT
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using namespace DataPlant;
-		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNodeNum;
-		int OutletNodeNum;
-		Real64 InletNodeTemp;
-		Real64 InletNodeMdot;
-		Real64 OutletNodeTemp;
-		Real64 OutletNodeMdot;
-
-		for ( int ThisLoopNum = 1; ThisLoopNum <= isize( PlantLoop ); ++ThisLoopNum ) {
-			auto & loop( PlantLoop( ThisLoopNum ) );
+		for ( int ThisLoopNum = 1; ThisLoopNum <= isize( DataPlant::PlantLoop ); ++ThisLoopNum ) {
+			auto & loop( DataPlant::PlantLoop( ThisLoopNum ) );
 			for ( int ThisLoopSide = 1; ThisLoopSide <= isize( loop.LoopSide ); ++ThisLoopSide ) {
 				auto & loop_side( loop.LoopSide( ThisLoopSide ) );
 
@@ -2273,20 +2252,17 @@ namespace PlantUtilities {
 					loop_side.OutletNode.MassFlowRateHistory = 0.0;
 				}
 
-				InletNodeNum = loop_side.NodeNumIn;
-				InletNodeTemp = Node( InletNodeNum ).Temp;
-				InletNodeMdot = Node( InletNodeNum ).MassFlowRate;
+				int InletNodeNum = loop_side.NodeNumIn;
+				Real64 InletNodeTemp = DataLoopNode::Node( InletNodeNum ).Temp;
+				Real64 InletNodeMdot = DataLoopNode::Node( InletNodeNum ).MassFlowRate;
 
-				OutletNodeNum = loop_side.NodeNumOut;
-				OutletNodeTemp = Node( OutletNodeNum ).Temp;
-				OutletNodeMdot = Node( OutletNodeNum ).MassFlowRate;
+				int OutletNodeNum = loop_side.NodeNumOut;
+				Real64 OutletNodeTemp = DataLoopNode::Node( OutletNodeNum ).Temp;
+				Real64 OutletNodeMdot = DataLoopNode::Node( OutletNodeNum ).MassFlowRate;
 
 				rshift1( loop_side.InletNode.TemperatureHistory, InletNodeTemp );
-
 				rshift1( loop_side.InletNode.MassFlowRateHistory, InletNodeMdot );
-
 				rshift1( loop_side.OutletNode.TemperatureHistory, OutletNodeTemp );
-
 				rshift1( loop_side.OutletNode.MassFlowRateHistory, OutletNodeMdot );
 
 			}
@@ -2319,21 +2295,9 @@ namespace PlantUtilities {
 		//  in cases where demand side (air loop, for example) equipment is "fighting" with the plant loop
 		// The result of this routine can help the plant "lock-in" and take action to stop the iteration
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataPlant;
 		using namespace DataLoopNode;
-
-		// Return value
-		bool Converged;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 InletAvgTemp;
@@ -2342,42 +2306,31 @@ namespace PlantUtilities {
 		Real64 OutletAvgMdot;
 
 		if ( FirstHVACIteration ) {
-			Converged = false;
-			return Converged;
+			return false;
 		}
 
 		InletAvgTemp = sum( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) / size( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory );
-
 		if ( any_ne( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory, InletAvgTemp ) ) {
-			Converged = false;
-			return Converged;
+			return false;
 		}
 
 		InletAvgMdot = sum( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) / size( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory );
-
 		if ( any_ne( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory, InletAvgMdot ) ) {
-			Converged = false;
-			return Converged;
+			return false;
 		}
 
 		OutletAvgTemp = sum( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) / size( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory );
-
 		if ( any_ne( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory, OutletAvgTemp ) ) {
-			Converged = false;
-			return Converged;
+			return false;
 		}
 
 		OutletAvgMdot = sum( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) / size( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory );
-
 		if ( any_ne( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory, OutletAvgMdot ) ) {
-			Converged = false;
-			return Converged;
+			return false;
 		}
 
-		//If we made it this far, we're good!
-		Converged = true;
-
-		return Converged;
+		// If we made it this far, we're good!
+		return true;
 
 	}
 

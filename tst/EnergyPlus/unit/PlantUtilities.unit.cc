@@ -50,6 +50,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include <ObjexxFCL/Array.functions.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataPlant.hh>
@@ -341,5 +343,86 @@ TEST_F( EnergyPlusFixture, TestIntegerIsWithinTwoValues ) {
 
 	// odd expected false cases
 	EXPECT_FALSE(PlantUtilities::IntegerIsWithinTwoValues(1, 2, 0));
+
+}
+
+TEST_F( EnergyPlusFixture, TestCheckPlantConvergence ) {
+
+	// For this case, we need a single plant loop and loop side
+	// We will leverage the LogPlantConvergencePoints function to manage the history terms
+	// That function is nice because it is very tightly contained, so we don't have to set up a lot of global state
+	DataPlant::PlantLoop.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide.allocate(1);
+	DataLoopNode::Node.allocate(2);
+	DataPlant::PlantLoop(1).LoopSide(1).NodeNumIn = 1;
+	DataPlant::PlantLoop(1).LoopSide(1).NodeNumOut = 2;
+	auto &inNode = DataLoopNode::Node(1);
+	auto &outNode = DataLoopNode::Node(2);
+	Real64 const roomTemp = 25.0;
+	Real64 const nonZeroFlow = 3.14;
+
+	// History terms should be allocated to 5 zeros
+	EXPECT_EQ(5u, DataPlant::PlantLoop(1).LoopSide(1).InletNode.TemperatureHistory.size());
+	EXPECT_EQ(5u, DataPlant::PlantLoop(1).LoopSide(1).OutletNode.TemperatureHistory.size());
+	EXPECT_EQ(5u, DataPlant::PlantLoop(1).LoopSide(1).InletNode.MassFlowRateHistory.size());
+	EXPECT_EQ(5u, DataPlant::PlantLoop(1).LoopSide(1).OutletNode.MassFlowRateHistory.size());
+	EXPECT_NEAR(0.0, sum(DataPlant::PlantLoop(1).LoopSide(1).InletNode.TemperatureHistory), 0.001);
+	EXPECT_NEAR(0.0, sum(DataPlant::PlantLoop(1).LoopSide(1).OutletNode.TemperatureHistory), 0.001);
+	EXPECT_NEAR(0.0, sum(DataPlant::PlantLoop(1).LoopSide(1).InletNode.MassFlowRateHistory), 0.001);
+	EXPECT_NEAR(0.0, sum(DataPlant::PlantLoop(1).LoopSide(1).OutletNode.MassFlowRateHistory), 0.001);
+
+	// If we check the plant convergence right now with first hvac true, it should require a resimulation
+	EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, true));
+
+	// But if we check it with first hvac false, everything should be stable and pass
+	EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+
+	// Now let's introduce a disturbance by changing the inlet node temperature and logging it
+	inNode.Temp = roomTemp;
+	PlantUtilities::LogPlantConvergencePoints(false);
+	// We expect it to be false here since the temperature changed
+	EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+	// But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
+	// Need to call it 5 times total to fully initialize the history
+	for (int i = 1; i < 5; ++i) {
+		PlantUtilities::LogPlantConvergencePoints(false);
+	}
+	EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+
+	// Repeat this for the outlet node temperature
+	outNode.Temp = roomTemp;
+	PlantUtilities::LogPlantConvergencePoints(false);
+	// We expect it to be false here since the temperature changed
+	EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+	// But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
+	// Need to call it 5 times total to fully initialize the history
+	for (int i = 1; i < 5; ++i) {
+		PlantUtilities::LogPlantConvergencePoints(false);
+	}
+	EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+
+	// Repeat this for the inlet node mass flow rate
+	inNode.MassFlowRate = nonZeroFlow;
+	PlantUtilities::LogPlantConvergencePoints(false);
+	// We expect it to be false here since the temperature changed
+	EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+	// But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
+	// Need to call it 5 times total to fully initialize the history
+	for (int i = 1; i < 5; ++i) {
+		PlantUtilities::LogPlantConvergencePoints(false);
+	}
+	EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+
+	// And finally the outlet node mass flow rate
+	outNode.MassFlowRate = nonZeroFlow;
+	PlantUtilities::LogPlantConvergencePoints(false);
+	// We expect it to be false here since the temperature changed
+	EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+	// But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
+	// Need to call it 5 times total to fully initialize the history
+	for (int i = 1; i < 5; ++i) {
+		PlantUtilities::LogPlantConvergencePoints(false);
+	}
+	EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
 
 }
