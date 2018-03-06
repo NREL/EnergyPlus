@@ -1555,7 +1555,9 @@ namespace ChillerAbsorption {
 					if ( (BLASTAbsorber( ChillNum ).FlowMode == ConstantFlow) || (BLASTAbsorber( ChillNum ).FlowMode == NotModulated) ) {
 						GenMassFlowRate = BLASTAbsorber( ChillNum ).GenMassFlowRateMax;
 					} else { // LeavingSetpointModulated
-						GenMassFlowRate = min( BLASTAbsorber( ChillNum ).GenMassFlowRateMax, QGenerator / CpFluid / BLASTAbsorber( ChillNum ).GeneratorDeltaTemp );
+						// since the .FlowMode applies to the chiller evaporator, the generater mass flow rate will be proportional to the evaporator mass flow rate
+						Real64 GenFlowRatio = EvapMassFlowRate / BLASTAbsorber( ChillNum ).EvapMassFlowRateMax;
+						GenMassFlowRate = min( BLASTAbsorber( ChillNum ).GenMassFlowRateMax, GenFlowRatio * BLASTAbsorber( ChillNum ).GenMassFlowRateMax );
 					}
 				} else { // If FlowLock is True
 					GenMassFlowRate = Node( GeneratorInletNode ).MassFlowRate;
