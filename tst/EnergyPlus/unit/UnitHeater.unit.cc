@@ -1122,17 +1122,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		createFacilityElectricPowerServiceObject();
 		SizingManager::ManageSizing();
 
-		ErrorsFound = false;
-		GetWaterCoilInput();
-		EXPECT_FALSE( ErrorsFound );
-		GetWaterCoilsInputFlag = false;
-
-		ErrorsFound = false;
-		GetFanInput();
-		EXPECT_FALSE( ErrorsFound );
-
-		ErrorsFound = false;
-		GetUnitHeaterInput(); // get unit heaters data
 		EXPECT_FALSE( ErrorsFound );
 		EXPECT_EQ( 1, NumOfUnitHeats );
 		EXPECT_EQ( "ZONE2UNITHEAT", UnitHeat( 1 ).Name );

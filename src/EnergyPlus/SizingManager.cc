@@ -612,8 +612,8 @@ namespace SizingManager {
 				ShowSevereError( RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved." );
 				ErrorsFound = true;
 			}
-		} else {
-			// No system sizing - still need to set up system zone equipment and transfer zone sizing data to TermUnitFinalZoneSizing
+		} else if ( ( NumZoneSizingInput > 0 ) && ( DoZoneSizing || DoSystemSizing || DoPlantSizing ) ) {
+			// If zone sizing but no system sizing - still need to set up system zone equipment and transfer zone sizing data to TermUnitFinalZoneSizing
 			SysSizingCalc = true; // set true here so equipment does not try to size yet
 			SimAir = true;
 			SimZoneEquip = true;
