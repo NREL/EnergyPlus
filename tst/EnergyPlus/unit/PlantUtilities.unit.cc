@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -82,5 +83,121 @@ TEST_F( EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1 )
 	Real64 TestFlowRate3 = 67.8;
 	RegisterPlantCompDesignFlow( TestNodeNum1, TestFlowRate3 );
 	EXPECT_EQ( TestFlowRate3, CompDesWaterFlow( 1 ).DesVolFlowRate );
+
+}
+
+TEST_F( EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp )
+{
+	// This test captures all code paths through the RegulateCondenserCompFlowReqOp function
+	// We only need a single component to check here
+	DataPlant::PlantLoop.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+	auto & thisComponent = DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1);
+	Real64 flowRequest = 3.14;
+	Real64 returnedFlow;
+
+	// if the component's ON flag is false, then it should return zero flow request no matter the other values
+	thisComponent.ON = false;
+
+	thisComponent.CurOpSchemeType = DataPlant::HeatingRBOpSchemeType; // meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+
+	thisComponent.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType; // meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+
+	thisComponent.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType; // meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+
+	thisComponent.CurOpSchemeType = DataPlant::UncontrolledOpSchemeType; // NOT meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+
+	// if the component's ON flag is true, then it needs to make decisions
+	thisComponent.ON = true;
+
+	thisComponent.CurOpSchemeType = DataPlant::HeatingRBOpSchemeType; // meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+
+	thisComponent.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType; // meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+
+	thisComponent.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType; // meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(0.0, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+
+	thisComponent.CurOpSchemeType = DataPlant::UncontrolledOpSchemeType; // NOT meaningful load
+
+	thisComponent.MyLoad = 0.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+	thisComponent.MyLoad = 1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
+	thisComponent.MyLoad = -1000.0;
+	returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(1, 1, 1, 1, flowRequest);
+	EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
 }

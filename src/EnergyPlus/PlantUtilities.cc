@@ -296,7 +296,7 @@ namespace PlantUtilities {
 		Real64 SeriesBranchMaxAvail;
 		Real64 SeriesBranchMinAvail;
 
-		if ( OneTimeDiagSetup ) {
+		if ( OneTimeDiagSetup ) {  // TODO: Just add this flag to the node data structure so we don't have to allocate and check here
 			NodeErrorMsgIssued.dimension( NumOfNodes, false );
 			NullPlantErrorMsgIssued = false;
 			OneTimeDiagSetup = false;
@@ -313,7 +313,6 @@ namespace PlantUtilities {
 			}
 			return;
 		}
-		// FLOW:
 
 		MdotOldRequest = Node( InletNode ).MassFlowRateRequest;
 		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
@@ -438,7 +437,7 @@ namespace PlantUtilities {
 			Node( OutletNode ).MassFlowRate = Node( InletNode ).MassFlowRate;
 			CompFlow = Node( OutletNode ).MassFlowRate;
 		} else {
-			ShowFatalError( "SetComponentFlowRate: Flow lock out of range" ); //DEBUG error...should never get here
+			ShowFatalError( "SetComponentFlowRate: Flow lock out of range" ); //DEBUG error...should never get here LCOV_EXCL_LINE
 		}
 
 		if ( comp.CurOpSchemeType == DemandOpSchemeType ) {
@@ -588,7 +587,7 @@ namespace PlantUtilities {
 					ShowContinueError( "Node minimum flow rate available [kg/s] = " + RoundSigDigits( a_node.MassFlowRateMinAvail, 8 ) );
 				}
 			} else {
-				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + RoundSigDigits( loop_side.FlowLock ) ); //DEBUG error...should never get here
+				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + RoundSigDigits( loop_side.FlowLock ) ); //DEBUG error...should never get here LCOV_EXCL_LINE
 			}
 
 			Real64 const a_node_MasFlowRate( a_node.MassFlowRate );

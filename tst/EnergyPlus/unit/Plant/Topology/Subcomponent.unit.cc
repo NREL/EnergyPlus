@@ -45,40 +45,20 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantReportingMeterData_hh_INCLUDED
-#define PlantReportingMeterData_hh_INCLUDED
+// EnergyPlus::Boilers Unit Tests
 
-#include <OutputProcessor.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
-namespace EnergyPlus {
-    namespace DataPlant {
+// EnergyPlus Headers
+#include <EnergyPlus/Plant/Topology/Subcomponents.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
 
-        struct MeterData {
-            // Members
-            std::string ReportVarName;
-            OutputProcessor::Unit ReportVarUnits;
-            int ResourceType;
-            std::string EndUse;
-            int EndUse_CompMode;
-            std::string Group;
-            int ReportVarIndex;
-            int ReportVarIndexType;
-            int ReportVarType;
-            Real64 CurMeterReading;
+using namespace EnergyPlus;
 
-            // Default Constructor
-            MeterData() :
-                    ReportVarUnits(OutputProcessor::Unit::None),
-                    ResourceType(0),
-                    EndUse_CompMode(0),
-                    ReportVarIndex(0),
-                    ReportVarIndexType(0),
-                    ReportVarType(0),
-                    CurMeterReading(0.0) {}
-
-        };
-    }
+TEST_F(EnergyPlusFixture, Plant_Topology_Subcomponent ) {
+    EnergyPlus::DataPlant::SubcomponentData sc;
+    EnergyPlus::DataPlant::SubSubcomponentData ssc;
+    // Could test default constructor I guess...
 }
-
-#endif
