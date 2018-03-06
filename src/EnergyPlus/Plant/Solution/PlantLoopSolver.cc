@@ -167,7 +167,7 @@ namespace PlantLoopSolver {
 
 		auto & thisPlantLoop = DataPlant::PlantLoop( LoopNum );
 		auto & thisLoopSide = thisPlantLoop.LoopSide( ThisSide );
-		auto & otherLoopSide = thisPlantLoop.LoopSide( OtherSide );
+//		auto & otherLoopSide = thisPlantLoop.LoopSide( OtherSide );
 
 		int ThisSideInletNode = thisLoopSide.NodeNumIn;
 
@@ -259,8 +259,8 @@ namespace PlantLoopSolver {
             int pumpCompIndexOnBranch = 0;
             for ( int compNum = 1; compNum <= branch.TotalComponents; ++ compNum ) {
                 auto & component = branch.Comp( compNum );
-				auto & comp_inlet_node = DataLoopNode::Node( component.NodeNumIn );
-				auto & comp_outlet_node = DataLoopNode::Node( component.NodeNumOut );
+				// auto & comp_inlet_node = DataLoopNode::Node( component.NodeNumIn );
+				// auto & comp_outlet_node = DataLoopNode::Node( component.NodeNumOut );
                 auto & t = component.TypeOf_Num;
                 if ( t == DataPlant::TypeOf_PumpConstantSpeed || t == DataPlant::TypeOf_PumpBankConstantSpeed || t == DataPlant::TypeOf_PumpVariableSpeed || t == DataPlant::TypeOf_PumpBankVariableSpeed ) {
                     pumpCompIndexOnBranch = compNum;

@@ -2348,7 +2348,7 @@ namespace PlantUtilities {
 			Optional_int CountMatchPlantLoops,
 			Optional_int_const InletNodeNumber,
 			Optional_int_const SingleLoopSearch,
-			Optional_bool errFlag
+			Optional_bool errFlag // TODO: I think callers are expecting this to be passed by reference...
 	)
 	{
 

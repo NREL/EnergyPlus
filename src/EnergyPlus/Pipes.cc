@@ -139,9 +139,9 @@ namespace Pipes {
 			}
 		}
 		// If we didn't find it, fatal
-		ShowFatalError( "LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName );
+		ShowFatalError( "LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName ); // LCOV_EXCL_LINE
 		// Shut up the compiler
-		return nullptr;
+		return nullptr; // LCOV_EXCL_LINE
 	}
 
 	void LocalPipeData::simulate( const PlantLocation & EP_UNUSED( calledFromLocation ), bool const EP_UNUSED( FirstHVACIteration ), Real64 & EP_UNUSED( CurLoad ), bool const EP_UNUSED( RunFlag ) ) {
@@ -150,10 +150,10 @@ namespace Pipes {
 			bool errFlag = false;
 			PlantUtilities::ScanPlantLoopsForObject( this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, _, _, FoundOnLoop, _, _, errFlag );
 			if ( FoundOnLoop == 0 ) {
-				ShowFatalError( "SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop." );
+				ShowFatalError( "SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop." );  // LCOV_EXCL_LINE
 			}
 			if ( errFlag ) {
-				ShowFatalError( "SimPipes: Program terminated due to previous condition(s)." );
+				ShowFatalError( "SimPipes: Program terminated due to previous condition(s)." );  // LCOV_EXCL_LINE
 			}
 			this->OneTimeInit = false;
 		}
@@ -234,7 +234,7 @@ namespace Pipes {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "GetPipeInput: Errors getting input for pipes" );
+			ShowFatalError( "GetPipeInput: Errors getting input for pipes" );  // LCOV_EXCL_LINE
 		}
 
 	}
