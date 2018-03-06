@@ -48,6 +48,8 @@
 #ifndef PlantOperationEquipAndOperations_hh_INCLUDED
 #define PlantOperationEquipAndOperations_hh_INCLUDED
 
+#include <ObjexxFCL/Array1D.hh>
+
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {

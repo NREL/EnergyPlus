@@ -45,33 +45,50 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PLANTCOMPONENT_HH_INCLUDED
-#define PLANTCOMPONENT_HH_INCLUDED
+// EnergyPlus::Boilers Unit Tests
 
-#include <DataGlobals.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
-namespace EnergyPlus {
+// EnergyPlus Headers
+#include <EnergyPlus/Plant/Topology/Component.hh>
+#include <EnergyPlus/Plant/Topology/Branch.hh>
 
-	// Forward Declarations
-	struct PlantLocation;
+#include "Fixtures/EnergyPlusFixture.hh"
 
-	class PlantComponent {
+using namespace EnergyPlus;
 
-		public:
-			virtual void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) = 0;
+TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad) {
+    EnergyPlus::DataPlant::BranchData b;
+    b.Comp.allocate(3);
 
-			virtual void getDesignCapacities( const PlantLocation & EP_UNUSED(calledFromLocation), Real64 & EP_UNUSED(MaxLoad), Real64 & EP_UNUSED(MinLoad), Real64 & EP_UNUSED(OptLoad) ) {}
+    b.Comp[0].MyLoad = 20000;
+    b.Comp[1].MyLoad = 21000;
+    b.Comp[2].MyLoad = 22000;
+    Real64 maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
 
-			virtual void getDesignTemperatures( Real64 & EP_UNUSED(TempDesCondIn), Real64 & EP_UNUSED(TempDesEvapOut) ) {}
+    b.Comp[0].MyLoad = 22000;
+    b.Comp[1].MyLoad = 21000;
+    b.Comp[2].MyLoad = 20000;
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
 
-			virtual void getSizingFactor( Real64 & EP_UNUSED(SizFac) ) {}
+    b.Comp[0].MyLoad = 0;
+    b.Comp[1].MyLoad = -21000;
+    b.Comp[2].MyLoad = 22000;
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
 
-			virtual void onInitLoopEquip( const PlantLocation & EP_UNUSED( calledFromLocation ) ) {}
+    b.Comp[0].MyLoad = 0;
+    b.Comp[1].MyLoad = 0;
+    b.Comp[2].MyLoad = -22000;  // still highest via absolute value
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
 
-		~PlantComponent() {}
-
-	};
-
+    b.Comp[0].MyLoad = 0;
+    b.Comp[1].MyLoad = 21000;
+    b.Comp[2].MyLoad = -22000;
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
 }
-
-#endif

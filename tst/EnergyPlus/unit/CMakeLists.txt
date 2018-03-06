@@ -113,6 +113,7 @@ set( test_src
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  Plant/Topology/Branch.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
