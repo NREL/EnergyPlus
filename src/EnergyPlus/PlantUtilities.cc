@@ -1445,9 +1445,6 @@ namespace PlantUtilities {
 		//  associated component.  Therefore whenever we come in with a non-zero index, we will just
 		//  verify that the stored loop/side/branch/comp matches
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::CriteriaType_MassFlowRate;
@@ -1456,18 +1453,6 @@ namespace PlantUtilities {
 		using DataPlant::CriteriaDelta_MassFlowRate;
 		using DataPlant::CriteriaDelta_Temperature;
 		using DataPlant::CriteriaDelta_HeatTransferRate;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//      -- set this to zero initially in calling routine
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 
 		CriteriaData CurCriteria; // for convenience
 
@@ -1668,32 +1653,19 @@ namespace PlantUtilities {
 		// check if anything changed or doesn't agree and set simulation flags.
 		// update outlet conditions if needed or possible
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataLoopNode::Node;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "UpdateComponentHeatRecoverySide" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool DidAnythingChange( false ); // set to true if conditions changed
 		int OtherLoopNum; // local loop pointer for remote connected loop
 		int OtherLoopSide; // local loop side pointer for remote connected loop
-		//  INTEGER :: CountConnectedLoops ! local total number of connected loops
 		int ConnectLoopNum; // local do loop counter
 		Real64 Cp; // local fluid specific heat
 
@@ -1708,7 +1680,7 @@ namespace PlantUtilities {
 
 		if ( Node( OutletNodeNum ).Temp != ModelOutletTemp ) DidAnythingChange = true;
 
-		// could also check heat rate agains McDeltaT from node data
+		// could also check heat rate against McDeltaT from node data
 
 		if ( ( Node( InletNodeNum ).MassFlowRate == 0.0 ) && ( ModelRecoveryHeatRate > 0.0 ) ) {
 			//no flow but trying to move heat to this loop problem!
@@ -1774,31 +1746,16 @@ namespace PlantUtilities {
 		// check if anything changed or doesn't agree and set simulation flags.
 		// update outlet conditions if needed or possible
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataLoopNode::Node;
 		using DataLoopNode::NodeType_Water;
 		using DataLoopNode::NodeType_Steam;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool DidAnythingChange( false ); // set to true if conditions changed
 		int OtherLoopNum; // local loop pointer for remote connected loop
 		int OtherLoopSide; // local loop side pointer for remote connected loop
-		//  INTEGER :: CountConnectedLoops ! local total number of connected loops
 		int ConnectLoopNum; // local do loop counter
 
 		DidAnythingChange = false;
@@ -1866,30 +1823,9 @@ namespace PlantUtilities {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Setup PlantLoop data structure pointers to direct interacting loops
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::ConnectedLoopData;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
 
 		if ( Loop1Num == 0 || Loop1LoopSideNum == 0 || Loop2Num == 0 || Loop2LoopSideNum == 0 ) {
 			return; // Associated ScanPlantLoopsForObject couldn't find the component in the the plant loop structure...
@@ -1945,29 +1881,9 @@ namespace PlantUtilities {
 		// PURPOSE OF THIS SUBROUTINE:
 		// re-arrange the calling order, move one loop side from an old index to a new one
 
-		// METHODOLOGY EMPLOYED:
-		// move
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataPlant;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Object Data
 		PlantCallingOrderInfoStruct RecordToMoveInPlantCallingOrderInfo;
@@ -2062,27 +1978,10 @@ namespace PlantUtilities {
 		// The design flow rate is stored in a dynamic structure array along with the plant component's inlet node number
 		// (which is used by plant as a component identifier instead if name and type).
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// (condenser side for water / water components)
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// design water flow rate
 		int NumPlantComps;
 		int PlantCompNum; // component do loop index
 		bool Found;
@@ -2144,24 +2043,9 @@ namespace PlantUtilities {
 		// Copy over state variables but not setpoints
 		// derived from adiabatic Pipes
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
 		using DataPlant::PlantLoop;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Node( OutletNodeNum ).FluidType = Node( InletNodeNum ).FluidType;
@@ -2218,9 +2102,6 @@ namespace PlantUtilities {
 		// Return value
 		Real64 BoundedValue;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		BoundedValue = ValueToBound;
 		BoundedValue = max( BoundedValue, Node( NodeNumToBoundWith ).MassFlowRateMinAvail );
 		BoundedValue = min( BoundedValue, Node( NodeNumToBoundWith ).MassFlowRateMaxAvail );
@@ -2251,23 +2132,8 @@ namespace PlantUtilities {
 		// Pull down node max avail to new max avail if it doesn't violate any other node conditions
 		// Assumes that current min/max avails are already honoring hardware min/max values, so they aren't checked here
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataLoopNode::Node;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 OldMinAvail;
@@ -2310,9 +2176,6 @@ namespace PlantUtilities {
 		// Return value
 		Real64 BoundedValue;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		BoundedValue = ValueToBound;
 		BoundedValue = max( BoundedValue, LowerBound );
 		BoundedValue = min( BoundedValue, UpperBound );
@@ -2342,18 +2205,8 @@ namespace PlantUtilities {
 		// TRUE if ValueToCheck = [LowerBound, UpperBound]
 		// in other words, it returns true if ValueToCheck=LowerBound, or if ValueToCheck=UpperBound
 
-		// USE STATEMENTS:
-		// na
-
 		// Return value
-		bool ValueIsBetween;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		ValueIsBetween = ( ValueToCheck >= LowerBound ) && ( ValueToCheck <= UpperBound );
-
-		return ValueIsBetween;
+		return ( ValueToCheck >= LowerBound ) && ( ValueToCheck <= UpperBound );
 
 	}
 
