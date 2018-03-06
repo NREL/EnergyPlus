@@ -113,10 +113,10 @@ namespace PlantComponentTemperatureSources {
 	void
 	SimWaterSource(
 		std::string const & SourceName, // user-specified name for this component
-		int const EquipFlowCtrl, // Flow control mode for the equipment
+		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
 		int & CompIndex, // HX number pointer
-		bool const RunFlag, // simulate HX when TRUE
-		bool const FirstHVACIteration, // initialize variables when TRUE
+		bool const EP_UNUSED( RunFlag ), // simulate HX when TRUE
+		bool const EP_UNUSED( FirstHVACIteration ), // initialize variables when TRUE
 		bool & InitLoopEquip, // If not zero, calculate the max load for operating conditions
 		Real64 & MyLoad, // loop demand component will meet
 		Real64 & MaxLoad,
@@ -148,28 +148,28 @@ namespace PlantComponentTemperatureSources {
 			GetInput = false;
 		}
 
-		// Find the correct Chiller
+		// Find the correct instance
 		if ( CompIndex == 0 ) {
 			SourceNum = UtilityRoutines::FindItemInList( SourceName, WaterSource );
 			if ( SourceNum == 0 ) {
-				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );
+				ShowFatalError( "SimWaterSource: Specified heat exchanger not one of Valid heat exchangers=" + SourceName );  // LCOV_EXCL_LINE
 			}
 			CompIndex = SourceNum;
 		} else {
 			SourceNum = CompIndex;
 			if ( SourceNum > NumSources || SourceNum < 1 ) {
-				ShowFatalError( "SimWaterSource:  Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Number of Units=" + TrimSigDigits( NumSources ) + ", Entered Unit name=" + SourceName );
+				ShowFatalError( "SimWaterSource:  Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Number of Units=" + TrimSigDigits( NumSources ) + ", Entered Unit name=" + SourceName );  // LCOV_EXCL_LINE
 			}
 			if ( WaterSource( SourceNum ).CheckEquipName ) {
 				if ( SourceName != WaterSource( SourceNum ).Name ) {
-					ShowFatalError( "SimWaterSource: Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Unit name=" + SourceName + ", stored Unit Name for that index=" + WaterSource( SourceNum ).Name );
+					ShowFatalError( "SimWaterSource: Invalid CompIndex passed=" + TrimSigDigits( SourceNum ) + ", Unit name=" + SourceName + ", stored Unit Name for that index=" + WaterSource( SourceNum ).Name );  // LCOV_EXCL_LINE
 				}
 				WaterSource( SourceNum ).CheckEquipName = false;
 			}
 		}
 
 		if ( InitLoopEquip ) {
-			InitWaterSource( SourceNum, RunFlag, MyLoad, FirstHVACIteration );
+			InitWaterSource( SourceNum, MyLoad );
 			SizeWaterSource( SourceNum );
 			if ( GetSizingFactor ) {
 				SizingFactor = WaterSource( SourceNum ).SizFac;
@@ -180,8 +180,8 @@ namespace PlantComponentTemperatureSources {
 			return;
 		}
 
-		InitWaterSource( SourceNum, RunFlag, MyLoad, FirstHVACIteration );
-		CalcWaterSource( SourceNum, MyLoad, RunFlag, EquipFlowCtrl );
+		InitWaterSource( SourceNum, MyLoad );
+		CalcWaterSource( SourceNum );
 		UpdateWaterSource( SourceNum );
 
 	}
@@ -295,9 +295,7 @@ namespace PlantComponentTemperatureSources {
 	void
 	InitWaterSource(
 		int const SourceNum, // number of the current component being simulated
-		bool const EP_UNUSED( RunFlag ), // TRUE when component operating
-		Real64 const MyLoad,
-		bool const EP_UNUSED( FirstHVACIteration ) // initialize variables when TRUE
+		Real64 const MyLoad
 	)
 	{
 
@@ -313,9 +311,6 @@ namespace PlantComponentTemperatureSources {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataPlant::PlantLoop;
@@ -327,24 +322,13 @@ namespace PlantComponentTemperatureSources {
 		using FluidProperties::GetSpecificHeatGlycol;
 		using ScheduleManager::GetCurrentScheduleValue;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitWaterSource" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rho; // local fluid density
 		Real64 cp; // local specific heat
 		bool errFlag;
-
-		//FLOW
 
 		// Init more variables
 		if ( WaterSource( SourceNum ).MyFlag ) {
@@ -440,9 +424,6 @@ namespace PlantComponentTemperatureSources {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rate from the plant sizing array.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -454,18 +435,6 @@ namespace PlantComponentTemperatureSources {
 		using namespace OutputReportPredefined;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum( 0 ); // Plant Sizing index corresponding to CurLoopNum
@@ -540,10 +509,7 @@ namespace PlantComponentTemperatureSources {
 
 	void
 	CalcWaterSource(
-		int const SourceNum,
-		Real64 const MyLoad,
-		bool const RunFlag,
-		int const EquipFlowCtrl // Flow control mode for the equipment
+		int const SourceNum
 	)
 	{
 
@@ -553,40 +519,18 @@ namespace PlantComponentTemperatureSources {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcWaterSource" );
 
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Cp;
-		Real64 rDummy;
-		int iDummy;
-		bool lDummy;
-
-		rDummy = MyLoad;
-		iDummy = EquipFlowCtrl;
-		lDummy = RunFlag;
-
 		if ( WaterSource( SourceNum ).MassFlowRate > 0.0 ) {
 			WaterSource( SourceNum ).OutletTemp = WaterSource( SourceNum ).BoundaryTemp;
-			Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
+			Real64 Cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.loopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).HeatRate = WaterSource( SourceNum ).MassFlowRate * Cp * ( WaterSource( SourceNum ).OutletTemp - WaterSource( SourceNum ).InletTemp );
 			WaterSource( SourceNum ).HeatEnergy = WaterSource( SourceNum ).HeatRate * TimeStepSys * SecInHour;
 		} else {
@@ -600,45 +544,10 @@ namespace PlantComponentTemperatureSources {
 	void
 	UpdateWaterSource( int const SourceNum )
 	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Dan Fisher
-		//       DATE WRITTEN:    October 1998
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-		// REFERENCES:
-
-		// USE STATEMENTS:
-		//USE DataGlobals,     ONLY: SecInHour
-		//USE DataHVACGlobals, ONLY: TimeStepSys
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-
-		InletNode = WaterSource( SourceNum ).InletNodeNum;
-		OutletNode = WaterSource( SourceNum ).OutletNodeNum;
-
-		//set outlet node temperatures
+		int OutletNode = WaterSource( SourceNum ).OutletNodeNum;
 		Node( OutletNode ).Temp = WaterSource( SourceNum ).OutletTemp;
 
 	}
-
-	// End of Record Keeping subroutines for the Const COP Chiller Module
-	// *****************************************************************************
 
 } // PlantComponentTemperatureSources
 
