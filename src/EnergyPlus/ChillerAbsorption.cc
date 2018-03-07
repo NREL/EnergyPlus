@@ -1517,11 +1517,7 @@ namespace ChillerAbsorption {
 		PumpingPower = ElectricInputRat * NomPumpPower * FRAC;
 
 		//Calculate steam load
-		if ( FRAC < 1.0 ) {
-			QGenerator = SteamInputRat * MinPartLoadRat * AbsorberNomCap * FRAC;
-		} else {
-			QGenerator = SteamInputRat * QEvaporator;
-		}
+		QGenerator = SteamInputRat * QEvaporator * FRAC;
 
 		if ( EvapMassFlowRate == 0.0 ) {
 			QGenerator = 0.0;
