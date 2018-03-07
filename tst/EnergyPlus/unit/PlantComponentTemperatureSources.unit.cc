@@ -125,5 +125,10 @@ namespace EnergyPlus {
 		PlantComponentTemperatureSources::SimWaterSource("FLUIDSOURCE", dummyInteger, compIndex, dummyRunFlag, firstHVACIteration, initLoopEquip, myLoad, maxLoad, minLoad, optLoad, getSizingFactor, sizingFactor);
 		EXPECT_NEAR(0.05, waterSource1.MassFlowRate, 0.001);
 
+		// Do this for scheduled temperature
+		// NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+		// MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+		// ProcessScheduleInput(); // read schedules
+
 	}
 }
