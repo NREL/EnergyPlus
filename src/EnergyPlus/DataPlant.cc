@@ -54,7 +54,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <General.hh>
-#include <Plant/Operation/PlantConvergencePoint.hh>
+#include <Plant/PlantConvergencePoint.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {

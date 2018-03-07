@@ -57,7 +57,7 @@
 #include <SimulationManager.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <BranchInputManager.hh>
-#include <Plant/Solution/PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <WeatherManager.hh>
 #include <DataHVACGlobals.hh>
 #include <OutputReportPredefined.hh>

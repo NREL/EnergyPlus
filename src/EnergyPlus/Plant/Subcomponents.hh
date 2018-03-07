@@ -48,7 +48,7 @@
 #ifndef PlantTopologySubcomponents_hh_INCLUDED
 #define PlantTopologySubcomponents_hh_INCLUDED
 
-#include <Plant/Reporting/MeterData.hh>
+#include <Plant/MeterData.hh>
 
 namespace EnergyPlus {
     namespace DataPlant {

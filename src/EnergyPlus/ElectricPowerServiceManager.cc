@@ -54,7 +54,7 @@
 
 // EnergyPlus Headers
 #include <ElectricPowerServiceManager.hh>
-#include <Plant/Topology/PlantLocation.hh>
+#include <Plant/PlantLocation.hh>
 #include <OutputProcessor.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>

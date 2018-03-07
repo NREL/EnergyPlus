@@ -49,12 +49,12 @@
 #define PlantTopologyLoopSide_hh_INCLUDED
 
 #include <DataLoopNode.hh>
-#include <Plant/Operation/LoopSidePumpInformation.hh>
-#include <Plant/Operation/PlantConvergencePoint.hh>
-#include <Plant/Topology/Branch.hh>
-#include <Plant/Topology/ConnectedLoopData.hh>
-#include <Plant/Topology/MixerData.hh>
-#include <Plant/Topology/SplitterData.hh>
+#include <Plant/LoopSidePumpInformation.hh>
+#include <Plant/PlantConvergencePoint.hh>
+#include <Plant/Branch.hh>
+#include <Plant/ConnectedLoopData.hh>
+#include <Plant/MixerData.hh>
+#include <Plant/SplitterData.hh>
 
 namespace EnergyPlus {
 	namespace DataPlant {

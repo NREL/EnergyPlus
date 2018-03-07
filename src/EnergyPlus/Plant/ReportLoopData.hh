@@ -45,25 +45,41 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantOperationCallingOrder_hh_INCLUDED
-#define PlantOperationCallingOrder_hh_INCLUDED
+#ifndef PlantReportingReporting_hh_INCLUDED
+#define PlantReportingReporting_hh_INCLUDED
 
-#include <Plant/Reporting/MeterData.hh>
+#include <Plant/ReportBranchData.hh>
 
 namespace EnergyPlus {
     namespace DataPlant {
 
-        struct PlantCallingOrderInfoStruct {
+        struct ReportLoopData {
             // Members
-            int LoopIndex; // plant or condenser loop indexes in calling order
-            int LoopSide; // plant or condenser loop sides in calling order
-            int LoopPumpSimulationType; // type of pump topology on half loop
+            std::string Name; // Name of the component list
+            int NodeNumIn; // Node number for the inlet to this loop
+            std::string NodeNameIn; // Node name for the inlet to this loop
+            int NodeNumOut; // Node number for the outlet to this loop
+            std::string NodeNameOut; // Node name for the outlet to this loop
+            Real64 Electric;
+            Real64 Gas;
+            Real64 Purchased;
+            Real64 OtherEnergy;
+            int TotalBranches; // Total number of branches on the loop
+            Real64 LoopVentLoad;
+            Real64 VentLoadFrac;
+            Array1D <ReportBranchData> Branch; // Branch data
 
             // Default Constructor
-            PlantCallingOrderInfoStruct() :
-                    LoopIndex(0),
-                    LoopSide(0),
-                    LoopPumpSimulationType(0) {}
+            ReportLoopData() :
+                    NodeNumIn(0),
+                    NodeNumOut(0),
+                    Electric(0.0),
+                    Gas(0.0),
+                    Purchased(0.0),
+                    OtherEnergy(0.0),
+                    TotalBranches(0),
+                    LoopVentLoad(0.0),
+                    VentLoadFrac(0.0) {}
 
         };
     }

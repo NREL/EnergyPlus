@@ -120,7 +120,7 @@ extern "C" {
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
 #include <OutputReports.hh>
-#include <Plant/Solution/PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <PollutionModule.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>

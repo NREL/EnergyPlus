@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/Plant/Solution/PlantManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>

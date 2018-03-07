@@ -401,27 +401,27 @@ SET( SRC
   PipeHeatTransfer.hh
   Pipes.cc
   Pipes.hh
-  Plant/Operation/CallingOrder.hh
-  Plant/Operation/Enums.hh
-  Plant/Operation/EquipAndOperations.hh
-  Plant/Operation/LoopSidePumpInformation.hh
-  Plant/Operation/PlantAvailManager.hh
-  Plant/Operation/PlantConvergencePoint.hh
-  Plant/Reporting/LoopSideReportVars.hh
-  Plant/Reporting/MeterData.hh
-  Plant/Reporting/ReportBranchData
-  Plant/Reporting/ReportCompData
-  Plant/Reporting/ReportLoopData.hh
-  Plant/Reporting/ReportVars.hh
-  Plant/Topology/Branch.hh
-  Plant/Topology/Component.hh
-  Plant/Topology/ConnectedLoopData.hh
-  Plant/Topology/Connection.hh
-  Plant/Topology/Loop.hh
-  Plant/Topology/LoopSide.hh
-  Plant/Topology/MixerData.hh
-  Plant/Topology/SplitterData.hh
-  Plant/Topology/Subcomponents.hh
+  Plant/CallingOrder.hh
+  Plant/Enums.hh
+  Plant/EquipAndOperations.hh
+  Plant/LoopSidePumpInformation.hh
+  Plant/PlantAvailManager.hh
+  Plant/PlantConvergencePoint.hh
+  Plant/LoopSideReportVars.hh
+  Plant/MeterData.hh
+  Plant/ReportBranchData
+  Plant/ReportCompData
+  Plant/ReportLoopData.hh
+  Plant/ReportVars.hh
+  Plant/Branch.hh
+  Plant/Component.hh
+  Plant/ConnectedLoopData.hh
+  Plant/Connection.hh
+  Plant/Loop.hh
+  Plant/LoopSide.hh
+  Plant/MixerData.hh
+  Plant/SplitterData.hh
+  Plant/Subcomponents.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
   PlantChillers.cc
@@ -435,13 +435,13 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
-  Plant/Topology/PlantLocation.hh
+  Plant/PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
-  Plant/Solution/PlantLoopSolver.cc
-  Plant/Solution/PlantLoopSolver.hh
-  Plant/Solution/PlantManager.cc
-  Plant/Solution/PlantManager.hh
+  Plant/PlantLoopSolver.cc
+  Plant/PlantLoopSolver.hh
+  Plant/PlantManager.cc
+  Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
   PlantPipingSystemsManager.hh
   PlantPressureSystem.cc

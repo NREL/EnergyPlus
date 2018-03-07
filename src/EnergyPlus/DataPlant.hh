@@ -57,14 +57,14 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
-#include <Plant/Solution/PlantLoopSolver.hh>
+#include <Plant/PlantLoopSolver.hh>
 #include <OutputProcessor.hh>
-#include <Plant/Operation/CallingOrder.hh>
-#include <Plant/Operation/Enums.hh>
-#include <Plant/Operation/PlantAvailManager.hh>
-#include <Plant/Reporting/ReportLoopData.hh>
-#include <Plant/Reporting/ReportVars.hh>
-#include <Plant/Topology/Loop.hh>
+#include <Plant/CallingOrder.hh>
+#include <Plant/Enums.hh>
+#include <Plant/PlantAvailManager.hh>
+#include <Plant/ReportLoopData.hh>
+#include <Plant/ReportVars.hh>
+#include <Plant/Loop.hh>
 
 namespace EnergyPlus {
 

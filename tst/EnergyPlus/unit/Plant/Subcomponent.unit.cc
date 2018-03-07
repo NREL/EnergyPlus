@@ -45,47 +45,20 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantReportingReportVars_hh_INCLUDED
-#define PlantReportingReportVars_hh_INCLUDED
+// EnergyPlus::Boilers Unit Tests
 
-#include <Plant/Reporting/LoopSideReportVars.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
-namespace EnergyPlus {
-    namespace DataPlant {
+// EnergyPlus Headers
+#include <EnergyPlus/Plant/Subcomponents.hh>
 
-        struct ReportVars {
-            // Members
-            // Whole loop descriptions
-            Real64 CoolingDemand; // Plant Loop Cooling Demand, W
-            Real64 HeatingDemand; // Plant Loop Heating Demand[W]
-            Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
-            Real64 UnmetDemand; // Plant Loop Unmet Demand [W]
-            // Loop side data
-            Array1D <LoopSideReportVars> LoopSide;
-            Real64 BypassFrac; // Debug Variable
-            Real64 InletNodeFlowrate; // Debug Variable
-            Real64 InletNodeTemperature; // Debug Variable
-            Real64 OutletNodeFlowrate; // Debug Variable
-            Real64 OutletNodeTemperature; // Debug Variable
-            int LastLoopSideSimulated;
+#include "Fixtures/EnergyPlusFixture.hh"
 
-            // Default Constructor
-            ReportVars() :
-                    CoolingDemand(0.0),
-                    HeatingDemand(0.0),
-                    DemandNotDispatched(0.0),
-                    UnmetDemand(0.0),
-                    LoopSide(2),
-                    BypassFrac(0.0),
-                    InletNodeFlowrate(0.0),
-                    InletNodeTemperature(0.0),
-                    OutletNodeFlowrate(0.0),
-                    OutletNodeTemperature(0.0),
-                    LastLoopSideSimulated(0) {}
+using namespace EnergyPlus;
 
-        };
-
-    }
+TEST_F(EnergyPlusFixture, Plant_Topology_Subcomponent ) {
+    EnergyPlus::DataPlant::SubcomponentData sc;
+    EnergyPlus::DataPlant::SubSubcomponentData ssc;
+    // Could test default constructor I guess...
 }
-
-#endif

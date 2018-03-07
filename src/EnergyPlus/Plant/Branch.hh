@@ -48,7 +48,7 @@
 #ifndef PlantTopologyBranch_hh_INCLUDED
 #define PlantTopologyBranch_hh_INCLUDED
 
-#include <Plant/Topology/Component.hh>
+#include <Plant/Component.hh>
 
 namespace EnergyPlus {
 	namespace DataPlant {

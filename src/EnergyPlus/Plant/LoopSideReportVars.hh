@@ -45,43 +45,24 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantReportingReporting_hh_INCLUDED
-#define PlantReportingReporting_hh_INCLUDED
-
-#include <Plant/Reporting/ReportBranchData.hh>
+#ifndef PlantReportingLoopSideReportVars_hh_INCLUDED
+#define PlantReportingLoopSideReportVars_hh_INCLUDED
 
 namespace EnergyPlus {
     namespace DataPlant {
 
-        struct ReportLoopData {
+        struct LoopSideReportVars {
             // Members
-            std::string Name; // Name of the component list
-            int NodeNumIn; // Node number for the inlet to this loop
-            std::string NodeNameIn; // Node name for the inlet to this loop
-            int NodeNumOut; // Node number for the outlet to this loop
-            std::string NodeNameOut; // Node name for the outlet to this loop
-            Real64 Electric;
-            Real64 Gas;
-            Real64 Purchased;
-            Real64 OtherEnergy;
-            int TotalBranches; // Total number of branches on the loop
-            Real64 LoopVentLoad;
-            Real64 VentLoadFrac;
-            Array1D <ReportBranchData> Branch; // Branch data
+            Real64 LoopSetPtDemandAtInlet;
+            Real64 ThisSideLoadAlterations;
 
             // Default Constructor
-            ReportLoopData() :
-                    NodeNumIn(0),
-                    NodeNumOut(0),
-                    Electric(0.0),
-                    Gas(0.0),
-                    Purchased(0.0),
-                    OtherEnergy(0.0),
-                    TotalBranches(0),
-                    LoopVentLoad(0.0),
-                    VentLoadFrac(0.0) {}
+            LoopSideReportVars() :
+                    LoopSetPtDemandAtInlet(0.0),
+                    ThisSideLoadAlterations(0.0) {}
 
         };
+
     }
 }
 

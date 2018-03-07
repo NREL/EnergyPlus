@@ -66,7 +66,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <Plant/Solution/PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <SimulationManager.hh>
 #include <SQLiteProcedures.hh>

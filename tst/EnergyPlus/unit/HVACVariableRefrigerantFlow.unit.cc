@@ -82,7 +82,7 @@
 #include <HVACFan.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <OutputReportPredefined.hh>
-#include <Plant/Solution/PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SizingManager.hh>

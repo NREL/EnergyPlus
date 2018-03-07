@@ -54,7 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <Plant/Topology/LoopSide.hh>
+#include <Plant/LoopSide.hh>
 
 namespace EnergyPlus {
 

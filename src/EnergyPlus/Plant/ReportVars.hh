@@ -45,24 +45,43 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantReportingLoopSideReportVars_hh_INCLUDED
-#define PlantReportingLoopSideReportVars_hh_INCLUDED
+#ifndef PlantReportingReportVars_hh_INCLUDED
+#define PlantReportingReportVars_hh_INCLUDED
 
-#include <Plant/Topology/Connection.hh>
-#include <Plant/Topology/Subcomponents.hh>
+#include <Plant/LoopSideReportVars.hh>
 
 namespace EnergyPlus {
     namespace DataPlant {
 
-        struct LoopSideReportVars {
+        struct ReportVars {
             // Members
-            Real64 LoopSetPtDemandAtInlet;
-            Real64 ThisSideLoadAlterations;
+            // Whole loop descriptions
+            Real64 CoolingDemand; // Plant Loop Cooling Demand, W
+            Real64 HeatingDemand; // Plant Loop Heating Demand[W]
+            Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
+            Real64 UnmetDemand; // Plant Loop Unmet Demand [W]
+            // Loop side data
+            Array1D <LoopSideReportVars> LoopSide;
+            Real64 BypassFrac; // Debug Variable
+            Real64 InletNodeFlowrate; // Debug Variable
+            Real64 InletNodeTemperature; // Debug Variable
+            Real64 OutletNodeFlowrate; // Debug Variable
+            Real64 OutletNodeTemperature; // Debug Variable
+            int LastLoopSideSimulated;
 
             // Default Constructor
-            LoopSideReportVars() :
-                    LoopSetPtDemandAtInlet(0.0),
-                    ThisSideLoadAlterations(0.0) {}
+            ReportVars() :
+                    CoolingDemand(0.0),
+                    HeatingDemand(0.0),
+                    DemandNotDispatched(0.0),
+                    UnmetDemand(0.0),
+                    LoopSide(2),
+                    BypassFrac(0.0),
+                    InletNodeFlowrate(0.0),
+                    InletNodeTemperature(0.0),
+                    OutletNodeFlowrate(0.0),
+                    OutletNodeTemperature(0.0),
+                    LastLoopSideSimulated(0) {}
 
         };
 

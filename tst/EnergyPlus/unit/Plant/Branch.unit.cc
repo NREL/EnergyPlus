@@ -51,14 +51,44 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/Topology/Subcomponents.hh>
+#include <EnergyPlus/Plant/Component.hh>
+#include <EnergyPlus/Plant/Branch.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, Plant_Topology_Subcomponent ) {
-    EnergyPlus::DataPlant::SubcomponentData sc;
-    EnergyPlus::DataPlant::SubSubcomponentData ssc;
-    // Could test default constructor I guess...
+TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad) {
+    EnergyPlus::DataPlant::BranchData b;
+    b.Comp.allocate(3);
+
+    b.Comp[0].MyLoad = 20000;
+    b.Comp[1].MyLoad = 21000;
+    b.Comp[2].MyLoad = 22000;
+    Real64 maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
+
+    b.Comp[0].MyLoad = 22000;
+    b.Comp[1].MyLoad = 21000;
+    b.Comp[2].MyLoad = 20000;
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
+
+    b.Comp[0].MyLoad = 0;
+    b.Comp[1].MyLoad = -21000;
+    b.Comp[2].MyLoad = 22000;
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
+
+    b.Comp[0].MyLoad = 0;
+    b.Comp[1].MyLoad = 0;
+    b.Comp[2].MyLoad = -22000;  // still highest via absolute value
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
+
+    b.Comp[0].MyLoad = 0;
+    b.Comp[1].MyLoad = 21000;
+    b.Comp[2].MyLoad = -22000;
+    maxLoad = b.max_abs_Comp_MyLoad();
+    ASSERT_NEAR(22000, maxLoad, 0.001);
 }

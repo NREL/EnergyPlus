@@ -55,7 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <Plant/Solution/PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <BranchInputManager.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
@@ -77,7 +77,7 @@
 #include <Pipes.hh>
 #include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
-#include <Plant/Solution/PlantLoopSolver.hh>
+#include <Plant/PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>

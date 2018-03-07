@@ -114,8 +114,8 @@ set( test_src
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
   Pipes.unit.cc
-  Plant/Topology/Branch.unit.cc
-  Plant/Topology/Subcomponent.unit.cc
+  Plant/Branch.unit.cc
+  Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc

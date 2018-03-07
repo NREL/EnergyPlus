@@ -45,50 +45,28 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Boilers Unit Tests
+#ifndef PlantOperationCallingOrder_hh_INCLUDED
+#define PlantOperationCallingOrder_hh_INCLUDED
 
-// Google Test Headers
-#include <gtest/gtest.h>
+#include <Plant/MeterData.hh>
 
-// EnergyPlus Headers
-#include <EnergyPlus/Plant/Topology/Component.hh>
-#include <EnergyPlus/Plant/Topology/Branch.hh>
+namespace EnergyPlus {
+    namespace DataPlant {
 
-#include "Fixtures/EnergyPlusFixture.hh"
+        struct PlantCallingOrderInfoStruct {
+            // Members
+            int LoopIndex; // plant or condenser loop indexes in calling order
+            int LoopSide; // plant or condenser loop sides in calling order
+            int LoopPumpSimulationType; // type of pump topology on half loop
 
-using namespace EnergyPlus;
+            // Default Constructor
+            PlantCallingOrderInfoStruct() :
+                    LoopIndex(0),
+                    LoopSide(0),
+                    LoopPumpSimulationType(0) {}
 
-TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad) {
-    EnergyPlus::DataPlant::BranchData b;
-    b.Comp.allocate(3);
-
-    b.Comp[0].MyLoad = 20000;
-    b.Comp[1].MyLoad = 21000;
-    b.Comp[2].MyLoad = 22000;
-    Real64 maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
-
-    b.Comp[0].MyLoad = 22000;
-    b.Comp[1].MyLoad = 21000;
-    b.Comp[2].MyLoad = 20000;
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
-
-    b.Comp[0].MyLoad = 0;
-    b.Comp[1].MyLoad = -21000;
-    b.Comp[2].MyLoad = 22000;
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
-
-    b.Comp[0].MyLoad = 0;
-    b.Comp[1].MyLoad = 0;
-    b.Comp[2].MyLoad = -22000;  // still highest via absolute value
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
-
-    b.Comp[0].MyLoad = 0;
-    b.Comp[1].MyLoad = 21000;
-    b.Comp[2].MyLoad = -22000;
-    maxLoad = b.max_abs_Comp_MyLoad();
-    ASSERT_NEAR(22000, maxLoad, 0.001);
+        };
+    }
 }
+
+#endif

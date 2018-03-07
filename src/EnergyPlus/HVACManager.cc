@@ -91,7 +91,7 @@
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <PlantCondLoopOperation.hh>
-#include <Plant/Solution/PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <PlantUtilities.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>

@@ -45,50 +45,27 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantReportingReportCompData_hh_INCLUDED
-#define PlantReportingReportCompData_hh_INCLUDED
+#ifndef PlantReportingReportBranchData_hh_INCLUDED
+#define PlantReportingReportBranchData_hh_INCLUDED
 
-#include <Plant/Reporting/MeterData.hh>
-#include <Plant/Topology/Connection.hh>
-#include <Plant/Topology/Subcomponents.hh>
+#include <Plant/ReportCompData.hh>
 
 namespace EnergyPlus {
     namespace DataPlant {
 
-        struct ReportCompData {
+        struct ReportBranchData {
             // Members
-            bool Parent; // TRUE = designated component is made up of sub-components
-            std::string TypeOf; // The 'keyWord' identifying  component type
-            std::string Name; // Component name
-            int CompIndex; // Component Index in whatever is using this component
-            std::string NodeNameIn; // Component inlet node name
-            std::string NodeNameOut; // Component outlet node name
-            int NodeNumIn; // Component inlet node number
-            int NodeNumOut; // Component outlet node number
-            int NumMeteredVars;
-            int NumSubComps;
-            Real64 LoopLoadFrac; // Fraction of loop load met by component
-            Real64 TotPlantSupplyElec;
-            Real64 TotPlantSupplyGas;
-            Real64 TotPlantSupplyPurch;
-            Real64 TotPlantSupplyOther;
-            PlantConnection ConnectPlant; // Index of energy output report data
-            Array1D <MeterData> MeteredVar; // Index of energy output report data
-            Array1D <SubcomponentData> SubComp;
+            std::string Name; // Name of the branch
+            int TotalComponents; // Total number of components on the branch
+            int NodeNumIn; // Branch inlet node number
+            int NodeNumOut; // Branch outlet node number
+            Array1D <ReportCompData> Comp; // Component type list
 
             // Default Constructor
-            ReportCompData() :
-                    Parent(false),
-                    CompIndex(0),
+            ReportBranchData() :
+                    TotalComponents(0),
                     NodeNumIn(0),
-                    NodeNumOut(0),
-                    NumMeteredVars(0),
-                    NumSubComps(0),
-                    LoopLoadFrac(0.0),
-                    TotPlantSupplyElec(0.0),
-                    TotPlantSupplyGas(0.0),
-                    TotPlantSupplyPurch(0.0),
-                    TotPlantSupplyOther(0.0) {}
+                    NodeNumOut(0) {}
 
         };
 
