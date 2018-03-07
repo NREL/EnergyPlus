@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <ConfiguredFunctions.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
@@ -1318,6 +1319,13 @@ namespace EnergyPlus {
 		GetProjectControlData( ErrorsFound ); // returns ErrorsFound false
 		EXPECT_FALSE( ErrorsFound );
 		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi" );
+	}
+
+	TEST_F( EnergyPlusFixture, HeatBalanceManager_ComplexFenestrationStateInputTest )
+	{
+        ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/tst/EnergyPlus/unit/Resources/MonsterComplexFenestrationTestInputs.idf" ) ) ) );
+		bool errorsFound = false;
+		HeatBalanceManager::GetConstructData(errorsFound);
 	}
 
 }
