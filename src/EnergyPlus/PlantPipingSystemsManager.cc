@@ -119,8 +119,8 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_ZoneCoupled_Basement( "Site:GroundDomain:Basement" );
 
 	// MODULE VARIABLE DECLARATIONS:
-	Array1D< Direction > NeighborFieldCells( 6 );
-	Array1D< Direction > NeighborBoundaryCells( 6 );
+	Array1D< Direction > NeighborFieldCells;
+	Array1D< Direction > NeighborBoundaryCells;
 	Array1D< FullDomainStructureInfo > PipingSystemDomains;
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
@@ -486,6 +486,9 @@ namespace PlantPipingSystemsManager {
 		int TotalNumSegments;
 		int ThisCircuitPipeSegmentCounter;
 		std::string ThisSegmentName;
+
+		NeighborFieldCells.allocate(6);
+		NeighborBoundaryCells.allocate(6);
 
 		// Read number of objects and allocate main data structures - first domains
 		NumGeneralizedDomains = inputProcessor->getNumObjectsFound( ObjName_ug_GeneralDomain );

@@ -55,6 +55,7 @@
 #include "EnergyPlus/HeatBalanceManager.hh"
 #include "EnergyPlus/PlantPipingSystemsManager.hh"
 #include "EnergyPlus/SurfaceGeometry.hh"
+#include "EnergyPlus/DataPlant.hh"
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
@@ -1622,4 +1623,111 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelec
 	ReadBasementInputs( 1, 1, errorsFound );
 
 	EXPECT_TRUE( errorsFound );
+}
+
+TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
+
+	std::string const idf_objects = delimited_string({
+		"  PipingSystem:Underground:Domain,",
+		"    My Piping System,        !- Name",
+		"    4,                       !- Xmax {m}",
+		"    2.5,                     !- Ymax {m}",
+		"    75,                      !- Zmax {m}",
+		"    2,                       !- X-Direction Mesh Density Parameter",
+		"    Uniform,                 !- X-Direction Mesh Type",
+		"    ,                        !- X-Direction Geometric Coefficient",
+		"    2,                       !- Y-Direction Mesh Density Parameter",
+		"    Uniform,                 !- Y-Direction Mesh Type",
+		"    ,                        !- Y-Direction Geometric Coefficient",
+		"    6,                       !- Z-Direction Mesh Density Parameter",
+		"    Uniform,                 !- Z-Direction Mesh Type",
+		"    ,                        !- Z-Direction Geometric Coefficient",
+		"    1.08,                    !- Soil Thermal Conductivity {W/m-K}",
+		"    962,                     !- Soil Density {kg/m3}",
+		"    2576,                    !- Soil Specific Heat {J/kg-K}",
+		"    30,                      !- Soil Moisture Content Volume Fraction {percent}",
+		"    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}",
+		"    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+		"    KATemps,                 !- Undisturbed Ground Temperature Model Name",
+		"    No,                      !- This Domain Includes Basement Surface Interaction",
+		"    ,                        !- Width of Basement Floor in Ground Domain {m}",
+		"    ,                        !- Depth of Basement Wall In Ground Domain {m}",
+		"    ,                        !- Shift Pipe X Coordinates By Basement Width",
+		"    ,                        !- Name of Basement Wall Boundary Condition Model",
+		"    ,                        !- Name of Basement Floor Boundary Condition Model",
+		"    0.005,                   !- Convergence Criterion for the Outer Cartesian Domain Iteration Loop {deltaC}",
+		"    100,                     !- Maximum Iterations in the Outer Cartesian Domain Iteration Loop",
+		"    0.408,                   !- Evapotranspiration Ground Cover Parameter",
+		"    1,                       !- Number of Pipe Circuits Entered for this Domain",
+		"    My Pipe Circuit;         !- Pipe Circuit 1",
+
+		"  Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+		"    KATemps,                 !- Name",
+		"    1.08,                    !- Soil Thermal Conductivity {W/m-K}",
+		"    962,                     !- Soil Density {kg/m3}",
+		"    2576,                    !- Soil Specific Heat {J/kg-K}",
+		"    15.5,                    !- Average Soil Surface Temperature {C}",
+		"    12.8,                    !- Average Amplitude of Surface Temperature {deltaC}",
+		"    17.3;                    !- Phase Shift of Minimum Surface Temperature {days}",
+
+		"  PipingSystem:Underground:PipeCircuit,",
+		"    My Pipe Circuit,         !- Name",
+		"    0.3895,                  !- Pipe Thermal Conductivity {W/m-K}",
+		"    641,                     !- Pipe Density {kg/m3}",
+		"    2405,                    !- Pipe Specific Heat {J/kg-K}",
+		"    0.016,                   !- Pipe Inner Diameter {m}",
+		"    0.02667,                 !- Pipe Outer Diameter {m}",
+		"    0.004,                   !- Design Flow Rate {m3/s}",
+		"    Plant Supply Intermediate Node,  !- Circuit Inlet Node",
+		"    Plant Supply Outlet Node,!- Circuit Outlet Node",
+		"    0.001,                   !- Convergence Criterion for the Inner Radial Iteration Loop {deltaC}",
+		"    100,                     !- Maximum Iterations in the Inner Radial Iteration Loop",
+		"    2,                       !- Number of Soil Nodes in the Inner Radial Near Pipe Mesh Region",
+		"    0.03,                    !- Radial Thickness of Inner Radial Near Pipe Mesh Region",
+		"    2,                       !- Number of Pipe Segments Entered for this Pipe Circuit",
+		"    Segment 1,               !- Pipe Segment 1",
+		"    Segment 2;               !- Pipe Segment 2",
+
+		"  PipingSystem:Underground:PipeSegment,",
+		"    Segment 1,               !- Name",
+		"    1.95,                    !- X Position {m}",
+		"    1.25,                    !- Y Position {m}",
+		"    IncreasingZ;             !- Flow Direction",
+
+		"  PipingSystem:Underground:PipeSegment,",
+		"    Segment 2,               !- Name",
+		"    2.05,                    !- X Position {m}",
+		"    1.25,                    !- Y Position {m}",
+		"    DecreasingZ;             !- Flow Direction"
+	});
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	// Setup the plant itself manually
+	DataPlant::TotNumLoops = 1;
+	DataPlant::PlantLoop.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide.allocate(2);
+	DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+	DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+
+	int compIndex = 0;
+	bool firstHVAC = true; // not used
+
+	// first call, set initLoopEquip to true; it will only call GetInput
+	bool initLoopEquip = true;
+	PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
+
+	// second call, turn off initLoopEquip so it tries to do a simulation
+	initLoopEquip = false;
+	PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
+
 }
