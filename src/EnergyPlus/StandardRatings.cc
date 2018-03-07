@@ -183,13 +183,13 @@ namespace StandardRatings {
 	// Test H3 (low and High Speed) Std. AHRI 210/240
 
 	// ANSI/ASHRAE Standard 127-2012 -- Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
-	//  Class 1 23.9°C( 75.0°F ) 23.9°C( 75.0°F ) 23.9°C( 75.0°F ) 23.9°C( 75.0°F )
-	//	Class 2 29.4°C( 85.0°F ) 29.4°C( 85.0°F ) 29.4°C( 85.0°F ) 29.4°C( 85.0°F )
-	//	Class 3 35.0°C( 95.0°F ) 35.0°C( 95.0°F ) 35.0°C( 95.0°F ) 35.0°C( 95.0°F )
-	//	Class 4 40.5°C( 105°F ) 40.5°C( 105°F ) 40.5°C( 105°F ) 40.5°C( 105°F )
+	//  Class 1 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F )
+	//	Class 2 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F )
+	//	Class 3 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F )
+	//	Class 4 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F )
 	Array1D < Real64 > const IndoorDBTempClassI2IV( 4, { 23.9, 29.4, 35.0, 40.5 } );
 	Real64 const IndoorTDPA2D( 11.1 );
-	//35.0°C( 95.0°F ) 26.7°C( 80.0°F ) 18.3°C( 65.0°F ) 4.4°C( 40.0°F )
+	//35.0C( 95.0F ) 26.7C( 80.0F ) 18.3C( 65.0F ) 4.4C( 40.0F )
 	Array1D < Real64 > const OutdoorDBTempAllClassA2D( 4, { 35.0, 26.7, 18.3, 4.4 } );
 
 	// Functions
