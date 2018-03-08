@@ -12698,6 +12698,11 @@ namespace OutputReportTabular {
 		CompLoadTablesType & compLoadTotal
 	)
 	{
+
+		// zero the grand total -total cell
+		compLoadTotal.cells( cTotal, rGrdTot ) = 0.;
+		compLoadTotal.cellUsed( cTotal, rGrdTot ) = true;
+
 		// zero the grand total row
 		for ( int col = 1; col <= cLatent; ++col ) {
 			compLoadTotal.cells( col, rGrdTot ) = 0.;
@@ -12717,7 +12722,6 @@ namespace OutputReportTabular {
 				}
 			}
 		}
-		compLoadTotal.cellUsed( cTotal, rGrdTot ) = true;
 
 		// compute the % grand total column
 		Real64 grandTotalTotal = compLoadTotal.cells( cTotal, rGrdTot );
