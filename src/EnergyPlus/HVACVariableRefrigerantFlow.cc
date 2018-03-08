@@ -2327,7 +2327,8 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).RatedCompPowerPerCapcity = rNumericArgs( 2 );
 			VRF( VRFNum ).RatedCompPower = VRF( VRFNum ).RatedCompPowerPerCapcity * VRF( VRFNum ).RatedEvapCapacity;
 			VRF( VRFNum ).CoolingCapacity = VRF( VRFNum ).RatedEvapCapacity;
-			VRF( VRFNum ).HeatingCapacity = VRF( VRFNum ).RatedEvapCapacity * ( 1 + VRF( VRFNum ).RatedCompPowerPerCapcity );
+			VRF( VRFNum ).RatedHeatCapacity = VRF( VRFNum ).RatedEvapCapacity * ( 1 + VRF( VRFNum ).RatedCompPowerPerCapcity );
+			VRF( VRFNum ).HeatingCapacity = VRF( VRFNum ).RatedHeatCapacity;
 
 			//Reference system COP
 			VRF( VRFNum ).CoolingCOP = 1 / VRF( VRFNum ).RatedCompPowerPerCapcity;
@@ -5625,6 +5626,9 @@ namespace HVACVariableRefrigerantFlow {
 
 			if ( FoundAll && ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl )) {
 			// Size VRF rated evaporative capacity (VRF-FluidTCtrl Model)
+				// Set piping correction factors to 1.0 here for reporting to eio output - recalculated every time step in VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl
+				VRF( VRFCond ).PipingCorrectionCooling = 1.0;
+				VRF( VRFCond ).PipingCorrectionHeating = 1.0;
 
 				// Size VRF( VRFCond ).RatedEvapCapacity
 				IsAutoSize = false;
@@ -5650,8 +5654,8 @@ namespace HVACVariableRefrigerantFlow {
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", VRF( VRFCond ).HeatingCapacity );
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", VRF( VRFCond ).CoolingCapacity );
 				} else {
-					CoolingCapacityUser = VRF( VRFCond ).CoolingCapacity;
-					HeatingCapacityUser = VRF( VRFCond ).HeatingCapacity;
+					CoolingCapacityUser = VRF( VRFCond ).RatedEvapCapacity;
+					HeatingCapacityUser = VRF( VRFCond ).RatedHeatCapacity;
 
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", CoolingCapacityDes, "User-Specified Rated Total Cooling Capacity (gross) [W]", CoolingCapacityUser );
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", HeatingCapacityDes, "User-Specified Rated Total Heating Capacity [W]", HeatingCapacityUser );
