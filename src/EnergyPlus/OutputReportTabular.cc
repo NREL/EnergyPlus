@@ -12677,6 +12677,7 @@ namespace OutputReportTabular {
 		compLoadTotal.zoneDryBulb = compLoadPartial.zoneDryBulb;
 		compLoadTotal.zoneRelHum = compLoadPartial.zoneRelHum;
 		compLoadTotal.zoneHumRatio = compLoadPartial.zoneHumRatio;
+		compLoadTotal.supAirTemp = compLoadPartial.supAirTemp;
 
 		// sum the peak related values
 		compLoadTotal.designPeakLoad += compLoadPartial.designPeakLoad * multiplier;
