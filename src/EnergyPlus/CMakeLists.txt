@@ -409,8 +409,8 @@ SET( SRC
   Plant/PlantConvergencePoint.hh
   Plant/LoopSideReportVars.hh
   Plant/MeterData.hh
-  Plant/ReportBranchData
-  Plant/ReportCompData
+  Plant/ReportBranchData.hh
+  Plant/ReportCompData.hh
   Plant/ReportLoopData.hh
   Plant/ReportVars.hh
   Plant/Branch.hh
@@ -614,6 +614,8 @@ SET( SRC
   ZoneTempPredictorCorrector.cc
   ZoneTempPredictorCorrector.hh
 )
+
+CREATE_SRC_GROUPS( "${SRC}" )
 
 if (UNIX)
   ADD_DEFINITIONS("-fPIC")
