@@ -666,7 +666,7 @@ namespace HVACCooledBeam {
 						// the design cooling coil load is the zone load minus whatever the central system does. Note that
 						// DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
 						if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak > 0.0 ) {
-							DesCoilLoad = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolLoad - CpAir * RhoAir * DesAirVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU );
+							DesCoilLoad = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesAirVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU );
 						} else {
 							DesCoilLoad = CpAir * RhoAir * DesAirVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
 						}
