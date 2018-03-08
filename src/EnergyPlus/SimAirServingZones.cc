@@ -4861,7 +4861,6 @@ namespace SimAirServingZones {
 		static Real64 Vou( 0.0 ); // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
 		static Real64 Vot( 0.0 ); // Required outdoor air intake at primary AHU per ASHRAE std 62.1
 		Real64 SysHtgPeakAirflow; // Peak heating airflow
-		int NumZonesForHtg; // Number of heating zones for given primary system
 		int MatchingCooledZoneNum; // temporary variable
 		Real64 termunitsizingtempfrac; // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
 		Real64 termunitsizingtemp; // (1.0+termunitsizing(ctrlzone)%inducrat)
