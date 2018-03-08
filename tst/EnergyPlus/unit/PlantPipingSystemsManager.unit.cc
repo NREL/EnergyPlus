@@ -1785,6 +1785,18 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 	bool initLoopEquip = true;
 	PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
 
+	EXPECT_EQ(2u, PlantPipingSystemsManager::PipingSystemDomains.size());
+
+	EXPECT_TRUE(PlantPipingSystemsManager::PipingSystemDomains(1).HasAPipeCircuit);
+	EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.X.RegionMeshCount);
+	EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Y.RegionMeshCount);
+	EXPECT_EQ(6, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Z.RegionMeshCount);
+
+    EXPECT_FALSE(PlantPipingSystemsManager::PipingSystemDomains(2).HasAPipeCircuit);
+	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.X.RegionMeshCount);
+	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Y.RegionMeshCount);
+	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Z.RegionMeshCount);
+
 	// second call, turn off initLoopEquip so it tries to do a simulation
 	initLoopEquip = false;
 	PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
