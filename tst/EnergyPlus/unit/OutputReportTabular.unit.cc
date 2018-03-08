@@ -70,6 +70,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -6123,6 +6124,7 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	ShowMessage( "Begin Test: OutputReportTabularTest, CollectPeakZoneConditions_test" );
 
 	Psychrometrics::InitializePsychRoutines();
+	createCoilSelectionReportObj();
 
 	CompLoadTablesType compLoad;
 	int timeOfMax = 10;
