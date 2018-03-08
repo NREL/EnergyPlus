@@ -77,7 +77,7 @@ namespace EnergyPlus {
 			int PressureCurveType; // Either none, pressure curve, or generic curve
 			int PressureCurveIndex; // Curve: index for pressure drop calculations
 			Real64 PressureEffectiveK;
-			bool QuickDisableForCSBranchPumping;
+			bool disableOverrideForCSBranchPumping;
 
 			// Default Constructor
 			BranchData() :
@@ -101,7 +101,7 @@ namespace EnergyPlus {
 					PressureCurveType(0),
 					PressureCurveIndex(0),
 					PressureEffectiveK(0.0),
-					QuickDisableForCSBranchPumping(false) {}
+					disableOverrideForCSBranchPumping(false) {}
 
 			// Max abs of Comp array MyLoad values //Autodesk:Tuned For replacement of any( abs( Comp.MyLoad() > SmallLoad ) usage
 			Real64

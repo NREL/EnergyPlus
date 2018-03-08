@@ -242,7 +242,7 @@ namespace PlantLoopSolver {
 	{
 		for ( int branchNum = 2; branchNum <= loop_side.TotalBranches-1; ++branchNum ) {
 			auto & branch = loop_side.Branch( branchNum );
-			branch.QuickDisableForCSBranchPumping = false;
+			branch.disableOverrideForCSBranchPumping = false;
 		}
 	}
 
@@ -269,7 +269,7 @@ namespace PlantLoopSolver {
                 }
             }
             if ( abs(totalDispatchedLoadOnBranch) < 0.001 ) {
-				branch.QuickDisableForCSBranchPumping = true;
+				branch.disableOverrideForCSBranchPumping = true;
             }
         }
     }
@@ -720,7 +720,7 @@ namespace PlantLoopSolver {
 
 				if ( BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide ) ++ParallelBranchIndex;
 
-				if ( branch.QuickDisableForCSBranchPumping ) {
+				if ( branch.disableOverrideForCSBranchPumping ) {
 					continue;
 				}
 

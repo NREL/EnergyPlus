@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "EnergyPlus/DataSurfaces.hh"
 #include "EnergyPlus/HeatBalanceManager.hh"
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include "EnergyPlus/PlantPipingSystemsManager.hh"
 #include "EnergyPlus/SurfaceGeometry.hh"
 #include "EnergyPlus/DataPlant.hh"
@@ -1628,6 +1629,52 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelec
 TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 
 	std::string const idf_objects = delimited_string({
+		"Site:GroundDomain:Basement,",
+			"CoupledBasement,	!- Name",
+			"5,				!- Ground Domain Depth {m}",
+			"1,				!- Aspect Ratio",
+			"5,				!- Domain Perimeter Offset {m}",
+			"1.8,			!- Soil Thermal Conductivity {W/m-K}",
+			"3200,			!- Soil Density {kg/m3}",
+			"836,			!- Soil Specific Heat {J/kg-K}",
+			"30,			!- Soil Moisture Content Volume Fraction {percent}",
+			"50,			!- Soil Moisture Content Volume Fraction at Saturation {percent}",
+			"Site:GroundTemperature:Undisturbed:KusudaAchenbach,	!- Type of Undisturbed Ground Temperature Model",
+			"KATemps,		!- Name of Undisturbed Ground Temperature Model",
+			"1,				!- Evapotranspiration Ground Cover Parameter",
+			"GroundCoupledOSCM,		!- Name of Basement Floor Boundary Condition Model",
+			"Yes,					!- Basement Horizontal Underfloor Insulation Present (Yes/No)",
+			"Dummy Material,		!- Basement Horizontal Insulation Underfloor Material Name",
+			"Perimeter,				!- Full Horizontal or Perimeter Only (Full/Perimeter)",
+			"1,						!- Perimeter width (m)",
+			"2.5,					!- Depth of Basement Wall In Ground Domain {m}",
+			"GroundCoupledOSCM,		!- Name of Basement Floor Boundary Condition Model",
+			"Yes,					!- Basement Wall Vertical Insulation Present(Yes/No)",
+			"Dummy Material,		!- Basement Wall Vertical Insulation Material Name",
+			"2.3,					!- Vertical insulation depth from surface (m)",
+			"timestep;				!- Domain Update interval. (Timestep, Hourly)",
+		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+			"KATemps,		!- Name of object",
+			"1.8,			!- Soil Thermal Conductivity {W/m-K}",
+			"3200,			!- Soil Density {kg/m3}",
+			"836,			!- Soil Specific Heat {J/kg-K}",
+			"15.5,			!- Annual average surface temperature {C}",
+			"12.8,			!- Annual amplitude of surface temperature {delta C}",
+			"17.3;			!- Phase shift of minimum surface temperature {days}",
+		"SurfaceProperty:OtherSideConditionsModel,",
+			"GroundCoupledOSCM,		!- Name",
+			"GroundCoupledSurface;	!- Type of Modeling",
+		"Material,",
+			"Dummy Material, !- Name",
+			"MediumRough,	!- Roughness",
+			"0.1397,		!- Thickness {m}",
+			"1.8,			!- Conductivity {W/m-K}",
+			"2400,			!- Density {kg/m3}",
+			"750,			!- Specific Heat {J/kg-K}",
+			"0.9,			!- Thermal Absorptance",
+			"0.65,			!- Solar Absorptance",
+			"0.65;			!- Visible Absorptance",
+
 		"  PipingSystem:Underground:Domain,",
 		"    My Piping System,        !- Name",
 		"    4,                       !- Xmax {m}",
@@ -1719,6 +1766,18 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
 	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
+    // Dummy surface
+    DataSurfaces::TotSurfaces = 1;
+    Surface.allocate( 1 );
+    Surface( 1 ).OSCMPtr = 1;
+    Surface( 1 ).Area = 100;
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+    // Other necessary inputs
+    bool errorsFound = false;
+    GetOSCMData( errorsFound );
+    GetMaterialData( errorsFound );
+
 	int compIndex = 0;
 	bool firstHVAC = true; // not used
 
@@ -1729,5 +1788,10 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 	// second call, turn off initLoopEquip so it tries to do a simulation
 	initLoopEquip = false;
 	PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
+
+	// we can also try to call from the Domain side
+	DataGlobals::BeginSimFlag = true;
+	DataGlobals::BeginEnvrnFlag = true;
+	PlantPipingSystemsManager::SimulateGroundDomains(false);
 
 }

@@ -125,10 +125,12 @@ namespace PlantPipingSystemsManager {
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
 	std::unordered_map< std::string, std::string > GroundDomainUniqueNames;
+	bool GetInputFlag( true ); // First time, input is "gotten"
 
 	void
 	clear_state()
 	{
+		GetInputFlag = true;
 		PipingSystemDomains.deallocate();
 		PipingSystemCircuits.deallocate();
 		PipingSystemSegments.deallocate();
@@ -182,7 +184,6 @@ namespace PlantPipingSystemsManager {
 		static std::string const RoutineName( "SimPipingSystems" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int CircuitNum;
 
 		// Read input if necessary
@@ -259,7 +260,6 @@ namespace PlantPipingSystemsManager {
 		static std::string const RoutineName( "InitAndSimGroundDomain" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		static bool WriteEIOFlag( true ); // Set to false once eio information is written
 
 		static gio::Fmt DomainCellsToEIOHeader( "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')" );
@@ -275,7 +275,12 @@ namespace PlantPipingSystemsManager {
 		}
 
 		for ( int DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
+
 			auto & thisDomain( PipingSystemDomains( DomainNum ) );
+
+			// if the domain contains a pipe circuit, it shouldn't be initialized here, it has its own entry point
+			if ( thisDomain.HasAPipeCircuit ) continue;
+
 			if ( thisDomain.DomainNeedsToBeMeshed ) {
 				thisDomain.developMesh();
 			}
