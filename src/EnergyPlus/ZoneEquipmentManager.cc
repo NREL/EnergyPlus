@@ -2747,7 +2747,8 @@ namespace ZoneEquipmentManager {
 							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow = ZoneSizing( DDNum, CtrlZoneNum ).InpDesCoolAirFlow;
 							ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMassFlow = ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow * ZoneSizing( DDNum, CtrlZoneNum ).DesCoolDens;
 						}
-						// Save cooling flows with MinOA for use later
+						// Save cooling flows without MinOA for use later
+						ZoneSizing( DDNum, CtrlZoneNum ).CoolFlowSeqNoOA = ZoneSizing( DDNum, CtrlZoneNum ).CoolFlowSeq ;
 						ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlowNoOA = ZoneSizing( DDNum, CtrlZoneNum ).DesCoolVolFlow;
 						ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMassFlowNoOA = ZoneSizing( DDNum, CtrlZoneNum ).DesCoolMassFlow;
 					}
@@ -2923,6 +2924,10 @@ namespace ZoneEquipmentManager {
 							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow = ZoneSizing( DDNum, CtrlZoneNum ).InpDesHeatAirFlow;
 							ZoneSizing( DDNum, CtrlZoneNum ).DesHeatMassFlow = ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow * ZoneSizing( DDNum, CtrlZoneNum ).DesHeatDens;
 						}
+						// Save heating flows without MinOA for use later
+						ZoneSizing( DDNum, CtrlZoneNum ).HeatFlowSeqNoOA = ZoneSizing( DDNum, CtrlZoneNum ).HeatFlowSeq ;
+						ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlowNoOA = ZoneSizing( DDNum, CtrlZoneNum ).DesHeatVolFlow;
+						ZoneSizing( DDNum, CtrlZoneNum ).DesHeatMassFlowNoOA = ZoneSizing( DDNum, CtrlZoneNum ).DesHeatMassFlow;
 					}
 				}
 
