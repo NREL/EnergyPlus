@@ -5962,7 +5962,7 @@ namespace SimAirServingZones {
 					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU = CalcSysSizing( AirLoopNum ).CoolSupHumRat;
 					TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolCoilInHumRatTU;
 					if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow <= 0.0 ) continue;
-					Real64 coolMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingCoolFlow( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlowNoOA );
+					Real64 coolMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesCoolMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing
 					CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow += coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					SysCoolRetTemp += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 					SysCoolRetHumRat += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneHumRatAtCoolPeak * coolMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -6016,7 +6016,7 @@ namespace SimAirServingZones {
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU;
 						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow <= 0.0 ) continue;
-						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlowNoOA );
+						Real64 heatMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing
 						CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow += heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetTemp += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetHumRat += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
@@ -6054,7 +6054,7 @@ namespace SimAirServingZones {
 						// save the system heating supply air hum rat
 						TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatCoilInHumRatTU = CalcSysSizing( AirLoopNum ).HeatSupHumRat;
 						if ( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow <= 0.0 ) continue;
-						Real64 heatMassFlow = TermUnitSizing( TermUnitSizingIndex ).applyTermUnitSizingHeatFlow( TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow, TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlowNoOA );
+						Real64 heatMassFlow = TermUnitFinalZoneSizing( TermUnitSizingIndex ).DesHeatMassFlow; // already scaled for term unit sizing in UpdateTermUnitFinalZoneSizing
 						CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow += heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetTemp += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneRetTempAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
 						SysHeatRetHumRat += TermUnitFinalZoneSizing( TermUnitSizingIndex ).ZoneHumRatAtHeatPeak * heatMassFlow / ( 1.0 + TermUnitSizing( TermUnitSizingIndex ).InducRat );
