@@ -266,6 +266,7 @@ namespace WaterCoils {
 		bool UseDesignWaterDeltaTemp; // is true, the DesignWaterDeltaTemp is used for sizing coil design water flow rate
 		std::string ControllerName; // controller name used by water coil
 		int ControllerIndex; // controller index used by water coil
+		bool reportCoilFinalSizes; // one time report of sizes to coil summary report
 
 		// Default Constructor
 		WaterCoilEquipConditions() :
@@ -380,9 +381,9 @@ namespace WaterCoils {
 			DesignWaterDeltaTemp( 0.0 ),
 			UseDesignWaterDeltaTemp( false ),
 			ControllerName( "" ),
-			ControllerIndex( 0 )
+			ControllerIndex( 0 ),
+			reportCoilFinalSizes( true )
 			{}
-
 	};
 
 	struct WaterCoilNumericFieldData
@@ -431,6 +432,9 @@ namespace WaterCoils {
 		int const CoilNum,
 		bool const FirstHVACIteration // unused1208
 	);
+
+	void // refactor for coil report
+	CalcAdjustedCoilUA( int const CoilNum  ); //refactor for coil report
 
 	void
 	SizeWaterCoil( int const CoilNum );

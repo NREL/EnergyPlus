@@ -60,7 +60,7 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest ) {
 		// issue #6040
 		std::string const idf_objects = delimited_string({
-		
+
 			"  Schedule:Compact,",
 			"    FANANDCOILAVAILSCHED,    !- Name",
 			"    FRACTION,                !- Schedule Type Limits Name",
@@ -353,7 +353,7 @@ namespace EnergyPlus {
 			"    Dimensionless,           !- Input Unit Type for X",
 			"    Dimensionless,           !- Input Unit Type for Y",
 			"    Dimensionless;           !- Output Unit Type",
-		
+
 			"Curve:Biquadratic,",
 			"    5CapacityCurveIpakCS,    !- Name",
 			"    0.551,                   !- Coefficient1 Constant",
@@ -392,7 +392,7 @@ namespace EnergyPlus {
 
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			DataGlobals::NumOfTimeStepInHour = 1;
 			DataGlobals::MinutesPerTimeStep = 60;

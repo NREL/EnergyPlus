@@ -97,6 +97,8 @@ namespace ScheduleManager {
 	extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
 	extern bool ScheduleDSTSFileWarningIssued;
 
+	extern bool ScheduleFileShadingProcessed; // This is false unless there is a Schedule:File:Shading object.
+
 
 	enum class ScheduleInterpolation {
 		No,                       // no interpolation

@@ -62,7 +62,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -93,13 +93,6 @@ namespace NodeInputManager {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::OutputFileBNDetails;
 	using DataGlobals::DisplayAdvancedReportVariables;
-	using InputProcessor::GetNumObjectsFound;
-	using InputProcessor::GetObjectItem;
-	using InputProcessor::FindItemInList;
-	using InputProcessor::VerifyName;
-	using InputProcessor::MakeUPPERCase;
-	using InputProcessor::SameString;
-	using InputProcessor::GetObjectDefMaxArgs;
 	using General::TrimSigDigits;
 	using namespace DataLoopNode;
 	using namespace BranchNodeConnections;
@@ -241,7 +234,7 @@ namespace NodeInputManager {
 		}
 
 		if ( not_blank( Name ) ) {
-			ThisOne = FindItemInList( Name, NodeLists );
+			ThisOne = UtilityRoutines::FindItemInList( Name, NodeLists );
 			if ( ThisOne != 0 ) {
 				NumNodes = NodeLists( ThisOne ).NumOfNodesInList;
 				NodeNumbers( {1,NumNodes} ) = NodeLists( ThisOne ).NodeNumbers( {1,NumNodes} );
@@ -354,7 +347,7 @@ namespace NodeInputManager {
 
 		Try = 0;
 		if ( NumOfNodeLists > 0 ) {
-			Try = FindItemInList( Name, NodeLists );
+			Try = UtilityRoutines::FindItemInList( Name, NodeLists );
 		}
 
 		if ( Try != 0 ) {
@@ -565,17 +558,15 @@ namespace NodeInputManager {
 		int NumNumbers; // Number of numerics in IDF item
 		int IOStatus; // IOStatus for IDF item (not checked)
 		int NCount; // Actual number of node lists
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool flagError; // true when error node list name should be output
 		Array1D_string cAlphas;
 		Array1D< Real64 > rNumbers;
 
 		ErrorsFound = false;
-		GetObjectDefMaxArgs( CurrentModuleObject, NCount, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NCount, NumAlphas, NumNumbers );
 		cAlphas.allocate( NumAlphas );
 		rNumbers.allocate( NumNumbers );
-		NumOfNodeLists = GetNumObjectsFound( CurrentModuleObject );
+		NumOfNodeLists = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NodeLists.allocate( NumOfNodeLists );
 		for ( int i = 1; i <= NumOfNodeLists; ++i ) {
 			NodeLists( i ).Name.clear();
@@ -584,14 +575,9 @@ namespace NodeInputManager {
 
 		NCount = 0;
 		for ( Loop = 1; Loop <= NumOfNodeLists; ++Loop ) {
-			GetObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphas( 1 ), NodeLists, NCount, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				continue;
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus );
+			if ( UtilityRoutines::IsNameEmpty( cAlphas( 1 ), CurrentModuleObject, ErrorsFound) ) continue;
+
 			++NCount;
 			NodeLists( NCount ).Name = cAlphas( 1 );
 			NodeLists( NCount ).NodeNames.allocate( NumAlphas - 1 );
@@ -622,7 +608,7 @@ namespace NodeInputManager {
 					continue;
 				}
 				NodeLists( NCount ).NodeNumbers( Loop1 ) = AssignNodeNumber( NodeLists( NCount ).NodeNames( Loop1 ), NodeType_Unknown, ErrorsFound );
-				if ( SameString( NodeLists( NCount ).NodeNames( Loop1 ), NodeLists( NCount ).Name ) ) {
+				if ( UtilityRoutines::SameString( NodeLists( NCount ).NodeNames( Loop1 ), NodeLists( NCount ).Name ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\", invalid node name in list." );
 					ShowContinueError( "... Node " + TrimSigDigits( Loop1 ) + " Name=\"" + cAlphas( Loop1 + 1 ) + "\", duplicates NodeList Name." );
 					ErrorsFound = true;
@@ -647,7 +633,7 @@ namespace NodeInputManager {
 			for ( Loop2 = 1; Loop2 <= NodeLists( Loop ).NumOfNodesInList; ++Loop2 ) {
 				for ( Loop1 = 1; Loop1 <= NumOfNodeLists; ++Loop1 ) {
 					if ( Loop == Loop1 ) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
-					if ( ! SameString( NodeLists( Loop ).NodeNames( Loop2 ), NodeLists( Loop1 ).Name ) ) continue;
+					if ( ! UtilityRoutines::SameString( NodeLists( Loop ).NodeNames( Loop2 ), NodeLists( Loop1 ).Name ) ) continue;
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + NodeLists( Loop1 ).Name + "\", invalid node name in list." );
 					ShowContinueError( "... Node " + TrimSigDigits( Loop2 ) + " Name=\"" + NodeLists( Loop ).NodeNames( Loop2 ) + "\", duplicates NodeList Name." );
 					ShowContinueError( "... NodeList=\"" + NodeLists( Loop1 ).Name + "\", is duplicated." );
@@ -722,7 +708,7 @@ namespace NodeInputManager {
 
 		NumNode = 0;
 		if ( NumOfUniqueNodeNames > 0 ) {
-			NumNode = FindItemInList( Name, NodeID( {1,NumOfUniqueNodeNames} ), NumOfUniqueNodeNames );
+			NumNode = UtilityRoutines::FindItemInList( Name, NodeID( {1,NumOfUniqueNodeNames} ), NumOfUniqueNodeNames );
 			if ( NumNode > 0 ) {
 				AssignNodeNumber = NumNode;
 				++NodeRef( NumNode );
@@ -830,7 +816,7 @@ namespace NodeInputManager {
 		int NumNums;
 
 		if ( GetOnlySingleNodeFirstTime ) {
-			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+			inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 			GetOnlySingleNodeNodeNums.dimension( NumParams, 0 );
 			GetOnlySingleNodeFirstTime = false;
 		}
@@ -985,7 +971,7 @@ namespace NodeInputManager {
 				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument." );
 			}
 			if ( ! CheckName().empty() ) {
-				Found = FindItemInList( CheckName, UniqueNodeNames, NumCheckNodes );
+				Found = UtilityRoutines::FindItemInList( CheckName, UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
 					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
 					ShowContinueError( "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\"." );
@@ -1007,7 +993,7 @@ namespace NodeInputManager {
 				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument." );
 			}
 			if ( CheckNumber != 0 ) {
-				Found = FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
+				Found = UtilityRoutines::FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
 					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
 					ShowContinueError( "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID( CheckNumber ) + "\"." );
@@ -1179,17 +1165,17 @@ namespace NodeInputManager {
 				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
 				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
-						if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
+					if ( UtilityRoutines::SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
+						if ( UtilityRoutines::SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
 							NodeWetBulbRepReq( iNode ) = true;
 							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
+						} else if ( UtilityRoutines::SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
 							NodeRelHumidityRepReq( iNode ) = true;
 							NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
+						} else if ( UtilityRoutines::SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
 							NodeDewPointRepReq( iNode ) = true;
 							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Specific Heat" ) ) {
+						} else if ( UtilityRoutines::SameString( ReqRepVars( iReq ).VarName, "System Node Specific Heat" ) ) {
 							NodeSpecificHeatRepReq( iNode ) = true;
 							NodeSpecificHeatSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
 						}

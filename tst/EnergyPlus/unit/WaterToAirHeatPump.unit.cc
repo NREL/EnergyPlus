@@ -134,7 +134,7 @@ TEST_F( EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir )
 	} );
 
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	FluidProperties::RefrigData.allocate( 1 );
 	FluidProperties::RefrigData( 1 ).Name = "R22";

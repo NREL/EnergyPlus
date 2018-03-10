@@ -602,6 +602,10 @@ namespace EvaporativeCoolers {
 	//        End of Reporting subroutines for the EvaporativeCoolers Module
 	// *****************************************************************************
 
+	// Used to clear global data between Unit Tests, should not be normally called
+	void
+	clear_state();
+
 } // EvaporativeCoolers
 
 } // EnergyPlus
