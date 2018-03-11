@@ -312,6 +312,7 @@ namespace DataAirLoop {
 		int NumComponents;
 		int NumControllers;
 		int NumSimpleControllers; // number of CONTROLLER:SIMPLE objects in OA Sys controller list
+		int OAControllerPtr;
 		Array1D_string ComponentName;
 		Array1D_string ComponentType;
 		Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
@@ -326,7 +327,8 @@ namespace DataAirLoop {
 			ControllerListNum( 0 ),
 			NumComponents( 0 ),
 			NumControllers( 0 ),
-			NumSimpleControllers( 0 )
+			NumSimpleControllers( 0 ),
+			OAControllerPtr( 0 )
 		{}
 
 	};

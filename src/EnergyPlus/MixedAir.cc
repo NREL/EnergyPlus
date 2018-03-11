@@ -478,6 +478,8 @@ namespace MixedAir {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
 		//INTEGER :: CtrlNum
+		int CtrlNum;
+		int ControllerIndex;
 		int OAMixerNum;
 		int OAControllerNum;
 		static std::string CompType; //Tuned Made static
@@ -492,9 +494,11 @@ namespace MixedAir {
 		//    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
 		//    CALL SimOAController(CtrlName,FirstHVACIteration)
 		//  END DO
-		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
 		CurOASysNum = OASysNum;
-		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
+		CtrlNum = OutsideAirSys( OASysNum ).OAControllerPtr;
+		CtrlName = OutsideAirSys( OASysNum ).ControllerName( CtrlNum );
+		ControllerIndex = OutsideAirSys( OASysNum ).ControllerIndex( CtrlNum );
+		SimOAController( CtrlName, ControllerIndex, FirstHVACIteration, AirLoopNum );
 		SimOASysComponents( OASysNum, FirstHVACIteration, AirLoopNum );
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {
@@ -1179,6 +1183,14 @@ namespace MixedAir {
 					ErrorsFound = true;
 
 				}}
+			}
+
+			// loop through the controller types in the controller list for OA system and save the pointr to the controller 
+			for ( int OAControllerNum = 1; OAControllerNum <= OutsideAirSys( OASysNum ).NumControllers; ++OAControllerNum ) {
+				if ( UtilityRoutines::SameString( OutsideAirSys( OASysNum ).ControllerType( OAControllerNum ), CurrentModuleObjects( CMO_OAController ) ) ) {
+					OutsideAirSys( OASysNum ).OAControllerPtr = OAControllerNum;
+					break;
+				}
 			}
 
 		}
