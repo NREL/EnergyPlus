@@ -295,23 +295,7 @@ void
 	Real64 ThisLoopSideFlow = DataPlant::PlantLoop( LoopNum ).loopSolver.DetermineLoopSideFlowRate( LoopNum, ThisSide, ThisSideInletNode, ThisLoopSideFlowRequest );
 
 	// We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
-	InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide );
-
-	// If we are doing a common pipe simulation, and there is greater other-side flow than this side,
-	// then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
-	if ( DataPlant::PlantLoop( LoopNum ).CommonPipeType != DataPlant::CommonPipe_No ) {
-		const int otherSideOutletNodeNum = DataPlant::PlantLoop( LoopNum ).LoopSide( OtherSide ).NodeNumOut;
-		Real64 otherSideFlow = DataLoopNode::Node( otherSideOutletNodeNum ).MassFlowRate;
-		Real64 commonPipeFlow = otherSideFlow - ThisLoopSideFlow;
-		if ( commonPipeFlow > 0 ) {
-			Real64 const otherSideExitTemp = DataLoopNode::Node( otherSideOutletNodeNum ).Temp;
-			Real64 const Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( LoopNum ).FluidName, otherSideExitTemp, DataPlant::PlantLoop( LoopNum ).FluidIndex, "DoFlowAndLoadSolutionPass" );
-			Real64 LoopSetPointTemperature = DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).TempSetPoint;
-			// Calculate the common pipe demand
-			Real64 const commonPipeLoad = commonPipeFlow * Cp * ( LoopSetPointTemperature - otherSideExitTemp );
-			InitialDemandToLoopSetPoint += commonPipeLoad;
-		}
-	}
+	InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide, ThisLoopSideFlow );
 
 	UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
 
@@ -1216,15 +1200,6 @@ Real64
 				LastComponentSimulated.allocate( NumBranchesInRegion );
 			}
 			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated( i ) = 0; // Only zero the active elements
-//			AccessibleBranches.allocate( NumBranchesInRegion );
-
-//			BranchIndex = 0;
-//			for ( BranchCounter = FirstBranchNum; BranchCounter <= LastBranchNum; ++BranchCounter ) {
-//				++BranchIndex;
-//				AccessibleBranches( BranchIndex ).LoopNum = LoopNum;
-//				AccessibleBranches( BranchIndex ).LoopSideNum = LoopSideNum;
-//				AccessibleBranches( BranchIndex ).BranchNum = BranchCounter;
-//			}
 
 		}
 
@@ -1447,21 +1422,12 @@ Real64
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
 		// Using/Aliasing
 		using DataPlant::LoopSidePumpInformation;
 		using DataPlant::PlantLoop;
 		using DataPlant::TotNumLoops;
 		using DataLoopNode::Node;
 		using Pumps::SimPumps;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopCounter;
@@ -1479,9 +1445,7 @@ Real64
 		int PumpBranchNum;
 		int PumpCompNum;
 		int PumpOutletNode;
-		/////////// hoisted into namespace
-		//static bool EstablishedCompPumpIndeces( false );
-		//////////////////////////////
+
 		//~ One time sweep through all loops/loopsides/pumps, assigning indeces to the pl%ls%br%comp%indexinloopsidepumps variable
 		if ( ! EstablishedCompPumpIndeces ) {
 			for ( LoopCounter = 1; LoopCounter <= TotNumLoops; ++LoopCounter ) {
@@ -1555,7 +1519,8 @@ Real64
 	Real64
 	PlantLoopSolverClass::CalcOtherSideDemand(
 		int const LoopNum,
-		int const ThisSide
+		int const ThisSide,
+        Real64 ThisLoopSideFlow
 	)
 	{
 
@@ -1578,7 +1543,7 @@ Real64
 		// FUNCTION PARAMETER DEFINITIONS:
 		static Array1D_int const InitCompArray( 1, 0 );
 
-		Demand = DataPlant::PlantLoop( LoopNum ).loopSolver.EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, InitCompArray );
+		Demand = DataPlant::PlantLoop( LoopNum ).loopSolver.EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, ThisLoopSideFlow, InitCompArray );
 
 		return Demand;
 
@@ -1590,6 +1555,7 @@ Real64
 		int const LoopSideNum,
 		int const FirstBranchNum,
 		int const LastBranchNum,
+		Real64 ThisLoopSideFlow,
 		Array1S_int LastComponentSimulated
 	)
 	{
@@ -1614,7 +1580,7 @@ Real64
 		using General::RoundSigDigits;
 
 		// Return value
-		Real64 LoadToLoopSetPoint; // function result
+		Real64 LoadToLoopSetPoint = 0.0; // function result
 
 		//~ Indexing variables
 		int BranchCounter; // ~ This contains the index for the %Branch(:) structure
@@ -1627,8 +1593,8 @@ Real64
 		//~ General variables
 		Real64 EnteringTemperature;
 		Real64 MassFlowRate;
-		Real64 SumMdotTimesTemp;
-		Real64 SumMdot;
+		Real64 SumMdotTimesTemp = 0.0;
+		Real64 SumMdot = 0.0;
 		Real64 WeightedInletTemp;
 		Real64 LoopSetPointTemperature;
 		Real64 LoopSetPointTemperatureHi;
@@ -1641,14 +1607,24 @@ Real64
 		Real64 EnthalpySteamSatVapor; // Enthalpy of saturated vapor
 		Real64 EnthalpySteamSatLiquid; // Enthalpy of saturated liquid
 		Real64 LatentHeatSteam; // Latent heat of steam
+		Real64 commonPipeFlow = 0.0;
+		Real64 otherSideExitingTemperature;
 
-		// Initialize
-		LoadToLoopSetPoint = 0.0;
+		// We will place one specialized case in here for common pipe simulations.
+        // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
+        //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
+        //  as the flow going through the actual supply side
+        if ( DataPlant::PlantLoop( LoopNum ).CommonPipeType != DataPlant::CommonPipe_No ) {
+            const int OtherSide = 3 - LoopSideNum;
+            const int otherSideOutletNodeNum = DataPlant::PlantLoop( LoopNum ).LoopSide( OtherSide ).NodeNumOut;
+            commonPipeFlow = DataLoopNode::Node( otherSideOutletNodeNum ).MassFlowRate - ThisLoopSideFlow;
+            otherSideExitingTemperature = DataLoopNode::Node( otherSideOutletNodeNum ).Temp;
+            SumMdotTimesTemp += otherSideExitingTemperature * commonPipeFlow;
+            SumMdot += commonPipeFlow;
+        }
 
 		// Sweep across flow paths in this group and calculate the deltaT and then the load
 		BranchIndex = 0;
-		SumMdotTimesTemp = 0.0;
-		SumMdot = 0.0;
 		for ( BranchCounter = FirstBranchNum; BranchCounter <= LastBranchNum; ++BranchCounter ) {
 
 			++BranchIndex;
@@ -1661,8 +1637,8 @@ Real64
 			EnteringTemperature = Node( EnteringNodeNum ).Temp;
 			MassFlowRate = Node( EnteringNodeNum ).MassFlowRate;
 
-			SumMdotTimesTemp += ( EnteringTemperature * MassFlowRate );
-			SumMdot += ( MassFlowRate );
+			SumMdotTimesTemp += EnteringTemperature * MassFlowRate;
+			SumMdot += MassFlowRate;
 
 		}
 
