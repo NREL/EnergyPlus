@@ -6527,6 +6527,79 @@ TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
 
 }
 
+TEST( OutputReportTabularTest, GetDelaySequencesTwice_test )
+{
+
+	int coolDesSelected = 1;
+	int iZone = 1;
+	TotDesDays = 2;
+	TotRunDesPersDays = 3;
+	NumOfTimeStepInHour = 4;
+
+	NumOfZones = 4;
+	Zone.allocate( NumOfZones );
+
+	Zone( iZone ).SurfaceFirst = 1;
+	Zone( iZone ).SurfaceLast = 1;
+
+	TotSurfaces = 4;
+	Surface.allocate( TotSurfaces );
+	Surface( 1 ).HeatTransSurf = true;
+	Surface( 1 ).Class = SurfaceClass_Window;
+
+	Array1D< Real64 > peopleDelaySeq;
+	peopleDelaySeq.allocate( NumOfTimeStepInHour * 24 );
+	peopleDelaySeq = 0.;
+
+	Array1D< Real64 > peopleDelaySeqCool;
+	peopleDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	peopleDelaySeqCool = 0.;
+
+	Array1D< Real64 > equipDelaySeqCool;
+	equipDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	equipDelaySeqCool = 0.;
+
+	Array1D< Real64 > hvacLossDelaySeqCool;
+	hvacLossDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	hvacLossDelaySeqCool = 0.;
+
+	Array1D< Real64 > powerGenDelaySeqCool;
+	powerGenDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	powerGenDelaySeqCool = 0.;
+
+	Array1D< Real64 > lightDelaySeqCool;
+	lightDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	lightDelaySeqCool = 0.;
+
+	Array1D< Real64 > feneSolarDelaySeqCool;
+	feneSolarDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	feneSolarDelaySeqCool = 0.;
+
+	Array3D< Real64 > feneCondInstantSeq;
+	feneCondInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	feneCondInstantSeq = 0.0;
+
+	Array2D< Real64 > surfDelaySeqCool;
+	surfDelaySeqCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+	surfDelaySeqCool = 0.0;
+
+	AllocateLoadComponentArrays();
+
+	feneCondInstantSeq( coolDesSelected, 1, 1 ) =  0.88;
+
+	netSurfRadSeq( coolDesSelected, 1, 1 ) = 0.05;
+
+	GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
+
+	EXPECT_EQ( 0.83, feneCondInstantSeq( coolDesSelected, 1, 1 )); // the first time the subtraction operation should have occurred
+
+	GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
+
+	EXPECT_EQ( 0.83, feneCondInstantSeq( coolDesSelected, 1, 1 )); // the second time the subtraction should not have happened since it is only adjusted once so the value should be the same.
+
+}
+
+
 TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay )
 {
 	EnergyPlus::sqlite->sqliteBegin();
@@ -6558,5 +6631,6 @@ TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLo
 	EXPECT_EQ( "AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 
 }
+
 
 
