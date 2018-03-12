@@ -546,7 +546,7 @@ Real64
 				if ( ParallelOrOutletIndex == Parallel ) {
 					// The branch index will be the current pathtype + 1 to add the inlet branch
 					BranchIndex = PathCounter + 1;
-				} else if ( ParallelOrOutletIndex == Outlet ) {
+				} else { // ParallelOrOutletIndex == Outlet
 					// The branch index will be the LoopSide outlet node
 					BranchIndex = this_loop_side.TotalBranches;
 				}
