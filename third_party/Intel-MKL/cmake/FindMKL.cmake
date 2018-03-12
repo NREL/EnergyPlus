@@ -64,13 +64,14 @@ if(MKL_SDL)
     set(MKL_MINIMAL_LIBRARY ${MKL_LIBRARY})
 else()
     ######################### Interface layer #######################
-    MESSAGE(STATUS "WIN32:    " ${WIN32})
+#    MESSAGE(STATUS "WIN32:    " ${WIN32})
     if(WIN32)
 #        set(MKL_INTERFACE_LIBNAME mkl_intel_c)
 #        set(MKL_INTERFACE_LIBNAME mkl_intel)
         set(MKL_INTERFACE_LIBNAME mkl_intel_lp64)
     else()
-        set(MKL_INTERFACE_LIBNAME mkl_intel)
+#        set(MKL_INTERFACE_LIBNAME mkl_intel)
+        set(MKL_INTERFACE_LIBNAME mkl_intel_lp64)
     endif()
 
     find_library(MKL_INTERFACE_LIBRARY ${MKL_INTERFACE_LIBNAME}
@@ -79,7 +80,7 @@ else()
     MESSAGE(STATUS "MKL_INTERFACE_LIBRARY:    " ${MKL_INTERFACE_LIBRARY})
 
     ######################## Threading layer ########################
-    MESSAGE(STATUS "MKL_MULTI_THREADED:    " ${MKL_MULTI_THREADED})
+#    MESSAGE(STATUS "MKL_MULTI_THREADED:    " ${MKL_MULTI_THREADED})
     if(MKL_MULTI_THREADED)
         set(MKL_THREADING_LIBNAME mkl_intel_thread)
     else()
@@ -99,8 +100,8 @@ else()
     find_library(MKL_SCALAPACK_LIBRARY mkl_scalapack_core
             PATHS ${MKL_ROOT}/lib/intel64/)
     MESSAGE(STATUS "MKL_CORE_LIBRARY:    " ${MKL_CORE_LIBRARY})
-    MESSAGE(STATUS "MKL_FTT_LIBRARY:    " ${MKL_FFT_LIBRARY})
-    MESSAGE(STATUS "MKL_SCALAPACK_LIBRARY:    " ${MKL_SCALAPACK_LIBRARY})
+#    MESSAGE(STATUS "MKL_FTT_LIBRARY:    " ${MKL_FFT_LIBRARY})
+#    MESSAGE(STATUS "MKL_SCALAPACK_LIBRARY:    " ${MKL_SCALAPACK_LIBRARY})
 
     ############################ RTL layer ##########################
     if(WIN32)
@@ -114,6 +115,8 @@ else()
             PATHS ${MKL_ROOT}/lib/intel64)
     MESSAGE(STATUS "MKL_RTL_LIBNAME:    " ${MKL_RTL_LIBNAME})
     MESSAGE(STATUS "MKL_RTL_LIBRARY:    " ${MKL_RTL_LIBRARY})
+    MESSAGE(STATUS "MKL_ROOT:    " ${MKL_ROOT})
+    MESSAGE(STATUS "MKL_INCLUDE_DIR:    " ${MKL_INCLUDE_DIR})
 
 #    set(MKL_LIBRARY ${MKL_INTERFACE_LIBRARY} ${MKL_THREADING_LIBRARY} ${MKL_CORE_LIBRARY} ${MKL_FFT_LIBRARY} ${MKL_SCALAPACK_LIBRARY} ${MKL_RTL_LIBRARY})
     set(MKL_MINIMAL_LIBRARY ${MKL_INTERFACE_LIBRARY} ${MKL_THREADING_LIBRARY} ${MKL_CORE_LIBRARY} ${MKL_RTL_LIBRARY})

@@ -581,9 +581,11 @@ endif()
 MESSAGE(STATUS "ENERGYPLUS_SOURCE_DIR:    " ${EnergyPlus_SOURCE_DIR})
 set(INTEL_ROOT "${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/" CACHE PATH "Folder contains intel libs")
 set(MKL_SDL False)
+#set(MKL_STATAIC True)
 set(MKL_MULTI_THREADED True)
 set(CMAKE_MODULE_PATH ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/cmake)
 set(MKL_ROOT ${EnergyPlus_SOURCE_DIR}/third_party/Intel-MKL/)
+set(MKL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/third_party/Intel-MKL/include/)
 find_package(MKL REQUIRED)
 
 #set(
