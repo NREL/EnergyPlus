@@ -1766,17 +1766,17 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
 	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
-    // Dummy surface
-    DataSurfaces::TotSurfaces = 1;
-    Surface.allocate( 1 );
-    Surface( 1 ).OSCMPtr = 1;
-    Surface( 1 ).Area = 100;
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+	// Dummy surface
+	DataSurfaces::TotSurfaces = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).OSCMPtr = 1;
+	Surface( 1 ).Area = 100;
+	HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    // Other necessary inputs
-    bool errorsFound = false;
-    GetOSCMData( errorsFound );
-    GetMaterialData( errorsFound );
+	// Other necessary inputs
+	bool errorsFound = false;
+	GetOSCMData( errorsFound );
+	GetMaterialData( errorsFound );
 
 	int compIndex = 0;
 	bool firstHVAC = true; // not used
@@ -1792,7 +1792,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 	EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Y.RegionMeshCount);
 	EXPECT_EQ(6, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Z.RegionMeshCount);
 
-    EXPECT_FALSE(PlantPipingSystemsManager::PipingSystemDomains(2).HasAPipeCircuit);
+	EXPECT_FALSE(PlantPipingSystemsManager::PipingSystemDomains(2).HasAPipeCircuit);
 	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.X.RegionMeshCount);
 	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Y.RegionMeshCount);
 	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Z.RegionMeshCount);

@@ -99,8 +99,8 @@ namespace PlantLoopSolver {
 	Real64 UpdatedDemandToLoopSetPoint;
 	Real64 LoadToLoopSetPointThatWasntMet; // Unmet Demand
 	Real64 InitialDemandToLoopSetPointSAVED;
-    bool CurrentLoopSideIsConstantSpeedBranchPumped;
-    int RefrigIndex( 0 ); // Index denoting refrigerant used (possibly steam)
+	bool CurrentLoopSideIsConstantSpeedBranchPumped;
+	int RefrigIndex( 0 ); // Index denoting refrigerant used (possibly steam)
 
 	static std::string const fluidNameSteam( "STEAM" );
 	namespace {
@@ -123,8 +123,8 @@ namespace PlantLoopSolver {
 		InitialDemandToLoopSetPointSAVED = 0.0;
 		RefrigIndex = 0 ; // Index denoting refrigerant used (possibly steam)
 		EstablishedCompPumpIndeces = false;
-        CurrentLoopSideIsConstantSpeedBranchPumped = false;
-    }
+	    CurrentLoopSideIsConstantSpeedBranchPumped = false;
+	}
 
 	void
 	PlantHalfLoopSolver(
@@ -186,12 +186,12 @@ namespace PlantLoopSolver {
 			}
 
 			// Set the flag to false so we won't do these again this time step
-            thisLoopSide.OncePerTimeStepOperations = false;
+	        thisLoopSide.OncePerTimeStepOperations = false;
 
 		} else {
 
 			// Set the flag to true so that it is activated for the next time step
-            thisLoopSide.OncePerTimeStepOperations = true;
+	        thisLoopSide.OncePerTimeStepOperations = true;
 
 		}
 
@@ -205,11 +205,11 @@ namespace PlantLoopSolver {
 		thisPlantLoop.loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
 
 		// On constant speed branch pump loop sides we need to resimulate
-        if ( CurrentLoopSideIsConstantSpeedBranchPumped ) {
-            // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
+	    if ( CurrentLoopSideIsConstantSpeedBranchPumped ) {
+	        // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
 			thisPlantLoop.loopSolver.DisableAnyBranchPumpsConnectedToUnloadedEquipment(LoopNum, ThisSide);
 			thisPlantLoop.loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode, FirstHVACIteration);
-        }
+	    }
 
 		// A couple things are specific to which LoopSide we are on
 		if ( LoopSideNum == DataPlant::DemandSide ) {
@@ -246,157 +246,157 @@ namespace PlantLoopSolver {
 		}
 	}
 
-    void
+void
 	PlantLoopSolverClass::DisableAnyBranchPumpsConnectedToUnloadedEquipment(
-        int LoopNum,
-        int ThisSide
-    )
-    {
-        auto & loop_side = DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide );
-        for ( int branchNum = 2; branchNum <= loop_side.TotalBranches-1; ++branchNum ) {
-            auto & branch = loop_side.Branch( branchNum );
-            Real64 totalDispatchedLoadOnBranch = 0.0;
-            int pumpCompIndexOnBranch = 0;
-            for ( int compNum = 1; compNum <= branch.TotalComponents; ++ compNum ) {
-                auto & component = branch.Comp( compNum );
+	int LoopNum,
+	int ThisSide
+)
+{
+	auto & loop_side = DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide );
+	for ( int branchNum = 2; branchNum <= loop_side.TotalBranches-1; ++branchNum ) {
+	    auto & branch = loop_side.Branch( branchNum );
+	    Real64 totalDispatchedLoadOnBranch = 0.0;
+	    int pumpCompIndexOnBranch = 0;
+	    for ( int compNum = 1; compNum <= branch.TotalComponents; ++ compNum ) {
+	        auto & component = branch.Comp( compNum );
 				// auto & comp_inlet_node = DataLoopNode::Node( component.NodeNumIn );
 				// auto & comp_outlet_node = DataLoopNode::Node( component.NodeNumOut );
-                auto & t = component.TypeOf_Num;
-                if ( t == DataPlant::TypeOf_PumpConstantSpeed || t == DataPlant::TypeOf_PumpBankConstantSpeed || t == DataPlant::TypeOf_PumpVariableSpeed || t == DataPlant::TypeOf_PumpBankVariableSpeed ) {
-                    pumpCompIndexOnBranch = compNum;
-                } else {
-                    totalDispatchedLoadOnBranch += component.MyLoad;
-                }
-            }
-            if ( abs(totalDispatchedLoadOnBranch) < 0.001 ) {
+	        auto & t = component.TypeOf_Num;
+	        if ( t == DataPlant::TypeOf_PumpConstantSpeed || t == DataPlant::TypeOf_PumpBankConstantSpeed || t == DataPlant::TypeOf_PumpVariableSpeed || t == DataPlant::TypeOf_PumpBankVariableSpeed ) {
+	            pumpCompIndexOnBranch = compNum;
+	        } else {
+	            totalDispatchedLoadOnBranch += component.MyLoad;
+	        }
+	    }
+	    if ( abs(totalDispatchedLoadOnBranch) < 0.001 ) {
 				branch.disableOverrideForCSBranchPumping = true;
-            }
-        }
-    }
+	    }
+	}
+}
 
-    void
+void
 	PlantLoopSolverClass::DoFlowAndLoadSolutionPass(
-        int LoopNum,
-        int ThisSide,
-        int OtherSide,
-        int ThisSideInletNode,
-        bool FirstHVACIteration
-    )
-    {
+	int LoopNum,
+	int ThisSide,
+	int OtherSide,
+	int ThisSideInletNode,
+	bool FirstHVACIteration
+)
+{
 
-        // I don't think we need this actually
-        bool LoopShutDownFlag = false;
+	// I don't think we need this actually
+	bool LoopShutDownFlag = false;
 
-        // First thing is to setup mass flow request information
-        Real64 ThisLoopSideFlowRequest = DataPlant::PlantLoop( LoopNum ).loopSolver.SetupLoopFlowRequest( LoopNum, ThisSide, OtherSide );
+	// First thing is to setup mass flow request information
+	Real64 ThisLoopSideFlowRequest = DataPlant::PlantLoop( LoopNum ).loopSolver.SetupLoopFlowRequest( LoopNum, ThisSide, OtherSide );
 
-        // Now we know what the loop would "like" to run at, let's see the pump
-        // operation range (min/max avail) to see whether it is possible this time around
-        Real64 ThisLoopSideFlow = DataPlant::PlantLoop( LoopNum ).loopSolver.DetermineLoopSideFlowRate( LoopNum, ThisSide, ThisSideInletNode, ThisLoopSideFlowRequest );
+	// Now we know what the loop would "like" to run at, let's see the pump
+	// operation range (min/max avail) to see whether it is possible this time around
+	Real64 ThisLoopSideFlow = DataPlant::PlantLoop( LoopNum ).loopSolver.DetermineLoopSideFlowRate( LoopNum, ThisSide, ThisSideInletNode, ThisLoopSideFlowRequest );
 
-        // We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
-        InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide );
-        UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
+	// We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
+	InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide );
+	UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
 
-        LoadToLoopSetPointThatWasntMet = 0.0;
+	LoadToLoopSetPointThatWasntMet = 0.0;
 
-        // We now have a loop side flow request, along with inlet min/max avails.
-        // We can now make a first pass through the component simulation, requesting flow as necessary.
-        // Normal "supply side" components will set a mass flow rate on their outlet node to request flow,
-        // while "Demand side" components will set a a mass flow request on their inlet node to request flow.
-        DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowUnlocked;
+	// We now have a loop side flow request, along with inlet min/max avails.
+	// We can now make a first pass through the component simulation, requesting flow as necessary.
+	// Normal "supply side" components will set a mass flow rate on their outlet node to request flow,
+	// while "Demand side" components will set a a mass flow request on their inlet node to request flow.
+	DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowUnlocked;
 		DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
 
-        // DSU? discussion/comments about loop solver/flow resolver interaction
-        // At this point, the components have been simulated.  They should have either:
-        //  - logged a massflowrequest
-        //  - or logged a MassFlowRate
-        // We need to decide what the components are going to do on FlowLock=0.
-        // If we want all control here at the solver level, the components just need to
-        //  log their MassFlowRate on their outlet nodes, or some other mechanism.
-        // Then the loop solver can scan the branch and get the max, and this will be the requested
-        //  flow rate for the branch.
-        // The loop solver will then set this as the branch outlet mass flow rate in preparation
-        //  for the flow resolver.
-        // The loop solver may need to do something to the inlet/outlet branch, but I'm not sure yet.
-        // The following comment block is what I had already thought of, and it may still make sense.
+	// DSU? discussion/comments about loop solver/flow resolver interaction
+	// At this point, the components have been simulated.  They should have either:
+	//  - logged a massflowrequest
+	//  - or logged a MassFlowRate
+	// We need to decide what the components are going to do on FlowLock=0.
+	// If we want all control here at the solver level, the components just need to
+	//  log their MassFlowRate on their outlet nodes, or some other mechanism.
+	// Then the loop solver can scan the branch and get the max, and this will be the requested
+	//  flow rate for the branch.
+	// The loop solver will then set this as the branch outlet mass flow rate in preparation
+	//  for the flow resolver.
+	// The loop solver may need to do something to the inlet/outlet branch, but I'm not sure yet.
+	// The following comment block is what I had already thought of, and it may still make sense.
 
-        // Now that all the flow requests have been logged, we need to prepare them for the
-        //  flow resolver.  This will just take the requests and determine the desired flow
-        //  request for that branch according to pump placement, pump type, and other component
-        //  conditions.  In many cases, this will just be to simply take the max request from
-        //  the branch, which will already be within pumping limits for that flow path.
-        // We can then call the flow resolver to lock down branch inlet flow rates.
+	// Now that all the flow requests have been logged, we need to prepare them for the
+	//  flow resolver.  This will just take the requests and determine the desired flow
+	//  request for that branch according to pump placement, pump type, and other component
+	//  conditions.  In many cases, this will just be to simply take the max request from
+	//  the branch, which will already be within pumping limits for that flow path.
+	// We can then call the flow resolver to lock down branch inlet flow rates.
 
-        // The flow resolver takes information such as requested flows and min/max available flows and
-        //  sets the corrected flow on the inlet to each parallel branch
+	// The flow resolver takes information such as requested flows and min/max available flows and
+	//  sets the corrected flow on the inlet to each parallel branch
 		DataPlant::PlantLoop( LoopNum ).loopSolver.ResolveParallelFlows( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration );
 
-        // Re-Initialize variables for this next pass
-        InitialDemandToLoopSetPointSAVED = InitialDemandToLoopSetPoint;
-        CurrentAlterationsToDemand = 0.0;
-        UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
+	// Re-Initialize variables for this next pass
+	InitialDemandToLoopSetPointSAVED = InitialDemandToLoopSetPoint;
+	CurrentAlterationsToDemand = 0.0;
+	UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
 
-        // Now that flow rates have been resolved, we just need to set the flow lock status
-        //  flag, and resimulate.  During this simulation each component will still use the
-        //  SetFlowRequest routine, but this routine will also set the outlet flow rate
-        //  equal to the inlet flow rate, accoridng to flowlock logic.
-        DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowLocked;
+	// Now that flow rates have been resolved, we just need to set the flow lock status
+	//  flag, and resimulate.  During this simulation each component will still use the
+	//  SetFlowRequest routine, but this routine will also set the outlet flow rate
+	//  equal to the inlet flow rate, accoridng to flowlock logic.
+	DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowLocked;
 		DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
 
-    }
+}
 
-    Real64
+Real64
 	PlantLoopSolverClass::DetermineLoopSideFlowRate(
-        int LoopNum,
-        int ThisSide,
-        int ThisSideInletNode,
-        Real64 ThisSideLoopFlowRequest
-    )
-    {
-        Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
-        Real64 TotalPumpMinAvailFlow = 0.0;
-        Real64 TotalPumpMaxAvailFlow = 0.0;
-        if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
+	int LoopNum,
+	int ThisSide,
+	int ThisSideInletNode,
+	Real64 ThisSideLoopFlowRequest
+)
+{
+	Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
+	Real64 TotalPumpMinAvailFlow = 0.0;
+	Real64 TotalPumpMaxAvailFlow = 0.0;
+	if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
 
-            //~ Initialize pump values
-            for ( auto & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
-                e.CurrentMinAvail = 0.0;
-                e.CurrentMaxAvail = 0.0;
-            }
-            DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowPumpQuery;
+	    //~ Initialize pump values
+	    for ( auto & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+	        e.CurrentMinAvail = 0.0;
+	        e.CurrentMaxAvail = 0.0;
+	    }
+	    DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowPumpQuery;
 
-            //~ Simulate pumps
+	    //~ Simulate pumps
 			DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps( LoopNum, ThisSide );
 
-            //~ Calculate totals
-            for ( auto const & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
-                TotalPumpMinAvailFlow += e.CurrentMinAvail;
-                TotalPumpMaxAvailFlow += e.CurrentMaxAvail;
-            }
+	    //~ Calculate totals
+	    for ( auto const & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+	        TotalPumpMinAvailFlow += e.CurrentMinAvail;
+	        TotalPumpMaxAvailFlow += e.CurrentMaxAvail;
+	    }
 
-            // Use the pump min/max avail to attempt to constrain the loop side flow
-            ThisLoopSideFlow = PlantUtilities::BoundValueToWithinTwoValues( ThisLoopSideFlow, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
+	    // Use the pump min/max avail to attempt to constrain the loop side flow
+	    ThisLoopSideFlow = PlantUtilities::BoundValueToWithinTwoValues( ThisLoopSideFlow, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
 
-        }
+	}
 
-        // Now we check flow restriction from the other side, both min and max avail.
-        // Doing this last basically means it wins, so the pump should pull down to meet the flow restriction
-        ThisLoopSideFlow = PlantUtilities::BoundValueToNodeMinMaxAvail( ThisLoopSideFlow, ThisSideInletNode );
+	// Now we check flow restriction from the other side, both min and max avail.
+	// Doing this last basically means it wins, so the pump should pull down to meet the flow restriction
+	ThisLoopSideFlow = PlantUtilities::BoundValueToNodeMinMaxAvail( ThisLoopSideFlow, ThisSideInletNode );
 
-        // Final preparation of loop inlet min/max avail if pumps exist
-        if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
-            // At this point, the pump limits should have been obeyed unless a flow restriction was encountered from the other side
-            // The pump may, however, have even tighter constraints than the other side
-            // At this point, the inlet node doesn't know anything about those limits
-            // Since we have already honored the other side flow restriction, try to honor the pump limits here
-            PlantUtilities::TightenNodeMinMaxAvails( ThisSideInletNode, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
-        }
+	// Final preparation of loop inlet min/max avail if pumps exist
+	if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
+	    // At this point, the pump limits should have been obeyed unless a flow restriction was encountered from the other side
+	    // The pump may, however, have even tighter constraints than the other side
+	    // At this point, the inlet node doesn't know anything about those limits
+	    // Since we have already honored the other side flow restriction, try to honor the pump limits here
+	    PlantUtilities::TightenNodeMinMaxAvails( ThisSideInletNode, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
+	}
 
-        // Now reset the entering mass flow rate to the decided-upon flow rate
-        DataLoopNode::Node( ThisSideInletNode ).MassFlowRate = ThisLoopSideFlow;
-        return ThisLoopSideFlow;
-    }
+	// Now reset the entering mass flow rate to the decided-upon flow rate
+	DataLoopNode::Node( ThisSideInletNode ).MassFlowRate = ThisLoopSideFlow;
+	return ThisLoopSideFlow;
+}
 
 	PlantLoopSolverClass::m_FlowControlValidator
 	PlantLoopSolverClass::ValidateFlowControlPaths(
@@ -662,7 +662,7 @@ namespace PlantLoopSolver {
 		static Array1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
 		static Array1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
 		static Array1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
-        CurrentLoopSideIsConstantSpeedBranchPumped = false;
+	    CurrentLoopSideIsConstantSpeedBranchPumped = false;
 
 		static bool AllocatedParallelArray( false );
 		int MaxParallelBranchCount;
@@ -721,6 +721,7 @@ namespace PlantLoopSolver {
 				if ( BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide ) ++ParallelBranchIndex;
 
 				if ( branch.disableOverrideForCSBranchPumping ) {
+					branch.RequestedMassFlow = 0.0;
 					continue;
 				}
 
@@ -1003,9 +1004,9 @@ namespace PlantLoopSolver {
 			ShowFatalError( "Program terminates due to preceding conditions." );
 		}
 
-        CurrentLoopSideIsConstantSpeedBranchPumped = ThisLoopHasConstantSpeedBranchPumps( ThisSide );
+	CurrentLoopSideIsConstantSpeedBranchPumped = ThisLoopHasConstantSpeedBranchPumps( ThisSide );
 
-        return LoopFlow;
+	return LoopFlow;
 
 	}
 

@@ -2337,18 +2337,18 @@ namespace PlantUtilities {
 
 	void
 	ScanPlantLoopsForObject(
-			std::string const & CompName,
-			int const CompType,
-			int & LoopNum,
-			int & LoopSideNum,
-			int & BranchNum,
-			int & CompNum,
-			Optional< Real64 const > LowLimitTemp,
-			Optional< Real64 const > HighLimitTemp,
-			Optional_int CountMatchPlantLoops,
-			Optional_int_const InletNodeNumber,
-			Optional_int_const SingleLoopSearch,
-			Optional_bool errFlag // TODO: I think callers are expecting this to be passed by reference...
+		std::string const & CompName,
+		int const CompType,
+		int & LoopNum,
+		int & LoopSideNum,
+		int & BranchNum,
+		int & CompNum,
+		Optional< Real64 const > LowLimitTemp,
+		Optional< Real64 const > HighLimitTemp,
+		Optional_int CountMatchPlantLoops,
+		Optional_int_const InletNodeNumber,
+		Optional_int_const SingleLoopSearch,
+		Optional_bool errFlag // TODO: I think callers are expecting this to be passed by reference...
 	)
 	{
 

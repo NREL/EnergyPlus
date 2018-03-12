@@ -136,6 +136,7 @@ namespace PlantPipingSystemsManager {
 		PipingSystemSegments.deallocate();
 		NeighborFieldCells.deallocate();
 		NeighborBoundaryCells.deallocate();
+		GroundDomainUniqueNames.clear();
 	}
 
 	void
