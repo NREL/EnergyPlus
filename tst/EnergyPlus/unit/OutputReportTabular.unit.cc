@@ -6127,7 +6127,7 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	createCoilSelectionReportObj();
 
 	CompLoadTablesType compLoad;
-	int timeOfMax = 10;
+	int timeOfMax = 63;
 	int zoneIndex = 1;
 	bool isCooling = true;
 
@@ -6137,20 +6137,23 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	Zone( 1 ).FloorArea = 12.;
 
 	WeatherManager::DesDayInput.allocate( 1 );
-	WeatherManager::DesDayInput( 1 ).Month = 1;
-	WeatherManager::DesDayInput( 1 ).DayOfMonth = 1;
+	WeatherManager::DesDayInput( 1 ).Month = 5;
+	WeatherManager::DesDayInput( 1 ).DayOfMonth = 21;
+
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 15;
 
 	CoolPeakDateHrMin.allocate( 1 );
 
 	CalcFinalZoneSizing.allocate( 1 );
-	CalcFinalZoneSizing( 1 ).CoolOutTempSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolOutTempSeq( 10 ) = 38.;
-	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq( 10 ) = 0.01459;
-	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq( 10 ) = 24.;
-	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq( 10 ) = 0.00979;
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq( 63 ) = 38.;
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq( 63 ) = 0.01459;
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq( 63 ) = 24.;
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq( 63 ) = 0.00979;
 	CalcFinalZoneSizing( 1 ).DesCoolLoad = 500.;
 	CalcFinalZoneSizing( 1 ).ZnCoolDgnSAMethod = SupplyAirTemperature;
 	CalcFinalZoneSizing( 1 ).CoolDesTemp = 13.;
@@ -6161,6 +6164,7 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 
 	CollectPeakZoneConditions( compLoad, 1, timeOfMax, zoneIndex, isCooling );
 
+	EXPECT_EQ( compLoad.peakDateHrMin, "5/21 15:45:00" );
 	EXPECT_EQ( compLoad.outsideDryBulb, 38. );
 	EXPECT_EQ( compLoad.outsideHumRatio, 0.01459 );
 	EXPECT_EQ( compLoad.zoneDryBulb, 24. );
