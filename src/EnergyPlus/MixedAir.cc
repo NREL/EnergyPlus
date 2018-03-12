@@ -479,9 +479,8 @@ namespace MixedAir {
 		int CompNum;
 		//INTEGER :: CtrlNum
 		int CtrlNum;
-		int ControllerIndex;
 		int OAMixerNum;
-		int OAControllerNum;
+		int OAControllerNum; // OA controller index in OAController
 		static std::string CompType; //Tuned Made static
 		static std::string CompName; //Tuned Made static
 		static std::string CtrlName; //Tuned Made static
@@ -495,10 +494,10 @@ namespace MixedAir {
 		//    CALL SimOAController(CtrlName,FirstHVACIteration)
 		//  END DO
 		CurOASysNum = OASysNum;
-		CtrlNum = OutsideAirSys( OASysNum ).OAControllerPtr;
+		CtrlNum = OutsideAirSys( OASysNum ).OAControllerIndexPtr;
 		CtrlName = OutsideAirSys( OASysNum ).ControllerName( CtrlNum );
-		ControllerIndex = OutsideAirSys( OASysNum ).ControllerIndex( CtrlNum );
-		SimOAController( CtrlName, ControllerIndex, FirstHVACIteration, AirLoopNum );
+		OAControllerNum = OutsideAirSys( OASysNum ).OAControllerIndex;
+		SimOAController( CtrlName, OAControllerNum, FirstHVACIteration, AirLoopNum );
 		SimOASysComponents( OASysNum, FirstHVACIteration, AirLoopNum );
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {
@@ -510,7 +509,7 @@ namespace MixedAir {
 				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
 				if ( UtilityRoutines::SameString( CompType, "OutdoorAir:Mixer" ) ) {
 					OAMixerNum = UtilityRoutines::FindItemInList( CompName, OAMixer );
-					OAControllerNum = UtilityRoutines::FindItemInList( CtrlName, OAController );
+					OAControllerNum = OutsideAirSys( OASysNum ).OAControllerIndex;
 					if ( OAController( OAControllerNum ).MixNode != OAMixer( OAMixerNum ).MixNode ) {
 						ShowSevereError( "The mixed air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
 						ShowContinueError( "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
@@ -1185,10 +1184,10 @@ namespace MixedAir {
 				}}
 			}
 
-			// loop through the controller types in the controller list for OA system and save the pointr to the controller 
+			// loop through the controllers in the controller list for OA system and save the pointer to the OA controller index
 			for ( int OAControllerNum = 1; OAControllerNum <= OutsideAirSys( OASysNum ).NumControllers; ++OAControllerNum ) {
 				if ( UtilityRoutines::SameString( OutsideAirSys( OASysNum ).ControllerType( OAControllerNum ), CurrentModuleObjects( CMO_OAController ) ) ) {
-					OutsideAirSys( OASysNum ).OAControllerPtr = OAControllerNum;
+					OutsideAirSys( OASysNum ).OAControllerIndexPtr = OAControllerNum;
 					break;
 				}
 			}
@@ -2478,6 +2477,7 @@ namespace MixedAir {
 					found = UtilityRoutines::FindItemInList( thisOAController.Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
 					if ( found != 0 ) {
 						thisOASys = OASysNum;
+						OutsideAirSys( thisOASys ).OAControllerIndex = GetOAController( thisOAController.Name );
 						break; // we found it
 					}
 				}
@@ -2519,6 +2519,8 @@ namespace MixedAir {
 				ErrorsFound = true;
 
 			}}
+
+
 
 			OAControllerMyOneTimeFlag( OAControllerNum ) = false;
 
