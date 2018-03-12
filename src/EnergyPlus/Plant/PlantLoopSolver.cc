@@ -296,6 +296,23 @@ void
 
 	// We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
 	InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide );
+
+	// If we are doing a common pipe simulation, and there is greater other-side flow than this side,
+	// then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
+	if ( DataPlant::PlantLoop( LoopNum ).CommonPipeType != DataPlant::CommonPipe_No ) {
+		const int otherSideOutletNodeNum = DataPlant::PlantLoop( LoopNum ).LoopSide( OtherSide ).NodeNumOut;
+		Real64 otherSideFlow = DataLoopNode::Node( otherSideOutletNodeNum ).MassFlowRate;
+		Real64 commonPipeFlow = otherSideFlow - ThisLoopSideFlow;
+		if ( commonPipeFlow > 0 ) {
+			Real64 const otherSideExitTemp = DataLoopNode::Node( otherSideOutletNodeNum ).Temp;
+			Real64 const Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( LoopNum ).FluidName, otherSideExitTemp, DataPlant::PlantLoop( LoopNum ).FluidIndex, "DoFlowAndLoadSolutionPass" );
+			Real64 LoopSetPointTemperature = DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).TempSetPoint;
+			// Calculate the common pipe demand
+			Real64 const commonPipeLoad = commonPipeFlow * Cp * ( LoopSetPointTemperature - otherSideExitTemp );
+			InitialDemandToLoopSetPoint += commonPipeLoad;
+		}
+	}
+
 	UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
 
 	LoadToLoopSetPointThatWasntMet = 0.0;
@@ -1558,9 +1575,6 @@ Real64
 		// Return value
 		Real64 Demand;
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// FUNCTION PARAMETER DEFINITIONS:
 		static Array1D_int const InitCompArray( 1, 0 );
 
@@ -1586,12 +1600,6 @@ Real64
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::LoopDemandTol;
@@ -1608,11 +1616,6 @@ Real64
 		// Return value
 		Real64 LoadToLoopSetPoint; // function result
 
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		//~ Indexing variables
 		int BranchCounter; // ~ This contains the index for the %Branch(:) structure
 		int BranchIndex; // ~ This is a 1 - n value within the current branch group
