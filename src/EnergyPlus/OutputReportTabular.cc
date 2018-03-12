@@ -529,6 +529,7 @@ namespace OutputReportTabular {
 		bool UpdateTabularReportsGetInput( true );
 		bool GatherHeatGainReportfirstTime( true );
 		bool AllocateLoadComponentArraysDoAllocate( true );
+		bool initAdjFenDone( false );
 	}
 
 	// Functions
@@ -538,6 +539,7 @@ namespace OutputReportTabular {
 		UpdateTabularReportsGetInput = true;
 		GatherHeatGainReportfirstTime = true;
 		AllocateLoadComponentArraysDoAllocate = true;
+		initAdjFenDone = false ;
 		OutputTableBinnedCount = 0;
 		BinResultsTableCount = 0;
 		BinResultsIntervalCount = 0;
@@ -11990,7 +11992,7 @@ namespace OutputReportTabular {
 		using DataEnvironment::TotDesDays;
 		using DataEnvironment::TotRunDesPersDays;
 
-		static bool initAdjFenDone(false);
+		// static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
 		static Array3D_bool adjFenDone;
 
 		Array1D< Real64 > peopleRadIntoSurf;
