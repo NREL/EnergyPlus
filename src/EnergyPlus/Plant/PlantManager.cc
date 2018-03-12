@@ -55,7 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <BranchInputManager.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
@@ -77,7 +77,7 @@
 #include <Pipes.hh>
 #include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
-#include <PlantLoopSolver.hh>
+#include <Plant/PlantLoopSolver.hh>
 #include <PlantUtilities.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
@@ -107,13 +107,6 @@ namespace PlantManager {
 	// This module serves as the driver for the plant simulation. All necessary iterations and update related to plant
 	// connections are performed in this module.
 
-	// METHODOLOGY EMPLOYED:
-	// Standard EnergyPlus methodology
-
-	// REFERENCES: none
-
-	// OTHER NOTES: none
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
@@ -124,53 +117,28 @@ namespace PlantManager {
 	using namespace FluidProperties;
 	using PlantLoopSolver::PlantHalfLoopSolver;
 
-	// Data
 	// MODULE PARAMETER DEFINITIONS
-	int const MaxBranchLevel( 200 );
 	int const Plant( 1 );
 	int const Condenser( 2 );
-	int const SupplyLoopPumpSingleSplitMix( 1 );
-	int const DemandSingleSplitterMixer( 1 );
 	int const TempSetPt( 1001 );
-	int const FlowSetPt( 1007 );
 	bool InitLoopEquip( true );
 	bool GetCompSizFac( true );
 
 	static std::string const fluidNameSteam( "STEAM" );
 
-	//MODULE DERIVED TYPE DEFINITIONS
-
-	// MODULE VARIABLE DEFINITIONS
-	int PlantSupplyLoopCase( 0 );
-	int PlantDemandLoopCase( 0 );
-
 	Array1D_int SupplySideInletNode; // Node number for the supply side inlet
 	Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
 	Array1D_int DemandSideInletNode; // Inlet node on the demand side
-
-	// SUBROUTINE SPECIFICATIONS:
-	//The following public routines are called from HVAC Manager
-	//PUBLIC  CheckPlantLoopData      !called from SimHVAC
-
-	// Object Data
-	Array1D< LoopPipeData > LoopPipe;
 	TempLoopData TempLoop; // =(' ',' ',' ',0, , , ,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.)
-
-	// MODULE SUBROUTINES
-
-	// Functions
 
 	void
 	clear_state()
 	{
 		InitLoopEquip = true;
 		GetCompSizFac = true;
-		PlantSupplyLoopCase = 0;
-		PlantDemandLoopCase = 0;
 		SupplySideInletNode.deallocate();
 		SupplySideOutletNode.deallocate();
 		DemandSideInletNode.deallocate();
-		LoopPipe.deallocate();
 		TempLoop = TempLoopData();
 	}
 
@@ -719,7 +687,7 @@ namespace PlantManager {
 		int BranchNum; // DO loop counter for branches
 		int CompNum; // DO loop counter for components
 		int NodeNum; // DO loop counter for nodes
-		int PipeNum; // Counter for pipes
+//		int PipeNum; // Counter for pipes
 		int Outlet;
 		int Inlet;
 		int NumParams;
@@ -764,14 +732,10 @@ namespace PlantManager {
 		inputProcessor->getObjectDefMaxArgs( "Connector:Mixer", NumParams, NumAlphas, NumNumbers );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 		MaxNumNumbers = max( MaxNumNumbers, NumNumbers );
-		// FLOW:
-
-		//  TotNumLoops = NumPlantLoops + NumCondLoops    !Needed when including condenser.
 		NumHalfLoops = 2 * TotNumLoops; //Will be NumLoops when condenser added
 		NumPipes = 0;
 		NumPlantPipes = 0;
 		NumCondPipes = 0;
-		LoopPipe.allocate( NumHalfLoops );
 		HalfLoopNum = 0;
 		SysPipeNum = 0;
 
@@ -1518,47 +1482,6 @@ namespace PlantManager {
 					InletNodeNumbers.deallocate();
 				}
 
-				if ( NumOfPipesInLoop > 0 ) {
-					PipeNum = 0;
-					LoopPipe( HalfLoopNum ).Pipe.allocate( NumOfPipesInLoop );
-					for ( BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum ) {
-						for ( CompNum = 1; CompNum <= TempLoop.Branch( BranchNum ).TotalComponents; ++CompNum ) {
-							if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_Pipe || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeSteam || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-
-								++PipeNum;
-								if ( PipeNum > NumOfPipesInLoop ) ShowFatalError( "Pipe counting problem in GetPlantSideLoops" );
-
-								LoopPipe( HalfLoopNum ).NumPipes = NumOfPipesInLoop;
-								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name = TempLoop.Branch( BranchNum ).Comp( CompNum ).Name;
-								if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_Pipe ) {
-									LoopPipe( HalfLoopNum ).Pipe( PipeNum ).TypeOf = TypeOf_Pipe;
-								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeSteam ) {
-									LoopPipe( HalfLoopNum ).Pipe( PipeNum ).TypeOf = TypeOf_PipeSteam;
-								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior ) {
-									LoopPipe( HalfLoopNum ).Pipe( PipeNum ).TypeOf = TypeOf_PipeInterior;
-								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-									LoopPipe( HalfLoopNum ).Pipe( PipeNum ).TypeOf = TypeOf_PipeExterior;
-								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground ) {
-									LoopPipe( HalfLoopNum ).Pipe( PipeNum ).TypeOf = TypeOf_PipeUnderground;
-								}
-								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNameIn = TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNameIn;
-								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNumIn = TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNameOut = TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNameOut;
-								LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNumOut = TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
-
-								if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_Pipe || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeSteam ) {
-									//                Call InitializePipes(TempLoop%Branch(BranchNum)%Comp(CompNum)%TypeOf_Num,  &
-									//                            LoopPipe(HalfLoopNum)%Pipe(PipeNum)%Name,  &
-									//                            TempLoop%Branch(BranchNum)%Comp(CompNum)%CompNum, &
-									//                            0.0d0)
-								} else if ( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeInterior || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeUnderground || TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num == TypeOf_PipeExterior ) {
-									//InitializeHeatTransferPipes( TempLoop.Branch( BranchNum ).Comp( CompNum ).TypeOf_Num, LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name, TempLoop.Branch( BranchNum ).Comp( CompNum ).CompNum );
-								}
-							}
-						}
-					}
-				}
-
 				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SplitterExists = TempLoop.SplitterExists;
 				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).MixerExists = TempLoop.MixerExists;
 				PlantLoop( LoopNum ).LoopSide( LoopSideNum ).BypassExists = TempLoop.BypassExists;
@@ -1594,28 +1517,6 @@ namespace PlantManager {
 			}
 
 		} // ...end of demand side loops DO loop
-
-		Pipe.allocate( NumPipes ); // Pipe definition in DataPlant
-		SysPipeNum = 0;
-
-		for ( HalfLoopNum = 1; HalfLoopNum <= NumHalfLoops; ++HalfLoopNum ) {
-			for ( PipeNum = 1; PipeNum <= LoopPipe( HalfLoopNum ).NumPipes; ++PipeNum ) {
-				++SysPipeNum;
-				if ( mod( HalfLoopNum, 2 ) != 0 ) {
-					Pipe( SysPipeNum ).ParentHalfLoop = DemandSide;
-				} else {
-					Pipe( SysPipeNum ).ParentHalfLoop = SupplySide;
-				}
-				Pipe( SysPipeNum ).Name = LoopPipe( HalfLoopNum ).Pipe( PipeNum ).Name;
-				Pipe( SysPipeNum ).TypeOf = LoopPipe( HalfLoopNum ).Pipe( PipeNum ).TypeOf;
-				Pipe( SysPipeNum ).NodeNameIn = LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNameIn;
-				Pipe( SysPipeNum ).NodeNumIn = LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNumIn;
-				Pipe( SysPipeNum ).NodeNameOut = LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNameOut;
-				Pipe( SysPipeNum ).NodeNumOut = LoopPipe( HalfLoopNum ).Pipe( PipeNum ).NodeNumOut;
-			}
-		}
-
-		LoopPipe.deallocate();
 
 		//DSU? can we clean this out this next do loop now? looks like bandaids.
 		for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
@@ -2069,7 +1970,6 @@ namespace PlantManager {
 		using PlantUtilities::SetAllFlowLocks;
 		using DataHVACGlobals::NumPlantLoops;
 		using DataHVACGlobals::NumCondLoops;
-		using PlantLoopSolver::SimulateAllLoopSidePumps;
 		using DataPlant::PlantFirstSizesOkayToReport;
 
 		// Locals
@@ -2226,7 +2126,7 @@ namespace PlantManager {
 					SizePlantLoop( LoopNum, FinishSizingFlag );
 				}
 				//pumps are special so call them directly
-				SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
+				PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
 				for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
 					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 						SimPlantEquip( LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip, GetCompSizFac );
@@ -2285,7 +2185,7 @@ namespace PlantManager {
 						} //-CompNum
 					} //-BranchNum
 					//pumps are special so call them directly
-					SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
+					PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps(LoopNum , LoopSideNum);
 			}
 
 
@@ -2888,110 +2788,6 @@ namespace PlantManager {
 		} // plant loops
 
 	}
-
-	//SUBROUTINE CheckPlantLoopData
-
-	//          ! SUBROUTINE INFORMATION:
-	//          !       AUTHOR         B. Griffith
-	//          !       DATE WRITTEN   May 2008
-	//          !       MODIFIED       na
-	//          !       RE-ENGINEERED  na
-
-	//          ! PURPOSE OF THIS SUBROUTINE:
-	//          ! This routine checks plant loop for input problems early in the simulation
-	//          ! Some of the same checks also occur in CheckPlantOnAbort but those only execute if aborted
-	//          ! Additional plant loop input checks can be added here.
-
-	//          ! METHODOLOGY EMPLOYED:
-	//          ! Test plant loop data for know issues.
-	//          !  1. CR 7431.  detect presence of water coils and check for "ACTIVE" branch control.
-
-	//          ! REFERENCES:
-	//          ! na
-
-	//          ! USE STATEMENTS:
-	//          ! na
-
-	//  IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
-
-	//          ! SUBROUTINE ARGUMENT DEFINITIONS:
-	//          ! na
-
-	//          ! SUBROUTINE PARAMETER DEFINITIONS:
-	//          ! na
-
-	//          ! INTERFACE BLOCK SPECIFICATIONS:
-	//          ! na
-
-	//          ! DERIVED TYPE DEFINITIONS:
-	//          ! na
-
-	//          ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	//  LOGICAL :: ShouldBeACTIVE
-	//  INTEGER :: SideNum
-	//  INTEGER :: numLoopSides
-	//unused-1208  INTEGER :: SplitNum
-	//  INTEGER :: BranchNum  ! DO loop counter for branches
-	//  INTEGER :: CompNum    ! do loop for multiple components on a branch
-	//  INTEGER :: LoopNum    ! DO loop counter for loops
-
-	//  IF (.not. (TotNumLoops  > 0)) RETURN
-	//  IF (.not.(ALLOCATED(PlantLoop))) RETURN
-
-	//  DO LoopNum = 1, TotNumLoops
-	//    numLoopSides = 2
-	//    DO SideNum = 1, numLoopSides
-	//      DO BranchNum =1, PlantLoop(LoopNum)%LoopSide(SideNum)%TotalBranches
-	//        DO CompNum= 1,  PlantLoop(LoopNum)%LoopSide(SideNum)%Branch(BranchNum)%TotalComponents
-	//          ShouldBeACTIVE = .FALSE.
-
-	//          SELECT CASE (PlantLoop(LoopNum)%LoopSide(SideNum)%Branch(BranchNum)%Comp(CompNum)%TypeOf_Num)
-	//          ! for now, check that all water coils are on "active" branch.
-	//          CASE (TypeOf_WaterUseConnection)
-	//            ShouldBeACTIVE = .TRUE.
-	//          CASE (TypeOf_CoilWaterCooling)
-	//            ShouldBeACTIVE = .TRUE.
-	//          CASE (TypeOf_CoilWaterDetailedFlatCooling)
-	//            ShouldBeACTIVE = .TRUE.
-	//          CASE (TypeOf_CoilWaterSimpleHeating)
-	//            ShouldBeACTIVE = .TRUE.
-	//          CASE (TypeOf_CoilSteamAirHeating)
-	//            ShouldBeACTIVE = .TRUE.
-
-	//          CASE DEFAULT
-
-	//          END SELECT
-
-	//          If (ShouldBeACTIVE) THEN
-	//            SELECT CASE (PlantLoop(LoopNum)%LoopSide(SideNum)%Branch(BranchNum)%Comp(CompNum)%FlowCtrl)
-
-	//            CASE (ControlType_Unknown)
-	//               CALL ShowWarningError('Found potential problem with Control Type for Branch named: '&
-	//                             //TRIM(PlantLoop(LoopNum)%LoopSide(SideNum)%Branch(BranchNum)%Name) )
-	//                             !DSU3 note, this confuses branch and components, should have reported out comp name as well.
-	//               CALL ShowContinueError('This branch should (probably) be ACTIVE but has control type unknown')
-	//            CASE (ControlType_Active)
-	//              ! do nothing, this is correct control type.
-	//            CASE (ControlType_Passive)
-	//               CALL ShowSevereError('Found problem with Control Type for Branch named: '&
-	//                             //TRIM(PlantLoop(LoopNum)%LoopSide(SideNum)%Branch(BranchNum)%Name) )
-	//               CALL ShowContinueError('This branch should be ACTIVE but has control type PASSIVE')
-	//            CASE (ControlType_SeriesActive)
-	//              ! do nothing, should be okay. (? don't really understand SeriesActive though)
-	//            CASE (ControlType_Bypass)
-	//               CALL ShowSevereError('Found problem with Control Type for Branch named: '&
-	//                             //TRIM(PlantLoop(LoopNum)%LoopSide(SideNum)%Branch(BranchNum)%Name) )
-	//               CALL ShowContinueError('This branch should be ACTIVE but has control type Bypass')
-	//            END SELECT
-	//          ENDIF ! should be active
-	//        ENDDO !comp num loop
-	//      ENDDO ! branches
-	//    ENDDO ! loop sides
-	//  ENDDO ! plant loops
-
-	//  RETURN
-
-	//END SUBROUTINE CheckPlantLoopData
 
 	void
 	InitOneTimePlantSizingInfo( int const LoopNum ) // loop being initialized for sizing

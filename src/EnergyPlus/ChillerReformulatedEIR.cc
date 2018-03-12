@@ -681,7 +681,7 @@ namespace ChillerReformulatedEIR {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_ElectricReformEIR;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;

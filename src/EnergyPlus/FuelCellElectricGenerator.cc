@@ -3663,7 +3663,7 @@ namespace FuelCellElectricGenerator {
 		using DataGlobals::HourOfDay;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Generator_FCExhaust;
 		using FluidProperties::GetDensityGlycol;

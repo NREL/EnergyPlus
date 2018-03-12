@@ -13,7 +13,6 @@ endif()
 SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.hpp"
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.hpp"
-  Timer.h
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
@@ -402,6 +401,27 @@ SET( SRC
   PipeHeatTransfer.hh
   Pipes.cc
   Pipes.hh
+  Plant/CallingOrder.hh
+  Plant/Enums.hh
+  Plant/EquipAndOperations.hh
+  Plant/LoopSidePumpInformation.hh
+  Plant/PlantAvailManager.hh
+  Plant/PlantConvergencePoint.hh
+  Plant/LoopSideReportVars.hh
+  Plant/MeterData.hh
+  Plant/ReportBranchData.hh
+  Plant/ReportCompData.hh
+  Plant/ReportLoopData.hh
+  Plant/ReportVars.hh
+  Plant/Branch.hh
+  Plant/Component.hh
+  Plant/ConnectedLoopData.hh
+  Plant/Connection.hh
+  Plant/Loop.hh
+  Plant/LoopSide.hh
+  Plant/MixerData.hh
+  Plant/SplitterData.hh
+  Plant/Subcomponents.hh
   PlantCentralGSHP.cc
   PlantCentralGSHP.hh
   PlantChillers.cc
@@ -415,13 +435,13 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
-  PlantLocation.hh
+  Plant/PlantLocation.hh
   PlantLoopEquip.cc
   PlantLoopEquip.hh
-  PlantLoopSolver.cc
-  PlantLoopSolver.hh
-  PlantManager.cc
-  PlantManager.hh
+  Plant/PlantLoopSolver.cc
+  Plant/PlantLoopSolver.hh
+  Plant/PlantManager.cc
+  Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
   PlantPipingSystemsManager.hh
   PlantPressureSystem.cc
@@ -594,6 +614,8 @@ SET( SRC
   ZoneTempPredictorCorrector.cc
   ZoneTempPredictorCorrector.hh
 )
+
+CREATE_SRC_GROUPS( "${SRC}" )
 
 if (UNIX)
   ADD_DEFINITIONS("-fPIC")

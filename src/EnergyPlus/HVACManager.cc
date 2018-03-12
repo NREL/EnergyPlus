@@ -91,7 +91,7 @@
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <PlantCondLoopOperation.hh>
-#include <PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <PlantUtilities.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
@@ -665,7 +665,7 @@ namespace HVACManager {
 		using PlantManager::InitOneTimePlantSizingInfo;
 		using PlantCondLoopOperation::SetupPlantEMSActuators;
 		using SimAirServingZones::ManageAirLoops;
-		using DataPlant::SetAllPlantSimFlagsToValue;
+		using PlantUtilities::SetAllPlantSimFlagsToValue;
 		using DataPlant::TotNumLoops;
 		using DataPlant::PlantManageSubIterations;
 		using DataPlant::PlantManageHalfLoopCalls;
@@ -1535,7 +1535,7 @@ namespace HVACManager {
 		using PlantUtilities::ResetAllPlantInterConnectFlags;
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
-		using DataPlant::AnyPlantLoopSidesNeedSim;
+		using PlantUtilities::AnyPlantLoopSidesNeedSim;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

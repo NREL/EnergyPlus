@@ -70,6 +70,7 @@
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -1144,7 +1145,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		InitUnitHeater( UnitHeatNum, ZoneNum, FirstHVACIteration );
 		InitWaterCoil( CoilNum, FirstHVACIteration ); // init hot water heating coil
 
-		PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
+		PltSizHeatNum = PlantUtilities::MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
 		HWMaxVolFlowRate = WaterCoils::WaterCoil( CoilNum ).MaxWaterVolFlowRate;
