@@ -1750,7 +1750,7 @@ namespace SingleDuct {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using PlantUtilities::InitComponentNodes;
@@ -2072,7 +2072,7 @@ namespace SingleDuct {
 		using DataGlobals::AutoCalculate;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataHeatBalance::Zone;

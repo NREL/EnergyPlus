@@ -652,7 +652,7 @@ namespace ChillerIndirectAbsorption {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Indirect_Absorption;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
@@ -847,7 +847,7 @@ namespace ChillerIndirectAbsorption {
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using CurveManager::CurveValue;
 		using namespace OutputReportPredefined;

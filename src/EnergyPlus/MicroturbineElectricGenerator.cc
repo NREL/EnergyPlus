@@ -1071,7 +1071,7 @@ namespace MicroturbineElectricGenerator {
 		using FluidProperties::GetDensityGlycol;
 		using CurveManager::CurveValue;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroTurbine;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;

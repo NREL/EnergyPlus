@@ -971,7 +971,7 @@ namespace WaterUse {
 		using DataWater::WaterStorage;
 		using DataHeatBalance::Zone;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_WaterUseConnection;
 		using PlantUtilities::InitComponentNodes;
 

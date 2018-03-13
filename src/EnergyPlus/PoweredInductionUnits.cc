@@ -673,7 +673,7 @@ namespace PoweredInductionUnits {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataDefineEquip::AirDistUnit;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using PlantUtilities::InitComponentNodes;
@@ -870,7 +870,7 @@ namespace PoweredInductionUnits {
 		using SteamCoils::GetCoilSteamOutletNode;
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using ReportSizingManager::ReportSizingOutput;

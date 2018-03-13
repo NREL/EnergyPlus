@@ -104,7 +104,7 @@ namespace Boilers {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_Boiler_Simple;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 	using DataBranchAirLoopPlant::ControlType_SeriesActive;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;

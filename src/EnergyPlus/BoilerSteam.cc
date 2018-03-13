@@ -476,7 +476,7 @@ namespace BoilerSteam {
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
 		using DataPlant::TypeOf_Boiler_Steam;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::SingleSetPoint;
