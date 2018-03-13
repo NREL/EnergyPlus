@@ -1055,34 +1055,12 @@ ReportCoilSelection::setCoilWaterFlowNodeNums(
 	int const plantLoopNum // plant loop structure index
 )
 {
-	int index = getIndexForOrCreateDataObjFromCoilName( coilName,coilType );
-	auto & c( coilSelectionDataObjs[ index ] );
+	int plantSizNum = -999;
 	if ( ( DataSizing::NumPltSizInput > 0 ) && ( inletNodeNum > 0 ) && ( outletNodeNum > 0 ) ) {
 		bool errorsfound = false;
-		c->pltSizNum = PlantUtilities::MyPlantSizingIndex( "water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
-	} else {
-		c->pltSizNum = -999;
+		plantSizNum = PlantUtilities::MyPlantSizingIndex( "water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
 	}
-	c->waterLoopNum = plantLoopNum;
-
-	if ( c->waterLoopNum > 0 && c->pltSizNum > 0 ) {
-		c->plantLoopName = DataPlant::PlantLoop( c->waterLoopNum ).Name;
-		if ( DataSizing::PlantSizData( c->pltSizNum  ).LoopType != DataSizing::SteamLoop ) {
-			c->rhoFluid = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
-
-			c->cpFluid = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );		
-		} else { // steam loop
-			c->rhoFluid = FluidProperties::GetSatDensityRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 1.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
-			c->cpFluid =  FluidProperties::GetSatSpecificHeatRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 0.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
-		}
-
-		c->coilDesWaterMassFlow = waterVdot * c->rhoFluid;
-	}
-	if ( isAutoSized ) {
-		c->coilWaterFlowAutoMsg = "Yes" ;
-	} else {
-		c->coilWaterFlowAutoMsg = "No" ;
-	}
+	coilSelectionReportObj->setCoilWaterFlowPltSizNum( coilName, coilType, waterVdot,  isAutoSized, plantSizNum, plantLoopNum);
 }
 
 void
@@ -1099,9 +1077,11 @@ ReportCoilSelection::setCoilWaterFlowPltSizNum(
 	auto & c( coilSelectionDataObjs[ index ] );
 	c->pltSizNum = plantSizNum;
 	c->waterLoopNum = plantLoopNum;
+	if ( c->waterLoopNum > 0 ) {
+		c->plantLoopName = DataPlant::PlantLoop( c->waterLoopNum ).Name;
+	}
 
 	if ( c->waterLoopNum > 0 && c->pltSizNum > 0 ) {
-		c->plantLoopName = DataPlant::PlantLoop( c->waterLoopNum ).Name;
 		if ( DataSizing::PlantSizData( c->pltSizNum  ).LoopType != DataSizing::SteamLoop ) {
 			c->rhoFluid = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, DataGlobals::InitConvTemp, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
 
@@ -1110,7 +1090,8 @@ ReportCoilSelection::setCoilWaterFlowPltSizNum(
 			c->rhoFluid = FluidProperties::GetSatDensityRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 1.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
 			c->cpFluid =  FluidProperties::GetSatSpecificHeatRefrig( DataPlant::PlantLoop( c->waterLoopNum ).FluidName, 100.0, 0.0, DataPlant::PlantLoop( c->waterLoopNum ).FluidIndex, "ReportCoilSelection::setCoilWaterFlow" );
 		}
-
+	}
+	if ( c->rhoFluid > 0.0 ) {
 		c->coilDesWaterMassFlow = waterVdot * c->rhoFluid;
 	}
 	if ( isAutoSized ) {
