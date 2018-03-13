@@ -407,7 +407,7 @@ public: // methods
 		std::string const & coilType, // idf input object class name of coil
 		Real64 const totalHeatingCap, // {W} coil Heating capacity
 		bool const isAutoSize, // true if value was autosized
-		int const DataPltSizNum, // plant sizing structure index
+		int const dataPltSizNum, // plant sizing structure index
 		int const dataWaterLoopNum // plant loop structure index
 	);
 

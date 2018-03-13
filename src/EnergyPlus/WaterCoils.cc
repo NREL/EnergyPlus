@@ -1406,7 +1406,6 @@ namespace WaterCoils {
 					PreDefTableEntry( pdchHeatCoilNomEff, WaterCoil( CoilNum ).Name, "-" );
 					addFootNoteSubTable( pdstHeatCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for." );
 					gio::write( OutputFileInits, fmtA ) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 2 );
-					bool errorsfound;
 					coilSelectionReportObj->setCoilAirFlow(WaterCoil( CoilNum ).Name,"Coil:Heating:Water", WaterCoil( CoilNum ).DesAirVolFlowRate,WaterCoil( CoilNum ).RequestingAutoSize );
 					coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums( WaterCoil( CoilNum ).Name,"Coil:Heating:Water",WaterCoil( CoilNum ).TotWaterHeatingCoilRate,WaterCoil( CoilNum ).RequestingAutoSize, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, WaterCoil ( CoilNum ).WaterLoopNum ); //coil report
 				} else if ( SELECT_CASE_var == WaterCoil_DetFlatFinCooling ) {
@@ -1426,7 +1425,6 @@ namespace WaterCoils {
 					addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for." );
 					gio::write( OutputFileInits, fmtA ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 );
 					coilSelectionReportObj->setCoilAirFlow( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).DesAirVolFlowRate,WaterCoil( CoilNum ).RequestingAutoSize ); //Coil Report
-					bool errorsFound;
 					coilSelectionReportObj->setCoilWaterCoolingCapacity( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).DesWaterCoolingCoilRate, WaterCoil( CoilNum ).RequestingAutoSize, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, WaterCoil( CoilNum ).WaterLoopNum ); //Coil Report
 				} else if ( SELECT_CASE_var == WaterCoil_Cooling ) {
 					if ( RptCoilHeaderFlag( 2 ) ) {
@@ -1447,7 +1445,6 @@ namespace WaterCoils {
 					addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for." );
 					gio::write( OutputFileInits, fmtA ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 ) + ',' + RoundSigDigits( UATotal, 2 ) + ',' + RoundSigDigits( SurfaceArea, 2 );
 					coilSelectionReportObj->setCoilAirFlow( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water", WaterCoil( CoilNum ).DesAirVolFlowRate,WaterCoil( CoilNum ).RequestingAutoSize ); // Coil Report
-					bool errorsFound;
 					coilSelectionReportObj->setCoilWaterCoolingCapacity( WaterCoil( CoilNum ).Name,"Coil:Cooling:Water", WaterCoil( CoilNum ).DesWaterCoolingCoilRate, WaterCoil( CoilNum ).RequestingAutoSize, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum ,WaterCoil ( CoilNum ).WaterLoopNum ); //Coil Report
 				}}
 				if ( WaterCoil( CoilNum ).DesWaterCoolingCoilRate <= 0.0 ) WaterCoil( CoilNum ).DesWaterCoolingCoilRate = WaterCoil( CoilNum ).TotWaterCoolingCoilRate;
@@ -1731,7 +1728,7 @@ namespace WaterCoils {
 		// cooling coils
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling && WaterCoil( CoilNum ).RequestingAutoSize ) {
 			// find the appropriate Plant Sizing object
-			PltSizCoolNum = DataPlant::MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
+			PltSizCoolNum = PlantUtilities::MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
 		}
 
 
@@ -2005,7 +2002,7 @@ namespace WaterCoils {
 		// if this is a heating coil
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Heating && WaterCoil( CoilNum ).RequestingAutoSize ) {
 			// find the appropriate heating Plant Sizing object
-			PltSizHeatNum = DataPlant::MyPlantSizingIndex( "hot water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum,
+			PltSizHeatNum = PlantUtilities::MyPlantSizingIndex( "hot water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum,
 				WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
 		}
 

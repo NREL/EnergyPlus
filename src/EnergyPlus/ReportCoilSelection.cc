@@ -76,6 +76,7 @@
 #include <WeatherManager.hh>
 #include <WindowAC.hh>
 #include <PackagedTerminalHeatPump.hh>
+#include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <FluidProperties.hh>
 #include <UtilityRoutines.hh>
@@ -1058,7 +1059,7 @@ ReportCoilSelection::setCoilWaterFlowNodeNums(
 	auto & c( coilSelectionDataObjs[ index ] );
 	if ( ( DataSizing::NumPltSizInput > 0 ) && ( inletNodeNum > 0 ) && ( outletNodeNum > 0 ) ) {
 		bool errorsfound = false;
-		c->pltSizNum = DataPlant::MyPlantSizingIndex( "water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
+		c->pltSizNum = PlantUtilities::MyPlantSizingIndex( "water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
 	} else {
 		c->pltSizNum = -999;
 	}
@@ -1622,7 +1623,7 @@ ReportCoilSelection::setCoilWaterCoolingCapacity(
 	c->capIsAutosized = isAutoSize;
 	if ( ( DataSizing::NumPltSizInput > 0 ) && ( inletNodeNum > 0 ) && ( outletNodeNum > 0 ) ) {
 		bool errorsfound = false;
-		c->pltSizNum = DataPlant::MyPlantSizingIndex( "chilled water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
+		c->pltSizNum = PlantUtilities::MyPlantSizingIndex( "chilled water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
 	} else {
 		c->pltSizNum = -999;
 	}
@@ -1646,7 +1647,7 @@ ReportCoilSelection::setCoilWaterHeaterCapacityNodeNums(
 	c->capIsAutosized = isAutoSize;
 	if ( ( DataSizing::NumPltSizInput > 0 ) && ( inletNodeNum > 0 ) && ( outletNodeNum > 0 ) ) {
 		bool errorsfound = false;
-		c->pltSizNum = DataPlant::MyPlantSizingIndex( "hot water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
+		c->pltSizNum = PlantUtilities::MyPlantSizingIndex( "hot water coil", coilName, inletNodeNum, outletNodeNum, errorsfound );
 	} else {
 		c->pltSizNum = -999;
 	}
