@@ -6746,7 +6746,7 @@ namespace RefrigeratedCase {
 
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_RefrigSystemWaterCondenser;
 		using DataPlant::TypeOf_RefrigerationWaterCoolRack;
 		using PlantUtilities::InitComponentNodes;

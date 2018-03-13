@@ -437,6 +437,7 @@ namespace PoweredInductionUnits {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					PIU( PIUNum ).ADUNum = ADUNum;
+					AirDistUnit( ADUNum ).InletNodeNum = PIU( PIUNum ).PriAirInNode;
 				}
 			}
 			// one assumes if there isn't one assigned, it's an error?
@@ -597,6 +598,7 @@ namespace PoweredInductionUnits {
 			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 				if ( PIU( PIUNum ).OutAirNode == AirDistUnit( ADUNum ).OutletNodeNum ) {
 					//      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
+					AirDistUnit( ADUNum ).InletNodeNum = PIU( PIUNum ).PriAirInNode;
 					PIU( PIUNum ).ADUNum = ADUNum;
 				}
 			}
@@ -617,7 +619,7 @@ namespace PoweredInductionUnits {
 							ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = PIU( PIUNum ).OutAirNode;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							AirDistUnit( PIU( PIUNum ).ADUNum ).ZoneEqNum = CtrlZone;
-							PIU( PIUNum ).CtrlZoneNum = CtrlZone; // store control zone index for later use in finding air loop index
+							PIU( PIUNum ).CtrlZoneNum = CtrlZone;
 							PIU( PIUNum ).ctrlZoneInNodeIndex = SupAirIn;
 							AirNodeFound = true;
 						}
@@ -671,11 +673,12 @@ namespace PoweredInductionUnits {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataDefineEquip::AirDistUnit;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using PlantUtilities::InitComponentNodes;
 		using DataGlobals::AnyPlantInModel;
+		using DataZoneEquipment::ZoneEquipConfig;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPIU" );
@@ -785,6 +788,7 @@ namespace PoweredInductionUnits {
 			if ( PIU( PIUNum ).AirLoopNum == 0 ) { // fill air loop index
 				if ( PIU( PIUNum ).CtrlZoneNum > 0 && PIU( PIUNum ).ctrlZoneInNodeIndex > 0 ) {
 					PIU( PIUNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( PIU( PIUNum ).CtrlZoneNum ).InletNodeAirLoopNum( PIU( PIUNum ).ctrlZoneInNodeIndex );
+					AirDistUnit( PIU( PIUNum ).ADUNum ).AirLoopNum = PIU( PIUNum ).AirLoopNum;
 				}
 			}
 
@@ -866,7 +870,7 @@ namespace PoweredInductionUnits {
 		using SteamCoils::GetCoilSteamOutletNode;
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using ReportSizingManager::ReportSizingOutput;
@@ -914,6 +918,7 @@ namespace PoweredInductionUnits {
 
 		PltSizHeatNum = 0;
 		DesMassFlow = 0.0;
+		DesCoilLoad = 0.0;
 		ErrorsFound = false;
 		IsAutoSize = false;
 		MaxPriAirVolFlowDes = 0.0;

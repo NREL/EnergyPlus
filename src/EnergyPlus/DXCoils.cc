@@ -253,6 +253,15 @@ namespace DXCoils {
 	Array1D< DXCoilData > DXCoil;
 	Array1D< DXCoilNumericFieldData > DXCoilNumericFields;
 
+	//bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool CrankcaseHeaterReportVarFlag( true );
+	}
 	// Functions
 
 	void
@@ -5051,7 +5060,6 @@ namespace DXCoils {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyEnvrnFlag; // One time environment flag
 		static Array1D_bool MySizeFlag; // One time sizing flag
-		static bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
 		Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
 		Real64 RatedHeatPumpIndoorHumRat; // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
 		Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
@@ -15041,6 +15049,7 @@ Label50: ;
 
 		GetCoilsInputFlag = true;
 		MyOneTimeFlag = true;
+		CrankcaseHeaterReportVarFlag = true;
 
 		DXCoil.deallocate();
 		DXCoilNumericFields.deallocate();
