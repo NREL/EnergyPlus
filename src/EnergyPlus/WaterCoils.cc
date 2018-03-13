@@ -807,7 +807,7 @@ namespace WaterCoils {
 		using DataSizing::AutoSize;
 		using DataSizing::CurSysNum;
 		using namespace OutputReportPredefined;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace FaultsManager;

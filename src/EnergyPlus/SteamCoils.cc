@@ -115,9 +115,9 @@ namespace SteamCoils {
 	using namespace FluidProperties;
 	using DataEnvironment::StdBaroPress;
 	using DataPlant::TypeOf_CoilSteamAirHeating;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 	using DataPlant::PlantLoop;
-	using DataPlant::MyPlantSizingIndex;
+	using PlantUtilities::MyPlantSizingIndex;
 	using namespace ScheduleManager;
 
 	// Data

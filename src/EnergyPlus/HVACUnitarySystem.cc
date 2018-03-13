@@ -509,7 +509,7 @@ namespace HVACUnitarySystem {
 		// Using/Aliasing
 		using DataAirLoop::AirLoopControlInfo;
 		using DataAirflowNetwork::AirflowNetworkUnitarySystem;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_UnitarySystemRecovery;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CoilSteamAirHeating;

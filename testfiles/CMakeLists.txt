@@ -148,6 +148,7 @@ ADD_SIMULATION_TEST(IDF_FILE CoilWaterDesuperheating.idf EPW_FILE USA_FL_Miami.I
 ADD_SIMULATION_TEST(IDF_FILE CommonPipe_Pri-Sec.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CompSetPtControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CondFD1ZonePurchAirAutoSizeWithPCM.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+#ADD_SIMULATION_TEST(IDF_FILE ConstSpeedBranchPumpExercise.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Convection.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ConvectionAdaptiveSmallOffice.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CoolingCoilFreezingPrevention.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

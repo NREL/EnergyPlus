@@ -74,6 +74,7 @@
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
+#include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -6784,7 +6785,7 @@ namespace SetPointManager {
 					this->plantSetpointNodeIndex = DataPlant::PlantLoop( plantIndex ).TempSetPointNodeNum;
 					fluidIndex = DataPlant::PlantLoop( plantIndex ).FluidIndex;
 					// now that we've found the plant populated, let's verify that the nodes match
-					if ( ! DataPlant::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
+					if ( ! PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
 						ShowSevereError( "Node problem for SetpointManager:ReturnTemperature:ChilledWater." );
 						ShowContinueError( "Return and Supply nodes were not found on the same plant loop.  Verify node names." );
 						ShowFatalError( "Simulation aborts due to setpoint node problem" );
@@ -6890,7 +6891,7 @@ namespace SetPointManager {
 					this->plantSetpointNodeIndex = DataPlant::PlantLoop( plantIndex ).TempSetPointNodeNum;
 					fluidIndex = DataPlant::PlantLoop( plantIndex ).FluidIndex;
 					// now that we've found the plant populated, let's verify that the nodes match
-					if ( ! DataPlant::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
+					if ( ! PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
 						ShowSevereError( "Node problem for SetpointManager:ReturnTemperature:HotWater." );
 						ShowContinueError( "Return and Supply nodes were not found on the same plant loop.  Verify node names." );
 						ShowFatalError( "Simulation aborts due to setpoint node problem" );
