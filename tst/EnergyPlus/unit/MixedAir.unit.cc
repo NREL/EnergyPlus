@@ -5689,26 +5689,23 @@ namespace EnergyPlus {
 
 		GetOutsideAirSysInputs();
 
-		int OASysNum = 1;
-		EXPECT_EQ( OutsideAirSys( OASysNum ).NumControllers, 3 );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).ControllerType( 1 ), "CONTROLLER:WATERCOIL" );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).ControllerName( 1 ), "OA CC CONTROLLER 1" );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).ControllerType( 2 ), "CONTROLLER:OUTDOORAIR" );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).ControllerName( 2 ), "OA CONTROLLER 1" );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).ControllerType( 3 ), "CONTROLLER:WATERCOIL" );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).ControllerName( 3 ), "OA HC CONTROLLER 1" );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).OAControllerIndexPtr, 2 );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).OAControllerIndex, 0 );
+		auto & CurrentOASystem( DataAirLoop::OutsideAirSys[0] );
 
-		int CtrlNum = OutsideAirSys( OASysNum ).OAControllerIndexPtr;
-		static std::string CtrlName = OutsideAirSys( OASysNum ).ControllerName( CtrlNum );
-		int OAControllerIndex = OutsideAirSys( OASysNum ).OAControllerIndex;
+		EXPECT_EQ( CurrentOASystem.NumControllers, 3 );
+		EXPECT_EQ( CurrentOASystem.ControllerType( 1 ), "CONTROLLER:WATERCOIL" );
+		EXPECT_EQ( CurrentOASystem.ControllerName( 1 ), "OA CC CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.ControllerType( 2 ), "CONTROLLER:OUTDOORAIR" );
+		EXPECT_EQ( CurrentOASystem.ControllerName( 2 ), "OA CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.ControllerType( 3 ), "CONTROLLER:WATERCOIL" );
+		EXPECT_EQ( CurrentOASystem.ControllerName( 3 ), "OA HC CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.OAControllerName, "OA CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.OAControllerIndex, 0 );
 		int AirLoopNum = 0;
 		bool FirstHVACIteration = true;
-
-		SimOAController( CtrlName, OAControllerIndex, FirstHVACIteration, AirLoopNum );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).OAControllerIndexPtr, 2 );
-		EXPECT_EQ( OutsideAirSys( OASysNum ).OAControllerIndex, 1 );
+		// sim OAController with OAControllerIndex = 0 for the first time only
+		SimOAController( CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum );
+		// OAControllerIndex is set during first time InitOAController run
+		EXPECT_EQ( CurrentOASystem.OAControllerIndex, 1 );
 
 	}
 }
