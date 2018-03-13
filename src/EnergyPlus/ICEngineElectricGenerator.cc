@@ -849,7 +849,7 @@ namespace ICEngineElectricGenerator {
 		// Using/Aliasing
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_ICEngine;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;

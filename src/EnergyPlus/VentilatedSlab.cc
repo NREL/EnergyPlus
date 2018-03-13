@@ -1117,7 +1117,7 @@ namespace VentilatedSlab {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::VentilatedSlab_Num;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataPlant::TypeOf_CoilWaterCooling;
@@ -1425,7 +1425,7 @@ namespace VentilatedSlab {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
