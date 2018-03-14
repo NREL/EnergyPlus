@@ -65,7 +65,7 @@ TEST_F( EnergyPlusFixture, ERLExpression_TestExponentials ) {
 	DataGlobals::KickOffSimulation = false;
 	EMSManager::FinishProcessingUserInput = false;
 
-	bool errorsFound;
+	bool errorsFound = false;
 
 	DataRuntimeLanguage::ErlExpression.allocate(1);
 	auto & erlExpression = DataRuntimeLanguage::ErlExpression(1);
