@@ -129,6 +129,7 @@ set( test_src
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
