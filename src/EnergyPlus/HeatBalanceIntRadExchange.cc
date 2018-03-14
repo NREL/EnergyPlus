@@ -1555,10 +1555,10 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> eigenA(A.size1(), A.size2());
-//		double A_arr[A.size1()][A.size2()];
-		double A_arr[1000][1000];
-//		double I_arr[A.size1()][A.size2()];
-		double I_arr[1000][1000];
+		double A_arr[A.size1()][A.size2()];
+//		double A_arr[1000][1000];
+		double I_arr[A.size1()][A.size2()];
+//		double I_arr[1000][1000];
 
 		for ( auto i = 1; i <= A.size1(); i++ ) {
 			for ( auto j = 1; j <= A.size2(); j++ ) {
@@ -1566,17 +1566,6 @@ namespace HeatBalanceIntRadExchange {
 				A_arr[i-1][j-1] = A(i, j);
 				I_arr[i-1][j-1] = I(i, j);
 				eigenA(i-1, j-1) = val;
-			}
-		}
-
-		// check to see if input / instantiated eigen matrices are the same
-		for ( auto i = 1; i <= A.size1(); i++ ) {
-			for ( auto j = 1; j <= A.size2(); j++ ) {
-				auto const Ainv = eigenA(i-1, j-1);
-				auto const ePlus = A_arr[i - 1][j-1];
-				if (std::abs(Ainv - ePlus) > 0.000001) {
-					auto rip = 0;
-				}
 			}
 		}
 
