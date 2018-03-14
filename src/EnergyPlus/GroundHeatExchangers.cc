@@ -3345,7 +3345,7 @@ namespace GroundHeatExchangers {
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_GrndHtExchgSystem;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 
 		// Locals
@@ -3453,7 +3453,7 @@ namespace GroundHeatExchangers {
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_GrndHtExchgSlinky;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 		using namespace GroundTemperatureManager;
 
