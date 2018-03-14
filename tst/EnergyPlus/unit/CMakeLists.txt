@@ -63,6 +63,7 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
+  FuelCellElectricGenerator.unit.cc
   Furnaces.unit.cc
   General.unit.cc
   GeneralRoutines.unit.cc
