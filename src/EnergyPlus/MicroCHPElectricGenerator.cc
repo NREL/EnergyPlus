@@ -533,7 +533,7 @@ namespace MicroCHPElectricGenerator {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::SysSizingCalc;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroCHP;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizeCompleted;

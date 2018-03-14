@@ -278,7 +278,7 @@ namespace HeatPumpWaterToWaterSimple {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GSHPNum; // GSHP number

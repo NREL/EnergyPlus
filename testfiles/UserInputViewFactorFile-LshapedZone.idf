@@ -102,7 +102,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.000000;                !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 2%, MaxDB=29.9°C MWB=22.1°C
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 2%, MaxDB=29.9Â°C MWB=22.1Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 2% Condns DB=>MWB,  !- Name
