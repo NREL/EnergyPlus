@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -992,7 +992,7 @@ namespace DataPlant {
 		// Default Constructor
 		PlantLoopData() :
 			FluidType( 0 ),
-			FluidIndex( 0 ),
+			FluidIndex( 1 ), // default to water
 			MFErrIndex( 0 ),
 			MFErrIndex1( 0 ),
 			MFErrIndex2( 0 ),

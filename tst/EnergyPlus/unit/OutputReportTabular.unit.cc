@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -199,7 +199,7 @@ TEST(OutputReportTabularTest, unitsFromHeading)
 	SetupUnitConversions();
 	unitsStyle = unitsStyleInchPound;
 	unitString = "";
-	EXPECT_EQ(96, unitsFromHeading(unitString)); 
+	EXPECT_EQ(96, unitsFromHeading(unitString));
 	EXPECT_EQ("", unitString);
 	unitString = "Zone Floor Area {m2}";
 	EXPECT_EQ(46, unitsFromHeading(unitString));
@@ -1424,7 +1424,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 
@@ -2461,7 +2461,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	//DataGlobals::DDOnlySimulation = true;
@@ -3438,7 +3438,7 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		//"  Temperature;             !- Output Unit Type",
 	//} );
 
-	//ASSERT_FALSE( process_idf( idf_objects ) );
+	//ASSERT_TRUE( process_idf( idf_objects ) );
 
 	//OutputProcessor::TimeValue.allocate( 2 );
 	////DataGlobals::DDOnlySimulation = true;
@@ -3470,7 +3470,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 		"Minimum; !- Aggregation Type for Variable or Meter 2",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitUse;
 
@@ -3683,7 +3683,7 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 		"Always1; !- Schedule Name"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::DoWeathSim = true;
 
@@ -4823,7 +4823,7 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 		//"                                                                                                   "
 	//} );
 
-	//ASSERT_FALSE( process_idf( idf_objects ) );
+	//ASSERT_TRUE( process_idf( idf_objects ) );
 
 	//OutputProcessor::TimeValue.allocate( 2 );
 	////DataGlobals::DDOnlySimulation = true;
@@ -5923,7 +5923,7 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 		//"    SimpleAndTabular;        !- Option Type                                               ",
 	//} );
 
-	//ASSERT_FALSE( process_idf( idf_objects ) );
+	//ASSERT_TRUE( process_idf( idf_objects ) );
 
 	//OutputProcessor::TimeValue.allocate( 2 );
 	////DataGlobals::DDOnlySimulation = true;
@@ -5973,10 +5973,8 @@ TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 
 
 TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
-	sqlite_test->sqliteBegin();
-	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	EnergyPlus::sqlite->sqliteBegin();
+	EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 	displayTabularVeriSum = true;
 	Latitude = 12.3;
@@ -6048,12 +6046,10 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 
 	WriteVeriSumTable();
 
-	sqlite_test = std::move( EnergyPlus::sqlite );
-
 	auto tabularData = queryResult( "SELECT * FROM TabularData;", "TabularData" );
 	auto strings = queryResult( "SELECT * FROM Strings;", "Strings" );
 	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
-	sqlite_test->sqliteCommit();
+	EnergyPlus::sqlite->sqliteCommit();
 
 	EXPECT_EQ( 123ul, tabularData.size() );
 	// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value
@@ -6101,7 +6097,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitUse;
 
@@ -6524,9 +6520,8 @@ TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
 
 TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay )
 {
-	sqlite_test->sqliteBegin();
-	sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
-	EnergyPlus::sqlite = std::move( sqlite_test );
+	EnergyPlus::sqlite->sqliteBegin();
+	EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
 	DataHVACGlobals::NumPrimaryAirSys = 1;
 	SysSizPeakDDNum.allocate( DataHVACGlobals::NumPrimaryAirSys );
@@ -6544,14 +6539,12 @@ TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLo
 
 	WriteLoadComponentSummaryTables();
 
-	sqlite_test = std::move( EnergyPlus::sqlite );
-
 	auto tabularData = queryResult( "SELECT * FROM TabularData;", "TabularData" );
 	auto strings = queryResult( "SELECT * FROM Strings;", "Strings" );
 	auto stringTypes = queryResult( "SELECT * FROM StringTypes;", "StringTypes" );
-	sqlite_test->sqliteCommit();
+	EnergyPlus::sqlite->sqliteCommit();
 
-	EXPECT_EQ( 460ul, tabularData.size() ); 
+	EXPECT_EQ( 460ul, tabularData.size() );
 	EXPECT_EQ( 76ul, strings.size() );
 	EXPECT_EQ( "AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 

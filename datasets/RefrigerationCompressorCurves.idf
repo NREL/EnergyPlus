@@ -6458,17 +6458,6 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Carlyle_R-507_Low_06TRC033,   !nominal MBtu/h = 69302.9, !nominal kW = 14.0
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRC033,  !- Name
-    06TRC033_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRC033_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
-
 ! Capacity Curve for Carlyle_R-507_Low_06TRD039,   !nominal MBtu/h = 84321.9
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -6520,26 +6509,6 @@
     ,                        !- Rated Liquid Temperature {C}
     5.6;                     !- Rated Subcooling {deltaC}
 
-! Capacity Curve for Carlyle_R-507_Low_06TRD044,   !nominal MBtu/h = 95240.7
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRD044_R-507_Low_qcurv,!- Name
-    1.106e+005,              !- Coefficient1 Constant
-    3477.,                   !- Coefficient2 x
-    38.06,                   !- Coefficient3 x**2
-    -679.4,                  !- Coefficient4 y
-    0.07118,                 !- Coefficient5 y**2
-    -26.68,                  !- Coefficient6 x*y
-    0.09612,                 !- Coefficient7 x**3
-    -0.06346,                !- Coefficient8 y**3
-    -0.3872,                 !- Coefficient9 x**2*y
-    -0.08947,                !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
 ! Power Curve for Carlyle_R-507_Low_06TRD044,   !nominal kW = 19.5
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -6571,107 +6540,6 @@
     ,                        !- Rated Liquid Temperature {C}
     5.6;                     !- Rated Subcooling {deltaC}
 
-! Capacity Curve for Carlyle_R-507_Low_06TRE048,   !nominal MBtu/h = 105682.3
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRE048_R-507_Low_qcurv,!- Name
-    1.203e+005,              !- Coefficient1 Constant
-    3763.,                   !- Coefficient2 x
-    40.53,                   !- Coefficient3 x**2
-    -695.3,                  !- Coefficient4 y
-    -0.3098,                 !- Coefficient5 y**2
-    -28.09,                  !- Coefficient6 x*y
-    0.09850,                 !- Coefficient7 x**3
-    -0.06076,                !- Coefficient8 y**3
-    -0.4025,                 !- Coefficient9 x**2*y
-    -0.08759,                !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-507_Low_06TRE048,   !nominal kW = 21.0
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRE048_R-507_Low_pwrcurv,  !- Name
-    1.002e+004,              !- Coefficient1 Constant
-    -105.7,                  !- Coefficient2 x
-    -5.108,                  !- Coefficient3 x**2
-    368.2,                   !- Coefficient4 y
-    -0.9372,                 !- Coefficient5 y**2
-    3.172,                   !- Coefficient6 x*y
-    -0.04008,                !- Coefficient7 x**3
-    0.06076,                 !- Coefficient8 y**3
-    0.05281,                 !- Coefficient9 x**2*y
-    0.05608,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-507_Low_06TRE048,   !nominal MBtu/h = 105682.3, !nominal kW = 21.0
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRE048,  !- Name
-    06TRE048_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRE048_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
-
-! Capacity Curve for Carlyle_R-507_Low_06TRE054,   !nominal MBtu/h = 120496.8
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRE054_R-507_Low_qcurv,!- Name
-    1.350e+005,              !- Coefficient1 Constant
-    4172.,                   !- Coefficient2 x
-    44.33,                   !- Coefficient3 x**2
-    -757.8,                  !- Coefficient4 y
-    0.9766,                  !- Coefficient5 y**2
-    -28.43,                  !- Coefficient6 x*y
-    0.08753,                 !- Coefficient7 x**3
-    -0.09564,                !- Coefficient8 y**3
-    -0.4585,                 !- Coefficient9 x**2*y
-    -0.1442,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-507_Low_06TRE054,   !nominal kW = 24.2
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRE054_R-507_Low_pwrcurv,  !- Name
-    1.233e+004,              !- Coefficient1 Constant
-    -104.8,                  !- Coefficient2 x
-    -5.409,                  !- Coefficient3 x**2
-    345.0,                   !- Coefficient4 y
-    0.7406,                  !- Coefficient5 y**2
-    2.694,                   !- Coefficient6 x*y
-    -0.04539,                !- Coefficient7 x**3
-    0.05869,                 !- Coefficient8 y**3
-    0.04308,                 !- Coefficient9 x**2*y
-    0.06881,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-507_Low_06TRE054,   !nominal MBtu/h = 120496.8, !nominal kW = 24.2
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRE054,  !- Name
-    06TRE054_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRE054_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
 
 ! Capacity Curve for Carlyle_R-507_Low_06TRF065,   !nominal MBtu/h = 150455.3
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
@@ -6826,103 +6694,12 @@
     ,                        !- Rated Liquid Temperature {C}
     5.6;                     !- Rated Subcooling {deltaC}
 
-! Capacity Curve for Carlyle_R-507_Low_06TRC033,   !nominal MBtu/h = 69302.9
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRC033_R-507_Low_qcurv,!- Name
-    8.410e+004,              !- Coefficient1 Constant
-    2711.,                   !- Coefficient2 x
-    31.72,                   !- Coefficient3 x**2
-    -544.3,                  !- Coefficient4 y
-    -1.198,                  !- Coefficient5 y**2
-    -22.61,                  !- Coefficient6 x*y
-    0.1108,                  !- Coefficient7 x**3
-    -0.03669,                !- Coefficient8 y**3
-    -0.3130,                 !- Coefficient9 x**2*y
-    -0.06264,                !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-507_Low_06TRC033,   !nominal kW = 14.0
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRC033_R-507_Low_pwrcurv,  !- Name
-    5893.,                   !- Coefficient1 Constant
-    -110.3,                  !- Coefficient2 x
-    -2.602,                  !- Coefficient3 x**2
-    274.8,                   !- Coefficient4 y
-    0.5126,                  !- Coefficient5 y**2
-    5.950,                   !- Coefficient6 x*y
-    -0.007831,               !- Coefficient7 x**3
-    0.01667,                 !- Coefficient8 y**3
-    0.05845,                 !- Coefficient9 x**2*y
-    0.002292,                !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
 !Detailed Compressor: Carlyle_R-507_Low_06TRC033,   !nominal MBtu/h = 69302.9, !nominal kW = 14.0
 
   Refrigeration:Compressor,
     Carlyle_R-507_Low_06TRC033,  !- Name
     06TRC033_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06TRC033_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
-
-! Capacity Curve for Carlyle_R-507_Low_06TRD039,   !nominal MBtu/h = 84321.9
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRD039_R-507_Low_qcurv,!- Name
-    9.921e+004,              !- Coefficient1 Constant
-    3155.,                   !- Coefficient2 x
-    35.47,                   !- Coefficient3 x**2
-    -607.6,                  !- Coefficient4 y
-    -1.048,                  !- Coefficient5 y**2
-    -25.16,                  !- Coefficient6 x*y
-    0.1066,                  !- Coefficient7 x**3
-    -0.04275,                !- Coefficient8 y**3
-    -0.3506,                 !- Coefficient9 x**2*y
-    -0.07003,                !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-507_Low_06TRD039,   !nominal kW = 17.2
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRD039_R-507_Low_pwrcurv,  !- Name
-    7466.,                   !- Coefficient1 Constant
-    -123.5,                  !- Coefficient2 x
-    -3.531,                  !- Coefficient3 x**2
-    325.4,                   !- Coefficient4 y
-    0.1005,                  !- Coefficient5 y**2
-    5.649,                   !- Coefficient6 x*y
-    -0.01538,                !- Coefficient7 x**3
-    0.02963,                 !- Coefficient8 y**3
-    0.06220,                 !- Coefficient9 x**2*y
-    0.01650,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-507_Low_06TRD039,   !nominal MBtu/h = 84321.9, !nominal kW = 17.2
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRD039,  !- Name
-    06TRD039_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRD039_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -6948,36 +6725,6 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-! Power Curve for Carlyle_R-507_Low_06TRD044,   !nominal kW = 19.5
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRD044_R-507_Low_pwrcurv,  !- Name
-    9083.,                   !- Coefficient1 Constant
-    -125.2,                  !- Coefficient2 x
-    -5.352,                  !- Coefficient3 x**2
-    327.3,                   !- Coefficient4 y
-    0.06459,                 !- Coefficient5 y**2
-    3.631,                   !- Coefficient6 x*y
-    -0.04409,                !- Coefficient7 x**3
-    0.04271,                 !- Coefficient8 y**3
-    0.05129,                 !- Coefficient9 x**2*y
-    0.04370,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-507_Low_06TRD044,   !nominal MBtu/h = 95240.7, !nominal kW = 19.5
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRD044,  !- Name
-    06TRD044_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRD044_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
 
 ! Capacity Curve for Carlyle_R-507_Low_06TRE048,   !nominal MBtu/h = 105682.3
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
@@ -7076,159 +6823,6 @@
     Carlyle_R-507_Low_06TRE054,  !- Name
     06TRE054_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     06TRE054_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
-
-! Capacity Curve for Carlyle_R-507_Low_06TRF065,   !nominal MBtu/h = 150455.3
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRF065_R-507_Low_qcurv,!- Name
-    1.626e+005,              !- Coefficient1 Constant
-    4971.,                   !- Coefficient2 x
-    51.35,                   !- Coefficient3 x**2
-    -856.1,                  !- Coefficient4 y
-    0.8388,                  !- Coefficient5 y**2
-    -33.55,                  !- Coefficient6 x*y
-    0.1073,                  !- Coefficient7 x**3
-    -0.08324,                !- Coefficient8 y**3
-    -0.4817,                 !- Coefficient9 x**2*y
-    -0.1015,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-507_Low_06TRF065,   !nominal kW = 29.5
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRF065_R-507_Low_pwrcurv,  !- Name
-    1.462e+004,              !- Coefficient1 Constant
-    -159.5,                  !- Coefficient2 x
-    -8.804,                  !- Coefficient3 x**2
-    414.5,                   !- Coefficient4 y
-    0.7259,                  !- Coefficient5 y**2
-    1.730,                   !- Coefficient6 x*y
-    -0.09120,                !- Coefficient7 x**3
-    0.07167,                 !- Coefficient8 y**3
-    0.02473,                 !- Coefficient9 x**2*y
-    0.08004,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-507_Low_06TRF065,   !nominal MBtu/h = 150455.3, !nominal kW = 29.5
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRF065,  !- Name
-    06TRF065_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRF065_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
-
-! Capacity Curve for Carlyle_R-507_Low_06TRG078,   !nominal MBtu/h = 180602.7
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRG078_R-507_Low_qcurv,!- Name
-    1.907e+005,              !- Coefficient1 Constant
-    5752.,                   !- Coefficient2 x
-    59.17,                   !- Coefficient3 x**2
-    -978.6,                  !- Coefficient4 y
-    2.384,                   !- Coefficient5 y**2
-    -35.99,                  !- Coefficient6 x*y
-    0.1198,                  !- Coefficient7 x**3
-    -0.1179,                 !- Coefficient8 y**3
-    -0.5519,                 !- Coefficient9 x**2*y
-    -0.1468,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-507_Low_06TRG078,   !nominal kW = 36.2
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRG078_R-507_Low_pwrcurv,  !- Name
-    1.847e+004,              !- Coefficient1 Constant
-    -182.1,                  !- Coefficient2 x
-    -10.37,                  !- Coefficient3 x**2
-    474.9,                   !- Coefficient4 y
-    0.5361,                  !- Coefficient5 y**2
-    0.8693,                  !- Coefficient6 x*y
-    -0.1137,                 !- Coefficient7 x**3
-    0.1018,                  !- Coefficient8 y**3
-    0.006371,                !- Coefficient9 x**2*y
-    0.1036,                  !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-507_Low_06TRG078,   !nominal MBtu/h = 180602.7, !nominal kW = 36.2
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRG078,  !- Name
-    06TRG078_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRG078_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    5.6;                     !- Rated Subcooling {deltaC}
-
-! Capacity Curve for Carlyle_R-507_Low_06TRH088,   !nominal MBtu/h = 203573.0
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRH088_R-507_Low_qcurv,!- Name
-    2.120e+005,              !- Coefficient1 Constant
-    6332.,                   !- Coefficient2 x
-    65.16,                   !- Coefficient3 x**2
-    -1170.,                  !- Coefficient4 y
-    5.414,                   !- Coefficient5 y**2
-    -40.17,                  !- Coefficient6 x*y
-    0.1564,                  !- Coefficient7 x**3
-    -0.1424,                 !- Coefficient8 y**3
-    -0.5652,                 !- Coefficient9 x**2*y
-    -0.1181,                 !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Carlyle_R-507_Low_06TRH088,   !nominal kW = 41.9
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    06TRH088_R-507_Low_pwrcurv,  !- Name
-    2.202e+004,              !- Coefficient1 Constant
-    -135.0,                  !- Coefficient2 x
-    -9.724,                  !- Coefficient3 x**2
-    556.9,                   !- Coefficient4 y
-    0.4689,                  !- Coefficient5 y**2
-    0.3257,                  !- Coefficient6 x*y
-    -0.1073,                 !- Coefficient7 x**3
-    0.1053,                  !- Coefficient8 y**3
-    -0.005862,               !- Coefficient9 x**2*y
-    0.1059,                  !- Coefficient10 x*y**2
-    -40.0,                   !- Minimum Value of x
-    -17.8,                   !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Carlyle_R-507_Low_06TRH088,   !nominal MBtu/h = 203573.0, !nominal kW = 41.9
-
-  Refrigeration:Compressor,
-    Carlyle_R-507_Low_06TRH088,  !- Name
-    06TRH088_R-507_Low_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    06TRH088_R-507_Low_qcurv,!- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -7544,7 +7138,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    2DB3-0500-TFC_R-12_MED_qcurv,  !- Name
+    2DB3-0500-TFC_R-12_MED_qcurv 1,  !- Name
     2.433e+004,              !- Coefficient1 Constant
     749.9,                   !- Coefficient2 x
     0.8832,                  !- Coefficient3 x**2
@@ -7564,7 +7158,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    2DB3-0500-TFC_R-12_MED_pwrcurv,  !- Name
+    2DB3-0500-TFC_R-12_MED_pwrcurv 1,  !- Name
     1066.,                   !- Coefficient1 Constant
     -133.6,                  !- Coefficient2 x
     -5.214,                  !- Coefficient3 x**2
@@ -7580,12 +7174,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-DISCUS-60HZ_R-12_MED_2DB3-0500-TFC,   !nominal MBtu/h = 39700.0, !nominal kW = 4.6
+!Detailed Compressor: Copeland-DISCUS-60HZ_R-12_MED_2DB3-0500-TFC_1,   !nominal MBtu/h = 39700.0, !nominal kW = 4.6
 
   Refrigeration:Compressor,
-    Copeland-DISCUS-60HZ_R-12_MED_2DB3-0500-TFC,  !- Name
-    2DB3-0500-TFC_R-12_MED_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    2DB3-0500-TFC_R-12_MED_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-DISCUS-60HZ_R-12_MED_2DB3-0500-TFC 1,  !- Name
+    2DB3-0500-TFC_R-12_MED_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    2DB3-0500-TFC_R-12_MED_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -7748,7 +7342,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    3DB3-0750-TFC_R-12_HIGH_qcurv,  !- Name
+    3DB3-0750-TFC_R-12_HIGH_qcurv 1,  !- Name
     3.472e+004,              !- Coefficient1 Constant
     1295.,                   !- Coefficient2 x
     18.30,                   !- Coefficient3 x**2
@@ -7768,7 +7362,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    3DB3-0750-TFC_R-12_HIGH_pwrcurv,  !- Name
+    3DB3-0750-TFC_R-12_HIGH_pwrcurv 1,  !- Name
     1244.,                   !- Coefficient1 Constant
     -112.7,                  !- Coefficient2 x
     -3.560,                  !- Coefficient3 x**2
@@ -7784,12 +7378,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-DISCUS-60HZ_R-12_HIGH_3DB3-0750-TFC,   !nominal MBtu/h = 83100.0, !nominal kW = 7.8
+!Detailed Compressor: Copeland-DISCUS-60HZ_R-12_HIGH_3DB3-0750-TFC_1,   !nominal MBtu/h = 83100.0, !nominal kW = 7.8
 
   Refrigeration:Compressor,
-    Copeland-DISCUS-60HZ_R-12_HIGH_3DB3-0750-TFC,  !- Name
-    3DB3-0750-TFC_R-12_HIGH_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    3DB3-0750-TFC_R-12_HIGH_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-DISCUS-60HZ_R-12_HIGH_3DB3-0750-TFC 1,  !- Name
+    3DB3-0750-TFC_R-12_HIGH_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    3DB3-0750-TFC_R-12_HIGH_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -16571,7 +16165,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    ZF24K4E-TWC_R-404A_LOW_qcurv,  !- Name
+    ZF24K4E-TWC_R-404A_LOW_qcurv 1,  !- Name
     3.351e+004,              !- Coefficient1 Constant
     1036.,                   !- Coefficient2 x
     10.70,                   !- Coefficient3 x**2
@@ -16591,7 +16185,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    ZF24K4E-TWC_R-404A_LOW_pwrcurv,  !- Name
+    ZF24K4E-TWC_R-404A_LOW_pwrcurv 1,  !- Name
     6577.,                   !- Coefficient1 Constant
     210.3,                   !- Coefficient2 x
     4.448,                   !- Coefficient3 x**2
@@ -16607,12 +16201,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-SCROLL-60HZ_R-404A_LOW_ZF24K4E-TWC,   !nominal MBtu/h = 32500.0, !nominal kW = 3.6
+!Detailed Compressor: Copeland-SCROLL-60HZ_R-404A_LOW_ZF24K4E-TWC_1,   !nominal MBtu/h = 32500.0, !nominal kW = 3.6
 
   Refrigeration:Compressor,
-    Copeland-SCROLL-60HZ_R-404A_LOW_ZF24K4E-TWC,  !- Name
-    ZF24K4E-TWC_R-404A_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    ZF24K4E-TWC_R-404A_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-SCROLL-60HZ_R-404A_LOW_ZF24K4E-TWC 1,  !- Name
+    ZF24K4E-TWC_R-404A_LOW_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    ZF24K4E-TWC_R-404A_LOW_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -17123,57 +16717,6 @@
     Copeland-SCROLL-60HZ_R-404A_MED_ZF15K4E-TF5,  !- Name
     ZF15K4E-TF5_R-404A_MED_pwrcurv,  !- Refrigeration Compressor Power Curve Name
     ZF15K4E-TF5_R-404A_MED_qcurv,  !- Refrigeration Compressor Capacity Curve Name
-    ,                        !- Rated Superheat {deltaC}
-    18.3,                    !- Rated Return Gas Temperature {C}
-    ,                        !- Rated Liquid Temperature {C}
-    0.0;                     !- Rated Subcooling {deltaC}
-
-! Capacity Curve for Copeland-SCROLL-60HZ_R-404A_MED_ZF18K4E-TF5,   !nominal MBtu/h = 45000.0
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    ZF18K4E-TF5_R-404A_MED_qcurv,  !- Name
-    2.964e+004,              !- Coefficient1 Constant
-    955.0,                   !- Coefficient2 x
-    11.51,                   !- Coefficient3 x**2
-    -257.9,                  !- Coefficient4 y
-    0.5981,                  !- Coefficient5 y**2
-    -6.391,                  !- Coefficient6 x*y
-    0.04222,                 !- Coefficient7 x**3
-    -0.01643,                !- Coefficient8 y**3
-    -0.08582,                !- Coefficient9 x**2*y
-    -0.03802,                !- Coefficient10 x*y**2
-    -17.8,                   !- Minimum Value of x
-    4.4,                     !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-! Power Curve for Copeland-SCROLL-60HZ_R-404A_MED_ZF18K4E-TF5,   !nominal kW = 6.3
-! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-
-  Curve:Bicubic,
-    ZF18K4E-TF5_R-404A_MED_pwrcurv,  !- Name
-    3758.,                   !- Coefficient1 Constant
-    89.69,                   !- Coefficient2 x
-    1.016,                   !- Coefficient3 x**2
-    53.42,                   !- Coefficient4 y
-    -0.2849,                 !- Coefficient5 y**2
-    -0.9809,                 !- Coefficient6 x*y
-    0.003939,                !- Coefficient7 x**3
-    0.008778,                !- Coefficient8 y**3
-    -0.01141,                !- Coefficient9 x**2*y
-    0.01087,                 !- Coefficient10 x*y**2
-    -17.8,                   !- Minimum Value of x
-    4.4,                     !- Maximum Value of x
-    10.0,                    !- Minimum Value of y
-    48.9;                    !- Maximum Value of y
-
-!Detailed Compressor: Copeland-SCROLL-60HZ_R-404A_MED_ZF18K4E-TF5,   !nominal MBtu/h = 45000.0, !nominal kW = 6.3
-
-  Refrigeration:Compressor,
-    Copeland-SCROLL-60HZ_R-404A_MED_ZF18K4E-TF5,  !- Name
-    ZF18K4E-TF5_R-404A_MED_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    ZF18K4E-TF5_R-404A_MED_qcurv,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -19631,7 +19174,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    CRH3-0275-PFV_R-22_HIGH_qcurv,  !- Name
+    CRH3-0275-PFV_R-22_HIGH_qcurv 1,  !- Name
     1.523e+004,              !- Coefficient1 Constant
     615.2,                   !- Coefficient2 x
     9.559,                   !- Coefficient3 x**2
@@ -19651,7 +19194,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    CRH3-0275-PFV_R-22_HIGH_pwrcurv,  !- Name
+    CRH3-0275-PFV_R-22_HIGH_pwrcurv 1,  !- Name
     1015.,                   !- Coefficient1 Constant
     -4.986,                  !- Coefficient2 x
     -0.3039,                 !- Coefficient3 x**2
@@ -19667,12 +19210,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-COPELAWELD-60HZ_R-22_HIGH_CRH3-0275-PFV,   !nominal MBtu/h = 32100.0, !nominal kW = 3.4
+!Detailed Compressor: Copeland-COPELAWELD-60HZ_R-22_HIGH_CRH3-0275-PFV_1,   !nominal MBtu/h = 32100.0, !nominal kW = 3.4
 
   Refrigeration:Compressor,
-    Copeland-COPELAWELD-60HZ_R-22_HIGH_CRH3-0275-PFV,  !- Name
-    CRH3-0275-PFV_R-22_HIGH_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    CRH3-0275-PFV_R-22_HIGH_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-COPELAWELD-60HZ_R-22_HIGH_CRH3-0275-PFV 1,  !- Name
+    CRH3-0275-PFV_R-22_HIGH_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    CRH3-0275-PFV_R-22_HIGH_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -19835,7 +19378,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    CRJ3-0300-TF5_R-22_HIGH_qcurv,  !- Name
+    CRJ3-0300-TF5_R-22_HIGH_qcurv 1,  !- Name
     1.742e+004,              !- Coefficient1 Constant
     675.6,                   !- Coefficient2 x
     10.45,                   !- Coefficient3 x**2
@@ -19855,7 +19398,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    CRJ3-0300-TF5_R-22_HIGH_pwrcurv,  !- Name
+    CRJ3-0300-TF5_R-22_HIGH_pwrcurv 1,  !- Name
     1361.,                   !- Coefficient1 Constant
     -2.867,                  !- Coefficient2 x
     -0.2508,                 !- Coefficient3 x**2
@@ -19871,12 +19414,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-COPELAWELD-60HZ_R-22_HIGH_CRJ3-0300-TF5,   !nominal MBtu/h = 35100.0, !nominal kW = 3.7
+!Detailed Compressor: Copeland-COPELAWELD-60HZ_R-22_HIGH_CRJ3-0300-TF5_1,   !nominal MBtu/h = 35100.0, !nominal kW = 3.7
 
   Refrigeration:Compressor,
-    Copeland-COPELAWELD-60HZ_R-22_HIGH_CRJ3-0300-TF5,  !- Name
-    CRJ3-0300-TF5_R-22_HIGH_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    CRJ3-0300-TF5_R-22_HIGH_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-COPELAWELD-60HZ_R-22_HIGH_CRJ3-0300-TF5 1,  !- Name
+    CRJ3-0300-TF5_R-22_HIGH_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    CRJ3-0300-TF5_R-22_HIGH_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -20957,7 +20500,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    CS10K6E-TF5_R-404A_MED_qcurv,  !- Name
+    CS10K6E-TF5_R-404A_MED_qcurv 1,  !- Name
     9903.,                   !- Coefficient1 Constant
     422.8,                   !- Coefficient2 x
     8.476,                   !- Coefficient3 x**2
@@ -20977,7 +20520,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    CS10K6E-TF5_R-404A_MED_pwrcurv,  !- Name
+    CS10K6E-TF5_R-404A_MED_pwrcurv 1,  !- Name
     501.0,                   !- Coefficient1 Constant
     -28.73,                  !- Coefficient2 x
     -0.3011,                 !- Coefficient3 x**2
@@ -20993,12 +20536,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-COPELAWELD-60HZ_R-404A_MED_CS10K6E-TF5,   !nominal MBtu/h = 10000.0, !nominal kW = 1.6
+!Detailed Compressor: Copeland-COPELAWELD-60HZ_R-404A_MED_CS10K6E-TF5_1,   !nominal MBtu/h = 10000.0, !nominal kW = 1.6
 
   Refrigeration:Compressor,
-    Copeland-COPELAWELD-60HZ_R-404A_MED_CS10K6E-TF5,  !- Name
-    CS10K6E-TF5_R-404A_MED_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    CS10K6E-TF5_R-404A_MED_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-COPELAWELD-60HZ_R-404A_MED_CS10K6E-TF5 1,  !- Name
+    CS10K6E-TF5_R-404A_MED_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    CS10K6E-TF5_R-404A_MED_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     4.4,                     !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -36665,7 +36208,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    4DA1-1000-TSK_R-12_LOW_qcurv,  !- Name
+    4DA1-1000-TSK_R-12_LOW_qcurv 1,  !- Name
     3.387e+004,              !- Coefficient1 Constant
     1151.,                   !- Coefficient2 x
     14.31,                   !- Coefficient3 x**2
@@ -36685,7 +36228,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    4DA1-1000-TSK_R-12_LOW_pwrcurv,  !- Name
+    4DA1-1000-TSK_R-12_LOW_pwrcurv 1,  !- Name
     4881.,                   !- Coefficient1 Constant
     113.2,                   !- Coefficient2 x
     2.220,                   !- Coefficient3 x**2
@@ -36701,12 +36244,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_LOW_4DA1-1000-TSK,   !nominal MBtu/h = 22700.0, !nominal kW = 4.5
+!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_LOW_4DA1-1000-TSK_1,   !nominal MBtu/h = 22700.0, !nominal kW = 4.5
 
   Refrigeration:Compressor,
-    Copeland-DISCUS-50HZ_R-12_LOW_4DA1-1000-TSK,  !- Name
-    4DA1-1000-TSK_R-12_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    4DA1-1000-TSK_R-12_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-DISCUS-50HZ_R-12_LOW_4DA1-1000-TSK 1,  !- Name
+    4DA1-1000-TSK_R-12_LOW_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    4DA1-1000-TSK_R-12_LOW_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -36716,7 +36259,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    4DJ1-2000-TSK_R-12_LOW_qcurv,  !- Name
+    4DJ1-2000-TSK_R-12_LOW_qcurv 1,  !- Name
     4.898e+004,              !- Coefficient1 Constant
     1657.,                   !- Coefficient2 x
     20.04,                   !- Coefficient3 x**2
@@ -36736,7 +36279,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    4DJ1-2000-TSK_R-12_LOW_pwrcurv,  !- Name
+    4DJ1-2000-TSK_R-12_LOW_pwrcurv 1,  !- Name
     7837.,                   !- Coefficient1 Constant
     228.9,                   !- Coefficient2 x
     4.522,                   !- Coefficient3 x**2
@@ -36752,12 +36295,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_LOW_4DJ1-2000-TSK,   !nominal MBtu/h = 34800.0, !nominal kW = 7.0
+!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_LOW_4DJ1-2000-TSK_1,   !nominal MBtu/h = 34800.0, !nominal kW = 7.0
 
   Refrigeration:Compressor,
-    Copeland-DISCUS-50HZ_R-12_LOW_4DJ1-2000-TSK,  !- Name
-    4DJ1-2000-TSK_R-12_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    4DJ1-2000-TSK_R-12_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-DISCUS-50HZ_R-12_LOW_4DJ1-2000-TSK 1,  !- Name
+    4DJ1-2000-TSK_R-12_LOW_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    4DJ1-2000-TSK_R-12_LOW_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -36818,7 +36361,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    2DF3-0300-TFC_R-12_HIGH_qcurv,  !- Name
+    2DF3-0300-TFC_R-12_HIGH_qcurv 1,  !- Name
     1.563e+004,              !- Coefficient1 Constant
     598.9,                   !- Coefficient2 x
     8.104,                   !- Coefficient3 x**2
@@ -36838,7 +36381,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    2DF3-0300-TFC_R-12_HIGH_pwrcurv,  !- Name
+    2DF3-0300-TFC_R-12_HIGH_pwrcurv 1,  !- Name
     657.4,                   !- Coefficient1 Constant
     -58.00,                  !- Coefficient2 x
     -1.743,                  !- Coefficient3 x**2
@@ -36854,12 +36397,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_HIGH_2DF3-0300-TFC,   !nominal MBtu/h = 38700.0, !nominal kW = 3.5
+!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_HIGH_2DF3-0300-TFC_1,   !nominal MBtu/h = 38700.0, !nominal kW = 3.5
 
   Refrigeration:Compressor,
-    Copeland-DISCUS-50HZ_R-12_HIGH_2DF3-0300-TFC,  !- Name
-    2DF3-0300-TFC_R-12_HIGH_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    2DF3-0300-TFC_R-12_HIGH_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-DISCUS-50HZ_R-12_HIGH_2DF3-0300-TFC 1,  !- Name
+    2DF3-0300-TFC_R-12_HIGH_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    2DF3-0300-TFC_R-12_HIGH_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -37073,7 +36616,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    4DA1-1000-TSK_R-12_HIGH_qcurv,  !- Name
+    4DA1-1000-TSK_R-12_HIGH_qcurv 1,  !- Name
     3.586e+004,              !- Coefficient1 Constant
     1216.,                   !- Coefficient2 x
     15.85,                   !- Coefficient3 x**2
@@ -37093,7 +36636,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    4DA1-1000-TSK_R-12_HIGH_pwrcurv,  !- Name
+    4DA1-1000-TSK_R-12_HIGH_pwrcurv 1,  !- Name
     2587.,                   !- Coefficient1 Constant
     -33.11,                  !- Coefficient2 x
     -0.9480,                 !- Coefficient3 x**2
@@ -37109,12 +36652,12 @@
     10.0,                    !- Minimum Value of y
     48.9;                    !- Maximum Value of y
 
-!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_HIGH_4DA1-1000-TSK,   !nominal MBtu/h = 101000.0, !nominal kW = 10.2
+!Detailed Compressor: Copeland-DISCUS-50HZ_R-12_HIGH_4DA1-1000-TSK_1,   !nominal MBtu/h = 101000.0, !nominal kW = 10.2
 
   Refrigeration:Compressor,
-    Copeland-DISCUS-50HZ_R-12_HIGH_4DA1-1000-TSK,  !- Name
-    4DA1-1000-TSK_R-12_HIGH_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    4DA1-1000-TSK_R-12_HIGH_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    Copeland-DISCUS-50HZ_R-12_HIGH_4DA1-1000-TSK 1,  !- Name
+    4DA1-1000-TSK_R-12_HIGH_pwrcurv 1,  !- Refrigeration Compressor Power Curve Name
+    4DA1-1000-TSK_R-12_HIGH_qcurv 1,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -55482,13 +55025,13 @@
 
 ! Capacity Curve for Bitzer 2MSL-07K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  3.13 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  3.13 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2MSL-07K-4SU_R744_qcurv_sub,  !- Name
@@ -55509,13 +55052,13 @@
 
 ! Power Curve for Bitzer 2MSL-07K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  0.85 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  0.85 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2MSL-07K-4SU_R744_pwrcurv_sub,  !- Name
@@ -55551,13 +55094,13 @@
 
 ! Capacity Curve for Bitzer 2KSL-1K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  5.23 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  5.23 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2KSL-1K-4SU_R744_qcurv_sub,  !- Name
@@ -55578,13 +55121,13 @@
 
 ! Power Curve for Bitzer 2KSL-1K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  1.41 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  1.41 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2KSL-1K-4SU_R744_pwrcurv_sub,  !- Name
@@ -55620,13 +55163,13 @@
 
 ! Capacity Curve for Bitzer 2JSL-2K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  6.87 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  6.87 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2JSL-2K-4SU_R744_qcurv_sub,  !- Name
@@ -55647,13 +55190,13 @@
 
 ! Power Curve for Bitzer 2JSL-2K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  1.83 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  1.83 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2JSL-2K-4SU_R744_pwrcurv_sub,  !- Name
@@ -55689,13 +55232,13 @@
 
 ! Capacity Curve for Bitzer 2HSL-3K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  8.74 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  8.74 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2HSL-3K-4SU_R744_qcurv_sub,  !- Name
@@ -55716,13 +55259,13 @@
 
 ! Power Curve for Bitzer 2HSL-3K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  2.3 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  2.3 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2HSL-3K-4SU_R744_pwrcurv_sub,  !- Name
@@ -55758,13 +55301,13 @@
 
 ! Capacity Curve for Bitzer 2GSL-3K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  10.43 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  10.43 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2GSL-3K-4SU_R744_qcurv_sub,  !- Name
@@ -55785,13 +55328,13 @@
 
 ! Power Curve for Bitzer 2GSL-3K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  2.7 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  2.7 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2GSL-3K-4SU_R744_pwrcurv_sub,  !- Name
@@ -55827,13 +55370,13 @@
 
 ! Capacity Curve for Bitzer 2FSL-4K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  13.42 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  13.42 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2FSL-4K-4SU_R744_qcurv_sub,  !- Name
@@ -55854,13 +55397,13 @@
 
 ! Power Curve for Bitzer 2FSL-4K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  3.44 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  3.44 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2FSL-4K-4SU_R744_pwrcurv_sub,  !- Name
@@ -55896,13 +55439,13 @@
 
 ! Capacity Curve for Bitzer 2ESL-4K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  16.68 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  16.68 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2ESL-4K-4SU_R744_qcurv_sub,  !- Name
@@ -55923,13 +55466,13 @@
 
 ! Power Curve for Bitzer 2ESL-4K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  4.11 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  4.11 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2ESL-4K-4SU_R744_pwrcurv_sub,  !- Name
@@ -55965,13 +55508,13 @@
 
 ! Capacity Curve for Bitzer 2DSL-5K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  19.74 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  19.74 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2DSL-5K-4SU_R744_qcurv_sub,  !- Name
@@ -55992,13 +55535,13 @@
 
 ! Power Curve for Bitzer 2DSL-5K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  4.84 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  4.84 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2DSL-5K-4SU_R744_pwrcurv_sub,  !- Name
@@ -56034,13 +55577,13 @@
 
 ! Capacity Curve for Bitzer 2CSL-6K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  24 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  24 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2CSL-6K-4SU_R744_qcurv_sub,  !- Name
@@ -56061,13 +55604,13 @@
 
 ! Power Curve for Bitzer 2CSL-6K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  5.85 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  5.85 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     2CSL-6K-4SU_R744_pwrcurv_sub,  !- Name
@@ -56103,13 +55646,13 @@
 
 ! Capacity Curve for Bitzer 4FSL-7K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  25.9 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  25.9 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4FSL-7K-4SU_R744_qcurv_sub,  !- Name
@@ -56130,13 +55673,13 @@
 
 ! Power Curve for Bitzer 4FSL-7K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  6.29 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  6.29 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4FSL-7K-4SU_R744_pwrcurv_sub,  !- Name
@@ -56172,13 +55715,13 @@
 
 ! Capacity Curve for Bitzer 4ESL-9K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  32.8 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  32.8 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4ESL-9K-4SU_R744_qcurv_sub,  !- Name
@@ -56199,13 +55742,13 @@
 
 ! Power Curve for Bitzer 4ESL-9K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  7.96 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  7.96 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4ESL-9K-4SU_R744_pwrcurv_sub,  !- Name
@@ -56241,13 +55784,13 @@
 
 ! Capacity Curve for Bitzer 4DSL-10K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  38.9 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  38.9 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4DSL-10K-4SU_R744_qcurv_sub,  !- Name
@@ -56268,13 +55811,13 @@
 
 ! Power Curve for Bitzer 4DSL-10K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  9.45 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  9.45 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4DSL-10K-4SU_R744_pwrcurv_sub,  !- Name
@@ -56310,13 +55853,13 @@
 
 ! Capacity Curve for Bitzer 4CSL-12K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  47.5 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  47.5 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4CSL-12K-4SU_R744_qcurv_sub,  !- Name
@@ -56337,13 +55880,13 @@
 
 ! Power Curve for Bitzer 4CSL-12K-4SU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  11.48 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  11.48 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4CSL-12K-4SU_R744_pwrcurv_sub,  !- Name
@@ -56379,13 +55922,13 @@
 
 ! Capacity Curve for Bitzer 4VSL-15K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  61 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  61 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4VSL-15K-2NU_R744_qcurv_sub,  !- Name
@@ -56406,13 +55949,13 @@
 
 ! Power Curve for Bitzer 4VSL-15K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  14.65 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  14.65 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4VSL-15K-2NU_R744_pwrcurv_sub,  !- Name
@@ -56448,13 +55991,13 @@
 
 ! Capacity Curve for Bitzer 4TSL-20K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  73 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  73 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4TSL-20K-2NU_R744_qcurv_sub,  !- Name
@@ -56475,13 +56018,13 @@
 
 ! Power Curve for Bitzer 4TSL-20K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  17.54 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  17.54 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4TSL-20K-2NU_R744_pwrcurv_sub,  !- Name
@@ -56517,13 +56060,13 @@
 
 ! Capacity Curve for Bitzer 4PSL-25K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  86.3 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  86.3 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4PSL-25K-2NU_R744_qcurv_sub,  !- Name
@@ -56544,13 +56087,13 @@
 
 ! Power Curve for Bitzer 4PSL-25K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  20.7 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  20.7 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4PSL-25K-2NU_R744_pwrcurv_sub,  !- Name
@@ -56586,13 +56129,13 @@
 
 ! Capacity Curve for Bitzer 4NSL-30K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  100.9 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Capacity:  100.9 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4NSL-30K-2NU_R744_qcurv_sub,  !- Name
@@ -56613,13 +56156,13 @@
 
 ! Power Curve for Bitzer 4NSL-30K-2NU (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  24.1 kW (-35°C SST, -5°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -50°C
-! Maximum SST:  -15°C
-! Minimum SDT:  -20°C
-! Maximum SDT:   15°C
+! Nominal Power:  24.1 kW (-35ï¿½C SST, -5ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -50ï¿½C
+! Maximum SST:  -15ï¿½C
+! Minimum SDT:  -20ï¿½C
+! Maximum SDT:   15ï¿½C
 
   Curve:Bicubic,
     4NSL-30K-2NU_R744_pwrcurv_sub,  !- Name
@@ -56655,13 +56198,13 @@
 
 ! Capacity Curve for Bitzer 4MTC-7K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  30.8 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
-! Minimum SDT:    5°C
-! Maximum SDT:   31°C
+! Nominal Capacity:  30.8 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
+! Minimum SDT:    5ï¿½C
+! Maximum SDT:   31ï¿½C
 
   Curve:Bicubic,
     4MTC-7K_R744_qcurv_sub,  !- Name
@@ -56682,13 +56225,13 @@
 
 ! Power Curve for Bitzer 4MTC-7K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  4.87 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
-! Minimum SDT:    5°C
-! Maximum SDT:   31°C
+! Nominal Power:  4.87 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
+! Minimum SDT:    5ï¿½C
+! Maximum SDT:   31ï¿½C
 
   Curve:Bicubic,
     4MTC-7K_R744_pwrcurv_sub,!- Name
@@ -56709,10 +56252,10 @@
 
 ! Capacity Curve for Bitzer 4MTC-7K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  23.8 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Capacity:  23.8 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  313040 J/kg
 
@@ -56735,10 +56278,10 @@
 
 ! Power Curve for Bitzer 4MTC-7K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  7.80 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Power:  7.80 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  10000000 Pa
 
@@ -56776,13 +56319,13 @@
 
 ! Capacity Curve for Bitzer 4MTC-10K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  30.7 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  30.7 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4MTC-10K_R744_qcurv_sub, !- Name
@@ -56803,13 +56346,13 @@
 
 ! Power Curve for Bitzer 4MTC-10K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  4.99 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  4.99 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4MTC-10K_R744_pwrcurv_sub,  !- Name
@@ -56830,10 +56373,10 @@
 
 ! Capacity Curve for Bitzer 4MTC-10K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  24.0 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Capacity:  24.0 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  336410 J/kg
 
@@ -56856,10 +56399,10 @@
 
 ! Power Curve for Bitzer 4MTC-10K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  8.03 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Power:  8.03 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  12000000 Pa
 
@@ -56897,13 +56440,13 @@
 
 ! Capacity Curve for Bitzer 4KTC-10K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  45.4 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  45.4 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4KTC-10K_R744_qcurv_sub, !- Name
@@ -56924,13 +56467,13 @@
 
 ! Power Curve for Bitzer 4KTC-10K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  7.01 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  7.01 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4KTC-10K_R744_pwrcurv_sub,  !- Name
@@ -56951,10 +56494,10 @@
 
 ! Capacity Curve for Bitzer 4KTC-10K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  35.6 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Capacity:  35.6 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  313040 J/kg
 
@@ -56977,10 +56520,10 @@
 
 ! Power Curve for Bitzer 4KTC-10K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  11.45 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Power:  11.45 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  10000000 Pa
 
@@ -57018,13 +56561,13 @@
 
 ! Capacity Curve for Bitzer 4JTC-10K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  43.9 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  43.9 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4JTC-10K_R744_qcurv_sub, !- Name
@@ -57045,13 +56588,13 @@
 
 ! Power Curve for Bitzer 4JTC-10K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  7.01 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  7.01 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4JTC-10K_R744_pwrcurv_sub,  !- Name
@@ -57072,10 +56615,10 @@
 
 ! Capacity Curve for Bitzer 4JTC-10K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  34.5 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Capacity:  34.5 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  313040 J/kg
 
@@ -57098,10 +56641,10 @@
 
 ! Power Curve for Bitzer 4JTC-10K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  11.21 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Power:  11.21 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  10000000 Pa
 
@@ -57139,13 +56682,13 @@
 
 ! Capacity Curve for Bitzer 4JTC-15K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  43.9 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  43.9 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4JTC-15K_R744_qcurv_sub, !- Name
@@ -57166,13 +56709,13 @@
 
 ! Power Curve for Bitzer 4JTC-15K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  7.10 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  7.10 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4JTC-15K_R744_pwrcurv_sub,  !- Name
@@ -57193,10 +56736,10 @@
 
 ! Capacity Curve for Bitzer 4JTC-15K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  34.6 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:   15°C
+! Nominal Capacity:  34.6 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:   15ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  336410 J/kg
 
@@ -57219,10 +56762,10 @@
 
 ! Power Curve for Bitzer 4JTC-15K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  11.26 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:   15°C
+! Nominal Power:  11.26 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:   15ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  12000000 Pa
 
@@ -57260,13 +56803,13 @@
 
 ! Capacity Curve for Bitzer 4HTC-15K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  56.8 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  56.8 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4HTC-15K_R744_qcurv_sub, !- Name
@@ -57287,13 +56830,13 @@
 
 ! Power Curve for Bitzer 4HTC-15K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  9.00 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  9.00 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4HTC-15K_R744_pwrcurv_sub,  !- Name
@@ -57314,10 +56857,10 @@
 
 ! Capacity Curve for Bitzer 4HTC-15K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  44.4 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Capacity:  44.4 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  313040 J/kg
 
@@ -57340,10 +56883,10 @@
 
 ! Power Curve for Bitzer 4HTC-15K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  14.27 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Power:  14.27 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  10000000 Pa
 
@@ -57381,13 +56924,13 @@
 
 ! Capacity Curve for Bitzer 4HTC-20K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  57.3 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  57.3 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4HTC-20K_R744_qcurv_sub, !- Name
@@ -57408,13 +56951,13 @@
 
 ! Power Curve for Bitzer 4HTC-20K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  9.27 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  9.27 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4HTC-20K_R744_pwrcurv_sub,  !- Name
@@ -57435,10 +56978,10 @@
 
 ! Capacity Curve for Bitzer 4HTC-20K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  45.5 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:   15°C
+! Nominal Capacity:  45.5 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:   15ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  336410 J/kg
 
@@ -57461,10 +57004,10 @@
 
 ! Power Curve for Bitzer 4HTC-20K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  14.65 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:   15°C
+! Nominal Power:  14.65 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:   15ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  12000000 Pa
 
@@ -57502,13 +57045,13 @@
 
 ! Capacity Curve for Bitzer 4FTC-20K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  85.8 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  85.8 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4FTC-20K_R744_qcurv_sub, !- Name
@@ -57529,13 +57072,13 @@
 
 ! Power Curve for Bitzer 4FTC-20K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  13.68 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:    0.0°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  13.68 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:    0.0ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4FTC-20K_R744_pwrcurv_sub,  !- Name
@@ -57556,10 +57099,10 @@
 
 ! Capacity Curve for Bitzer 4FTC-20K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  68.1 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Capacity:  68.1 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  313040 J/kg
 
@@ -57582,10 +57125,10 @@
 
 ! Power Curve for Bitzer 4FTC-20K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  21.9 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:    0°C
+! Nominal Power:  21.9 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:    0ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  10000000 Pa
 
@@ -57623,13 +57166,13 @@
 
 ! Capacity Curve for Bitzer 4FTC-30K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  85.8 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Capacity:  85.8 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4FTC-30K_R744_qcurv_sub, !- Name
@@ -57650,13 +57193,13 @@
 
 ! Power Curve for Bitzer 4FTC-30K (R-744) - Subcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  13.89 kW (-5°C SST, 15°C SDT)
-! Rated Subcooling:  0°C
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20.0°C
-! Maximum SST:   16.8°C
-! Minimum SDT:    5.0°C
-! Maximum SDT:   31.0°C
+! Nominal Power:  13.89 kW (-5ï¿½C SST, 15ï¿½C SDT)
+! Rated Subcooling:  0ï¿½C
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20.0ï¿½C
+! Maximum SST:   16.8ï¿½C
+! Minimum SDT:    5.0ï¿½C
+! Maximum SDT:   31.0ï¿½C
 
   Curve:Bicubic,
     4FTC-30K_R744_pwrcurv_sub,  !- Name
@@ -57677,10 +57220,10 @@
 
 ! Capacity Curve for Bitzer 4FTC-30K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  69.2 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:   15°C
+! Nominal Capacity:  69.2 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:   15ï¿½C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  336410 J/kg
 
@@ -57703,10 +57246,10 @@
 
 ! Power Curve for Bitzer 4FTC-30K (R-744) - Transcritical Operation
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  21.8 kW (-5°C SST, Tgco=25°C, Pgc=7500000 Pa)
-! Rated Suction Gas Superheat:  10°C
-! Minimum SST:  -20°C
-! Maximum SST:   15°C
+! Nominal Power:  21.8 kW (-5ï¿½C SST, Tgco=25ï¿½C, Pgc=7500000 Pa)
+! Rated Suction Gas Superheat:  10ï¿½C
+! Minimum SST:  -20ï¿½C
+! Maximum SST:   15ï¿½C
 ! Minimum Gas Cooler Pressure:   7500000 Pa
 ! Maximum Gas Cooler Pressure:  12000000 Pa
 

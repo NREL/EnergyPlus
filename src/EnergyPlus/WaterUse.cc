@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,7 +66,7 @@
 #include <DataWater.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -262,7 +262,6 @@ namespace WaterUse {
 		// Using/Aliasing
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -285,7 +284,7 @@ namespace WaterUse {
 		}
 
 		if ( CompIndex == 0 ) {
-			WaterConnNum = FindItemInList( CompName, WaterConnections );
+			WaterConnNum = UtilityRoutines::FindItemInList( CompName, WaterConnections );
 			if ( WaterConnNum == 0 ) {
 				ShowFatalError( "SimulateWaterUseConnection: Unit not found=" + CompName );
 			}
@@ -372,11 +371,6 @@ namespace WaterUse {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
@@ -388,15 +382,9 @@ namespace WaterUse {
 		using Psychrometrics::RhoH2O;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		//unused1208  INTEGER                        :: NumArgs
@@ -408,21 +396,14 @@ namespace WaterUse {
 		// FLOW:
 
 		cCurrentModuleObject = "WaterUse:Equipment";
-		NumWaterEquipment = GetNumObjectsFound( cCurrentModuleObject );
+		NumWaterEquipment = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWaterEquipment > 0 ) {
 			WaterEquipment.allocate( NumWaterEquipment );
 
 			for ( WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum ) {
-				GetObjectItem( cCurrentModuleObject, WaterEquipNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterEquipment, WaterEquipNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, WaterEquipNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WaterEquipment( WaterEquipNum ).Name = cAlphaArgs( 1 );
 
 				WaterEquipment( WaterEquipNum ).EndUseSubcatName = cAlphaArgs( 2 );
@@ -474,7 +455,7 @@ namespace WaterUse {
 				}
 
 				if ( ( NumAlphas > 6 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
-					WaterEquipment( WaterEquipNum ).Zone = FindItemInList( cAlphaArgs( 7 ), Zone );
+					WaterEquipment( WaterEquipNum ).Zone = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), Zone );
 
 					if ( WaterEquipment( WaterEquipNum ).Zone == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + cAlphaArgs( 7 ) );
@@ -510,21 +491,14 @@ namespace WaterUse {
 		}
 
 		cCurrentModuleObject = "WaterUse:Connections";
-		NumWaterConnections = GetNumObjectsFound( cCurrentModuleObject );
+		NumWaterConnections = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumWaterConnections > 0 ) {
 			WaterConnections.allocate( NumWaterConnections );
 
 			for ( WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum ) {
-				GetObjectItem( cCurrentModuleObject, WaterConnNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), WaterConnections, WaterConnNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, WaterConnNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				WaterConnections( WaterConnNum ).Name = cAlphaArgs( 1 );
 
 				if ( ( ! lAlphaFieldBlanks( 2 ) ) || ( ! lAlphaFieldBlanks( 3 ) ) ) {
@@ -604,7 +578,7 @@ namespace WaterUse {
 				WaterConnections( WaterConnNum ).WaterEquipment.allocate( NumAlphas - 9 );
 
 				for ( AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum ) {
-					WaterEquipNum = FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment );
+					WaterEquipNum = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), WaterEquipment );
 
 					if ( WaterEquipNum == 0 ) {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( AlphaNum ) + '=' + cAlphaArgs( AlphaNum ) );

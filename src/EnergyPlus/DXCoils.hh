@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -514,6 +514,10 @@ namespace DXCoils {
 		Real64 ActualSC; // Actual subcooling degrees [C]
 		Real64 RateBFVRFIUEvap; // VRF Iutdoor Unit Evaporator Rated Bypass Factor
 		Real64 RateBFVRFIUCond; // VRF Iutdoor Unit Condenser Rated Bypass Factor
+		int CAPFTErrIndex; // index/pointer to recurring error structure for CAPFT curve value <= 0.0
+		int EIRFTErrIndex; // index/pointer to recurring error structure for EIRFT curve value <= 0.0
+		bool reportCoilFinalSizes; // one time report of sizes to coil selection report
+		Real64 capModFacTotal; // current coil capacity modification factor
 
 		// Default Constructor
 		DXCoilData() :
@@ -753,7 +757,11 @@ namespace DXCoils {
 			ActualSH( 0.0 ),
 			ActualSC( 0.0 ),
 			RateBFVRFIUEvap( 0.0592 ),
-			RateBFVRFIUCond( 0.1360 )
+			RateBFVRFIUCond( 0.1360 ),
+			CAPFTErrIndex( 0 ),
+			EIRFTErrIndex( 0 ),
+			reportCoilFinalSizes( true ),
+			capModFacTotal( 0.0 )
 		{}
 
 	};
@@ -947,7 +955,8 @@ namespace DXCoils {
 		Real64 & TotCap, // total capacity at the given conditions [W]
 		Real64 & SHR, // sensible heat ratio at the given conditions
 		Real64 const CondInletTemp, // Condenser inlet temperature [C]
-		Real64 const Pressure // air pressure [Pa]
+		Real64 const Pressure, // air pressure [Pa]
+		Real64 & TotCapModFac // capacity modification factor, func of temp and func of flow
 	);
 
 	void

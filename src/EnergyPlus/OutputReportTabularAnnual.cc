@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,7 +63,7 @@
 // EnergyPlus Headers
 #include <OutputReportTabularAnnual.hh>
 #include <OutputReportTabular.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <DataGlobals.hh>
 #include <OutputReportData.hh>
 #include <DataHVACGlobals.hh>
@@ -73,6 +73,7 @@
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <DisplayRoutines.hh>
+#include <UtilityRoutines.hh>
 
 
 namespace EnergyPlus {
@@ -109,7 +110,7 @@ namespace EnergyPlus {
 			int curNumDgts( 2 );
 			AnnualFieldSet::AggregationKind curAgg( AnnualFieldSet::AggregationKind::sumOrAvg );
 
-			objCount = InputProcessor::GetNumObjectsFound( currentModuleObject );
+			objCount = inputProcessor->getNumObjectsFound( currentModuleObject );
 			if ( objCount > 0 ) {
 				// if not a run period using weather do not create reports
 				if ( !DataGlobals::DoWeathSim ) {
@@ -117,11 +118,11 @@ namespace EnergyPlus {
 					return;
 				}
 			}
-			InputProcessor::GetObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
+			inputProcessor->getObjectDefMaxArgs( currentModuleObject, numParams, numAlphas, numNums );
 			alphArray.allocate( numAlphas );
 			numArray.dimension( numNums, 0.0 );
 			for ( int tabNum = 1 ; tabNum <= objCount; ++tabNum ) {
-				InputProcessor::GetObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
+				inputProcessor->getObjectItem( currentModuleObject, tabNum, alphArray, numAlphas, numArray, numNums, IOStat );
 				if ( numAlphas >= 5 ) {
 					annualTables.push_back( AnnualTable(alphArray( 1 ), alphArray( 2 ), alphArray( 3 ) ));
 					// the remaining fields are repeating in groups of three and need to be added to the data structure
@@ -179,7 +180,7 @@ namespace EnergyPlus {
 		{
 			int keyCount = 0;
 			int typeVar = 0;
-			int avgSumVar = 0;
+			OutputProcessor::StoreType avgSumVar;
 			int stepTypeVar = 0;
 			OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
 			Array1D_string namesOfKeys; // keyNames
@@ -266,7 +267,7 @@ namespace EnergyPlus {
 			}
 		}
 
-		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017 
+		// Generate an error message if an advanced aggregation kind columns don't follow the appropriate column - Glazer 2017
 		bool
 		AnnualTable::invalidAggregationOrder( )
 		{
@@ -326,8 +327,6 @@ namespace EnergyPlus {
 			// Jason Glazer, August 2015
 			// For each cell of the table, gather the value as indicated by the type of aggregation
 
-			// int const isAverage( 1 );
-			int const isSum( 2 );
 			int timestepTimeStamp;
 			Real64 elapsedTime = AnnualTable::getElapsedTime( kindOfTimeStep );
 			Real64 secondsInTimeStep = AnnualTable::getSecondsInTimeStep( kindOfTimeStep );
@@ -368,7 +367,7 @@ namespace EnergyPlus {
 							// noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:
 							switch ( fldStIt->m_aggregate ){
 							case AnnualFieldSet::AggregationKind::sumOrAvg:
-								if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+								if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									newResultValue = oldResultValue + curValue;
 								}
 								else {
@@ -379,7 +378,7 @@ namespace EnergyPlus {
 								break;
 							case AnnualFieldSet::AggregationKind::maximum:
 								// per MJW when a summed variable is used divide it by the length of the time step
-								if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+								if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									curValue /= secondsInTimeStep;
 								}
 								if ( curValue > oldResultValue ) {
@@ -394,7 +393,7 @@ namespace EnergyPlus {
 								break;
 							case AnnualFieldSet::AggregationKind::minimum:
 								// per MJW when a summed variable is used divide it by the length of the time step
-								if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+								if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									curValue /= secondsInTimeStep;
 								}
 								if ( curValue < oldResultValue ) {
@@ -474,7 +473,7 @@ namespace EnergyPlus {
 							case AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev:
 							case AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev:
 								//  for all of the binning options add the value to the deferred
-								if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+								if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 									fldStIt->m_cell[row].deferredResults.push_back( curValue /= secondsInTimeStep ); // divide by time just like max and min
 								}
 								else {
@@ -519,7 +518,7 @@ namespace EnergyPlus {
 										if ( scanVarNum > 0 ){
 											Real64 scanValue = GetInternalVariableValue( scanTypeOfVar, scanVarNum );
 											// When a summed variable is used divide it by the length of the time step
-											if ( fldStRemainIt->m_varAvgSum == isSum ) { // if it is a summed variable
+											if ( fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 												scanValue /= secondsInTimeStep;
 											}
 											fldStRemainIt->m_cell[row].result = scanValue;
@@ -546,7 +545,7 @@ namespace EnergyPlus {
 											break; // for fldStRemainIt
 										}
 										else if ( fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::sumOrAverageHoursShown ){
-											if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+											if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 												fldStRemainIt->m_cell[row].result = oldScanValue + scanValue;
 											}
 											else {
@@ -555,7 +554,7 @@ namespace EnergyPlus {
 											fldStRemainIt->m_cell[row].duration += elapsedTime;
 										}
 										else if ( fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ){
-											if ( fldStRemainIt->m_varAvgSum == isSum ) { // if it is a summed variable
+											if ( fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 												scanValue /= secondsInTimeStep;
 											}
 											if ( scanValue > oldScanValue ) {
@@ -564,7 +563,7 @@ namespace EnergyPlus {
 											}
 										}
 										else if ( fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ){
-											if ( fldStRemainIt->m_varAvgSum == isSum ) { // if it is a summed variable
+											if ( fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 												scanValue /= secondsInTimeStep;
 											}
 											if ( scanValue < oldScanValue ) {
@@ -664,8 +663,6 @@ namespace EnergyPlus {
 			Array1D_int columnWidth;
 			Array1D_string rowHead;
 			Array2D_string tableBody;
-			int const isAverage( 1 );
-			int const isSum( 2 );
 			Real64 veryLarge = 1.0E280;
 			Real64 verySmall = -1.0E280;
 			std::vector<std::string> aggString;
@@ -757,7 +754,7 @@ namespace EnergyPlus {
 
 					for ( unsigned int row = 0; row != m_objectNames.size(); row++ ) { //loop through by row.
 						if ( fldStIt->m_cell[row].indexesForKeyVar >= 0 ){
-							if ( fldStIt->m_varAvgSum == isAverage ) { // if it is a average variable divide by duration
+							if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Averaged ) { // if it is a average variable divide by duration
 								if ( fldStIt->m_cell[row].duration != 0.0 ) {
 									curVal = ( ( fldStIt->m_cell[row].result / fldStIt->m_cell[row].duration ) * curConversionFactor ) + curConversionOffset;
 								}
@@ -781,7 +778,7 @@ namespace EnergyPlus {
 
 					} //row
 					// add the summary to bottom
-					if ( fldStIt->m_varAvgSum == isAverage ) { // if it is a average variable divide by duration
+					if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Averaged ) { // if it is a average variable divide by duration
 						if ( sumDuration > 0 ) {
 							tableBody( columnRecount, rowSumAvg ) = OutputReportTabular::RealToStr( sumVal / sumDuration, fldStIt->m_showDigits );
 						}
@@ -825,7 +822,7 @@ namespace EnergyPlus {
 					}
 				}
 				else if ( curAgg == AnnualFieldSet::AggregationKind::valueWhenMaxMin ) {
-					if ( fldStIt->m_varAvgSum == isSum ) {
+					if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) {
 						curUnits += "/s";
 					}
 					fixUnitsPerSecond( curUnits, curConversionFactor );
@@ -850,7 +847,7 @@ namespace EnergyPlus {
 				else if ( ( curAgg == AnnualFieldSet::AggregationKind::maximum ) || ( curAgg == AnnualFieldSet::AggregationKind::minimum ) ||
 					( curAgg == AnnualFieldSet::AggregationKind::maximumDuringHoursShown ) || ( curAgg == AnnualFieldSet::AggregationKind::minimumDuringHoursShown ) ) {
 					// put in the name of the variable for the column
-					if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+					if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 						curUnits += "/s";
 					}
 					fixUnitsPerSecond( curUnits, curConversionFactor );
@@ -897,7 +894,7 @@ namespace EnergyPlus {
 				}
 				else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax ){
 					// put in the name of the variable for the column
-					if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+					if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 						curUnits += "/s";
 					}
 					fixUnitsPerSecond( curUnits, curConversionFactor );
@@ -913,7 +910,7 @@ namespace EnergyPlus {
 				}
 				else if ( curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax ){
 					// put in the name of the variable for the column
-					if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+					if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 						curUnits += "/s";
 					}
 					fixUnitsPerSecond( curUnits, curConversionFactor );
@@ -934,7 +931,7 @@ namespace EnergyPlus {
 				}
 				else if (curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero ){
 					// put in the name of the variable for the column
-					if ( fldStIt->m_varAvgSum == isSum ) { // if it is a summed variable
+					if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) { // if it is a summed variable
 						curUnits += "/s";
 					}
 					fixUnitsPerSecond( curUnits, curConversionFactor );
@@ -957,7 +954,7 @@ namespace EnergyPlus {
 					curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev ){
 				}
 			} //fldStIt
-			OutputReportTabular::WriteReportHeaders( m_name, "Entire Facility", isAverage );
+			OutputReportTabular::WriteReportHeaders( m_name, "Entire Facility", OutputProcessor::StoreType::Averaged );
 			OutputReportTabular::WriteSubtitle( "Custom Annual Report" );
 			OutputReportTabular::WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose annual XML tables.
 			if ( sqlite ) {
@@ -1112,64 +1109,64 @@ namespace EnergyPlus {
 		{
 			AnnualFieldSet::AggregationKind outAggType;
 
-			if ( InputProcessor::SameString( inString, "SumOrAverage" ) ) {
+			if ( UtilityRoutines::SameString( inString, "SumOrAverage" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::sumOrAvg;
 			}
-			else if ( InputProcessor::SameString( inString, "Maximum" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "Maximum" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::maximum;
 			}
-			else if ( InputProcessor::SameString( inString, "Minimum" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "Minimum" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::minimum;
 			}
-			else if ( InputProcessor::SameString( inString, "ValueWhenMaximumOrMinimum" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "ValueWhenMaximumOrMinimum" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::valueWhenMaxMin;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursZero" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursZero" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursZero;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNonzero" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNonzero" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNonZero;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursPositive" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursPositive" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursPositive;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNonpositive" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNonpositive" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNonPositive;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNegative" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNegative" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNegative;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursNonNegative" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursNonNegative" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursNonNegative;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursInTenPercentBins" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursInTenPercentBins" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenPercentBins;
 			}
-			else if ( InputProcessor::SameString( inString, "HourInTenBinsMinToMax" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HourInTenBinsMinToMax" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax;
 			}
-			else if ( InputProcessor::SameString( inString, "HourInTenBinsZeroToMax" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HourInTenBinsZeroToMax" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax;
 			}
-			else if ( InputProcessor::SameString( inString, "HourInTenBinsMinToZero" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HourInTenBinsMinToZero" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursInTenBinsPlusMinusTwoStdDev" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursInTenBinsPlusMinusTwoStdDev" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev;
 			}
-			else if ( InputProcessor::SameString( inString, "HoursInTenBinsPlusMinusThreeStdDev" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "HoursInTenBinsPlusMinusThreeStdDev" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev;
 			}
-			else if ( InputProcessor::SameString( inString, "NoAggregation" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "NoAggregation" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::noAggregation;
 			}
-			else if ( InputProcessor::SameString( inString, "SumOrAverageDuringHoursShown" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "SumOrAverageDuringHoursShown" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::sumOrAverageHoursShown;
 			}
-			else if ( InputProcessor::SameString( inString, "MaximumDuringHoursShown" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "MaximumDuringHoursShown" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::maximumDuringHoursShown;
 			}
-			else if ( InputProcessor::SameString( inString, "MinimumDuringHoursShown" ) ) {
+			else if ( UtilityRoutines::SameString( inString, "MinimumDuringHoursShown" ) ) {
 				outAggType = AnnualFieldSet::AggregationKind::minimumDuringHoursShown;
 			}
 			else {
@@ -1332,7 +1329,6 @@ namespace EnergyPlus {
 			int indexUnitConv;
 			std::string curUnits;
 			std::string energyUnitsString;
-			int const isSum( 2 );
 			Real64 curSI;
 			Real64 curIP;
 			Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor( unitsStyle, energyUnitsString );
@@ -1355,7 +1351,7 @@ namespace EnergyPlus {
 					curConversionOffset = 0.0;
 				}
 			}
-			if ( fldStIt->m_varAvgSum == isSum ) {
+			if ( fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed ) {
 				curUnits += "/s";
 			}
 			fixUnitsPerSecond( curUnits, curConversionFactor );
@@ -1470,7 +1466,7 @@ namespace EnergyPlus {
 			ret.push_back( outStr );
 			outStr = std::to_string( fldSt.m_keyCount );
 			ret.push_back( outStr );
-			outStr = std::to_string( fldSt.m_varAvgSum );
+			outStr = std::to_string( static_cast<int>( fldSt.m_varAvgSum ) );
 			ret.push_back( outStr );
 			outStr = std::to_string( fldSt.m_varStepType );
 			ret.push_back( outStr );

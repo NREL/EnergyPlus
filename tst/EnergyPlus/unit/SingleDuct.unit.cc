@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -121,7 +121,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 
 	} ) ;
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -293,7 +293,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 
 	} ) ;
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -1254,7 +1254,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 
@@ -2449,7 +2449,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 

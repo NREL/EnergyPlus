@@ -624,11 +624,11 @@ This object also allows users to enter characteristic properties of the processe
 
 The MaterialProperty:PhaseChangeHysteresis object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
 
-\paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-name}
 
 This input must match the name of a material defined elsewhere within EnergyPlus.  The thermal properies of that material are then overridden by the properties defind in this object.
 
-\paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Latent Heat during the Entire Phase Change Process}\label{materialpropertyphasechangehysteresis-inputs-latent-heat-during-the-entire-phase-change-process}
 
 This is the total amount of latent heat absorbed or discharged during the transition from solid to liquid or back, in Joules.
 The shapes of the enthalpy curves differ based on direction, but the total amount of energy from one state to the other does not.
@@ -641,19 +641,19 @@ This is the constant thermal conductivity used while the material is fully liqui
 
 This is the constant density while the material is fully liquid, in kg/m3.
 
-\paragraph{Field: Liquid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Liquid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-liquid-state-specific-heat}
 
 This is the constant specific heat while the material is fully liquid, in J/kg-K.
 
-\paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-high-temperature-difference-of-melting-curve}
 
 This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
 
-\paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-peak-melting-temperature}
 
 This is the center (peak) of the melting curve, in Kelvin.
 
-\paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-low-temperature-difference-of-melting-curve}
 
 This is the width of the enthalpy/specific heat melting curve, on the low side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
 
@@ -665,19 +665,19 @@ This is the constant thermal conductivity used while the material is fully solid
 
 This is the constant density while the material is fully solid, in kg/m3.
 
-\paragraph{Field: Solid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Solid State Specific Heat}\label{materialpropertyphasechangehysteresis-inputs-solid-state-specific-heat}
 
 This is the constant specific heat while the material is fully crystallized, in J/kg-K.
 
-\paragraph{Field: High Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: High Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-high-temperature-difference-of-freezing-curve}
 
 This is the width of the enthalpy/specific heat freezing curve, on the high side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
 
-\paragraph{Field: Peak Freezing Temperature}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Peak Freezing Temperature}\label{materialpropertyphasechangehysteresis-inputs-peak-freezing-temperature}
 
 This is the center (peak) of the freezing curve, in Kelvin.  This will be higher than the peak melting temperature based on empirical data.
 
-\paragraph{Field: Low Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-name}
+\paragraph{Field: Low Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-low-temperature-difference-of-freezing-curve}
 
 This is the width of the enthalpy/specific heat freezing curve, on the low side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
 
@@ -1095,7 +1095,7 @@ MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity
         2.602;     !- Thermal Conductivity \#2
 \end{lstlisting}
 
-\subsubsection{Surface Outputs}\label{outputs-2-021}
+\subsubsection{Surface Outputs}\label{surface-outputs}
 
 \begin{itemize}
 \item
@@ -1138,7 +1138,7 @@ This output is the temperature on the external ``surface'' of the surface.
 
 This output is the relative humidity on the external ``surface'' of the surface.
 
-\subsubsection{Internal Cell Outputs}\label{outputs-2-021}
+\subsubsection{Internal Cell Outputs}\label{internal-cell-outputs}
 
 Detailed profile data for the variables Temperature {[}C{]}, Relative Humidity {[}\%{]} and Water Content {[}kg/kg{]} within each surface can also be reported. To calculate the heat and moisture transfer through surfaces HAMT splits up surfaces into discrete cells. Each cell is composed of a single material and has a position within the surface. HAMT automatically assigns cells to construction objects so that there are more cells closer to boundaries between materials and also at the ``surfaces'' of the surface. It is not possible for users to define their own cells.
 
@@ -1216,7 +1216,7 @@ The surface-to-surface thickness of the glass (m).
 
 Transmittance at normal incidence averaged over the solar spectrum. Used only when Optical Data Type = SpectralAverage.
 
-For uncoated glass, when alternative optical properties are available---such as thickness, solar index of refraction, and solar extinction coefficient---they can be converted to equivalent solar transmittance and reflectance values using the equations given in ``Conversion from Alternative Specification of Glass Optical Properties.'')
+For uncoated glass, when alternative optical properties are available---such as thickness, solar index of refraction, and solar extinction coefficient---they can be converted to equivalent solar transmittance and reflectance values using the equations given in \textbf{``Glass Optical Properties Conversion.''}
 
 \paragraph{Field: Front Side Solar Reflectance at Normal Incidence}\label{field-front-side-solar-reflectance-at-normal-incidence}
 
@@ -1230,7 +1230,7 @@ Back-side reflectance at normal incidence averaged over the solar spectrum. Used
 
 Transmittance at normal incidence averaged over the solar spectrum and weighted by the response of the human eye. Used only when Optical Data Type = SpectralAverage.
 
-For uncoated glass, when alternative optical properties are available---such as thickness, visible index of refraction, and visible extinction coefficient---they can be converted to equivalent visible transmittance and reflectance values using the equations given in ``Conversion from Alternative Specification of Glass Optical Properties.'')
+For uncoated glass, when alternative optical properties are available---such as thickness, visible index of refraction, and visible extinction coefficient---they can be converted to equivalent visible transmittance and reflectance values using the equations given in \textbf{``Glass Optical Properties Conversion.''}
 
 \paragraph{Field: Front Side Visible Reflectance at Normal Incidence}\label{field-front-side-visible-reflectance-at-normal-incidence}
 
@@ -2217,7 +2217,7 @@ Transmittance averaged over the solar spectrum and weighted by the response of t
 
 Reflectance averaged over the solar spectrum and weighted by the response of the human eye. Assumed same on both side of shade and independent of incidence angle.
 
-\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity}
+\paragraph{Field: Infrared Hemispherical Emissivity}\label{field-infrared-hemispherical-emissivity-201710020805}
 
 Effective long-wave emissivity. Assumed same on both sides of shade. We can approximate this~ effective emissivity, \(\varepsilon_{eff}\), as follows. Let \(\eta\) be the ``openness'' the shade, i.e.,~ the ratio of the area of openings in the shade to the overall shade area (see Field: Air-Flow Permeability, below). Let the emissivity of the shade material be \(\varepsilon\). Then
 
@@ -2881,7 +2881,7 @@ WindowMaterial:Screen,
 
 \subsection{WindowMaterial:Shade:EquivalentLayer}\label{windowmaterialshadeequivalentlayer}
 
-This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank.
+This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support WindowProperty:ShadingControl. 
 
 \subsubsection{Inputs}\label{inputs-26-002}
 
@@ -2956,7 +2956,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%. The equivalent layer window drapery fabric shade model does not support WindowProperty:ShadingControl.
 
 \begin{figure}[hbtp] % fig 21
 \centering
@@ -3052,7 +3052,8 @@ This object specifies the properties of an Equivalent Layer window blind consist
 \caption{Geometry and Properties used for venetian blind analysis \protect \label{fig:geometry-and-properties-used-for-venetian}}
 \end{figure}
 
-The input data required to characterize a venetian blind are: front and back side reflectance and transmittance of the slat, geometry (Slat width, w, slat spacing, s, slat crown, c, and slat angle, f, and long wave emittance and transmittance of the slat. Blinds can be located on the inside of the window, on the outside of the window, or between two layers of glass. The blind is assumed to cover all of the glazed part of the window.
+The input data required to characterize a venetian blind are: front and back side reflectance and transmittance of the slat, geometry (Slat width, w, slat spacing, s, slat crown, c, and slat angle, $\phi$, and long wave emittance and transmittance of the slat. Blinds can be located on the inside of the window, on the outside of the window, or between two layers of glass. The blind is assumed to cover all of the glazed part of the window.
+The equivalent layer window blind model allows three slat angle control types (see \textit{Slat Angle Control} input field) but does not support WindowProperty:ShadingControl. 
 
 \subsubsection{Inputs}\label{inputs-28-001}
 
@@ -3078,7 +3079,7 @@ The perpendicular length between the slat cord ~and the curve (m). Crown = 0.062
 
 \paragraph{Field: Slat Angle}\label{field-slat-angle-2}
 
-The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). The slat angle is +ve if the tip of the slat front face is tilted upward, or else the slat angle is -ve if the tip of the slat front face is tilted downward. The slat angle varies between -90 to +90.~ If the ``Slat Angle Control'' input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value allowed is -90.0, and the maximum value allowed is 90.0 degrees.~ The default value is 45 degrees.
+The angle (degrees) between the glazing outward normal and the slat outward normal, where the outward normal points away from the front face of the slat (degrees). The slat angle is +ve if the tip of the slat front face is tilted upward, or else the slat angle is -ve if the tip of the slat front face is tilted downward. The slat angle varies between -90 to +90.~ If the \textit{`Slat Angle Control} input field below specified is ``FixedSlatAngle'', then the slat angle is fixed at ``Slat Angle'' value entered.~ Minimum value allowed is -90.0, and the maximum value allowed is 90.0 degrees.~ The default value is 45 degrees.
 
 \paragraph{Field: Front Side Slat Beam-Diffuse Solar Transmittance}\label{field-front-side-slat-beam-diffuse-solar-transmittance}
 
@@ -3185,7 +3186,7 @@ WindowMaterial:Blind:EquivalentLayer,
 
 \subsection{WindowMaterial:Screen:EquivalentLayer}\label{windowmaterialscreenequivalentlayer}
 
-This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-diffuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.~ Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}.~ The calculation of effective solar properties requires a set of properties measured at normal incidence.
+This object specifies the optical and thermal properties of exterior screen materials for Equivalent Layer Window. Can only be placed on the exterior side of window construction. The window screen model assumes the screen is made up of intersecting orthogonally-crossed cylinders. The surface of the cylinders is assumed to be diffusely reflecting. The beam solar radiation transmitted through an equivalent Layer window screen varies with sun angle and is made up of two distinct elements: a beam-beam component and a beam-diffuse component. The beam-beam transmittance component is calculated using screen openness area fraction determined from the geometry of the screen and the incident angle of the sun. Empirical correlations are used to obtain the effective off-normal solar and longwave properties of insect screens.~ Insect screen geometry is shown in Figure~\ref{fig:geometry-used-for-insect-screen-analysis}.~ The calculation of effective solar properties requires a set of properties measured at normal incidence. The equivalent layer window screen shade model does not support WindowProperty:ShadingControl.
 
 \begin{figure}[hbtp] % fig 23
 \centering
@@ -3261,7 +3262,7 @@ WindowMaterial:Screen:EquivalentLayer,
 
 \subsection{WindowMaterial:Glazing:EquivalentLayer}\label{windowmaterialglazingequivalentlayer}
 
-Glass material properties for equivalent layer window model.~ Uses transmittance/reflectance input method.~ For exterior windows, ``front side'' is the side of the glass closest to the outside air and ``back side'' is the side closest to the zone the window is defined in. For interzone windows, ``front side'' is the side closest to the zone adjacent to the zone the window is defined in and ``back side'' is the side closest to the zone the window is defined in.
+Glass material properties for equivalent layer window model.~ Uses transmittance/reflectance input method.~ For exterior windows, ``front side'' is the side of the glass closest to the outside air and ``back side'' is the side closest to the zone the window is defined in. For interzone windows, ``front side'' is the side closest to the zone adjacent to the zone the window is defined in and ``back side'' is the side closest to the zone the window is defined in. The equivalent layer window glazing model does not support WindowProperty:ShadingControl.
 
 \subsubsection{Inputs}\label{inputs-30-001}
 

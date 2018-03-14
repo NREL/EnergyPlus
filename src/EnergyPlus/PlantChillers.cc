@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,7 +72,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -300,25 +300,9 @@ namespace PlantChillers {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ChillNum; // chiller number pointer
@@ -335,7 +319,7 @@ namespace PlantChillers {
 
 			// Find the correct Chiller
 			if ( CompIndex == 0 ) {
-				ChillNum = FindItemInList( ChillerName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, ElectricChiller.ma( &ElectricChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimElectricChiller: Specified Chiller not one of Valid Electric Chillers=" + ChillerName );
 				}
@@ -397,7 +381,7 @@ namespace PlantChillers {
 
 			// Find the correct Chiller
 			if ( CompIndex == 0 ) {
-				ChillNum = FindItemInList( ChillerName, EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimEngineDrivenChiller: Specified Chiller not one of Valid EngineDriven Chillers=" + ChillerName );
 				}
@@ -456,7 +440,7 @@ namespace PlantChillers {
 			}
 
 			if ( CompIndex == 0 ) {
-				ChillNum = FindItemInList( ChillerName, GTChiller.ma( &GTChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, GTChiller.ma( &GTChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimGTChiller: Specified Chiller not one of Valid Gas Turbine Chillers=" + ChillerName );
 				}
@@ -519,7 +503,7 @@ namespace PlantChillers {
 
 			// Find the correct Chiller
 			if ( CompIndex == 0 ) {
-				ChillNum = FindItemInList( ChillerName, ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ) );
+				ChillNum = UtilityRoutines::FindItemInList( ChillerName, ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ) );
 				if ( ChillNum == 0 ) {
 					ShowFatalError( "SimConstCOPChiller: Specified Chiller not one of Valid Constant COP Chillers=" + ChillerName );
 				}
@@ -587,12 +571,7 @@ namespace PlantChillers {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -615,15 +594,13 @@ namespace PlantChillers {
 		//  CHARACTER(len=MaxNameLength),DIMENSION(9)   :: AlphArray !character string data
 		//  REAL(r64),                        DIMENSION(22)  :: NumArray  !numeric data
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 		//  CHARACTER(len=MaxNameLength) :: cCurrentModuleObject  ! for ease in renaming.
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:Electric";
-		NumElectricChillers = GetNumObjectsFound( cCurrentModuleObject );
+		NumElectricChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElectricChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " Equipment specified in input file" );
@@ -639,15 +616,9 @@ namespace PlantChillers {
 
 		//LOAD ARRAYS WITH Electric CURVE FIT CHILLER DATA
 		for ( ChillerNum = 1; ChillerNum <= NumElectricChillers; ++ChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,  cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks,  cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElectricChiller.ma( &ElectricChillerSpecs::Base ), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -975,14 +946,7 @@ namespace PlantChillers {
 		// This routine will get the input
 		// required by the EngineDriven Chiller model.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using BranchNodeConnections::TestCompSet;
@@ -1004,14 +968,12 @@ namespace PlantChillers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:EngineDriven";
-		NumEngineDrivenChillers = GetNumObjectsFound( cCurrentModuleObject );
+		NumEngineDrivenChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumEngineDrivenChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -1026,15 +988,9 @@ namespace PlantChillers {
 
 		//LOAD ARRAYS WITH EngineDriven CURVE FIT CHILLER DATA
 		for ( ChillerNum = 1; ChillerNum <= NumEngineDrivenChillers; ++ChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EngineDrivenChiller.ma( &EngineDrivenChillerSpecs::Base ), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -1241,7 +1197,7 @@ namespace PlantChillers {
 
 			EngineDrivenChiller( ChillerNum ).FuelHeatingValue = rNumericArgs( 25 );
 
-			// add support of autosize to this. 
+			// add support of autosize to this.
 
 			EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate = rNumericArgs( 26 );
 			if ( EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 || EngineDrivenChiller( ChillerNum ).DesignHeatRecVolFlowRate ==  DataSizing::AutoSize ) {
@@ -1435,12 +1391,7 @@ namespace PlantChillers {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -1461,14 +1412,12 @@ namespace PlantChillers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:CombustionTurbine";
-		NumGTChillers = GetNumObjectsFound( cCurrentModuleObject );
+		NumGTChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGTChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -1482,15 +1431,9 @@ namespace PlantChillers {
 		GTChillerReport.allocate( NumGTChillers );
 
 		for ( ChillerNum = 1; ChillerNum <= NumGTChillers; ++ChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GTChiller.ma( &GTChillerSpecs::Base ), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -1871,12 +1814,8 @@ namespace PlantChillers {
 		//arrays associated with the type PlantLoopProps.
 
 		// METHODOLOGY EMPLOYED: to be determined...
-		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -1888,15 +1827,8 @@ namespace PlantChillers {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataSizing::AutoSize;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetConstCOPChillerInput: " ); // include trailing blank space
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ChillerNum;
@@ -1904,14 +1836,12 @@ namespace PlantChillers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		bool Okay;
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "Chiller:ConstantCOP";
-		NumConstCOPChillers = GetNumObjectsFound( cCurrentModuleObject );
+		NumConstCOPChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumConstCOPChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -1926,15 +1856,9 @@ namespace PlantChillers {
 
 		//LOAD ARRAYS WITH BLAST ConstCOP CHILLER DATA
 		for ( ChillerNum = 1; ChillerNum <= NumConstCOPChillers; ++ChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ConstCOPChiller.ma( &ConstCOPChillerSpecs::Base ), ChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -3099,9 +3023,6 @@ namespace PlantChillers {
 		// the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
 		// is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
@@ -3111,7 +3032,6 @@ namespace PlantChillers {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
@@ -3593,7 +3513,7 @@ namespace PlantChillers {
 			RegisterPlantCompDesignFlow( EngineDrivenChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 		}
 
-		// autosize support for heat recovery flow rate. 
+		// autosize support for heat recovery flow rate.
 		if ( EngineDrivenChiller( ChillNum ).HeatRecActive ) {
 			Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * EngineDrivenChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( PlantFirstSizesOkayToFinalize ) {
@@ -3879,7 +3799,7 @@ namespace PlantChillers {
 		// save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
 		if ( GTChiller( ChillNum ).Base.CondenserType == WaterCooled ) RegisterPlantCompDesignFlow( GTChiller( ChillNum ).Base.CondInletNodeNum, tmpCondVolFlowRate );
 
-		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap / ( GTChiller( ChillNum ).engineCapacityScalar * GTChiller( ChillNum ).Base.COP ); 
+		GTEngineCapacityDes = GTChiller( ChillNum ).Base.NomCap / ( GTChiller( ChillNum ).engineCapacityScalar * GTChiller( ChillNum ).Base.COP );
 		if ( PlantFirstSizesOkayToFinalize ) {
 			if ( GTChiller( ChillNum ).GTEngineCapacityWasAutoSized ) {
 				GTChiller( ChillNum ).GTEngineCapacity = GTEngineCapacityDes;
@@ -3910,7 +3830,7 @@ namespace PlantChillers {
 			}
 		}
 
-		// autosize support for heat recovery flow rate. 
+		// autosize support for heat recovery flow rate.
 		if ( GTChiller( ChillNum ).HeatRecActive ) {
 			Real64 tmpHeatRecVolFlowRate = GTChiller( ChillNum ).Base.CondVolFlowRate * GTChiller( ChillNum ).HeatRecCapacityFraction;
 			if ( PlantFirstSizesOkayToFinalize ) {
@@ -4426,16 +4346,16 @@ namespace PlantChillers {
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 RatedCOP_ff = RatedCOP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
 			RatedCOP = RatedCOP_ff * ElectricChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
-		
+
 		// initialize outlet air humidity ratio of air or evap cooled chillers
 		CondOutletHumRat = Node( CondInletNode ).HumRat;
 
@@ -4484,15 +4404,15 @@ namespace PlantChillers {
 		if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( ElectricChiller( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset ));
 			ElectricChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
-		
+
 		//Calculate chiller performance from this set of performance equations.
 		//  from BLAST...Z=(TECONDW-ADJTC(1))/ADJTC(2)-(TLCHLRW-ADJTC(3))
 
@@ -4696,7 +4616,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ElectricChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -5085,20 +5005,20 @@ namespace PlantChillers {
 		LoopNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = EngineDrivenChiller( ChillerNum ).Base.CWLoopSideNum;
 		EvapMassFlowRateMax = EngineDrivenChiller( ChillerNum ).Base.EvapMassFlowRateMax;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			COP = COP_ff * EngineDrivenChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
 
 		//*********************************
@@ -5107,13 +5027,13 @@ namespace PlantChillers {
 		if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( EngineDrivenChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
 			EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		//Calculate chiller performance from this set of performance equations.
@@ -5221,7 +5141,7 @@ namespace PlantChillers {
 				// ChillerPartLoadRatio = PartLoadRat;
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
-			
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5299,7 +5219,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( EngineDrivenChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -5737,20 +5657,20 @@ namespace PlantChillers {
 		EvapMassFlowRateMax = GTChiller( ChillerNum ).Base.EvapMassFlowRateMax;
 		LoopNum = GTChiller( ChillerNum ).Base.CWLoopNum;
 		LoopSideNum = GTChiller( ChillerNum ).Base.CWLoopSideNum;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( GTChiller( ChillerNum ).Base.FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
-			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;			
+			ChillerNomCap = NomCap_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
 			COP = COP_ff * GTChiller( ChillerNum ).Base.FaultyChillerFoulingFactor;
-			
+
 		}
 
 		//*********************************
@@ -5759,13 +5679,13 @@ namespace PlantChillers {
 		if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = GTChiller( ChillerNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( GTChiller( ChillerNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset ));
 			GTChiller( ChillerNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		//Calculate chiller performance from this set of performance equations.
@@ -5871,7 +5791,7 @@ namespace PlantChillers {
 				// ChillerPartLoadRatio = PartLoadRat;
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - EvapOutletTemp;
 			}
-			
+
 		} else { // If FlowLock is True
 
 			EvapMassFlowRate = Node( EvapInletNode ).MassFlowRate;
@@ -5943,7 +5863,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( GTChiller( ChillerNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -6220,7 +6140,7 @@ namespace PlantChillers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen 
+		//       MODIFIED       Nov.-Dec. 2001, Jan. 2002, Richard Liesen
 		//                      Feb. 2010, Chandan Sharma, FSEC. Added basin heater
 		//                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
 		//                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
@@ -6301,16 +6221,16 @@ namespace PlantChillers {
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerNomCap;
 			Real64 COP_ff = COP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerNomCap = NomCap_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
-			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor; 
-			
+			COP = COP_ff * ConstCOPChiller( ChillNum ).Base.FaultyChillerFoulingFactor;
+
 		}
-		
+
 		//set module level chiller inlet and temperature variables
 		LoopNum = ConstCOPChiller( ChillNum ).Base.CWLoopNum;
 		LoopSideNum = ConstCOPChiller( ChillNum ).Base.CWLoopSideNum;
@@ -6333,15 +6253,15 @@ namespace PlantChillers {
 		if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOutSetPoint
 			TempEvapOutSetPoint = min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset );
 			ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOutSetPoint;
-			
+
 		}
-		
+
 		EvapDeltaTemp = std::abs( Node( EvapInletNode ).Temp - TempEvapOutSetPoint );
 		EvapInletTemp = Node( EvapInletNode ).Temp;
 
@@ -6576,7 +6496,7 @@ namespace PlantChillers {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( ConstCOPChiller( ChillNum ).Base.FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator

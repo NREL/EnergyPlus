@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -157,6 +157,9 @@ namespace SteamCoils {
 		bool FaultyCoilSATFlag; // True if the coil has SAT sensor fault
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
+		bool reportCoilFinalSizes; // one time report of sizes to coil selection report
+		Real64 DesCoilCapacity; //store design load
+		Real64 DesAirVolFlow; // store design air flow
 
 		// Default Constructor
 		SteamCoilEquipConditions() :
@@ -214,7 +217,10 @@ namespace SteamCoils {
 			DesiccantDehumNum( 0 ),
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
-			FaultyCoilSATOffset( 0.0 )
+			FaultyCoilSATOffset( 0.0 ),
+			reportCoilFinalSizes( true ),
+			DesCoilCapacity( 0.0 ),
+			DesAirVolFlow( 0.0 )
 		{}
 
 	};

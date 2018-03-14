@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -249,7 +249,7 @@ namespace EnergyPlus {
 		"    0.0,                        !- Speed 5 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}",
 		"    wasteHeat VS Temp1 Test,                        !- Speed 5 Waste Heat Function of Temperature Curve Name",
 		"    10734.02101,            !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {w}",
-		"    0.816,                   !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",	
+		"    0.816,                   !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
 		"    7.661685232,             !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}",
 		"    0.652231367,             !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
 		"    0.0008201726 ,                  !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}",
@@ -300,7 +300,7 @@ namespace EnergyPlus {
 		"    1CoolingEIRFWCurve,      !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name",
 		"    0.0,                        !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}",
 		"    wasteHeat VS Temp1 Test;                        !- Speed 9 Waste Heat Function of Temperature Curve Name",
-    
+
 		"  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,",
 		"    Lobby_ZN_1_FLR_2 WSHP Heating Mode,  !- Name",
 		"    Lobby_ZN_1_FLR_2 WSHP Heating Source Side Inlet Node,  !- Water-to-Refrigerant HX Water Inlet Node Name",
@@ -421,7 +421,7 @@ namespace EnergyPlus {
 		"    1HeatingEIRFWCurve,      !- Speed 9 Energy Input Ratio Function of Water Flow Fraction Curve Name",
 		"    0.0,                        !- Speed 9 Reference Unit Waste Heat Fraction of Input Power At Rated Conditions {dimensionless}",
 		"    wasteHeat VS Temp1 Test;                        !- Speed 9 Waste Heat Function of Temperature Curve Name",
- 
+
 		"  Fan:OnOff,",
 		"    Lobby_ZN_1_FLR_2 WSHP Fan,              !- Name",
 		"    ALWAYS_ON,    !- Availability Schedule Name",
@@ -2483,8 +2483,8 @@ namespace EnergyPlus {
 
 			});
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
-			
+			ASSERT_TRUE( process_idf( idf_objects ) );
+
 			VariableSpeedCoils::GetVarSpeedCoilInput();
 
 			EXPECT_EQ ( VariableSpeedCoils::VarSpeedCoil( 1 ).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE" );
@@ -2654,7 +2654,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		VariableSpeedCoils::GetVarSpeedCoilInput();
 

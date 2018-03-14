@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,12 +69,12 @@ namespace EnergyPlus {
 			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
 
 		EXPECT_EQ( HeatingCoils::HeatingCoil( 1 ).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypeInputError ) {
@@ -89,7 +89,7 @@ namespace EnergyPlus {
 			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		ASSERT_THROW( HeatingCoils::GetHeatingCoilInput(), std::runtime_error );
 
 		std::string const error_string = delimited_string( {
@@ -103,7 +103,7 @@ namespace EnergyPlus {
 
 
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas ) {
@@ -118,7 +118,7 @@ namespace EnergyPlus {
 			 "  Air Loop Outlet Node;    !- Air Outlet Node Name"
 														 });
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <DataEnvironment.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -1603,7 +1602,6 @@ namespace DataHeatBalance {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1626,7 +1624,7 @@ namespace DataHeatBalance {
 
 		// maybe it's already there
 		errFlag = false;
-		Found = FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
+		Found = UtilityRoutines::FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
 		if ( Found == 0 ) {
 			// Add a new blind
 			Blind.redimension( ++TotBlinds );

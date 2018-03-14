@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,7 +64,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -141,26 +141,8 @@ namespace MicroturbineElectricGenerator {
 
 		// METHODOLOGY EMPLOYED:       Uses empirical models based on manufacturers data
 
-		// REFERENCES:
-		//  na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -173,7 +155,7 @@ namespace MicroturbineElectricGenerator {
 
 		// SELECT and CALL GENERATOR MODEL
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MTGenerator );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, MTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -221,38 +203,13 @@ namespace MicroturbineElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// INTEGER, INTENT(IN)          :: FlowLock !unused1208 !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		if ( GetMTInput ) {
 			GetMTGeneratorInput();
 			GetMTInput = false;
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MTGenerator );
+			CompNum = UtilityRoutines::FindItemInList( CompName, MTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );
 				return;
@@ -286,19 +243,12 @@ namespace MicroturbineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		//  EnergyPlus input processor.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveType;
 		using CurveManager::GetCurveMinMaxValues;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -308,18 +258,12 @@ namespace MicroturbineElectricGenerator {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
-		// Locals
-		// PARAMETERS:
-		//  na
-
 		// LOCAL VARIABLES:
 		int GeneratorNum; // Index to generator
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // Error flag... trips fatal error message at end of get input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 ElectOutFTempElevOutput; // Output of Electrical Power Output Modifier Curve (function of temp and elev)
 		Real64 ElecEfficFTempOutput; // Output of Electrical Efficiency Modifier Curve (function of temp)
 		Real64 ElecEfficFPLROutput; // Output of Electrical Efficiency Modifier Curve (function of PLR)
@@ -344,7 +288,7 @@ namespace MicroturbineElectricGenerator {
 
 		// FLOW:
 		cCurrentModuleObject = "Generator:MicroTurbine";
-		NumMTGenerators = GetNumObjectsFound( cCurrentModuleObject );
+		NumMTGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumMTGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -358,14 +302,8 @@ namespace MicroturbineElectricGenerator {
 
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
-			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			MTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			MTGenerator( GeneratorNum ).RefElecPowerOutput = NumArray( 1 );
@@ -688,11 +626,11 @@ namespace MicroturbineElectricGenerator {
 
 				MTGenerator( GeneratorNum ).RefInletWaterTemp = NumArray( 13 );
 
-				if ( SameString( AlphArray( 9 ), "InternalControl" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 9 ), "InternalControl" ) ) {
 					MTGenerator( GeneratorNum ).InternalFlowControl = true; //  A9, \field Heat Recovery Water Flow Operating Mode
 					MTGenerator( GeneratorNum ).PlantFlowControl = false;
 				}
-				if ( ( ! ( SameString( AlphArray( 9 ), "InternalControl" ) ) ) && ( ! ( SameString( AlphArray( 9 ), "PlantControl" ) ) ) ) {
+				if ( ( ! ( UtilityRoutines::SameString( AlphArray( 9 ), "InternalControl" ) ) ) && ( ! ( UtilityRoutines::SameString( AlphArray( 9 ), "PlantControl" ) ) ) ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphArray( 9 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ShowContinueError( "Operating Mode must be INTERNAL CONTROL or PLANT CONTROL." );
@@ -2021,24 +1959,6 @@ namespace MicroturbineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
 
@@ -2050,7 +1970,7 @@ namespace MicroturbineElectricGenerator {
 
 		ExhaustOutletNodeNum = 0;
 
-		CompNum = FindItemInList( CompName, MTGenerator );
+		CompNum = UtilityRoutines::FindItemInList( CompName, MTGenerator );
 
 		if ( CompNum == 0 ) {
 			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );

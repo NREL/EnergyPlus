@@ -78,6 +78,47 @@ ThermostatSetpoint:DualSetpoint
 
 The corresponding control type name. The name is used in an object with the name of the control type and specifies the schedule.
 
+\paragraph{Field: Temperature Difference Between Cutout And Setpoint}\label{field-temperature-difference-between-cutout-and-Setpoint}
+
+This optional choice field provides a temperature difference between cutout temperature and setpoint. When the temperature difference is greater than 0.0, the difference is applied to both heating and cooling by possibly revising setpoints based on control types.
+
+If MAT is defined as zone air temperature at previous time step, DeltaT represents the temperature difference between cutout and setpoint and is greater than 0.0, and PredictedLoad represents predicted load calculated in the ZoneTempPredictorCorrector, following action will be taken: 
+
+\begin{lstlisting}
+0 - Uncontrolled (No specification or default)
+	No change
+
+1 - Single Heating Setpoint
+	If ( MAT < ThermostatSetpoint:SingleHeating )
+		ThermostatSetpoint:SingleHeating = ThermostatSetpoint:SingleHeating + DeltaT
+	Else
+		Set PredictedLoad = 0
+	End If
+
+2 - Single Cooling SetPoint
+	If ( MAT > ThermostatSetpoint:SingleCooling )
+		ThermostatSetpoint:SingleCooling = ThermostatSetpoint:SingleCooling - DeltaT
+	Else
+		Set PredictedLoad = 0
+	End If
+
+3 - Single Heating/Cooling Setpoint
+	No change
+
+4 - Dual Setpoint (Heating and Cooling) with deadband
+	If ( MAT < HeatingSetpoint )
+		HeatingSetpoint = HeatingSetpoint + DeltaT
+		CoolingSetpoint = No change
+	Else If ( MAT > CoolingSetpoint )
+		HeatingSetpoint = No change
+		CoolingSetpoint = CoolingSetpoint - DeltaT
+	Else
+		Set PredictedLoad = 0
+	End If
+\end{lstlisting}
+
+When PredictedLoad = 0, HVAC system turns off. The performance is equivalent to an ON/Off thermostat.
+
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
