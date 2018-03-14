@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -263,7 +263,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check )
 		"	0.04556;            !- U-Tube Distance {m}"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -460,7 +460,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check
 		"	12.778359;               !- G-Function G Value 76"
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -503,7 +503,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Che
 		"	2;                  !- Borehole Spacing {m}",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -712,7 +712,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors
 		"	GHE-1 g-functions;  !- Response Factors Object Name",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -783,7 +783,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check 
 		"	GHE-Array;			!- !- GHE Array Object Name"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -875,7 +875,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_C
 		"	GHE-4;              !- GHE Borehole Definition 4"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -1195,7 +1195,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check )
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -1302,7 +1302,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_r
 
 	DisableGLHECaching = true;
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -1364,7 +1364,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor )
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetGroundHeatExchangerInput();
 
@@ -1680,7 +1680,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_r
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -1985,7 +1985,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance )
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -2282,7 +2282,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -2581,7 +2581,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -2880,7 +2880,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -3179,7 +3179,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalRes
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -3478,7 +3478,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalRes
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();
@@ -3777,7 +3777,7 @@ TEST_F( EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalRes
 	DisableGLHECaching = true;
 
 	// Setup
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ProcessScheduleInput();
 	ScheduleInputProcessed = true;
 	GetPlantLoopData();

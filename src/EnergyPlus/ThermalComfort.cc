@@ -70,7 +70,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <OutputReportTabular.hh>
@@ -130,8 +130,6 @@ namespace ThermalComfort {
 	using DataRoomAirModel::IsZoneUI;
 	using DataRoomAirModel::VComfort_Jet;
 	using DataRoomAirModel::VComfort_Recirculation;
-
-	//Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyRhFnTdbWPb;
 
 	namespace {
@@ -242,6 +240,8 @@ namespace ThermalComfort {
 	Real64 TotalAnyZoneNotMetCoolingOccupied( 0.0 );
 	Real64 TotalAnyZoneNotMetOccupied( 0.0 );
 	Array1D< Real64 > ZoneOccHrs;
+	bool useEpwData( false );
+	Array1D< Real64 > DailyAveOutTemp( 30, 0.0 );
 
 	// Subroutine Specifications for the Thermal Comfort module
 
@@ -1213,7 +1213,7 @@ namespace ThermalComfort {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine calculates TSV using the KSU 2 Node model.
-		
+
 		// METHODOLOGY EMPLOYED:
 		// This subroutine is based heavily upon the work performed by Dan Maloney for
 		// the BLAST program.  Many of the equations are based on the original Pierce
@@ -1674,9 +1674,6 @@ namespace ThermalComfort {
 		using namespace DataGlobals;
 		using namespace DataHeatBalance;
 		using DataSurfaces::Surface;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
 
@@ -1696,7 +1693,7 @@ namespace ThermalComfort {
 		int WhichAFList; // Used in validating AngleFactorList
 
 		cCurrentModuleObject = "ComfortViewFactorAngles";
-		NumOfAngleFactorLists = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfAngleFactorLists = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		AngleFactorList.allocate( NumOfAngleFactorLists );
 		for ( auto & e : AngleFactorList ) {
 			e.Name.clear();
@@ -1709,11 +1706,11 @@ namespace ThermalComfort {
 			AllAngleFacSummed = 0.0;
 			auto & thisAngFacList( AngleFactorList( Item ) );
 
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			thisAngFacList.Name = cAlphaArgs( 1 ); // no need for verification/uniqueness.
 			thisAngFacList.ZoneName = cAlphaArgs( 2 );
-			thisAngFacList.ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			thisAngFacList.ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( thisAngFacList.ZonePtr == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - not found" );
 				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -1732,7 +1729,7 @@ namespace ThermalComfort {
 
 			for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
 				thisAngFacList.SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				thisAngFacList.SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
+				thisAngFacList.SurfacePtr( SurfNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface );
 				thisAngFacList.AngleFactor( SurfNum ) = rNumericArgs( SurfNum );
 				// Error trap for surfaces that do not exist or surfaces not in the zone
 				if ( thisAngFacList.SurfacePtr( SurfNum ) == 0 ) {
@@ -1766,7 +1763,7 @@ namespace ThermalComfort {
 
 		for ( Item = 1; Item <= TotPeople; ++Item ) {
 			if ( People( Item ).MRTCalcType != AngleFactor ) continue;
-			People( Item ).AngleFactorListPtr = FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
+			People( Item ).AngleFactorListPtr = UtilityRoutines::FindItemInList( People( Item ).AngleFactorListName, AngleFactorList );
 			WhichAFList = People( Item ).AngleFactorListPtr;
 			if ( WhichAFList == 0 && ( People( Item ).Fanger || People( Item ).Pierce || People( Item ).KSU ) ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + People( Item ).AngleFactorListName + "\", invalid" );
@@ -1819,7 +1816,7 @@ namespace ThermalComfort {
 		SurfEAF = 0.0;
 
 		auto & thisAngFacList( AngleFactorList( AngleFacNum ) );
-		
+
 		for ( SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum ) {
 			SurfaceTemp = TH( 2, 1, thisAngFacList.SurfacePtr( SurfNum ) ) + KelvinConv;
 			SurfEAF = Construct( Surface( thisAngFacList.SurfacePtr( SurfNum ) ).Construction ).InsideAbsorpThermal * thisAngFacList.AngleFactor( SurfNum );
@@ -1839,7 +1836,7 @@ namespace ThermalComfort {
 		int const SurfNum
 	)
 	{
-		
+
 		// Purpose: Calculate a modified zone MRT that excludes the Surface( SurfNum ).
 		//          This is necessary for the surface weighted option to not in essence
 		//          double count SurfNum in the MRT calculation.  Other than that, the
@@ -1848,7 +1845,7 @@ namespace ThermalComfort {
 		//          RadTemp (radiant temperature) for use by the thermal comfort routines
 		//          that is the average of the surface temperature to be weighted and
 		//          the modified zone MRT.
-		
+
 		// Using/Aliasing
 		using DataHeatBalSurface::TH;
 		using DataSurfaces::Surface;
@@ -1857,7 +1854,7 @@ namespace ThermalComfort {
 
 		// Return value
 		Real64 CalcSurfaceWeightedMRT = 0.0;
-		
+
 		// Local variables
 		int SurfNum2; // surface number used in "for" loop
 		int ZoneNum2; // zone number index
@@ -1883,7 +1880,7 @@ namespace ThermalComfort {
 				}
 			}
 		}
-		
+
 		// Calculate the sum of area*emissivity and area*emissivity*temperature for all surfaces in the zone EXCEPT the surface being weighted
 		// Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
 		SumAET = 0.0;
@@ -1895,7 +1892,7 @@ namespace ThermalComfort {
 				ZoneAESum( ZoneNum ) += SurfaceAE( SurfNum2 );
 			}
 		}
-		
+
 		// Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
 		if ( ZoneAESum( ZoneNum ) > 0.01 ) {
 			CalcSurfaceWeightedMRT = 0.5 * ( TH( 2, 1, SurfNum ) + ( SumAET / ZoneAESum( ZoneNum ) ) );
@@ -1911,7 +1908,7 @@ namespace ThermalComfort {
 		return CalcSurfaceWeightedMRT;
 
 	}
-	
+
 	Real64
 	CalcSatVapPressFromTemp( Real64 const Temp )
 	{
@@ -2287,10 +2284,11 @@ namespace ThermalComfort {
 			}}
 			if ( testHeating && ( SensibleLoadPredictedNoAdj > 0 ) ) { //heating
 				if ( AirModel( iZone ).AirModelType != RoomAirModel_Mixing ) {
-					deltaT = TempTstatAir( iZone ) - ZoneThermostatSetPointLo( iZone );
+					deltaT = TempTstatAir( iZone ) - ZoneThermostatSetPointLo( iZone );					
 				} else {
 					deltaT = ZTAV( iZone ) - ZoneThermostatSetPointLo( iZone );
 				}
+
 				if ( deltaT < deviationFromSetPtThresholdHtg ) {
 					ThermalComfortSetPoint( iZone ).notMetHeating = TimeStepZone;
 					ThermalComfortSetPoint( iZone ).totalNotMetHeating += TimeStepZone;
@@ -2307,6 +2305,10 @@ namespace ThermalComfort {
 					deltaT = TempTstatAir( iZone ) - ZoneThermostatSetPointHi( iZone );
 				} else {
 					deltaT = ZTAV( iZone ) - ZoneThermostatSetPointHi( iZone );
+				}
+				
+				if ( Zone( iZone ).HasAdjustedReturnTempByITE) {
+					deltaT = TempTstatAir( iZone ) - Zone( iZone ) .AdjustedReturnTempByITE;
 				}
 				if ( deltaT > deviationFromSetPtThresholdClg ) {
 					ThermalComfortSetPoint( iZone ).notMetCooling = TimeStepZone;
@@ -2437,7 +2439,6 @@ namespace ThermalComfort {
 		bool statFileExists;
 		bool epwFileExists;
 		static bool useStatData( false );
-		static bool useEpwData( false );
 		int readStat;
 		int jStartDay;
 		int calcStartDay;
@@ -2488,18 +2489,26 @@ namespace ThermalComfort {
 				}
 				useStatData = true;
 			} else if ( epwFileExists ) {
+				//determine number of days in year
+				int DaysInYear;
+				if ( DataEnvironment::CurrentYearIsLeapYear ) {
+					DaysInYear = 366;
+				} else {
+					DaysInYear = 365;
+				}
+				DailyAveOutTemp = 0.0;
 				epwFile = GetNewUnitNumber();
 				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, DataStringGlobals::inputWeatherFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
 					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file " + DataStringGlobals::inputWeatherFileName+ " for input (read)." );
 				}
-				for ( i = 1; i <= 9; ++i ) { // Headers
-					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
+				for ( i = 1; i <= 8; ++i ) { // Headers
+					{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 				}
 				jStartDay = DayOfYear - 1;
 				calcStartDay = jStartDay - 30;
-				if ( calcStartDay > 0 ) {
-					calcStartHr = 24 * ( calcStartDay - 1 ) + 1;
+				if ( calcStartDay >= 0 ) {
+					calcStartHr = 24 * calcStartDay + 1;
 					for ( i = 1; i <= calcStartHr - 1; ++i ) {
 						{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
 					}
@@ -2515,13 +2524,13 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
-						runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
+						DailyAveOutTemp( i ) = avgDryBulbASH;
 					}
 				} else { // Do special things for wrapping the epw
 					calcEndDay = jStartDay;
-					calcStartDay += 365;
+					calcStartDay += DaysInYear;
 					calcEndHr = 24 * calcEndDay;
-					calcStartHr = 24 * ( calcStartDay - 1 ) + 1;
+					calcStartHr = 24 * calcStartDay + 1;
 					for ( i = 1; i <= calcEndDay; ++i ) {
 						avgDryBulbASH = 0.0;
 						for ( j = 1; j <= 24; ++j ) {
@@ -2534,10 +2543,10 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
-						runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
+						DailyAveOutTemp( i + 30 - calcEndDay ) = avgDryBulbASH;
 					}
 					for ( i = calcEndHr + 1; i <= calcStartHr - 1; ++i ) {
-						{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
+						{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 					}
 					for ( i = 1; i <= 30 - calcEndDay; ++i ) {
 						avgDryBulbASH = 0.0;
@@ -2551,7 +2560,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbASH += ( dryBulb / 24.0 );
 						}
-						runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
+						DailyAveOutTemp( i ) = avgDryBulbASH;
 					}
 				}
 				gio::close( epwFile );
@@ -2567,7 +2576,15 @@ namespace ThermalComfort {
 
 		if ( BeginDayFlag && useEpwData ) {
 			// Update the running average, reset the daily avg
-			runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
+			DailyAveOutTemp( 30 ) = avgDryBulbASH;
+			Real64 sum = 0.0;
+			for ( i = 1; i <= 29; i++ ) {
+				sum += DailyAveOutTemp( i );
+			}
+			runningAverageASH = ( sum + avgDryBulbASH ) / 30.0;
+			for ( i = 1; i <= 29; i++ ) {
+				DailyAveOutTemp( i ) = DailyAveOutTemp( i + 1 );
+			}
 			avgDryBulbASH = 0.0;
 		}
 

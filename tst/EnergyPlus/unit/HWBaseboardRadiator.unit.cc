@@ -55,7 +55,7 @@
 #include <DataLoopNode.hh>
 #include <ScheduleManager.hh>
 #include <Psychrometrics.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <HWBaseboardRadiator.hh>
 #include <FluidProperties.hh>
 #include <DataPlant.hh>
@@ -66,7 +66,6 @@ using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
 using namespace ScheduleManager;
 using namespace Psychrometrics;
-using namespace InputProcessor;
 using namespace HWBaseboardRadiator;
 using namespace DataLoopNode;
 using namespace FluidProperties;

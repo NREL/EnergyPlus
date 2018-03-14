@@ -70,7 +70,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MicroturbineElectricGenerator.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -184,12 +184,7 @@ namespace ChillerExhaustAbsorption {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using CurveManager::CurveValue;
 		using DataPlant::TypeOf_Chiller_ExhFiredAbsorption;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
@@ -198,14 +193,6 @@ namespace ChillerExhaustAbsorption {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// used to determine if heating side or cooling
 		// side of chiller-heater is being called
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -221,7 +208,7 @@ namespace ChillerExhaustAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, ExhaustAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, ExhaustAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimExhaustAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -329,13 +316,7 @@ namespace ChillerExhaustAbsorption {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -345,24 +326,18 @@ namespace ChillerExhaustAbsorption {
 		using MicroturbineElectricGenerator::GetMTGeneratorExhaustNode;
 		using DataSizing::AutoSize;
 
-		// Locals
-		// PARAMETERS
-
 		//LOCAL VARIABLES
 		int AbsorberNum; // Absorber counter
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		int MTExhaustNodeNum; // Exhaust node number passed from MicroTurbine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string ChillerName;
-		bool errFlag;
 		bool Okay;
 
 		//FLOW
 		cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
-		NumExhaustAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
+		NumExhaustAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumExhaustAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
@@ -380,19 +355,10 @@ namespace ChillerExhaustAbsorption {
 		//LOAD ARRAYS
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumExhaustAbsorbers; ++AbsorberNum ) {
-			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, Get_ErrorsFound );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), Get_ErrorsFound, cCurrentModuleObject + " Name" );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExhaustAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				Get_ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
-			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				Get_ErrorsFound = true;
-			}
 			ExhaustAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
 			ChillerName = cCurrentModuleObject + " Named " + ExhaustAbsorber( AbsorberNum ).Name;
 
@@ -432,7 +398,7 @@ namespace ChillerExhaustAbsorption {
 			if ( ExhaustAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
 				ExhaustAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				ExhaustAbsorber( AbsorberNum ).CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
 			} else {
 				ExhaustAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 13 );
@@ -456,9 +422,9 @@ namespace ChillerExhaustAbsorption {
 				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				Get_ErrorsFound = false;
 			}
-			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = false;
-			} else if ( SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				ExhaustAbsorber( AbsorberNum ).isEnterCondensTemp = true;
@@ -467,9 +433,9 @@ namespace ChillerExhaustAbsorption {
 				ShowContinueError( "resetting to ENTERING-CONDENSER, simulation continues" );
 			}
 			// Assign Other Paramters
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = false;
-			} else if ( SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				ExhaustAbsorber( AbsorberNum ).isWaterCooled = true;
@@ -506,7 +472,7 @@ namespace ChillerExhaustAbsorption {
 			ExhaustAbsorber( AbsorberNum ).SizFac = rNumericArgs( 16 );
 			ExhaustAbsorber( AbsorberNum ).TypeOf = cAlphaArgs( 17 );
 
-			if ( SameString( cAlphaArgs( 17 ), "Generator:MicroTurbine" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 17 ), "Generator:MicroTurbine" ) ) {
 				ExhaustAbsorber( AbsorberNum ).CompType_Num = iGeneratorMicroturbine;
 				ExhaustAbsorber( AbsorberNum ).ExhuastSourceName = cAlphaArgs( 18 );
 
@@ -605,7 +571,7 @@ namespace ChillerExhaustAbsorption {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::TypeOf_Chiller_ExhFiredAbsorption;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
@@ -1846,22 +1812,8 @@ namespace ChillerExhaustAbsorption {
 		// PURPOSE OF THIS SUBROUTINE:
 		// reporting
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int lChillReturnNodeNum; // Node number on the inlet side of the plant
@@ -1947,22 +1899,8 @@ namespace ChillerExhaustAbsorption {
 		// PURPOSE OF THIS SUBROUTINE:
 		// reporting
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int lHeatReturnNodeNum; // absorber steam inlet node number, water side

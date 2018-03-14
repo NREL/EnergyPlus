@@ -57,7 +57,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <GlobalNames.hh>
-#include <PlantLocation.hh>
+#include <Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -163,6 +163,15 @@ public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	);
+
+	int
+	getZoneIndex();
+
+	int
+	getAirLoopNum();
+
+	Real64
+	getPrimAirDesignVolFlow();
 
  private: // Methods
 

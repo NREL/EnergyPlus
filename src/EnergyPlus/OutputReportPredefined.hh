@@ -96,6 +96,8 @@ namespace OutputReportPredefined {
 	extern int pdchFanEndUse;
 	extern int pdchFanPwr;
 	extern int pdchFanPwrPerFlow;
+	extern int pdchFanDesDay;
+	extern int pdchFanPkTime;
 	// Pump subtable
 	extern int pdstPump;
 	extern int pdchPumpType;
@@ -319,6 +321,11 @@ namespace OutputReportPredefined {
 	extern int pdchSysSizUserClAir;
 	extern int pdchSysSizCalcHtAir;
 	extern int pdchSysSizUserHtAir;
+	extern int pdchSysSizAdjustedClAir;
+	extern int pdchSysSizAdjustedHtAir;
+	extern int pdchSysSizAdjustedMainAir;
+	extern int pdchSysSizCalcHeatFlowRatio;
+	extern int pdchSysSizUserHeatFlowRatio;
 	extern int pdstPlantSize;
 	extern int pdchPlantSizCalcVdot;
 	extern int pdchPlantSizMeasVdot;
@@ -329,6 +336,143 @@ namespace OutputReportPredefined {
 	extern int pdchPlantSizPkTimeDayOfSim;
 	extern int pdchPlantSizPkTimeHour;
 	extern int pdchPlantSizPkTimeMin;
+
+	// Coil Sizing Details
+	extern int pdrCoilSizingDetailsTable;
+	extern int pdstCoilSummaryCoilSelection;
+	extern int pdchCoilName;
+	extern int pdchCoilLocation;
+	extern int pdchCoilHVACType;
+	extern int pdchCoilHVACName;
+	extern int pdchCoilZoneName;
+	extern int pdchCoilType;
+	extern int pdchSysSizingMethCoinc;
+	extern int pdchSysSizingMethCap;
+	extern int pdchSysSizingMethAir;
+
+	extern int pdchCoilIsCapAutosized;
+	extern int pdchCoilIsAirFlowAutosized;
+	extern int pdchCoilIsWaterFlowAutosized;
+	extern int pdchCoilIsOATreated;
+
+	extern int pdchCoilFinalTotalCap;
+	extern int pdchCoilFinalSensCap;
+	extern int pdchCoilFinalAirVolFlowRate;
+	extern int pdchCoilFinalPlantVolFlowRate;
+
+	extern int pdchCoilDDnameSensIdealPeak;
+	extern int pdchCoilDateTimeSensIdealPeak;
+	extern int pdchCoilDDnameTotIdealPeak;
+	extern int pdchCoilDateTimeTotIdealPeak;
+	extern int pdchCoilDDnameAirFlowIdealPeak;
+	extern int pdchCoilDateTimeAirFlowIdealPeak;
+	extern int pdchCoilTotalCapIdealPeak;
+	extern int pdchCoilSensCapIdealPeak;
+	extern int pdchCoilOffRatingCapacityModifierIdealPeak;
+	extern int pdchCoilAirMassFlowIdealPeak;
+	extern int pdchCoilAirVolumeFlowIdealPeak;
+	extern int pdchCoilEntDryBulbIdealPeak;
+	extern int pdchCoilEntWetBulbIdealPeak;
+	extern int pdchCoilEntHumRatIdealPeak;
+	extern int pdchCoilEntEnthalpyIdealPeak;
+	extern int pdchCoilLvgDryBulbIdealPeak;
+	extern int pdchCoilLvgWetBulbIdealPeak;
+	extern int pdchCoilLvgHumRatIdealPeak;
+	extern int pdchCoilLvgEnthalpyIdealPeak;
+	extern int pdchCoilWaterMassFlowIdealPeak;
+	extern int pdchCoilEntWaterTempIdealPeak;
+	extern int pdchCoilLvgWaterTempIdealPeak;
+	extern int pdchCoilWaterDeltaTempIdealPeak;
+	extern int pdchCoilRatedTotalCap;
+	extern int pdchCoilRatedSensCap;
+	extern int pdchCoilRatedAirMass;
+	extern int pdchCoilRatedEntDryBulb;
+	extern int pdchCoilRatedEntWetBulb;
+	extern int pdchCoilRatedEntHumRat;
+	extern int pdchCoilRatedEntEnthalpy;
+	extern int pdchCoilRatedLvgDryBulb;
+	extern int pdchCoilRatedLvgWetBulb;
+	extern int pdchCoilRatedLvgHumRat;
+	extern int pdchCoilRatedLvgEnthalpy;
+
+	extern int pdchFanAssociatedWithCoilName;
+	extern int pdchFanAssociatedWithCoilType;
+	extern int pdchFanAssociatedVdotSize;
+	extern int pdchFanAssociatedMdotSize;
+
+	extern int pdchFanHeatGainIdealPeak;
+	extern int pdchCoilNetTotalCapacityIdealPeak;
+	extern int pdchCoilPlantLoopName;
+	extern int pdchPlantMassFlowMaximum;
+	extern int pdchPlantRetTempDesign;
+	extern int pdchPlantSupTempDesign;
+	extern int pdchPlantDeltaTempDesign;
+	extern int pdchPlantCapacity;
+	extern int pdchCoilCapPrcntPlantCapacity;
+	extern int pdchCoilFlowPrcntPlantFlow;
+	extern int pdchOADryBulbIdealPeak;
+	extern int pdchOAHumRatIdealPeak;
+	extern int pdchOAWetBulbatIdealPeak;
+	extern int pdchOAVolFlowIdealPeak;
+	extern int pdchOAFlowPrcntIdealPeak;
+	extern int pdchAirSysRADryBulbIdealPeak;
+	extern int pdchAirSysRAHumRatIdealPeak;
+	extern int pdchZoneAirDryBulbIdealPeak;
+	extern int pdchZoneAirHumRatIdealPeak;
+	extern int pdchZoneAirRelHumIdealPeak;
+//	extern int pdchAirSysFanHeatGain;
+	extern int pdchCoilUA;
+	extern int pdchZoneSensibleLoadIdealPeak;
+	extern int pdchZoneLatentLoadIdealPeak;
+	extern int pdchCoilIdealSizCapOverSimPeak;
+	extern int pdchCoilIdealSizCapUnderSimPeak;
+	extern int pdchReheatCoilMultiplier;
+	extern int pdchFlowCapRatioLowCapIncreaseRatio;
+	extern int pdchFlowCapRatioHiCapDecreaseRatio;
+	extern int pdchPlantFluidSpecificHeat;
+	extern int pdchPlantFluidDensity;
+	extern int pdchMoistAirSpecificHeat;
+	extern int pdchDryAirSpecificHeat;
+	extern int pdchStandRhoAir;
+
+	// Coil Sizing Summary (subset of Coil Selection Table)
+	extern int pdst2CoilSummaryCoilSelection;
+	extern int pdch2CoilName;
+	extern int pdch2CoilType;
+	extern int pdch2CoilHVACType;
+	extern int pdch2CoilHVACName;
+
+	extern int pdch2CoilFinalTotalCap;
+	extern int pdch2CoilFinalSensCap;
+	extern int pdch2CoilFinalAirVolFlowRate;
+	extern int pdch2CoilFinalPlantVolFlowRate;
+	extern int pdch2CoilUA;
+
+	extern int pdch2CoilDDnameSensIdealPeak;
+	extern int pdch2CoilDateTimeSensIdealPeak;
+	extern int pdch2CoilDDnameAirFlowIdealPeak;
+	extern int pdch2CoilDateTimeAirFlowIdealPeak;
+	extern int pdch2CoilTotalCapIdealPeak;
+	extern int pdch2CoilSensCapIdealPeak;
+	extern int pdch2CoilAirVolumeFlowIdealPeak;
+	extern int pdch2CoilEntDryBulbIdealPeak;
+	extern int pdch2CoilEntWetBulbIdealPeak;
+	extern int pdch2CoilEntHumRatIdealPeak;
+	extern int pdch2CoilLvgDryBulbIdealPeak;
+	extern int pdch2CoilLvgWetBulbIdealPeak;
+	extern int pdch2CoilLvgHumRatIdealPeak;
+	extern int pdch2CoilRatedTotalCap;
+	extern int pdch2CoilRatedSensCap;
+
+	extern int pdch2OADryBulbIdealPeak;
+	extern int pdch2OAHumRatIdealPeak;
+	extern int pdch2OAWetBulbatIdealPeak;
+	extern int pdch2OAFlowPrcntIdealPeak;
+	extern int pdch2ZoneAirDryBulbIdealPeak;
+	extern int pdch2ZoneAirHumRatIdealPeak;
+	extern int pdch2ZoneAirRelHumIdealPeak;
+	extern int pdch2ZoneSensibleLoadIdealPeak;
+	extern int pdch2ZoneLatentLoadIdealPeak;
 
 	//System summary
 	extern int pdrSystem;
@@ -531,6 +675,8 @@ namespace OutputReportPredefined {
 	extern int pdchS62svrClEv;
 	extern int pdchS62svrClVot;
 	extern int pdchS62svrClPercOA;
+	extern int pdchS62svrClEnvironmentOfPs;
+	extern int pdchS62svrClTimeOfPs;
 
 	extern int pdstS62sysVentReqHeat;
 	extern int pdchS62svrHtSumVpz;
@@ -543,6 +689,8 @@ namespace OutputReportPredefined {
 	extern int pdchS62svrHtEv;
 	extern int pdchS62svrHtVot;
 	extern int pdchS62svrHtPercOA;
+	extern int pdchS62svrHtEnvironmentOfPs;
+	extern int pdchS62svrHtTimeOfPs;
 
 	extern int pdstS62znVentPar;
 	extern int pdchS62zvpAlN;

@@ -70,10 +70,11 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
+#include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -569,14 +570,6 @@ namespace SetPointManager {
 		// Use the Get routines from the InputProcessor module.
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::GetNodeNums;
 		using DataHeatBalance::Zone;
@@ -622,8 +615,6 @@ namespace SetPointManager {
 		int ZoneNum; // loop index for zone nodes
 		int NumNodes;
 		Array1D_int NodeNums;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool NodeListError( false );
 		bool ErrInList;
 		int Found;
@@ -642,176 +633,176 @@ namespace SetPointManager {
 		ZoneNum = 0;
 
 		cCurrentModuleObject = "SetpointManager:Scheduled";
-		NumSchSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSchSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = NumNums;
 		MaxNumAlphas = NumAlphas;
 
 		cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
-		NumDualSchSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled:DualSetpoint'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumDualSchSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Scheduled:DualSetpoint'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
-		NumOutAirSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirReset'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumOutAirSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirReset'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
-		NumSZRhSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Reheat'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZRhSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Reheat'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
-		NumSZHtSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Heating'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZHtSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Heating'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
-		NumSZClSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Cooling'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZClSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Cooling'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
-		NumSZMinHumSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Minimum'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Minimum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
-		NumSZMaxHumSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Maximum'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:SingleZone:Humidity:Maximum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MixedAir";
-		NumMixedAirSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MixedAir'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMixedAirSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MixedAir'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
-		NumOAPretreatSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirPretreat'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumOAPretreatSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:OutdoorAirPretreat'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:Warmest";
-		NumWarmestSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Warmest'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumWarmestSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Warmest'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:Coldest";
-		NumColdestSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Coldest'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumColdestSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:Coldest'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
-		NumWarmestSetPtMgrsTempFlow = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:WarmestTemperatureFlow'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumWarmestSetPtMgrsTempFlow = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:WarmestTemperatureFlow'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
-		NumRABFlowSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:ReturnAirBypassFlow'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumRABFlowSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:ReturnAirBypassFlow'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
-		NumMZClgAverageSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Cooling:Average'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZClgAverageSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Cooling:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
-		NumMZHtgAverageSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Heating:Average'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZHtgAverageSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Heating:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
-		NumMZAverageMinHumSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZAverageMinHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MinimumHumidity:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
-		NumMZAverageMaxHumSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZAverageMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:MaximumHumidity:Average'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
-		NumMZMinHumSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Minimum'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZMinHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Minimum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
-		NumMZMaxHumSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Maximum'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumMZMaxHumSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:MultiZone:Humidity:Maximum'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
-		NumFollowOATempSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowOutdoorAirTemperature'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumFollowOATempSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowOutdoorAirTemperature'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
-		NumFollowSysNodeTempSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowSystemNodeTemperature'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumFollowSysNodeTempSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowSystemNodeTemperature'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
-		NumGroundTempSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowGroundTemperature'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumGroundTempSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:FollowGroundTemperature'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
-		NumCondEntSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumCondEntSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-		NumIdealCondEntSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset:Ideal'
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject ); // 'SetpointManager:CondenserEnteringReset:Ideal'
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
-		NumSZOneStageCoolingSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZOneStageCoolingSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
-		NumSZOneStageHeatingSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumSZOneStageHeatingSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:ChilledWater";
-		NumReturnWaterResetChWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumReturnWaterResetChWSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 		cCurrentModuleObject = "SetpointManager:ReturnTemperature:HotWater";
-		NumReturnWaterResetHWSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
+		NumReturnWaterResetHWSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNums );
 		MaxNumNumbers = max( MaxNumNumbers, NumNums );
 		MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
@@ -852,7 +843,7 @@ namespace SetPointManager {
 		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
 		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
-		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 		NodeNums.dimension( NumParams, 0 );
 
 		if ( NumAllSetPtMgrs > 0 ) AllSetPtMgr.allocate( NumAllSetPtMgrs ); // Allocate the entire Setpoint Manager input data array
@@ -866,35 +857,29 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:Scheduled";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SchSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SchSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SchSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			// setup program flow control integers
-			if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "HumidityRatio" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "HumidityRatio" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_HumRat;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumHumidityRatio" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumHumidityRatio" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxHumRat;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumHumidityRatio" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumHumidityRatio" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinHumRat;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MassFlowRate" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MassFlowRate" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MassFlow;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumMassFlowRate" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumMassFlowRate" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxMassFlow;
-			} else if ( SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumMassFlowRate" ) ) {
+			} else if ( UtilityRoutines::SameString( SchSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumMassFlowRate" ) ) {
 				SchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinMassFlow;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
@@ -958,18 +943,12 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DualSchSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			DualSchSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			DualSchSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( DualSchSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( DualSchSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				DualSchSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1044,22 +1023,16 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OutAirSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			OutAirSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
-			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
-			} else if ( SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( OutAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
 				OutAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1137,18 +1110,12 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZRhSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SingZoneRhSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SingZoneRhSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SingZoneRhSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( SingZoneRhSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( SingZoneRhSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				SingZoneRhSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1185,7 +1152,7 @@ namespace SetPointManager {
 			}
 
 			// get the actual zone number of the control zone
-			SingZoneRhSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
+			SingZoneRhSetPtMgr( SetPtMgrNum ).ControlZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( SingZoneRhSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -1214,18 +1181,12 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZHtSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SingZoneHtSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SingZoneHtSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SingZoneHtSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( SingZoneHtSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( SingZoneHtSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				SingZoneHtSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1262,7 +1223,7 @@ namespace SetPointManager {
 			}
 
 			// get the actual zone number of the control zone
-			SingZoneHtSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
+			SingZoneHtSetPtMgr( SetPtMgrNum ).ControlZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( SingZoneHtSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -1290,18 +1251,12 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZClSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SingZoneClSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SingZoneClSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SingZoneClSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( SingZoneClSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( SingZoneClSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				SingZoneClSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1338,7 +1293,7 @@ namespace SetPointManager {
 			}
 
 			// get the actual zone number of the control zone
-			SingZoneClSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 3 ), Zone );
+			SingZoneClSetPtMgr( SetPtMgrNum ).ControlZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Zone );
 			if ( SingZoneClSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
@@ -1366,15 +1321,9 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SZMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZMinHumSetPtMgr( SetPtMgrNum ).CtrlVarType = "MinimumHumidityRatio";
 			SZMinHumSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinHumRat;
@@ -1444,15 +1393,9 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SZMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZMaxHumSetPtMgr( SetPtMgrNum ).CtrlVarType = "MaximumHumidityRatio";
 			SZMaxHumSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxHumRat;
@@ -1523,19 +1466,12 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:MixedAir";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MixedAirSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			MixedAirSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MixedAirSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( MixedAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( MixedAirSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				MixedAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1605,20 +1541,13 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumOAPretreatSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OAPretreatSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			OAPretreatSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			OAPretreatSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			// setup program flow control integers.
-			{ auto const SELECT_CASE_var( MakeUPPERCase( OAPretreatSetPtMgr( SetPtMgrNum ).CtrlVarType ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( OAPretreatSetPtMgr( SetPtMgrNum ).CtrlVarType ) );
 
 			if ( SELECT_CASE_var == "TEMPERATURE" ) {
 				OAPretreatSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
@@ -1716,18 +1645,12 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:Warmest";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			WarmestSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			WarmestSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( WarmestSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( WarmestSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				WarmestSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1745,7 +1668,7 @@ namespace SetPointManager {
 				ShowContinueError( "..." + cNumericFieldNames( 2 ) + "=[" + RoundSigDigits( WarmestSetPtMgr( SetPtMgrNum ).MaxSetTemp, 1 ) + "] is less than " + cNumericFieldNames( 1 ) + "=[" + RoundSigDigits( WarmestSetPtMgr( SetPtMgrNum ).MinSetTemp, 1 ) + "]." );
 			}
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 4 ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 4 ) ) );
 			if ( SELECT_CASE_var == "MAXIMUMTEMPERATURE" ) {
 				WarmestSetPtMgr( SetPtMgrNum ).Strategy = MaxTemp;
 			} else {
@@ -1793,18 +1716,12 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:Coldest";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ColdestSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			ColdestSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			ColdestSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( ColdestSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( ColdestSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				ColdestSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1822,7 +1739,7 @@ namespace SetPointManager {
 				ShowContinueError( "..." + cNumericFieldNames( 2 ) + "=[" + RoundSigDigits( ColdestSetPtMgr( SetPtMgrNum ).MaxSetTemp, 1 ) + "] is less than " + cNumericFieldNames( 1 ) + "=[" + RoundSigDigits( ColdestSetPtMgr( SetPtMgrNum ).MinSetTemp, 1 ) + "]." );
 			}
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 4 ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 4 ) ) );
 			if ( SELECT_CASE_var == "MINIMUMTEMPERATURE" ) {
 				ColdestSetPtMgr( SetPtMgrNum ).Strategy = MinTemp;
 			} else {
@@ -1870,18 +1787,12 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WarmestSetPtMgrTempFlow, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			WarmestSetPtMgrTempFlow( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( WarmestSetPtMgrTempFlow( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( WarmestSetPtMgrTempFlow( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				WarmestSetPtMgrTempFlow( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -1904,7 +1815,7 @@ namespace SetPointManager {
 				ShowContinueError( "..." + cNumericFieldNames( 3 ) + "=[" + RoundSigDigits( WarmestSetPtMgrTempFlow( SetPtMgrNum ).MinTurndown, 2 ) + "] is greater than 0.8;" );
 				ShowContinueError( "...typical values for " + cNumericFieldNames( 3 ) + " are less than 0.8." );
 			}
-			{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 4 ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( cAlphaArgs( 4 ) ) );
 			if ( SELECT_CASE_var == "TEMPERATUREFIRST" ) {
 				WarmestSetPtMgrTempFlow( SetPtMgrNum ).Strategy = TempFirst;
 			} else if ( SELECT_CASE_var == "FLOWFIRST" ) {
@@ -1954,21 +1865,15 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), RABFlowSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			RABFlowSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			RABFlowSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
 			RABFlowSetPtMgr( SetPtMgrNum ).NumCtrlNodes = 1;
 			NumNodesCtrld = 1;
 
-			if ( SameString( RABFlowSetPtMgr( SetPtMgrNum ).CtrlVarType, "Flow" ) ) {
+			if ( UtilityRoutines::SameString( RABFlowSetPtMgr( SetPtMgrNum ).CtrlVarType, "Flow" ) ) {
 				RABFlowSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MassFlow;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -2013,15 +1918,9 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageCoolingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			MZAverageCoolingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
 			MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopNum = 0;
@@ -2072,15 +1971,9 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageHeatingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			MZAverageHeatingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
 			MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopNum = 0;
@@ -2131,15 +2024,9 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			MZAverageMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
 			MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopNum = 0;
@@ -2190,15 +2077,9 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZAverageMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			MZAverageMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
 			MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopNum = 0;
@@ -2249,15 +2130,9 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZMinHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			MZMinHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
 			MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopNum = 0;
@@ -2308,15 +2183,9 @@ namespace SetPointManager {
 		// Input the data for each setpoint manager
 		cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MZMaxHumSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			MZMaxHumSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName = cAlphaArgs( 2 );
 			MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopNum = 0;
@@ -2368,22 +2237,16 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumFollowOATempSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), FollowOATempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			FollowOATempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				FollowOATempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
-			} else if ( SameString( FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
 				FollowOATempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
-			} else if ( SameString( FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( FollowOATempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
 				FollowOATempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -2393,9 +2256,9 @@ namespace SetPointManager {
 				ErrorsFound = true;
 			}
 			FollowOATempSetPtMgr( SetPtMgrNum ).RefTempType = cAlphaArgs( 3 );
-			if ( SameString( FollowOATempSetPtMgr( SetPtMgrNum ).RefTempType, "OutdoorAirWetBulb" ) ) {
+			if ( UtilityRoutines::SameString( FollowOATempSetPtMgr( SetPtMgrNum ).RefTempType, "OutdoorAirWetBulb" ) ) {
 				FollowOATempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefTempType_WetBulb;
-			} else if ( SameString( FollowOATempSetPtMgr( SetPtMgrNum ).RefTempType, "OutdoorAirDryBulb" ) ) {
+			} else if ( UtilityRoutines::SameString( FollowOATempSetPtMgr( SetPtMgrNum ).RefTempType, "OutdoorAirDryBulb" ) ) {
 				FollowOATempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefTempType_DryBulb;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
@@ -2449,22 +2312,16 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumFollowSysNodeTempSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), FollowSysNodeTempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			FollowSysNodeTempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
-			} else if ( SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
 				FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
-			} else if ( SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
 				FollowSysNodeTempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -2475,9 +2332,9 @@ namespace SetPointManager {
 			}
 			FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 			FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefTempType = cAlphaArgs( 4 );
-			if ( SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefTempType, "NodeWetBulb" ) ) {
+			if ( UtilityRoutines::SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefTempType, "NodeWetBulb" ) ) {
 				FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefTempType_WetBulb;
-			} else if ( SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefTempType, "NodeDryBulb" ) ) {
+			} else if ( UtilityRoutines::SameString( FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefTempType, "NodeDryBulb" ) ) {
 				FollowSysNodeTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefTempType_DryBulb;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -2532,22 +2389,16 @@ namespace SetPointManager {
 		// Input the data for each Setpoint Manager
 		cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumGroundTempSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GroundTempSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			GroundTempSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				GroundTempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
-			} else if ( SameString( GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MaximumTemperature" ) ) {
 				GroundTempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MaxTemp;
-			} else if ( SameString( GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
+			} else if ( UtilityRoutines::SameString( GroundTempSetPtMgr( SetPtMgrNum ).CtrlVarType, "MinimumTemperature" ) ) {
 				GroundTempSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_MinTemp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -2557,7 +2408,7 @@ namespace SetPointManager {
 				ErrorsFound = true;
 			}
 			GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType = cAlphaArgs( 3 );
-			if ( SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:BuildingSurface" ) ) {
+			if ( UtilityRoutines::SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:BuildingSurface" ) ) {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_BuildingSurface;
 				if ( NoSurfaceGroundTempObjWarning ) {
 					if ( ! GroundTempObjInput ) {
@@ -2566,7 +2417,7 @@ namespace SetPointManager {
 					}
 					NoSurfaceGroundTempObjWarning = false;
 				}
-			} else if ( SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:Shallow" ) ) {
+			} else if ( UtilityRoutines::SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:Shallow" ) ) {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_Shallow;
 				if ( NoShallowGroundTempObjWarning ) {
 					if ( ! GroundTemp_SurfaceObjInput ) {
@@ -2575,7 +2426,7 @@ namespace SetPointManager {
 					}
 					NoShallowGroundTempObjWarning = false;
 				}
-			} else if ( SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:Deep" ) ) {
+			} else if ( UtilityRoutines::SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:Deep" ) ) {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_Deep;
 				if ( NoDeepGroundTempObjWarning ) {
 					if ( ! GroundTemp_DeepObjInput ) {
@@ -2584,7 +2435,7 @@ namespace SetPointManager {
 					}
 					NoDeepGroundTempObjWarning = false;
 				}
-			} else if ( SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:FCfactorMethod" ) ) {
+			} else if ( UtilityRoutines::SameString( GroundTempSetPtMgr( SetPtMgrNum ).RefGroundTempObjType, "Site:GroundTemperature:FCfactorMethod" ) ) {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_FCfactorMethod;
 				if ( NoFCGroundTempObjWarning ) {
 					if ( ! FCGroundTemps ) {
@@ -2653,18 +2504,12 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CondEntSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			CondEntSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			CondEntSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( CondEntSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( CondEntSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				CondEntSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				// should not come here if idd type choice and key list is working
@@ -2724,18 +2569,12 @@ namespace SetPointManager {
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
 
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IdealCondEntSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			IdealCondEntSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			IdealCondEntSetPtMgr( SetPtMgrNum ).CtrlVarType = cAlphaArgs( 2 );
-			if ( SameString( IdealCondEntSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
+			if ( UtilityRoutines::SameString( IdealCondEntSetPtMgr( SetPtMgrNum ).CtrlVarType, "Temperature" ) ) {
 				IdealCondEntSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
 			} else {
 				ShowSevereError( " found invalid control type of " + cAlphaArgs( 2 ) + " in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
@@ -2779,15 +2618,9 @@ namespace SetPointManager {
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZOneStageCoolingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).CtrlVarType = "Temperature";
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
@@ -2803,7 +2636,7 @@ namespace SetPointManager {
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneName = cAlphaArgs( 2 );
 			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ZoneNodeNum = GetSystemNodeNumberForZone( cAlphaArgs( 2 ) );
 			// get the actual zone number of the control zone
-			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( SZOneStageCoolingSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -2851,15 +2684,9 @@ namespace SetPointManager {
 
 		cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum ) {
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SZOneStageHeatingSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).CtrlVarType = "Temperature";
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).CtrlTypeMode = iCtrlVarType_Temp;
@@ -2875,7 +2702,7 @@ namespace SetPointManager {
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneName = cAlphaArgs( 2 );
 			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ZoneNodeNum = GetSystemNodeNumberForZone( cAlphaArgs( 2 ) );
 			// get the actual zone number of the control zone
-			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( SZOneStageHeatingSetPtMgr( SetPtMgrNum ).ControlZoneNum == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 				ShowContinueError( "..invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -2924,16 +2751,9 @@ namespace SetPointManager {
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			// set up the name
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ReturnWaterResetChWSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 
 			// process the sense and actuate nodes
@@ -2947,16 +2767,16 @@ namespace SetPointManager {
 
 			// process the return temperature type/value
 			std::string returnType( cAlphaArgs( 4 ) );
-			if ( SameString( returnType, "SCHEDULED" ) ) {
+			if ( UtilityRoutines::SameString( returnType, "SCHEDULED" ) ) {
 				ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).returnTemperatureScheduleIndex = GetScheduleIndex( cAlphaArgs( 5 ) );
 				if ( ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).returnTemperatureScheduleIndex == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 					ShowContinueError( "..invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( returnType, "CONSTANT" ) ) {
+			} else if ( UtilityRoutines::SameString( returnType, "CONSTANT" ) ) {
 				ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).returnTemperatureConstantTarget = rNumericArgs( 3 );
-			} else if ( SameString( returnType, "RETURNTEMPERATURESETPOINT" ) ) {
+			} else if ( UtilityRoutines::SameString( returnType, "RETURNTEMPERATURESETPOINT" ) ) {
 				ReturnWaterResetChWSetPtMgr( SetPtMgrNum ).useReturnTempSetpoint = true;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
@@ -2981,16 +2801,9 @@ namespace SetPointManager {
 		for ( SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum ) {
 
 			// get the object inputs
-			GetObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			// set up the name
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ReturnWaterResetHWSetPtMgr, SetPtMgrNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).Name = cAlphaArgs( 1 );
 
 			// process the sense and actuate nodes
@@ -3004,16 +2817,16 @@ namespace SetPointManager {
 
 			// process the return temperature type/value
 			std::string returnType( cAlphaArgs( 4 ) );
-			if ( SameString( returnType, "SCHEDULED" ) ) {
+			if ( UtilityRoutines::SameString( returnType, "SCHEDULED" ) ) {
 				ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).returnTemperatureScheduleIndex = GetScheduleIndex( cAlphaArgs( 5 ) );
 				if ( ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).returnTemperatureScheduleIndex == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
 					ShowContinueError( "..invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( returnType, "CONSTANT" ) ) {
+			} else if ( UtilityRoutines::SameString( returnType, "CONSTANT" ) ) {
 				ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).returnTemperatureConstantTarget = rNumericArgs( 3 );
-			} else if ( SameString( returnType, "RETURNTEMPERATURESETPOINT" ) ) {
+			} else if ( UtilityRoutines::SameString( returnType, "RETURNTEMPERATURESETPOINT" ) ) {
 				ReturnWaterResetHWSetPtMgr( SetPtMgrNum ).useReturnTempSetpoint = true;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid field." );
@@ -3071,20 +2884,6 @@ namespace SetPointManager {
 		// Then check SPM 2 nodes with SPM 3. Check E with I-L, F with I-L, etc.
 		// 3) For SET POINT MANAGER:RETURN AIR BYPASS FLOW
 		//    check for duplicate air loop names.
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -3220,39 +3019,21 @@ namespace SetPointManager {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneControls::HumidityControlZone;
 		using DataZoneControls::NumHumidityControlZones;
-		using InputProcessor::FindItemInList;
 		using DataAirSystems::PrimaryAirSystem;
 		using DataHeatBalance::Zone;
 		using DataHVACGlobals::NumPlantLoops;
 		using DataHVACGlobals::NumCondLoops;
 		using namespace DataPlant;
-		using InputProcessor::SameString;
 		using DataEnvironment::GroundTemp_Deep;
 		using DataEnvironment::GroundTemp;
 		using DataEnvironment::GroundTemp_Surface;
 		using DataEnvironment::GroundTempFC;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// NA
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -3417,7 +3198,7 @@ namespace SetPointManager {
 									}
 									if ( LookForFan ) {
 										//cpw22Aug2010 Add Fan:ComponentModel (new)
-										if ( SameString( CompType, "Fan:ConstantVolume" ) || SameString( CompType, "Fan:VariableVolume" ) || SameString( CompType, "Fan:OnOff" ) || SameString( CompType, "Fan:ComponentModel" ) ) {
+										if ( UtilityRoutines::SameString( CompType, "Fan:ConstantVolume" ) || UtilityRoutines::SameString( CompType, "Fan:VariableVolume" ) || UtilityRoutines::SameString( CompType, "Fan:OnOff" ) || UtilityRoutines::SameString( CompType, "Fan:ComponentModel" ) ) {
 											FanNodeIn = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
 											FanNodeOut = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
 											break;
@@ -3430,7 +3211,7 @@ namespace SetPointManager {
 								for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 									CompType = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf;
 									//cpw22Aug2010 Add Fan:ComponentModel (new)
-									if ( SameString( CompType, "Fan:ConstantVolume" ) || SameString( CompType, "Fan:VariableVolume" ) || SameString( CompType, "Fan:OnOff" ) || SameString( CompType, "Fan:ComponentModel" ) ) {
+									if ( UtilityRoutines::SameString( CompType, "Fan:ConstantVolume" ) || UtilityRoutines::SameString( CompType, "Fan:VariableVolume" ) || UtilityRoutines::SameString( CompType, "Fan:OnOff" ) || UtilityRoutines::SameString( CompType, "Fan:ComponentModel" ) ) {
 										FanNodeIn = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
 										FanNodeOut = PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
 									}
@@ -3453,7 +3234,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_Warmest );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( WarmestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( WarmestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + WarmestSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + WarmestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3477,7 +3258,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_Coldest );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( ColdestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( ColdestSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + ColdestSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + ColdestSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3503,7 +3284,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_WarmestTempFlow );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + WarmestSetPtMgrTempFlow( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3528,7 +3309,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_RAB );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( RABFlowSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( RABFlowSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						AllSetPtMgr( RABFlowSetPtMgr( SetPtMgrNum ).AllSetPtMgrIndex ).AirLoopNum = AirLoopNum;
 						AllSetPtMgr( RABFlowSetPtMgr( SetPtMgrNum ).AllSetPtMgrIndex ).AirLoopName = RABFlowSetPtMgr( SetPtMgrNum ).AirLoopName;
 						if ( AirLoopNum == 0 ) {
@@ -3562,7 +3343,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZCoolingAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageCoolingSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageCoolingSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3586,7 +3367,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZHeatingAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageHeatingSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageHeatingSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3612,7 +3393,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMinHumAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageMinHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageMinHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3645,7 +3426,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMaxHumAverage );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZAverageMaxHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZAverageMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3678,7 +3459,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMinHum );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZMinHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZMinHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -3711,7 +3492,7 @@ namespace SetPointManager {
 				cSetPointManagerType = cValidSPMTypes( iSPMType_MZMaxHum );
 				for ( SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum ) {
 					if ( NumPrimaryAirSys > 0 ) {
-						AirLoopNum = FindItemInList( MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
+						AirLoopNum = UtilityRoutines::FindItemInList( MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName );
 						if ( AirLoopNum == 0 ) {
 							ShowSevereError( cSetPointManagerType + "=\"" + MZMaxHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid Air Loop specified:" );
 							ShowContinueError( "Air Loop not found =\"" + MZMaxHumSetPtMgr( SetPtMgrNum ).AirLoopName + "\"." );
@@ -5640,7 +5421,7 @@ namespace SetPointManager {
 				SetPointTemp = max( SetPointTemp, ZoneSetPointTemp );
 			}
 		} else {
-			// single-duct or central heated and cooled zones 
+			// single-duct or central heated and cooled zones
 			for ( ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled; ++ZonesHeatedIndex ) {
 				CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedIndex );
 				ZoneInletNode = AirToZoneNodeInfo( AirLoopNum ).CoolZoneInletNodes( ZonesHeatedIndex );
@@ -7004,7 +6785,7 @@ namespace SetPointManager {
 					this->plantSetpointNodeIndex = DataPlant::PlantLoop( plantIndex ).TempSetPointNodeNum;
 					fluidIndex = DataPlant::PlantLoop( plantIndex ).FluidIndex;
 					// now that we've found the plant populated, let's verify that the nodes match
-					if ( ! DataPlant::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
+					if ( ! PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
 						ShowSevereError( "Node problem for SetpointManager:ReturnTemperature:ChilledWater." );
 						ShowContinueError( "Return and Supply nodes were not found on the same plant loop.  Verify node names." );
 						ShowFatalError( "Simulation aborts due to setpoint node problem" );
@@ -7110,7 +6891,7 @@ namespace SetPointManager {
 					this->plantSetpointNodeIndex = DataPlant::PlantLoop( plantIndex ).TempSetPointNodeNum;
 					fluidIndex = DataPlant::PlantLoop( plantIndex ).FluidIndex;
 					// now that we've found the plant populated, let's verify that the nodes match
-					if ( ! DataPlant::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
+					if ( ! PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( this->supplyNodeIndex, this->returnNodeIndex ) ) {
 						ShowSevereError( "Node problem for SetpointManager:ReturnTemperature:HotWater." );
 						ShowContinueError( "Return and Supply nodes were not found on the same plant loop.  Verify node names." );
 						ShowFatalError( "Simulation aborts due to setpoint node problem" );
@@ -8077,35 +7858,15 @@ namespace SetPointManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Determine if ideal condenser entering set point manager is used in model and set flag
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
 		using DataGlobals::AnyIdealCondEntSetPointInModel;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		std::string cCurrentModuleObject;
 
 		cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
-		NumIdealCondEntSetPtMgrs = GetNumObjectsFound( cCurrentModuleObject );
+		NumIdealCondEntSetPtMgrs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumIdealCondEntSetPtMgrs > 0 ) {
 			AnyIdealCondEntSetPointInModel = true;

@@ -156,7 +156,7 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest )
 
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	ErrorsFound = false;
 	GetProjectControlData( ErrorsFound ); // read project control data

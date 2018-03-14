@@ -2310,7 +2310,7 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    HW Loop Temp Schedule,   !- Schedule Name",
 		"    Hot Water Loop Setpoint Node List;  !- Setpoint Node or NodeList Name",
 		} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized

@@ -102,7 +102,7 @@ namespace EnergyPlus {
 			m_varUnits(OutputProcessor::Unit::None),
 			m_typeOfVar(0),
 			m_keyCount(0),
-			m_varAvgSum(0),
+			m_varAvgSum(OutputProcessor::StoreType::Averaged),
 			m_bottomBinValue( 0 ),
 			m_topBinValue( 0 )
 		{}
@@ -124,7 +124,7 @@ namespace EnergyPlus {
 		};
 
 		int
-		getVariableKeyCountandTypeFromFldSt( int &typeVar, int &avgSumVar, int &stepTypeVar, OutputProcessor::Unit &unitsVar );
+		getVariableKeyCountandTypeFromFldSt( int &typeVar, OutputProcessor::StoreType &avgSumVar, int &stepTypeVar, OutputProcessor::Unit &unitsVar );
 
 		void
 		getVariableKeysFromFldSt( int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int>  &indexesForKeyVar );
@@ -136,7 +136,7 @@ namespace EnergyPlus {
 		OutputProcessor::Unit m_varUnits; // Units sting, may be blank
 		int m_typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int m_keyCount; 
-		int m_varAvgSum; // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType m_varAvgSum; // Variable  is Averaged=1 or Summed=2
 		int m_varStepType; // Variable time step is Zone=1 or HVAC=2
 		std::vector <std::string> m_namesOfKeys; // stored version of name of keys from getVariableKeys
 		std::vector <int> m_indexesForKeyVar; // stored version of name of keys from getVariableKeys

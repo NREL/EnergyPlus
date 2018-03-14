@@ -60,7 +60,8 @@
 #include <DataSizing.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -128,12 +129,14 @@ namespace HeatPumpWaterToWaterSimple {
 	// Object Data
 	Array1D< GshpSpecs > GSHP;
 	Array1D< ReportVars > GSHPReport;
+	std::unordered_map< std::string, std::string > HeatPumpWaterUniqueNames;
 
 	void
 	clear_state(){
 		NumGSHPs = 0;
 		GetInputFlag = true;
 		InitWatertoWaterHPOneTimeFlag = true;
+		HeatPumpWaterUniqueNames.clear();
 		GSHP.deallocate();
 		GSHPReport.deallocate();
 	}
@@ -172,7 +175,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		int GSHPNum( 0 );
 		if ( CompIndex == 0 ) {
-			GSHPNum = InputProcessor::FindItemInList( GSHPName, GSHP );
+			GSHPNum = UtilityRoutines::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterSimple: Specified heat pump not one of valid heat pumps. Heat pump = " + GSHPName );
 			}
@@ -269,33 +272,13 @@ namespace HeatPumpWaterToWaterSimple {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Obtain input from IDF and store them in data structures
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
-		using DataPlant::ScanPlantLoopsForObject;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
+		using PlantUtilities::ScanPlantLoopsForObject;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GSHPNum; // GSHP number
@@ -307,12 +290,10 @@ namespace HeatPumpWaterToWaterSimple {
 		int IOStat; // IO Status when calling get input subroutine
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
-		NumCoolCoil = GetNumObjectsFound( HPEqFitCoolingUC );
-		NumHeatCoil = GetNumObjectsFound( HPEqFitHeatingUC );
+		NumCoolCoil = inputProcessor->getNumObjectsFound( HPEqFitCoolingUC );
+		NumHeatCoil = inputProcessor->getNumObjectsFound( HPEqFitHeatingUC );
 		NumGSHPs = NumCoolCoil + NumHeatCoil;
 
 		if ( NumGSHPs <= 0 ) {
@@ -322,6 +303,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		if ( NumGSHPs > 0 ) {
 			GSHP.allocate( NumGSHPs );
+			HeatPumpWaterUniqueNames.reserve( NumGSHPs );
 			GSHPReport.allocate( NumGSHPs );
 			// initialize the data structures
 		}
@@ -331,15 +313,8 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = HPNum;
 
-			GetObjectItem( HPEqFitCoolingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks,DataIPShortCuts::lAlphaFieldBlanks );
-			IsNotOK = false;
-			IsBlank = true;
-			VerifyName( DataIPShortCuts::cAlphaArgs( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) DataIPShortCuts::cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( HPEqFitCoolingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat,DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs( 1 ), HPEqFitCoolingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFCooling;
 			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowCool = DataIPShortCuts::rNumericArgs( 1 );
@@ -373,9 +348,9 @@ namespace HeatPumpWaterToWaterSimple {
 				if ( ! DataIPShortCuts::lNumericFieldBlanks( 15 ) ) {
 					GSHP( GSHPNum ).refCOP = DataIPShortCuts::rNumericArgs( 15 );
 				} else {
-					GSHP( GSHPNum ).refCOP = 8.0; 
+					GSHP( GSHPNum ).refCOP = 8.0;
 				}
-			
+
 			} else {
 				GSHP( GSHPNum ).refCOP = 8.0;
 			}
@@ -422,15 +397,8 @@ namespace HeatPumpWaterToWaterSimple {
 
 			GSHPNum = NumCoolCoil + HPNum;
 
-			GetObjectItem( HPEqFitHeatingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
-			IsNotOK = false;
-			IsBlank = true;
-			VerifyName( DataIPShortCuts::cAlphaArgs( 1 ), GSHP, HPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) DataIPShortCuts::cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( HPEqFitHeatingUC, HPNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, DataIPShortCuts::lNumericFieldBlanks, DataIPShortCuts::lAlphaFieldBlanks );
+			GlobalNames::VerifyUniqueInterObjectName( HeatPumpWaterUniqueNames, DataIPShortCuts::cAlphaArgs( 1 ), HPEqFitHeatingUC, ErrorsFound );
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterEFHeating;
 			GSHP( GSHPNum ).Name = DataIPShortCuts::cAlphaArgs( 1 );
 			GSHP( GSHPNum ).RatedLoadVolFlowHeat = DataIPShortCuts::rNumericArgs( 1 );
@@ -465,9 +433,9 @@ namespace HeatPumpWaterToWaterSimple {
 				if ( ! DataIPShortCuts::lNumericFieldBlanks( 15 ) ) {
 					GSHP( GSHPNum ).refCOP = DataIPShortCuts::rNumericArgs( 15 );
 				} else {
-					GSHP( GSHPNum ).refCOP = 7.5; 
+					GSHP( GSHPNum ).refCOP = 7.5;
 				}
-			
+
 			} else {
 				GSHP( GSHPNum ).refCOP = 7.5;
 			}
@@ -513,7 +481,7 @@ namespace HeatPumpWaterToWaterSimple {
 		//now process companion coils, if any
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			if ( ! GSHP( GSHPNum ).companionName.empty() ) {
-				GSHP( GSHPNum ).companionIndex = InputProcessor::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
+				GSHP( GSHPNum ).companionIndex = UtilityRoutines::FindItemInList( GSHP( GSHPNum ).companionName, GSHP );
 				if ( GSHP( GSHPNum ).companionIndex == 0 ) {
 					ShowSevereError( "GetEquationFitWaterToWater Input: did not find companion heat pump named '" + GSHP( GSHPNum ).companionName + "' in heat pump called " + GSHP( GSHPNum ).Name );
 					ErrorsFound =  true;
@@ -592,7 +560,6 @@ namespace HeatPumpWaterToWaterSimple {
 		using DataPlant::TypeOf_HPWaterEFCooling;
 		using DataPlant::TypeOf_HPWaterEFHeating;
 		using DataPlant::PlantLoop;
-		using InputProcessor::SameString;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -777,7 +744,7 @@ namespace HeatPumpWaterToWaterSimple {
 				//now compare to companion coil and take higher
 				if ( GSHP( GSHPNum ).companionIdentified ) {
 					tmpLoadSideVolFlowRate = max ( tmpLoadSideVolFlowRate,GSHP( GSHPNum ).RatedLoadVolFlowHeat );
-					//store flow rate right away regardless of PlantFirstSizesOkayToFinalize so that data are available 
+					//store flow rate right away regardless of PlantFirstSizesOkayToFinalize so that data are available
 					GSHP( GSHPNum ).RatedLoadVolFlowCool = tmpLoadSideVolFlowRate;
 				}
 				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
@@ -788,7 +755,7 @@ namespace HeatPumpWaterToWaterSimple {
 				Real64 rho = FluidProperties::GetDensityGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				Real64 Cp = FluidProperties::GetSpecificHeatGlycol( DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, DataGlobals::CWInitConvTemp, DataPlant::PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 				tmpCoolingCap = Cp * rho * DataSizing::PlantSizData( pltLoadSizNum ).DeltaT * tmpLoadSideVolFlowRate;
-			} else { 
+			} else {
 				if ( GSHP( GSHPNum ).ratedCapCoolWasAutoSized ) tmpCoolingCap = 0.0;
 				if ( GSHP( GSHPNum ).ratedLoadVolFlowCoolWasAutoSized ) tmpLoadSideVolFlowRate = 0.0;
 			}
@@ -810,7 +777,7 @@ namespace HeatPumpWaterToWaterSimple {
 							} else {
 								ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name,"User-Specified Nominal Capacity [W]", nomCoolingCapUser );
 							}
-							
+
 							if ( DataGlobals::DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCoolingCap - nomCoolingCapUser ) / nomCoolingCapUser ) > DataSizing::AutoVsHardSizingThreshold ) {
 									ShowMessage( "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + GSHP( GSHPNum ).Name );
@@ -861,7 +828,7 @@ namespace HeatPumpWaterToWaterSimple {
 				if ( GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized && GSHP( GSHPNum ).RatedLoadVolFlowHeat > 0.0 ) {
 					//fill load side flow rate size from companion coil
 					tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowHeat;
-					if ( DataPlant::PlantFirstSizesOkayToFinalize ) { 
+					if ( DataPlant::PlantFirstSizesOkayToFinalize ) {
 						GSHP( GSHPNum ).RatedLoadVolFlowCool = tmpLoadSideVolFlowRate;
 						if ( DataPlant::PlantFinalSizesOkayToReport ) {
 							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate );
@@ -873,7 +840,7 @@ namespace HeatPumpWaterToWaterSimple {
 				}
 				if ( GSHP( GSHPNum ).ratedCapHeatWasAutoSized && GSHP( GSHPNum ).RatedCapHeat > 0.0 ) {
 					tmpCoolingCap = GSHP( GSHPNum ).RatedCapHeat;
-					if ( DataPlant::PlantFirstSizesOkayToFinalize ) { 
+					if ( DataPlant::PlantFirstSizesOkayToFinalize ) {
 						GSHP( GSHPNum ).RatedCapCool = tmpCoolingCap;
 						if ( DataPlant::PlantFinalSizesOkayToReport ) {
 							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Nominal Capacity [W]", tmpCoolingCap );
@@ -910,7 +877,7 @@ namespace HeatPumpWaterToWaterSimple {
 
 		if ( GSHP( GSHPNum ).ratedSourceVolFlowCoolWasAutoSized ) {
 			GSHP( GSHPNum ).RatedSourceVolFlowCool = tmpSourceSideVolFlowRate;
-			if ( DataPlant::PlantFinalSizesOkayToReport ) { 
+			if ( DataPlant::PlantFinalSizesOkayToReport ) {
 				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Cooling",GSHP( GSHPNum ).Name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
 			}
 			if ( DataPlant::PlantFirstSizesOkayToReport ) {
@@ -1101,7 +1068,7 @@ namespace HeatPumpWaterToWaterSimple {
 				if ( GSHP( GSHPNum ).ratedLoadVolFlowHeatWasAutoSized && GSHP( GSHPNum ).RatedLoadVolFlowCool > 0.0 ) {
 					//fill load side flow rate size from companion coil
 					tmpLoadSideVolFlowRate = GSHP( GSHPNum ).RatedLoadVolFlowCool;
-					if ( DataPlant::PlantFirstSizesOkayToFinalize ) { 
+					if ( DataPlant::PlantFirstSizesOkayToFinalize ) {
 						GSHP( GSHPNum ).RatedLoadVolFlowHeat = tmpLoadSideVolFlowRate;
 						if ( DataPlant::PlantFinalSizesOkayToReport ) {
 							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadSideVolFlowRate );
@@ -1114,7 +1081,7 @@ namespace HeatPumpWaterToWaterSimple {
 				}
 				if ( GSHP( GSHPNum ).ratedCapHeatWasAutoSized && GSHP( GSHPNum ).RatedCapCool > 0.0 ) {
 					tmpHeatingCap = GSHP( GSHPNum ).RatedCapCool;
-					if ( DataPlant::PlantFirstSizesOkayToFinalize ) { 
+					if ( DataPlant::PlantFirstSizesOkayToFinalize ) {
 						GSHP( GSHPNum ).RatedCapHeat = tmpHeatingCap;
 						if ( DataPlant::PlantFinalSizesOkayToReport ) {
 							ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Nominal Capacity [W]", tmpHeatingCap );
@@ -1151,7 +1118,7 @@ namespace HeatPumpWaterToWaterSimple {
 		}
 		if ( GSHP( GSHPNum ).ratedSourceVolFlowHeatWasAutoSized ) {
 			GSHP( GSHPNum ).RatedSourceVolFlowHeat = tmpSourceSideVolFlowRate;
-			if ( DataPlant::PlantFinalSizesOkayToReport ) { 
+			if ( DataPlant::PlantFinalSizesOkayToReport ) {
 				ReportSizingManager::ReportSizingOutput( "HeatPump:WaterToWater:EquationFit:Heating",GSHP( GSHPNum ).Name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceSideVolFlowRate );
 			}
 			if ( DataPlant::PlantFirstSizesOkayToReport ) {

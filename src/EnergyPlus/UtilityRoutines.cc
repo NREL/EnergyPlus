@@ -59,6 +59,8 @@ extern "C" {
 // ObjexxFCL Headers
 #include <ObjexxFCL/char.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
+// #include <ObjexxFCL/Array1.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -83,7 +85,7 @@ extern "C" {
 #include <GeneralRoutines.hh>
 #include <NodeInputManager.hh>
 #include <OutputReports.hh>
-#include <PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <SimulationManager.hh>
 #include <SolarShading.hh>
 #include <SQLiteProcedures.hh>
@@ -94,6 +96,376 @@ namespace EnergyPlus {
 
 namespace UtilityRoutines {
 	bool outputErrorHeader( true );
+	gio::Fmt fmtLD( "*" );
+	gio::Fmt fmtA( "(A)" );
+
+	Real64
+	ProcessNumber(
+		std::string const & String,
+		bool & ErrorFlag
+	) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function processes a string that should be numeric and
+		// returns the real value of the string.
+
+		// METHODOLOGY EMPLOYED:
+		// FUNCTION ProcessNumber translates the argument (a string)
+		// into a real number.  The string should consist of all
+		// numeric characters (except a decimal point).  Numerics
+		// with exponentiation (i.e. 1.2345E+03) are allowed but if
+		// it is not a valid number an error message along with the
+		// string causing the error is printed out and 0.0 is returned
+		// as the value.
+
+		// REFERENCES:
+		// List directed Fortran input/output.
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const ValidNumerics( "0123456789.+-EeDd" );
+
+		Real64 rProcessNumber = 0.0;
+		//  Make sure the string has all what we think numerics should have
+		std::string const PString( stripped( String ) );
+		std::string::size_type const StringLen( PString.length() );
+		ErrorFlag = false;
+		if ( StringLen == 0 ) return rProcessNumber;
+		int IoStatus( 0 );
+		if ( PString.find_first_not_of( ValidNumerics ) == std::string::npos ) {
+			{
+				IOFlags flags;
+				gio::read( PString, fmtLD, flags ) >> rProcessNumber;
+				IoStatus = flags.ios();
+			}
+			ErrorFlag = false;
+		} else {
+			rProcessNumber = 0.0;
+			ErrorFlag = true;
+		}
+		if ( IoStatus != 0 ) {
+			rProcessNumber = 0.0;
+			ErrorFlag = true;
+		}
+
+		return rProcessNumber;
+
+	}
+
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1_string const & ListOfItems,
+		int const NumItems
+	) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is not case insensitive and doesn't need
+		// for most inputs -- they are automatically turned to UPPERCASE.
+		// If you need case insensitivity use FindItem.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( String == ListOfItems( Count ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+	int
+	FindItemInList(
+		std::string const & String,
+		Array1S_string const ListOfItems,
+		int const NumItems
+	) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is not case insensitive and doesn't need
+		// for most inputs -- they are automatically turned to UPPERCASE.
+		// If you need case insensitivity use FindItem.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( String == ListOfItems( Count ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+
+	int
+	FindItemInSortedList(
+		std::string const & String,
+		Array1S_string const ListOfItems,
+		int const NumItems
+	) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is case insensitive.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		int Probe( 0 );
+		int LBnd( 0 );
+		int UBnd( NumItems + 1 );
+		bool Found( false );
+		while ( ( !Found ) || ( Probe != 0 ) ) {
+			Probe = ( UBnd - LBnd ) / 2;
+			if ( Probe == 0 ) break;
+			Probe += LBnd;
+			if ( equali( String, ListOfItems( Probe ) ) ) {
+				Found = true;
+				break;
+			} else if ( lessthani( String, ListOfItems( Probe ) ) ) {
+				UBnd = Probe;
+			} else {
+				LBnd = Probe;
+			}
+		}
+		return Probe;
+	}
+
+	int
+	FindItem(
+		std::string const & String,
+		Array1D_string const & ListOfItems,
+		int const NumItems
+	) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   April 1999
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is case insensitive.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		int FindItem = UtilityRoutines::FindItemInList( String, ListOfItems, NumItems );
+		if ( FindItem != 0 ) return FindItem;
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( equali( String, ListOfItems( Count ) ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+	int
+	FindItem(
+		std::string const & String,
+		Array1S_string const ListOfItems,
+		int const NumItems
+	) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   April 1999
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function looks up a string in a similar list of
+		// items and returns the index of the item in the list, if
+		// found.  This routine is case insensitive.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		int FindItem = UtilityRoutines::FindItemInList( String, ListOfItems, NumItems );
+		if ( FindItem != 0 ) return FindItem;
+
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( equali( String, ListOfItems( Count ) ) ) return Count;
+		}
+		return 0; // Not found
+	}
+
+	std::string
+	MakeUPPERCase( std::string const & InputString ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This function returns the Upper Case representation of the InputString.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses the Intrinsic SCAN function to scan the lowercase representation of
+		// characters (DataStringGlobals) for each character in the given string.
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+		std::string ResultString( InputString );
+
+		for ( std::string::size_type i = 0, e = len( InputString ); i < e; ++i ) {
+			int const curCharVal = int( InputString[ i ] );
+			if ( ( 97 <= curCharVal && curCharVal <= 122 ) ||
+				 ( 224 <= curCharVal && curCharVal <= 255 ) ) { // lowercase ASCII and accented characters
+				ResultString[ i ] = char( curCharVal - 32 );
+			}
+		}
+
+		return ResultString;
+
+	}
+
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Array1D_string const & NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   February 2000
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine verifys that a new name can be added to the
+		// list of names for this item (i.e., that there isn't one of that
+		// name already and that this name is not blank).
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Found;
+
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames );
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
+
+	}
+
+	void
+	VerifyName(
+		std::string const & NameToVerify,
+		Array1S_string const NamesList,
+		int const NumOfNames,
+		bool & ErrorFound,
+		bool & IsBlank,
+		std::string const & StringToDisplay
+	) {
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   February 2000
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine verifys that a new name can be added to the
+		// list of names for this item (i.e., that there isn't one of that
+		// name already and that this name is not blank).
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Found;
+
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames );
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
+
+	}
+
+	bool
+	IsNameEmpty(
+		std::string & NameToVerify,
+		std::string const & StringToDisplay,
+		bool & ErrorFound
+	){
+		if ( NameToVerify.empty() ) {
+			ShowSevereError(StringToDisplay + " Name, cannot be blank");
+			ErrorFound = true;
+			NameToVerify = "xxxxx";
+			return true;
+		}
+		return false;
+	}
+
+	std::string
+	IPTrimSigDigits( int const IntegerValue ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   March 2002
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function accepts a number as parameter as well as the number of
+		// significant digits after the decimal point to report and returns a string
+		// that is appropriate.
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		std::string String; // Working string
+
+		gio::write( String, fmtLD ) << IntegerValue;
+		return stripped( String );
+
+	}
 }
 
 void

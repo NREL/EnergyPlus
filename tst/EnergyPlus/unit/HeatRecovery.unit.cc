@@ -476,7 +476,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 			"   AHU OA Controller;         !- Controller 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetReturnAirPathInput();
 		GetAirPathData();
@@ -520,7 +520,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    -6.00,                   !- Time Zone {hr}",
 		"    190.00;                  !- Elevation {m}",
 
-		"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C",
+		"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C",
 		"SizingPeriod:DesignDay,",
 		"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
 		"    7,                       !- Month",
@@ -550,7 +550,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    1.0;                     !- Sky Clearness",
 
 
-		"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C",
+		"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C",
 		"SizingPeriod:DesignDay,",
 		"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 		"    1,                       !- Month",
@@ -3791,7 +3791,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 ); //
 	ManageSimulation(); // run the design day
@@ -3812,7 +3812,7 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 }
 
 TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
-	
+
 	int ExchNum( 1 );
 	int BalDesDehumPerfDataIndex( 1 );
 	Real64 FaceVelocity;
@@ -3822,7 +3822,7 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 	DataSizing::NumSysSizInput = 1;
 	DataSizing::SysSizInput.allocate( NumSysSizInput );
 	DataSizing::CurSysNum = 1; // primary air system
-	DataSizing::CurOASysNum = 0; // no OA system 
+	DataSizing::CurOASysNum = 0; // no OA system
 	DataSizing::CurZoneEqNum = 0; // size it based on system
 	DataSizing::SysSizInput( CurSysNum ).AirLoopNum = 1;
 
@@ -3856,7 +3856,7 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 
 	// calc heat recovery sizing
 	SizeHeatRecovery( ExchNum );
-	
+
 	// test autosized nominal vol flow rate
 	EXPECT_EQ( 1.0, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomSupAirVolFlow ); // m3/s
 
@@ -3899,7 +3899,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// get heat recovery heat exchanger generic
 	GetHeatRecoveryInput();
@@ -3914,7 +3914,7 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 	ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent = true;
 	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 1.0;
 
-	// size the HX nominal supply air volume flow rate 
+	// size the HX nominal supply air volume flow rate
 	SizeHeatRecovery( ExchNum );
 
 	// verify the name and autosized supply air flow rate

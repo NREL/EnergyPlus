@@ -2811,7 +2811,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
@@ -3752,16 +3752,23 @@ namespace EnergyPlus {
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
 			"    SequentialLoad,          !- Load Distribution Scheme",
-			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    Main Zone Direct Air ADU,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
 			"    1;                        !- Zone Equipment 1 Heating or No-Load Sequence",
 
-			"  AirTerminal:SingleDuct:Uncontrolled,",
-			"    Main Zone Direct Air,     !- Name",
-			"    Constant,                 !- Availability Schedule Name",
-			"    Main Zone In Node,        !- Zone Supply Air Node Name",
-			"    autosize;                 !- Maximum Air Flow Rate {m3/s}",
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    Main Zone Direct Air ADU, !- Name",
+			"    Main Zone In Node,       !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+			"    Main Zone Direct Air;    !- Air Terminal Name",
+
+			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+			"    Main Zone Direct Air,    !- Name",
+			"    Constant,                !- Availability Schedule Name",
+			"    Main Zone In Node 2AT,   !- Air Inlet Node Name",
+			"    Main Zone In Node,       !- Air Outlet Node Name",
+			"    autosize;                !- Maximum Air Flow Rate {m3/s}",
 
 			"  CoilSystem:Cooling:DX,",
 			"    Desiccant DXSystem Cooling Coil Sys,  !- Name",
@@ -3827,7 +3834,7 @@ namespace EnergyPlus {
 			"  AirLoopHVAC:ZoneSplitter,",
 			"    Desiccant DXSystem Zone Supply Air Splitter,  !- Name",
 			"    Desiccant DXSystem Zone Equipment Inlet Node,  !- Inlet Node Name",
-			"    Main Zone In Node;        !- Outlet 1 Node Name",
+			"    Main Zone In Node 2AT;      !- Outlet 1 Node Name",
 
 			"  AirLoopHVAC:ZoneMixer,",
 			"    Desiccant DXSystem Zone Return Air Mixer,  !- Name",
@@ -3983,7 +3990,7 @@ namespace EnergyPlus {
 			"    100.0;                   !- Maximum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
@@ -4923,16 +4930,23 @@ namespace EnergyPlus {
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
 			"    SequentialLoad,          !- Load Distribution Scheme",
-			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    Main Zone Direct Air ADU,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
 			"    1;                        !- Zone Equipment 1 Heating or No-Load Sequence",
 
-			"  AirTerminal:SingleDuct:Uncontrolled,",
-			"    Main Zone Direct Air,     !- Name",
-			"    Constant,                 !- Availability Schedule Name",
-			"    Main Zone In Node,        !- Zone Supply Air Node Name",
-			"    autosize;                 !- Maximum Air Flow Rate {m3/s}",
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    Main Zone Direct Air ADU, !- Name",
+			"    Main Zone In Node,       !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+			"    Main Zone Direct Air;    !- Air Terminal Name",
+
+			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+			"    Main Zone Direct Air,    !- Name",
+			"    Constant,                !- Availability Schedule Name",
+			"    Main Zone In Node 2AT,   !- Air Inlet Node Name",
+			"    Main Zone In Node,       !- Air Outlet Node Name",
+			"    autosize;                !- Maximum Air Flow Rate {m3/s}",
 
 			"  CoilSystem:Cooling:DX,",
 			"    Desiccant DXSystem Cooling Coil Sys,  !- Name",
@@ -4998,7 +5012,7 @@ namespace EnergyPlus {
 			"  AirLoopHVAC:ZoneSplitter,",
 			"    Desiccant DXSystem Zone Supply Air Splitter,  !- Name",
 			"    Desiccant DXSystem Zone Equipment Inlet Node,  !- Inlet Node Name",
-			"    Main Zone In Node;        !- Outlet 1 Node Name",
+			"    Main Zone In Node 2AT;        !- Outlet 1 Node Name",
 
 			"  AirLoopHVAC:ZoneMixer,",
 			"    Desiccant DXSystem Zone Return Air Mixer,  !- Name",
@@ -5392,7 +5406,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
@@ -6341,16 +6355,23 @@ namespace EnergyPlus {
 			"  ZoneHVAC:EquipmentList,",
 			"    Main Zone Eq,             !- Name",
 			"    SequentialLoad,          !- Load Distribution Scheme",
-			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-			"    Main Zone Direct Air,     !- Zone Equipment 1 Name",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    Main Zone Direct Air ADU,     !- Zone Equipment 1 Name",
 			"    1,                        !- Zone Equipment 1 Cooling Sequence",
 			"    1;                        !- Zone Equipment 1 Heating or No-Load Sequence",
 
-			"  AirTerminal:SingleDuct:Uncontrolled,",
-			"    Main Zone Direct Air,     !- Name",
-			"    Constant,                 !- Availability Schedule Name",
-			"    Main Zone In Node,        !- Zone Supply Air Node Name",
-			"    autosize;                 !- Maximum Air Flow Rate {m3/s}",
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    Main Zone Direct Air ADU, !- Name",
+			"    Main Zone In Node,       !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+			"    Main Zone Direct Air;    !- Air Terminal Name",
+
+			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+			"    Main Zone Direct Air,    !- Name",
+			"    Constant,                !- Availability Schedule Name",
+			"    Main Zone In Node 2AT,   !- Air Inlet Node Name",
+			"    Main Zone In Node,       !- Air Outlet Node Name",
+			"    autosize;                !- Maximum Air Flow Rate {m3/s}",
 
 			"  CoilSystem:Cooling:DX,",
 			"    Desiccant DXSystem Cooling Coil Sys,  !- Name",
@@ -6416,7 +6437,7 @@ namespace EnergyPlus {
 			"  AirLoopHVAC:ZoneSplitter,",
 			"    Desiccant DXSystem Zone Supply Air Splitter,  !- Name",
 			"    Desiccant DXSystem Zone Equipment Inlet Node,  !- Inlet Node Name",
-			"    Main Zone In Node;        !- Outlet 1 Node Name",
+			"    Main Zone In Node 2AT;        !- Outlet 1 Node Name",
 
 			"  AirLoopHVAC:ZoneMixer,",
 			"    Desiccant DXSystem Zone Return Air Mixer,  !- Name",
@@ -6628,7 +6649,7 @@ namespace EnergyPlus {
 			"    100.0;                   !- Maximum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 		DataGlobals::DDOnlySimulation = true;
