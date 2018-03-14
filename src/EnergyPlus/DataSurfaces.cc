@@ -282,6 +282,10 @@ namespace DataSurfaces {
 	int const WSC_SAC_ScheduledSlatAngle( 2 );
 	int const WSC_SAC_BlockBeamSolar( 3 );
 
+	// WindowShadingControl Multiple Surface Control Type
+	int const WSC_MSCT_Sequential( 1 );
+	int const WSC_MSCT_Group( 2 );
+
 	// Parameter for window screens beam reflectance accounting
 	int const DoNotModel( 0 );
 	int const ModelAsDirectBeam( 1 );

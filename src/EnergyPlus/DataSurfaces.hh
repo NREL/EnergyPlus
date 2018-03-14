@@ -1512,6 +1512,7 @@ namespace DataSurfaces {
 	{
 		// Members
 		std::string Name; // User supplied name of this set of shading control data
+		int SequenceNumber; // Shading control sequence number
 		int ShadingType; // Shading type (InteriorShade, SwitchableGlazing,
 		//  CHARACTER(len=32) :: ShadingType    = ' ' ! Shading type (InteriorShade, SwitchableGlazing,
 		//  ExteriorShade,InteriorBlind,ExteriorBlind,BetweenGlassShade,
@@ -1588,9 +1589,17 @@ namespace DataSurfaces {
 		//  BlockBeamSolar: if beam solar is incident on the window, and a blind is on the
 		//    window, the slat angle is adjusted to just block beam solar; otherwise the
 		//    slat angle is set to the value given in the associated Material:WindowBlind.
+		int DaylightControlIndex; // Pointer to the array of Daylighting Controls
+		int MultiSurfaceCtrlType; // Type of control order when multiple surfaces are referenced
+		// 0 = not specified
+		// 1 = Sequential
+		// 2 = Group
+		Array1D_int FenestrationIndex; // Pointers to fenestration surfaces
+
 
 		// Default Constructor
 		WindowShadingControlData() :
+			SequenceNumber( 0 ),
 			ShadingType( WSC_ST_NoShade ),
 			ShadedConstruction( 0 ),
 			ShadingDevice( 0 ),
@@ -1601,7 +1610,9 @@ namespace DataSurfaces {
 			ShadingControlIsScheduled( false ),
 			GlareControlIsActive( false ),
 			SlatAngleSchedule( 0 ),
-			SlatAngleControlForBlinds( 0 )
+			SlatAngleControlForBlinds( 0 ),
+			DaylightControlIndex( 0 ),
+			MultiSurfaceCtrlType( 0 )
 		{}
 
 	};
