@@ -3270,6 +3270,7 @@ namespace ZoneTempPredictorCorrector {
 		ZoneSetPoint = 0.0;
 		LoadToHeatingSetPoint = 0.0;
 		LoadToCoolingSetPoint = 0.0;
+		Real64 TempTole = 0.02;
 
 
 		for ( RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum ) {
@@ -3292,14 +3293,20 @@ namespace ZoneTempPredictorCorrector {
 				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
 				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
 				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
-					TempZoneThermostatSetPoint( ZoneNum ) += TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 					ZoneThermostatSetPointLo( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
-				}
-				else {
+				} else if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo && ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet - TempTole ) ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
+				} else {
 					HeatOffFlag = true;
 				}
 			}
-			// Determine zone load based on
+			if ( TempControlledZone( RelativeZoneNum ).HeatModeLast && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
+				TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+				ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+				HeatOffFlag = true;
+			}			// Determine zone load based on
 			// Qload + Qsys = 0 and Qsys = mCp(Tsys-Tzone)
 			// System Load Sign Convention:
 			//     - -> Cooling required to reach setpoint
@@ -3337,12 +3344,19 @@ namespace ZoneTempPredictorCorrector {
 				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
 				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
 				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
-					TempZoneThermostatSetPoint( ZoneNum ) -= TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 					ZoneThermostatSetPointHi( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
-				}
-				else {
+				} else if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet + TempTole ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
+				} else {
 					CoolOffFlag = true;
 				}
+			}
+			if ( TempControlledZone( RelativeZoneNum ).CoolModeLast && Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
+				TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+				ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+				CoolOffFlag = true;
 			}
 
 			//PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
@@ -3452,19 +3466,34 @@ namespace ZoneTempPredictorCorrector {
 				ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
 				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
 				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
+
 				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
-					ZoneThermostatSetPointHi( ZoneNum ) -= TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-				}
-				else {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				} else if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet + TempTole ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				} else {
 					CoolOffFlag = true;
 				}
+				if ( TempControlledZone( RelativeZoneNum ).CoolModeLast && Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+					CoolOffFlag = true;
+				}
+
 				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
-					ZoneThermostatSetPointLo( ZoneNum ) += TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 					if ( ZoneThermostatSetPointHi( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) {
 						ZoneThermostatSetPointLo( ZoneNum ) = ZoneThermostatSetPointHi( ZoneNum );
 					}
+				} else if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo && ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet - TempTole ) ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					if ( ZoneThermostatSetPointHi( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) {
+						ZoneThermostatSetPointLo( ZoneNum ) = ZoneThermostatSetPointHi( ZoneNum );
+					}
+				} else {
+					HeatOffFlag = true;
 				}
-				else {
+				if ( TempControlledZone( RelativeZoneNum ).HeatModeLast && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
 					HeatOffFlag = true;
 				}
 			}
@@ -3544,6 +3573,20 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		}}
+		if ( NumOpTempControlledZones > 0 ) {
+			if ( TempControlledZone( RelativeZoneNum ).DeltaTCutSet > 0.0 ) {
+				if ( CoolOffFlag ) {
+					TempControlledZone( RelativeZoneNum ).CoolModeLast = true;
+				} else {
+					TempControlledZone( RelativeZoneNum ).CoolModeLast = false;
+				}
+				if ( HeatOffFlag ) {
+					TempControlledZone( RelativeZoneNum ).HeatModeLast = true;
+				} else {
+					TempControlledZone( RelativeZoneNum ).HeatModeLast = false;
+				}
+			}
+		}
 
 		// Staged control zone
 		if ( NumStageCtrZone > 0 ) {

@@ -134,6 +134,8 @@ namespace DataZoneControls {
 		Real64 DeltaTCutSet; // Temperature difference between cutout and setpoint
 		Real64 ZoneThermostatSetPointHi; // Cooling setpoint
 		Real64 ZoneThermostatSetPointLo; // Heating setpoint
+		bool CoolModeLast;
+		bool HeatModeLast;
 
 		// Default Constructor
 		ZoneTempControls() :
@@ -166,7 +168,10 @@ namespace DataZoneControls {
 			DehumidifyingSchedIndex( 0 ),
 			DeltaTCutSet( 0 ),
 			ZoneThermostatSetPointHi( 0.0 ),
-			ZoneThermostatSetPointLo( 0.0 )
+			ZoneThermostatSetPointLo( 0.0 ),
+			CoolModeLast( false ),
+		    HeatModeLast( false)
+
 		{}
 
 	};
