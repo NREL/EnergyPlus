@@ -76,6 +76,7 @@
 #include <GlobalNames.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <PlantUtilities.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
@@ -1691,7 +1692,7 @@ namespace PlantCondLoopOperation {
 							auto & this_equip( this_equip_list.Comp( EquipNum ) );
 							ThisTypeOfNum = UtilityRoutines::FindItem( this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 							errFlag1 = false;
-							ScanPlantLoopsForObject( this_equip.Name, ThisTypeOfNum, DummyLoopNum, LoopSideNum, BranchNum, CompNum, _, _, NumSearchResults, _, LoopNum, errFlag1 );
+							PlantUtilities::ScanPlantLoopsForObject( this_equip.Name, ThisTypeOfNum, DummyLoopNum, LoopSideNum, BranchNum, CompNum, _, _, NumSearchResults, _, LoopNum, errFlag1 );
 
 							if ( errFlag1 ) {
 								ShowSevereError( "InitLoadDistribution: Equipment specified for operation scheme not found on correct loop" );
