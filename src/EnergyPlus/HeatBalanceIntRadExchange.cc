@@ -50,6 +50,7 @@
 #include <cmath>
 #define EIGEN_USE_MKL_ALL
 #include <Eigen/Dense>
+#include <Eigen/LU>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -1285,6 +1286,7 @@ namespace HeatBalanceIntRadExchange {
 		//       MODIFIED       July 2000 (COP for the ASHRAE Loads Toolkit)
 		//       RE-ENGINEERED  September 2000 (RKS for EnergyPlus)
 		//       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance tuned
+		//       RE-ENGINEERED  March 2018 (Preston Shires & Mark Adams): Use Eigen with Intel MKL
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Determines Hottel's ScriptF coefficients which account for the total
@@ -1329,18 +1331,8 @@ namespace HeatBalanceIntRadExchange {
 		++NumCalcScriptF_Calls;
 #endif
 
-
 		// Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
-		Array2D< Real64 > Cmatrix( N, N ); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
-		assert( equal_dimensions( Cmatrix, F ) ); // For linear indexing
-		Array2D< Real64 >::size_type l( 0u );
-		for ( int j = 1; j <= N; ++j ) {
-			for ( int i = 1; i <= N; ++i, ++l ) {
-				Cmatrix[ l ] = A( i ) * F[ l ]; // [ l ] == ( i, j )
-			}
-		}
-
-		Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic> cMatrix(N, N);
+		Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic> cMatrix(N, N); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
 		for ( auto j = 1; j <= N; j++ ) {
 			for ( auto i = 1; i <= N; i++ ) {
 				cMatrix(j - 1, i - 1) = A( i ) * F( j , i ); // tested to contain identical data as original Cmatrix
@@ -1348,224 +1340,147 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		// Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
-		Array1D< Real64 > Excite( N ); // Excitation vector = A*EMISS/REFLECTANCE
-		l = 0u;
-		for ( int i = 1; i <= N; ++i, l += N + 1 ) {
-			Real64 EMISS_i( EMISS( i ) );
-			if ( EMISS_i > MaxEmissLimit ) { // Check/limit EMISS for this surface to avoid divide by zero below
-				EMISS_i = EMISS( i ) = MaxEmissLimit;
-				ShowWarningError( "A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999" );
-			}
-			Real64 const EMISS_i_fac( A( i ) / ( 1.0 - EMISS_i ) );
-			Excite( i ) = -EMISS_i * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
-			Cmatrix[ l ] -= EMISS_i_fac; // Coefficient matrix for partial radiosity calculation // [ l ] == ( i, i )
-		}
-
-		std::vector< Real64 > excite( N );
+		std::vector< Real64 > excite( N ); // Excitation vector = A*EMISS/REFLECTANCE
 		for ( int i = 1; i <= N; i++ ) {
 			if ( EMISS( i ) > MaxEmissLimit ) {
-				EMISS( i ) = MaxEmissLimit;
+				EMISS( i ) = MaxEmissLimit; // Check/limit EMISS for this surface to avoid divide by zero below
 				ShowWarningError( "A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999" );
 			}
 			auto const EMISS_i_fac( A( i ) / ( 1.0 - EMISS( i ) ) );
 			excite.at( i - 1 ) = -EMISS( i ) * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
-			cMatrix( i - 1, i - 1) -= EMISS_i_fac;
+			cMatrix( i - 1, i - 1) -= EMISS_i_fac; // Coefficient matrix for partial radiosity calculation
 		}
 
-//		for ( auto j = 1; j <= N; j++ ) {
-//			for ( auto i = 1; i <= N; i++ ) {
-//				auto test1 = cMatrix(j - 1, i - 1);
-//				auto test2 = Cmatrix(j , i);
-//				if (std::abs(test1 - test2) > 0.00001) {
-//					auto heyWrong = "ok";
+		// Scale Cinverse columns by excitation to get partial radiosity matrix
+		auto const tmpInverse = cMatrix.inverse();
+		std::vector< std::vector < Real64 > > cInverse(N, std::vector< Real64 >( N ) );
+		for (auto i = 0; i < tmpInverse.rows(); i++) {
+			for (auto j = 0; j < tmpInverse.cols(); j++) {
+				cInverse.at( i ).at ( j ) = tmpInverse( i, j ) *  excite.at( i );
+			}
+		}
+
+		// Form Script F matrix transposed
+//		assert( equal_dimensions( Cinverse, ScriptF ) ); // For linear indexing
+		assert( cInverse.size() * cInverse[0].size() == ScriptF.size1() * ScriptF.size2() );
+		for ( int i = 1; i <= N; i++ ) {
+			auto const EMISS_fac = EMISS( i ) / (1 - EMISS( i ));
+			for (int j = 1; j <= N; j++ ) {
+				if (i == j) {
+					ScriptF( i, j ) = EMISS_fac * ( cInverse.at( j - 1 ).at( i - 1 ) - EMISS( i ) );
+				} else {
+					ScriptF( i, j ) = EMISS_fac * cInverse.at( j - 1 ).at( i - 1 );
+				}
+			}
+		}
+	}
+
+//	void
+//	CalcMatrixInverse(
+//		Array2< Real64 > & A, // Matrix: Gets reduced to L\U form
+//		Array2< Real64 > & I // Returned as inverse matrix
+//	)
+//	{
+//		// SUBROUTINE INFORMATION:
+//		//       AUTHOR         Jakob Asmundsson
+//		//       DATE WRITTEN   January 1999
+//		//       MODIFIED       September 2000 (RKS for EnergyPlus)
+//		//       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance/memory tuning rewrite
+//
+//		// PURPOSE OF THIS SUBROUTINE:
+//		// To find the inverse of Matrix, using partial pivoting.
+//
+//		// METHODOLOGY EMPLOYED:
+//		// Inverse is found using partial pivoting and Gauss elimination
+//
+//		// REFERENCES:
+//		// Any Linear Algebra book
+//
+//		// Validation
+//		assert( A.square() );
+//		assert( A.I1() == A.I2() );
+//		assert( equal_dimensions( A, I ) );
+//
+//		// Initialization
+//		int const l( A.l1() );
+//		int const u( A.u1() );
+//		int const n( u - l + 1 );
+//		I.to_identity(); // I starts out as identity
+//
+//		// Could do row scaling here to improve condition and then check min pivot isn't too small
+//
+//		// Compute in-place LU decomposition of [A|I] with row pivoting
+//		for ( int i = l; i <= u; ++i ) {
+//
+//			// Find pivot row in column i below diagonal
+//			int iPiv = i;
+//			Real64 aPiv( std::abs( A( i, i ) ) );
+//			auto ik( A.index( i, i + 1 ) );
+//			for ( int k = i + 1; k <= u; ++k, ++ik ) {
+//				Real64 const aAki( std::abs( A[ ik ] ) ); // [ ik ] == ( i, k )
+//				if ( aAki > aPiv ) {
+//					iPiv = k;
+//					aPiv = aAki;
+//				}
+//			}
+//			assert( aPiv != 0.0 ); //? Is zero pivot possible for some user inputs? If so if test/handler needed
+//
+//			// Swap row i with pivot row
+//			if ( iPiv != i ) {
+//				auto ji( A.index( l, i ) ); // [ ji ] == ( j, i )
+//				auto pj( A.index( l, iPiv ) ); // [ pj ] == ( j, iPiv )
+//				for ( int j = l; j <= u; ++j, ji += n, pj += n ) {
+//					Real64 const Aij( A[ ji ] );
+//					A[ ji ] = A[ pj ];
+//					A[ pj ] = Aij;
+//					Real64 const Iij( I[ ji ] );
+//					I[ ji ] = I[ pj ];
+//					I[ pj ] = Iij;
+//				}
+//			}
+//
+//			// Put multipliers in column i and reduce block below A(i,i)
+//			Real64 const Aii_inv( 1.0 / A( i, i ) );
+//			for ( int k = i + 1; k <= u; ++k ) {
+//				Real64 const multiplier( A( i, k ) * Aii_inv );
+//				A( i, k ) = multiplier;
+//				if ( multiplier != 0.0 ) {
+//					auto ji( A.index( i + 1, i ) ); // [ ji ] == ( j, i )
+//					auto jk( A.index( i + 1, k ) ); // [ jk ] == ( j, k )
+//					for ( int j = i + 1; j <= u; ++j, ji += n, jk += n ) {
+//						A[ jk ] -= multiplier * A[ ji ];
+//					}
+//					ji = A.index( l, i );
+//					jk = A.index( l, k );
+//					for ( int j = l; j <= u; ++j, ji += n, jk += n ) {
+//						Real64 const Iij( I[ ji ] );
+//						if ( Iij != 0.0 ) {
+//							I[ jk ] -= multiplier * Iij;
+//						}
+//					}
+//				}
+//			}
+//
+//		}
+//
+//		// Perform back-substitution on [U|I] to put inverse in I
+//		for ( int k = u; k >= l; --k ) {
+//			Real64 const Akk_inv( 1.0 / A( k, k ) );
+//			auto jk( A.index( l, k ) ); // [ jk ] == ( j, k )
+//			for ( int j = l; j <= u; ++j, jk += n ) {
+//				I[ jk ] *= Akk_inv;
+//			}
+//			auto ik( A.index( k, l ) ); // [ ik ] == ( i, k )
+//			for ( int i = l; i < k; ++i, ++ik ) { // Eliminate kth column entries from I in rows above k
+//				Real64 const Aik( A[ ik ] );
+//				auto ji( A.index( l, i ) ); // [ ji ] == ( j, i )
+//				auto jk( A.index( l, k ) ); // [ jk ] == ( k, j )
+//				for ( int j = l; j <= u; ++j, ji += n, jk += n ) {
+//					I[ ji ] -= Aik * I[ jk ];
 //				}
 //			}
 //		}
-
-		auto const cInverse = cMatrix.inverse();
-
-
-
-
-		Array2D< Real64 > Cinverse( N, N ); // Inverse of Cmatrix
-		CalcMatrixInverse( Cmatrix, Cinverse ); // SOLVE THE LINEAR SYSTEM
-		Cmatrix.clear(); // Release memory ASAP
-
-		// Scale Cinverse colums by excitation to get partial radiosity matrix
-		l = 0u;
-		for ( int j = 1; j <= N; ++j ) {
-			Real64 const e_j( Excite( j ) );
-			for ( int i = 1; i <= N; ++i, ++l ) {
-				Cinverse[ l ] *= e_j; // [ l ] == ( i, j )
-			}
-		}
-		Excite.clear(); // Release memory ASAP
-
-		// Form Script F matrix transposed
-		assert( equal_dimensions( Cinverse, ScriptF ) ); // For linear indexing
-		Array2D< Real64 >::size_type m( 0u );
-		for ( int i = 1; i <= N; ++i ) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
-			Real64 const EMISS_i( EMISS( i ) );
-			Real64 const EMISS_fac( EMISS_i / ( 1.0 - EMISS_i ) );
-			l = static_cast< Array2D< Real64 >::size_type >( i - 1 );
-			for ( int j = 1; j <= N; ++j, l += N, ++m ) {
-				if ( i == j ) {
-					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
-					ScriptF[ m ] = EMISS_fac * ( Cinverse[ l ] - EMISS_i ); // [ l ] = ( i, j ), [ m ] == ( j, i )
-				} else {
-					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
-					ScriptF[ m ] = EMISS_fac * Cinverse[ l ]; // [ l ] == ( i, j ), [ m ] == ( j, i )
-				}
-			}
-		}
-
-	}
-
-	void
-	CalcMatrixInverse(
-		Array2< Real64 > & A, // Matrix: Gets reduced to L\U form
-		Array2< Real64 > & I // Returned as inverse matrix
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Jakob Asmundsson
-		//       DATE WRITTEN   January 1999
-		//       MODIFIED       September 2000 (RKS for EnergyPlus)
-		//       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance/memory tuning rewrite
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// To find the inverse of Matrix, using partial pivoting.
-
-		// METHODOLOGY EMPLOYED:
-		// Inverse is found using partial pivoting and Gauss elimination
-
-		// REFERENCES:
-		// Any Linear Algebra book
-
-		// Validation
-		assert( A.square() );
-		assert( A.I1() == A.I2() );
-		assert( equal_dimensions( A, I ) );
-
-		// Initialization
-		int const l( A.l1() );
-		int const u( A.u1() );
-		int const n( u - l + 1 );
-		I.to_identity(); // I starts out as identity
-
-		// Could do row scaling here to improve condition and then check min pivot isn't too small
-
-		// Compute in-place LU decomposition of [A|I] with row pivoting
-		for ( int i = l; i <= u; ++i ) {
-
-			// Find pivot row in column i below diagonal
-			int iPiv = i;
-			Real64 aPiv( std::abs( A( i, i ) ) );
-			auto ik( A.index( i, i + 1 ) );
-			for ( int k = i + 1; k <= u; ++k, ++ik ) {
-				Real64 const aAki( std::abs( A[ ik ] ) ); // [ ik ] == ( i, k )
-				if ( aAki > aPiv ) {
-					iPiv = k;
-					aPiv = aAki;
-				}
-			}
-			assert( aPiv != 0.0 ); //? Is zero pivot possible for some user inputs? If so if test/handler needed
-
-			// Swap row i with pivot row
-			if ( iPiv != i ) {
-				auto ji( A.index( l, i ) ); // [ ji ] == ( j, i )
-				auto pj( A.index( l, iPiv ) ); // [ pj ] == ( j, iPiv )
-				for ( int j = l; j <= u; ++j, ji += n, pj += n ) {
-					Real64 const Aij( A[ ji ] );
-					A[ ji ] = A[ pj ];
-					A[ pj ] = Aij;
-					Real64 const Iij( I[ ji ] );
-					I[ ji ] = I[ pj ];
-					I[ pj ] = Iij;
-				}
-			}
-
-			// Put multipliers in column i and reduce block below A(i,i)
-			Real64 const Aii_inv( 1.0 / A( i, i ) );
-			for ( int k = i + 1; k <= u; ++k ) {
-				Real64 const multiplier( A( i, k ) * Aii_inv );
-				A( i, k ) = multiplier;
-				if ( multiplier != 0.0 ) {
-					auto ji( A.index( i + 1, i ) ); // [ ji ] == ( j, i )
-					auto jk( A.index( i + 1, k ) ); // [ jk ] == ( j, k )
-					for ( int j = i + 1; j <= u; ++j, ji += n, jk += n ) {
-						A[ jk ] -= multiplier * A[ ji ];
-					}
-					ji = A.index( l, i );
-					jk = A.index( l, k );
-					for ( int j = l; j <= u; ++j, ji += n, jk += n ) {
-						Real64 const Iij( I[ ji ] );
-						if ( Iij != 0.0 ) {
-							I[ jk ] -= multiplier * Iij;
-						}
-					}
-				}
-			}
-
-		}
-
-		// Perform back-substitution on [U|I] to put inverse in I
-		for ( int k = u; k >= l; --k ) {
-			Real64 const Akk_inv( 1.0 / A( k, k ) );
-			auto jk( A.index( l, k ) ); // [ jk ] == ( j, k )
-			for ( int j = l; j <= u; ++j, jk += n ) {
-				I[ jk ] *= Akk_inv;
-			}
-			auto ik( A.index( k, l ) ); // [ ik ] == ( i, k )
-			for ( int i = l; i < k; ++i, ++ik ) { // Eliminate kth column entries from I in rows above k
-				Real64 const Aik( A[ ik ] );
-				auto ji( A.index( l, i ) ); // [ ji ] == ( j, i )
-				auto jk( A.index( l, k ) ); // [ jk ] == ( k, j )
-				for ( int j = l; j <= u; ++j, ji += n, jk += n ) {
-					I[ ji ] -= Aik * I[ jk ];
-				}
-			}
-		}
-
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> eigenA(A.size1(), A.size2());
-		double A_arr[A.size1()][A.size2()];
-//		double A_arr[1000][1000];
-		double I_arr[A.size1()][A.size2()];
-//		double I_arr[1000][1000];
-
-		for ( auto i = 1; i <= A.size1(); i++ ) {
-			for ( auto j = 1; j <= A.size2(); j++ ) {
-				auto const val = A(i, j);
-				A_arr[i-1][j-1] = A(i, j);
-				I_arr[i-1][j-1] = I(i, j);
-				eigenA(i-1, j-1) = val;
-			}
-		}
-
-		auto inverse = eigenA.inverse();
-
-		// check to see if inverse resultant matrices are the same
-		for ( auto i = 1; i <= A.size1(); i++ ) {
-			for ( auto j = 1; j <= A.size2(); j++ ) {
-                auto const inv = inverse(i-1, j-1);
-				auto const ePlusInv = I_arr[i - 1][j-1];
-				if (std::abs(inv - ePlusInv) > 0.0001) {
-					auto checkOrigA = A_arr[i - 1][j - 1];
-					auto checkOrigEigen = eigenA(i - 1, j - 1);
-					auto rip = 0;
-				}
-			}
-		}
-
-		// test to see if replacing values actually works
-		for ( auto i = 1; i <= A.size1(); i++ ) {
-			for ( auto j = 1; j <= A.size2(); j++ ) {
-				auto const inv = inverse(i-1, j-1);
-                I(i, j) = inv;
-			}
-		}
-
-	}
+//	}
 
 } // HeatBalanceIntRadExchange
 
