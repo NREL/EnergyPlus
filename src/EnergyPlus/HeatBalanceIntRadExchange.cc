@@ -1329,6 +1329,7 @@ namespace HeatBalanceIntRadExchange {
 		++NumCalcScriptF_Calls;
 #endif
 
+
 		// Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
 		Array2D< Real64 > Cmatrix( N, N ); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
 		assert( equal_dimensions( Cmatrix, F ) ); // For linear indexing
@@ -1336,6 +1337,13 @@ namespace HeatBalanceIntRadExchange {
 		for ( int j = 1; j <= N; ++j ) {
 			for ( int i = 1; i <= N; ++i, ++l ) {
 				Cmatrix[ l ] = A( i ) * F[ l ]; // [ l ] == ( i, j )
+			}
+		}
+
+		Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic> cMatrix(N, N);
+		for ( auto j = 1; j <= N; j++ ) {
+			for ( auto i = 1; i <= N; i++ ) {
+				cMatrix(j - 1, i - 1) = A( i ) * F( j , i ); // tested to contain identical data as original Cmatrix
 			}
 		}
 
@@ -1352,6 +1360,32 @@ namespace HeatBalanceIntRadExchange {
 			Excite( i ) = -EMISS_i * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
 			Cmatrix[ l ] -= EMISS_i_fac; // Coefficient matrix for partial radiosity calculation // [ l ] == ( i, i )
 		}
+
+		std::vector< Real64 > excite( N );
+		for ( int i = 1; i <= N; i++ ) {
+			if ( EMISS( i ) > MaxEmissLimit ) {
+				EMISS( i ) = MaxEmissLimit;
+				ShowWarningError( "A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999" );
+			}
+			auto const EMISS_i_fac( A( i ) / ( 1.0 - EMISS( i ) ) );
+			excite.at( i - 1 ) = -EMISS( i ) * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
+			cMatrix( i - 1, i - 1) -= EMISS_i_fac;
+		}
+
+//		for ( auto j = 1; j <= N; j++ ) {
+//			for ( auto i = 1; i <= N; i++ ) {
+//				auto test1 = cMatrix(j - 1, i - 1);
+//				auto test2 = Cmatrix(j , i);
+//				if (std::abs(test1 - test2) > 0.00001) {
+//					auto heyWrong = "ok";
+//				}
+//			}
+//		}
+
+		auto const cInverse = cMatrix.inverse();
+
+
+
 
 		Array2D< Real64 > Cinverse( N, N ); // Inverse of Cmatrix
 		CalcMatrixInverse( Cmatrix, Cinverse ); // SOLVE THE LINEAR SYSTEM
