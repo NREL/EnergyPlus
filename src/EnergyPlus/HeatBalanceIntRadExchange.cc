@@ -1522,7 +1522,6 @@ namespace HeatBalanceIntRadExchange {
 				}
 			}
 		}
-//		auto test = 0;
 
 		// test to see if replacing values actually works
 		for ( auto i = 1; i <= A.size1(); i++ ) {
