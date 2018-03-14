@@ -7006,8 +7006,8 @@ namespace SurfaceGeometry {
 			++ControlNum;
 			WindowShadingControl( ControlNum ).Name = cAlphaArgs( 1 ); // Set the Control Name in the Derived Type
 			WindowShadingControl( ControlNum ).SequenceNumber = int(rNumericArgs( 1 ));
-			WindowShadingControl( ControlNum ).ShadedConstruction = FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
-			WindowShadingControl( ControlNum ).ShadingDevice = FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
+			WindowShadingControl( ControlNum ).ShadedConstruction = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Construct, TotConstructs );
+			WindowShadingControl( ControlNum ).ShadingDevice = UtilityRoutines::FindItemInList( cAlphaArgs( 8 ), Material, TotMaterials );
 			WindowShadingControl( ControlNum ).Schedule = GetScheduleIndex( cAlphaArgs( 5 ) );
 			WindowShadingControl( ControlNum ).SetPoint = rNumericArgs( 2 );
 			WindowShadingControl( ControlNum ).SetPoint2 = rNumericArgs( 3 );
