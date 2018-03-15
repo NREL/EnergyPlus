@@ -320,8 +320,6 @@ namespace EnergyPlus {
 			std::vector<int>  Psa_curve_pointer;
 			std::vector<CMode>  OperatingModes;
 			std::vector<CSetting> CurrentOperatingSettings;
-			//debug values
-			int DebugBreak;
 
 			CSetting OptimalSetting;
 			CSetting oStandBy;

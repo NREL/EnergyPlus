@@ -117,7 +117,7 @@ namespace EnergyPlus {
 		SimZoneHybridUnitaryAirConditioners(
 				std::string const & CompName, // name of the packaged terminal heat pump
 				int const ZoneNum, // number of zone being served
-				Real64 & SensibleOutputProvided, // sensible capacity delivered to zone cooling is negitive
+				Real64 & SensibleOutputProvided, // sensible capacity delivered to zone cooling is negative
 				Real64 & LatentOutputProvided, // Latent add/removal  (kg/s), dehumid = negative
 				int & CompIndex // index to zone hvac unit
 				)
@@ -355,9 +355,9 @@ namespace EnergyPlus {
 				DesignMinVRMassFlow = DesignMinVR *  1.225;
 			}
 			ZoneHybridUnitaryAirConditioner(UnitNum).doStep( ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
-			SensibleOutputProvided = -(ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut); // cooling negitive
+			SensibleOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut; // cooling negative
 			
-			LatentOutputProvided = -(ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOutMass);// dehumidification negitive kg/s
+			LatentOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOutMass;// dehumidification negative kg/s
 		}
 
 		void

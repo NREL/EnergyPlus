@@ -2111,11 +2111,7 @@ namespace EnergyPlus {//***************
 
 			// REFERENCES: OutletVolumetricFlowRate, SupplyVentilationVolume, MinOA_Msa, SupplyVentilationAir
 			// na
-			DebugBreak = 12;
-			if ((DataGlobals::HourOfDay == DebugBreak) && !WarmupFlag)
-			{
-				int k = 1;//debug step
-			}
+
 			// set requested loads to output variables
 			RequestedLoadToHeatingSetpoint = RequestedCoolingLoad;
 			RequestedLoadToCoolingSetpoint = RequestedHeatingLoad;
