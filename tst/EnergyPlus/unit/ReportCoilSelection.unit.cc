@@ -54,6 +54,7 @@
 #include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -84,8 +85,8 @@ TEST_F( EnergyPlusFixture, ReportCoilSelection_ChWCoil )
 	DataPlant::PlantLoop.allocate( 1 );
 	DataPlant::PlantLoop( 1 ).Name = "Chilled Water Loop";
 	DataPlant::PlantLoop( 1 ).FluidName = "Water";
-	//DataGlobals::InitConvTemp = 20.0;
 	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+	DataPlant::PlantLoop( 1 ).MaxMassFlowRate = 0.1;
 	DataPlant::PlantLoop( 1 ).LoopSide.allocate( 2 );
 	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
 	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).TotalBranches = 1;
@@ -100,39 +101,6 @@ TEST_F( EnergyPlusFixture, ReportCoilSelection_ChWCoil )
 	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
 	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = chWInletNodeNum;
 	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = chWOutletNodeNum;
-
-	//void
-	//finishCoilSummaryReportTable();
-
-	//void
-	//setCoilFinalSizes(  
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilObjName , //  coil object name, e.g., Coil:Cooling:Water
-	//	Real64 const totGrossCap, // total capacity [W]
-	//	Real64 const sensGrossCap,// sensible capacity [W]
-	//	Real64 const airFlowRate, // design or reference or rated air flow rate [m3/s]
-	//	Real64 const waterFlowRate //design or reference or rated water flow rate [m3/s]
-	//);
-	//
-	//void
-	//setRatedCoilConditions(
-	//	std::string const & coilName,    // ! user-defined name of the coil
-	//	std::string const & coilObjName , //  coil object name, e.g., Coil:Cooling:Water
-	//	Real64 const RatedCoilTotCap,    // ! rated coil total capacity [W]
-	//	Real64 const RatedCoilSensCap,    // rated coil sensible capacity [W]
-	//	Real64 const RatedAirMassFlow,    // rated coil design air mass flow rate [m3/s]
-	//	Real64 const RatedCoilInDb,       // rated coil inlet air dry bulb at time of peak [C]
-	//	Real64 const RatedCoilInHumRat,   // rated coil inlet air humidity ratio [kgWater/kgDryAir]
-	//	Real64 const RatedCoilInWb,       // rated coil inlet air wet bulb [C]
-	//	Real64 const RatedCoilOutDb,      // rated coil outlet air dry bulb [C]
-	//	Real64 const RatedCoilOutHumRat,  // rated coil outlet air humidity ratio, [kgWater/kgDryAir]
-	//	Real64 const RatedCoilOutWb,      // rated coil outlet air wet bulb [C]
-
-	//	Real64 const RatedCoilOadbRef,    // rated DX coil outside air dry bulb reference [C]
-	//	Real64 const RatedCoilOawbRef,    // rated DX coil outside air wet bulb reference [C]
-	//	Real64 const RatedCoilBpFactor,   // rated coil bypass factor
-	//	Real64 const RatedCoilEff        // rated coil effectiveness
-	//);
 
 	Real64 airVdot ( 0.052 ); // air flow rate in m3/s
 	bool isAutoSized ( false ); // true if autosized
@@ -155,6 +123,9 @@ TEST_F( EnergyPlusFixture, ReportCoilSelection_ChWCoil )
 	EXPECT_EQ( -999, c1->cpFluid );
 	EXPECT_EQ( -999, c1->coilDesWaterMassFlow );
 	EXPECT_EQ( "No", c1->coilWaterFlowAutoMsg );
+
+	// Exercise report writing with mostly defaults
+	coilSelectionReportObj->finishCoilSummaryReportTable();
 
 	// Use the other form for coil 2
 	std::string coil2Name ( "Coil 2" ); // user-defined name of the coil
@@ -186,180 +157,178 @@ TEST_F( EnergyPlusFixture, ReportCoilSelection_ChWCoil )
 	EXPECT_NEAR( expFlow, c1b->coilDesWaterMassFlow, 0.01 );
 	EXPECT_EQ( "Yes", c1b->coilWaterFlowAutoMsg );
 
-	//void
-	//setCoilWaterFlowPltSizNum(  
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const waterVdot, // water flow rate in m3/s
-	//	bool const isAutoSized, // true if water flow was autosized
-	//	int const DataPltSizNum, // plant sizing structure index
-	//	int const DataWaterLoopNum // plant loop structure index
-	//);
+	Real64 uA = 1000.00;
+	Real64 sizingCap = 500.0;
+	int curSysNum = 1;
+	int curZoneEqNum = 0;
+	isAutoSized = true; // true if autosized
+	DataAirSystems::PrimaryAirSystem.allocate( 1 );
+	DataAirLoop::AirToZoneNodeInfo.allocate( 1 );
+	DataAirLoop::AirToZoneNodeInfo( 1 ).NumZonesHeated = 2;
+	DataAirLoop::AirToZoneNodeInfo( 1 ).HeatCtrlZoneNums.allocate( DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated );
+	DataAirLoop::AirToZoneNodeInfo( 1 ).HeatCtrlZoneNums( 1 ) = 2;
+	DataAirLoop::AirToZoneNodeInfo( 1 ).HeatCtrlZoneNums( 2 ) = 3;
+	DataGlobals::NumOfZones = 3;
+	DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+	DataHeatBalance::Zone( 1 ).Name = "Zone 1";
+	DataHeatBalance::Zone( 2 ).Name = "Zone 2";
+	DataHeatBalance::Zone( 3 ).Name = "Zone 3";
 
-	//void
-	//setCoilEntAirTemp(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const entAirDryBulbTemp, // ideal loads sizing result for air entering coil drybulb temp (C)
-	//	int const curSysNum, // airloop system number index, if non zero
-	//	int const curZoneEqNum // zone equipment list index, if non-zero
-	//);
+	// This triggers doAirLoopSetUp
+	coilSelectionReportObj->setCoilUA( coil2Name, coil2Type, uA, sizingCap, isAutoSized, curSysNum, curZoneEqNum );
 
-	//void
-	//setCoilEntAirHumRat(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const entAirHumRat
-	//);
+	// Exercise report writing again
+	coilSelectionReportObj->finishCoilSummaryReportTable();
+}
 
-	//void
-	//setCoilEntWaterTemp(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const entWaterTemp     // degree C
-	//);
+TEST_F( EnergyPlusFixture, ReportCoilSelection_SteamCoil )
+{
+	std::string coil1Name ( "Coil 1" ); // user-defined name of the coil
+	std::string coil1Type ( "Coil:Heating:Steam" ); // idf input object class name of coil
+	int wInletNodeNum = 9;
+	int wOutletNodeNum = 15;
 
-	//void
-	//setCoilLvgWaterTemp(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const lvgWaterTemp     // degree C
-	//);
-	//
-	//void
-	//setCoilWaterDeltaT(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const CoilWaterDeltaT // degree C temperature difference used to size coil
-	//);
-	//
-	//void
-	//setCoilLvgAirTemp(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const lvgAirDryBulbTemp // air temperature leaving coil {C}
-	//);
+	EnergyPlus::DataPlant::TotNumLoops = 1;
+	DataPlant::PlantLoop.allocate( 1 );
+	DataPlant::PlantLoop( 1 ).Name = "Steam Loop";
+	DataPlant::PlantLoop( 1 ).FluidName = "Steam";
+	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
+	DataPlant::PlantLoop( 1 ).MaxMassFlowRate = 0.1;
+	DataPlant::PlantLoop( 1 ).LoopSide.allocate( 2 );
+	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
+	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).TotalBranches = 1;
+	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
+	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).TotalComponents = 1;
+	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch.allocate( 1 );
+	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).TotalBranches = 1;
+	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
+	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).TotalComponents = 1;
 
-	//void
-	//setCoilLvgAirHumRat(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const lvgAirHumRat // 
-	//);
+	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
+	DataPlant::PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
+	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = wInletNodeNum;
+	DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = wOutletNodeNum;
 
-	//void
-	//setCoilCoolingCapacity(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const totalCoolingCap, // {W} coil cooling capacity
-	//	bool const isAutoSize, // true if value was autosized
-	//	int const curSysNum, // airloop system number index, if non zero
-	//	int const curZoneEqNum, // zone equipment list index, if non-zero
-	//	int const curOASysNum, // OA system equipment list index, if non-zero
-	//	Real64 const fanCoolLoad, // {W} fan load used in ideal loads coil sizing
-	//	Real64 const coilCapFunTempFac, // {W} curve result for modification factor for capacity as a function of temperature
-	//	Real64 const DXFlowPerCapMinRatio, // non dimensional ratio, capacity adjustment ratio min
-	//	Real64 const DXFlowPerCapMaxRatio // non dimensional ratio, capacity adjustment ratio max
-	//);
+	Real64 airVdot ( 0.052 ); // air flow rate in m3/s
+	bool isAutoSized ( false ); // true if autosized
+	coilSelectionReportObj->setCoilAirFlow( coil1Name, coil1Type, airVdot, isAutoSized );
+	auto & c1 ( coilSelectionReportObj->coilSelectionDataObjs[ 0 ] );
+	EXPECT_EQ( coil1Name, c1->coilName_ );
+	EXPECT_EQ( coil1Type, c1->coilObjName );
+	EXPECT_EQ( airVdot, c1->coilDesVolFlow );
+	EXPECT_EQ( isAutoSized, c1->volFlowIsAutosized );
 
-	//void
-	//setCoilHeatingCapacity(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const totalHeatingCap, // {W} coil Heating capacity
-	//	bool const isAutoSize, // true if value was autosized
-	//	int const curSysNum, // airloop system number index, if non zero
-	//	int const curZoneEqNum, // zone equipment list index, if non-zero
-	//	int const curOASysNum, // OA system equipment list index, if non-zero
-	//	Real64 const fanHeatGain, // {W} fan load used in ideal loads coil sizing
-	//	Real64 const coilCapFunTempFac, // {W} curve result for modification factor for capacity as a function of temperature
-	//	Real64 const DXFlowPerCapMinRatio, // non dimensional ratio, capacity adjustment ratio min
-	//	Real64 const DXFlowPerCapMaxRatio // non dimensional ratio, capacity adjustment ratio max
-	//);
+	int loopNum = 1;
+	Real64 waterVdot = 0.05;
+	// First with no plant sizing objects defined
+	isAutoSized = false; // true if autosized
+	coilSelectionReportObj->setCoilWaterFlowNodeNums( coil1Name, coil1Type, waterVdot,  isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum );
+	EXPECT_EQ( -999, c1->pltSizNum );
+	EXPECT_EQ( loopNum, c1->waterLoopNum );
+	EXPECT_EQ( DataPlant::PlantLoop( 1 ).Name, c1->plantLoopName );
+	EXPECT_EQ( -999, c1->rhoFluid );
+	EXPECT_EQ( -999, c1->cpFluid );
+	EXPECT_EQ( -999, c1->coilDesWaterMassFlow );
+	EXPECT_EQ( "No", c1->coilWaterFlowAutoMsg );
 
-	//void
-	//setCoilWaterCoolingCapacity(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const totalCoolingCap, // {W} coil cooling capacity
-	//	bool const isAutoSize, // true if value was autosized
-	//	int const inletNodeNum, // coil chw inlet node num
-	//	int const outletNodeNum, // coil chw outlet node num
-	//	int const dataWaterLoopNum // plant loop structure index
-	//);
+	// Now add a plant sizing object
+	DataSizing::NumPltSizInput = 1;
+	DataSizing::PlantSizData.allocate( 1 );
+	DataSizing::PlantSizData( 1 ).PlantLoopName = "Steam Loop";
+	DataSizing::PlantSizData( 1 ).LoopType = DataSizing::SteamLoop;
+	isAutoSized = true; // true if autosized
+	coilSelectionReportObj->setCoilWaterFlowNodeNums( coil1Name, coil1Type, waterVdot,  isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum );
+	auto & c1b ( coilSelectionReportObj->coilSelectionDataObjs[ 0 ] );
+	EXPECT_EQ( 1, c1b->pltSizNum );
+	EXPECT_EQ( loopNum, c1b->waterLoopNum );
+	EXPECT_EQ( DataPlant::PlantLoop( 1 ).Name, c1b->plantLoopName );
+	EXPECT_NEAR( 0.6, c1b->rhoFluid, 0.01 );
+	EXPECT_NEAR( 4216.0, c1b->cpFluid, 0.1 );
+	Real64 expFlow = waterVdot * c1b->rhoFluid;
+	EXPECT_NEAR( expFlow, c1b->coilDesWaterMassFlow, 0.01 );
+	EXPECT_EQ( "Yes", c1b->coilWaterFlowAutoMsg );
 
-	//void
-	//setCoilWaterHeaterCapacityNodeNums(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const totalHeatingCap, // {W} coil Heating capacity
-	//	bool const isAutoSize, // true if value was autosized
-	//	int const inletNodeNum, // coil chw inlet node num
-	//	int const outletNodeNum, // coil chw outlet node num
-	//	int const dataWaterLoopNum // plant loop structure index
-	//);
+	// Exercise report writing again
+	coilSelectionReportObj->finishCoilSummaryReportTable();
+}
 
-	//void
-	//setCoilWaterHeaterCapacityPltSizNum(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const totalHeatingCap, // {W} coil Heating capacity
-	//	bool const isAutoSize, // true if value was autosized
-	//	int const dataPltSizNum, // plant sizing structure index
-	//	int const dataWaterLoopNum // plant loop structure index
-	//);
+TEST_F( EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil )
+{
+	std::string coil1Name ( "Coil 1" ); // user-defined name of the coil
+	std::string coil1Type ( "Coil:Heating:Fuel" ); // idf input object class name of coil
 
-	//void
-	//setCoilUA(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const UAvalue, // [W/k] UA value for coil, 
-	//	Real64 const dataCapacityUsedForSizing, // [W] sizing global
-	//	bool const isAutoSize, // true if value was autosized
-	//	int const curSysNum, // airloop system number index, if non zero
-	//	int const curZoneEqNum // zone equipment list index, if non-zero
-	//);
+	DataGlobals::NumOfZones = 3;
+	DataHeatBalance::Zone.allocate( DataGlobals::NumOfZones );
+	DataHeatBalance::Zone( 1 ).Name = "Zone 1";
+	DataHeatBalance::Zone( 2 ).Name = "Zone 2";
+	DataHeatBalance::Zone( 3 ).Name = "Zone 3";
 
-	//void
-	//setCoilReheatMultiplier(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	Real64 const multiplierReheatLoad
-	//);
+	int curSysNum = 0;
+	int curZoneEqNum = 2;
+	DataZoneEquipment::ZoneEquipList.allocate( 3 );
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).NumOfEquipTypes = 2;
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipName.allocate( 2 );
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipType.allocate( 2 );
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipType_Num.allocate( 2 );
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipName( 1 )= "Zone 2 Fan Coil";
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipType( 1 )= "ZoneHVAC:FourPipeFanCoil";
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipType_Num( 1 ) = DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil;
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipName( 2 )= "Zone 2 Unit Heater";
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipType( 2 )= "ZoneHVAC:UnitHeater";
+	DataZoneEquipment::ZoneEquipList( curZoneEqNum ).EquipType_Num( 2 ) = DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator;
 
-	//void
-	//setCoilSupplyFanInfo(
-	//	std::string const & coilName, // user-defined name of the coil
-	//	std::string const & coilType, // idf input object class name of coil
-	//	std::string const & fanName,
-	//	DataAirSystems::fanModelTypeEnum const & fanEnumType,
-	//	int const & fanIndex
-	//);
+	Real64 totGrossCap = 500.0;
+	Real64 sensGrossCap = 500.0;
+	Real64 airFlowRate = 0.11;
+	Real64 waterFlowRate = 0.0;
 
-	//std::string 
-	//getTimeText(
-	//	int const timeStepAtPeak
-	//);
+	coilSelectionReportObj->setCoilFinalSizes(  coil1Name, coil1Type, totGrossCap, sensGrossCap, airFlowRate, waterFlowRate );
 
-	//bool
-	//isCompTypeFan(
-	//	std::string const & compType // string component type, input object class name
-	//);
+	Real64 RatedCoilTotCap = 400.0;
+	Real64 RatedCoilSensCap = 399.0;
+	Real64 RatedAirMassFlow = 0.001;
+	Real64 RatedCoilInDb = 23.0;
+	Real64 RatedCoilInHumRat = 0.008;
+	Real64 RatedCoilInWb = 20.0;
+	Real64 RatedCoilOutDb = 40.0;
+	Real64 RatedCoilOutHumRat = 0.009;
+	Real64 RatedCoilOutWb = 30.0;
 
-	//bool 
-	//isCompTypeCoil(
-	//	std::string const & compType // string component type, input object class name
-	//);
+	Real64 RatedCoilOadbRef = 24.0;
+	Real64 RatedCoilOawbRef = 16.0;
+	Real64 RatedCoilBpFactor = 0.2;
+	Real64 RatedCoilEff = 0.8;
+	coilSelectionReportObj->setRatedCoilConditions( coil1Name, coil1Type, RatedCoilTotCap, RatedCoilSensCap, RatedAirMassFlow, RatedCoilInDb, RatedCoilInHumRat, RatedCoilInWb, 
+		RatedCoilOutDb, RatedCoilOutHumRat, RatedCoilOutWb, RatedCoilOadbRef, RatedCoilOawbRef, RatedCoilBpFactor, RatedCoilEff );
 
-	//void
-	//setZoneLatentLoadCoolingIdealPeak(
-	//	int const zoneIndex,
-	//	Real64 const zoneCoolingLatentLoad
-	//);
-	//
-	//void
-	//setZoneLatentLoadHeatingIdealPeak(
-	//	int const zoneIndex,
-	//	Real64 const zoneHeatingLatentLoad
-	//);
+	Real64 entAirDryBulbTemp = 24.0;
+	coilSelectionReportObj->setCoilEntAirTemp( coil1Name, coil1Type, entAirDryBulbTemp, curSysNum, curZoneEqNum );
+
+	Real64 entAirHumRat = 0.004;
+	coilSelectionReportObj->setCoilEntAirHumRat( coil1Name, coil1Type, entAirHumRat );
+
+	Real64 entWaterTemp = 60.0;
+	coilSelectionReportObj->setCoilEntWaterTemp( coil1Name, coil1Type, entWaterTemp );
+
+	Real64 lvgWaterTemp = 50.0;
+	coilSelectionReportObj->setCoilLvgWaterTemp( coil1Name, coil1Type, lvgWaterTemp );
+
+	Real64 CoilWaterDeltaT = 50.0;
+	coilSelectionReportObj->setCoilWaterDeltaT( coil1Name, coil1Type, CoilWaterDeltaT );
+
+	Real64 lvgAirDryBulbTemp = 12.0;
+	coilSelectionReportObj->setCoilLvgAirTemp( coil1Name, coil1Type, lvgAirDryBulbTemp );
+
+	Real64 lvgAirHumRat = 0.006;
+	coilSelectionReportObj->setCoilLvgAirHumRat( coil1Name, coil1Type, lvgAirHumRat );
+
+	int zoneNum = 1;
+	Real64 zoneCoolingLatentLoad = 1234.0;
+	coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( zoneNum, zoneCoolingLatentLoad );
+
+	Real64 zoneHeatingLatentLoad = 4321.0;
+	coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( zoneNum, zoneHeatingLatentLoad );
+
+	// Exercise report writing again
+	coilSelectionReportObj->finishCoilSummaryReportTable();
 }
