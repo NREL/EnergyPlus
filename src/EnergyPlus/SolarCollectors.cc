@@ -802,7 +802,7 @@ namespace SolarCollectors {
 		if ( SetLoopIndexFlag( CollectorNum ) ) {
 			if ( allocated( PlantLoop ) ) {
 				errFlag = false;
-				ScanPlantLoopsForObject( Collector( CollectorNum ).Name, Collector( CollectorNum ).TypeNum, Collector( CollectorNum ).WLoopNum, Collector( CollectorNum ).WLoopSideNum, Collector( CollectorNum ).WLoopBranchNum, Collector( CollectorNum ).WLoopCompNum, _, _, _, _, _, errFlag );
+				PlantUtilities::ScanPlantLoopsForObject( Collector( CollectorNum ).Name, Collector( CollectorNum ).TypeNum, Collector( CollectorNum ).WLoopNum, Collector( CollectorNum ).WLoopSideNum, Collector( CollectorNum ).WLoopBranchNum, Collector( CollectorNum ).WLoopCompNum, _, _, _, _, _, errFlag );
 				if ( errFlag ) {
 					ShowFatalError( "InitSolarCollector: Program terminated due to previous condition(s)." );
 				}

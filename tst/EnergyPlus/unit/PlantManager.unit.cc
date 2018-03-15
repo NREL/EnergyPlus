@@ -56,7 +56,7 @@
 #include <ObjexxFCL/string.functions.hh>
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>

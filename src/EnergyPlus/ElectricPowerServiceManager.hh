@@ -58,7 +58,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <PlantLocation.hh>
+#include <Plant/PlantLocation.hh>
 #include <OutputProcessor.hh>
 #include <DataHeatBalance.hh>
 #include <EMSManager.hh>

@@ -777,7 +777,7 @@ namespace SwimmingPool {
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_SwimmingPool_Indoor;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataGlobals::AnyPlantInModel;
 
 		bool errFlag;
