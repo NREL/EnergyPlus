@@ -65,7 +65,7 @@
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
 #include <DataHVACGlobals.hh>
-#include <PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <BranchInputManager.hh>
 #include <SizingManager.hh>
 #include <WeatherManager.hh>

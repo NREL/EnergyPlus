@@ -664,7 +664,7 @@ namespace CoolingPanelSimple {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataLoopNode::Node;
 		using PlantUtilities::InitComponentNodes;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using FluidProperties::GetDensityGlycol;
@@ -845,7 +845,7 @@ namespace CoolingPanelSimple {
 		using ReportSizingManager::RequestSizing;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataHeatBalance::Zone;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using General::RoundSigDigits;
