@@ -1250,23 +1250,23 @@ ReportCoilSelection::setCoilCoolingCapacity(
 		//DesOutAirVolFlow
 
 		//loop over cooled zones attached to this airloop to find average Room condition
-		// weighted average by zone air volume for all the zones on this coil's air system
-		Real64 sumT_V( 0.0 ); // numerator for average zone temperature, zone temperature values times zone air volume
-		Real64 sumW_V( 0.0 );  // numerator average zone humidity ratio, zone hum rat value times zone air volume
+		// change weighting to use supply air flow rate rather than zone air volume for all the zones on this coil's air system
+		Real64 sumT_Vdot( 0.0 ); // numerator for average zone temperature, zone temperature values times zone supply air volume flow rate
+		Real64 sumW_Vdot( 0.0 );  // numerator average zone humidity ratio, zone hum rat value times zone supply air volume flow rate
 		Real64 sumSensLoad( 0.0 ); // straight total for zone design loads
-		Real64 sumV( 0.0 ); // denominator for zone-volume weighted averages
+		Real64 sumVdot( 0.0 ); // denominator for supply air flow rate weighted averages
 
 		for ( auto & z : c->zoneNum ) {
 			Real64 mult = DataHeatBalance::Zone( z ).Multiplier * DataHeatBalance::Zone( z ).ListMultiplier;
-			sumT_V += DataSizing::FinalZoneSizing( z ).ZoneTempAtCoolPeak * DataHeatBalance::Zone( z ).Volume * mult;
-			sumW_V += DataSizing::FinalZoneSizing( z ).ZoneHumRatAtCoolPeak * DataHeatBalance::Zone( z ).Volume * mult;
+			sumT_Vdot += DataSizing::FinalZoneSizing( z ).ZoneTempAtCoolPeak * DataSizing::FinalZoneSizing( z ).DesCoolVolFlow * mult;
+			sumW_Vdot += DataSizing::FinalZoneSizing( z ).ZoneHumRatAtCoolPeak * DataSizing::FinalZoneSizing( z ).DesCoolVolFlow * mult;
 			sumSensLoad += DataSizing::FinalZoneSizing( z ).DesCoolLoad * mult;
-			sumV += DataHeatBalance::Zone( z ).Volume * mult;
+			sumVdot += DataSizing::FinalZoneSizing( z ).DesCoolVolFlow * mult;
 		}
 
-		if ( c->zoneNum.size() > 0 && sumV > 0.0 ) {
-			c->rmPeakTemp = ( sumT_V / sumV );
-			c->rmPeakHumRat = ( sumW_V / sumV );
+		if ( c->zoneNum.size() > 0 && sumVdot > 0.0 ) {
+			c->rmPeakTemp = ( sumT_Vdot / sumVdot );
+			c->rmPeakHumRat = ( sumW_Vdot / sumVdot );
 			c->rmPeakRelHum = Psychrometrics::PsyRhFnTdbWPb( c->rmPeakTemp,c->rmPeakHumRat, DataEnvironment::StdBaroPress ) * 100.0; // convert to percentage
 		} else {
 			c->rmPeakTemp = -999.0;
@@ -1282,22 +1282,38 @@ ReportCoilSelection::setCoilCoolingCapacity(
 
 		// now set Coil Ent And Lvg Conditions
 		if ( curOASysNum > 0 ) { // then this system coil is part of OA system
-			c->coilDesEntTemp = DataSizing::FinalSysSizing( curSysNum ).OutTempAtCoolPeak;
-			c->coilDesEntHumRat = DataSizing::FinalSysSizing( curSysNum ).OutHumRatAtCoolPeak;
+			if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly
+				c->coilDesEntTemp = DataSizing::FinalSysSizing( curSysNum ).OutTempAtCoolPeak;
+			}
+			if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly
+				c->coilDesEntHumRat = DataSizing::FinalSysSizing( curSysNum ).OutHumRatAtCoolPeak;
+			}
 			c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb( c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity" );
 			c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW ( c->coilDesEntTemp, c->coilDesEntHumRat );
-			c->coilDesLvgTemp = DataSizing::FinalSysSizing( curSysNum ).PrecoolTemp;
-			c->coilDesLvgHumRat = DataSizing::FinalSysSizing( curSysNum ).PrecoolHumRat;
+			if ( c->coilDesLvgTemp == -999.0 ) { // don't overwrite if already set directly
+				c->coilDesLvgTemp = DataSizing::FinalSysSizing( curSysNum ).PrecoolTemp;
+			}
+			if ( c->coilDesLvgHumRat == -999.0 ) { // don't overwrite if already set directly
+				c->coilDesLvgHumRat = DataSizing::FinalSysSizing( curSysNum ).PrecoolHumRat;
+			}
 			c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb( c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity" );
 			c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW ( c->coilDesLvgTemp, c->coilDesLvgHumRat );
 
 		} else { // part of main air loop
-			c->coilDesEntTemp = DataSizing::FinalSysSizing( curSysNum ).MixTempAtCoolPeak;
-			c->coilDesEntHumRat = DataSizing::FinalSysSizing( curSysNum ).MixHumRatAtCoolPeak;
+			if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly
+				c->coilDesEntTemp = DataSizing::FinalSysSizing( curSysNum ).MixTempAtCoolPeak;
+			}
+			if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly
+				c->coilDesEntHumRat = DataSizing::FinalSysSizing( curSysNum ).MixHumRatAtCoolPeak;
+			}
 			c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb( c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity" );
 			c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW ( c->coilDesEntTemp, c->coilDesEntHumRat );
-			c->coilDesLvgTemp = DataSizing::FinalSysSizing( curSysNum ).CoolSupTemp;
-			c->coilDesLvgHumRat = DataSizing::FinalSysSizing( curSysNum ).CoolSupHumRat;
+			if ( c->coilDesLvgTemp == -999.0 ) {
+				c->coilDesLvgTemp = DataSizing::FinalSysSizing( curSysNum ).CoolSupTemp;
+			}
+			if ( c->coilDesLvgHumRat == -999.0 ) { // don't overwrite if already set directly
+				c->coilDesLvgHumRat = DataSizing::FinalSysSizing( curSysNum ).CoolSupHumRat;
+			}
 			c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb( c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity" );
 			c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW ( c->coilDesLvgTemp, c->coilDesLvgHumRat );
 			if ( DataAirSystems::PrimaryAirSystem( curSysNum ).NumOACoolCoils > 0) { // there is precooling of the OA stream
@@ -1322,7 +1338,11 @@ ReportCoilSelection::setCoilCoolingCapacity(
 
 		c->rmSensibleAtPeak = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolLoad;
 
-		c->oaPeakVolFlow = DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow;
+		if ( DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow > 0.0 ) {
+			c->oaPeakVolFlow = DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow;
+		} else {
+			c->oaPeakVolFlow = 0.0;
+		}
 		//coil entering conditions depend on the type of zone equipment involved
 		// set typeof_Coil integer
 		if ( DataSizing::TermUnitIU ) { //an unpowered induction terminal unit
@@ -1339,20 +1359,36 @@ ReportCoilSelection::setCoilCoolingCapacity(
 			//c->coilDesEntTemp = c->oaPeakVolFrac * DataSizing::FinalZoneSizing( curZoneEqNum ).OutTempAtCoolPeak + ( 1.0 - c->oaPeakVolFrac ) * DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneTempAtCoolPeak;
 			//c->coilDesEntHumRat =  c->oaPeakVolFrac * DataSizing::FinalZoneSizing( curZoneEqNum ).OutHumRatAtCoolPeak + ( 1.0 - c->oaPeakVolFrac ) * DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneHumRatAtCoolPeak;
 		} else if ( DataSizing::ZoneEqDXCoil ) {
-			if ( DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow > 0.0) {
-				c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInTemp;
-				c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInHumRat;
+			if ( DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow > 0.0 ) {
+				if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirTemp
+					c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInTemp;
+				}
+				if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirHumRat
+					c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInHumRat;
+				}
 			} else {
-				c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneRetTempAtCoolPeak;
-				c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneHumRatAtCoolPeak;
+				if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirTemp
+					c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneRetTempAtCoolPeak;
+				}
+				if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirHumRat
+					c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneHumRatAtCoolPeak;
+				}
 			}
 		} else {
-			c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInTemp;
-			c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInHumRat;
+			if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirTemp
+				c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInTemp;
+			}
+			if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirHumRat
+				c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolCoilInHumRat;
+			}
 		}
 
-		c->coilDesLvgTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDesTemp;
-		c->coilDesLvgHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDesHumRat;
+		if ( c->coilDesLvgTemp == -999.0 ) { // don't overwrite if already set directly by setCoilLvgAirTemp
+			c->coilDesLvgTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDesTemp;
+		}
+		if ( c->coilDesLvgHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilLvgAirHumRat
+			c->coilDesLvgHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).CoolDesHumRat;
+		}
 		c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb( c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity" );
 		c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW ( c->coilDesLvgTemp, c->coilDesLvgHumRat );
 	} else {
@@ -1409,23 +1445,23 @@ ReportCoilSelection::setCoilHeatingCapacity(
 		//DesOutAirVolFlow
 
 		//loop over heated zones attached to this airloop to find average Room condition, if none heated use cooled zones
-		// weighted average by zone air volume for all the zones on this coil's air system
-		Real64 sumT_V( 0.0 ); // numerator for average zone temperature, zone temperature values times zone air volume
-		Real64 sumW_V( 0.0 );  // numerator average zone humidity ratio, zone hum rat value times zone air volume
+		// weighted average by zone supply air volume flow rate for all the zones on this coil's air system
+		Real64 sumT_Vdot( 0.0 ); // numerator for average zone temperature, zone temperature values times zone air volume
+		Real64 sumW_Vdot( 0.0 );  // numerator average zone humidity ratio, zone hum rat value times zone air volume
 		Real64 sumLoad( 0.0 ); // straight total for zone design loads
-		Real64 sumV( 0.0 ); // denominator for zone-volume weighted averages
+		Real64 sumVdot( 0.0 ); // denominator for zone-volume weighted averages
 
 		for ( auto & z : c->zoneNum ) {
 			Real64 mult = DataHeatBalance::Zone( z ).Multiplier * DataHeatBalance::Zone( z ).ListMultiplier;
-			sumT_V += DataSizing::FinalZoneSizing( z ).ZoneTempAtHeatPeak * DataHeatBalance::Zone( z ).Volume * mult;
-			sumW_V += DataSizing::FinalZoneSizing( z ).ZoneHumRatAtHeatPeak * DataHeatBalance::Zone( z ).Volume * mult;
+			sumT_Vdot += DataSizing::FinalZoneSizing( z ).ZoneTempAtHeatPeak * DataSizing::FinalZoneSizing( z ).DesHeatVolFlow * mult;
+			sumW_Vdot += DataSizing::FinalZoneSizing( z ).ZoneHumRatAtHeatPeak * DataSizing::FinalZoneSizing( z ).DesHeatVolFlow * mult;
 			sumLoad += DataSizing::FinalZoneSizing( z ).DesHeatLoad * mult;
-			sumV += DataHeatBalance::Zone( z ).Volume * mult;
+			sumVdot += DataSizing::FinalZoneSizing( z ).DesHeatVolFlow * mult;
 		}
 
-		if ( c->zoneNum.size() > 0 && sumV > 0.0 ) {
-			c->rmPeakTemp = ( sumT_V / sumV );
-			c->rmPeakHumRat = ( sumW_V / sumV );
+		if ( c->zoneNum.size() > 0 && sumVdot > 0.0 ) {
+			c->rmPeakTemp = ( sumT_Vdot / sumVdot );
+			c->rmPeakHumRat = ( sumW_Vdot / sumVdot );
 			c->rmPeakRelHum = Psychrometrics::PsyRhFnTdbWPb( c->rmPeakTemp,c->rmPeakHumRat, DataEnvironment::StdBaroPress ) * 100.0; // convert to percentage
 		} else {
 			c->rmPeakTemp = -999.0;
@@ -1488,7 +1524,11 @@ ReportCoilSelection::setCoilHeatingCapacity(
 
 		c->rmSensibleAtPeak = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatLoad;
 
-		c->oaPeakVolFlow = DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow;
+		if ( DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow > 0.0 ) {
+			c->oaPeakVolFlow = DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow;
+		} else {
+			c->oaPeakVolFlow = 0.0;
+		}
 		//coil entering conditions depend on the type of zone equipment involved
 		// set typeof_Coil integer
 		if ( DataSizing::TermUnitIU ) { //an unpowered induction terminal unit
@@ -1500,25 +1540,40 @@ ReportCoilSelection::setCoilHeatingCapacity(
 			//should be picked up by CoolingWaterDesAirInletHumRatSizing and CoolingWaterDesWaterInletTempSizing
 
 		} else if ( DataSizing::ZoneEqDXCoil ) {
-			if ( DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow > 0.0) {
-				c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInTemp;
-				c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInHumRat;
+			if ( DataSizing::ZoneEqSizing( curZoneEqNum ).OAVolFlow > 0.0 ) {
+				if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirTemp
+					c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInTemp;
+				}
+				if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirHumRat
+					c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInHumRat;
+				}
 			} else {
-				c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneRetTempAtHeatPeak;
-				c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneHumRatAtHeatPeak;
+				if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirTemp
+					c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneRetTempAtHeatPeak;
+				}
+				if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirHumRat
+					c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneHumRatAtHeatPeak;
+				}
 			}
 		} else {
-			c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInTemp;
-			c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInHumRat;
+			if ( c->coilDesEntTemp == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirTemp
+				c->coilDesEntTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInTemp;
+			}
+			if ( c->coilDesEntHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilEntAirHumRat
+				c->coilDesEntHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).DesHeatCoilInHumRat;
+			}
 		}
 
 
 		c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb( c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity" );
 		c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW ( c->coilDesEntTemp, c->coilDesEntHumRat );
 
-
-		c->coilDesLvgTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).HeatDesTemp;
-		c->coilDesLvgHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).HeatDesHumRat;
+		if ( c->coilDesLvgTemp == -999.0 ) { // don't overwrite if already set directly by setCoilLvgAirTemp
+			c->coilDesLvgTemp = DataSizing::FinalZoneSizing( curZoneEqNum ).HeatDesTemp;
+		}
+		if ( c->coilDesLvgHumRat == -999.0 ) { // don't overwrite if already set directly by setCoilLvgAirHumRat
+			c->coilDesLvgHumRat = DataSizing::FinalZoneSizing( curZoneEqNum ).HeatDesHumRat;
+		}
 		c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb( c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity" );
 		c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW ( c->coilDesLvgTemp, c->coilDesLvgHumRat );
 

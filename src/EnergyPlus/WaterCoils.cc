@@ -2142,6 +2142,7 @@ namespace WaterCoils {
 					WaterCoil( CoilNum ).InletAirTemp = TempSize;
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
 					RequestSizing( CompType, CompName, HeatingCoilDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName );
+					WaterCoil( CoilNum ).DesInletAirHumRat = TempSize; //coil report
 					WaterCoil( CoilNum ).InletAirHumRat = TempSize;
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
 					RequestSizing( CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName );
@@ -2154,6 +2155,7 @@ namespace WaterCoils {
 					WaterCoil( CoilNum ).InletAirTemp = TempSize;
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
 					RequestSizing( CompType, CompName, HeatingWaterDesAirInletHumRatSizing, SizingString, TempSize, bPRINT, RoutineName );
+					WaterCoil( CoilNum ).DesInletAirHumRat = TempSize; //coil report
 					WaterCoil( CoilNum ).InletAirHumRat = TempSize;
 					TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from RequestSizing
 					RequestSizing( CompType, CompName, HeatingAirflowUASizing, SizingString, TempSize, bPRINT, RoutineName );

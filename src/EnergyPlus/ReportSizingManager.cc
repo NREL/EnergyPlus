@@ -2935,8 +2935,14 @@ namespace ReportSizingManager {
 			//SizingResult is water flow in m3/s
 			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizCoolNum, DataWaterLoopNum );
 			coilSelectionReportObj->setCoilWaterDeltaT( CompName, CompType , CoilDesWaterDeltaT );
-			coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp );
-			coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp + CoilDesWaterDeltaT );
+			if ( DataDesInletWaterTemp > 0.0 ) {
+				coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataDesInletWaterTemp );
+				coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataDesInletWaterTemp + CoilDesWaterDeltaT );
+			} else {
+				coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp );
+				coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp + CoilDesWaterDeltaT );
+			}
+
 		} else if ( SizingType == HeatingWaterflowSizing ) {
 			//SizingResult is water flow in m3/s
 			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum  );
