@@ -985,13 +985,6 @@ namespace OutputReportTabular {
 	);
 
 	void
-	CollectPeakAirLoopConditions(
-		CompLoadTablesType & compLoad,
-		int const & airLoopIndex,
-		bool const & isCooling
-	);
-
-	void
 	ComputeEngineeringChecks(
 		CompLoadTablesType & compLoad
 	);

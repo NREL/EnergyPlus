@@ -6180,58 +6180,6 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 
 }
 
-TEST( OutputReportTabularTest, CollectPeakAirLoopConditions_test )
-{
-	ShowMessage( "Begin Test: OutputReportTabularTest, CollectPeakAirLoopConditions_test" );
-
-	CompLoadTablesType compLoad;
-	int airLoopIndex = 1;
-	bool isCooling = true;
-
-	CalcSysSizing.allocate( 1 );
-	CalcSysSizing( 1 ).SensCoolCap = 500.;
-
-	FinalSysSizing.allocate( 1 );
-	FinalSysSizing( 1 ).CoolSupTemp = 13.;
-	FinalSysSizing( 1 ).MixTempAtCoolPeak = 18.;
-	FinalSysSizing( 1 ).SensCoolCap = 600.;
-	FinalSysSizing( 1 ).DesMainVolFlow = 3.3;
-	FinalSysSizing( 1 ).DesOutAirVolFlow = 0.12;
-
-	CollectPeakAirLoopConditions( compLoad, airLoopIndex, isCooling );
-
-	EXPECT_EQ( compLoad.supAirTemp, 13. );
-	EXPECT_EQ( compLoad.mixAirTemp, 18. );
-	EXPECT_EQ( compLoad.designPeakLoad, 600. );
-	EXPECT_EQ( compLoad.peakDesSensLoad, 500. );
-	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
-	EXPECT_EQ( compLoad.outsideAirFlow, 0.12 );
-	EXPECT_EQ( compLoad.diffDesignPeak, 100. );
-
-	isCooling = false;
-
-	CalcSysSizing( 1 ).HeatCap = 800.;
-
-	FinalSysSizing.allocate( 1 );
-	FinalSysSizing( 1 ).HeatSupTemp = 45.;
-	FinalSysSizing( 1 ).HeatMixTemp = 37.;
-	FinalSysSizing( 1 ).HeatCap = 900.;
-	FinalSysSizing( 1 ).DesMainVolFlow = 3.3;
-	FinalSysSizing( 1 ).DesOutAirVolFlow = 0.12;
-
-
-	CollectPeakAirLoopConditions( compLoad, airLoopIndex, isCooling );
-
-	EXPECT_EQ( compLoad.supAirTemp, 45. );
-	EXPECT_EQ( compLoad.mixAirTemp, 37. );
-	EXPECT_EQ( compLoad.designPeakLoad, -900. );
-	EXPECT_EQ( compLoad.peakDesSensLoad, -800. );
-	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
-	EXPECT_EQ( compLoad.outsideAirFlow, 0.12 );
-	EXPECT_EQ( compLoad.diffDesignPeak, -100. );
-
-}
-
 TEST( OutputReportTabularTest, ComputeEngineeringChecks_test )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, ComputeEngineeringChecks_test" );

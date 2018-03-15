@@ -11867,9 +11867,6 @@ namespace OutputReportTabular {
 					}
 				}
 
-				CollectPeakAirLoopConditions( AirLoopCoolCompLoadTables( iAirLoop ), iAirLoop, true );
-				CollectPeakAirLoopConditions( AirLoopHeatCompLoadTables( iAirLoop ), iAirLoop, false );
-
 				ComputeEngineeringChecks( AirLoopCoolCompLoadTables( iAirLoop ) );
 				ComputeEngineeringChecks( AirLoopHeatCompLoadTables( iAirLoop ) );
 
@@ -12474,36 +12471,6 @@ namespace OutputReportTabular {
 			compLoad.numPeople = totNumPeople;
 
 		}
-	}
-
-	// for the load summary report add airloop related values the peak conditions subtable
-	void
-	CollectPeakAirLoopConditions(
-		CompLoadTablesType & compLoad,
-		int const & airLoopIndex,
-		bool const & isCooling
-	)
-	{
-		using DataSizing::FinalSysSizing;
-		using DataSizing::CalcSysSizing;
-
-		if ( isCooling ) {
-			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).CoolSupTemp;
-			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).MixTempAtCoolPeak;
-			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).SensCoolCap;
-			compLoad.peakDesSensLoad = CalcSysSizing( airLoopIndex ).SensCoolCap;
-
-		} else {
-			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
-			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
-			compLoad.designPeakLoad = -FinalSysSizing( airLoopIndex ).HeatCap;
-			compLoad.peakDesSensLoad = -CalcSysSizing( airLoopIndex ).HeatCap;
-		}
-		compLoad.diffDesignPeak = compLoad.designPeakLoad - compLoad.peakDesSensLoad;
-
-		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
-		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
-
 	}
 
 	void
