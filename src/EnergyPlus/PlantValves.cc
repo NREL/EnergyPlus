@@ -279,7 +279,7 @@ namespace PlantValves {
 		using DataLoopNode::Node;
 		using DataPlant::TypeOf_ValveTempering;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::GenEquipTypes_Pump;
 		using DataBranchAirLoopPlant::ControlType_Active;
 		using DataHVACGlobals::NumPlantLoops;

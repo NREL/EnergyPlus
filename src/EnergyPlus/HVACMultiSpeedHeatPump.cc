@@ -1512,7 +1512,7 @@ namespace HVACMultiSpeedHeatPump {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipList;
 		using DataAirLoop::AirToZoneNodeInfo;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_MultiSpeedHeatPumpRecovery;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CoilSteamAirHeating;

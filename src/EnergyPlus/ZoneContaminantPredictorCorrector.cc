@@ -1586,8 +1586,8 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					} else {
-						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
-						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorCO2;
+						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 					}
 					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 
@@ -1668,8 +1668,8 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					} else {
-						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
-						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorGC;
+						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 					}
 					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 
@@ -1965,8 +1965,6 @@ namespace ZoneContaminantPredictorCorrector {
 		Real64 C;
 		Real64 CO2MassFlowRate;
 		Real64 GCMassFlowRate;
-		Real64 ExhMassFlowRate;
-		Real64 TotExitMassFlowRate;
 		Real64 ZoneMassFlowRate;
 		Real64 SysTimeStepInSeconds;
 		Real64 ZoneMult;
@@ -2036,8 +2034,6 @@ namespace ZoneContaminantPredictorCorrector {
 			CO2MassFlowRate = 0.0;
 			GCMassFlowRate = 0.0;
 			ZoneMassFlowRate = 0.0;
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = 0.0;
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 			// Check to see if this is a controlled zone
@@ -2077,17 +2073,6 @@ namespace ZoneContaminantPredictorCorrector {
 					ZoneMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 				} // NodeNum
 
-				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
-					ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
-				} // NodeNum
-
-				TotExitMassFlowRate = ExhMassFlowRate;
-				if ( ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes > 0 ) {
-					for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigNum ).NumReturnNodes; ++retNode ) {
-						TotExitMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnNode( retNode ) ).MassFlowRate / ZoneMult;
-					}
-				}
-
 				// Do the calculations for the plenum zone
 			} else if ( ZoneRetPlenumAirFlag ) {
 				for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
@@ -2124,9 +2109,6 @@ namespace ZoneContaminantPredictorCorrector {
 						ZoneMassFlowRate += AirDistUnit( ADUNum ).MassFlowRateDnStrLk / ZoneMult;
 					}
 				}
-				// Do not allow exhaust mass flow for a plenum zone
-				ExhMassFlowRate = 0.0;
-				TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 
 			} else if ( ZoneSupPlenumAirFlag ) {
 
@@ -2137,9 +2119,6 @@ namespace ZoneContaminantPredictorCorrector {
 					GCMassFlowRate += ( Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate * Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).GenContam ) / ZoneMult;
 				}
 				ZoneMassFlowRate += Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate / ZoneMult;
-				// Do not allow exhaust mass flow for a plenum zone
-				ExhMassFlowRate = 0.0;
-				TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 			}
 
 			SysTimeStepInSeconds = SecInHour * TimeStepSys;
@@ -2157,29 +2136,15 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( Contaminant.CO2Simulation ) CO2Gain = ZoneCO2Gain( ZoneNum ) * RhoAir * 1.0e6;
 			if ( Contaminant.GenericContamSimulation ) GCGain = ZoneGCGain( ZoneNum ) * RhoAir * 1.0e6;
 
-			// Check for the flow and NO flow condition
-			if ( ZoneMassFlowRate > 0.0 ) {
-				if ( Contaminant.CO2Simulation ) {
-					B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + ( CO2MassFlowRate ) + MixingMassFlowCO2( ZoneNum );
-					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
-						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
+			if ( Contaminant.CO2Simulation ) {
+				B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + ( CO2MassFlowRate ) + MixingMassFlowCO2( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorCO2;
+				A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+				if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+					// Multizone airflow calculated in AirflowNetwork
+					B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
+					A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 				}
-			} else if ( ZoneMassFlowRate <= 0.0 ) {
-				if ( Contaminant.CO2Simulation ) {
-					B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
-					A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = CO2Gain + AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO;
-						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
-				}
+				C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
 			}
 
 			if ( Contaminant.CO2Simulation ) {
@@ -2219,28 +2184,15 @@ namespace ZoneContaminantPredictorCorrector {
 				}
 			}
 
-			if ( ZoneMassFlowRate > 0.0 ) {
-				if ( Contaminant.GenericContamSimulation ) {
-					B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + ( GCMassFlowRate ) + MixingMassFlowGC( ZoneNum );
-					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;
-						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+			if ( Contaminant.GenericContamSimulation ) {
+				B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + ( GCMassFlowRate ) + MixingMassFlowGC( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorGC;
+				A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+				if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+					// Multizone airflow calculated in AirflowNetwork
+					B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;
+					A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 				}
-			} else if ( ZoneMassFlowRate <= 0.0 ) {
-				if ( Contaminant.GenericContamSimulation ) {
-					B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
-					A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = GCGain + AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC;
-						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
-				}
+				C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 			}
 
 			if ( Contaminant.GenericContamSimulation ) {

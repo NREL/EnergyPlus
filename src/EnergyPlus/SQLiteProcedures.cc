@@ -1391,6 +1391,9 @@ std::string SQLite::reportingFreqName(const int reportingFreqIndex)
 	case LocalReportSim:
 		result = "Run Period";
 		break;
+	case LocalReportYearly:
+		result = "Annual";
+		break;
 	default:
 		result = "Unknown!!!";
 		break;

@@ -19,11 +19,13 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
   ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
@@ -36,6 +38,7 @@ set( test_src
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
@@ -112,9 +115,13 @@ set( test_src
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  Pipes.unit.cc
+  Plant/Branch.unit.cc
+  Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
@@ -124,6 +131,7 @@ set( test_src
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
@@ -141,6 +149,7 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  StandardRatings.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
@@ -164,6 +173,7 @@ set( test_src
   WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc

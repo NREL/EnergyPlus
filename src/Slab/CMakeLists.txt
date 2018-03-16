@@ -4,7 +4,7 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
-SET(SRC
+set(SRC
   3DSlabHT.f90
   DataGlobals.f90
   DataStringGlobals.f90
@@ -19,6 +19,8 @@ SET(SRC
   SimData.f90
 )
 
+set(STATIC_EXE FALSE)
+
 if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
@@ -29,6 +31,7 @@ elseif(UNIX)
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
   else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static" )
+    set(STATIC_EXE TRUE)
   endif()
 else()
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
@@ -37,17 +40,21 @@ else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
   else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+    set(STATIC_EXE TRUE)
   endif()
 endif()
 
-set(SKIP_BUILD_RPATH true)
-ADD_EXECUTABLE( Slab ${SRC} )
+set(SKIP_BUILD_RPATH TRUE)
+add_executable( Slab ${SRC} )
 
-SET_TARGET_PROPERTIES(Slab PROPERTIES
+set_target_properties(Slab PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( Slab PreProcess/GrndTempCalc )
+install( TARGETS Slab DESTINATION PreProcess/GrndTempCalc )
+if(NOT ${STATIC_EXE})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+  install_target_prereqs( Slab PreProcess/GrndTempCalc )
+endif()
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../idd/SlabGHT.idd" DESTINATION "PreProcess/GrndTempCalc/")
 

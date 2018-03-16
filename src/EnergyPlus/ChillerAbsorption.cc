@@ -552,7 +552,7 @@ namespace ChillerAbsorption {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Absorption;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
@@ -768,7 +768,7 @@ namespace ChillerAbsorption {
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -1541,24 +1541,35 @@ namespace ChillerAbsorption {
 		}
 
 		if ( GeneratorInletNode > 0 ) {
-			//         Hot water plant is used for the generator
 			if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
-				CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, Node( GeneratorInletNode ).Temp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
-				if ( ( BLASTAbsorber( ChillNum ).FlowMode == ConstantFlow ) || ( BLASTAbsorber( ChillNum ).FlowMode == NotModulated ) ) {
-					SteamMassFlowRate = BLASTAbsorber( ChillNum ).GenMassFlowRateMax;
-				} else {
-					SteamMassFlowRate = QGenerator / CpFluid / BLASTAbsorber( ChillNum ).GeneratorDeltaTemp;
+				Real64 GenMassFlowRate = 0.0;
+				int GenLoopNum = BLASTAbsorber( ChillNum ).GenLoopNum;
+				int GenLoopSideNum = BLASTAbsorber( ChillNum ).GenLoopSideNum;
+				//  Hot water plant is used for the generator
+				CpFluid = GetSpecificHeatGlycol( PlantLoop( GenLoopNum ).FluidName, Node( GeneratorInletNode ).Temp, PlantLoop( GenLoopSideNum ).FluidIndex, RoutineName );
+				if ( PlantLoop( GenLoopNum ).LoopSide( GenLoopSideNum ).FlowLock == 0 ) {
+					if ( (BLASTAbsorber( ChillNum ).FlowMode == ConstantFlow) || (BLASTAbsorber( ChillNum ).FlowMode == NotModulated) ) {
+						GenMassFlowRate = BLASTAbsorber( ChillNum ).GenMassFlowRateMax;
+					} else { // LeavingSetpointModulated
+						// since the .FlowMode applies to the chiller evaporator, the generater mass flow rate will be proportional to the evaporator mass flow rate
+						Real64 GenFlowRatio = EvapMassFlowRate / BLASTAbsorber( ChillNum ).EvapMassFlowRateMax;
+						GenMassFlowRate = min( BLASTAbsorber( ChillNum ).GenMassFlowRateMax, GenFlowRatio * BLASTAbsorber( ChillNum ).GenMassFlowRateMax );
+					}
+				} else { // If FlowLock is True
+					GenMassFlowRate = Node( GeneratorInletNode ).MassFlowRate;
 				}
+				SetComponentFlowRate( GenMassFlowRate, GeneratorInletNode, GeneratorOutletNode, GenLoopNum, GenLoopSideNum, BLASTAbsorber( ChillNum ).GenBranchNum, BLASTAbsorber( ChillNum ).GenCompNum );
 
-				SetComponentFlowRate( SteamMassFlowRate, GeneratorInletNode, GeneratorOutletNode, BLASTAbsorber( ChillNum ).GenLoopNum, BLASTAbsorber( ChillNum ).GenLoopSideNum, BLASTAbsorber( ChillNum ).GenBranchNum, BLASTAbsorber( ChillNum ).GenCompNum );
-
-				if ( SteamMassFlowRate <= 0.0 ) {
+				if ( GenMassFlowRate <= 0.0 ) {
 					GenOutletTemp = Node( GeneratorInletNode ).Temp;
 					SteamOutletEnthalpy = Node( GeneratorInletNode ).Enthalpy;
 				} else {
-					GenOutletTemp = Node( GeneratorInletNode ).Temp - QGenerator / ( CpFluid * SteamMassFlowRate );
-					SteamOutletEnthalpy = Node( GeneratorInletNode ).Enthalpy - QGenerator / SteamMassFlowRate;
+					GenOutletTemp = Node( GeneratorInletNode ).Temp - QGenerator / ( CpFluid * GenMassFlowRate );
+					SteamOutletEnthalpy = Node( GeneratorInletNode ).Enthalpy - QGenerator / GenMassFlowRate;
 				}
+				Node( GeneratorOutletNode ).Temp = GenOutletTemp;
+				Node( GeneratorOutletNode ).Enthalpy = SteamOutletEnthalpy;
+				Node( GeneratorOutletNode ).MassFlowRate = GenMassFlowRate;
 
 			} else { // using a steam plant for the generator
 

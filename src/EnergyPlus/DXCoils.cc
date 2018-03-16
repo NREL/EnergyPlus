@@ -253,6 +253,15 @@ namespace DXCoils {
 	Array1D< DXCoilData > DXCoil;
 	Array1D< DXCoilNumericFieldData > DXCoilNumericFields;
 
+	//bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
+	namespace {
+		// These were static variables within different functions. They were pulled out into the namespace
+		// to facilitate easier unit testing of those functions.
+		// These are purposefully not in the header file as an extern variable. No one outside of this should
+		// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+		bool CrankcaseHeaterReportVarFlag( true );
+	}
 	// Functions
 
 	void
@@ -5051,7 +5060,6 @@ namespace DXCoils {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Array1D_bool MyEnvrnFlag; // One time environment flag
 		static Array1D_bool MySizeFlag; // One time sizing flag
-		static bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
 		Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
 		Real64 RatedHeatPumpIndoorHumRat; // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
 		Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)
@@ -8801,6 +8809,17 @@ Label50: ;
 				}}
 			}
 
+			if ( TotCapTempModFac < 0.0 ) {
+				if ( DXCoil( DXCoilNum ).CAPFTErrIndex == 0 ) {
+					ShowWarningMessage( "The TotCapTempModFac curve value for DX heating coil " + DXCoil( DXCoilNum ).Name + " =" + RoundSigDigits( TotCapTempModFac, 2 ) );
+					ShowContinueError( "TotCapTempModFac curve value must be > 0. TotCapTempModFac curve value has been reset to 0.0 and simulation is continuing." );
+					ShowContinueError( "Check the IO reference manual for TotCapTempModFac curve guidance [ " + DXCoil( DXCoilNum ).DXCoilType + " ]." );
+					ShowContinueErrorTimeStamp( "" );
+				}
+				ShowRecurringWarningErrorAtEnd( "DX heating coil TotCapTempModFac curve value < 0 warning continues... ", DXCoil( DXCoilNum ).CAPFTErrIndex, TotCapTempModFac, TotCapTempModFac );
+				TotCapTempModFac = 0.0;
+			}
+
 			//  Get total capacity modifying factor (function of mass flow) for off-rated conditions
 			AirMassFlowRatio = AirMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode );
 			TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).CCapFFlow( Mode ), AirMassFlowRatio );
@@ -8901,6 +8920,18 @@ Label50: ;
 				EIRTempModFac = 1.0;
 				EIRFlowModFac = 1.0;
 			}
+
+			if ( EIRTempModFac < 0.0 ) {
+				if ( DXCoil( DXCoilNum ).EIRFTErrIndex == 0 ) {
+					ShowWarningMessage( "The EIRTempModFac curve value for DX heating coil " + DXCoil( DXCoilNum ).Name + " =" + RoundSigDigits( EIRTempModFac, 2 ) );
+					ShowContinueError( "EIRTempModFac curve value must be > 0.  EIRTempModFac curve value has been reset to 0.0 and simulation is continuing." );
+					ShowContinueError( "Check the IO reference manual for EIRTempModFac curve guidance [ " + DXCoil( DXCoilNum ).DXCoilType + " ]." );
+					ShowContinueErrorTimeStamp( "" );
+				} 
+				ShowRecurringWarningErrorAtEnd( "DX heating coil EIRTempModFac curve value < 0.0 warning continues... ", DXCoil( DXCoilNum ).EIRFTErrIndex, EIRTempModFac, EIRTempModFac );
+				EIRTempModFac = 0.0;
+			}
+
 			EIR = DXCoil( DXCoilNum ).RatedEIR( Mode ) * EIRTempModFac * EIRFlowModFac;
 			// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
 			PLRHeating = min( 1.0, ( PartLoadRatio + ( LoadDueToDefrost * PartLoadRatio ) / TotCapAdj ) );
@@ -15018,6 +15049,7 @@ Label50: ;
 
 		GetCoilsInputFlag = true;
 		MyOneTimeFlag = true;
+		CrankcaseHeaterReportVarFlag = true;
 
 		DXCoil.deallocate();
 		DXCoilNumericFields.deallocate();

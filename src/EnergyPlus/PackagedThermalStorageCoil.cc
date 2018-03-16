@@ -78,6 +78,7 @@
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -1667,7 +1668,7 @@ namespace PackagedThermalStorageCoil {
 		// Using/Aliasing
 		using DataPlant::TypeOf_PackagedTESCoolingCoil;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using General::RoundSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 

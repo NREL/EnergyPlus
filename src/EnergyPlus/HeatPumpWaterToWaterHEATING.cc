@@ -226,7 +226,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPEHeating;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::FindRefrigerant;
