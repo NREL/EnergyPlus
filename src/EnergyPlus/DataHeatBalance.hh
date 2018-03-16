@@ -3550,6 +3550,9 @@ namespace DataHeatBalance {
 		bool & isValid // returns true if result is valid
 	);
 
+	void
+	SetFlagForWindowConstructionWithShadeOrBlindLayer();
+
 } // DataHeatBalance
 
 } // EnergyPlus
