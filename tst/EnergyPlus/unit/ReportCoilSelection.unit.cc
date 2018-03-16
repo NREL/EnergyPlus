@@ -176,6 +176,50 @@ TEST_F( EnergyPlusFixture, ReportCoilSelection_ChWCoil )
 
 	// This triggers doAirLoopSetUp
 	coilSelectionReportObj->setCoilUA( coil2Name, coil2Type, uA, sizingCap, isAutoSized, curSysNum, curZoneEqNum );
+	EXPECT_EQ( uA, c2->coilUA );
+	EXPECT_EQ( sizingCap, c2->coilTotCapAtPeak );
+	EXPECT_EQ( curSysNum, c2->airloopNum );
+	EXPECT_EQ( curZoneEqNum, c2->zoneEqNum );
+
+	// This coil serves zones 2 and 3 - rmLatentAtPeak is summed for all applicable zones
+	Real64 zoneCoolingLatentLoad = 1000.0;
+	int zoneNum = 1;
+	coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( zoneNum, zoneCoolingLatentLoad );
+	EXPECT_EQ( 0.0, c2->rmLatentAtPeak );
+	zoneNum = 2;
+	coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( zoneNum, zoneCoolingLatentLoad );
+	EXPECT_EQ( 1000.0, c2->rmLatentAtPeak );
+	zoneNum = 3;
+	coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( zoneNum, zoneCoolingLatentLoad );
+	EXPECT_EQ( 2000.0, c2->rmLatentAtPeak );
+
+	// Add a heating coil
+	std::string coil3Name ( "Coil 3" ); // user-defined name of the coil
+	std::string coil3Type ( "Coil:Heating:Electric" ); // idf input object class name of coil
+	uA = -999.0;
+	sizingCap = 500.0;
+	curSysNum = 1;
+	curZoneEqNum = 0;
+	isAutoSized = false; // true if autosized
+	// This triggers doAirLoopSetUp
+	coilSelectionReportObj->setCoilUA( coil3Name, coil3Type, uA, sizingCap, isAutoSized, curSysNum, curZoneEqNum );
+	auto & c3 ( coilSelectionReportObj->coilSelectionDataObjs[ 2 ] );
+	EXPECT_EQ( uA, c3->coilUA );
+	EXPECT_EQ( sizingCap, c3->coilTotCapAtPeak );
+	EXPECT_EQ( curSysNum, c3->airloopNum );
+	EXPECT_EQ( curZoneEqNum, c3->zoneEqNum );
+
+	// This coil serves zones 2 and 3 - rmLatentAtPeak is summed for all applicable zones
+	Real64 zoneHeatingLatentLoad = 100.0;
+	zoneNum = 1;
+	coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( zoneNum, zoneHeatingLatentLoad );
+	EXPECT_EQ( 0.0, c3->rmLatentAtPeak );
+	zoneNum = 2;
+	coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( zoneNum, zoneHeatingLatentLoad );
+	EXPECT_EQ( 100.0, c3->rmLatentAtPeak );
+	zoneNum = 3;
+	coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( zoneNum, zoneHeatingLatentLoad );
+	EXPECT_EQ( 200.0, c3->rmLatentAtPeak );
 
 	// Exercise report writing again
 	coilSelectionReportObj->finishCoilSummaryReportTable();
@@ -283,51 +327,100 @@ TEST_F( EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil )
 	Real64 waterFlowRate = 0.0;
 
 	coilSelectionReportObj->setCoilFinalSizes(  coil1Name, coil1Type, totGrossCap, sensGrossCap, airFlowRate, waterFlowRate );
+	auto & c1 ( coilSelectionReportObj->coilSelectionDataObjs[ 0 ] );
+	EXPECT_EQ( totGrossCap, c1->coilTotCapFinal );
+	EXPECT_EQ( sensGrossCap, c1->coilSensCapFinal );
+	EXPECT_EQ( airFlowRate, c1->coilRefAirVolFlowFinal );
+	EXPECT_EQ( waterFlowRate, c1->coilRefWaterVolFlowFinal );
 
 	Real64 RatedCoilTotCap = 400.0;
 	Real64 RatedCoilSensCap = 399.0;
 	Real64 RatedAirMassFlow = 0.001;
-	Real64 RatedCoilInDb = 23.0;
-	Real64 RatedCoilInHumRat = 0.008;
+	Real64 RatedCoilInDb = -999.0;
+	Real64 RatedCoilInHumRat = -999.0;
 	Real64 RatedCoilInWb = 20.0;
-	Real64 RatedCoilOutDb = 40.0;
-	Real64 RatedCoilOutHumRat = 0.009;
+	Real64 RatedCoilOutDb = -999.0;
+	Real64 RatedCoilOutHumRat = -999.0;
 	Real64 RatedCoilOutWb = 30.0;
-
 	Real64 RatedCoilOadbRef = 24.0;
 	Real64 RatedCoilOawbRef = 16.0;
 	Real64 RatedCoilBpFactor = 0.2;
 	Real64 RatedCoilEff = 0.8;
+
+	// First without setting coil inlet/outlet conditions
 	coilSelectionReportObj->setRatedCoilConditions( coil1Name, coil1Type, RatedCoilTotCap, RatedCoilSensCap, RatedAirMassFlow, RatedCoilInDb, RatedCoilInHumRat, RatedCoilInWb, 
 		RatedCoilOutDb, RatedCoilOutHumRat, RatedCoilOutWb, RatedCoilOadbRef, RatedCoilOawbRef, RatedCoilBpFactor, RatedCoilEff );
 
+	EXPECT_EQ( RatedCoilTotCap, c1->coilRatedTotCap );
+	EXPECT_EQ( RatedCoilSensCap, c1->coilRatedSensCap );
+	EXPECT_EQ( RatedAirMassFlow, c1->ratedAirMassFlow );
+	EXPECT_EQ( RatedCoilInDb, c1->ratedCoilInDb );
+	EXPECT_EQ( RatedCoilInWb, c1->ratedCoilInWb );
+	EXPECT_EQ( RatedCoilInHumRat, c1->ratedCoilInHumRat );
+	EXPECT_EQ( -999.0, c1->ratedCoilInEnth );
+	EXPECT_EQ( RatedCoilOutDb, c1->ratedCoilOutDb );
+	EXPECT_EQ( RatedCoilOutWb, c1->ratedCoilOutWb );
+	EXPECT_EQ( RatedCoilOutHumRat, c1->ratedCoilOutHumRat );
+	EXPECT_EQ( -999.0, c1->ratedCoilOutEnth );
+	EXPECT_EQ( RatedCoilEff, c1->ratedCoilEff );
+	EXPECT_EQ( RatedCoilBpFactor, c1->ratedCoilBpFactor );
+	EXPECT_EQ( RatedCoilOadbRef, c1->ratedCoilOadbRef );
+	EXPECT_EQ( RatedCoilOawbRef, c1->ratedCoilOawbRef );
+
+	// again with setting coil inlet/outlet conditions
+	RatedCoilInDb = 23.0;
+	RatedCoilInHumRat = 0.008;
+	RatedCoilOutDb = 40.0;
+	RatedCoilOutHumRat = 0.009;
+	coilSelectionReportObj->setRatedCoilConditions( coil1Name, coil1Type, RatedCoilTotCap, RatedCoilSensCap, RatedAirMassFlow, RatedCoilInDb, RatedCoilInHumRat, RatedCoilInWb, 
+		RatedCoilOutDb, RatedCoilOutHumRat, RatedCoilOutWb, RatedCoilOadbRef, RatedCoilOawbRef, RatedCoilBpFactor, RatedCoilEff );
+	EXPECT_EQ( RatedCoilInDb, c1->ratedCoilInDb );
+	EXPECT_EQ( RatedCoilInHumRat, c1->ratedCoilInHumRat );
+	EXPECT_NEAR( 43460.9, c1->ratedCoilInEnth, 0.1 );
+	EXPECT_EQ( RatedCoilOutDb, c1->ratedCoilOutDb );
+	EXPECT_EQ( RatedCoilOutHumRat, c1->ratedCoilOutHumRat );
+	EXPECT_NEAR( 63371.3, c1->ratedCoilOutEnth, 0.1 );
+
 	Real64 entAirDryBulbTemp = 24.0;
 	coilSelectionReportObj->setCoilEntAirTemp( coil1Name, coil1Type, entAirDryBulbTemp, curSysNum, curZoneEqNum );
+	EXPECT_EQ( entAirDryBulbTemp, c1->coilDesEntTemp );
+	EXPECT_EQ( curSysNum, c1->airloopNum );
+	EXPECT_EQ( curZoneEqNum, c1->zoneEqNum );
 
 	Real64 entAirHumRat = 0.004;
 	coilSelectionReportObj->setCoilEntAirHumRat( coil1Name, coil1Type, entAirHumRat );
+	EXPECT_EQ( entAirHumRat, c1->coilDesEntHumRat );
 
 	Real64 entWaterTemp = 60.0;
 	coilSelectionReportObj->setCoilEntWaterTemp( coil1Name, coil1Type, entWaterTemp );
+	EXPECT_EQ( entWaterTemp, c1->coilDesWaterEntTemp );
 
 	Real64 lvgWaterTemp = 50.0;
 	coilSelectionReportObj->setCoilLvgWaterTemp( coil1Name, coil1Type, lvgWaterTemp );
+	EXPECT_EQ( lvgWaterTemp, c1->coilDesWaterLvgTemp );
 
 	Real64 CoilWaterDeltaT = 50.0;
 	coilSelectionReportObj->setCoilWaterDeltaT( coil1Name, coil1Type, CoilWaterDeltaT );
+	EXPECT_EQ( CoilWaterDeltaT, c1->coilDesWaterTempDiff );
 
 	Real64 lvgAirDryBulbTemp = 12.0;
 	coilSelectionReportObj->setCoilLvgAirTemp( coil1Name, coil1Type, lvgAirDryBulbTemp );
+	EXPECT_EQ( lvgAirDryBulbTemp, c1->coilDesLvgTemp );
 
 	Real64 lvgAirHumRat = 0.006;
 	coilSelectionReportObj->setCoilLvgAirHumRat( coil1Name, coil1Type, lvgAirHumRat );
+	EXPECT_EQ( lvgAirHumRat, c1->coilDesLvgHumRat );
 
 	int zoneNum = 1;
 	Real64 zoneCoolingLatentLoad = 1234.0;
 	coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( zoneNum, zoneCoolingLatentLoad );
+	// Expect zero because it's a heating coil
+	EXPECT_EQ( 0.0, c1->rmLatentAtPeak );
 
 	Real64 zoneHeatingLatentLoad = 4321.0;
 	coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( zoneNum, zoneHeatingLatentLoad );
+	// Expect zero because doZoneEqSetup isn't currently executed
+	EXPECT_EQ( 0.0, c1->rmLatentAtPeak );
 
 	// Exercise report writing again
 	coilSelectionReportObj->finishCoilSummaryReportTable();
