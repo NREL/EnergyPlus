@@ -4318,7 +4318,7 @@ namespace Furnaces {
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
 		using DataAirLoop::AirToZoneNodeInfo;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::PlantLoop;
 		using SteamCoils::SimulateSteamCoilComponents;
