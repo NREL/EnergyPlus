@@ -109,6 +109,7 @@
 #include <ZoneTempPredictorCorrector.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <ElectricPowerServiceManager.hh>
+#include <../FMI/EPFMIData.hpp>
 
 //#include <fmiModelTypes.h>
 //#include <fmi1_types.h>
@@ -415,29 +416,13 @@ namespace HVACManager {
       std::cout << "PreTime: " << PreTime << std::endl;
       std::cout << "DataGlobals::SimTime: " << DataGlobals::SimTime << std::endl;
 
-    while ( PreTime < DataGlobals::SimTime ) {
-      // Advance time
-      Real64 Time = DataGlobals::SimTime;
-
-      Real64 DTime = Time - PreTime;
-      PreTime = Time;
-
-			TimeStepSys = DTime / SecondsPerHour;
-
-      //EMO.fmiGetReal(OutputRefs,2,Outputs);
-      //InletNode.Temp = Outputs[0];
-      //InletNode.MassFlowRate = Outputs[1];
-
-      //ReturnAirNode.Temp = ZoneNode.Temp;
-      //ReturnAirNode.MassFlowRate = Outputs[1];
+    while ( timeinfo.current < DataGlobals::SimTime ) {
 
 			UpdateInternalGainValues( true, true );
 
 		  BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
-      // Like iCorrectStep but simpler,
-      // only use the analytical solution which does not require 2nd and third history terms
-      ZoneTempPredictorCorrector::UpdateZoneAirTemp();
+      //ZoneTempPredictorCorrector::UpdateZoneAirTemp();
 
 			UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
 
@@ -517,6 +502,19 @@ namespace HVACManager {
 			SysTimeElapsed += TimeStepSys;
 
 			FirstTimeStepSysFlag = false;
+
+      // Signal that the step is done
+      {
+        std::unique_lock<std::mutex> lk( time_mutex );
+        epstatus = EPStatus::IDLE;
+      }
+      time_cv.notify_one();
+      
+      // Wait until we are signaled to make another step
+      {
+        std::unique_lock<std::mutex> lk( time_mutex );
+        time_cv.wait( lk, [](){ return epstatus == EPStatus::WORKING; } );
+      }
     } // time iteration
 
 		// DO FINAL UPDATE OF RECORD KEEPING VARIABLES

@@ -5,7 +5,10 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../EnergyPlus/public )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../EnergyPlus )
 
 set(src
+  EPFMI.hpp
   EPFMI.cpp
+  EPFMIData.hpp
+  EPFMIData.cpp
   ../EnergyPlus/CommandLineInterface.hh 
   ../EnergyPlus/CommandLineInterface.cc 
   ../EnergyPlus/EnergyPlusPgm.cc 

@@ -230,8 +230,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
 	);
 
-  void
-  UpdateZoneAirTemp();
+  //void
+  //UpdateZoneAirTemp();
 
 	void
 	GetZoneAirSetPoints();
@@ -374,6 +374,9 @@ namespace ZoneTempPredictorCorrector {
 		int const TempControlledZoneID,
 		int const ActualZoneNum // controlled zone actual zone number
 	);
+
+  Real64 
+  HDot( const int ZoneNum );
 
 } // ZoneTempPredictorCorrector
 
