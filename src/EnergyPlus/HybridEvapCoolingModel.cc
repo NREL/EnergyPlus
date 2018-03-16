@@ -1002,6 +1002,7 @@ namespace EnergyPlus {//***************
 			WaterConsumption(0.0),
 			QSensZoneOut(0),
 			QLatentZoneOut( 0),
+			QLatentZoneOutMass(0),
 			ExternalStaticPressure(0.0),
 			RequestedHumdificationMass(0.0),
 			RequestedHumdificationLoad(0.0),
@@ -1960,7 +1961,7 @@ namespace EnergyPlus {//***************
 			// ideally there would be a clear flag that indicates "this is the last timestep of the day, so report", but that doesn't seem to exist. 
 			if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag)
 			{
-				if (count_EnvironmentConditionsNotMet>0) ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, system " + Name.c_str() + " was unable to operate for " + RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1)+ " timesteps because environment conditions were beyond the allowable operating range for any mode.");
+				if (count_EnvironmentConditionsNotMet>0) ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " + RoundSigDigits((Real64)count_EnvironmentConditionsNotMet, 1)+ " timesteps because environment conditions were beyond the allowable operating range for any mode.");
 				if (count_SAHR_OC_MetOnce>0)  ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() + " failed to meet supply air humidity ratio for " + RoundSigDigits(Real64(count_SAHR_OC_MetOnce), 1) + " time steps. For these time steps For these time steps" + Name.c_str() + " was set to mode 0");
 				if (count_SAT_OC_MetOnce>0) ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() + " failed to meet supply air temperature constraints for " + RoundSigDigits(Real64(count_SAT_OC_MetOnce), 1) + " time steps. For these time steps For these time steps" + Name.c_str()+" was set to mode 0" );
 				
@@ -2240,7 +2241,8 @@ namespace EnergyPlus {//***************
 				QSensZoneOut = OutletMassFlowRate* 0.5* (Returncp + Outletcp)*(StepIns.Tra - OutletTemp); //Watts
 				Real64 OutletMassFlowRateDry = OutletMassFlowRate * (1 - Wsa);
 				Real64 LambdaSa = Psychrometrics::PsyHfgAirFnWTdb(0, OutletTemp);
-				QLatentZoneOut = 1000 * LambdaSa * OutletMassFlowRateDry* (InletHumRat - OutletHumRat); //Watts
+				QLatentZoneOutMass = 1000  * OutletMassFlowRateDry* (InletHumRat - OutletHumRat); //Watts
+				QLatentZoneOut = QLatentZoneOutMass * LambdaSa;
 				QTotZoneOut = OutletMassFlowRateDry * (InletEnthalpy - OutletEnthalpy); //Watts
 				Real64 QLatentCheck = QTotZoneOut - QSensZoneOut;//Watts
 
@@ -2331,6 +2333,7 @@ namespace EnergyPlus {//***************
 				QTotZoneOut = 0;
 				QSensZoneOut = 0;
 				QLatentZoneOut = 0;
+				QLatentZoneOutMass = 0;
 				QTotSystemOut = 0;
 				QSensSystemOut = 0;
 				QLatentSystemOut = 0;

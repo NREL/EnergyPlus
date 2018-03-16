@@ -509,7 +509,7 @@ namespace HVACUnitarySystem {
 		// Using/Aliasing
 		using DataAirLoop::AirLoopControlInfo;
 		using DataAirflowNetwork::AirflowNetworkUnitarySystem;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_UnitarySystemRecovery;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
@@ -10809,7 +10809,7 @@ namespace HVACUnitarySystem {
 							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum - 1 );
 						}
 					}
-				} else {
+				} else { // cycling fan mode
 					if ( HeatSpeedNum <= 1 ) {
 						CompOffMassFlow = 0.0; // #5518
 						CompOffFlowRatio = 0.0;
@@ -10890,7 +10890,7 @@ namespace HVACUnitarySystem {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 					}
-				} else {
+				} else { // cycling fan mode
 					if ( CoolSpeedNum <= 1 ) {
 						CompOffMassFlow = 0.0; // #5518
 						CompOffFlowRatio = 0.0;

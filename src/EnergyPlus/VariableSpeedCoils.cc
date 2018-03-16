@@ -2614,7 +2614,7 @@ namespace VariableSpeedCoils {
 		using DataGlobals::SysSizingCalc;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -3142,7 +3142,7 @@ namespace VariableSpeedCoils {
 		// Using/Aliasing
 		using namespace Psychrometrics;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using DataHVACGlobals::SmallAirVolFlow;
 		using DataHVACGlobals::SmallLoad;
 		using General::RoundSigDigits;
@@ -6492,8 +6492,6 @@ namespace VariableSpeedCoils {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Bo Shen, , based on DX:CalcTotCapSHR, introducing two speed levels
 		//       DATE WRITTEN   March 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates total capacity and sensible heat ratio of a DX coil at the specified conditions
@@ -6520,59 +6518,34 @@ namespace VariableSpeedCoils {
 		// Using/Aliasing
 		using CurveManager::CurveValue;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcTotCapSHR_VSWSHP" );
+		static int const MaxIter( 30 ); // Maximum number of iterations for dry evaporator calculations
+		static Real64 const Tolerance( 0.01 ); // Error tolerance for dry evaporator iterations
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 InletWetBulbCalc; // calculated inlet wetbulb temperature used for finding dry coil point [C]
-		Real64 InletHumRatCalc; // calculated inlet humidity ratio used for finding dry coil point [kg water / kg dry air]
-		Real64 TotCapTempModFac1;
-		// Total capacity modifier (function of entering wetbulb, outside water inlet temp) at low speed
-		Real64 TotCapAirFlowModFac1;
-		// Total capacity modifier (function of actual supply air flow vs nominal flow) at low speed
-		Real64 TotCapWaterFlowModFac1;
-		// Total capacity modifier (function of actual supply water flow vs nominal flow) at low speed
-		Real64 TotCapTempModFac2;
-		// Total capacity modifier (function of entering wetbulb, outside water inlet temp) at high speed
-		Real64 TotCapAirFlowModFac2;
-		// Total capacity modifier (function of actual supply air flow vs nominal flow) at high speed
-		Real64 TotCapWaterFlowModFac2;
-		// Total capacity modifier (function of actual supply water flow vs nominal flow) at high speed
-		Real64 hDelta; // Change in air enthalpy across the cooling coil [J/kg]
-		Real64 hADP; // Apparatus dew point enthalpy [J/kg]
-		Real64 tADP; // Apparatus dew point temperature [C]
-		Real64 wADP; // Apparatus dew point humidity ratio [kg/kg]
-		Real64 hTinwADP; // Enthalpy at inlet dry-bulb and wADP [J/kg]
-		Real64 SHRCalc; // temporary calculated value of SHR
+		Real64 TotCapWaterFlowModFac1; // Total capacity modifier (function of actual supply water flow vs nominal flow) at low speed
+		Real64 TotCapTempModFac2; // Total capacity modifier (function of entering wetbulb, outside water inlet temp) at high speed
+		Real64 TotCapAirFlowModFac2; // Total capacity modifier (function of actual supply air flow vs nominal flow) at high speed
+		Real64 TotCapWaterFlowModFac2; // Total capacity modifier (function of actual supply water flow vs nominal flow) at high speed
 		Real64 TotCapCalc; // temporary calculated value of total capacity [W]
 		Real64 TotCapCalc1; // temporary calculated value of total capacity [W] at low speed
 		Real64 TotCapCalc2; // temporary calculated value of total capacity [W] at high speed
-		int Counter; // Counter for dry evaporator iterations
-		int MaxIter; // Maximum number of iterations for dry evaporator calculations
-		Real64 RF; // Relaxation factor for dry evaporator iterations
-		Real64 Tolerance; // Error tolerance for dry evaporator iterations
-		Real64 werror; // Deviation of humidity ratio in dry evaporator iteration loop
-		static bool LoopOn( true ); // flag to control the loop iteration
 
-		MaxIter = 30;
-		RF = 0.4;
-		Counter = 0;
-		Tolerance = 0.01;
-		werror = 0.0;
+		int Counter = 0; // Error tolerance for dry evaporator iterations
+		Real64 RF = 0.4; // Relaxation factor for dry evaporator iterations
+		Real64 werror = 0.0; // Deviation of humidity ratio in dry evaporator iteration loop
+		Real64 SHRCalc = SHR; // initialize temporary calculated value of SHR
+		Real64 InletWetBulbCalc = InletWetBulb; // calculated inlet wetbulb temperature used for finding dry coil point [C]
+		Real64 InletHumRatCalc = InletHumRat; // calculated inlet humidity ratio used for finding dry coil point [kg water / kg dry air]
+		bool LoopOn = true;  // flag to control the loop iteration
 
-		InletWetBulbCalc = InletWetBulb;
-		InletHumRatCalc = InletHumRat;
-		LoopOn = true;
-
-		//  DO WHILE (ABS(werror) .gt. Tolerance .OR. Counter == 0)
-		//   Get capacity modifying factor (function of inlet wetbulb & outside drybulb) for off-rated conditions
+		//  LOOP WHILE (ABS(werror) .gt. Tolerance .OR. Counter == 0)
 		while ( LoopOn ) {
-			TotCapTempModFac1 = CurveValue( CCapFTemp1, InletWetBulbCalc, CondInletTemp );
+			//   Get capacity modifying factor (function of inlet wetbulb & condenser inlet temp) for off-rated conditions
+			Real64 TotCapTempModFac1 = CurveValue( CCapFTemp1, InletWetBulbCalc, CondInletTemp );
 			//   Get capacity modifying factor (function of mass flow) for off-rated conditions
-			TotCapAirFlowModFac1 = CurveValue( CCapAirFFlow1, AirMassFlowRatio );
+			Real64 TotCapAirFlowModFac1 = CurveValue( CCapAirFFlow1, AirMassFlowRatio );
 			//Get capacity modifying factor (function of mass flow) for off-rated conditions
 			if ( CCapWaterFFlow1 == 0 ) {
 				TotCapWaterFlowModFac1 = 1.0;
@@ -6603,45 +6576,38 @@ namespace VariableSpeedCoils {
 				TotCapModFac = ( TotCapAirFlowModFac2 * TotCapWaterFlowModFac2 * TotCapTempModFac2 ) * SpeedRatio + ( 1.0 - SpeedRatio ) * ( TotCapAirFlowModFac1 * TotCapWaterFlowModFac1 * TotCapTempModFac1 );
 			}
 
-			if ( CBF < 0.001 ) {
-				SHRCalc = 1.0;
-				LoopOn = false;
-			}
-			else {
-				//   Calculate apparatus dew point conditions using TotCap and CBF
-				hDelta = TotCapCalc / AirMassFlow;
-				hADP = InletEnthalpy - hDelta / ( 1.0 - CBF );
-				tADP = PsyTsatFnHPb( hADP, Pressure );
-				wADP = PsyWFnTdbH( tADP, hADP );
-				hTinwADP = PsyHFnTdbW( InletDryBulb, wADP );
-				SHRCalc = min( ( hTinwADP - hADP ) / ( InletEnthalpy - hADP ), 1.0 );
-				//   Check for dry evaporator conditions (win < wadp)
-				if ( wADP > InletHumRatCalc || ( Counter >= 1 && Counter < MaxIter ) ) {
-					if ( InletHumRatCalc == 0.0 ) InletHumRatCalc = 0.00001;
-					werror = ( InletHumRatCalc - wADP ) / InletHumRatCalc;
-					//     Increase InletHumRatCalc at constant inlet air temp to find coil dry-out point. Then use the
-					//     capacity at the dry-out point to determine exiting conditions from coil. This is required
-					//     since the TotCapTempModFac doesn't work properly with dry-coil conditions.
-					InletHumRatCalc = RF * wADP + ( 1.0 - RF ) * InletHumRatCalc;
-					InletWetBulbCalc = PsyTwbFnTdbWPb( InletDryBulb, InletHumRatCalc, Pressure );
-					++Counter;
-					if ( std::abs( werror ) > Tolerance ) {
-						LoopOn = true; //go to 50   ! Recalculate with modified inlet conditions
-					}
-					else {
-						LoopOn = false;
-					}
-				}
-				else {
+			Real64 localCBF = max( 0.0, CBF ); // negative coil bypass factor is physically impossible
+
+			//   Calculate apparatus dew point conditions using TotCap and CBF
+			Real64 hDelta = TotCapCalc / AirMassFlow; // Change in air enthalpy across the cooling coil [J/kg]
+			Real64 hADP = InletEnthalpy - hDelta / ( 1.0 - localCBF ); // Apparatus dew point enthalpy [J/kg]
+			Real64 tADP = PsyTsatFnHPb( hADP, Pressure ); // Apparatus dew point temperature [C]
+			Real64 wADP = PsyWFnTdbH( tADP, hADP ); // Apparatus dew point humidity ratio [kg/kg]
+			Real64 hTinwADP = PsyHFnTdbW( InletDryBulb, wADP ); // Enthalpy at inlet dry-bulb and wADP [J/kg]
+			SHRCalc = min( ( hTinwADP - hADP ) / ( InletEnthalpy - hADP ), 1.0 ); // temporary calculated value of SHR
+
+			//   Check for dry evaporator conditions (win < wadp)
+			if ( wADP > InletHumRatCalc || ( Counter >= 1 && Counter < MaxIter ) ) {
+				if ( InletHumRatCalc == 0.0 ) InletHumRatCalc = 0.00001;
+				werror = ( InletHumRatCalc - wADP ) / InletHumRatCalc;
+				//     Increase InletHumRatCalc at constant inlet air temp to find coil dry-out point. Then use the
+				//     capacity at the dry-out point to determine exiting conditions from coil. This is required
+				//     since the TotCapTempModFac doesn't work properly with dry-coil conditions.
+				InletHumRatCalc = RF * wADP + ( 1.0 - RF ) * InletHumRatCalc;
+				InletWetBulbCalc = PsyTwbFnTdbWPb( InletDryBulb, InletHumRatCalc, Pressure );
+				++Counter;
+				if ( std::abs( werror ) > Tolerance ) {
+					LoopOn = true; // Recalculate with modified inlet conditions
+				} else {
 					LoopOn = false;
 				}
+			} else {
+				LoopOn = false;
 			}
-		}
-
-		// END DO
+		} // END LOOP
 
 		//  Calculate full load output conditions
-		if ( SHRCalc > 1.0 || Counter > 0 ) SHRCalc = 1.0;
+		if ( SHRCalc > 1.0 || Counter > 0 ) SHRCalc = 1.0; // if Counter > 0 means a dry coil so SHR = 1
 
 		SHR = SHRCalc;
 		TotCap1 = TotCapCalc1;

@@ -616,7 +616,7 @@ namespace SteamBaseboardRadiator {
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::InitComponentNodes;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

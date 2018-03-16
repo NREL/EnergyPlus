@@ -136,7 +136,7 @@ namespace WaterCoils {
 	using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 	using DataPlant::TypeOf_CoilWaterSimpleHeating;
 	using DataPlant::PlantLoop;
-	using DataPlant::MyPlantSizingIndex;
+	using PlantUtilities::MyPlantSizingIndex;
 	using namespace ScheduleManager;
 
 	// Data
@@ -808,7 +808,7 @@ namespace WaterCoils {
 		using DataSizing::AutoSize;
 		using DataSizing::CurSysNum;
 		using namespace OutputReportPredefined;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace FaultsManager;

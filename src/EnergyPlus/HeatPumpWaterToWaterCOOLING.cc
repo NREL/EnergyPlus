@@ -226,7 +226,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPECooling;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::FindRefrigerant;
@@ -436,7 +436,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPECooling;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
