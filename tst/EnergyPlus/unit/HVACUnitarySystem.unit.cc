@@ -2226,7 +2226,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	UnitarySystem( UnitarySysNum ).Humidistat = false;
 	UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DataSizing::None;
 
-	// cycling fan mode should drop to 0 flow rate only below speed = 1
+	// cycling fan mode should drop to 0 flow rate for cycling fan mode only below speed = 1
 	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
 
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
@@ -2256,13 +2256,13 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.6, MSHPMassFlowRateHigh );
 
-	// cycling fan mode should drop to idle flow rate as speed = 1
+	// cycling fan mode should drop to 0 flow rate at speed = 1
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 1;
 	HeatingLoad = false;
 	CoolingLoad = true;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
-	EXPECT_EQ( 0.0, CompOffMassFlow ); // CompOffMassFlow equal to idle mass flow rate
+	EXPECT_EQ( 0.0, CompOffMassFlow ); // CompOffMassFlow equal to 0 mass flow rate for cycling fan
 	EXPECT_EQ( 0.3, CompOnMassFlow );
 	EXPECT_EQ( 0.0, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
@@ -2286,7 +2286,7 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = false;
 	CoolingLoad = false;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
-	EXPECT_EQ( 0.2, CompOffMassFlow ); // CompOffMassFlow equal to spped 1 mass flow rate
+	EXPECT_EQ( 0.2, CompOffMassFlow ); // CompOffMassFlow equal to speed 1 mass flow rate
 	EXPECT_EQ( 0.2, CompOnMassFlow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateHigh );
@@ -4417,7 +4417,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan ) {
 
 	// test model performance
 	EXPECT_NEAR( ZoneSysEnergyDemand( ControlZoneNum ).RemainingOutputRequired, Qsens_sys, 1.0 ); // Watts
-	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, ( UnitarySystem( 1 ).CoolMassFlowRate( UnitarySystem( 1 ).CoolingSpeedNum ) * UnitarySystem( 1 ).PartLoadFrac ) );
+	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, UnitarySystem( 1 ).CoolMassFlowRate( UnitarySystem( 1 ).CoolingSpeedNum ) * UnitarySystem( 1 ).PartLoadFrac ); // cycling fan
 	EXPECT_DOUBLE_EQ( Node( InletNode ).MassFlowRate, Node( OutletNode ).MassFlowRate );
 
 	// compare fan RTF with fan PLR and global PLF
