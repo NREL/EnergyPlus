@@ -25,6 +25,7 @@ set( test_src
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
   ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
