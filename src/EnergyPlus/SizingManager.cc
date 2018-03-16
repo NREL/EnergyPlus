@@ -1433,6 +1433,7 @@ namespace SizingManager {
 	DetermineSystemPopulationDiversity(){
 		// determine Pz sum, Ps, and D for each air system for standard 62.1
 
+		//first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
 		bool anyVRPinModel( false );
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
