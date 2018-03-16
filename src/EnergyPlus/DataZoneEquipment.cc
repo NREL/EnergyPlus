@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,7 +63,8 @@
 #include <DirectAirManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -114,34 +115,35 @@ namespace DataZoneEquipment {
 	int const VRFTerminalUnit_Num( 11 );
 	int const PurchasedAir_Num( 12 );
 	int const ZoneEvaporativeCoolerUnit_Num( 13 );
-	int const AirDistUnit_Num( 14 );
-	int const DirectAir_Num( 15 );
-	int const BBWaterConvective_Num( 16 );
-	int const BBElectricConvective_Num( 17 );
-	int const HiTempRadiant_Num( 18 );
-	int const LoTempRadiant_Num( 19 );
-	int const ZoneExhaustFan_Num( 20 );
-	int const HeatXchngr_Num( 21 );
-	int const HPWaterHeater_Num( 22 );
-	int const BBWater_Num( 23 );
-	int const ZoneDXDehumidifier_Num( 24 );
-	int const BBSteam_Num( 25 );
-	int const BBElectric_Num( 26 );
-	int const RefrigerationAirChillerSet_Num( 27 );
-	int const UserDefinedZoneHVACForcedAir_Num( 28 );
-	int const ZoneUnitarySystem_Num( 29 ); // AirloopHVAC:UnitarySystem configured as zone equipment
-	int const CoolingPanel_Num( 30 );
-	int const TotalNumZoneEquipType( 30 );
+	int const ZoneHybridEvaporativeCooler_Num(14);
+	int const AirDistUnit_Num( 15 );
+	int const DirectAir_Num( 16 );
+	int const BBWaterConvective_Num( 17 );
+	int const BBElectricConvective_Num( 18 );
+	int const HiTempRadiant_Num( 19 );
+	int const LoTempRadiant_Num(20);
+	int const ZoneExhaustFan_Num(21);
+	int const HeatXchngr_Num(22);
+	int const HPWaterHeater_Num(23);
+	int const BBWater_Num(24);
+	int const ZoneDXDehumidifier_Num(25);
+	int const BBSteam_Num(26);
+	int const BBElectric_Num(27);
+	int const RefrigerationAirChillerSet_Num(28);
+	int const UserDefinedZoneHVACForcedAir_Num(29);
+	int const ZoneUnitarySystem_Num(30); // AirloopHVAC:UnitarySystem configured as zone equipment
+	int const CoolingPanel_Num( 31 );
+	int const TotalNumZoneEquipType( 31 );
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
 
+	int const NumValidSysAvailZoneComponents( 14 );
+	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit","ZoneHVAC:HybridUnitaryHVAC" } );
+	
 	// Per Person Ventilation Rate Mode
 	int const PerPersonDCVByCurrentLevel( 1 );
 	int const PerPersonByDesignLevel( 2 );
-
-	int const NumValidSysAvailZoneComponents( 13 );
-	Array1D_string const cValidSysAvailManagerCompTypes( NumValidSysAvailZoneComponents, { "ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump", "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump", "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator", "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem", "ZoneHVAC:EvaporativeCoolerUnit" } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -169,6 +171,7 @@ namespace DataZoneEquipment {
 
 	// Object Data
 	Array1D< EquipConfiguration > ZoneEquipConfig;
+	std::unordered_set< std::string > UniqueZoneEquipListNames;
 	Array1D< EquipList > ZoneEquipList;
 	Array1D< ControlList > HeatingControlList;
 	Array1D< ControlList > CoolingControlList;
@@ -200,7 +203,7 @@ namespace DataZoneEquipment {
 		CoolingControlList.deallocate();
 		SupplyAirPath.deallocate();
 		ReturnAirPath.deallocate();
-
+		UniqueZoneEquipListNames.clear();
 	}
 
 	void
@@ -259,21 +262,7 @@ namespace DataZoneEquipment {
 		// Get all the system related equipment which may be attached to
 		// a zone
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::MakeUPPERCase;
-		using InputProcessor::SameString;
 		using DataHeatBalance::Zone;
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::GetNodeNums;
@@ -289,17 +278,8 @@ namespace DataZoneEquipment {
 		using DataGlobals::ScheduleAlwaysOn;
 		using namespace ScheduleManager;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneEquipmentData1: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -328,8 +308,7 @@ namespace DataZoneEquipment {
 		// static bool ErrorsFound( false ); // If errors detected in input // GetZoneEquipmentDataErrorsFound
 		// static int found( 0 );
 		////////////////////////////////////////////////////////////////////////////////////
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
+		bool IsNotOK; // Flag to verify nam
 		bool NodeListError;
 		bool UniqueNodeError;
 		int NumOfControlledZones; // The number of Controlled Zone Equip Configuration objects
@@ -369,21 +348,21 @@ namespace DataZoneEquipment {
 
 		// Look in the input file for zones with air loop and zone equipment attached
 
-		NumOfControlledZones = GetNumObjectsFound( "ZoneHVAC:EquipmentConnections" );
-		NumOfZoneEquipLists = GetNumObjectsFound( "ZoneHVAC:EquipmentList" ); // Look for lists of equipment data - there should
+		NumOfControlledZones = inputProcessor->getNumObjectsFound( "ZoneHVAC:EquipmentConnections" );
+		NumOfZoneEquipLists = inputProcessor->getNumObjectsFound( "ZoneHVAC:EquipmentList" ); // Look for lists of equipment data - there should
 		// be as many of these as there are controlled zones
-		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
 		NodeNums.dimension( NumParams, 0 );
-		GetObjectDefMaxArgs( "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums );
 		MaxAlphas = NumAlphas;
 		MaxNums = NumNums;
-		GetObjectDefMaxArgs( "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
-		GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:ReturnPath", NumParams, NumAlphas, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
 		AlphArray.allocate( MaxAlphas );
@@ -396,14 +375,14 @@ namespace DataZoneEquipment {
 		if ( ! allocated( SupplyAirPath ) ) {
 			// Look for and read in the air supply path
 			// component (splitters) information for each zone
-			NumSupplyAirPaths = GetNumObjectsFound( "AirLoopHVAC:SupplyPath" );
+			NumSupplyAirPaths = inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPath" );
 			SupplyAirPath.allocate( NumSupplyAirPaths );
 		}
 
 		if ( ! allocated( ReturnAirPath ) ) {
 			// Look for and read in the air return path
 			// component (mixers & plenums) information for each zone
-			NumReturnAirPaths = GetNumObjectsFound( "AirLoopHVAC:ReturnPath" );
+			NumReturnAirPaths = inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPath" );
 			ReturnAirPath.allocate( NumReturnAirPaths );
 		}
 
@@ -413,6 +392,7 @@ namespace DataZoneEquipment {
 		// be the same as the number of zones in the building
 		ZoneEquipList.allocate( NumOfZones );
 		ZoneEquipAvail.dimension( NumOfZones, NoAction );
+		UniqueZoneEquipListNames.reserve( NumOfZones );
 
 		if ( NumOfZoneEquipLists != NumOfControlledZones ) {
 			ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );
@@ -434,9 +414,9 @@ namespace DataZoneEquipment {
 
 			CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-			GetObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
+			inputProcessor->getObjectItem( CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // Get Equipment | data for one zone
 
-			ControlledZoneNum = FindItemInList( AlphArray( 1 ), Zone );
+			ControlledZoneNum = UtilityRoutines::FindItemInList( AlphArray( 1 ), Zone );
 
 			if ( ControlledZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFields( 1 ) + "=\"" + AlphArray( 1 ) + "\"" );
@@ -459,12 +439,10 @@ namespace DataZoneEquipment {
 			ZoneEquipConfig( ControlledZoneNum ).ZoneName = AlphArray( 1 ); // for x-referencing with the geometry data
 
 			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::EquipListName, ControlledZoneLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + cAlphaFields( 2 ) );
+			GlobalNames::IntraObjUniquenessCheck( AlphArray( 2 ), CurrentModuleObject, cAlphaFields( 2 ), UniqueZoneEquipListNames, IsNotOK );
 			if ( IsNotOK ) {
 				ShowContinueError( "..another Controlled Zone has been assigned that " + cAlphaFields( 2 ) + '.' );
 				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 2 ) = "xxxxx";
 			}
 			ZoneEquipConfig( ControlledZoneNum ).EquipListName = AlphArray( 2 ); // the name of the list containing all the zone eq.
 			InletNodeListName = AlphArray( 3 );
@@ -504,30 +482,21 @@ namespace DataZoneEquipment {
 
 			CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-			ZoneEquipListNum = GetObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
+			ZoneEquipListNum = inputProcessor->getObjectItemNum( CurrentModuleObject, ZoneEquipConfig( ControlledZoneNum ).EquipListName );
 			if ( ZoneEquipListNum > 0 ) {
 
-				GetObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), ZoneEquipList, ControlledZoneNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowContinueError( "Bad Zone Equipment name in " + CurrentModuleObject + "=\"" + ZoneEquipConfig( ControlledZoneNum ).EquipListName + "\"" );
-					ShowContinueError( "For Zone=\"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\"." );
-					GetZoneEquipmentDataErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
-
+				inputProcessor->getObjectItem( CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+				UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 				ZoneEquipList( ControlledZoneNum ).Name = AlphArray( 1 );
 
 				if ( !lAlphaBlanks( 2 ) ){
-					if ( SameString( AlphArray( 2 ), "SequentialLoad" ) ) {
+					if ( UtilityRoutines::SameString( AlphArray( 2 ), "SequentialLoad" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialLoading;
-					} else if ( SameString( AlphArray( 2 ), "UniformLoad" ) ) {
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "UniformLoad" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformLoading;
-					} else if ( SameString( AlphArray( 2 ), "UniformPLR" ) ) {
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "UniformPLR" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::UniformPLRLoading;
-					} else if ( SameString( AlphArray( 2 ), "SequentialUniformPLR" ) ) {
+					} else if ( UtilityRoutines::SameString( AlphArray( 2 ), "SequentialUniformPLR" ) ) {
 						ZoneEquipList( ControlledZoneNum ).LoadDistScheme = DataZoneEquipment::LoadDist::SequentialUniformPLRLoading;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\", Invalid choice." );
@@ -600,7 +569,7 @@ namespace DataZoneEquipment {
 					if ( ZoneEquipList( ControlledZoneNum ).HeatingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailHeatEquip;
 					if ( ZoneEquipList( ControlledZoneNum ).CoolingPriority( ZoneEquipTypeNum ) > 0 ) ++ZoneEquipList( ControlledZoneNum ).NumAvailCoolEquip;
 
-					{ auto const SELECT_CASE_var( MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
+					{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) ) );
 
 					if ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = AirDistUnit_Num;
@@ -651,7 +620,7 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" ) { // Simple Cooling Panel
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = CoolingPanel_Num;
-					
+
 					} else if ( SELECT_CASE_var == "ZONEHVAC:HIGHTEMPERATURERADIANT" ) { // High Temperature Radiators
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HiTempRadiant_Num;
 
@@ -702,7 +671,11 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneEvaporativeCoolerUnit_Num;
-					} else {
+
+					} else if (SELECT_CASE_var == "ZONEHVAC:HYBRIDUNITARYHVAC") {
+						ZoneEquipList(ControlledZoneNum).EquipType_Num(ZoneEquipTypeNum) = ZoneHybridEvaporativeCooler_Num;
+
+					}else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
 						ShowContinueError( "..Invalid Equipment Type = " + ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) );
 						GetZoneEquipmentDataErrorsFound = true;
@@ -888,7 +861,7 @@ namespace DataZoneEquipment {
 		//map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
 
 		for ( ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfZones; ++ControlledZoneLoop ) {
-			GetZoneEquipmentDataFound = FindItemInList( ZoneEquipList( ControlledZoneLoop ).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName );
+			GetZoneEquipmentDataFound = UtilityRoutines::FindItemInList( ZoneEquipList( ControlledZoneLoop ).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName );
 			if ( GetZoneEquipmentDataFound > 0 ) ZoneEquipConfig( GetZoneEquipmentDataFound ).EquipListIndex = ControlledZoneLoop;
 		} // end loop over controlled zones
 
@@ -897,14 +870,8 @@ namespace DataZoneEquipment {
 		CurrentModuleObject = "AirLoopHVAC:SupplyPath";
 		for ( PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum ) {
 
-			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SupplyAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			SupplyAirPath( PathNum ).Name = AlphArray( 1 );
 			SupplyAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 
@@ -952,15 +919,8 @@ namespace DataZoneEquipment {
 		CurrentModuleObject = "AirLoopHVAC:ReturnPath";
 		for ( PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum ) {
 
-			GetObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ReturnAirPath, PathNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				GetZoneEquipmentDataErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
 			ReturnAirPath( PathNum ).Name = AlphArray( 1 );
 			ReturnAirPath( PathNum ).NumOfComponents = nint( ( double( NumAlphas ) - 2.0 ) / 2.0 );
 
@@ -1079,29 +1039,8 @@ namespace DataZoneEquipment {
 		// PURPOSE OF THIS FUNCTION:
 		// Provides a way to check if a component name is listed on a zone equipment list.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
 		// Return value
 		bool IsOnList; // True if item is on a list, false if not.
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int Loop;
@@ -1113,13 +1052,13 @@ namespace DataZoneEquipment {
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) { // NumOfZoneEquipLists
 			if ( ZoneEquipList( Loop ).Name == "" ) continue; // dimensioned by NumOfZones.  Only valid ones have names.
 			for ( ListLoop = 1; ListLoop <= ZoneEquipList( Loop ).NumOfEquipTypes; ++ListLoop ) {
-				if ( ! SameString( ZoneEquipList( Loop ).EquipType( ListLoop ), ComponentType ) ) continue;
+				if ( ! UtilityRoutines::SameString( ZoneEquipList( Loop ).EquipType( ListLoop ), ComponentType ) ) continue;
 				if ( ComponentName == "*" ) {
 					IsOnList = true;
 					CtrlZoneNumLocal = Loop;
 					goto EquipList_exit;
 				}
-				if ( ! SameString( ZoneEquipList( Loop ).EquipName( ListLoop ), ComponentName ) ) continue;
+				if ( ! UtilityRoutines::SameString( ZoneEquipList( Loop ).EquipName( ListLoop ), ComponentName ) ) continue;
 				IsOnList = true;
 				CtrlZoneNumLocal = Loop;
 				goto EquipList_exit;
@@ -1147,38 +1086,15 @@ namespace DataZoneEquipment {
 		// This function returns the index into the Controlled Zone Equipment structure
 		// of the indicated zone.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int ControlledZoneIndex; // Index into Controlled Zone structure
 
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 		if ( ! ZoneEquipInputsFilled ) {
 			GetZoneEquipmentData1();
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 
 		return ControlledZoneIndex;
 
@@ -1198,29 +1114,8 @@ namespace DataZoneEquipment {
 		// This function returns the zone number for the indicated
 		// zone node num.  Returns 0 if did not find zone node in any Zone
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int ControlledZoneIndex; // Index into Controlled Zone structure
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool FoundIt;
@@ -1261,29 +1156,8 @@ namespace DataZoneEquipment {
 		// This function returns the system node number for the indicated
 		// zone.  Returns 0 if the Zone is not a controlled zone.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int SystemZoneNodeNumber; // System node number for controlled zone
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ControlledZoneIndex;
@@ -1293,7 +1167,7 @@ namespace DataZoneEquipment {
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		SystemZoneNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
 			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {
@@ -1321,15 +1195,11 @@ namespace DataZoneEquipment {
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the return air node number for the indicated
 		// zone and node name.  If NodeName is blank, return the first return node number,
-		// otherwise return the node number of the matching return node name.  
+		// otherwise return the node number of the matching return node name.
 		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int ReturnAirNodeNumber; // Return Air node number for controlled zone
-
 		int ControlledZoneIndex;
 
 		if ( ! ZoneEquipInputsFilled ) {
@@ -1337,7 +1207,7 @@ namespace DataZoneEquipment {
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		ReturnAirNodeNumber = 0; // default is not found
 		if ( ControlledZoneIndex > 0 ) {
 			{ auto const & thisZoneEquip( ZoneEquipConfig( ControlledZoneIndex ) );
@@ -1345,7 +1215,7 @@ namespace DataZoneEquipment {
 				if ( NodeName == "" ) {
 					// If NodeName is blank, return first return node number, but warn if there are multiple return nodes for this zone
 					ReturnAirNodeNumber = thisZoneEquip.ReturnNode( 1 );
-					if ( thisZoneEquip.NumReturnNodes > 1 ){ 
+					if ( thisZoneEquip.NumReturnNodes > 1 ){
 						ShowWarningError( "GetReturnAirNodeForZone: " + calledFromDescription + ", request for zone return node is ambiguous." );
 						ShowContinueError( "Zone=" + thisZoneEquip.ZoneName + " has "+ General::RoundSigDigits(thisZoneEquip.NumReturnNodes ) + " return nodes. First return node will be used." );
 					}
@@ -1368,17 +1238,14 @@ namespace DataZoneEquipment {
 	GetReturnNumForZone(
 		std::string const & ZoneName, // Zone name to match into Controlled Zone structure
 		std::string const & NodeName  // Return air node name to match (may be blank)
-	) 
+	)
 	{
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function returns the zone return number (not the node number) for the indicated
 		// zone and node name.  If NodeName is blank, return 1 (the first return node)
-		// otherwise return the index of the matching return node name.  
+		// otherwise return the index of the matching return node name.
 		// Returns 0 if the Zone is not a controlled zone or the node name does not match.
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 
 		// Return value
 		int ReturnIndex; // Return number for the given zone (not the node number)
@@ -1390,7 +1257,7 @@ namespace DataZoneEquipment {
 			ZoneEquipInputsFilled = true;
 		}
 
-		ControlledZoneIndex = FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
+		ControlledZoneIndex = UtilityRoutines::FindItemInList( ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName );
 		ReturnIndex = 0; // default if not found
 		if ( ControlledZoneIndex > 0 ) {
 			if ( ZoneEquipConfig( ControlledZoneIndex ).ActualZoneNum > 0 ) {

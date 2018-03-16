@@ -26,7 +26,7 @@ if not dryrun:
     filename = "LICENSE.txt"
     fp = open(filename,'w')
     fp.write(licensetxt)
-    fp.close
+    fp.close()
 else:
     print('Skipping writing out LICENSE.txt')
 

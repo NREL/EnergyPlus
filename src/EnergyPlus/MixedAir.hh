@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -270,7 +270,7 @@ namespace MixedAir {
 		int HeatRecoveryBypassControlType; // User input selects type of heat recovery optimization
 		bool ManageDemand; // Used by demand manager to manage ventilation
 		Real64 DemandLimitFlowRate; //Current demand limit if demand manager is ON
-		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check 
+		Real64 MaxOAFracBySetPoint; // The maximum OA fraction due to freezing cooling coil check
 		int MixedAirSPMNum; // index of mixed air setpoint manager
 		bool CoolCoilFreezeCheck; // if true, cooling coil freezing is prevented by recalculating the amount of OA
 		bool EconoActive; // if true economizer is active
@@ -734,11 +734,10 @@ namespace MixedAir {
 
 	void
 	CheckOAControllerName(
-		std::string const & OAControllerName, // proposed name
-		int const NumCurrentOAControllers, // Count on number of controllers
-		bool & IsNotOK, // Pass through to VerifyName
-		bool & IsBlank, // Pass through to VerifyName
-		std::string const & SourceID // Pass through to VerifyName
+		std::string & OAControllerName,
+		std::string const & ObjectType,
+		std::string const & FieldName,
+		bool & ErrorsFound
 	);
 
 	int

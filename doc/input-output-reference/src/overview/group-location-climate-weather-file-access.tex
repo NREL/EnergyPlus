@@ -6,9 +6,9 @@ This group of objects describes the ambient conditions for the simulation.
 
 The location class describes the parameters for the building's location. Only one location is allowed. Weather data file location, if it exists, will override any location data in the IDF. Thus, for an annual simulation, a Location does not need to be entered.
 
-\subsubsection{Inputs}\label{inputs-026}
+\subsubsection{Inputs}\label{inputs-201709281625}
 
-\paragraph{Field: Name}\label{field-name-025}
+\paragraph{Field: Name}\label{field-name-201709281626}
 
 This alpha field is used as an identifying field in output reports.
 
@@ -45,7 +45,7 @@ Site:Location, DENVER COLORADO,39.75,-104.87,-7,1610.26;
 \end{lstlisting}
 
 
-\subsection{Site:VariableLocation}\label{sitelocation}
+\subsection{Site:VariableLocation}\label{sitevariablelocation}
 
 This variable location class describes the parameters for a moving and/or rotating building's location.
 The applications for this include:
@@ -64,15 +64,15 @@ The latitude, longitude, and orientation are all defined according to the same c
 
 This alpha field is used as an identifying field in output reports.
 
-\paragraph{Field: Building Location Latitude Schedule}\label{field-latitude}
+\paragraph{Field: Building Location Latitude Schedule}\label{field-building-location-latitude-schedule}
 
 This field represents the latitude (in degrees) of the facility. By convention, North Latitude is represented as positive; South Latitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
 
-\paragraph{Field: Building Location Longitude Schedule}\label{field-longitude}
+\paragraph{Field: Building Location Longitude Schedule}\label{field-building-location-longitude-schedule}
 
 This field represents the longitude (in degrees) of the facility. By convention, East Longitude is represented as positive; West Longitude as negative. Minutes should be represented in decimal fractions of 60. (15' is 15/60 or .25)
 
-\paragraph{Field: Building Location Orientation Schedule}\label{field-time-zone}
+\paragraph{Field: Building Location Orientation Schedule}\label{field-building-location-orientation-schedule}
 
 This field represents the time zone of the facility (relative to Greenwich Mean Time or the 0\(^{th}\) meridian). Time zones west of GMT (e.g. North America) are represented as negative; east of GMT as positive. Non-whole hours can be represented in decimal (e.g. 6:30 is 6.5).
 
@@ -114,7 +114,7 @@ The design day input describes the parameters to effect a ``design day'' simulat
 We refer you to the ASHRAE Handbook of Fundamentals for philosophy of what parameters are important for use as ``design conditions'' in sizing equipment.
 
 \begin{callout}
-  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. \url{http://www.energyplus.gov/cfm/weather_data.cfm} These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
+  In the install, the ``design day files'' are included for the weather file locations that are included (weatherdata folder). All the design day definitions from the ASHRAE design conditions (latest publication date) are included, grouped by WMO region, on the main web site with the weather data. \url{https://www.energyplus.net/weather} These files are in ``macro'' form but it is easy to cut and paste the appropriate definition segments. These files include the location information as well as some locations have \textbf{RunPeriodControl:DaylightSavingTime} objects.
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-1-024}
@@ -613,7 +613,7 @@ In some countries (notably the US), when holidays fall on weekends, they are oft
 Note that a blank or null field in this field will indicate \textbf{No}.
 
 \begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
 \end{callout}
 
 \paragraph{Field: Use Weather File Rain Indicators}\label{field-use-weather-file-rain-indicators}
@@ -725,7 +725,7 @@ In some countries (notably the US), when holidays fall on weekends, they are oft
 Note that a blank or null field in this field will indicate \textbf{No}.
 
 \begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
 \end{callout}
 
 \paragraph{Field: Use Weather File Rain Indicators}\label{field-use-weather-file-rain-indicators-1}
@@ -741,7 +741,7 @@ Weather files can contain ``snow'' indicators. (EPW field ``Snow Depth'' \textgr
 For weather file run periods, special day run periods can be described. These will always be in effect for the selected days in the run period. Depending on the Use Special Days value in the RunPeriod:* object(s), these can augment any special days included on the weather file.
 
 \begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather} have neither special days specified nor daylight saving period. However, DDY (Design Day) files produced from the ASHRAE Design Conditions that accompany the EPW files may include a DaylightSavingPeriod object for certain locations.
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-6-013}
@@ -802,7 +802,7 @@ RunPeriodControl:SpecialDays, Vacation, 5/1, 14, CustomDay1;
 Similar to a special day period, a daylight saving period may be entered to be applied to weather file run periods. These will always be in effect, regardless of the value entered on the RunPeriod object. Note that this period will always override any daylight saving period specified in a weather file.
 
 \begin{callout}
-Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{http://www.energyplus.gov/cfm/weather\_data.cfm} have neither special days specified nor daylight saving period.
+Note: EnergyPlus processed weather files available on the EnergyPlus web site: \url{https://www.energyplus.net/weather} have neither special days specified nor daylight saving period.
 
 \warning{Note: For EnergyPlus Output:Variable and Output:Meter reporting, the time stamps are always in standard time. When daylight saving time is active, scheduled loads and controls will shift one hour relative to standard time.}
 \end{callout}
@@ -1688,7 +1688,7 @@ Water mains temperatures are a function of outdoor climate conditions and vary w
   maximum difference in monthly average outdoor air temperatures
 \end{itemize}
 
-These values can be easily calculated from annual weather data using a spreadsheet or from the ``.stat'' file available with the EnergyPlus weather files at \href{http://www.energyplus.gov}{www.energyplus.gov}. Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
+These values can be easily calculated from annual weather data using a spreadsheet or from the ``.stat'' file available with the EnergyPlus weather files at \href{https://energyplus.net/weather}{www.energyplus.net}. Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
 
 Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
 

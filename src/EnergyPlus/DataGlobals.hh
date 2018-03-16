@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,6 +66,9 @@ namespace DataGlobals {
 	extern bool runReadVars;
 	extern bool DDOnlySimulation;
 	extern bool AnnualSimulation;
+	extern bool outputEpJSONConversion;
+	extern bool isEpJSON;
+	extern bool preserveIDFOrder;
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const BeginDay;
@@ -147,6 +150,8 @@ namespace DataGlobals {
 	extern bool BeginTimeStepFlag; // True at the start of each time step, False after first subtime step of time step
 	extern int DayOfSim; // Counter for days (during the simulation)
 	extern std::string DayOfSimChr; // Counter for days (during the simulation) (character -- for reporting)
+	extern int CalendarYear; // Calendar year of the current day of simulation
+	extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
 	extern bool EndEnvrnFlag; // True at the end of each environment (last time step of last hour of last day of environ)
 	extern bool EndDesignDayEnvrnsFlag; // True at the end of the last design day environment
 	// (last time step of last hour of last day of environ which is a design day)

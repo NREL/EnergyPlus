@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,16 +53,9 @@ extern "C" {
 #include <FMI/main.h>
 }
 
-
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
 #include <ExternalInterface.hh>
-#include <General.hh>
-#include <InputProcessor.hh>
-#include <UtilityRoutines.hh>
 
 // C++ Standard Library Headers
 #include <string>

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -233,12 +233,8 @@ namespace IceThermalStorage {
 
 		// PURPOSE OF THIS SUBROUTINE:
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataGlobals::BeginEnvrnFlag;
 		using FluidProperties::GetSpecificHeatGlycol;
@@ -259,11 +255,6 @@ namespace IceThermalStorage {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SimIceStorage" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool firstTime( true );
@@ -291,7 +282,7 @@ namespace IceThermalStorage {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			IceStorageNum = FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
+			IceStorageNum = UtilityRoutines::FindItemInList( IceStorageName, IceStorageTypeMap, TotalIceStorages );
 			if ( IceStorageNum == 0 ) {
 				ShowFatalError( "SimIceStorage: Unit not found=" + IceStorageName );
 			}
@@ -848,13 +839,8 @@ namespace IceThermalStorage {
 		//arrays associated with the type PlantLoopProps.
 
 		// METHODOLOGY EMPLOYED: to be determined...
-		// REFERENCES:
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using namespace ScheduleManager;
 		using BranchNodeConnections::TestCompSet;
@@ -864,29 +850,18 @@ namespace IceThermalStorage {
 		// Locals
 		int IceNum;
 
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		bool ErrorsFound;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		// FLOW:
 
 		ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
 		//LOAD ARRAYS WITH IceStorage DATA
-		NumIceStorages = GetNumObjectsFound( cIceStorageSimple ); // by ZG
-		NumDetIceStorages = GetNumObjectsFound( cIceStorageDetailed );
+		NumIceStorages = inputProcessor->getNumObjectsFound( cIceStorageSimple ); // by ZG
+		NumDetIceStorages = inputProcessor->getNumObjectsFound( cIceStorageDetailed );
 
 		IceStorageTypeMap.allocate( NumIceStorages + NumDetIceStorages );
 		CheckEquipName.allocate( NumIceStorages + NumDetIceStorages );
@@ -899,14 +874,8 @@ namespace IceThermalStorage {
 		cCurrentModuleObject = cIceStorageSimple;
 		for ( IceNum = 1; IceNum <= NumIceStorages; ++IceNum ) {
 
-			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), IceStorage, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, _, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -920,9 +889,9 @@ namespace IceThermalStorage {
 
 			// Get Ice Thermal Storage Type
 			IceStorage( IceNum ).ITSType = cAlphaArgs( 2 );
-			if ( SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
+			if ( UtilityRoutines::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilInternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilInternal;
-			} else if ( SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
+			} else if ( UtilityRoutines::SameString( IceStorage( IceNum ).ITSType, "IceOnCoilExternal" ) ) {
 				IceStorage( IceNum ).ITSType_Num = ITSType_IceOnCoilExternal;
 			} else {
 				ShowSevereError( cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -995,14 +964,8 @@ namespace IceThermalStorage {
 
 		for ( IceNum = 1; IceNum <= NumDetIceStorages; ++IceNum ) {
 
-			GetObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), DetIceStor, IceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, IceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
 			++TotalIceStorages;
 			IceStorageTypeMap( TotalIceStorages ).StorageType = cCurrentModuleObject;
@@ -1098,9 +1061,9 @@ namespace IceThermalStorage {
 			}
 
 			DetIceStor( IceNum ).ThawProcessIndicator = cAlphaArgs( 9 );
-			if ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
+			if ( UtilityRoutines::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt;
-			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
+			} else if ( ( UtilityRoutines::SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
 				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );
@@ -1225,7 +1188,7 @@ namespace IceThermalStorage {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_TS_IceDetailed;
 		using DataPlant::CommonPipe_TwoWay;
@@ -1334,7 +1297,7 @@ namespace IceThermalStorage {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataPlant::TypeOf_TS_IceSimple;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::CommonPipe_TwoWay;
 		using DataPlant::SupplySide;
 		using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;

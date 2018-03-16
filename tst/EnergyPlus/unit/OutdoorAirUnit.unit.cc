@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -274,7 +274,7 @@ namespace EnergyPlus {
 			" ",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::BeginEnvrnFlag = true;
 		DataSizing::CurZoneEqNum = 1;
@@ -305,6 +305,7 @@ namespace EnergyPlus {
 		FinalZoneSizing.allocate( 1 );
 		FinalZoneSizing( CurZoneEqNum ).MinOA = 0.5;
 		FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak = 26.66667;
+		FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak = 26.66667;
 		FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
 		FinalZoneSizing( CurZoneEqNum ).CoolDDNum = 1;
 		FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax = 1;

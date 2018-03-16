@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -332,7 +332,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -347,7 +347,7 @@ namespace EnergyPlus {
 
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "ZoneHVAC:PackagedTerminalAirConditioner", PTUnit( 1 ).UnitType );  // zoneHVAC equipment type
 
@@ -576,7 +576,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -596,7 +596,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on inlet side of PTAC
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "ZoneHVAC:PackagedTerminalAirConditioner", PTUnit( 1 ).UnitType );  // zoneHVAC equipment type
 
@@ -647,12 +647,12 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
@@ -665,15 +665,15 @@ namespace EnergyPlus {
 		Schedule( PTUnit( PTUnitNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( PTUnit( PTUnitNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
-		// simulate PTAC zoneHVAC equipment 
+		// simulate PTAC zoneHVAC equipment
 		SimPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided );
 		// apply mass conservation to determine secondary air mass flow rate
 		SecondaryAirMassFlowRate = Node( PTUnit( PTUnitNum ).AirInNode ).MassFlowRate - PrimaryAirMassFlowRate;
-		// check the terminal air mixer secondary air mass flow rate 
+		// check the terminal air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
 	}
@@ -903,7 +903,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -923,7 +923,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on supply side of PTAC
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "ZoneHVAC:PackagedTerminalAirConditioner", PTUnit( 1 ).UnitType );  // zoneHVAC equipment type
 
@@ -969,17 +969,17 @@ namespace EnergyPlus {
 		DXCoil( 1 ).RatedCBF( 1 ) = 0.05;
 		DXCoil( 1 ).RatedAirMassFlowRate( 1 ) = HVACInletMassFlowRate;
 
-		// primary air condition at outside air condition 
+		// primary air condition at outside air condition
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set PTUnit inlet condition to zone air node	
+		// set PTUnit inlet condition to zone air node
 		Node( PTUnit( PTUnitNum ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( PTUnit( PTUnitNum ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( PTUnitNum ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
@@ -992,18 +992,18 @@ namespace EnergyPlus {
 		Schedule( PTUnit( PTUnitNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( PTUnit( PTUnitNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
-		// simulate PTAC zoneHVAC equipment 
+		// simulate PTAC zoneHVAC equipment
 		SimPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided );
 		// apply mass conservation to determine secondary mass flow rate
 		SecondaryAirMassFlowRate = Node( SysATMixer( 1 ).SecInNode ).MassFlowRate;
-		// check the terminal air mixer secondary air mass flow rate 
+		// check the terminal air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the terminal air mixer outlet air mass flow rate 
+		// check the terminal air mixer outlet air mass flow rate
 		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
 	}
@@ -1316,7 +1316,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -1336,7 +1336,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on inlet side of PTHP
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "ZoneHVAC:PackagedTerminalHeatPump", PTUnit( 1 ).UnitType ); // zoneHVAC equipment type
 
@@ -1387,12 +1387,12 @@ namespace EnergyPlus {
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
@@ -1405,15 +1405,15 @@ namespace EnergyPlus {
 		Schedule( PTUnit( PTUnitNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( PTUnit( PTUnitNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
-		// simulate PTHP zoneHVAC equipment 
+		// simulate PTHP zoneHVAC equipment
 		SimPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided );
 		// apply mass conservation to determine secondary air mass flow rate
 		SecondaryAirMassFlowRate = Node( PTUnit( PTUnitNum ).AirInNode ).MassFlowRate - PrimaryAirMassFlowRate;
-		// check the terminal air mixer secondary air mass flow rate 
+		// check the terminal air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
 	}
@@ -1726,7 +1726,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -1746,7 +1746,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on supply side of PTHP
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "ZoneHVAC:PackagedTerminalHeatPump", PTUnit( 1 ).UnitType ); // zoneHVAC equipment type
 
@@ -1792,17 +1792,17 @@ namespace EnergyPlus {
 		DXCoil( 1 ).RatedCBF( 1 ) = 0.05;
 		DXCoil( 1 ).RatedAirMassFlowRate( 1 ) = HVACInletMassFlowRate;
 
-		// primary air condition at outside air condition 
+		// primary air condition at outside air condition
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( PTUnit( PTUnitNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set PTUnit inlet condition to zone air node	
+		// set PTUnit inlet condition to zone air node
 		Node( PTUnit( PTUnitNum ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( PTUnit( PTUnitNum ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( PTUnit( PTUnitNum ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
 
-		PTUnit( 1 ).CtrlZoneNum = 1;
+		PTUnit( 1 ).ControlZoneNum = 1;
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
@@ -1815,18 +1815,18 @@ namespace EnergyPlus {
 		Schedule( PTUnit( PTUnitNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( PTUnit( PTUnitNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
-		// simulate PTHP zoneHVAC equipment 
+		// simulate PTHP zoneHVAC equipment
 		SimPTUnit( PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided );
 		// apply mass conservation to determine secondary mass flow rate
 		SecondaryAirMassFlowRate = Node( SysATMixer( 1 ).SecInNode ).MassFlowRate;
-		// check the terminal air mixer secondary air mass flow rate 
+		// check the terminal air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the terminal air mixer outlet air mass flow rate 
+		// check the terminal air mixer outlet air mass flow rate
 		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOut, 2.0 );
 
 	}
@@ -2395,7 +2395,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -2416,7 +2416,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on inlet side of VRF terminal unit
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "TU1", VRFTU( 1 ).Name ); // zoneHVAC equipment name
 		//EXPECT_EQ( "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", VRFTU( 1 ).Name ); // zoneHVAC equipment type
@@ -2473,7 +2473,7 @@ namespace EnergyPlus {
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -2491,15 +2491,15 @@ namespace EnergyPlus {
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( VRFTU( VRFTUNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
 		// Simulate zoneHVAC equipment (VRF terminal unit)
 		SimVRF( VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq );
-		// check the terminal air mixer secondary air mass flow rate 
+		// check the terminal air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
 		// check the terminal air mixer outlet flow rate must be equal to VRFTU mass flow rate
 		ASSERT_EQ( HVACInletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
 	}
@@ -3068,7 +3068,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -3089,7 +3089,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on inlet side of VRF terminal unit
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "TU1", VRFTU( 1 ).Name ); // zoneHVAC equipment name
 
@@ -3145,7 +3145,7 @@ namespace EnergyPlus {
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set VRF terminal unit inlet condition to zone air node	
+		// set VRF terminal unit inlet condition to zone air node
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -3163,17 +3163,17 @@ namespace EnergyPlus {
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( VRFTU( VRFTUNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
 		// simulate zoneHVAC equipment (VRF terminal unit)
 		SimVRF( VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq );
 
-		// check the terminal air mixer secondary air mass flow rate 
+		// check the terminal air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the terminal air mixer outlet air mass flow rate 
+		// check the terminal air mixer outlet air mass flow rate
 		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
 	}
@@ -4818,7 +4818,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -4839,7 +4839,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on inlet side of VRF terminal unit
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "TU1", VRFTU( 1 ).Name ); // zoneHVAC equipment name
 
@@ -4895,7 +4895,7 @@ namespace EnergyPlus {
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -4913,18 +4913,18 @@ namespace EnergyPlus {
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( VRFTU( VRFTUNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
 		// Simulate zoneHVAC equipment (VRF terminal unit)
 		SimVRF( VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq );
 
-		// check the terminal air mixer secondary air mass flow rate, requires updating the secondary flow 
+		// check the terminal air mixer secondary air mass flow rate, requires updating the secondary flow
 		SecondaryAirMassFlowRate = Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate - PrimaryAirMassFlowRate;
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
 		// check the terminal air mixer outlet flow rate must be equal to VRFTU mass flow rate
 		HVACInletMassFlowRate = Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate;
 		ASSERT_EQ( HVACInletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 5.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 5.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 5.0 );
 
 	}
@@ -6570,7 +6570,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -6591,7 +6591,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on supply side of VRF terminal unit
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 		EXPECT_EQ( "TU1", VRFTU( 1 ).Name ); // zoneHVAC equipment name
 
@@ -6645,7 +6645,7 @@ namespace EnergyPlus {
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( VRFTU( VRFTUNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set VRF terminal unit inlet condition to zone air node	
+		// set VRF terminal unit inlet condition to zone air node
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -6663,18 +6663,18 @@ namespace EnergyPlus {
 		Schedule( VRFTU( VRFTUNum ).SchedPtr ).CurrentValue = 1.0; // unit is always available
 		Schedule( VRFTU( VRFTUNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
 		// Simulate zoneHVAC equipment (VRF terminal unit)
 		SimVRF( VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, QUnitOutVRFTU, LatOutputProvided, QZnReq );
 
-		// check the terminal air mixer secondary air mass flow rate, requires updating the secondary flow 
+		// check the terminal air mixer secondary air mass flow rate, requires updating the secondary flow
 		SecondaryAirMassFlowRate = Node( VRFTU( VRFTUNum ).VRFTUInletNodeNum ).MassFlowRate;
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the terminal air mixer outlet flow rate must be equal to the mass flow rate of VRFTU + the primary air 
+		// check the terminal air mixer outlet flow rate must be equal to the mass flow rate of VRFTU + the primary air
 		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOutVRFTU, 2.0 );
 
 	}
@@ -6811,7 +6811,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -6831,7 +6831,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on inlet side of PTHP
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_InletSide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 
 		BeginEnvrnFlag = false;
@@ -6878,7 +6878,7 @@ namespace EnergyPlus {
 		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set secondary air (recirculating air) conditions to zone air node		
+		// set secondary air (recirculating air) conditions to zone air node
 		Node( SysATMixer( 1 ).SecInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( SysATMixer( 1 ).SecInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( SysATMixer( 1 ).SecInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -6887,7 +6887,7 @@ namespace EnergyPlus {
 		SysSizingRunDone = true;
 		ZoneSizingRunDone = true;
 		SysSizingCalc = true;
-	
+
 		CurDeadBandOrSetback.allocate( 1 );
 		CurDeadBandOrSetback( 1 ) = false;
 		ZoneSysEnergyDemand.allocate( 1 );
@@ -6898,15 +6898,15 @@ namespace EnergyPlus {
 		Schedule( UnitVent( UnitVentNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 		Schedule( UnitVent( UnitVentNum ).MinOASchedPtr ).CurrentValue = 0.5; // min OA fraction is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
-		// simulate Unit Ventilator zoneHVAC equipment 
+		// simulate Unit Ventilator zoneHVAC equipment
 		SimUnitVentilator( UnitVent( UnitVentNum ).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum );
 		// apply mass conservation to determine secondary air mass flow rate
 		SecondaryAirMassFlowRate = Node( UnitVent( UnitVentNum ).AirInNode ).MassFlowRate - PrimaryAirMassFlowRate;
-		// check the air mixer secondary air mass flow rate 
+		// check the air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
 
 	}
@@ -7044,7 +7044,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::TimeStep = 1;
@@ -7064,7 +7064,7 @@ namespace EnergyPlus {
 		// get input test for terminal air single duct mixer on supply side of PTHP
 		ASSERT_EQ( 1, NumATMixers );
 		EXPECT_EQ( "SPACE1-1 DOAS AIR TERMINAL", SysATMixer( 1 ).Name ); // single duct air terminal mixer name
-		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type 
+		EXPECT_EQ( DataHVACGlobals::ATMixer_SupplySide, SysATMixer( 1 ).MixerType ); // air terminal mixer connection type
 		EXPECT_EQ( "AIRTERMINAL:SINGLEDUCT:MIXER", AirDistUnit( 1 ).EquipType( 1 ) ); // Air distribution unit equipment type
 
 		// set input variables
@@ -7106,12 +7106,12 @@ namespace EnergyPlus {
 		Node( Fan( 1 ).InletNodeNum ).MassFlowRateMaxAvail = HVACInletMassFlowRate;
 		Node( Fan( 1 ).OutletNodeNum ).MassFlowRateMax = HVACInletMassFlowRate;
 
-		// primary air condition at outside air condition 
+		// primary air condition at outside air condition
 		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).Temp = DataEnvironment::OutDryBulbTemp;
 		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).HumRat = DataEnvironment::OutHumRat;
 		Node( UnitVent( UnitVentNum ).ATMixerPriNode ).Enthalpy = DataEnvironment::OutEnthalpy;
 
-		// set UnitVent inlet condition to zone air node	
+		// set UnitVent inlet condition to zone air node
 		Node( UnitVent( UnitVentNum ).AirInNode ).Temp = Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp;
 		Node( UnitVent( UnitVentNum ).AirInNode ).HumRat = Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat;
 		Node( UnitVent( UnitVentNum ).AirInNode ).Enthalpy = Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy;
@@ -7131,18 +7131,18 @@ namespace EnergyPlus {
 		Schedule( UnitVent( UnitVentNum ).FanAvailSchedPtr ).CurrentValue = 1.0; // fan is always available
 		Schedule( UnitVent( UnitVentNum ).MinOASchedPtr ).CurrentValue = 0.5; // min OA fraction is always available
 
-		// set secondary air mass flow rate to zero 
+		// set secondary air mass flow rate to zero
 		Node( SysATMixer( 1 ).SecInNode ).MassFlowRate = 0.0;
-		// simulate Unit Ventilator ZoneHVAC equipment 
+		// simulate Unit Ventilator ZoneHVAC equipment
 		SimUnitVentilator( UnitVent( UnitVentNum ).Name, ZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided, UnitVentNum );
 		// apply mass conservation to determine secondary mass flow rate
 		SecondaryAirMassFlowRate = Node( SysATMixer( 1 ).SecInNode ).MassFlowRate;
-		// check the terminal air mixer secondary air mass flow rate 
+		// check the terminal air mixer secondary air mass flow rate
 		ASSERT_EQ( SecondaryAirMassFlowRate, Node( SysATMixer( 1 ).SecInNode ).MassFlowRate );
-		// check the air mixer outlet air mass flow rate 
+		// check the air mixer outlet air mass flow rate
 		ATMixerOutletMassFlowRate = SecondaryAirMassFlowRate + PrimaryAirMassFlowRate;
 		ASSERT_EQ( ATMixerOutletMassFlowRate, SysATMixer( 1 ).MixedAirMassFlowRate );
-		// check the cooling output delivered is within 2.0 Watt of zone cooling load 
+		// check the cooling output delivered is within 2.0 Watt of zone cooling load
 		ASSERT_NEAR( QZnReq, QUnitOut, 0.001 );
 
 	}
@@ -7286,7 +7286,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		ASSERT_FALSE( ErrorsFound );

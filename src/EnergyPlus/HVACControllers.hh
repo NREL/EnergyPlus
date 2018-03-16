@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -234,6 +234,7 @@ namespace HVACControllers {
 		int FaultyCoilSATIndex;  // Index of the fault object corresponding to the coil
 		Real64 FaultyCoilSATOffset; // Coil SAT sensor offset
 		bool BypassControllerCalc; // set true for OA sys water coils
+		int AirLoopControllerIndex; // index to controller on specific air loop
 
 		// Default Constructor
 		ControllerPropsType() :
@@ -278,7 +279,8 @@ namespace HVACControllers {
 			FaultyCoilSATFlag( false ),
 			FaultyCoilSATIndex( 0 ),
 			FaultyCoilSATOffset( 0.0 ),
-			BypassControllerCalc( false)
+			BypassControllerCalc( false),
+			AirLoopControllerIndex( 0 )
 		{}
 
 	};
@@ -559,6 +561,11 @@ namespace HVACControllers {
 		std::string const & ControllerName, // name of coil controller
 		int & WaterInletNodeNum, // input actuator node number
 		bool & NodeNotFound // true if matching actuator node not found
+	);
+
+	int
+	GetControllerIndex(
+		std::string const & ControllerName // name of coil controller
 	);
 
 } // HVACControllers

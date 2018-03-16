@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -252,7 +252,7 @@ namespace GroundHeatExchangers {
 		std::shared_ptr < GLHEResponseFactorsStruct > myRespFactors;
 		Real64 designFlow; // Design volumetric flow rate			[m3/s]
 		Real64 designMassFlow; // Design mass flow rate				[kg/s]
-		Real64 tempGround; // The far field temperature of the ground   [°C]
+		Real64 tempGround; // The far field temperature of the ground   [ï¿½C]
 		Array1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
 		Array1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
 		Array1D< Real64 > QnSubHr; // Contains the sub-hourly heat extraction/rejection rate normalized by the total active length of bore holes  [W/m]
@@ -260,11 +260,11 @@ namespace GroundHeatExchangers {
 		int AGG; // Minimum Hourly History required
 		int SubAGG; // Minimum sub-hourly History
 		Array1D_int LastHourN; // Stores the Previous hour's N for past hours until the minimum sub-hourly history
-		Real64 bhTemp; // [°C]
+		Real64 bhTemp; // [ï¿½C]
 		Real64 massFlowRate; // [kg/s]
-		Real64 outletTemp; // [°C]
-		Real64 inletTemp; // [°C]
-		Real64 aveFluidTemp; // [°C]
+		Real64 outletTemp; // [ï¿½C]
+		Real64 inletTemp; // [ï¿½C]
+		Real64 aveFluidTemp; // [ï¿½C]
 		Real64 QGLHE; // [W] heat transfer rate
 		bool myFlag;
 		bool myEnvrnFlag;

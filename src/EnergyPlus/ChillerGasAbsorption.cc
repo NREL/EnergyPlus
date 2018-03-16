@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,7 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -172,7 +172,7 @@ namespace ChillerGasAbsorption {
 		// PURPOSE OF THIS SUBROUTINE: This is the Absorption Chiller model driver.  It
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
-		using InputProcessor::FindItemInList;
+
 		using CurveManager::CurveValue;
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
@@ -187,7 +187,7 @@ namespace ChillerGasAbsorption {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, GasAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, GasAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimGasAbsorber: Unit not found=" + AbsorberName );
 			}
@@ -287,10 +287,6 @@ namespace ChillerGasAbsorption {
 		// This routine will get the input
 		// required by the Direct Fired Absorption chiller modelin the object ChillerHeater:Absorption:DirectFired
 
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -303,15 +299,12 @@ namespace ChillerGasAbsorption {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string ChillerName;
-		bool errFlag;
 		bool Okay;
 
 		//FLOW
 		cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
-		NumGasAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
+		NumGasAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumGasAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment found in input file" );
@@ -329,19 +322,10 @@ namespace ChillerGasAbsorption {
 		//LOAD ARRAYS
 
 		for ( AbsorberNum = 1; AbsorberNum <= NumGasAbsorbers; ++AbsorberNum ) {
-			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, Get_ErrorsFound );
+			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), Get_ErrorsFound, cCurrentModuleObject + " Name" );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), GasAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				Get_ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
-			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
-			if ( errFlag ) {
-				Get_ErrorsFound = true;
-			}
 			GasAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
 			ChillerName = cCurrentModuleObject + " Named " + GasAbsorber( AbsorberNum ).Name;
 
@@ -381,7 +365,7 @@ namespace ChillerGasAbsorption {
 			if ( GasAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
 				GasAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
 			}
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
 			} else {
 				GasAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 13 );
@@ -405,9 +389,9 @@ namespace ChillerGasAbsorption {
 				ShowFatalError( "Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				Get_ErrorsFound = false;
 			}
-			if ( SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "LeavingCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = false;
-			} else if ( SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "EnteringCondenser" ) ) {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isEnterCondensTemp = true;
@@ -416,9 +400,9 @@ namespace ChillerGasAbsorption {
 				ShowContinueError( "resetting to EnteringCondenser, simulation continues" );
 			}
 			// Assign Other Parameters
-			if ( SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "AirCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = false;
-			} else if ( SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "WaterCooled" ) ) {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
 			} else {
 				GasAbsorber( AbsorberNum ).isWaterCooled = true;
@@ -573,7 +557,7 @@ namespace ChillerGasAbsorption {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;

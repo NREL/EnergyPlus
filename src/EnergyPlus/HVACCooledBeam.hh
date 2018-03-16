@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -134,6 +134,9 @@ namespace HVACCooledBeam {
 		int CBLoadReSimIndex;
 		int CBMassFlowReSimIndex;
 		int CBWaterOutletTempReSimIndex;
+		int CtrlZoneNum; //control zone index
+		int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
+		int AirLoopNum; //air loop index that terminal is attached to
 
 		// Default Constructor
 		CoolBeamData() :
@@ -180,7 +183,10 @@ namespace HVACCooledBeam {
 			CWCompNum( 0 ),
 			CBLoadReSimIndex( 0 ),
 			CBMassFlowReSimIndex( 0 ),
-			CBWaterOutletTempReSimIndex( 0 )
+			CBWaterOutletTempReSimIndex( 0 ),
+			CtrlZoneNum( 0 ),
+			ctrlZoneInNodeIndex( 0 ),
+			AirLoopNum( 0 )
 		{}
 
 	};

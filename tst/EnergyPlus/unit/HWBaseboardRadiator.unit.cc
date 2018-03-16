@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,7 +55,7 @@
 #include <DataLoopNode.hh>
 #include <ScheduleManager.hh>
 #include <Psychrometrics.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <HWBaseboardRadiator.hh>
 #include <FluidProperties.hh>
 #include <DataPlant.hh>
@@ -66,7 +66,6 @@ using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
 using namespace ScheduleManager;
 using namespace Psychrometrics;
-using namespace InputProcessor;
 using namespace HWBaseboardRadiator;
 using namespace DataLoopNode;
 using namespace FluidProperties;

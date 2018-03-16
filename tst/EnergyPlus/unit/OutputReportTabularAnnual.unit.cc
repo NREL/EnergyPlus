@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,7 +80,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_GetInput )
 		"Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::DoWeathSim = true;
 
@@ -129,7 +129,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering )
 		"Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitPow;
 	Real64 extLitUse;
@@ -175,7 +175,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_GatherResults )
 		"Zone Electric Equipment Total Heating Energy; !- Variable or Meter 3 Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 extLitPow;
 	Real64 extLitUse;
@@ -238,7 +238,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 		"    Until: 24:00, 0.0;       !- Field 11",
 	});
 
-	ASSERT_FALSE ( process_idf ( idf_objects ) );	
+	ASSERT_TRUE( process_idf ( idf_objects ) );
 
 	Real64 facilUse;
 	SetupOutputVariable ( "Misc Facility Electric Energy", OutputProcessor::Unit::J, facilUse, "Zone", "Sum", "Lite1", _, "Electricity", "Facility", "General" ); //create an electric meter
@@ -289,7 +289,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder )
 		"0; !- field Digits After Decimal 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Real64 facilUse;
 	SetupOutputVariable( "Misc Facility Electric Energy", OutputProcessor::Unit::J, facilUse, "Zone", "Sum", "Lite1", _, "Electricity", "Facility", "General" ); //create an electric meter

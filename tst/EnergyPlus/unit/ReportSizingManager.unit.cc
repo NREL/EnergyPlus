@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans) {
 		"    TestFan4OutletNode;           !- Air Outlet Node Name",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string fanName = "TEST FAN 1";
 	HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( fanName ) ); // call constructor
@@ -551,8 +551,6 @@ TEST_F( SQLiteFixture, ReportSizingManager_SQLiteRecordReportSizingOutputTest ) 
 	Real64 VarValue;
 	Real64 UsrValue;
 
-	EnergyPlus::sqlite = std::move( sqlite_test );
-
 	// input values
 	CompType = "BOILER:HOTWATER";
 	CompName = "RESIDENTIAL BOILER ELECTRIC";
@@ -563,10 +561,9 @@ TEST_F( SQLiteFixture, ReportSizingManager_SQLiteRecordReportSizingOutputTest ) 
 	// boiler hot water autosizing and userspecified nominal capacity reporting to SQLite output
 	ReportSizingManager::ReportSizingOutput( CompType, CompName, VarDesc, VarValue, UsrDesc, UsrValue );
 	// get the sqlite output
-	sqlite_test = std::move( EnergyPlus::sqlite );
 	// query the sqLite
 	auto result = queryResult( "SELECT * FROM ComponentSizes;", "ComponentSizes" );
-	sqlite_test->sqliteCommit();
+	EnergyPlus::sqlite->sqliteCommit();
 	// check that there are two sizing result records
 	ASSERT_EQ( 2ul, result.size() );
 	std::vector<std::string> testResult0{ "1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W" };

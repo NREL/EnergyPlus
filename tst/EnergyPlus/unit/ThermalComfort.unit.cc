@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -103,6 +103,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
 	TimeStepZone = 0.25;
 	ThermalComfortInASH55.allocate( NumOfZones );
 	ThermalComfortInASH55( 1 ).ZoneIsOccupied = true;
+	Zone.allocate( NumOfZones );
 
 	// SingleHeatingSetPoint thermostat
 
@@ -707,7 +708,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;
@@ -851,4 +852,47 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT )
 	
 }
 
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test )
+{
+	// 5381
+	useEpwData = true;
 
+	DailyAveOutTemp( 1 ) = 8.704166667;
+	DailyAveOutTemp( 2 ) = 9.895833333;
+	DailyAveOutTemp( 3 ) = 12.2;
+	DailyAveOutTemp( 4 ) = 8.445833333;
+	DailyAveOutTemp( 5 ) = 7.8;
+	DailyAveOutTemp( 6 ) = 7.158333333;
+	DailyAveOutTemp( 7 ) = 8.0125;
+	DailyAveOutTemp( 8 ) = 8.279166667;
+	DailyAveOutTemp( 9 ) = 8.166666667;
+	DailyAveOutTemp( 10 ) = 7.141666667;
+	DailyAveOutTemp( 11 ) = 7.433333333;
+	DailyAveOutTemp( 12 ) = 9.0625;
+	DailyAveOutTemp( 13 ) = 9.741666667;
+	DailyAveOutTemp( 14 ) = 9.545833333;
+	DailyAveOutTemp( 15 ) = 11.43333333;
+	DailyAveOutTemp( 16 ) = 12.375;
+	DailyAveOutTemp( 17 ) = 12.59583333;
+	DailyAveOutTemp( 18 ) = 12.6625;
+	DailyAveOutTemp( 19 ) = 13.50833333;
+	DailyAveOutTemp( 20 ) = 12.99583333;
+	DailyAveOutTemp( 21 ) = 11.58333333;
+	DailyAveOutTemp( 22 ) = 11.72083333;
+	DailyAveOutTemp( 23 ) = 9.1875;
+	DailyAveOutTemp( 24 ) = 6.8;
+	DailyAveOutTemp( 25 ) = 9.391666667;
+	DailyAveOutTemp( 26 ) = 8.1125;
+	DailyAveOutTemp( 27 ) = 8.4;
+	DailyAveOutTemp( 28 ) = 8.475;
+	DailyAveOutTemp( 29 ) = 7.941666667;
+	DailyAveOutTemp( 30 ) = 9.316666667;
+
+	DataGlobals::BeginDayFlag = true;
+
+	CalcThermalComfortAdaptiveASH55( false );
+	EXPECT_NEAR( ThermalComfort::runningAverageASH, 9.29236111, 0.001 );
+	useEpwData = false;
+	DataGlobals::BeginDayFlag = false;
+
+}

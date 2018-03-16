@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,6 @@
 #include <DataRoomAirModel.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -95,7 +94,6 @@ namespace MundtSimMgr {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using InputProcessor::SameString;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -372,7 +370,7 @@ namespace MundtSimMgr {
 
 						AirNodeFoundFlag = false;
 						for ( AirNodeNum = AirNodeBeginNum; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum ) {
-							if ( SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
+							if ( UtilityRoutines::SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
 								LineNode( NodeNum, MundtZoneIndex ).ClassType = AirNode( AirNodeNum ).ClassType;
 								LineNode( NodeNum, MundtZoneIndex ).AirNodeName = AirNode( AirNodeNum ).Name;
 								LineNode( NodeNum, MundtZoneIndex ).Height = AirNode( AirNodeNum ).Height;

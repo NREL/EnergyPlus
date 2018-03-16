@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,6 +70,7 @@
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -1099,7 +1100,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		"    32.2,                    !- Rated Outlet Air Temperature {C}",
 		"    ;                        !- Rated Ratio for Air and Water Convection",
 	} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
@@ -1144,7 +1145,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		InitUnitHeater( UnitHeatNum, ZoneNum, FirstHVACIteration );
 		InitWaterCoil( CoilNum, FirstHVACIteration ); // init hot water heating coil
 
-		PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
+		PltSizHeatNum = PlantUtilities::MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
 		HWMaxVolFlowRate = WaterCoils::WaterCoil( CoilNum ).MaxWaterVolFlowRate;
@@ -1274,7 +1275,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 		"    32.2,                    !- Rated Outlet Air Temperature {C}",
 		"    ;                        !- Rated Ratio for Air and Water Convection",
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 	MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
@@ -2416,7 +2417,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 		"    Chilled Water Loop Outside Air Sensor,  !- Name",
 		"    -1;                      !- Height Above Ground {m}",
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;
