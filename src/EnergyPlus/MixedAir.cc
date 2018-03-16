@@ -479,10 +479,9 @@ namespace MixedAir {
 		int CompNum;
 		//INTEGER :: CtrlNum
 		int OAMixerNum;
-		int OAControllerNum;
+		int OAControllerNum; // OA controller index in OAController
 		static std::string CompType; //Tuned Made static
 		static std::string CompName; //Tuned Made static
-		static std::string CtrlName; //Tuned Made static
 		bool FatalErrorFlag( false );
 
 		// SimOutsideAirSys can handle only 1 controller right now.  This must be
@@ -492,21 +491,21 @@ namespace MixedAir {
 		//    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
 		//    CALL SimOAController(CtrlName,FirstHVACIteration)
 		//  END DO
-		CtrlName = OutsideAirSys( OASysNum ).ControllerName( 1 );
 		CurOASysNum = OASysNum;
-		SimOAController( CtrlName, OutsideAirSys( OASysNum ).ControllerIndex( 1 ), FirstHVACIteration, AirLoopNum );
+		auto & CurrentOASystem( OutsideAirSys( OASysNum ) );
+		SimOAController( CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum );
 		SimOASysComponents( OASysNum, FirstHVACIteration, AirLoopNum );
 
 		if ( MyOneTimeErrorFlag( OASysNum ) ) {
-			if ( OutsideAirSys( OASysNum ).NumControllers - OutsideAirSys( OASysNum ).NumSimpleControllers > 1 ) {
-				ShowWarningError( "AirLoopHVAC:OutdoorAirSystem " + OutsideAirSys( OASysNum ).Name + " has more than 1 outside air controller; only the 1st will be used" );
+			if ( CurrentOASystem.NumControllers - CurrentOASystem.NumSimpleControllers > 1 ) {
+				ShowWarningError( "AirLoopHVAC:OutdoorAirSystem " + CurrentOASystem.Name + " has more than 1 outside air controller; only the 1st will be used" );
 			}
-			for ( CompNum = 1; CompNum <= OutsideAirSys( OASysNum ).NumComponents; ++CompNum ) {
-				CompType = OutsideAirSys( OASysNum ).ComponentType( CompNum );
-				CompName = OutsideAirSys( OASysNum ).ComponentName( CompNum );
+			for ( CompNum = 1; CompNum <= CurrentOASystem.NumComponents; ++CompNum ) {
+				CompType = CurrentOASystem.ComponentType( CompNum );
+				CompName = CurrentOASystem.ComponentName( CompNum );
 				if ( UtilityRoutines::SameString( CompType, "OutdoorAir:Mixer" ) ) {
 					OAMixerNum = UtilityRoutines::FindItemInList( CompName, OAMixer );
-					OAControllerNum = UtilityRoutines::FindItemInList( CtrlName, OAController );
+					OAControllerNum = CurrentOASystem.OAControllerIndex;
 					if ( OAController( OAControllerNum ).MixNode != OAMixer( OAMixerNum ).MixNode ) {
 						ShowSevereError( "The mixed air node of Controller:OutdoorAir=\"" + OAController( OAControllerNum ).Name + "\"" );
 						ShowContinueError( "should be the same node as the mixed air node of OutdoorAir:Mixer=\"" + OAMixer( OAMixerNum ).Name + "\"." );
@@ -1179,6 +1178,14 @@ namespace MixedAir {
 					ErrorsFound = true;
 
 				}}
+			}
+
+			// loop through the controllers in the controller list for OA system and save the pointer to the OA controller index
+			for ( int OAControllerNum = 1; OAControllerNum <= OutsideAirSys( OASysNum ).NumControllers; ++OAControllerNum ) {
+				if ( UtilityRoutines::SameString( OutsideAirSys( OASysNum ).ControllerType( OAControllerNum ), CurrentModuleObjects( CMO_OAController ) ) ) {
+					OutsideAirSys( OASysNum ).OAControllerName = OutsideAirSys( OASysNum ).ControllerName( OAControllerNum );
+					break;
+				}
 			}
 
 		}
@@ -2466,6 +2473,7 @@ namespace MixedAir {
 					found = UtilityRoutines::FindItemInList( thisOAController.Name, OutsideAirSys( OASysNum ).ControllerName, isize( OutsideAirSys( OASysNum ).ControllerName ) );
 					if ( found != 0 ) {
 						thisOASys = OASysNum;
+						OutsideAirSys( thisOASys ).OAControllerIndex = GetOAController( thisOAController.Name );
 						break; // we found it
 					}
 				}
@@ -2507,6 +2515,8 @@ namespace MixedAir {
 				ErrorsFound = true;
 
 			}}
+
+
 
 			OAControllerMyOneTimeFlag( OAControllerNum ) = false;
 

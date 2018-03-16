@@ -10809,18 +10809,10 @@ namespace HVACUnitarySystem {
 							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum - 1 );
 						}
 					}
-				} else {
-					if ( HeatSpeedNum < 1 ) {
-						CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
-						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
-					} else if ( HeatSpeedNum == 1 ) {
-						if ( UnitarySystem( UnitarySysNum ).MultiSpeedHeatingCoil ) {
-							CompOffMassFlow = 0.0; // #5518
-							CompOffFlowRatio = 0.0;
-						} else {
-							CompOffMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
-							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
-						}
+				} else { // cycling fan mode
+					if ( HeatSpeedNum <= 1 ) {
+						CompOffMassFlow = 0.0; // #5518
+						CompOffFlowRatio = 0.0;
 					} else {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum - 1 );
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum - 1 );
@@ -10898,18 +10890,10 @@ namespace HVACUnitarySystem {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 					}
-				} else {
-					if ( CoolSpeedNum < 1 ) {
-						CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
-						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
-					} else if ( CoolSpeedNum == 1 ) {
-						if ( UnitarySystem( UnitarySysNum ).MultiSpeedCoolingCoil ) {
-							CompOffMassFlow = 0.0; // #5518
-							CompOffFlowRatio = 0.0;
-						} else {
-							CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
-							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
-						}
+				} else { // cycling fan mode
+					if ( CoolSpeedNum <= 1 ) {
+						CompOffMassFlow = 0.0; // #5518
+						CompOffFlowRatio = 0.0;
 					} else {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
