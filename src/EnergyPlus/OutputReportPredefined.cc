@@ -1972,9 +1972,9 @@ namespace OutputReportPredefined {
 
 		//results from regular zone and system sizing calcs, "At Ideal Loads Peak"
 		pdch2CoilDDnameSensIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Design Day Name at Sensible Ideal Loads Peak" );
-		pdch2CoilDateTimeSensIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Date/Time at Sensible Ideal Loads Peak {TIMESTAMP}" );
+		pdch2CoilDateTimeSensIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Date/Time at Sensible Ideal Loads Peak" );
 		pdch2CoilDDnameAirFlowIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Design Day Name at Air Flow Ideal Loads Peak" );
-		pdch2CoilDateTimeAirFlowIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Date/Time at Air Flow Ideal Loads Peak {TIMESTAMP}" );
+		pdch2CoilDateTimeAirFlowIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Date/Time at Air Flow Ideal Loads Peak" );
 
 		pdch2CoilTotalCapIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Total Capacity at Ideal Loads Peak [W]" );
 		pdch2CoilSensCapIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Sensible Capacity at Ideal Loads Peak [W]" );
@@ -2055,11 +2055,11 @@ namespace OutputReportPredefined {
 
 		//results from regular zone and system sizing calcs, "At Ideal Loads Peak"
 		pdchCoilDDnameSensIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Design Day Name at Sensible Ideal Loads Peak" );
-		pdchCoilDateTimeSensIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Sensible Ideal Loads Peak {TIMESTAMP}" );
+		pdchCoilDateTimeSensIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Sensible Ideal Loads Peak" );
 		pdchCoilDDnameTotIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Design Day Name at Total Ideal Loads Peak" );
-		pdchCoilDateTimeTotIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Total Ideal Loads Peak {TIMESTAMP}" );
+		pdchCoilDateTimeTotIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Total Ideal Loads Peak" );
 		pdchCoilDDnameAirFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Design Day Name at Air Flow Ideal Loads Peak" );
-		pdchCoilDateTimeAirFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Air Flow Ideal Loads Peak {TIMESTAMP}" );
+		pdchCoilDateTimeAirFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Date/Time at Air Flow Ideal Loads Peak" );
 
 		pdchCoilTotalCapIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Total Capacity at Ideal Loads Peak [W]" );
 		pdchCoilSensCapIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Sensible Capacity at Ideal Loads Peak [W]" );
