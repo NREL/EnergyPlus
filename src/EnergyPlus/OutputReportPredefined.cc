@@ -1981,16 +1981,16 @@ namespace OutputReportPredefined {
 		pdch2CoilAirVolumeFlowIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]" );
 		pdch2CoilEntDryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]" );
 		pdch2CoilEntWetBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]" );
-		pdch2CoilEntHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]" );
+		pdch2CoilEntHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
 		pdch2CoilLvgDryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]" );
 		pdch2CoilLvgWetBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]" );
 		pdch2CoilLvgHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Ideal Loads Peak [C]" );
 		pdch2OADryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]" );
-		pdch2OAHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]" );
+		pdch2OAHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
 		pdch2OAWetBulbatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection,"Outdoor Air Wetbulb at Ideal Loads Peak [C]" );
 		pdch2OAFlowPrcntIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]" );
 		pdch2ZoneAirDryBulbIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]" );
-		pdch2ZoneAirHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]" );
+		pdch2ZoneAirHumRatIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
 		pdch2ZoneAirRelHumIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]" );
 		pdch2ZoneSensibleLoadIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]" );
 		pdch2ZoneLatentLoadIdealPeak = newPreDefColumn( pdst2CoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]" );
@@ -2068,7 +2068,7 @@ namespace OutputReportPredefined {
 		pdchCoilAirVolumeFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]" );
 		pdchCoilEntDryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Drybulb at Ideal Loads Peak [C]" );
 		pdchCoilEntWetBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Ideal Loads Peak [C]" );
-		pdchCoilEntHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]" );
+		pdchCoilEntHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
 		pdchCoilEntEnthalpyIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Ideal Loads Peak [J/KG-K]" );
 		pdchCoilLvgDryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Ideal Loads Peak [C]" );
 		pdchCoilLvgWetBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Ideal Loads Peak [C]" );
@@ -2081,14 +2081,14 @@ namespace OutputReportPredefined {
 		pdchFanHeatGainIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Supply Fan Air Heat Gain at Ideal Loads Peak [W]" );
 		pdchCoilNetTotalCapacityIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil and Fan Net Total Capacity at Ideal Loads Peak [W]" );
 		pdchOADryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Drybulb at Ideal Loads Peak [C]" );
-		pdchOAHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]" );
+		pdchOAHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
 		pdchOAWetBulbatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection,"Outdoor Air Wetbulb at Ideal Loads Peak [C]" );
 		pdchOAVolFlowIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Volume Flow Rate at Ideal Loads Peak [m3/s]" );
 		pdchOAFlowPrcntIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Outdoor Air Flow Percentage at Ideal Loads Peak [%]" );
 		pdchAirSysRADryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Return Air Drybulb at Ideal Loads Peak [C]" );
-		pdchAirSysRAHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Return Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]" );
+		pdchAirSysRAHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "System Return Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
 		pdchZoneAirDryBulbIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Air Drybulb at Ideal Loads Peak [C]" );
-		pdchZoneAirHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]" );
+		pdchZoneAirHumRatIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Air Humidity Ratio at Ideal Loads Peak [KGWATER/KGDRYAIR]" );
 		pdchZoneAirRelHumIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Air Relative Humidity at Ideal Loads Peak [%]" );
 		pdchZoneSensibleLoadIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Sensible Heat Gain at Ideal Loads Peak [W]" );
 		pdchZoneLatentLoadIdealPeak = newPreDefColumn( pdstCoilSummaryCoilSelection, "Zone Latent Heat Gain at Ideal Loads Peak [W]" );
@@ -2099,11 +2099,11 @@ namespace OutputReportPredefined {
 		pdchCoilRatedAirMass = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Air Mass Flow Rate at Rating Conditions [kg/s]" );
 		pdchCoilRatedEntDryBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Drybulb at Rating Conditions [C]" );
 		pdchCoilRatedEntWetBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Wetbulb at Rating Conditions [C]" );
-		pdchCoilRatedEntHumRat = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]" );
+		pdchCoilRatedEntHumRat = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Humidity Ratio at Rating Conditions [KGWATER/KGDRYAIR]" );
 		pdchCoilRatedEntEnthalpy = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Entering Air Enthalpy at Rating Conditions [J/KG-K]" );
 		pdchCoilRatedLvgDryBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Drybulb at Rating Conditions [C]" );
 		pdchCoilRatedLvgWetBulb = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Wetbulb at Rating Conditions [C]" );
-		pdchCoilRatedLvgHumRat = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]" );
+		pdchCoilRatedLvgHumRat = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Humidity Ratio at Rating Conditions [KGWATER/KGDRYAIR]" );
 		pdchCoilRatedLvgEnthalpy = newPreDefColumn( pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]" );
 
 		// System Summary Report
