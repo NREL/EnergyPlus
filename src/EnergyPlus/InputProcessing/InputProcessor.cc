@@ -712,7 +712,7 @@ namespace EnergyPlus {
 
 		// Only applicable if the incoming file was idf
 		int idfOrderNumber = Number;
-		if ( DataGlobals::isEpJSON ) return idfOrderNumber;
+		if ( DataGlobals::isEpJSON || ! DataGlobals::preserveIDFOrder ) return idfOrderNumber;
 
 		json * obj;
 		auto obj_iter = epJSON.find( Object );
@@ -759,7 +759,7 @@ namespace EnergyPlus {
 
 		// Only applicable if the incoming file was idf
 		int jSONOrderNumber = Number;
-		if ( DataGlobals::isEpJSON ) return jSONOrderNumber;
+		if ( DataGlobals::isEpJSON || ! DataGlobals::preserveIDFOrder ) return jSONOrderNumber;
 
 		json * obj;
 		auto obj_iter = epJSON.find( Object );

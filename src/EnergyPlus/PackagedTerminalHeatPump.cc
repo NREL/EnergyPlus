@@ -3106,7 +3106,7 @@ namespace PackagedTerminalHeatPump {
 		using DataHeatBalFanSys::TempControlType;
 		using Fans::GetFanVolFlow;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetDensityGlycol;

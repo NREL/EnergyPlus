@@ -76,6 +76,7 @@
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
+#include <PlantUtilities.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -793,7 +794,7 @@ namespace PipeHeatTransfer {
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitPipesHeatTransfer" );

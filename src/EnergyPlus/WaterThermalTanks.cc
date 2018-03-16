@@ -5068,7 +5068,7 @@ namespace WaterThermalTanks {
 
 			if ( ( UseInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum == 0 ) ) {
 				errFlag = false;
-				ScanPlantLoopsForObject( WaterThermalTank( WaterThermalTankNum ).Name, WaterThermalTank( WaterThermalTankNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
+				PlantUtilities::ScanPlantLoopsForObject( WaterThermalTank( WaterThermalTankNum ).Name, WaterThermalTank( WaterThermalTankNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
 				if ( errFlag ) {
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
@@ -5085,7 +5085,7 @@ namespace WaterThermalTanks {
 				// this is a heat pump water heater, need a separate block because TypeOf_HeatPumpWtrHeater shows up on Branch
 				//  (input should probably have been the associated tank )
 				errFlag = false;
-				ScanPlantLoopsForObject( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
+				PlantUtilities::ScanPlantLoopsForObject( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
 				if ( errFlag ) {
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
@@ -5100,7 +5100,7 @@ namespace WaterThermalTanks {
 			}
 			if ( ( SourceInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum == 0 ) ) {
 				errFlag = false;
-				ScanPlantLoopsForObject( WaterThermalTank( WaterThermalTankNum ).Name, WaterThermalTank( WaterThermalTankNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantCompNum, _, _, _, SourceInletNode, _, errFlag );
+				PlantUtilities::ScanPlantLoopsForObject( WaterThermalTank( WaterThermalTankNum ).Name, WaterThermalTank( WaterThermalTankNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantCompNum, _, _, _, SourceInletNode, _, errFlag );
 				if ( UseInletNode > 0 ) {
 					InterConnectTwoPlantLoopSides( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).TypeNum, true );
 				}

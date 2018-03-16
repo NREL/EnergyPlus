@@ -919,7 +919,7 @@ namespace FanCoilUnits {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::FanCoil4Pipe_Num;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
 		using FluidProperties::GetDensityGlycol;
@@ -1139,7 +1139,7 @@ namespace FanCoilUnits {
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
 		using HVACHXAssistedCoolingCoil::GetHXCoilType;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using ReportSizingManager::ReportSizingOutput;

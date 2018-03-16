@@ -1041,7 +1041,7 @@ namespace Pumps {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
 		using DataPlant::PlantReSizingCompleted;

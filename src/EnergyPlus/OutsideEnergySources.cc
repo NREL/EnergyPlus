@@ -100,7 +100,7 @@ namespace OutsideEnergySources {
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_PurchHotWater;
 	using DataPlant::TypeOf_PurchChilledWater;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 
 	//MODULE PARAMETER DEFINITIONS
 	int const EnergyType_DistrictHeating( 1 );

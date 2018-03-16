@@ -92,7 +92,7 @@ namespace PlantLoadProfile {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_PlantLoadProfile;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 	using PlantUtilities::SetComponentFlowRate;
 	using PlantUtilities::InitComponentNodes;
 

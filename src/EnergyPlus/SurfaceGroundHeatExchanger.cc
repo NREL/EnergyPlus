@@ -419,7 +419,7 @@ namespace loc {
 		using DataHeatBalance::Material;
 		using DataPlant::TypeOf_GrndHtExchgSurface;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
