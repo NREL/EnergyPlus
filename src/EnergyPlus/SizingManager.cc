@@ -1530,8 +1530,15 @@ namespace SizingManager {
 	void
 	DetermineSystemPopulationDiversity(){
 		// determine Pz sum, Ps, and D for each air system for standard 62.1
-		DisplayString( "Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System" );
 
+		//first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
+		bool anyVRPinModel( false );
+		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+			if ( FinalSysSizing( AirLoopNum ).SystemOAMethod == SOAM_VRP ) {
+				anyVRPinModel = true;
+				break;
+			}
+		}
 		// First get the design (max) level of people in all zones connected to air loop
 		for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 			int SysSizNum = UtilityRoutines::FindItemInList( FinalSysSizing( AirLoopNum ).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName );
@@ -1550,6 +1557,14 @@ namespace SizingManager {
 			}
 		}
 
+		if ( ! anyVRPinModel ) {
+			for ( int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				DBySys( AirLoopNum ) = 1.0;
+			}
+			return; // early return to not march through schedules
+		}
+
+		DisplayString( "Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System" );
 		// now march through all zone timesteps for entire year to find the concurrent max
 		int DaysInYear( 366 ); //assume leap year
 		int dayOfWeekType( 1 ); // assume year starts on Sunday
