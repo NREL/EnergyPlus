@@ -71,6 +71,12 @@ public:
 
 	std::string normalizeObjectType( std::string const & objectType );
 
+	std::vector< std::string > const & errors();
+
+	std::vector< std::string > const & warnings();
+
+	bool hasErrors();
+
 	enum class Token : size_t {
 		NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5, NUMBER = 6
 	};
@@ -81,8 +87,8 @@ private:
 	size_t beginning_of_line_index = 0;
 	char s[ 129 ];
 	std::unordered_map< std::string, std::string > objectTypeMap;
-	std::vector< std::string > errors;
-	std::vector< std::string > warnings;
+	std::vector< std::string > errors_;
+	std::vector< std::string > warnings_;
 
 	void increment_both_index( size_t & index, size_t & line_index );
 

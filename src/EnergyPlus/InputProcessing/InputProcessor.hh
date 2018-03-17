@@ -67,7 +67,7 @@
 #include <InputProcessing/DataStorage.hh>
 
 class IdfParser;
-class State;
+class Validation;
 
 namespace EnergyPlus {
 
@@ -257,6 +257,9 @@ namespace EnergyPlus {
 		std::vector < std::string > const &
 		validationWarnings();
 
+		bool
+		processErrors();
+
 		json const &
 		getFields( std::string const & objectType, std::string const & objectName );
 
@@ -280,7 +283,7 @@ namespace EnergyPlus {
 		using UnorderedUnusedObjectMap = std::map< const json::object_t * const, ObjectInfo >;
 
 		std::unique_ptr< IdfParser > idf_parser;
-		std::unique_ptr< State > state;
+		std::unique_ptr< Validation > validation;
 		std::unique_ptr< DataStorage > data;
 		json schema;
 		json epJSON;

@@ -560,7 +560,8 @@ namespace EnergyPlus {
 
 
 	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
-		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema);
+		bool success = true;
+		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
 		if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
 			inputProcessor->epJSON["Building"] = {
@@ -607,11 +608,14 @@ namespace EnergyPlus {
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
+		bool is_valid = inputProcessor->validation->validate( inputProcessor->epJSON );
+		bool hasErrors = inputProcessor->processErrors();
+
 		inputProcessor->initializeMaps();
 		SimulationManager::PostIPProcessing();
 		// inputProcessor->state->printErrors();
 
-		return true;
+		return success || is_valid || !hasErrors;
 	}
 
 	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {

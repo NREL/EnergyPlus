@@ -106,7 +106,6 @@ namespace EnergyPlus {
 
 	InputProcessor::InputProcessor() :
 		idf_parser( std::unique_ptr< IdfParser >( new IdfParser() ) ),
-		state( std::unique_ptr< State >( new State() ) ),
 		data( std::unique_ptr< DataStorage >( new DataStorage() ) )
 	{
 		auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
@@ -118,13 +117,7 @@ namespace EnergyPlus {
 			caseInsensitiveObjectMap.emplace( convertToUpper( it.key() ), it.key() );
 		}
 
-		state->initialize( & schema );
-
-		const auto state_ptr = state.get();
-		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed ) -> bool {
-			state_ptr->traverse( event, parsed, 999999999, 999999999 );
-			return true;
-		};
+		validation = std::unique_ptr< Validation >( new Validation( & schema ) );
 	}
 
 	std::unique_ptr< InputProcessor > InputProcessor::factory()
@@ -181,21 +174,15 @@ namespace EnergyPlus {
 		objectCacheMap.clear();
 		unusedInputs.clear();
 
-		state = std::unique_ptr< State >( new State() );
-		state->initialize( & schema );
-		const auto state_ptr = state.get();
-		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed ) -> bool {
-			state_ptr->traverse( event, parsed, 999999999, 999999999 );
-			return true;
-		};
+		validation = std::unique_ptr< Validation >( new Validation( & schema ) );
 	}
 
 	std::vector < std::string > const & InputProcessor::validationErrors() {
-		return state->validationErrors();
+		return validation->errors();
 	}
 
 	std::vector < std::string > const & InputProcessor::validationWarnings() {
-		return state->validationWarnings();
+		return validation->warnings();
 	}
 
 	std::pair< bool, std::string >
@@ -270,7 +257,12 @@ namespace EnergyPlus {
 		}
 
 		if ( ! DataGlobals::isEpJSON ) {
-			json const input_file_json = idf_parser->decode( input_file, schema );
+			bool success = true;
+			json const input_file_json = idf_parser->decode( input_file, schema, success );
+			bool hasErrors = processErrors();
+			if ( !success || hasErrors ) {
+				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+			}
 			if ( DataGlobals::outputEpJSONConversion ) {
 				input_file = input_file_json.dump( 4 );
 				std::string convertedIDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON" );
@@ -292,9 +284,10 @@ namespace EnergyPlus {
 			convertedFS << encoded << std::endl;
 		}
 
-		auto const num_errors = state->validationErrors().size();
-		// TODO: Need to add error outputting for idf parsing and validation
-		if ( num_errors ) {
+		bool is_valid = validation->validate( epJSON );
+		bool hasErrors = processErrors();
+
+		if ( !is_valid || hasErrors ) {
 			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
 		}
 
@@ -311,6 +304,32 @@ namespace EnergyPlus {
 		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
+	}
+
+	bool
+	InputProcessor::processErrors() {
+		auto const idf_parser_errors = idf_parser->errors();
+		auto const idf_parser_warnings = idf_parser->warnings();
+
+		auto const validation_errors = validation->errors();
+		auto const validation_warnings = validation->warnings();
+
+		for (auto const & error : idf_parser_errors ) {
+			ShowSevereError( error );
+		}
+		for (auto const & warning : idf_parser_warnings ) {
+			ShowWarningError( warning );
+		}
+		for (auto const & error : validation_errors ) {
+			ShowSevereError( error );
+		}
+		for (auto const & warning : validation_warnings ) {
+			ShowWarningError( warning );
+		}
+
+		bool has_errors = validation->hasErrors() || idf_parser->hasErrors();
+
+		return has_errors;
 	}
 
 	int
@@ -512,7 +531,11 @@ namespace EnergyPlus {
 					if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = false;
 				}
 				NumAlphas++;
+//				if ( NumAlphas < i + 1 ) {
+//					NumAlphas = i + 1;
+//				}
 			} else {
+				NumAlphas++;
 				Alphas( i + 1 ) = "";
 				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = true;
 			}
@@ -575,7 +598,11 @@ namespace EnergyPlus {
 								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = false;
 							}
 							NumAlphas++;
+//							if ( NumAlphas < alphas_index ) {
+//								NumAlphas = alphas_index;
+//							}
 						} else {
+							NumAlphas++;
 							Alphas( alphas_index + 1 ) = "";
 							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
 						}
@@ -613,7 +640,11 @@ namespace EnergyPlus {
 					if ( is_NumBlank ) NumBlank()( i + 1 ) = it.value().get < std::string >().empty();
 				}
 				NumNumbers++;
+//				if ( NumNumbers < i + 1 ) {
+//					NumNumbers = i + 1;
+//				}
 			} else {
+				NumNumbers++;
 				Numbers( i + 1 ) = 0;
 				if ( is_NumBlank )
 					NumBlank()( i + 1 ) = true;
@@ -670,6 +701,9 @@ namespace EnergyPlus {
 							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = val.get < std::string >().empty();
 						}
 						NumNumbers++;
+//						if ( NumNumbers < numerics_index ) {
+//							NumNumbers = numerics_index;
+//						}
 					} else {
 						auto const & schema_field = schema_extension_fields[ field ];
 						auto const & schema_field_default_iter = schema_field.find( "default" );
@@ -689,6 +723,7 @@ namespace EnergyPlus {
 						} else {
 							Numbers( numerics_index + 1 ) = 0;
 						}
+						NumNumbers++;
 						if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = true;
 					}
 					if ( is_NumericFieldNames ) {
