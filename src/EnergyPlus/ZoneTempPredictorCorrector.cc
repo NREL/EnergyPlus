@@ -3296,7 +3296,7 @@ namespace ZoneTempPredictorCorrector {
 				ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
 				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
 				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
-				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
+				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempTole ) {
 					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 					ZoneThermostatSetPointLo( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
 				} else if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo && ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet - TempTole ) ) {
@@ -3331,9 +3331,6 @@ namespace ZoneTempPredictorCorrector {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-			if ( HeatOffFlag ) {
-				LoadToHeatingSetPoint = 0.0;
-			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToCoolingSetPoint = LoadToHeatingSetPoint;
@@ -3347,7 +3344,7 @@ namespace ZoneTempPredictorCorrector {
 				ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
 				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
 				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
-				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
+				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempTole ) {
 					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 					ZoneThermostatSetPointHi( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
 				} else if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet + TempTole ) {
@@ -3379,9 +3376,6 @@ namespace ZoneTempPredictorCorrector {
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
 				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
-			}
-			if ( CoolOffFlag ) {
-				LoadToCoolingSetPoint = 0.0;
 			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
@@ -3471,7 +3465,7 @@ namespace ZoneTempPredictorCorrector {
 				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
 				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
 
-				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
+				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempTole ) {
 					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 				} else if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet + TempTole ) {
 					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
@@ -3483,7 +3477,7 @@ namespace ZoneTempPredictorCorrector {
 					CoolOffFlag = true;
 				}
 
-				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
+				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempTole ) {
 					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
 					if ( ZoneThermostatSetPointHi( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) {
 						ZoneThermostatSetPointLo( ZoneNum ) = ZoneThermostatSetPointHi( ZoneNum );
@@ -3542,10 +3536,6 @@ namespace ZoneTempPredictorCorrector {
 				ShowContinueError( "Zone Heating ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
 				ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
 				ShowFatalError( "Program terminates due to above conditions." );
-			}
-			if ( CoolOffFlag && HeatOffFlag ) {
-				LoadToHeatingSetPoint = 0.0;
-				LoadToCoolingSetPoint = 0.0;
 			}
 
 			if ( LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0 ) {
