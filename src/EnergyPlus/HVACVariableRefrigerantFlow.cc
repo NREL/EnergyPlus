@@ -2327,7 +2327,8 @@ namespace HVACVariableRefrigerantFlow {
 			VRF( VRFNum ).RatedCompPowerPerCapcity = rNumericArgs( 2 );
 			VRF( VRFNum ).RatedCompPower = VRF( VRFNum ).RatedCompPowerPerCapcity * VRF( VRFNum ).RatedEvapCapacity;
 			VRF( VRFNum ).CoolingCapacity = VRF( VRFNum ).RatedEvapCapacity;
-			VRF( VRFNum ).HeatingCapacity = VRF( VRFNum ).RatedEvapCapacity * ( 1 + VRF( VRFNum ).RatedCompPowerPerCapcity );
+			VRF( VRFNum ).RatedHeatCapacity = VRF( VRFNum ).RatedEvapCapacity * ( 1 + VRF( VRFNum ).RatedCompPowerPerCapcity );
+			VRF( VRFNum ).HeatingCapacity = VRF( VRFNum ).RatedHeatCapacity;
 
 			//Reference system COP
 			VRF( VRFNum ).CoolingCOP = 1 / VRF( VRFNum ).RatedCompPowerPerCapcity;
@@ -4132,11 +4133,11 @@ namespace HVACVariableRefrigerantFlow {
 
 		// Size TU
 		if ( MySizeFlag( VRFTUNum ) ) {
-			if ( ! SysSizingCalc ) {
+			if ( ! ZoneSizingCalc && ! SysSizingCalc ) {
 				SizeVRF( VRFTUNum );
 				TerminalUnitList( TUListIndex ).TerminalUnitNotSizedYet( IndexToTUInTUList ) = false;
 				MySizeFlag( VRFTUNum ) = false;
-			} // IF ( .NOT. SysSizingCalc) THEN
+			} // IF ( .NOT. ZoneSizingCalc) THEN
 		} // IF (MySizeFlag(VRFTUNum)) THEN
 
 		// Do the Begin Environment initializations
@@ -4194,7 +4195,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		// one-time checks of flow rate vs fan flow rate
 		if ( MyVRFFlag( VRFTUNum ) ) {
-			if ( ! SysSizingCalc ) {
+			if ( ! ZoneSizingCalc && ! SysSizingCalc ) {
 				if ( VRFTU( VRFTUNum ).ActualFanVolFlowRate != AutoSize ) {
 
 					if ( VRFTU( VRFTUNum ).MaxCoolAirVolFlow > VRFTU( VRFTUNum ).ActualFanVolFlowRate ) {
@@ -5625,6 +5626,9 @@ namespace HVACVariableRefrigerantFlow {
 
 			if ( FoundAll && ( VRF( VRFCond ).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl )) {
 			// Size VRF rated evaporative capacity (VRF-FluidTCtrl Model)
+				// Set piping correction factors to 1.0 here for reporting to eio output - recalculated every time step in VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl
+				VRF( VRFCond ).PipingCorrectionCooling = 1.0;
+				VRF( VRFCond ).PipingCorrectionHeating = 1.0;
 
 				// Size VRF( VRFCond ).RatedEvapCapacity
 				IsAutoSize = false;
@@ -5650,8 +5654,8 @@ namespace HVACVariableRefrigerantFlow {
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", VRF( VRFCond ).HeatingCapacity );
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", VRF( VRFCond ).CoolingCapacity );
 				} else {
-					CoolingCapacityUser = VRF( VRFCond ).CoolingCapacity;
-					HeatingCapacityUser = VRF( VRFCond ).HeatingCapacity;
+					CoolingCapacityUser = VRF( VRFCond ).RatedEvapCapacity;
+					HeatingCapacityUser = VRF( VRFCond ).RatedHeatCapacity;
 
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Cooling Capacity (gross) [W]", CoolingCapacityDes, "User-Specified Rated Total Cooling Capacity (gross) [W]", CoolingCapacityUser );
 					ReportSizingOutput( cVRFTypes( VRF( VRFCond ).VRFSystemTypeNum ), VRF( VRFCond ).Name, "Design Size Rated Total Heating Capacity [W]", HeatingCapacityDes, "User-Specified Rated Total Heating Capacity [W]", HeatingCapacityUser );
@@ -7746,7 +7750,7 @@ namespace HVACVariableRefrigerantFlow {
 		BFH = 0.136;
 
 		//1. COOLING Mode
-		if ( ( ! VRF( VRFNum ).HeatRecoveryUsed && CoolingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) {
+		if ( ( Garate > 0.0 ) && ( ( ! VRF( VRFNum ).HeatRecoveryUsed && CoolingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) ) ) ) {
 		//1.1) Cooling coil is running
 			QZnReqSenCoolingLoad = max( 0.0, - 1.0 * ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToCoolingSP );
 			Tout = T_TU_in - QZnReqSenCoolingLoad * 1.2 / Garate / 1005;
@@ -7760,7 +7764,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		//2. HEATING Mode
-		if ( ( ! VRF( VRFNum ).HeatRecoveryUsed && HeatingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) {
+		if ( ( Garate > 0.0 ) && ( ( ! VRF( VRFNum ).HeatRecoveryUsed && HeatingLoad( VRFNum ) ) || ( VRF( VRFNum ).HeatRecoveryUsed && TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) ) ) ) {
 		//2.1) Heating coil is running
 			QZnReqSenHeatingLoad = max( 0.0, ZoneSysEnergyDemand( ZoneIndex ).OutputRequiredToHeatingSP );
 			Tout = T_TU_in + QZnReqSenHeatingLoad / Garate / 1005;
@@ -9454,7 +9458,14 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		// minimum airflow rate
-		FanSpdRatioMin = min( OACompOnMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), 1.0 );
+		if (  DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ) > 0.0 ) {
+			FanSpdRatioMin = min( OACompOnMassFlow / DXCoil( DXCoilNum ).RatedAirMassFlowRate( Mode ), 1.0 );
+		} else {
+			// VRF terminal unit is off
+			QCoilAct = 0.0;
+			AirMassFlowRate = max( OACompOnMassFlow, 0.0 );
+			return AirMassFlowRate;
+		}
 
 		if ( FirstHVACIteration ) {
 			Par( 1 ) = 1.0;

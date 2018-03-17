@@ -108,6 +108,7 @@ namespace EvaporativeCoolers {
 		std::string Schedule; // HeatingCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		Real64 VolFlowRate; // Volume Flow Rate in Evap Cooler needed for calculating SatEff
+		Real64 DesVolFlowRate; // Design volume flow rate (autosize or user input) - this is only used to compute design pump power
 		Real64 OutletTemp;
 		Real64 OuletWetBulbTemp;
 		Real64 OutletHumRat;
@@ -204,6 +205,7 @@ namespace EvaporativeCoolers {
 			EvapCoolerType( 0 ),
 			SchedPtr( 0 ),
 			VolFlowRate( 0.0 ),
+			DesVolFlowRate( 0.0 ),
 			OutletTemp( 0.0 ),
 			OuletWetBulbTemp( 0.0 ),
 			OutletHumRat( 0.0 ),

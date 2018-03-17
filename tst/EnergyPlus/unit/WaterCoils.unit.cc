@@ -503,6 +503,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	CurTermUnitSizingNum = 1;
 	CurSysNum = 0;
 	TermUnitSizing.allocate( 1 );
+	TermUnitFinalZoneSizing.allocate( 1 );
 	TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
 	TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 3.0;
 	TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac = 0.5;
@@ -535,6 +536,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterUASizing )
 	FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.0;
 	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.006;
 	FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.008;
+	TermUnitFinalZoneSizing( CurTermUnitSizingNum ) = FinalZoneSizing( CurZoneEqNum );
 
 
 	MySizeFlag( 1 ) = true;
@@ -655,6 +657,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	CurSysNum = 0;
 	CurTermUnitSizingNum = 1;
 	TermUnitSizing.allocate( 1 );
+	TermUnitFinalZoneSizing.allocate( 1 );
 	TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = WaterCoil( CoilNum ).DesAirVolFlowRate / 1500.0; // DesAirVolFlowRate = 1.0 so TU air flow = 0.00067 (lower than 0.001)
 	TermUnitSizing( CurTermUnitSizingNum ).MaxHWVolFlow = WaterCoil( CoilNum ).MaxWaterVolFlowRate / 1500.0;
 	TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac = 0.5;
@@ -687,6 +690,7 @@ TEST_F( WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing ) {
 	FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak = 21.0;
 	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU = 0.006;
 	FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak = 0.008;
+	TermUnitFinalZoneSizing( CurTermUnitSizingNum ) = FinalZoneSizing( CurZoneEqNum );
 
 	MySizeFlag( 1 ) = true;
 	// run water coil sizing
