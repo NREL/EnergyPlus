@@ -1,6 +1,6 @@
 \section{Output:Table:SummaryReports}\label{outputtablesummaryreports}
 
-The Output:Table:SummaryReports object controls which predefined tabular reports are produced.~ The easiest option is to specify ``AllSummary'' which will produce all of the summary reports described in this section and does not include the Zone Component Load report. In addition, ``AllMonthly'' will produce all of the monthly reports described. If all predefined reports are needed. ``AllSummaryAndMonthly'' shows all of the summary and monthly predefined reports and does not include the Zone Component Load report. The ``AllSummaryAndSizingPeriod'' option and ``AllSummaryMonthlyAndSizingPeriod'' option are similar and add the Zone Component Load report. Including the Zone Component Load Summary report may increase the simulation run time.
+The Output:Table:SummaryReports object controls which predefined tabular reports are produced.~ The easiest option is to specify ``AllSummary'' which will produce all of the summary reports described in this section and does not include any of the Component Load Summary reports. In addition, ``AllMonthly'' will produce all of the monthly reports described. If all predefined reports are needed. ``AllSummaryAndMonthly'' shows all of the summary and monthly predefined reports and does not include any of the Component Load Summary reports. The ``AllSummaryAndSizingPeriod'' option and ``AllSummaryMonthlyAndSizingPeriod'' option are similar and add the Zone Component Load Summary, AirLoop Component Load Summary, and Facility Component Load Summary reports. Including the Component Load Summary reports will increase the simulation run time.
 
 \subsection{Inputs}\label{inputs-064}
 
@@ -371,6 +371,8 @@ Contains the time of the peak load and the outside dry bulb and wet bulb tempera
 This table shows some ratios that may be handy in evaluating the results. It contains the percentage of outside air, the airflow per floor area, the airflow per capacity, the floor area per capacity and the capacity per floor area. It also shows the number of people.
 
 The Air Loop Component Summary tables also include tables that indicate the zones included in the aggregated results for heating and cooling.
+
+If the time of the peak load for each Zone for cooling exactly matches the time of the peak load for the AirLoop or Facility than the Estimated Cooling Peak Load Components will represent a sum of the values from the corresponding zones. Likewise the Estimated Heating Peak Load Components will add up for the AirLoop or Facility if the times of the heating peaks exactly match. This is not necessarily the case for Peak Conditions or the Engineering Checks tables. Since the sizing of Airloops is based on the system sizing they usually will be different than the sum of the corresonding zones. 
 
 \paragraph{Standard 62.1 Summary}\label{standard-62.1-summary}
 
