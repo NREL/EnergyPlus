@@ -978,15 +978,9 @@ namespace OutputReportTabular {
 	void
 	CollectPeakZoneConditions(
 		CompLoadTablesType & compLoad,
+		int const & desDaySelected,
 		int const & timeOfMax,
 		int const & zoneIndex,
-		bool const & isCooling
-	);
-
-	void
-	CollectPeakAirLoopConditions(
-		CompLoadTablesType & compLoad,
-		int const & airLoopIndex,
 		bool const & isCooling
 	);
 

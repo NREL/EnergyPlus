@@ -2153,7 +2153,7 @@ namespace SingleDuct {
 			IsAutoSize = true;
 		}
 
-		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
+		if ( CurTermUnitSizingNum > 0 ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation continue
 				if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
 					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Air Flow Rate [m3/s]",
@@ -2194,7 +2194,7 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).MaxHeatAirVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
+		if ( CurTermUnitSizingNum > 0 ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation should continue
 				UserInputMaxHeatAirVolFlowRate = Sys( SysNum ).MaxHeatAirVolFlowRate;
 				if ( Sys( SysNum ).MaxHeatAirVolFlowRate > 0.0 ) {
@@ -2235,10 +2235,10 @@ namespace SingleDuct {
 		}
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == ConstantMinFrac ) {
 			if ( ZoneSizingRunDone ) {
-				if ( CurZoneEqNum > 0 ) {
+				if ( CurTermUnitSizingNum > 0 ) {
 					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
 					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
-						MinAirFlowFracDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate;
+						MinAirFlowFracDes = min( 1.0, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlowMin / Sys( SysNum ).MaxAirVolFlowRate );
 					} else {
 						MinAirFlowFracDes = 0.0;
 					}
@@ -2288,10 +2288,10 @@ namespace SingleDuct {
 		}
 		if ( Sys( SysNum ).ZoneMinAirFracMethod == FixedMin ) {
 			if ( ZoneSizingRunDone ) {
-				if ( CurZoneEqNum > 0 ) {
+				if ( CurTermUnitSizingNum > 0 ) {
 					// use the combined defaults or other user inputs stored in DesCoolVolFlowMin
 					if ( Sys( SysNum ).MaxAirVolFlowRate > 0.0 ) {
-						FixedMinAirDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlowMin;
+						FixedMinAirDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolVolFlowMin;
 					} else {
 						MinAirFlowFracDes = 0.0;
 					}
@@ -2362,9 +2362,9 @@ namespace SingleDuct {
 
 		if ( Sys( SysNum ).DamperHeatingAction == ReverseActionWithLimits) {
 			if ( ZoneSizingRunDone ) {
-				if ( CurZoneEqNum > 0 ) {
+				if ( CurTermUnitSizingNum > 0 ) {
 					// if zone sizing run done, set the design max reheat air flow to the value from the design calcs
-					MaxAirVolFlowRateDuringReheatDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlowMax;
+					MaxAirVolFlowRateDuringReheatDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatVolFlowMax;
 				}
 			}
 			else {
@@ -2511,14 +2511,14 @@ namespace SingleDuct {
 			Sys( SysNum ).MaxAirVolFractionDuringReheat = max( Sys( SysNum ).MaxAirVolFractionDuringReheat, 0.0 );
 		}
 
-		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
+		if ( CurTermUnitSizingNum > 0 ) {
 			TermUnitSizing( CurTermUnitSizingNum ).ReheatAirFlowMult = 1.0;
 			TermUnitSizing( CurTermUnitSizingNum ).ReheatLoadMult = 1.0;
 			if ( ZoneSizingRunDone ) {
 				if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheatVSFan ) {
-					TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = max( UserInputMaxHeatAirVolFlowRate, FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
+					TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = max( UserInputMaxHeatAirVolFlowRate, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
 				} else {
-					TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
+					TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow = max( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).NonAirSysDesHeatVolFlow, Sys( SysNum ).MaxAirVolFlowRate * Sys( SysNum ).ZoneMinAirFrac );
 				}
 			} else {
 				if ( Sys( SysNum ).SysType_Num == SingleDuctVAVReheatVSFan ) {
@@ -2570,7 +2570,7 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).MaxReheatWaterVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
+		if ( CurTermUnitSizingNum > 0 ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) {
 				if ( Sys( SysNum ).MaxReheatWaterVolFlow > 0.0 ) {
 					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Reheat Water Flow Rate [m3/s]", Sys( SysNum ).MaxReheatWaterVolFlow );
@@ -2590,9 +2590,9 @@ namespace SingleDuct {
 						if ( PltSizHeatNum > 0 ) {
 							CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow;
-							DesZoneHeatLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
-							ZoneDesTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-							ZoneDesHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
+							DesZoneHeatLoad = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).NonAirSysDesHeatLoad;
+							ZoneDesTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak;
+							ZoneDesHumRat = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneHumRatAtHeatPeak;
 							// the coil load is the zone design heating load plus (or minus!) the reheat load
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {
@@ -2642,7 +2642,7 @@ namespace SingleDuct {
 		if ( Sys( SysNum ).MaxReheatSteamVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if ( ( CurZoneEqNum > 0 ) && ( CurTermUnitSizingNum > 0 ) ) {
+		if ( CurTermUnitSizingNum > 0 ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) {
 				if ( Sys( SysNum ).MaxReheatSteamVolFlow > 0.0 ) {
 					ReportSizingOutput( Sys( SysNum ).SysType, Sys( SysNum ).SysName, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", Sys( SysNum ).MaxReheatSteamVolFlow );
@@ -2662,9 +2662,9 @@ namespace SingleDuct {
 						if ( PltSizHeatNum > 0 ) {
 							CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU;
 							DesMassFlow = StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow;
-							DesZoneHeatLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad;
-							ZoneDesTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-							ZoneDesHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
+							DesZoneHeatLoad = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).NonAirSysDesHeatLoad;
+							ZoneDesTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak;
+							ZoneDesHumRat = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneHumRatAtHeatPeak;
 							// the coil load is the zone design heating load plus (or minus!) the reheat load
 							DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnWTdb( ZoneDesHumRat, 0.5 * ( CoilInTemp + ZoneDesTemp ) ) * DesMassFlow * ( ZoneDesTemp - CoilInTemp );
 							if ( DesCoilLoad >= SmallLoad ) {
@@ -5161,10 +5161,11 @@ namespace SingleDuct {
 					thisZoneEqConfig.AirDistUnitHeat( SupAirIn ).OutNode = this->MixedAirOutNode;
 					thisADU.TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 					this->CtrlZoneInNodeIndex = SupAirIn;
+					{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisADU.TermUnitSizingNum ) );
+					thisTermUnitSizingData.ADUName = thisADU.Name;
 					// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit
 					if ( thisADU.AirTerminalSizingSpecIndex > 0 ) {
 						{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( thisADU.AirTerminalSizingSpecIndex ) );
-						{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex ) );
 						thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 						thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
 						thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
