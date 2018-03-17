@@ -2208,7 +2208,11 @@ This field is the name of the thermal zone (ref: Zone) which contains this Elect
 
 \paragraph{Field: Air Flow Calculation Method}\label{field-air-flow-calculation-method}
 
-This field specifies the method used to calculate the IT inlet temperature and zone return air temperature. If FlowFromSystem is chosen, the zone is assumed to be well-mixed. If FlowControlWithApproachTemperatures is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution. When FlowControlWithApproachTemperatures is chosen, the inputs of Air Inlet Connection Type, Design Recirculation Fraction and Recirculation Function of Loading and Supply Temperature Curve Name are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The FlowControlWithApproachTemperatures only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when FlowControlWithApproachTemperatures is chosen.
+This field specifies the method used to calculate the IT inlet temperature and zone return air temperature. 
+
+If \textbf{FlowFromSystem} is chosen, the zone is assumed to be well-mixed. 
+
+If \textbf{FlowControlWithApproachTemperatures} is chosen, Supply and Return approach temperature should be defined to indicate the temperature difference due to the air distribution.The inputs of \textit{Air Inlet Connection Type}, \textit{Design Recirculation Fraction} and \textit{Recirculation Function of Loading and Supply Temperature Curve Name} are ignored. For multiple ITE objects defined for one zone, the same calculation method should apply. The \textbf{FlowControlWithApproachTemperatures} only applies to ITE zones with single duct VAV terminal unit. Other return air heat gains from window or lights are not allowed when \textbf{FlowControlWithApproachTemperatures} is chosen.
 
 The default method is FlowFromSystem.
 
@@ -2284,7 +2288,7 @@ ZoneAirNode = This option is used if there is no containment and the ITE air inl
 
 RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. RoomAirModelType and RoomAir:Node).
 
-This field is only used when Air Flow Calculation Method is FlowFromSystem.
+This field is only used when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Air Inlet Room Air Model Node Name}\label{field-air-inlet-room-air-model-node-name}
 
@@ -2296,15 +2300,15 @@ Specifies the node name of a room air model node (ref. RoomAir:Node) which is th
 
 \paragraph{Field: Supply Air Node Name}\label{field-supply-air-node-name}
 
-Specifies the node name of the supply air inlet node service this ITE. If the Air Node Connection Type = AdjustedSupply ,then this field is required, and the conditions at this node will be used to determine the ITE air inlet conditions. This field is also required if reporting of the Supply Heat Index is desired. Also required if Calculation Method = FlowControlWithApproachTemperatures.
+Specifies the node name of the supply air inlet node service this ITE. If the Air Node Connection Type = AdjustedSupply ,then this field is required, and the conditions at this node will be used to determine the ITE air inlet conditions. This field is also required if reporting of the Supply Heat Index is desired. Also required if Calculation Method = \textbf{FlowControlWithApproachTemperatures}.
 
 \paragraph{Field: Design Recirculation Fraction}\label{field-design-recirculation-fraction}
 
-Specifies the recirculation fraction for this equipment at design conditions. This field is used only if the Air Node Connection Type = AdjustedSupply. The recirculation fraction is defined as the ratio of recirculated air flow to total air flow entering the ITE. Recirculation is dependent upon many factors including rack and containment configuration. The default is 0.0 (no recirculation). This field is only used when Air Flow Calculation Method = FlowFromSystem.
+Specifies the recirculation fraction for this equipment at design conditions. This field is used only if the Air Node Connection Type = AdjustedSupply. The recirculation fraction is defined as the ratio of recirculated air flow to total air flow entering the ITE. Recirculation is dependent upon many factors including rack and containment configuration. The default is 0.0 (no recirculation). This field is only used when Air Flow Calculation Method = \textbf{FlowFromSystem}.
 
 \paragraph{Field: Recirculation Function of Loading and Supply Temperature Curve Name}\label{field-recirculation-function-of-loading-and-supply-temperature-curve-name}
 
-The name of a two-variable curve or table lookup object which modifies the Design Recirculation Fraction as a function of CPU loading (x) and supply air node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature). This field is used only if the Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve is assumed to always equal 1.0. This field is only used when Air Flow Calculation Method = FlowFromSystem.
+The name of a two-variable curve or table lookup object which modifies the Design Recirculation Fraction as a function of CPU loading (x) and supply air node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature). This field is used only if the Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve is assumed to always equal 1.0. This field is only used when Air Flow Calculation Method = \textbf{FlowFromSystem}.
 
 \paragraph{Field: Design Electric Power Supply Efficiency}\label{field-design-electric-power-supply-efficiency}
 
@@ -2332,19 +2336,19 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 \paragraph{Field: Supply Temperature Difference}\label{field-supply-temperature-difference}
 
-The difference of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+The difference of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Supply Temperature Difference Schedule}\label{field-supply-temperature-difference-schedule}
 
-The difference schedule of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+The difference schedule of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference}\label{field-return-temperature-difference}
 
-The difference of the return outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+The difference of the return outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference Schedule}\label{field-return-temperature-difference-schedule}
 
-The difference schedule of the return outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to FlowControlWithApproachTemperatures. This field is ignored when Air Flow Calculation Method is FlowFromSystem.
+The difference schedule of the return outlet temperature from the well mixed zone temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 An IDF example:
 
@@ -2493,6 +2497,8 @@ ElectricEquipment:ITE:AirCooled Outputs
   Zone,Average,ITE Air Inlet Relative Humidity Difference Above Operating Range {[}\%{]}
 \item
   Zone,Average,ITE Air Inlet Relative Humidity Difference Below Operating Range {[}\%{]}
+\item
+  Zone,Average,Zone ITE Adjusted Return Air Temperature {[}C{]}
 \item
   Zone,Average,Zone ITE CPU Electric Power {[}W{]}
 \item
@@ -2718,6 +2724,10 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 \paragraph{ITE Air Inlet Relative Humidity Difference Below Operating Range {[}\%{]}}\label{ite-air-inlet-relative-humidity-difference-below-operating-range}
 
 The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Environmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+
+\paragraph{Zone ITE Adjusted Return Air Temperature [C]}
+
+Return air temperature after adjustment by ITE objects.
 
 \subsection{ZoneContaminantSourceAndSink:CarbonDioxide}\label{zonecontaminantsourceandsinkcarbondioxide}
 

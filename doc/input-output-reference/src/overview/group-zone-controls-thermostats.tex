@@ -92,14 +92,14 @@ If MAT is defined as zone air temperature at previous time step, DeltaT represen
 	If ( MAT < ThermostatSetpoint:SingleHeating )
 		ThermostatSetpoint:SingleHeating = ThermostatSetpoint:SingleHeating + DeltaT
 	Else
-		Set PredictedLoad = 0
+		No change
 	End If
 
 2 - Single Cooling SetPoint
 	If ( MAT > ThermostatSetpoint:SingleCooling )
 		ThermostatSetpoint:SingleCooling = ThermostatSetpoint:SingleCooling - DeltaT
 	Else
-		Set PredictedLoad = 0
+		No change
 	End If
 
 3 - Single Heating/Cooling Setpoint
@@ -113,11 +113,9 @@ If MAT is defined as zone air temperature at previous time step, DeltaT represen
 		HeatingSetpoint = No change
 		CoolingSetpoint = CoolingSetpoint - DeltaT
 	Else
-		Set PredictedLoad = 0
+		No change
 	End If
 \end{lstlisting}
-
-When PredictedLoad = 0, HVAC system turns off. The performance is equivalent to an ON/Off thermostat.
 
 An example of this statement in an IDF is:
 
