@@ -105,6 +105,7 @@
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
+#include <WeatherManager.hh>
 #include <ZonePlenum.hh>
 #include <ZoneTempPredictorCorrector.hh>
 
@@ -528,6 +529,7 @@ namespace OutputReportTabular {
 		bool UpdateTabularReportsGetInput( true );
 		bool GatherHeatGainReportfirstTime( true );
 		bool AllocateLoadComponentArraysDoAllocate( true );
+		bool initAdjFenDone( false );
 	}
 
 	// Functions
@@ -537,6 +539,7 @@ namespace OutputReportTabular {
 		UpdateTabularReportsGetInput = true;
 		GatherHeatGainReportfirstTime = true;
 		AllocateLoadComponentArraysDoAllocate = true;
+		initAdjFenDone = false ;
 		OutputTableBinnedCount = 0;
 		BinResultsTableCount = 0;
 		BinResultsIntervalCount = 0;
@@ -11746,7 +11749,7 @@ namespace OutputReportTabular {
 
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( ZoneCoolCompLoadTables(iZone).cells, ZoneCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					CollectPeakZoneConditions( ZoneCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+					CollectPeakZoneConditions( ZoneCoolCompLoadTables( iZone ), coolDesSelected, timeCoolMax, iZone, true );
 					//send latent load info to coil summary report
 					coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( iZone ,  ZoneCoolCompLoadTables(iZone).cells( cLatent, rGrdTot ) );  
 
@@ -11757,7 +11760,7 @@ namespace OutputReportTabular {
 
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( ZoneHeatCompLoadTables( iZone ).cells, ZoneHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-					CollectPeakZoneConditions( ZoneHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+					CollectPeakZoneConditions( ZoneHeatCompLoadTables( iZone ), heatDesSelected, timeHeatMax, iZone, false );
 
 					//send latent load info to coil summary report
 					coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( iZone , ZoneHeatCompLoadTables( iZone ).cells( cLatent, rGrdTot ) );
@@ -11789,11 +11792,27 @@ namespace OutputReportTabular {
 			for ( int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop ) {
 				zoneToAirLoopCool = 0;
 				zoneToAirLoopHeat = 0;
-				coolDesSelected = SysSizPeakDDNum( iAirLoop ).TotCoolPeakDD;
-				if ( coolDesSelected != 0 ) {
-					timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtTotCoolPk( coolDesSelected );
+				if ( DataSizing::FinalSysSizing( iAirLoop ).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad ) {
+					coolDesSelected = SysSizPeakDDNum( iAirLoop ).SensCoolPeakDD;
+					if ( coolDesSelected != 0 ) {
+						timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtSensCoolPk( coolDesSelected );
+					} else {
+						timeCoolMax = 0;
+					}
+				} else if ( DataSizing::FinalSysSizing( iAirLoop ).CoolingPeakLoadType == DataSizing::Ventilation ) {
+					coolDesSelected = SysSizPeakDDNum( iAirLoop ).CoolFlowPeakDD;
+					if ( coolDesSelected != 0 ) {
+						timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtCoolFlowPk( coolDesSelected );
+					} else {
+						timeCoolMax = 0;
+					}
 				} else {
-					timeCoolMax = 0;
+					coolDesSelected = SysSizPeakDDNum( iAirLoop ).TotCoolPeakDD;
+					if ( coolDesSelected != 0 ) {
+						timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtTotCoolPk( coolDesSelected );
+					} else {
+						timeCoolMax = 0;
+					}
 				}
 				heatDesSelected = SysSizPeakDDNum( iAirLoop ).HeatPeakDD;
 				if ( heatDesSelected != 0 ) {
@@ -11834,7 +11853,7 @@ namespace OutputReportTabular {
 
 						GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 						ComputeTableBodyUsingMovingAvg( AirLoopZonesCoolCompLoadTables( iZone ).cells, AirLoopZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-						CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+						CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), coolDesSelected, timeCoolMax, iZone, true );
 						AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables( iZone ) );
 					}
 					if ( displayZoneComponentLoadSummary && ( AirLoopZonesHeatCompLoadTables( iZone ).desDayNum == ZoneHeatCompLoadTables( iZone ).desDayNum ) && ( AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax == ZoneHeatCompLoadTables( iZone ).timeStepMax ) ) {
@@ -11845,7 +11864,7 @@ namespace OutputReportTabular {
 
 						GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 						ComputeTableBodyUsingMovingAvg( AirLoopZonesHeatCompLoadTables( iZone ).cells, AirLoopZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-						CollectPeakZoneConditions( AirLoopZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+						CollectPeakZoneConditions( AirLoopZonesHeatCompLoadTables( iZone ), heatDesSelected, timeHeatMax, iZone, false );
 						AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables( iZone ) );
 					}
 				}
@@ -11863,9 +11882,6 @@ namespace OutputReportTabular {
 						CombineLoadCompResults( AirLoopHeatCompLoadTables( iAirLoop ), AirLoopZonesHeatCompLoadTables( iZone ), mult );
 					}
 				}
-
-				CollectPeakAirLoopConditions( AirLoopCoolCompLoadTables( iAirLoop ), iAirLoop, true );
-				CollectPeakAirLoopConditions( AirLoopHeatCompLoadTables( iAirLoop ), iAirLoop, false );
 
 				ComputeEngineeringChecks( AirLoopCoolCompLoadTables( iAirLoop ) );
 				ComputeEngineeringChecks( AirLoopHeatCompLoadTables( iAirLoop ) );
@@ -11905,7 +11921,7 @@ namespace OutputReportTabular {
 				} else {
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesCoolCompLoadTables( iZone ).cells, FacilityZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					CollectPeakZoneConditions( FacilityZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+					CollectPeakZoneConditions( FacilityZonesCoolCompLoadTables( iZone ), coolDesSelected, timeCoolMax, iZone, true );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables( iZone ) );
 				}
 				FacilityZonesCoolCompLoadTables( iZone ).timeStepMax = timeCoolMax;
@@ -11917,7 +11933,7 @@ namespace OutputReportTabular {
 				} else {
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesHeatCompLoadTables( iZone ).cells, FacilityZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-					CollectPeakZoneConditions( FacilityZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+					CollectPeakZoneConditions( FacilityZonesHeatCompLoadTables( iZone ), heatDesSelected, timeHeatMax, iZone, false );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables( iZone ) );
 				}
 				FacilityZonesHeatCompLoadTables( iZone ).timeStepMax = timeHeatMax;
@@ -11986,12 +12002,23 @@ namespace OutputReportTabular {
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceClass_Window;
+		using DataEnvironment::TotDesDays;
+		using DataEnvironment::TotRunDesPersDays;
+
+		// static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
+		static Array3D_bool adjFenDone;
 
 		Array1D< Real64 > peopleRadIntoSurf;
 		Array1D< Real64 > equipRadIntoSurf;
 		Array1D< Real64 > hvacLossRadIntoSurf;
 		Array1D< Real64 > powerGenRadIntoSurf;
 		Array1D< Real64 > lightLWRadIntoSurf;
+
+		if ( !initAdjFenDone ) {
+			adjFenDone.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+			adjFenDone = false;
+			initAdjFenDone = true;
+		}
 
 		peopleRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
 		peopleRadIntoSurf = 0.;
@@ -12077,7 +12104,10 @@ namespace OutputReportTabular {
 				lightDelaySeq( kTimeStep ) = lightLWConvIntoZone + lightSWConvIntoZone;
 				feneSolarDelaySeq( kTimeStep ) = feneSolarConvIntoZone;
 				// also remove the net radiant component on the instanteous conduction for fenestration
-				feneCondInstantSeq( desDaySelected, kTimeStep, zoneIndex ) -= adjFeneSurfNetRadSeq;
+				if ( !adjFenDone( desDaySelected, kTimeStep, zoneIndex ) ) {
+					feneCondInstantSeq( desDaySelected, kTimeStep, zoneIndex ) -= adjFeneSurfNetRadSeq;
+					adjFenDone( desDaySelected, kTimeStep, zoneIndex ) = true;
+				}
 			} // for kTimeStep
 
 			decayCurve.deallocate();
@@ -12311,6 +12341,7 @@ namespace OutputReportTabular {
 	void
 	CollectPeakZoneConditions(
 		CompLoadTablesType & compLoad,
+		int const & desDaySelected,
 		int const & timeOfMax,
 		int const & zoneIndex,
 		bool const & isCooling
@@ -12333,7 +12364,7 @@ namespace OutputReportTabular {
 
 			if ( isCooling ) {
 				//Time of Peak Load
-				compLoad.peakDateHrMin = CoolPeakDateHrMin( zoneIndex );
+				compLoad.peakDateHrMin = General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( timeOfMax );
 
 				//Outside  Dry Bulb Temperature
 				compLoad.outsideDryBulb = CalcFinalZoneSizing( zoneIndex ).CoolOutTempSeq( timeOfMax );
@@ -12377,7 +12408,7 @@ namespace OutputReportTabular {
 
 			} else {
 				//Time of Peak Load
-				compLoad.peakDateHrMin = HeatPeakDateHrMin( zoneIndex );
+				compLoad.peakDateHrMin = General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( timeOfMax );
 
 				//Outside  Dry Bulb Temperature
 				compLoad.outsideDryBulb = CalcFinalZoneSizing( zoneIndex ).HeatOutTempSeq( timeOfMax );
@@ -12456,36 +12487,6 @@ namespace OutputReportTabular {
 			compLoad.numPeople = totNumPeople;
 
 		}
-	}
-
-	// for the load summary report add airloop related values the peak conditions subtable
-	void
-	CollectPeakAirLoopConditions(
-		CompLoadTablesType & compLoad,
-		int const & airLoopIndex,
-		bool const & isCooling
-	)
-	{
-		using DataSizing::FinalSysSizing;
-		using DataSizing::CalcSysSizing;
-
-		if ( isCooling ) {
-			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).CoolSupTemp;
-			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).MixTempAtCoolPeak;
-			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).SensCoolCap;
-			compLoad.peakDesSensLoad = CalcSysSizing( airLoopIndex ).SensCoolCap;
-
-		} else {
-			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
-			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
-			compLoad.designPeakLoad = -FinalSysSizing( airLoopIndex ).HeatCap;
-			compLoad.peakDesSensLoad = -CalcSysSizing( airLoopIndex ).HeatCap;
-		}
-		compLoad.diffDesignPeak = compLoad.designPeakLoad - compLoad.peakDesSensLoad;
-
-		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
-		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
-
 	}
 
 	void
@@ -12661,6 +12662,7 @@ namespace OutputReportTabular {
 		compLoadTotal.zoneDryBulb = compLoadPartial.zoneDryBulb;
 		compLoadTotal.zoneRelHum = compLoadPartial.zoneRelHum;
 		compLoadTotal.zoneHumRatio = compLoadPartial.zoneHumRatio;
+		compLoadTotal.supAirTemp = compLoadPartial.supAirTemp;
 
 		// sum the peak related values
 		compLoadTotal.designPeakLoad += compLoadPartial.designPeakLoad * multiplier;
@@ -12682,6 +12684,11 @@ namespace OutputReportTabular {
 		CompLoadTablesType & compLoadTotal
 	)
 	{
+
+		// zero the grand total -total cell
+		compLoadTotal.cells( cTotal, rGrdTot ) = 0.;
+		compLoadTotal.cellUsed( cTotal, rGrdTot ) = true;
+
 		// zero the grand total row
 		for ( int col = 1; col <= cLatent; ++col ) {
 			compLoadTotal.cells( col, rGrdTot ) = 0.;
@@ -12701,7 +12708,6 @@ namespace OutputReportTabular {
 				}
 			}
 		}
-		compLoadTotal.cellUsed( cTotal, rGrdTot ) = true;
 
 		// compute the % grand total column
 		Real64 grandTotalTotal = compLoadTotal.cells( cTotal, rGrdTot );
