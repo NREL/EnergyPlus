@@ -11845,7 +11845,7 @@ namespace OutputReportTabular {
 				// now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute them for specific design day and time of max
 				for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 					if ( !ZoneEquipConfig( iZone ).IsControlled ) continue;
-					if  ( displayZoneComponentLoadSummary && (AirLoopZonesCoolCompLoadTables( iZone ).desDayNum == ZoneCoolCompLoadTables( iZone ).desDayNum) && (AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax == ZoneCoolCompLoadTables( iZone ).timeStepMax) ){
+					if  ( displayZoneComponentLoadSummary && ( AirLoopZonesCoolCompLoadTables( iZone ).desDayNum == ZoneCoolCompLoadTables( iZone ).desDayNum ) && ( AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax == ZoneCoolCompLoadTables( iZone ).timeStepMax ) ){
 						AirLoopZonesCoolCompLoadTables( iZone ) = ZoneCoolCompLoadTables( iZone );
 					} else {
 						coolDesSelected = AirLoopZonesCoolCompLoadTables( iZone ).desDayNum;
