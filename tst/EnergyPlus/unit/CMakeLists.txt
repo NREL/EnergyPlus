@@ -128,6 +128,7 @@ set( test_src
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
+  ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
