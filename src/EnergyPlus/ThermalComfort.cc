@@ -2288,7 +2288,6 @@ namespace ThermalComfort {
 				} else {
 					deltaT = ZTAV( iZone ) - ZoneThermostatSetPointLo( iZone );
 				}
-
 				if ( deltaT < deviationFromSetPtThresholdHtg ) {
 					ThermalComfortSetPoint( iZone ).notMetHeating = TimeStepZone;
 					ThermalComfortSetPoint( iZone ).totalNotMetHeating += TimeStepZone;

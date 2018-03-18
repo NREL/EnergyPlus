@@ -2381,7 +2381,7 @@ namespace EnergyPlus {
 															"  Supply Fan 1,           !- Supply Fan Name",
 															"  BlowThrough,            !- Fan Placement",
 															"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-															"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+															"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
 															"  Furnace Heating Coil 1, !- Heating Coil Name",
 															"  ,                       !- DX Heating Coil Sizing Ratio",
 															"  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
@@ -2389,7 +2389,7 @@ namespace EnergyPlus {
 															"  ,                       !- Use DOAS DX Cooling Coil",
 															"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 															"  ,                       !- Latent Load Control",
-															"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+															"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
 															"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 															"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 															"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -2436,8 +2436,8 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 22, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "GASHEAT DXAC FURNACE 1", "LOAD", "EAST ZONE", "NONE", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "ZONE 2 INLET NODE",
-																	   "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:GAS", "FURNACE HEATING COIL 1",
-																	   "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:GAS",
+																	   "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:FUEL", "FURNACE HEATING COIL 1",
+																	   "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:FUEL",
 																	   "HUMIDISTAT REHEAT COIL 1", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "", "", "", "", ""} ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
 																false, false, false, false, false, true, true, false, false, false,

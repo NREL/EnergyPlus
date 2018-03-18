@@ -8934,7 +8934,11 @@ Label50: ;
 
 			EIR = DXCoil( DXCoilNum ).RatedEIR( Mode ) * EIRTempModFac * EIRFlowModFac;
 			// Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
-			PLRHeating = min( 1.0, ( PartLoadRatio + ( LoadDueToDefrost * PartLoadRatio ) / TotCapAdj ) );
+			if ( TotCapAdj > 0.0 ) {
+				PLRHeating = min( 1.0, ( PartLoadRatio + ( LoadDueToDefrost * PartLoadRatio ) / TotCapAdj ) );
+			} else {
+				PLRHeating = 0.0;
+			}
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_Heating ) {
 				PLF = CurveValue( DXCoil( DXCoilNum ).PLFFPLR( Mode ), PLRHeating ); // Calculate part-load factor
 			} else {

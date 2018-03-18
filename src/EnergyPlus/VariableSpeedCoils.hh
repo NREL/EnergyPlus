@@ -537,7 +537,7 @@ namespace VariableSpeedCoils {
 		Real64 const InletDryBulb, // inlet air dry bulb temperature [C]
 		Real64 const InletHumRat, // inlet air humidity ratio [kg water / kg dry air]
 		Real64 const InletEnthalpy, // inlet air specific enthalpy [J/kg]
-		Real64 const InletWetBulb, // inlet air wet bulb temperature [C]
+		Real64 & InletWetBulb, // inlet air wet bulb temperature [C]
 		Real64 const AirMassFlowRatio, // Ratio of actual air mass flow to nominal air mass flow
 		Real64 const WaterMassFlowRatio, // Ratio of actual water mass flow to nominal water mass flow
 		Real64 const AirMassFlow, // actual mass flow for capacity and SHR calculation

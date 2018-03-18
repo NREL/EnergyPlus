@@ -411,6 +411,7 @@ namespace EnergyPlus {
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
 		PVWatts::clear_state();
+		clearCoilSelectionReportObj(); // ReportCoilSelection
 		ReturnAirPathManager::clear_state();
 		RoomAirModelAirflowNetwork::clear_state();
 		RoomAirModelManager::clear_state();
