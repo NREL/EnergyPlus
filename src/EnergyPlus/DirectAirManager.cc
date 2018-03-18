@@ -343,10 +343,11 @@ namespace DirectAirManager {
 							DirectAir( DirectAirNum ).TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							DirectAir( DirectAirNum ).ZoneEqNum = CtrlZone;
 							DirectAir( DirectAirNum ).CtrlZoneInNodeIndex = SupAirIn;
+							{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( DirectAir( DirectAirNum ).TermUnitSizingNum ) );
+							thisTermUnitSizingData.ADUName = DirectAir( DirectAirNum ).EquipID;
 							// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit
 							if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex > 0 ) {
 								{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex ) );
-								{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex ) );
 								thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 								thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
 								thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;

@@ -45,93 +45,67 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::DataPlant Unit Tests
+// EnergyPlus::Fans Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <DataGlobals.hh>
+#include <DataRuntimeLanguage.hh>
+#include <EMSManager.hh>
+#include <RuntimeLanguageProcessor.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataPlant;
-using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim )
-{
-	TotNumLoops = 3;
-	PlantLoop.allocate( TotNumLoops );
-	for ( int l = 1; l <= TotNumLoops; ++l ) {
-		auto & loop( PlantLoop( l ) );
-		loop.LoopSide.allocate( 2 );
-	}
+TEST_F( EnergyPlusFixture, ERLExpression_TestExponentials ) {
+	// set the program state so that errors can be thrown
+	DataGlobals::DoingSizing = false;
+	DataGlobals::KickOffSimulation = false;
+	EMSManager::FinishProcessingUserInput = false;
 
-	EXPECT_TRUE( PlantUtilities::AnyPlantLoopSidesNeedSim() ); // SimLoopSideNeeded is set to true in default ctor
-	PlantUtilities::SetAllPlantSimFlagsToValue( false ); // Set all SimLoopSideNeeded to false
-	EXPECT_FALSE( PlantUtilities::AnyPlantLoopSidesNeedSim() );
-}
+	bool errorsFound = false;
 
-TEST_F( EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop )
-{
+	DataRuntimeLanguage::ErlExpression.allocate(1);
+	auto & erlExpression = DataRuntimeLanguage::ErlExpression(1);
+	erlExpression.Operator = DataRuntimeLanguage::FuncExp;
+	erlExpression.NumOperands = 1;
+	erlExpression.Operand.allocate(1);
 
-	// not using the DataPlantTest base class because of how specific this one is and that one is very general
-	if ( PlantLoop.allocated() ) PlantLoop.deallocate();
-	TotNumLoops = 2;
-	PlantLoop.allocate( 2 );
-	PlantLoop( 1 ).LoopSide.allocate(2);
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide.allocate(2);
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
+	erlExpression.Operand(1).Number = -25;
+	auto response1 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+	EXPECT_FALSE(errorsFound);
+	EXPECT_EQ(0, response1.Number); 
 
-	// initialize all node numbers to zero
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
+	erlExpression.Operand(1).Number = -20;
+	auto response2 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+	EXPECT_FALSE(errorsFound);
+	EXPECT_EQ(0, response2.Number); 
 
-	// specify the node numbers of interest
-	int const nodeNumA = 1;
-	int const nodeNumB = 2;
+	erlExpression.Operand(1).Number = -3;
+	auto response3 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+	EXPECT_FALSE(errorsFound);
+	EXPECT_NEAR(0.05, response3.Number, 0.001); 
 
-	// first test, expected pass
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_TRUE( PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
+	erlExpression.Operand(1).Number = 0;
+	auto response4 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+	EXPECT_FALSE(errorsFound);
+	EXPECT_NEAR(1, response4.Number, 0.001); 
 
-	// reset node numbers
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
+	erlExpression.Operand(1).Number = 3;
+	auto response5 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+	EXPECT_FALSE(errorsFound);
+	EXPECT_NEAR(20.08, response5.Number, 0.01); 
 
-	// second test, expected false
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_FALSE( PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
+	erlExpression.Operand(1).Number = 700;
+	auto response6 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+	EXPECT_TRUE(errorsFound);
+	EXPECT_EQ(0, response6.Number); 
 
-	TotNumLoops = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide.deallocate();
-	PlantLoop.deallocate();
+	erlExpression.Operand(1).Number = 710;
+	auto response7 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+	EXPECT_TRUE(errorsFound);
+	EXPECT_EQ(0, response7.Number); 
 
 }

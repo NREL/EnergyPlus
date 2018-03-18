@@ -70,10 +70,12 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobals;
@@ -6122,9 +6124,10 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	ShowMessage( "Begin Test: OutputReportTabularTest, CollectPeakZoneConditions_test" );
 
 	Psychrometrics::InitializePsychRoutines();
+	createCoilSelectionReportObj();
 
 	CompLoadTablesType compLoad;
-	int timeOfMax = 10;
+	int timeOfMax = 63;
 	int zoneIndex = 1;
 	bool isCooling = true;
 
@@ -6133,18 +6136,24 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	Zone( 1 ).ListMultiplier = 1;
 	Zone( 1 ).FloorArea = 12.;
 
+	WeatherManager::DesDayInput.allocate( 1 );
+	WeatherManager::DesDayInput( 1 ).Month = 5;
+	WeatherManager::DesDayInput( 1 ).DayOfMonth = 21;
+
+	DataGlobals::NumOfTimeStepInHour = 4;
+	DataGlobals::MinutesPerTimeStep = 15;
+
 	CoolPeakDateHrMin.allocate( 1 );
-	CoolPeakDateHrMin( 1 ) = "06/30 13:15:00";
 
 	CalcFinalZoneSizing.allocate( 1 );
-	CalcFinalZoneSizing( 1 ).CoolOutTempSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolOutTempSeq( 10 ) = 38.;
-	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq( 10 ) = 0.01459;
-	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq( 10 ) = 24.;
-	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq.allocate( 10 );
-	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq( 10 ) = 0.00979;
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolOutTempSeq( 63 ) = 38.;
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolOutHumRatSeq( 63 ) = 0.01459;
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolZoneTempSeq( 63 ) = 24.;
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq.allocate( 96 );
+	CalcFinalZoneSizing( 1 ).CoolZoneHumRatSeq( 63 ) = 0.00979;
 	CalcFinalZoneSizing( 1 ).DesCoolLoad = 500.;
 	CalcFinalZoneSizing( 1 ).ZnCoolDgnSAMethod = SupplyAirTemperature;
 	CalcFinalZoneSizing( 1 ).CoolDesTemp = 13.;
@@ -6153,9 +6162,9 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	FinalZoneSizing.allocate( 1 );
 	FinalZoneSizing( 1 ).DesCoolLoad = 600.;
 
-	CollectPeakZoneConditions( compLoad, timeOfMax, zoneIndex, isCooling );
+	CollectPeakZoneConditions( compLoad, 1, timeOfMax, zoneIndex, isCooling );
 
-	EXPECT_EQ( compLoad.peakDateHrMin, "06/30 13:15:00" );
+	EXPECT_EQ( compLoad.peakDateHrMin, "5/21 15:45:00" );
 	EXPECT_EQ( compLoad.outsideDryBulb, 38. );
 	EXPECT_EQ( compLoad.outsideHumRatio, 0.01459 );
 	EXPECT_EQ( compLoad.zoneDryBulb, 24. );
@@ -6168,58 +6177,6 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	EXPECT_NEAR( compLoad.totCapPerArea, 600. / 12., 0.0001 );
 	EXPECT_NEAR( compLoad.airflowPerTotCap, 3.3 / 600., 0.0001 );
 	EXPECT_NEAR( compLoad.areaPerTotCap, 12. / 600., 0.0001 );
-
-}
-
-TEST( OutputReportTabularTest, CollectPeakAirLoopConditions_test )
-{
-	ShowMessage( "Begin Test: OutputReportTabularTest, CollectPeakAirLoopConditions_test" );
-
-	CompLoadTablesType compLoad;
-	int airLoopIndex = 1;
-	bool isCooling = true;
-
-	CalcSysSizing.allocate( 1 );
-	CalcSysSizing( 1 ).SensCoolCap = 500.;
-
-	FinalSysSizing.allocate( 1 );
-	FinalSysSizing( 1 ).CoolSupTemp = 13.;
-	FinalSysSizing( 1 ).MixTempAtCoolPeak = 18.;
-	FinalSysSizing( 1 ).SensCoolCap = 600.;
-	FinalSysSizing( 1 ).DesMainVolFlow = 3.3;
-	FinalSysSizing( 1 ).DesOutAirVolFlow = 0.12;
-
-	CollectPeakAirLoopConditions( compLoad, airLoopIndex, isCooling );
-
-	EXPECT_EQ( compLoad.supAirTemp, 13. );
-	EXPECT_EQ( compLoad.mixAirTemp, 18. );
-	EXPECT_EQ( compLoad.designPeakLoad, 600. );
-	EXPECT_EQ( compLoad.peakDesSensLoad, 500. );
-	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
-	EXPECT_EQ( compLoad.outsideAirFlow, 0.12 );
-	EXPECT_EQ( compLoad.diffDesignPeak, 100. );
-
-	isCooling = false;
-
-	CalcSysSizing( 1 ).HeatCap = 800.;
-
-	FinalSysSizing.allocate( 1 );
-	FinalSysSizing( 1 ).HeatSupTemp = 45.;
-	FinalSysSizing( 1 ).HeatMixTemp = 37.;
-	FinalSysSizing( 1 ).HeatCap = 900.;
-	FinalSysSizing( 1 ).DesMainVolFlow = 3.3;
-	FinalSysSizing( 1 ).DesOutAirVolFlow = 0.12;
-
-
-	CollectPeakAirLoopConditions( compLoad, airLoopIndex, isCooling );
-
-	EXPECT_EQ( compLoad.supAirTemp, 45. );
-	EXPECT_EQ( compLoad.mixAirTemp, 37. );
-	EXPECT_EQ( compLoad.designPeakLoad, -900. );
-	EXPECT_EQ( compLoad.peakDesSensLoad, -800. );
-	EXPECT_EQ( compLoad.mainFanAirFlow, 3.3 );
-	EXPECT_EQ( compLoad.outsideAirFlow, 0.12 );
-	EXPECT_EQ( compLoad.diffDesignPeak, -100. );
 
 }
 
@@ -6518,6 +6475,79 @@ TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
 
 }
 
+TEST( OutputReportTabularTest, GetDelaySequencesTwice_test )
+{
+
+	int coolDesSelected = 1;
+	int iZone = 1;
+	TotDesDays = 2;
+	TotRunDesPersDays = 3;
+	NumOfTimeStepInHour = 4;
+
+	NumOfZones = 4;
+	Zone.allocate( NumOfZones );
+
+	Zone( iZone ).SurfaceFirst = 1;
+	Zone( iZone ).SurfaceLast = 1;
+
+	TotSurfaces = 4;
+	Surface.allocate( TotSurfaces );
+	Surface( 1 ).HeatTransSurf = true;
+	Surface( 1 ).Class = SurfaceClass_Window;
+
+	Array1D< Real64 > peopleDelaySeq;
+	peopleDelaySeq.allocate( NumOfTimeStepInHour * 24 );
+	peopleDelaySeq = 0.;
+
+	Array1D< Real64 > peopleDelaySeqCool;
+	peopleDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	peopleDelaySeqCool = 0.;
+
+	Array1D< Real64 > equipDelaySeqCool;
+	equipDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	equipDelaySeqCool = 0.;
+
+	Array1D< Real64 > hvacLossDelaySeqCool;
+	hvacLossDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	hvacLossDelaySeqCool = 0.;
+
+	Array1D< Real64 > powerGenDelaySeqCool;
+	powerGenDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	powerGenDelaySeqCool = 0.;
+
+	Array1D< Real64 > lightDelaySeqCool;
+	lightDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	lightDelaySeqCool = 0.;
+
+	Array1D< Real64 > feneSolarDelaySeqCool;
+	feneSolarDelaySeqCool.allocate( NumOfTimeStepInHour * 24 );
+	feneSolarDelaySeqCool = 0.;
+
+	Array3D< Real64 > feneCondInstantSeq;
+	feneCondInstantSeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+	feneCondInstantSeq = 0.0;
+
+	Array2D< Real64 > surfDelaySeqCool;
+	surfDelaySeqCool.allocate( NumOfTimeStepInHour * 24, TotSurfaces );
+	surfDelaySeqCool = 0.0;
+
+	AllocateLoadComponentArrays();
+
+	feneCondInstantSeq( coolDesSelected, 1, 1 ) =  0.88;
+
+	netSurfRadSeq( coolDesSelected, 1, 1 ) = 0.05;
+
+	GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
+
+	EXPECT_EQ( 0.83, feneCondInstantSeq( coolDesSelected, 1, 1 )); // the first time the subtraction operation should have occurred
+
+	GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
+
+	EXPECT_EQ( 0.83, feneCondInstantSeq( coolDesSelected, 1, 1 )); // the second time the subtraction should not have happened since it is only adjusted once so the value should be the same.
+
+}
+
+
 TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay )
 {
 	EnergyPlus::sqlite->sqliteBegin();
@@ -6549,5 +6579,6 @@ TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLo
 	EXPECT_EQ( "AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 
 }
+
 
 
