@@ -1558,7 +1558,7 @@ namespace PlantLoopSolver {
         // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
         //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
         //  as the flow going through the actual supply side
-        if ( DataPlant::PlantLoop( LoopNum ).CommonPipeType != DataPlant::CommonPipe_No ) {
+        if ( CurrentLoopSideIsConstantSpeedBranchPumped && LoopSideNum == 2 && DataPlant::PlantLoop( LoopNum ).CommonPipeType != DataPlant::CommonPipe_No ) {
             const int OtherSide = 3 - LoopSideNum;
             const int otherSideOutletNodeNum = DataPlant::PlantLoop( LoopNum ).LoopSide( OtherSide ).NodeNumOut;
             Real64 commonPipeFlow = DataLoopNode::Node( otherSideOutletNodeNum ).MassFlowRate - ThisLoopSideFlow;
