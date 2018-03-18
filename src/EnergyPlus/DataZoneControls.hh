@@ -136,6 +136,8 @@ namespace DataZoneControls {
 		Real64 ZoneThermostatSetPointLo; // Heating setpoint
 		bool CoolModeLast;
 		bool HeatModeLast;
+		bool CoolModeLastSave;
+		bool HeatModeLastSave;
 
 		// Default Constructor
 		ZoneTempControls() :
@@ -170,7 +172,9 @@ namespace DataZoneControls {
 			ZoneThermostatSetPointHi( 0.0 ),
 			ZoneThermostatSetPointLo( 0.0 ),
 			CoolModeLast( false ),
-		    HeatModeLast( false)
+			HeatModeLast( false ),
+			CoolModeLastSave( false ),
+			HeatModeLastSave( false )
 
 		{}
 
