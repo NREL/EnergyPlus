@@ -4757,7 +4757,7 @@ namespace ConvectionCoefficients {
 		static FacadeGeoCharactisticsStruct NorthWestFacade( 287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 );
 
 		// Formats
-		static gio::Fmt Format_900( "('! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], ','Outside Perimeter [m], Outside Height [m], Inside Model Assignment, ','Inside Height [cm], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio [ ], ','Window Location [ ], Near Radiant [Yes/No], Has Active HVAC [Yes/No]')" );
+		static gio::Fmt Format_900( "('! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], ','Outside Perimeter [m], Outside Height [m], Inside Model Assignment, ','Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, ','Window Location, Near Radiant {Yes/No}, Has Active HVAC {Yes/No}')" );
 		static gio::Fmt Format_901( "('Surface Convection Parameters,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
 		static gio::Fmt Format_8000( "('! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
 		static gio::Fmt Format_8001( "('Building Convection Parameters:North Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );

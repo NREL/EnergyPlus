@@ -789,7 +789,7 @@ namespace FaultsManager {
 			{ auto const SELECT_CASE_VAR( FaultsCoilSATSensor( jFault_CoilSAT ).CoilType );
 
 				if ( UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Electric" ) ||
-					UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Gas" ) ||
+					UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Fuel" ) ||
 					UtilityRoutines::SameString( SELECT_CASE_VAR, "Coil:Heating:Desuperheater" )
 				){
 					// Read in coil input if not done yet

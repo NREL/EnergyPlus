@@ -3173,18 +3173,18 @@ namespace VariableSpeedCoils {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 rhoair;
-		Real64 MixTemp;
-		Real64 MixHumRat;
-		Real64 MixEnth;
-		Real64 MixWetBulb;
-		Real64 SupTemp;
-		Real64 SupHumRat;
-		Real64 SupEnth;
-		Real64 OutTemp;
-		Real64 OutAirFrac;
-		Real64 VolFlowRate;
-		Real64 CoolCapAtPeak;
-		Real64 TotCapTempModFac;
+		Real64 MixTemp = -999.0;
+		Real64 MixHumRat = -999.0;
+		Real64 MixEnth = -999.0;
+		Real64 MixWetBulb = -999.0;
+		Real64 SupTemp = -999.0;
+		Real64 SupHumRat = -999.0;
+		Real64 SupEnth = -999.0;
+		Real64 OutTemp = -999.0;
+		Real64 OutAirFrac = -999.0;
+		Real64 VolFlowRate = -999.0;
+		Real64 CoolCapAtPeak = -999.0;
+		Real64 TotCapTempModFac = -999.0;
 		int TimeStepNumAtMax;
 		int DDNum;
 		int PltSizNum;
@@ -3298,7 +3298,7 @@ namespace VariableSpeedCoils {
 					VarSpeedCoil( DXCoilNum ).RatedHPWHCondWaterFlow;
 				VarSpeedCoil( DXCoilNum ).WaterVolFlowAutoSized = true;
 			}
-			coilSelectionReportObj->setCoilWaterFlow( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate,VarSpeedCoil( DXCoilNum ).WaterVolFlowAutoSized, -999 , VarSpeedCoil( DXCoilNum ).LoopNum );
+			coilSelectionReportObj->setCoilWaterFlowPltSizNum( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate,VarSpeedCoil( DXCoilNum ).WaterVolFlowAutoSized, -999, VarSpeedCoil( DXCoilNum ).LoopNum );
 		}
 
 		if ( VarSpeedCoil( DXCoilNum ).RatedAirVolFlowRate == AutoSize ) {
@@ -3767,7 +3767,7 @@ namespace VariableSpeedCoils {
 			} else if ( RatedCapHeatAutoSized ) {
 				RatedWaterVolFlowRateDes = VarSpeedCoil( DXCoilNum ).RatedCapHeat * VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowPerRatedTotCap( NormSpeed );
 			}
-			coilSelectionReportObj->setCoilWaterFlow( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, RatedWaterVolFlowRateDes, RatedWaterFlowAutoSized, PltSizNum, VarSpeedCoil( DXCoilNum ).LoopNum );
+			coilSelectionReportObj->setCoilWaterFlowNodeNums( VarSpeedCoil( DXCoilNum ).Name, VarSpeedCoil( DXCoilNum ).VarSpeedCoilType, RatedWaterVolFlowRateDes, RatedWaterFlowAutoSized, VarSpeedCoil( DXCoilNum ).WaterInletNodeNum, VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum, VarSpeedCoil( DXCoilNum ).LoopNum );
 			VarSpeedCoil( DXCoilNum ).RatedWaterVolFlowRate = RatedWaterVolFlowRateDes;
 			ReportSizingOutput( "COIL:" + VarSpeedCoil( DXCoilNum ).CoolHeatType + CurrentObjSubfix, VarSpeedCoil( DXCoilNum ).Name, "Design Size Rated Water Flow Rate [m3/s]", RatedWaterVolFlowRateDes );
 			// Ensure water flow rate at lower speed must be lower or
