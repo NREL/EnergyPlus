@@ -3488,20 +3488,22 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempTole ) {
 					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-					if ( ZoneThermostatSetPointHi( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) {
-						ZoneThermostatSetPointLo( ZoneNum ) = ZoneThermostatSetPointHi( ZoneNum );
-					}
 				} else if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo && ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet - TempTole ) ) {
 					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-					if ( ZoneThermostatSetPointHi( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) {
-						ZoneThermostatSetPointLo( ZoneNum ) = ZoneThermostatSetPointHi( ZoneNum );
-					}
 				} else {
 					HeatOffFlag = true;
 				}
 				if ( TempControlledZone( RelativeZoneNum ).HeatModeLast && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
 					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
 					HeatOffFlag = true;
+				}
+				// check setpoint for both and provde an error message
+				if ( ZoneThermostatSetPointLo( ZoneNum ) >= ZoneThermostatSetPointHi( ZoneNum ) ) {
+					ShowSevereError( "DualSetPointWithDeadBand: When Temperature Difference Between Cutout And Setpoint is applied, the heating setpoint is greater than the cooling setpoint. " );
+					ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+					ShowContinueError( "Zone Heating ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
+					ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
+					ShowFatalError( "Program terminates due to above conditions." );
 				}
 			}
 
