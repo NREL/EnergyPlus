@@ -3552,18 +3552,18 @@ This field describes the excess air ratio beyond stoichiometric air supply. This
 This field contains the name of a QuadraticCurve input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofElectricPower. The quadratic curve named here describes the first part of the relation below used to calculate the rate of inlet air, \({\dot N_{air}}\) (kmol/s). It is a quadratic function of the net DC electrical power, \({P_{el}}\) (W).
 
 \begin{equation}
-{a_3}
+{\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]
 \end{equation}
 
 \paragraph{Field: Air Rate Air Temperature Coefficient}\label{field-air-rate-air-temperature-coefficient}
 
-This field is used to describe the air temperature coefficient, \({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\) , used to adjust inlet air flow rate in the relations for inlet air rate.
+This field is used to describe the air temperature coefficient, \({a_3}\), used to adjust inlet air flow rate in the relations for inlet air rate.
 
 \paragraph{Field: Air Rate Function of Fuel Rate Curve Name}\label{field-air-rate-function-of-fuel-rate-curve-name}
 
 This field contains the name of a Curve:Quadratic input object described elsewhere in the input file. This field is only used if the air supply rate calculation mode is QuadraticFunctionofFuelRate. The quadratic curve named here describes the first part of the relation used to calculate the rate of inlet air, \({\dot N_{air}}\) (kmol/s). It is a quadratic function of the fuel flow rate, \({\dot N_{fuel}}\) .
 
-\({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {P_{el}} + {a_2} \cdot P_{el}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\) \({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)
+ \({\dot N_{air}} = \left[ {{a_0} + {a_1} \cdot {{\dot N}_{fuel}} + {a_2} \cdot \dot N_{fuel}^2} \right].\left[ {1 + {a_3} \cdot {T_{air}}} \right]\)
 
 \paragraph{Field: Air Intake Heat Recovery Mode}\label{field-air-intake-heat-recovery-mode}
 
