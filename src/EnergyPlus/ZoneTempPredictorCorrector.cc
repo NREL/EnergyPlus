@@ -2996,7 +2996,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			// Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
-			CalcPredictedSystemLoad( ZoneNum, RAFNFrac );
+			CalcPredictedSystemLoad( ZoneNum, RAFNFrac, ShortenTimeStepSys );
 
 			// Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
 			CalcPredictedHumidityRatio( ZoneNum, RAFNFrac );
@@ -3237,7 +3237,7 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac )
+	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac, bool const ShortenTimeStepSys ) 
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3282,6 +3282,15 @@ namespace ZoneTempPredictorCorrector {
 		}
 		CoolOffFlag = false;
 		HeatOffFlag = false;
+		if ( TempCtrlFound ) {
+			if ( ShortenTimeStepSys ) {
+				TempControlledZone( RelativeZoneNum ).HeatModeLast = TempControlledZone( RelativeZoneNum ).HeatModeLastSave;
+				TempControlledZone( RelativeZoneNum ).CoolModeLast = TempControlledZone( RelativeZoneNum ).CoolModeLastSave;
+			} else {
+				TempControlledZone( RelativeZoneNum ).HeatModeLastSave = TempControlledZone( RelativeZoneNum ).HeatModeLast;
+				TempControlledZone( RelativeZoneNum ).CoolModeLastSave = TempControlledZone( RelativeZoneNum ).CoolModeLast;
+			}
+		}
 		{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
 
 		if ( SELECT_CASE_var == 0 ) {
@@ -3479,20 +3488,22 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempTole ) {
 					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-					if ( ZoneThermostatSetPointHi( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) {
-						ZoneThermostatSetPointLo( ZoneNum ) = ZoneThermostatSetPointHi( ZoneNum );
-					}
 				} else if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo && ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet - TempTole ) ) {
 					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-					if ( ZoneThermostatSetPointHi( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) ) {
-						ZoneThermostatSetPointLo( ZoneNum ) = ZoneThermostatSetPointHi( ZoneNum );
-					}
 				} else {
 					HeatOffFlag = true;
 				}
 				if ( TempControlledZone( RelativeZoneNum ).HeatModeLast && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
 					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
 					HeatOffFlag = true;
+				}
+				// check setpoint for both and provde an error message
+				if ( ZoneThermostatSetPointLo( ZoneNum ) >= ZoneThermostatSetPointHi( ZoneNum ) ) {
+					ShowSevereError( "DualSetPointWithDeadBand: When Temperature Difference Between Cutout And Setpoint is applied, the heating setpoint is greater than the cooling setpoint. " );
+					ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+					ShowContinueError( "Zone Heating ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
+					ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
+					ShowFatalError( "Program terminates due to above conditions." );
 				}
 			}
 
@@ -3567,14 +3578,14 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		}}
-		if ( NumOpTempControlledZones > 0 && TempCtrlFound ) {
+		if ( TempCtrlFound ) {
 			if ( TempControlledZone( RelativeZoneNum ).DeltaTCutSet > 0.0 ) {
-				if ( CoolOffFlag ) {
+				if ( CoolOffFlag && ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
 					TempControlledZone( RelativeZoneNum ).CoolModeLast = true;
 				} else {
 					TempControlledZone( RelativeZoneNum ).CoolModeLast = false;
 				}
-				if ( HeatOffFlag ) {
+				if ( HeatOffFlag && ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired <= 0.0 ) {
 					TempControlledZone( RelativeZoneNum ).HeatModeLast = true;
 				} else {
 					TempControlledZone( RelativeZoneNum ).HeatModeLast = false;
