@@ -206,16 +206,16 @@ def change_utility_cost(schema):
 
 
 def change_special_cased_name_fields(schema):
-    original_name = schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_names'].pop('zone_terminal_unit_name')
-    schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_names']['name'] = original_name
+    original_name = schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_info'].pop('zone_terminal_unit_name')
+    schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_info']['name'] = {'field_name': original_name, 'field_type': 'a'}
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
     del schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['name'] = \
          schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('zone_terminal_unit_name')
 
-    original_name = schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_names'].pop('heat_pump_name')
-    schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_names']['name'] = original_name
+    original_name = schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_info'].pop('heat_pump_name')
+    schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_info']['name'] = {'field_name': original_name, 'field_type': 'a'}
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
     del schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]

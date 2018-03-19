@@ -559,7 +559,7 @@ namespace EnergyPlus {
 	}
 
 
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions ) {
 		bool success = true;
 		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
@@ -615,7 +615,13 @@ namespace EnergyPlus {
 		SimulationManager::PostIPProcessing();
 		// inputProcessor->state->printErrors();
 
-		return success || is_valid || !hasErrors;
+		bool successful_processing = success && is_valid && !hasErrors;
+
+		if ( ! successful_processing && use_assertions ) {
+			EXPECT_TRUE( compare_err_stream( "" ) );
+		}
+
+		return successful_processing;
 	}
 
 	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {

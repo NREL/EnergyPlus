@@ -255,7 +255,8 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	json array_of_extensions = json::array();
 	Token token;
 	std::string extension_key;
-	size_t legacy_idd_index = 0, extensible_index = 0;
+	size_t legacy_idd_index = 0;
+	size_t extensible_index = 0;
 	success = true;
 	bool was_value_parsed = false;
 	auto const & legacy_idd_fields_array = legacy_idd[ "fields" ];
@@ -285,6 +286,8 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 
 	while ( true ) {
 		token = look_ahead( idf, index );
+		root[ "idf_max_fields" ] = legacy_idd_index;
+		root[ "idf_max_extensible_fields" ] = extensible_index;
 		if ( token == Token::NONE ) {
 			success = false;
 			return root;
@@ -324,6 +327,8 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 					array_of_extensions.push_back( extensible );
 					extensible.clear();
 				}
+				root[ "idf_max_fields" ] = legacy_idd_index;
+				root[ "idf_max_extensible_fields" ] = extensible_index;
 				break;
 			}
 		} else if ( token == Token::EXCLAMATION ) {

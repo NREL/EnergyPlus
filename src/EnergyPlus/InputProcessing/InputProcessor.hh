@@ -123,6 +123,15 @@ namespace EnergyPlus {
 		int
 		getNumObjectsFound( std::string const & ObjectWord );
 
+		bool
+		findDefault( std::string & default_value, json const & schema_field_obj );
+
+		bool
+		findDefault( Real64 & default_value, json const & schema_field_obj );
+
+		std::pair< std::string, bool >
+		getObjectItemValue( std::string const & field_value, json const & schema_field_obj );
+
 		void
 		getObjectItem(
 			std::string const & Object,
