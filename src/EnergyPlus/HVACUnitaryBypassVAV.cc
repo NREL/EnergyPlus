@@ -438,6 +438,7 @@ namespace HVACUnitaryBypassVAV {
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   July 2006
 		//       MODIFIED       Bereket Nigusse, FSEC, April 2011: added OA Mixer object type
+		//                      Julien Marrec, EffiBEM, March 2018: fix problem in finding air terminal
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1174,18 +1175,32 @@ namespace HVACUnitaryBypassVAV {
 							ShowContinueError( "This zone will not be controlled to a temperature setpoint." );
 						}
 						int zoneNum = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
-						int zoneInlet = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
-						int coolingPriority = 0;
-						int heatingPriority = 0;
-						//setup zone equipment sequence information based on finding matching air terminal
-						if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
-							ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
-							CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) = coolingPriority;
-							CBVAV( CBVAVNum ).ZoneSequenceHeatingNum( AirLoopZoneNum ) = heatingPriority;
+						int zoneInlet = 0;
+						// Need to pass the Zone Inlet Node to get equipment priorities
+						// Loop on all zone inlet nodes, find the one connected to this AirLoop
+						for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( zoneNum ).NumInletNodes; ++zoneInNode ) {
+							int AirLoopNumber = ZoneEquipConfig( zoneNum ).InletNodeAirLoopNum( zoneInNode );
+							if ( CBVAV( CBVAVNum ).AirLoopNumber == AirLoopNumber ) {
+								// Get the Zone Inlet Node
+								zoneInlet = ZoneEquipConfig(zoneNum).InletNode(zoneInNode);
+							}
 						}
-						if ( CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) == 0 ) {
-							ShowSevereError( "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"" + CBVAV( CBVAVNum ).Name + "\", No matching air terminal found in the zone equipment list for zone = " + ZoneEquipConfig( zoneNum ).ZoneName + "." );
+						if (zoneInlet == 0) {
+							ShowSevereError( "Controled Zone Inlet Node not Found" );
 							ErrorsFound = true;
+						} else {
+							int coolingPriority = 0;
+							int heatingPriority = 0;
+							//setup zone equipment sequence information based on finding matching air terminal
+							if ( ZoneEquipConfig( zoneNum ).EquipListIndex > 0 ) {
+								ZoneEquipList( ZoneEquipConfig( zoneNum ).EquipListIndex ).getPrioritiesforInletNode( zoneInlet, coolingPriority, heatingPriority );
+								CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) = coolingPriority;
+								CBVAV( CBVAVNum ).ZoneSequenceHeatingNum( AirLoopZoneNum ) = heatingPriority;
+							}
+							if ( CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) == 0 ) {
+								ShowSevereError( "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"" + CBVAV( CBVAVNum ).Name + "\", No matching air terminal found in the zone equipment list for zone = " + ZoneEquipConfig( zoneNum ).ZoneName + "." );
+								ErrorsFound = true;
+							}
 						}
 					} else {
 						ShowSevereError( "Controlled Zone node not found." );
