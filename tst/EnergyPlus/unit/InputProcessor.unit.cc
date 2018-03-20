@@ -2381,11 +2381,7 @@ namespace EnergyPlus {
 															"  Supply Fan 1,           !- Supply Fan Name",
 															"  BlowThrough,            !- Fan Placement",
 															"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-<<<<<<< HEAD
 															"  Coil:Heating:Fuel,      !- Heating Coil Object Type",
-=======
-															"  Coil:Heating:Fuel,       !- Heating Coil Object Type",
->>>>>>> develop
 															"  Furnace Heating Coil 1, !- Heating Coil Name",
 															"  ,                       !- DX Heating Coil Sizing Ratio",
 															"  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
@@ -2393,11 +2389,7 @@ namespace EnergyPlus {
 															"  ,                       !- Use DOAS DX Cooling Coil",
 															"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 															"  ,                       !- Latent Load Control",
-<<<<<<< HEAD
 															"  Coil:Heating:Fuel,      !- Supplemental Heating Coil Object Type",
-=======
-															"  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
->>>>>>> develop
 															"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 															"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 															"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
