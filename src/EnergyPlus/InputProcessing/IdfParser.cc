@@ -238,6 +238,11 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 							warnings_.emplace_back( "Duplicate name found. name: \"" + name + "\". Overwriting existing object." );
 						}
 					}
+				} else {
+					auto const it = obj_loc.find( "name" );
+					if ( it != obj_loc.end() ) {
+						name = "";
+					}
 				}
 			}
 
@@ -297,12 +302,12 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			if ( !was_value_parsed ) {
 				int ext_size = 0;
 				if ( legacy_idd_index < legacy_idd_fields_array.size() ) {
-					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+//					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
 //					root[ field_name ] = "";
 				} else {
 					auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
 					ext_size = static_cast<int>( legacy_idd_extensibles_array.size() );
-					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
+//					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
 					extensible_index++;
 //					extensible[ field_name ] = "";
 				}
@@ -320,7 +325,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 					min_fields = found_min_fields.value();
 				}
 				for (; legacy_idd_index < min_fields; legacy_idd_index++) {
-					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+//					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
 //					root[ field_name ] = "";
 				}
 				if ( extensible.size() ) {

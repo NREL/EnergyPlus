@@ -347,7 +347,7 @@ namespace EnergyPlus {
 			"ZoneAirMassFlowConservation,",
 			"Yes, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
 			"AddInfiltrationFlow, !- Infiltration Balancing Method",
-			"MixingSourceZoneOnly; !- Infiltration Balancing Zones",
+			"MixingSourceZonesOnly; !- Infiltration Balancing Zones",
 		} );
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
@@ -550,7 +550,7 @@ namespace EnergyPlus {
 			"ZoneAirMassFlowConservation,",
 			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
 			"None, !- Infiltration Balancing Method",
-			"Ignored;                !- Infiltration Balancing Zones"
+			";                !- Infiltration Balancing Zones"
 		} );
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
@@ -1273,7 +1273,7 @@ namespace EnergyPlus {
 			"ZoneAirMassFlowConservation,",
 			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
 			"None, !- Infiltration Balancing Method",
-			"Ignored;                !- Infiltration Balancing Zones",
+			";                !- Infiltration Balancing Zones",
 			" HVACSystemRootFindingAlgorithm,",
 			" RegulaFalsiThenBisection,!- Algorithm",
 			" 5;                       !- Number of Iterations Before Algorithm Switch",
@@ -1307,7 +1307,7 @@ namespace EnergyPlus {
 			"ZoneAirMassFlowConservation,",
 			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
 			"None, !- Infiltration Balancing Method",
-			"Ignored;                !- Infiltration Balancing Zones",
+			";                !- Infiltration Balancing Zones",
 
 		} );
 

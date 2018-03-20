@@ -397,7 +397,7 @@ namespace EnergyPlus {
 				default_value = default_val.get< std::string >();
 			} else {
 				if ( default_val.is_number_integer() ) {
-					i64toa( default_val.get< int >(), s );
+					i64toa( default_val.get< std::int64_t >(), s );
 				} else {
 					dtoa( default_val.get< double >(), s );
 				}
@@ -421,7 +421,7 @@ namespace EnergyPlus {
 				// autosize and autocalculate
 				default_value = -99999;
 			}  else if ( default_val.is_number_integer() ) {
-				default_value = default_val.get< int >();
+				default_value = default_val.get< std::int64_t >();
 			} else {
 				default_value = default_val.get< double >();
 			}
@@ -534,13 +534,13 @@ namespace EnergyPlus {
 		auto const & obj = epJSON_it;
 		auto const & obj_val = obj.value();
 
-		int idf_max_fields = 0;
+		size_t idf_max_fields = 0;
 		auto found_idf_max_fields = obj_val.find( "idf_max_fields" );
 		if ( found_idf_max_fields != obj_val.end() ) {
 			idf_max_fields = *found_idf_max_fields;
 		}
 
-		int idf_max_extensible_fields = 0;
+		size_t idf_max_extensible_fields = 0;
 		auto found_idf_max_extensible_fields = obj_val.find( "idf_max_extensible_fields" );
 		if ( found_idf_max_extensible_fields != obj_val.end() ) {
 			idf_max_extensible_fields = *found_idf_max_extensible_fields;
@@ -590,7 +590,7 @@ namespace EnergyPlus {
 
 					} else {
 						if ( field_value.is_number_integer() ) {
-							i64toa( field_value.get < int >(), s );
+							i64toa( field_value.get< std::int64_t >(), s );
 						} else {
 							dtoa( field_value.get < double >(), s );
 						}
@@ -602,7 +602,7 @@ namespace EnergyPlus {
 					// process numeric value
 					if ( field_value.is_number() ) {
 						if ( field_value.is_number_integer() ) {
-							Numbers( numeric_index ) = field_value.get< int >();
+							Numbers( numeric_index ) = field_value.get< std::int64_t >();
 						} else {
 							Numbers( numeric_index ) = field_value.get< double >();
 						}
@@ -658,6 +658,7 @@ namespace EnergyPlus {
 
 		}
 
+		size_t extensible_count = 0;
 		 auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
 		 if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
 			auto const epJSON_extensions_array_itr = obj.value().find( extension_key );
@@ -671,7 +672,7 @@ namespace EnergyPlus {
 				for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
 					auto const & epJSON_extension_obj = it.value();
 
-					for ( size_t i = 0; i < legacy_idd_extensibles.size(); i++ ) {
+					for ( size_t i = 0; i < legacy_idd_extensibles.size(); i++, extensible_count++ ) {
 						std::string const & field_name = legacy_idd_extensibles[ i ];
 						auto const & epJSON_obj_field_iter = epJSON_extension_obj.find( field_name );
 						auto const & schema_field = schema_extension_fields[ field_name ];
@@ -681,7 +682,7 @@ namespace EnergyPlus {
 							ShowFatalError( "Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema." );
 						}
 						auto const & field_type = field_info.value().at( "field_type" ).get< std::string >();
-						bool within_idf_extensible_fields = ( i < idf_max_extensible_fields );
+						bool within_idf_extensible_fields = ( extensible_count < idf_max_extensible_fields );
 
 						if ( epJSON_obj_field_iter != epJSON_extension_obj.end() ) {
 							auto const & field_value = epJSON_obj_field_iter.value();
@@ -694,7 +695,7 @@ namespace EnergyPlus {
 									if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = value.second;
 								} else {
 									if ( field_value.is_number_integer() ) {
-										i64toa( field_value.get< int >(), s );
+										i64toa( field_value.get< std::int64_t >(), s );
 									} else {
 										dtoa( field_value.get< double >(), s );
 									}
@@ -705,7 +706,7 @@ namespace EnergyPlus {
 							else if ( field_type == "n" ) {
 								if ( field_value.is_number() ) {
 									if ( field_value.is_number_integer() ) {
-										Numbers( numeric_index ) = field_value.get < int >();
+										Numbers( numeric_index ) = field_value.get< std::int64_t >();
 									} else {
 										Numbers( numeric_index ) = field_value.get < double >();
 									}
@@ -773,7 +774,7 @@ namespace EnergyPlus {
 // 				auto const & field_value = it.value();
 // 				if ( field_value.is_number() ) {
 // 					if ( field_value.is_number_integer() ) {
-// 						Numbers( i + 1 ) = field_value.get< int >();
+// 						Numbers( i + 1 ) = field_value.get< std::int64_t >();
 // 					} else {
 // 						Numbers( i + 1 ) = field_value.get< double >();
 // 					}
@@ -826,7 +827,7 @@ namespace EnergyPlus {
 // 						auto const & field_value = epJSON_extension_field_iter.value();
 // 						if ( field_value.is_number() ) {
 // 							if ( field_value.is_number_integer() ) {
-// 								Numbers( numerics_index + 1 ) = field_value.get < int >();
+// 								Numbers( numerics_index + 1 ) = field_value.get< std::int64_t >();
 // 							} else {
 // 								Numbers( numerics_index + 1 ) = field_value.get < double >();
 // 							}
@@ -1521,9 +1522,9 @@ namespace EnergyPlus {
 			auto const & epJSON_object = epJSON_objects.value();
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
-				if ( !fields.at( "key_value" ).empty() ) {
-					addRecordToOutputVariableStructure( fields.at( "key_value" ),
-																		fields.at( "variable_name" ) );
+				auto it = fields.find( "key_value" );
+				if ( it != fields.end() && !it.value().empty() ) {
+					addRecordToOutputVariableStructure( it.value(), fields.at( "variable_name" ) );
 				} else {
 					addRecordToOutputVariableStructure( "*", fields.at( "variable_name" ) );
 				}
@@ -1541,13 +1542,11 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					if ( !obj.key().empty() ) {
-						addRecordToOutputVariableStructure( extensions.at( "key_name" ),
-																			extensions.at(
-																			"output_variable_or_meter_name" ) );
+					auto it = extensions.find( "key_name" );
+					if ( it != extensions.end() && !obj.key().empty() ) {
+						addRecordToOutputVariableStructure( it.value(), extensions.at( "output_variable_or_meter_name" ) );
 					} else {
-						addRecordToOutputVariableStructure( "*", extensions.at(
-						"output_variable_or_meter_name" ) );
+						addRecordToOutputVariableStructure( "*", extensions.at( "output_variable_or_meter_name" ) );
 					}
 				}
 			}
@@ -1564,13 +1563,11 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					if ( !obj.key().empty() ) {
-						addRecordToOutputVariableStructure( extensions.at( "key_name" ),
-																			extensions.at(
-																			"output_variable_or_meter_name" ) );
+					auto it = extensions.find( "key_name" );
+					if ( it != extensions.end() && !obj.key().empty() ) {
+						addRecordToOutputVariableStructure( it.value(), extensions.at( "output_variable_or_meter_name" ) );
 					} else {
-						addRecordToOutputVariableStructure( "*", extensions.at(
-						"output_variable_or_meter_name" ) );
+						addRecordToOutputVariableStructure( "*", extensions.at( "output_variable_or_meter_name" ) );
 					}
 				}
 			}
@@ -1581,13 +1578,11 @@ namespace EnergyPlus {
 			auto const & epJSON_object = epJSON_objects.value();
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
-				if ( !fields.at( "output_variable_or_output_meter_index_key_name" ).empty() ) {
-					addRecordToOutputVariableStructure(
-					fields.at( "output_variable_or_output_meter_index_key_name" ),
-					fields.at( "output_variable_or_output_meter_name" ) );
+				auto it = fields.find( "output_variable_or_output_meter_index_key_name" );
+				if ( it != fields.end() && !it.value().empty() ) {
+					addRecordToOutputVariableStructure( it.value(), fields.at( "output_variable_or_output_meter_name" ) );
 				} else {
-					addRecordToOutputVariableStructure( "*", fields.at(
-					"output_variable_or_output_meter_name" ) );
+					addRecordToOutputVariableStructure( "*", fields.at( "output_variable_or_output_meter_name" ) );
 				}
 			}
 		}
@@ -1624,8 +1619,7 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					addRecordToOutputVariableStructure( "*",
-																		extensions.at( "variable_or_meter_name" ) );
+					addRecordToOutputVariableStructure( "*", extensions.at( "variable_or_meter_name" ) );
 				}
 			}
 		}
@@ -1641,8 +1635,7 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					addRecordToOutputVariableStructure( "*", extensions.at(
-					"variable_or_meter_or_ems_variable_or_field_name" ) );
+					addRecordToOutputVariableStructure( "*", extensions.at( "variable_or_meter_or_ems_variable_or_field_name" ) );
 				}
 			}
 		}
