@@ -3,7 +3,7 @@
 #define __VALIJSON_OPTIONAL_HPP
 
 // This should be removed once C++17 is widely available
-#if __cplusplus >= 201703L && __has_include(<optional>)
+#if (defined(__cplusplus) && __cplusplus >= 201703L) || (defined(_HAS_CXX17) && _HAS_CXX17 == 1)
 	#include <optional>
 	namespace opt = std;
 #else
