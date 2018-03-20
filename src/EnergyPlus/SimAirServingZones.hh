@@ -233,6 +233,9 @@ namespace SimAirServingZones {
 	SetUpSysSizingArrays();
 
 	void
+	SizeSysOutdoorAir();
+
+	void
 	UpdateSysSizing( int const CallIndicator );
 
 	void

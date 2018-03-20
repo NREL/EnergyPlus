@@ -153,7 +153,8 @@ namespace PlantLoopSolver {
 		Real64
 		CalcOtherSideDemand(
 				int const LoopNum,
-				int const ThisSide
+				int const ThisSide,
+				Real64 ThisLoopSideFlow
 		);
 
 		void
@@ -182,6 +183,7 @@ namespace PlantLoopSolver {
 				int const LoopSideNum,
 				int const FirstBranchNum,
 				int const LastBranchNum,
+				Real64 ThisLoopSideFlow,
 				Array1S_int LastComponentSimulated
 		);
 

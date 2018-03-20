@@ -133,7 +133,7 @@ namespace DataGenerators {
 	int const fuelModeGaseousConstituents( 301 );
 	int const fuelModeGenericLiquid( 302 );
 
-	Real64 const MinProductGasTemp( 100.0 ); // Minimum bound on search for product gas temps
+	Real64 const MinProductGasTemp( -100.0 ); // Minimum bound on search for product gas temps
 	Real64 const MaxProductGasTemp( 2000.0 ); // Maximum bound on search for product gas temps
 
 	int const NISTShomate( 41 );

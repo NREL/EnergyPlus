@@ -132,6 +132,6 @@ TEST_F( EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop )
 	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
 	PlantLoop( 2 ).LoopSide( 2 ).Branch.deallocate();
 	PlantLoop( 2 ).LoopSide.deallocate();
-	PlantLoop.allocate( 2 );
+	PlantLoop.deallocate();
 
 }
