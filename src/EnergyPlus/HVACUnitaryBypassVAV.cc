@@ -201,6 +201,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64 SaveCompressorPLR( 0.0 ); // Holds DX compressor PLR from active DX coil
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
 	Array1D_bool CheckEquipName;
+	bool GetInputFlag( true ); // Flag set to make sure you get input once
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -208,6 +209,26 @@ namespace HVACUnitaryBypassVAV {
 	Array1D< CBVAVData > CBVAV;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		CBVAV.deallocate();
+		NumCBVAV = 0;
+		CompOnMassFlow = 0.0;
+		OACompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		OACompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		BypassDuctFlowFraction = 0.0;
+		PartLoadFrac = 0.0;
+		SaveCompressorPLR = 0.0;
+		TempSteamIn = 100.0;
+		CheckEquipName.deallocate();
+		GetInputFlag = true;
+	}
 
 	void
 	SimUnitaryBypassVAV(
@@ -250,7 +271,6 @@ namespace HVACUnitaryBypassVAV {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CBVAVNum; // Index of CBVAV system being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		Real64 OnOffAirFlowRatio; // Ratio of compressor ON airflow to average airflow over timestep
 		Real64 QUnitOut; // Sensible capacity delivered by this air loop system
 		Real64 QZnLoad; // Zone load required by all zones served by this air loop system
