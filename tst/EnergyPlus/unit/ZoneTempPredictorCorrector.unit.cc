@@ -545,7 +545,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 
 		ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired = 0.0; // no load and no thermostat since control type is set to 0 above
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( DualZoneNum, 1.0 );
+		CalcPredictedSystemLoad( DualZoneNum, 1.0, false );
 
 		EXPECT_EQ( 0.0, TempZoneThermostatSetPoint( DualZoneNum ) ); // Set point initialized to 0 and never set since thermostat control type = 0
 
@@ -561,7 +561,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempDepZnLd( HeatZoneNum ) = ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
 
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( HeatZoneNum, 1.0 );
+		CalcPredictedSystemLoad( HeatZoneNum, 1.0, false );
 
 		EXPECT_EQ( 20.0, TempZoneThermostatSetPoint( HeatZoneNum ) );
 		EXPECT_EQ( -1000.0, ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
@@ -590,25 +590,25 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempDepZnLd( DualZoneNum ) = ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
 
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( HeatZoneNum, 1.0 );
+		CalcPredictedSystemLoad( HeatZoneNum, 1.0, false );
 
 		EXPECT_EQ( 21.0, TempZoneThermostatSetPoint( HeatZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( HeatZoneNum ) ); // Tstat should show there is load on a single heating SP
 		EXPECT_EQ( 1000.0, ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-		CalcPredictedSystemLoad( CoolZoneNum, 1.0 );
+		CalcPredictedSystemLoad( CoolZoneNum, 1.0, false );
 
 		EXPECT_EQ( 23.0, TempZoneThermostatSetPoint( CoolZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( CoolZoneNum ) ); // Tstat should show there is load on a single cooling SP
 		EXPECT_EQ( -3000.0, ZoneSysEnergyDemand( CoolZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-		CalcPredictedSystemLoad( CoolHeatZoneNum, 1.0 );
+		CalcPredictedSystemLoad( CoolHeatZoneNum, 1.0, false );
 
 		ASSERT_EQ( 22.0, TempZoneThermostatSetPoint( CoolHeatZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( CoolHeatZoneNum ) ); // Tstat should show there is load on a single heating or cooling SP
 		EXPECT_EQ( -4000.0, ZoneSysEnergyDemand( CoolHeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-		CalcPredictedSystemLoad( DualZoneNum, 1.0 );
+		CalcPredictedSystemLoad( DualZoneNum, 1.0, false );
 
 		EXPECT_EQ( 20.0, TempZoneThermostatSetPoint( DualZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( DualZoneNum ) ); // Tstat should show there is load on a dual SP
@@ -622,7 +622,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempIndZnLd( DualZoneNum ) = 3500.0; // results in a cooling load
 
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( DualZoneNum, 1.0 );
+		CalcPredictedSystemLoad( DualZoneNum, 1.0, false );
 
 		EXPECT_EQ( 25.0, TempZoneThermostatSetPoint( DualZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( DualZoneNum ) ); // Tstat should show there is load on a dual SP
@@ -1303,14 +1303,14 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 	ZoneT1( 1 ) = MAT( 1 );
 
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
 
 	MAT( 1 ) = 23.0;
 	ZoneT1( 1 ) = MAT( 1 );
 	TempControlledZone( 1 ).HeatModeLast = true;
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
 	TempControlledZone( 1 ).HeatModeLast = false;
 
@@ -1326,14 +1326,14 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 
 	TempControlledZone( 1 ).CoolModeLast = true;
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
 	TempControlledZone( 1 ).CoolModeLast = false;
 
 	MAT( 1 ) = 27.0;
 	ZoneT1( 1 ) = MAT( 1 );
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
 
 	// SingleHeatCoolSetPoint
@@ -1347,7 +1347,7 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 	ZoneT1( 1 ) = MAT( 1 );
 
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
 
@@ -1366,7 +1366,7 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 	TempControlledZone( 1 ).CoolModeLast = true;
 	TempControlledZone( 1 ).HeatModeLast = true;
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
 	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
 	TempControlledZone( 1 ).HeatModeLast = false;
@@ -1375,7 +1375,7 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 	MAT( 1 ) = 21.0;
 	ZoneT1( 1 ) = MAT( 1 );
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
 	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
 
@@ -1384,7 +1384,7 @@ TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
 	MAT( 1 ) = 27.0;
 	ZoneT1( 1 ) = MAT( 1 );
 	CalcZoneAirTempSetPoints( );
-	CalcPredictedSystemLoad( 1, 0.0 );
+	CalcPredictedSystemLoad( 1, 0.0, false );
 	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
 	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
 

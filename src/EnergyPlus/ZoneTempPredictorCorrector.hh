@@ -254,7 +254,7 @@ namespace ZoneTempPredictorCorrector {
 	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > const & runningAverageASH, Array1D< Real64 > const & runningAverageCEN );
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
+	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac, bool const ShortenTimeStepSys );
 
 	void
 	CalcPredictedHumidityRatio( int const ZoneNum, Real64 RAFNFrac );
