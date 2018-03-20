@@ -472,8 +472,6 @@ namespace HVACUnitaryBypassVAV {
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipList;
-		using DataZoneEquipment::AirDistUnit_Num;
-		using DataZoneEquipment::DirectAir_Num;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using DataZoneControls::TempControlledZone;
@@ -531,7 +529,6 @@ namespace HVACUnitaryBypassVAV {
 		Array1D_string cNumericFields( 11 ); // Numeric field names
 		Array1D_bool lAlphaBlanks( 19 ); // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks( 11 ); // Logical array, numeric field input BLANK = .TRUE.
-		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
 		int HeatCoilInletNodeNum; // Heating coil air inlet node number
 		int HeatCoilOutletNodeNum; // Heating coil air outlet node number
 		int SteamIndex; // steam coil index
