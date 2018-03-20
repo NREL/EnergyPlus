@@ -2401,19 +2401,21 @@ namespace ZoneTempPredictorCorrector {
 
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				FirstSurfFlag = true;
-				for ( SurfNum = Zone( Loop ).SurfaceFirst; SurfNum <= Zone( Loop ).SurfaceLast; ++SurfNum ) {
-					if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+				if ( Zone( Loop ).SurfaceFirst > 0 ) {
+					for ( SurfNum = Zone( Loop ).SurfaceFirst; SurfNum <= Zone( Loop ).SurfaceLast; ++SurfNum ) {
+						if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
-					if ( FirstSurfFlag ) {
-						TRefFlag = Surface( SurfNum ).TAirRef;
-						FirstSurfFlag = false;
-					}
-					// for each particular zone, the reference air temperature(s) should be the same
-					// (either mean air, bulk air, or supply air temp).
-					if ( Surface( SurfNum ).TAirRef != TRefFlag ) {
-						ShowWarningError( "Different reference air temperatures for difference surfaces encountered in zone " + Zone( Loop ).Name );
-					}
+						if ( FirstSurfFlag ) {
+							TRefFlag = Surface( SurfNum ).TAirRef;
+							FirstSurfFlag = false;
+						}
+						// for each particular zone, the reference air temperature(s) should be the same
+						// (either mean air, bulk air, or supply air temp).
+						if ( Surface( SurfNum ).TAirRef != TRefFlag ) {
+							ShowWarningError( "Different reference air temperatures for difference surfaces encountered in zone " + Zone( Loop ).Name );
+						}
 
+					}
 				}
 			}
 
