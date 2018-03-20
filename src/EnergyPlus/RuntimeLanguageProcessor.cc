@@ -2833,22 +2833,26 @@ namespace RuntimeLanguageProcessor {
 							ShowContinueError( "Blank " + cAlphaFieldNames( 1 ) );
 							ShowContinueError( "Blank entry will be skipped, and the simulation continues" );
 						} else if ( ! errFlag ) {
-							VariableNum = FindEMSVariable( cAlphaArgs( ErlVarLoop ), 0 );
 							// Still need to check for conflicts with program and function names too
 
-							if ( VariableNum > 0 ) {
-								ShowSevereError( RoutineName + cCurrentModuleObject + ", invalid entry." );
-								ShowContinueError( "Invalid " + cAlphaFieldNames( ErlVarLoop ) + '=' + cAlphaArgs( ErlVarLoop ) );
-								ShowContinueError( "Name conflicts with an existing global variable name" );
-								ErrorsFound = true;
+							if ((cCurrentModuleObject.compare("ExternalInterface:FunctionalMockupUnitImport:To:Variable") == 0) && ErlVarLoop > 1){
+								// Only validate first field of object ExternalInterface:FunctionalMockupUnitImport:To:Variable. Skip others
 							} else {
-								VariableNum = NewEMSVariable( cAlphaArgs( ErlVarLoop ), 0 );
-								if ( GlobalNum > NumUserGlobalVariables ) {
-									// Initialize variables for the ExternalInterface variables.
-									// This object requires an initial value.
-									ExternalInterfaceInitializeErlVariable( VariableNum, SetErlValueNumber( rNumericArgs( 1 ) ), false );
-								}
+								VariableNum = FindEMSVariable( cAlphaArgs( ErlVarLoop ), 0 );
+								if ( VariableNum > 0 ) {
+									ShowSevereError( RoutineName + cCurrentModuleObject + ", invalid entry." );
+									ShowContinueError( "Invalid " + cAlphaFieldNames( ErlVarLoop ) + '=' + cAlphaArgs( ErlVarLoop ) );
+									ShowContinueError( "Name conflicts with an existing global variable name" );
+									ErrorsFound = true;
+								} else {
+									VariableNum = NewEMSVariable( cAlphaArgs( ErlVarLoop ), 0 );
+									if ( GlobalNum > NumUserGlobalVariables ) {
+										// Initialize variables for the ExternalInterface variables.
+										// This object requires an initial value.
+										ExternalInterfaceInitializeErlVariable( VariableNum, SetErlValueNumber( rNumericArgs( 1 ) ), false );
+									}
 
+								}
 							}
 						}
 					}
