@@ -242,8 +242,9 @@ namespace EnergyPlus {
 			Real64 ThirdFuelConsumption;	   //
 			Real64 WaterConsumptionRate;	   //
 			Real64 WaterConsumption;		   //
-			Real64 QSensZoneOut;
-			Real64 QLatentZoneOut;
+			Real64 QSensZoneOut;			//W
+			Real64 QLatentZoneOut;			// W
+			Real64 QLatentZoneOutMass;			// kg/s
 			Real64 ExternalStaticPressure;	   //
 			Real64 RequestedHumdificationMass;
 			Real64 RequestedHumdificationLoad;
@@ -319,8 +320,6 @@ namespace EnergyPlus {
 			std::vector<int>  Psa_curve_pointer;
 			std::vector<CMode>  OperatingModes;
 			std::vector<CSetting> CurrentOperatingSettings;
-			//debug values
-			int DebugBreak;
 
 			CSetting OptimalSetting;
 			CSetting oStandBy;
