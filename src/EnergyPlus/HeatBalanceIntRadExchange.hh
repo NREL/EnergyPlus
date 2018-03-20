@@ -57,6 +57,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#define EIGEN_USE_MKL_ALL
+#include <Eigen/Dense>
+#include <Eigen/LU>
 
 namespace EnergyPlus {
 
@@ -146,7 +149,7 @@ namespace HeatBalanceIntRadExchange {
 		Array1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
 		Array2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
 		Array1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		Array2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+		Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
 	);
 
 	void

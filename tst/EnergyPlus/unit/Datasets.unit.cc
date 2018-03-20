@@ -95,9 +95,9 @@ namespace EnergyPlus {
 	TEST_F( DataSetFixture, ExhaustFiredChiller ) {
 		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/ExhaustFiredChiller.idf" ) ) ) );
 	}
-	TEST_F( DataSetFixture, FluidPropertiesRefData ) {
-		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/FluidPropertiesRefData.idf" ) ) ) );
-	}
+//	TEST_F( DataSetFixture, FluidPropertiesRefData ) {
+//		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/FluidPropertiesRefData.idf" ) ) ) );
+//	}
 	TEST_F( DataSetFixture, FossilFuelEnvironmentalImpactFactors ) {
 		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/FossilFuelEnvironmentalImpactFactors.idf" ) ) ) );
 	}

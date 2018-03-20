@@ -48,9 +48,6 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
-#define EIGEN_USE_MKL_ALL
-#include <Eigen/Dense>
-#include <Eigen/LU>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -320,7 +317,21 @@ namespace HeatBalanceIntRadExchange {
 						}
 					}
 
-					CalcScriptF( n_zone_Surfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, zone_ScriptF );
+					Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigenZoneScriptF(zone_ScriptF.size1(), zone_ScriptF.size2());
+					for (auto i = 0; i < eigenZoneScriptF.rows(); i++) {
+						for (auto j = 0; j < eigenZoneScriptF.cols(); j++) {
+							eigenZoneScriptF(i, j) = zone_ScriptF(i + 1, j + 1);
+						}
+					}
+
+//					CalcScriptF( n_zone_Surfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, zone_ScriptF );
+					CalcScriptF( n_zone_Surfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, eigenZoneScriptF );
+
+					for (auto i = 0; i < eigenZoneScriptF.rows(); i++) {
+						for (auto j = 0; j < eigenZoneScriptF.cols(); j++) {
+							zone_ScriptF(i + 1, j + 1) = eigenZoneScriptF(i, j);
+						}
+					}
 					// precalc - multiply by StefanBoltzmannConstant
 					zone_ScriptF *= StefanBoltzmannConst;
 				}
@@ -622,8 +633,20 @@ namespace HeatBalanceIntRadExchange {
 
 			FixViewFactors( NumOfZoneSurfaces, ZoneInfo( ZoneNum ).Area, ZoneInfo( ZoneNum ).F, ZoneNum, CheckValue1, CheckValue2, FinalCheckValue, NumIterations, FixedRowSum );
 
+			Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigenZoneScriptF(ZoneInfo( ZoneNum ).ScriptF.size1(), ZoneInfo( ZoneNum ).ScriptF.size2());
+			for (auto i = 0; i < eigenZoneScriptF.rows(); i++) {
+				for (auto j = 0; j < eigenZoneScriptF.cols(); j++) {
+					eigenZoneScriptF(i, j) = ZoneInfo(ZoneNum).ScriptF(i + 1, j + 1);
+				}
+			}
 			// Calculate the script F factors
-			CalcScriptF( NumOfZoneSurfaces, ZoneInfo( ZoneNum ).Area, ZoneInfo( ZoneNum ).F, ZoneInfo( ZoneNum ).Emissivity, ZoneInfo( ZoneNum ).ScriptF );
+//			CalcScriptF( NumOfZoneSurfaces, ZoneInfo( ZoneNum ).Area, ZoneInfo( ZoneNum ).F, ZoneInfo( ZoneNum ).Emissivity, ZoneInfo( ZoneNum ).ScriptF );
+			CalcScriptF( NumOfZoneSurfaces, ZoneInfo( ZoneNum ).Area, ZoneInfo( ZoneNum ).F, ZoneInfo( ZoneNum ).Emissivity, eigenZoneScriptF );
+			for (auto i = 0; i < eigenZoneScriptF.rows(); i++) {
+				for (auto j = 0; j < eigenZoneScriptF.cols(); j++) {
+					ZoneInfo(ZoneNum).ScriptF(i + 1, j + 1) = eigenZoneScriptF(i, j);
+				}
+			}
 
 			if ( ViewFactorReport ) { // Write to SurfInfo File
 				// Zone Surface Information Output
@@ -1276,7 +1299,7 @@ namespace HeatBalanceIntRadExchange {
 		Array1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
 		Array2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
 		Array1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		Array2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+		Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
 	)
 	{
 
@@ -1321,7 +1344,7 @@ namespace HeatBalanceIntRadExchange {
 		assert( ( F.l1() == 1 ) && ( F.u1() == N ) );
 		assert( ( F.l2() == 1 ) && ( F.u2() == N ) );
 		assert( ( EMISS.l() == 1 ) && ( EMISS.u() == N ) );
-		assert( equal_dimensions( F, ScriptF ) );
+//		assert( equal_dimensions( F, ScriptF ) );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1332,10 +1355,10 @@ namespace HeatBalanceIntRadExchange {
 #endif
 
 		// Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
-		Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic> cMatrix(N, N); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
-		for ( auto j = 1; j <= N; j++ ) {
-			for ( auto i = 1; i <= N; i++ ) {
-				cMatrix(j - 1, i - 1) = A( i ) * F( j , i ); // tested to contain identical data as original Cmatrix
+		Eigen::Matrix<Real64, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> cMatrix(N, N); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
+		for ( auto i = 1; i <= N; i++ ) {
+			for ( auto j = 1; j <= N; j++ ) {
+				cMatrix(i - 1, j - 1) = A( j ) * F( i , j ); // tested to contain identical data as original Cmatrix
 			}
 		}
 
@@ -1362,14 +1385,14 @@ namespace HeatBalanceIntRadExchange {
 
 		// Form Script F matrix transposed
 //		assert( equal_dimensions( Cinverse, ScriptF ) ); // For linear indexing
-		assert( cInverse.size() * cInverse[0].size() == ScriptF.size1() * ScriptF.size2() );
+//		assert( cInverse.size() * cInverse[0].size() == ScriptF.size1() * ScriptF.size2() );
 		for ( int i = 1; i <= N; i++ ) {
 			auto const EMISS_fac = EMISS( i ) / (1 - EMISS( i ));
 			for (int j = 1; j <= N; j++ ) {
 				if (i == j) {
-					ScriptF( i, j ) = EMISS_fac * ( cInverse.at( j - 1 ).at( i - 1 ) - EMISS( i ) );
+					ScriptF( i - 1, j - 1 ) = EMISS_fac * ( cInverse.at( j - 1 ).at( i - 1 ) - EMISS( i ) );
 				} else {
-					ScriptF( i, j ) = EMISS_fac * cInverse.at( j - 1 ).at( i - 1 );
+					ScriptF( i - 1, j - 1 ) = EMISS_fac * cInverse.at( j - 1 ).at( i - 1 );
 				}
 			}
 		}
