@@ -1174,7 +1174,7 @@ namespace HVACUnitaryBypassVAV {
 							ShowContinueError( "This zone will not be controlled to a temperature setpoint." );
 						}
 						int zoneNum = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
-						int zoneInlet = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
+						int zoneInlet = CBVAV( CBVAVNum ).CBVAVBoxOutletNode( AirLoopZoneNum );
 						int coolingPriority = 0;
 						int heatingPriority = 0;
 						//setup zone equipment sequence information based on finding matching air terminal
@@ -1191,15 +1191,6 @@ namespace HVACUnitaryBypassVAV {
 						ShowSevereError( "Controlled Zone node not found." );
 						ErrorsFound = true;
 					}
-					if ( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex > 0 ) {
-						for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
-							if ( ( ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).EquipType_Num( EquipNum ) == AirDistUnit_Num ) || ( ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).EquipType_Num( EquipNum ) == DirectAir_Num ) ) {
-								CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) = ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).CoolingPriority( EquipNum );
-								CBVAV( CBVAVNum ).ZoneSequenceHeatingNum( AirLoopZoneNum ) = ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).HeatingPriority( EquipNum );
-							}
-						}
-					}
-
 				}
 			} else {
 			}
