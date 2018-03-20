@@ -568,7 +568,7 @@ namespace EnergyPlus {
 					{
 							"Bldg",
 							{
-									{"idfOrder", 0},
+									{"idf_order", 0},
 									{"north_axis", 0.0},
 									{"terrain", "Suburbs"},
 									{"loads_convergence_tolerance_value", 0.04},
@@ -585,7 +585,7 @@ namespace EnergyPlus {
 					{
 							"",
 							{
-									{"idfOrder", 0},
+									{"idf_order", 0},
 									{"starting_vertex_position", "UpperLeftCorner"},
 									{"vertex_entry_direction", "Counterclockwise"},
 									{"coordinate_system", "Relative"},

@@ -551,8 +551,6 @@ namespace EnergyPlus {
 		int alpha_index = 1;
 		int numeric_index = 1;
 
-		// int max_idf_index = obj_val[ "idfMaxIndex" ];
-		// auto const & max_idf_index = obj[ "idfMaxIndex" ];
 		for ( size_t i = 0; i < legacy_idd_fields.size(); ++i ) {
 			std::string const & field = legacy_idd_fields[ i ];
 			auto const & field_info = legacy_idd_field_info.find( field );
@@ -567,7 +565,6 @@ namespace EnergyPlus {
 			 		Alphas( alpha_index ) = obj.key();
 			 	} else {
 			 		Alphas( alpha_index ) = UtilityRoutines::MakeUPPERCase( obj.key() );
-			 		// Alphas( alpha_index ) = obj.key();
 			 	}
 			 	if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = obj.key().empty();
 			 	if ( is_AlphaFieldNames ) {
@@ -619,15 +616,7 @@ namespace EnergyPlus {
 						if ( is_NumBlank ) NumBlank()( numeric_index ) = is_empty;
 					}
 				}
-
-				// fields_count.emplace_back('A');
-				// NumAlphas++;
-//				if ( NumAlphas < i + 1 ) {
-//					NumAlphas = i + 1;
-//				}
 			} else {
-				// fields_count.emplace_back("a);
-				// NumAlphas++;
 				if ( field_type == "a" ) {
 					if ( ! ( within_idf_fields && findDefault( Alphas( alpha_index ), schema_field_obj ) ) ) {
 						Alphas( alpha_index ) = "";
@@ -668,8 +657,6 @@ namespace EnergyPlus {
 				auto const & legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
 				auto const & epJSON_extensions_array = epJSON_extensions_array_itr.value();
 				auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-//				int alphas_index = static_cast <int> ( alpha_index );
-//				int numerics_index = static_cast <int> ( numeric_index );
 
 				for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
 					auto const & epJSON_extension_obj = it.value();
@@ -723,14 +710,7 @@ namespace EnergyPlus {
 									if ( is_NumBlank ) NumBlank()( numeric_index ) = is_empty;
 								}
 							}
-							// fields_count.emplace_back('A');
-							// NumAlphas++;
-//							if ( NumAlphas < alphas_index ) {
-//								NumAlphas = alphas_index;
-//							}
 						} else {
-							// fields_count.emplace_back("a);
-							// NumAlphas++;
 
 							if ( field_type == "a" ) {
 								if ( ! ( within_idf_extensible_fields && findDefault( Alphas( alpha_index ), schema_field ) ) ) {
@@ -767,138 +747,6 @@ namespace EnergyPlus {
 			}
 		 }
 
-// 		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
-// 		for ( size_t i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
-// 			std::string const & field = legacy_idd_numerics_fields[ i ];
-// 			auto const & schema_obj = schema_obj_props[ field ];
-// 			auto it = obj.value().find( field );
-// 			if ( it != obj.value().end() ) {
-// 				auto const & field_value = it.value();
-// 				if ( field_value.is_number() ) {
-// 					if ( field_value.is_number_integer() ) {
-// 						Numbers( i + 1 ) = field_value.get< std::int64_t >();
-// 					} else {
-// 						Numbers( i + 1 ) = field_value.get< double >();
-// 					}
-// 					if ( is_NumBlank ) NumBlank()( i + 1 ) = false;
-// 				} else {
-// 					bool is_empty = field_value.get < std::string >().empty();
-// 					if ( is_empty ) {
-// 						findDefault( Numbers( i + 1 ), schema_obj );
-// 					} else {
-// 						Numbers( i + 1 ) = -99999; // autosize and autocalculate
-// 					}
-// 					if ( is_NumBlank ) NumBlank()( i + 1 ) = is_empty;
-// 				}
-// 				// fields_count.emplace_back('N');
-// 				// NumNumbers++;
-// //				if ( NumNumbers < i + 1 ) {
-// //					NumNumbers = i + 1;
-// //				}
-// 			} else {
-// 				// fields_count.emplace_back('n');
-// 				// NumNumbers++;
-// 				findDefault( Numbers( i + 1 ), schema_obj );
-// 				if ( is_NumBlank ) NumBlank()( i + 1 ) = true;
-// 			}
-// 			if ( NumNumbers + NumAlphas < max_idf_index ) {
-// 				NumNumbers++;
-// 			}
-// 			if ( is_NumericFieldNames ) {
-// 				NumericFieldNames()( i + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
-// 			}
-// 		}
-
-// 		auto const legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
-// 		auto const epJSON_extensions_iter = obj.value().find( extension_key );
-// 		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() && epJSON_extensions_iter != obj.value().end() ) {
-// 			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
-// 			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-// 			// auto const & epJSON_extensions_array = obj.value()[ extension_key ];
-// 			auto const & epJSON_extensions_array = epJSON_extensions_iter.value();
-// 			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
-
-// 			for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
-// 				auto const & epJSON_extension_obj = it.value();
-
-// 				for ( size_t i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
-// 					std::string const & field = legacy_idd_numerics_extensions[ i ];
-// 					auto const & epJSON_extension_field_iter = epJSON_extension_obj.find( field );
-// 					auto const & schema_obj = schema_extension_fields[ field ];
-// 					if ( epJSON_extension_field_iter != epJSON_extension_obj.end() ) {
-// 						auto const & field_value = epJSON_extension_field_iter.value();
-// 						if ( field_value.is_number() ) {
-// 							if ( field_value.is_number_integer() ) {
-// 								Numbers( numerics_index + 1 ) = field_value.get< std::int64_t >();
-// 							} else {
-// 								Numbers( numerics_index + 1 ) = field_value.get < double >();
-// 							}
-// 							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = false;
-// 						} else {
-// 							bool is_empty = field_value.get< std::string >().empty();
-// 							if ( is_empty ) {
-// 								findDefault( Numbers( numerics_index + 1 ), schema_obj );
-// 							} else {
-// 								Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
-// 							}
-// 							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = is_empty;
-// 						}
-// 						// fields_count.emplace_back('N');
-// 						// NumNumbers++;
-// //						if ( NumNumbers < numerics_index ) {
-// //							NumNumbers = numerics_index;
-// //						}
-// 					} else {
-// 						// fields_count.emplace_back('n');
-// 						// NumNumbers++;
-// 						findDefault( Numbers( numerics_index + 1 ), schema_obj );
-// 						if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = true;
-// 					}
-// 					if ( is_NumericFieldNames ) {
-// 						NumericFieldNames()( numerics_index + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
-// 					}
-// 					numerics_index++;
-// 					if ( NumNumbers + NumAlphas < max_idf_index ) {
-// 						NumNumbers++;
-// 					}
-// 				}
-// 			}
-// 		}
-
-		// bool found_end = false;
-		// for ( int i = max_idf_index - 1; i >= 0; --i ) {
-		// 	if ( fields_count[ i ] == 'N' ) {
-		// 		if ( !found_end ) found_end = true;
-		// 		NumNumbers++;
-		// 	}
-		// 	else if ( fields_count[ i ] == 'A' ) {
-		// 		if ( !found_end ) found_end = true;
-		// 		NumAlphas++;
-		// 	}
-		// 	else if ( fields_count[ i ] == 'n' && found_end ) {
-		// 		NumNumbers++;
-		// 	}
-		// 	else if ( fields_count[ i ] == 'a' && found_end ) {
-		// 		NumAlphas++;
-		// 	}
-		// }
-//		for ( auto it = fields_count.rbegin(); it != fields_count.rend(); ++it ) {
-//			if ( *it == 'N' ) {
-//				if ( !found_end ) found_end = true;
-//				NumNumbers++;
-//			}
-//			else if ( *it == 'A' ) {
-//				if ( !found_end ) found_end = true;
-//				NumAlphas++;
-//			}
-//			else if ( *it == 'n' && found_end ) {
-//				NumNumbers++;
-//			}
-//			else if ( *it == 'a' && found_end ) {
-//				NumAlphas++;
-//			}
-//		}
-
 		Status = 1;
 	}
 
@@ -931,7 +779,7 @@ namespace EnergyPlus {
 
 		// get list of saved object numbers from idf processing
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
-			int objNum = it.value()[ "idfOrder" ];
+			int objNum = it.value()[ "idf_order" ];
 			idfObjNums.emplace_back( objNum );
 		}
 
@@ -978,7 +826,7 @@ namespace EnergyPlus {
 
 		// get list of saved object numbers from idf processing
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
-			int objNum = it.value()[ "idfOrder" ];
+			int objNum = it.value()[ "idf_order" ];
 			idfObjNums.emplace_back( objNum );
 		}
 

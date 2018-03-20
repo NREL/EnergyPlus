@@ -266,13 +266,3 @@ def change_89_release_issues(schema):
     schema['properties']['Output:Table:SummaryReports']['patternProperties']['.*']['properties']['reports']['items']['properties']['report_name'].pop('enum')
 
 
-    # schema['properties']['WaterHeater']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-    # schema['properties']['WaterHeater']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-    # schema['properties']['WaterHeater']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-    # schema['properties']['WaterHeater']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-    # schema['properties']['WaterHeater']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-    # schema['properties']['WaterHeater']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-    # schema['properties']['WaterHeater']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
-
-
-

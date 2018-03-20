@@ -283,7 +283,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 		schema_obj_extensions = & schema_obj_props[ extension_key ][ "items" ][ "properties" ];
 	}
 
-	root[ "idfOrder" ] = idfObjectCount;
+	root[ "idf_order" ] = idfObjectCount;
 
 	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
 

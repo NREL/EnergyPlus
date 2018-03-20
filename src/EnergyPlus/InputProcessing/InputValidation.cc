@@ -86,7 +86,7 @@ bool Validation::validate( json const & parsed_input ) {
 	valijson::ValidationResults results;
     if (!validator.validate(validation_schema, doc, &results)) {
 		valijson::ValidationResults::Error error;
-	    int max_context = 0;
+	    size_t max_context = 0;
 		while (results.popError(error)) {
 			if ( error.context.size() >= max_context ) {
 				max_context = error.context.size();
