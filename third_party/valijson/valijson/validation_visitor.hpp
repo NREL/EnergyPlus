@@ -4,7 +4,8 @@
 
 #include <cmath>
 #include <string>
-#include <regex>
+// #include <regex>
+#include "re2/re2.h"
 
 #include <valijson/constraints/concrete_constraints.hpp>
 #include <valijson/constraints/constraint_visitor.hpp>
@@ -241,7 +242,7 @@ public:
 
     /**
      * @brief   Validate a value against a LinearItemsConstraint
-     
+
      * A LinearItemsConstraint represents an 'items' constraint that specifies,
      * for each item in array, an individual sub-schema that the item must
      * validate against. The LinearItemsConstraint class also captures the
@@ -786,10 +787,10 @@ public:
             return true;
         }
 
-        const std::regex patternRegex(
-                constraint.getPattern<std::string::allocator_type>());
+        // const std::regex patternRegex(
+        //         constraint.getPattern<std::string::allocator_type>());
 
-        if (!std::regex_search(target.asString(), patternRegex)) {
+        if (!RE2::FullMatch(target.asString(), constraint.getPattern<std::string::allocator_type>())) {
             if (results) {
                 results->pushError(context,
                         "Failed to match regex specified by 'pattern' "
@@ -1417,14 +1418,15 @@ private:
             // PropertiesConstraint. does std::regex currently support
             // custom allocators? Anyway, this isn't an issue here, because Valijson's
             // JSON Scheme validator does not yet support custom allocators.
-            const std::regex r(patternPropertyStr);
+            // const std::regex r(patternPropertyStr);
+            auto r = std::unique_ptr< RE2 >( new RE2( patternPropertyStr ) );
 
             bool matchFound = false;
 
             // Recursively validate all matching properties
             typedef const typename AdapterType::ObjectMember ObjectMember;
             for (const ObjectMember m : object) {
-                if (std::regex_search(m.first, r)) {
+                if (RE2::FullMatch(m.first, *r)) {
                     matchFound = true;
                     if (propertiesMatched) {
                         propertiesMatched->insert(m.first);
