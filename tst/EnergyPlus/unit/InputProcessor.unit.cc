@@ -1258,16 +1258,14 @@ namespace EnergyPlus {
 					"Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
 					";                        !- Constant Cooling Setpoint {C}"
 				}));
-		ASSERT_TRUE( process_idf( idf ) );
-		json & epJSON = getEpJSON();
-		json::parse( epJSON.dump(2) );
-		auto const & errors = validationErrors();
-		// auto const & warnings = validationWarnings();
-		// EXPECT_EQ(errors.size() + warnings.size(), 2ul);
-		if (errors.size() >= 2) {
-			EXPECT_NE(errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
-			EXPECT_NE(errors[1].find("You must run Parametric Preprocessor for \"Parametric:Logic\" at line"), std::string::npos);
-		}
+		EXPECT_FALSE( process_idf( idf, false ) );
+		std::string const error_string = delimited_string(
+			{
+				"   ** Severe  ** Line: 1 You must run Parametric Preprocessor for \"Parametric:Logic\"",
+				"   ** Severe  ** Line: 11 You must run the ExpandObjects program for \"HVACTemplate:Thermostat\"",
+			});
+
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 	}
 
 
