@@ -266,6 +266,9 @@ namespace EnergyPlus {
 		std::vector < std::string > const &
 		validationWarnings();
 
+		void
+		checkVersionMatch();
+
 		bool
 		processErrors();
 

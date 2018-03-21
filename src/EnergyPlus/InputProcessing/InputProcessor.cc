@@ -288,6 +288,9 @@ namespace EnergyPlus {
 
 		bool is_valid = validation->validate( epJSON );
 		bool hasErrors = processErrors();
+		if (hasErrors) {
+			checkVersionMatch();
+		}
 
 		if ( !is_valid || hasErrors ) {
 			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
@@ -306,6 +309,32 @@ namespace EnergyPlus {
 		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
+	}
+
+	void
+	InputProcessor::checkVersionMatch() {
+		using DataStringGlobals::MatchVersion;
+		auto it = epJSON.find("Version");
+		if (it != epJSON.end()) {
+			for ( auto const & version : it.value() ) {
+				std::string v = version["version_identifier"];
+				if (v.empty()) {
+					ShowWarningError("Input errors occurred and version ID was left blank, verify file version");
+				} else {
+					std::string::size_type const lenVer(len(MatchVersion));
+					int Which;
+					if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
+						Which = static_cast< int >( index(v.substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
+					} else {
+						Which = static_cast< int >( index(v, MatchVersion));
+					}
+					if (Which != 0) {
+						ShowWarningError(
+								"Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+					}
+				}
+			}
+		}
 	}
 
 	bool
