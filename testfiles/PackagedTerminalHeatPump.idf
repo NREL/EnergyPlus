@@ -2043,7 +2043,7 @@
 
   Output:Variable,*,Cooling Coil Runtime Fraction,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Houlry;
+  Output:Variable,*,Fan Electric Power,Hourly;
 
   Output:Variable,*,Fan Runtime Fraction,Hourly;
 

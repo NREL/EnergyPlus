@@ -562,15 +562,16 @@ namespace EnergyPlus {
 	}
 
 
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
-		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema);
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions ) {
+		bool success = true;
+		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
 		if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
 			inputProcessor->epJSON["Building"] = {
 					{
 							"Bldg",
 							{
-									{"idfOrder", 0},
+									{"idf_order", 0},
 									{"north_axis", 0.0},
 									{"terrain", "Suburbs"},
 									{"loads_convergence_tolerance_value", 0.04},
@@ -587,7 +588,7 @@ namespace EnergyPlus {
 					{
 							"",
 							{
-									{"idfOrder", 0},
+									{"idf_order", 0},
 									{"starting_vertex_position", "UpperLeftCorner"},
 									{"vertex_entry_direction", "Counterclockwise"},
 									{"coordinate_system", "Relative"},
@@ -610,11 +611,20 @@ namespace EnergyPlus {
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
+		bool is_valid = inputProcessor->validation->validate( inputProcessor->epJSON );
+		bool hasErrors = inputProcessor->processErrors();
+
 		inputProcessor->initializeMaps();
 		SimulationManager::PostIPProcessing();
 		// inputProcessor->state->printErrors();
 
-		return true;
+		bool successful_processing = success && is_valid && !hasErrors;
+
+		if ( ! successful_processing && use_assertions ) {
+			EXPECT_TRUE( compare_err_stream( "" ) );
+		}
+
+		return successful_processing;
 	}
 
 	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {

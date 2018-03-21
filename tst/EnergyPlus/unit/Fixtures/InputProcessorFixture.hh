@@ -79,6 +79,10 @@ namespace EnergyPlus {
 			return EnergyPlusFixture::process_idd( idd, errors_found );
 		}
 
+		bool processErrors() {
+			return inputProcessor->processErrors();
+		}
+
 		std::vector < std::string > const & validationErrors() {
 			return inputProcessor->validationErrors();
 		}

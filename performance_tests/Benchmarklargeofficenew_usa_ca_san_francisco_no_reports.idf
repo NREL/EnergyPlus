@@ -1972,7 +1972,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Core_bottom,      !- Name
@@ -2376,7 +2376,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Core_mid,         !- Name
@@ -2780,7 +2780,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Core_top,         !- Name
@@ -3200,7 +3200,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_bot_ZN_3,  !- Name
@@ -3565,7 +3565,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                        !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_bot_ZN_2,  !- Name
@@ -3930,7 +3930,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_bot_ZN_1,  !- Name
@@ -4295,7 +4295,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_bot_ZN_4,  !- Name
@@ -4660,7 +4660,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_mid_ZN_3,  !- Name
@@ -5025,7 +5025,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_mid_ZN_2,  !- Name
@@ -5390,7 +5390,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_mid_ZN_1,  !- Name
@@ -5755,7 +5755,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_mid_ZN_4,  !- Name
@@ -6120,7 +6120,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_top_ZN_3,  !- Name
@@ -6485,7 +6485,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_top_ZN_2,  !- Name
@@ -6850,7 +6850,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_top_ZN_1,  !- Name
@@ -7215,7 +7215,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Perimeter_top_ZN_4,  !- Name

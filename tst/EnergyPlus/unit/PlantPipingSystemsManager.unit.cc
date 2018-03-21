@@ -257,7 +257,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation ) {
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -399,7 +399,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -541,7 +541,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSe
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -683,7 +683,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection 
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -896,7 +896,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1109,7 +1109,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelec
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1251,7 +1251,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExten
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1464,7 +1464,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelect
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1606,7 +1606,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelec
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1707,15 +1707,6 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 		"    0.408,                   !- Evapotranspiration Ground Cover Parameter",
 		"    1,                       !- Number of Pipe Circuits Entered for this Domain",
 		"    My Pipe Circuit;         !- Pipe Circuit 1",
-
-		"  Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
-		"    KATemps,                 !- Name",
-		"    1.08,                    !- Soil Thermal Conductivity {W/m-K}",
-		"    962,                     !- Soil Density {kg/m3}",
-		"    2576,                    !- Soil Specific Heat {J/kg-K}",
-		"    15.5,                    !- Average Soil Surface Temperature {C}",
-		"    12.8,                    !- Average Amplitude of Surface Temperature {deltaC}",
-		"    17.3;                    !- Phase Shift of Minimum Surface Temperature {days}",
 
 		"  PipingSystem:Underground:PipeCircuit,",
 		"    My Pipe Circuit,         !- Name",

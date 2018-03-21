@@ -4793,11 +4793,6 @@
     0,                       !- Design Minimum Flow Rate {m3/s}
     Intermittent;            !- Pump Control Type
 
-  Connector:Splitter,
-    DHW Supply Splitter,     !- Name
-    Mains Inlet Branch,      !- Inlet Branch Name
-    Water Heater Branch;     !- Outlet Branch 1 Name
-
   PlantEquipmentList,
     DHW Plant Equipment,     !- Name
     WaterHeater:HeatPump:PumpedCondenser,  !- Equipment 1 Object Type

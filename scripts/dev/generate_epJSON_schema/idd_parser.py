@@ -156,7 +156,7 @@ def parse_idd(data):
 
 
 def parse_obj(data):
-    root = {'type': 'object', 'properties': {}, 'legacy_idd': {'field_names': {}, 'fields': [], 'alphas': { 'fields': [] }, 'numerics': { 'fields': [] } } }
+    root = {'type': 'object', 'properties': {}, 'legacy_idd': {'field_info': {}, 'fields': [], 'alphas': { 'fields': [] }, 'numerics': { 'fields': [] } } }
     extensible_count = 0
     duplicate_field_count = 0
 
@@ -483,23 +483,23 @@ def append_field_number(root, field_number, field_name, is_in_extensibles, origi
     if not is_in_extensibles:
         if field_number[0].lower() == 'a':
             root['legacy_idd']['alphas']['fields'].append(field_name)
-            root['legacy_idd']['field_names'][field_name] = original_name
+            root['legacy_idd']['field_info'][field_name] = {'field_name': original_name, 'field_type': 'a'}
         elif field_number[0].lower() == 'n':
             root['legacy_idd']['numerics']['fields'].append(field_name)
-            root['legacy_idd']['field_names'][field_name] = original_name
+            root['legacy_idd']['field_info'][field_name] = {'field_name': original_name, 'field_type': 'n'}
     else:
         if field_number[0].lower() == 'a':
             if 'extensions' not in root['legacy_idd']['alphas']:
                 root['legacy_idd']['alphas']['extensions'] = []
             root['legacy_idd']['alphas']['extensions'].append(field_name)
-            if field_name not in root['legacy_idd']['field_names']:
-                root['legacy_idd']['field_names'][field_name] = original_name
+            if field_name not in root['legacy_idd']['field_info']:
+                root['legacy_idd']['field_info'][field_name] = {'field_name': original_name, 'field_type': 'a'}
         elif field_number[0].lower() == 'n':
             if 'extensions' not in root['legacy_idd']['numerics']:
                 root['legacy_idd']['numerics']['extensions'] = []
             root['legacy_idd']['numerics']['extensions'].append(field_name)
-            if field_name not in root['legacy_idd']['field_names']:
-                root['legacy_idd']['field_names'][field_name] = original_name
+            if field_name not in root['legacy_idd']['field_info']:
+                root['legacy_idd']['field_info'][field_name] = {'field_name': original_name, 'field_type': 'n'}
 
 
 def parse_extensibles(items, field_data, field_name):

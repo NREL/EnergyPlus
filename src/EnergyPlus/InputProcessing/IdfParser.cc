@@ -163,6 +163,18 @@ std::string IdfParser::normalizeObjectType( std::string const & objectType ) {
 	return std::string();
 }
 
+std::vector < std::string > const & IdfParser::errors() {
+	return errors_;
+}
+
+std::vector < std::string > const & IdfParser::warnings() {
+	return warnings_;
+}
+
+bool IdfParser::hasErrors() {
+	return !errors_.empty();
+}
+
 json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema ) {
 	json root;
 	Token token;
@@ -189,24 +201,37 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 			auto const parsed_obj_name = parse_string( idf, index, success );
 			auto const obj_name = normalizeObjectType( parsed_obj_name );
 			if ( obj_name.empty() ) {
-				warnings.emplace_back( "Line " + std::to_string( cur_line_num ) + ", Column: " + std::to_string( index_into_cur_line ) +
-										" - \"" + parsed_obj_name + "\" is not a valid Object Type. Attempting to skip object." );
+				errors_.emplace_back( "Line: " + std::to_string( cur_line_num ) + " Index: " + std::to_string( index_into_cur_line ) +
+										" - \"" + parsed_obj_name + "\" is not a valid Object Type." );
+				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
+				continue;
+			}
+			else if ( obj_name.find( "Parametric:" ) != std::string::npos ) {
+				errors_.emplace_back( "Line: " + std::to_string( cur_line_num ) + " You must run Parametric Preprocessor for \"" + obj_name + "\"" );
+				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
+				continue;
+			}
+			else if ( obj_name.find( "Template" ) != std::string::npos ) {
+				errors_.emplace_back( "Line: " + std::to_string( cur_line_num ) + " You must run the ExpandObjects program for \"" + obj_name + "\"" );
 				while ( token != Token::SEMICOLON && token != Token::END ) token = next_token( idf, index );
 				continue;
 			}
 
+			bool object_success = true;
 			json const & obj_loc = schema_properties[ obj_name ];
 			json const & legacy_idd = obj_loc[ "legacy_idd" ];
-			json obj = parse_object( idf, index, success, legacy_idd, obj_loc, idfObjectCount );
-			if ( !success ) {
+			json obj = parse_object( idf, index, object_success, legacy_idd, obj_loc, idfObjectCount );
+			if ( !object_success ) {
 				auto found_index = idf.find_first_of( '\n', beginning_of_line_index );
 				std::string line;
 				if ( found_index != std::string::npos ) {
 					line = idf.substr( beginning_of_line_index, index - beginning_of_line_index );
 				}
-				errors.emplace_back( "Line " + std::to_string( cur_line_num ) + ", Index " + std::to_string( index_into_cur_line ) +
+				errors_.emplace_back( "Line: " + std::to_string( cur_line_num ) + " Index: " + std::to_string( index_into_cur_line ) +
 									" - Error parsing \"" + obj_name + "\". Error in following line." );
-				errors.emplace_back( "~~~ " + line );
+				errors_.emplace_back( "~~~ " + line );
+				success = false;
+				continue;
 			}
 			u64toa( root[ obj_name ].size() + 1, s );
 			std::string name = obj_name + " " + s;
@@ -220,8 +245,13 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 						if ( obj_name == "RunPeriod" ) {
 							name = obj_name + " " + s;
 						} else {
-							warnings.emplace_back( "Duplicate name found. name: \"" + name + "\"" );
+							warnings_.emplace_back( "Duplicate name found. name: \"" + name + "\". Overwriting existing object." );
 						}
+					}
+				} else {
+					auto const it = obj_loc.find( "name" );
+					if ( it != obj_loc.end() ) {
+						name = "";
 					}
 				}
 			}
@@ -240,7 +270,8 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 	json array_of_extensions = json::array();
 	Token token;
 	std::string extension_key;
-	size_t legacy_idd_index = 0, extensible_index = 0;
+	size_t legacy_idd_index = 0;
+	size_t extensible_index = 0;
 	success = true;
 	bool was_value_parsed = false;
 	auto const & legacy_idd_fields_array = legacy_idd[ "fields" ];
@@ -253,17 +284,25 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 
 	json const * schema_obj_extensions = nullptr;
 	if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
+		if ( key == legacy_idd.end() ) {
+			errors_.emplace_back( "\"extension\" key not found in schema. Need to add to list in modify_schema.py." );
+			success = false;
+			return root;
+		}
 		extension_key = key.value();
 		schema_obj_extensions = & schema_obj_props[ extension_key ][ "items" ][ "properties" ];
 	}
+
+	root[ "idf_order" ] = idfObjectCount;
 
 	auto const & found_min_fields = schema_obj_loc.find( "min_fields" );
 
 	index += 1;
 
 	while ( true ) {
-		root[ "idfOrder" ] = idfObjectCount;
 		token = look_ahead( idf, index );
+		root[ "idf_max_fields" ] = legacy_idd_index;
+		root[ "idf_max_extensible_fields" ] = extensible_index;
 		if ( token == Token::NONE ) {
 			success = false;
 			return root;
@@ -273,14 +312,14 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 			if ( !was_value_parsed ) {
 				int ext_size = 0;
 				if ( legacy_idd_index < legacy_idd_fields_array.size() ) {
-					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-					root[ field_name ] = "";
+//					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+//					root[ field_name ] = "";
 				} else {
 					auto const & legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
 					ext_size = static_cast<int>( legacy_idd_extensibles_array.size() );
-					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
+//					std::string const & field_name = legacy_idd_extensibles_array[ extensible_index % ext_size ];
 					extensible_index++;
-					extensible[ field_name ] = "";
+//					extensible[ field_name ] = "";
 				}
 				if ( ext_size && extensible_index % ext_size == 0 ) {
 					array_of_extensions.push_back( extensible );
@@ -296,13 +335,15 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 					min_fields = found_min_fields.value();
 				}
 				for (; legacy_idd_index < min_fields; legacy_idd_index++) {
-					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
-					root[ field_name ] = "";
+//					std::string const & field_name = legacy_idd_fields_array[ legacy_idd_index ];
+//					root[ field_name ] = "";
 				}
 				if ( extensible.size() ) {
 					array_of_extensions.push_back( extensible );
 					extensible.clear();
 				}
+				root[ "idf_max_fields" ] = legacy_idd_index;
+				root[ "idf_max_extensible_fields" ] = extensible_index;
 				break;
 			}
 		} else if ( token == Token::EXCLAMATION ) {
@@ -332,7 +373,7 @@ json IdfParser::parse_object( std::string const & idf, size_t & index, bool & su
 					root[ field ] = parse_string( idf, index, success );
 				} else {
 					u64toa( cur_line_num, s );
-					errors.emplace_back( std::string( "Line " ) + s + " - Field \"" + field + "\" was not found." );
+					errors_.emplace_back( std::string( "Line: " ) + s + " - Field \"" + field + "\" was not found." );
 				}
 			} else {
 				auto const val = parse_value( idf, index, success, find_field_iter.value() );
@@ -379,8 +420,9 @@ json IdfParser::parse_number( std::string const & idf, size_t & index, bool & su
 		save_i++;
 	}
 
-
-	assert( !num_str.empty() );
+	if ( num_str.empty() ) {
+		return parse_string( idf, index, success );
+	}
 
 	if ( num_str[ num_str.size() - 1 ] == 'e' || num_str[ num_str.size() - 1 ] == 'E' ) {
 		success = false;
