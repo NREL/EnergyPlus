@@ -1708,15 +1708,6 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 		"    1,                       !- Number of Pipe Circuits Entered for this Domain",
 		"    My Pipe Circuit;         !- Pipe Circuit 1",
 
-		"  Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
-		"    KATemps,                 !- Name",
-		"    1.08,                    !- Soil Thermal Conductivity {W/m-K}",
-		"    962,                     !- Soil Density {kg/m3}",
-		"    2576,                    !- Soil Specific Heat {J/kg-K}",
-		"    15.5,                    !- Average Soil Surface Temperature {C}",
-		"    12.8,                    !- Average Amplitude of Surface Temperature {deltaC}",
-		"    17.3;                    !- Phase Shift of Minimum Surface Temperature {days}",
-
 		"  PipingSystem:Underground:PipeCircuit,",
 		"    My Pipe Circuit,         !- Name",
 		"    0.3895,                  !- Pipe Thermal Conductivity {W/m-K}",
