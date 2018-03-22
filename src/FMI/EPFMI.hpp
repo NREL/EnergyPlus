@@ -45,6 +45,3 @@ unsigned int getNextEventTime(fmiEventInfo *eventInfo,
 
 unsigned int terminate(const char *log);
 
-unsigned int writeOutputFiles(const char *log);
-
-

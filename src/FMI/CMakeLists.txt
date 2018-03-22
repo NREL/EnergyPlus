@@ -15,17 +15,22 @@ set(src
   ../EnergyPlus/public/EnergyPlusPgm.hh 
 )
 
-add_library( epfmu ${src} )
+add_library( epfmi SHARED ${src} )
 
-target_link_libraries( epfmu energypluslib )
-
-add_executable( demo Test/demo.cpp )
-target_link_libraries( demo epfmu )
+target_link_libraries( epfmi energypluslib )
 
 set(test_src
   Test/EPFMI_Test.cpp
   Test/main.cc
 )
 
-CREATE_TEST_TARGETS( epfmu "${test_src}" "epfmu" )
+CREATE_TEST_TARGETS( epfmi "${test_src}" "epfmi" )
+
+install( TARGETS epfmi
+  RUNTIME DESTINATION ./bin
+  LIBRARY DESTINATION ./lib
+  ARCHIVE DESTINATION ./lib
+)
+
+install( FILES EPFMI.hpp DESTINATION ./include )
 

@@ -72,9 +72,6 @@ find_package(PythonInterp 2.7 REQUIRED)
 
 
 # then we can add python-based tests for it
-if ( BUILD_TESTING )
-  add_test( NAME VerifyIDFsInCMakeFolder COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/scripts/dev/VerifyIDFsInCMake.py" "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" )
-endif()
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -145,7 +142,6 @@ if( BUILD_TESTING )
 endif()
 
 # E+ required libraries
-ADD_SUBDIRECTORY(idd)
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
@@ -172,102 +168,13 @@ ADD_SUBDIRECTORY(src/FMI)
 
 if( BUILD_TESTING )
   ADD_SUBDIRECTORY(third_party/gtest)
-  ADD_SUBDIRECTORY(testfiles)
-  ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
-  ADD_SUBDIRECTORY(tst/jsoncpp/unit)
-
-  option( BUILD_PERFORMANCE_TESTS "Build performance testing targets" OFF )
-
-  if (BUILD_PERFORMANCE_TESTS)
-
-    if (UNIX AND NOT APPLE)
-      option( VALGRIND_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via valgrind / callgrind" OFF )
-
-      if (VALGRIND_ANALYZE_PERFORMANCE_TESTS)
-        find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
-      endif()
-    endif()
-    ADD_SUBDIRECTORY(performance_tests)
-  endif()
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
 configure_file( idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd" )
 configure_file( idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd" )
 
-if( BUILD_FORTRAN )
-  include(CMakeAddFortranSubdirectory)
-  cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
-  set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
-  cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V8-6-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V8-7-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 8-6-0 to 8-7-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/CalcSoilSurfTemp PROJECT CalcSoilSurfTemp NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/AppGPostProcess PROJECT AppGPostProcess NO_EXTERNAL_INSTALL )
-endif()
-
 if( BUILD_PACKAGE )
-  set(CPACK_INSTALL_CMAKE_PROJECTS
-    "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
-  )
-
-  if( BUILD_FORTRAN )
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Transition/;Transition;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Basement/;Basement;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/HVAC-Diagram/;HVAC-Diagram;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ParametricPreprocessor/;ParametricPreprocessor;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Slab/;Slab;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ConvertESOMTR/;ConvertESOMTR;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/CalcSoilSurfTemp/;CalcSoilSurfTemp;ALL;/")
-  endif()
-
   include(cmake/Install.cmake)
 endif()
 
-if (BUILD_VALIDATION_REPORTS)
-  if ( NOT BUILD_FORTRAN )
-    message("*** VALIDATION REPORT ERROR : Cannot build validation reports without Fortran targets.  Turn on BUILD_FORTRAN.")
-  endif()
-  # we should check to make sure the Python 3 binary is actually available on the system
-  # we won't use it here, the ValidationReports CMake will do all the setup, we just want a quick check to find the binary
-  find_program(PYTHON_THREE python3)
-  if ( PYTHON_THREE STREQUAL "PYTHON_THREE-NOTFOUND" )
-    message("*** VALIDATION REPORT ERROR : Cannot find Python3 on the system; Validation report building requires Python 3.")
-  endif()
-  include(ExternalProject)
-  ExternalProject_Add(ValidationReports
-    DEPENDS energyplus ReadVarsESO Basement Slab
-    GIT_REPOSITORY git://github.com/NREL/EnergyPlusValidationReports
-    GIT_TAG master
-    CMAKE_CACHE_ARGS
-      -DENERGYPLUS_PATH:PATH=${CMAKE_BINARY_DIR}
-      -DENERGYPLUS_VERSION:STRING=${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}
-    INSTALL_COMMAND ""
-    )
-endif()
-
-if (BUILD_DOCS)
-  # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
-  find_package(LATEX)
-  # so we'll create a cache variable which will be available to the add_subdirectory call below
-  set(XELATEX "XeLaTeX Compiler" CACHE INTERNAL "")
-  # and we'll simply take the found pdflatex compiler path and replace pdflatex with xelatex
-  string(REPLACE pdflatex xelatex XELATEX ${PDFLATEX_COMPILER})
-  # and then verify it actually exists at that location...which it should pretty much every time...
-  if( EXISTS ${XELATEX} )
-    # and if it does, just add the doc/CMakeLists commands
-    add_subdirectory(doc)
-  else()
-    # and if it doesn't, clearly state why it fails
-    message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
-  endif()
-endif()
