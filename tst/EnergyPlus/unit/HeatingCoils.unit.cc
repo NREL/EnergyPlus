@@ -93,7 +93,7 @@ namespace EnergyPlus {
 		ASSERT_THROW( HeatingCoils::GetHeatingCoilInput(), std::runtime_error );
 
 		std::string const error_string = delimited_string( {
-			"   ** Severe  ** <root>[Coil:Heating:Fuel][Furnace Coil][fuel_type] - Failed to match against any enum values.",
+			"   ** Severe  ** <root>[Coil:Heating:Fuel][Furnace Coil][fuel_type] - \"Electric\" - Failed to match against any enum values.",
 			"   ** Severe  ** GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
 			"   **  Fatal  ** GetHeatingCoilInput: Errors found in input.  Program terminates.",
 			"   ...Summary of Errors that led to program termination:",
