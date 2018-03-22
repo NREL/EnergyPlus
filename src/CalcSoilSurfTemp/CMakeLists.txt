@@ -44,9 +44,9 @@ endif()
 set(SKIP_BUILD_RPATH TRUE)
 ADD_EXECUTABLE( CalcSoilSurfTemp ${SRC} )
 
-install( TARGETS CalcSoilSurfTemp DESTINATION PreProcess )
+install( TARGETS CalcSoilSurfTemp DESTINATION PreProcess/CalcSoilSurfTemp )
 if(NOT ${STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-  install_target_prereqs( CalcSoilSurfTemp PreProcess )
+  install_target_prereqs( CalcSoilSurfTemp PreProcess/CalcSoilSurfTemp )
 endif()
 
