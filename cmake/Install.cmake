@@ -56,7 +56,7 @@ if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
 	install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${CMAKE_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")")
   install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
 else()
-  message(WARNING "No GITHUB_TOKEN found in environment; package won't be complete")
+  message(WARNING "No GITHUB_TOKEN found in environment; package won't include the change log")
 endif()
 
 # Install files that are in the current repo
