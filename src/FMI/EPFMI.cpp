@@ -88,7 +88,7 @@ unsigned int setupExperiment(double tStart,
   epthread = std::thread(EnergyPlusPgm, "");
 
   {
-    // Wait for E+ to go back to IDLE before returning
+    // Wait for E+ to go back to IDLE
     std::unique_lock<std::mutex> lk( time_mutex );
     time_cv.wait( lk, [](){ return epstatus == EPStatus::IDLE; } );
   }
@@ -101,15 +101,16 @@ unsigned int setupExperiment(double tStart,
   for ( int z = 0; z < EnergyPlus::DataGlobals::NumOfZones; ++z ) {
     unsigned int zz = varsPerZone * z;
     unsigned int valueReference;
+    unsigned int znumber = z + 1;
 
     // 10 = Zone Temperature
     valueReference = 10;
-    valueGetters[zz + valueReference] = std::bind(getZoneTemperature, _1, z);
-    valueSetters[zz + valueReference] = std::bind(setZoneTemperature, _1, z);
+    valueGetters[zz + valueReference] = std::bind(getZoneTemperature, _1, znumber);
+    valueSetters[zz + valueReference] = std::bind(setZoneTemperature, _1, znumber);
 
     // 11 = Zone Enthalpy, H
     valueReference = 11;
-    valueGetters[zz + valueReference] = std::bind(getZoneH, _1, z);
+    valueGetters[zz + valueReference] = std::bind(getZoneH, _1, znumber);
     valueSetters[zz + valueReference] = noSetter;
   }
 
@@ -194,7 +195,8 @@ unsigned int terminate(const char *log) {
   // Notify E+ to advance
   time_cv.notify_one();
 
-  //epthread.join();
+  epthread.join();
+
   return 0;
 }
 

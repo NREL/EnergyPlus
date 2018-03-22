@@ -135,6 +135,7 @@
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
+#include <../FMI/EPFMIData.hpp>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -368,9 +369,9 @@ namespace SimulationManager {
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
-		if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
-			DoOutputReporting = true;
-		}
+		///if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
+		///	DoOutputReporting = true;
+		///}
 		DoingSizing = false;
 
 		if ( ( DoZoneSizing || DoSystemSizing || DoPlantSizing ) && ! ( DoDesDaySim || ( DoWeathSim && RunPeriodsInInput ) ) ) {
@@ -477,6 +478,7 @@ namespace SimulationManager {
 			if ( ! Available ) break;
 			if ( ErrorsFound ) break;
 			if ( ( KindOfSim != ksRunPeriodWeather ) ) continue;
+      if( epstatus == EPStatus::TERMINATING ) break;
 
 			++EnvCount;
 
@@ -506,6 +508,7 @@ namespace SimulationManager {
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
+        if( epstatus == EPStatus::TERMINATING ) break;
 				if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
 
 
@@ -542,6 +545,7 @@ namespace SimulationManager {
 
 				for ( HourOfDay = 1; HourOfDay <= 24; ++HourOfDay ) { // Begin hour loop ...
 
+          if( epstatus == EPStatus::TERMINATING ) break;
 					BeginHourFlag = true;
 					EndHourFlag = false;
 

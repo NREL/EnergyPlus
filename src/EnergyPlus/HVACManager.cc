@@ -501,7 +501,7 @@ namespace HVACManager {
 
         if( epstatus == EPStatus::TERMINATING ) {
           // Make this cleaner
-          std::exit(0);
+          break;
         }
       }
     } // time iteration
