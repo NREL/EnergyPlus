@@ -15,7 +15,7 @@ using namespace std::placeholders;
 
 std::map<unsigned int, std::function<void(double*)> > valueGetters;
 std::map<unsigned int, std::function<void(const double*)> > valueSetters;
-std::thread epthread;
+std::thread * epthread;
 
 void noGetter(double*) {
   // This Getter is not implemented
@@ -85,7 +85,7 @@ unsigned int setupExperiment(double tStart,
     epstatus = EPStatus::WORKING;
   }
 
-  epthread = std::thread(EnergyPlusPgm, "");
+  epthread = new std::thread(EnergyPlusPgm, "");
 
   {
     // Wait for E+ to go back to IDLE
@@ -195,7 +195,8 @@ unsigned int terminate(const char *log) {
   // Notify E+ to advance
   time_cv.notify_one();
 
-  epthread.join();
+  epthread->join();
+  delete epthread;
 
   return 0;
 }

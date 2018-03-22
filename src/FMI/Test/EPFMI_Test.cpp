@@ -25,15 +25,21 @@ TEST( EPFMI, Alpha ) {
   double time = tStart;
 
   double outputs[] = {0.0};
-  const unsigned int outputRefs[] = {11};
+  const unsigned int outputRefs[] = {10, 11};
+
+  double inputs[] = {21.0};
+  const unsigned int inputRefs[] = {10};
 
   while ( time < tEnd ) {
     result = getNextEventTime(&eventInfo, nullptr);
     std::cout << "Current time: " << time << std::endl;
     std::cout << "Next event time: " << eventInfo.nextEventTime << std::endl;
 
-    result = getVariables(outputRefs, outputs, 1, nullptr); 
-    std::cout << "Output 11: " << outputs[0] << std::endl;
+    result = setVariables(inputRefs, inputs, 1, nullptr);
+
+    result = getVariables(outputRefs, outputs, 2, nullptr); 
+    std::cout << "Output 10 - T: " << outputs[0] << std::endl;
+    std::cout << "Output 11 - H: " << outputs[1] << std::endl;
 
     time = eventInfo.nextEventTime;
     setTime(time, nullptr);
