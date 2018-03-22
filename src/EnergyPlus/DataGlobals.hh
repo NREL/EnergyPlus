@@ -204,6 +204,7 @@ namespace DataGlobals {
 	extern int SimTimeSteps; // Number of (Loads) timesteps since beginning of run period (environment).
 	extern Real64 SimTime; // Seconds since beginning of run period (environment).
 	extern Real64 PreSimTime; // Seconds since beginning of run period (environment), at the previous timestep.
+	extern Real64 NextSimTime; // Seconds since beginning of run period (environment) to the next timestep.
 	extern int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
 	extern Real64 TimeStepZoneSec; // Seconds per time step
 	extern bool MetersHaveBeenInitialized;

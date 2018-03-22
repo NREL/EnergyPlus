@@ -286,8 +286,6 @@ namespace DataZoneEquipment {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneEquipmentData1: " ); // include trailing blank space
 
-    std::cout << RoutineName << std::endl;
-
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -397,30 +395,30 @@ namespace DataZoneEquipment {
 			ReturnAirPath.allocate( NumReturnAirPaths );
 		}
 
-		ZoneEquipConfig.allocate( NumOfZones ); // Allocate the array containing the configuration
-    
-    // Begin special hot wire for modelica connection
+		//ZoneEquipConfig.allocate( NumOfZones ); // Allocate the array containing the configuration
+    //
+    //// Begin special hot wire for modelica connection
 
-		for ( int ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) {
-      std::cout << "Adding defalt modelica nodes: " << ZoneLoop << std::endl;
-		  Zone( ZoneLoop ).IsControlled = true;
-		  ZoneEquipConfig( ZoneLoop ).IsControlled = true;
-		  ZoneEquipConfig( ZoneLoop ).ActualZoneNum = ZoneLoop;
-		  ZoneEquipConfig( ZoneLoop ).ZoneName = Zone( ZoneLoop ).Name; // for x-referencing with the geometry data
+		//for ( int ZoneLoop = 1; ZoneLoop <= NumOfZones; ++ZoneLoop ) {
+    //  std::cout << "Adding defalt modelica nodes: " << ZoneLoop << std::endl;
+		//  Zone( ZoneLoop ).IsControlled = true;
+		//  ZoneEquipConfig( ZoneLoop ).IsControlled = true;
+		//  ZoneEquipConfig( ZoneLoop ).ActualZoneNum = ZoneLoop;
+		//  ZoneEquipConfig( ZoneLoop ).ZoneName = Zone( ZoneLoop ).Name; // for x-referencing with the geometry data
 
-			CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
-      auto ZoneNodeName = Zone( ZoneLoop ).Name + " Air Node";
-      auto ReturnNodeName = Zone( ZoneLoop ).Name + " Return Air Node";
-      auto InletNodeName = Zone( ZoneLoop ).Name + " Inlet Air Node";
-			ZoneEquipConfig( ZoneLoop ).ZoneNode = GetOnlySingleNode( ZoneNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
-			ZoneEquipConfig( ZoneLoop ).ReturnAirNode = GetOnlySingleNode( ReturnNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
-		  Zone( ZoneLoop ).SystemZoneNodeNumber = ZoneEquipConfig( ZoneLoop ).ZoneNode;
+		//	CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
+    //  auto ZoneNodeName = Zone( ZoneLoop ).Name + " Air Node";
+    //  auto ReturnNodeName = Zone( ZoneLoop ).Name + " Return Air Node";
+    //  auto InletNodeName = Zone( ZoneLoop ).Name + " Inlet Air Node";
+		//	ZoneEquipConfig( ZoneLoop ).ZoneNode = GetOnlySingleNode( ZoneNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
+		//	ZoneEquipConfig( ZoneLoop ).ReturnAirNode = GetOnlySingleNode( ReturnNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent ); // all zone air state variables are
+		//  Zone( ZoneLoop ).SystemZoneNodeNumber = ZoneEquipConfig( ZoneLoop ).ZoneNode;
 
-      auto InletNode = GetOnlySingleNode( InletNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
-		  ZoneEquipConfig( ZoneLoop ).NumInletNodes = 1;
-		  ZoneEquipConfig( ZoneLoop ).InletNode.allocate( 1 );
-		  ZoneEquipConfig( ZoneLoop ).InletNode( 1 ) = InletNode;
-    }
+    //  auto InletNode = GetOnlySingleNode( InletNodeName, GetZoneEquipmentDataErrorsFound, CurrentModuleObject, Zone( ZoneLoop ).Name, NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent );
+		//  ZoneEquipConfig( ZoneLoop ).NumInletNodes = 1;
+		//  ZoneEquipConfig( ZoneLoop ).InletNode.allocate( 1 );
+		//  ZoneEquipConfig( ZoneLoop ).InletNode( 1 ) = InletNode;
+    //}
 
 		// data for each zone to the number of controlled zones
 		// found in the input file.  This may or may not

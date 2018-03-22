@@ -227,6 +227,7 @@ namespace DataGlobals {
 	int MinutesPerTimeStep( 0 ); // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
 	Real64 SimTime( 0.0 ); // Seconds since beginning of run period (environment).
 	Real64 PreSimTime( 0.0 ); // Seconds since beginning of run period (environment), at the previous timestep.
+	Real64 NextSimTime( 0.0 ); // Seconds since beginning of run period (environment) to the next timestep.
 	Real64 TimeStepZoneSec( 0.0 ); // Seconds per time step
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.

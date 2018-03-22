@@ -16,9 +16,29 @@ TEST( EPFMI, Alpha ) {
                            nullptr); // log
 
   double tStart = 0.0;
-  bool stopTimeDefined = false;
-  double tEnd = 0.0;
+  bool stopTimeDefined = true;
+  double tEnd = 86400;
 
-  int result2 = setupExperiment(tStart, stopTimeDefined, tEnd, nullptr);
+  result = setupExperiment(tStart, stopTimeDefined, tEnd, nullptr);
+
+  fmiEventInfo eventInfo;
+  double time = tStart;
+
+  double outputs[] = {0.0};
+  const unsigned int outputRefs[] = {11};
+
+  while ( time < tEnd ) {
+    result = getNextEventTime(&eventInfo, nullptr);
+    std::cout << "Current time: " << time << std::endl;
+    std::cout << "Next event time: " << eventInfo.nextEventTime << std::endl;
+
+    result = getVariables(outputRefs, outputs, 1, nullptr); 
+    std::cout << "Output 1: " << outputs[0] << std::endl;
+
+    time = eventInfo.nextEventTime;
+    setTime(time, nullptr);
+  }
+
+  terminate(nullptr);
 };
 

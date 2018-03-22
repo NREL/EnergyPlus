@@ -386,7 +386,6 @@ namespace SimulationManager {
 		KickOffSimulation = true;
 
 		ResetEnvironmentCounter();
-		SetupSimulation( ErrorsFound );
 
 		CheckAndReadFaults();
 
@@ -397,7 +396,9 @@ namespace SimulationManager {
 		WarmupFlag = false;
 		DoWeatherInitReporting = true;
 
-		DataZoneEquipment::GetZoneEquipmentData();
+		//DataZoneEquipment::GetZoneEquipmentData();
+		GetNextEnvironment( Available, ErrorsFound );
+    Available = true;
 
 		//  Note:  All the inputs have been 'gotten' by the time we get here.
 		ErrFound = false;
@@ -415,18 +416,18 @@ namespace SimulationManager {
 			SetupPollutionCalculations();
 			InitDemandManagers();
 
-			TestBranchIntegrity( ErrFound );
-			if ( ErrFound ) TerminalError = true;
-			TestAirPathIntegrity( ErrFound );
-			if ( ErrFound ) TerminalError = true;
-			CheckMarkedNodes( ErrFound );
-			if ( ErrFound ) TerminalError = true;
-			CheckNodeConnections( ErrFound );
-			if ( ErrFound ) TerminalError = true;
-			TestCompSetInletOutletNodes( ErrFound );
-			if ( ErrFound ) TerminalError = true;
-			CheckControllerLists( ErrFound );
-			if ( ErrFound ) TerminalError = true;
+			//TestBranchIntegrity( ErrFound );
+			//if ( ErrFound ) TerminalError = true;
+			//TestAirPathIntegrity( ErrFound );
+			//if ( ErrFound ) TerminalError = true;
+			//CheckMarkedNodes( ErrFound );
+			//if ( ErrFound ) TerminalError = true;
+			//CheckNodeConnections( ErrFound );
+			//if ( ErrFound ) TerminalError = true;
+			//TestCompSetInletOutletNodes( ErrFound );
+			//if ( ErrFound ) TerminalError = true;
+			//CheckControllerLists( ErrFound );
+			//if ( ErrFound ) TerminalError = true;
 
 			//if ( DoDesDaySim || DoWeathSim ) {
 			//	ReportLoopConnections();
@@ -457,9 +458,9 @@ namespace SimulationManager {
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
 
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
-		if ( DoHVACSizingSimulation ) {
-			ManageHVACSizingSimulation( ErrorsFound );
-		}
+		//if ( DoHVACSizingSimulation ) {
+		//	ManageHVACSizingSimulation( ErrorsFound );
+		//}
 
 		ShowMessage( "Beginning Simulation" );
 		DisplayString( "Beginning Primary Simulation" );
@@ -467,7 +468,7 @@ namespace SimulationManager {
 		ResetEnvironmentCounter();
 
 		EnvCount = 0;
-		WarmupFlag = true;
+		WarmupFlag = false;
 
 		while ( Available ) {
 
@@ -475,11 +476,7 @@ namespace SimulationManager {
 
 			if ( ! Available ) break;
 			if ( ErrorsFound ) break;
-			if ( ( ! DoDesDaySim ) && ( KindOfSim != ksRunPeriodWeather ) ) continue;
-			if ( ( ! DoWeathSim ) && ( KindOfSim == ksRunPeriodWeather ) ) continue;
-			if (KindOfSim == ksHVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
-
-			if (KindOfSim == ksHVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
+			if ( ( KindOfSim != ksRunPeriodWeather ) ) continue;
 
 			++EnvCount;
 
@@ -496,7 +493,7 @@ namespace SimulationManager {
 			BeginEnvrnFlag = true;
 			EndEnvrnFlag = false;
 			EndMonthFlag = false;
-			WarmupFlag = true;
+			WarmupFlag = false;
 			DayOfSim = 0;
 			DayOfSimChr = "0";
 			NumOfWarmupDays = 0;
@@ -510,6 +507,7 @@ namespace SimulationManager {
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
 				if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
+
 
 				++DayOfSim;
 				gio::write( DayOfSimChr, fmtLD ) << DayOfSim;

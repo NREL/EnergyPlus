@@ -30,30 +30,15 @@ unsigned int setupExperiment(double tStart,
 unsigned int setTime(double time,
                      const char *log);
 
-unsigned int setVariables(double time,
-                          const double* varPointers[],
+unsigned int setVariables(const unsigned int valueReferences[],
+                          const double variablePointers[],
                           size_t nVars1,
                           const char *log);
 
-unsigned int getVariables(double time,
-                          const double* varPointers[],
+unsigned int getVariables(const unsigned int valueReferences[],
+                          double variablePointers[],
                           size_t nVars2,
                           const char *log);
-
-unsigned int setContinuousStates(double time,
-                                 const double varPointers[],
-                                 size_t nVars3,
-                                 const char *log);
-
-unsigned int getContinuousStates(double time,
-                                 const double* varPointers[],
-                                 size_t nVars4,
-                                 const char *log);
-
-unsigned int getTimeDerivatives(double time,
-                                const double* varPointers[],
-                                size_t nVars5,
-                                const char *log);
 
 unsigned int getNextEventTime(fmiEventInfo *eventInfo,
                               const char *log);
@@ -61,4 +46,5 @@ unsigned int getNextEventTime(fmiEventInfo *eventInfo,
 unsigned int terminate(const char *log);
 
 unsigned int writeOutputFiles(const char *log);
+
 

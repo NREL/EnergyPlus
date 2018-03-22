@@ -400,29 +400,13 @@ namespace HVACManager {
 
 		UpdateInternalGainValues( true, true );
 
-    // Exchange data here
-
-	  auto const & Zec( ZoneEquipConfig( 1 ) );
-    // Assume there is only one inlet node
-    // which is true in our hacked E+
-	  auto & InletNode( Node( Zec.InletNode( 1 ) ) );
-    auto & ReturnAirNode( Node( Zec.ReturnAirNode ) );
-    auto & ZoneNode( Node( Zec.ZoneNode ) );
-
-
     Real64 PreTime = DataGlobals::PreSimTime;
 		FirstTimeStepSysFlag = true;
 
-      std::cout << "PreTime: " << PreTime << std::endl;
-      std::cout << "DataGlobals::SimTime: " << DataGlobals::SimTime << std::endl;
-
-    while ( timeinfo.current < DataGlobals::SimTime ) {
-
+    while ( fmutimeinfo.current < DataGlobals::NextSimTime ) {
 			UpdateInternalGainValues( true, true );
 
-		  BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
-
-      //ZoneTempPredictorCorrector::UpdateZoneAirTemp();
+		  BeginTimeStepFlag = false;
 
 			UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
 
@@ -513,7 +497,12 @@ namespace HVACManager {
       // Wait until we are signaled to make another step
       {
         std::unique_lock<std::mutex> lk( time_mutex );
-        time_cv.wait( lk, [](){ return epstatus == EPStatus::WORKING; } );
+        time_cv.wait( lk, [](){ return ((epstatus == EPStatus::WORKING) || (epstatus == EPStatus::TERMINATING)); } );
+
+        if( epstatus == EPStatus::TERMINATING ) {
+          // Make this cleaner
+          std::exit(0);
+        }
       }
     } // time iteration
 
