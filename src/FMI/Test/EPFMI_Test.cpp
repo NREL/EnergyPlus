@@ -1,11 +1,8 @@
 #include <gtest/gtest.h>
 #include "../EPFMI.hpp"
+#include "config.hpp"
 
 TEST( EPFMI, Alpha ) {
-  const char * input = "/Users/kbenne/Development/EnergyPlus/testfiles/RefBldgSmallOfficeNew2004_Chicago.idf";
-  const char * weather = "/Users/kbenne/Development/EnergyPlus/weather/USA_IL_Chicago-OHare_TMY2.epw";
-  const char * idd = "/Users/kbenne/Development/EnergyPlus/build/Products/Energy+.idd";
-
   int result = instantiate(input, // input
                            weather, // weather
                            idd, // idd
