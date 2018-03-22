@@ -150,9 +150,6 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
-IF(NOT APPLE )
-  ADD_SUBDIRECTORY(third_party/FMUParser)
-ENDIF()
 ADD_SUBDIRECTORY(third_party/jsoncpp)
 
 # Kiva
