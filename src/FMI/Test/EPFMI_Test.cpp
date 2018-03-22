@@ -33,7 +33,7 @@ TEST( EPFMI, Alpha ) {
     std::cout << "Next event time: " << eventInfo.nextEventTime << std::endl;
 
     result = getVariables(outputRefs, outputs, 1, nullptr); 
-    std::cout << "Output 1: " << outputs[0] << std::endl;
+    std::cout << "Output 11: " << outputs[0] << std::endl;
 
     time = eventInfo.nextEventTime;
     setTime(time, nullptr);
