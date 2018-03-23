@@ -96,6 +96,11 @@ namespace ZoneAirLoopEquipmentManager {
 	);
 
 	void
+	InitZoneAirLoopEquipmentTimeStep(
+		int const AirDistUnitNum
+	);
+
+	void
 	SimZoneAirLoopEquipment(
 		int const AirDistUnitNum,
 		Real64 & SysOutputProvided,

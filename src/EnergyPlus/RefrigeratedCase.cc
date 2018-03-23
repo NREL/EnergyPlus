@@ -73,8 +73,9 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -214,7 +215,6 @@ namespace RefrigeratedCase {
 	using DataHeatBalance::RefrigCondenserTypeEvap;
 	using DataHeatBalance::RefrigCondenserTypeWater;
 	using DataHeatBalance::RefrigCondenserTypeCascade;
-
 	using DataHVACGlobals::TimeStepSys; // used when operating for warehouse coil
 	using namespace DataGlobals; // includes LOGICAL :: BeginTimeStepFlag =.FALSE.
 	// True at the start of each time step, False after first subtime step of time step
@@ -473,6 +473,7 @@ namespace RefrigeratedCase {
 	Array1D< RefrigSystemData > System;
 	Array1D< TransRefrigSystemData > TransSystem;
 	Array1D< RefrigCondenserData > Condenser;
+	std::unordered_map< std::string, std::string > UniqueCondenserNames;
 	Array1D< RefrigCompressorData > Compressor;
 	Array1D< RefrigGasCoolerData > GasCooler;
 	Array1D< SubcoolerData > Subcooler;
@@ -488,6 +489,10 @@ namespace RefrigeratedCase {
 
 	// Functions
 
+	void
+	clear_state() {
+		UniqueCondenserNames.clear();
+	}
 	void
 	ManageRefrigeratedCaseRacks()
 	{
@@ -595,9 +600,6 @@ namespace RefrigeratedCase {
 		// METHODOLOGY EMPLOYED:
 		// GetObjectItem is called to read refrigerated case information
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using CurveManager::GetCurveIndex;
@@ -607,34 +609,18 @@ namespace RefrigeratedCase {
 		using DataHeatBalance::Zone; // , &
 		using DataHeatBalance::NumRefrigeratedRacks;
 		using DataHeatBalance::NumRefrigSystems;
-		//unused                               IntGainTypeOf_RefrigerationCompressorRack, &
-		//unused                               IntGainTypeOf_RefrigerationCase
 		using DataZoneEquipment::GetSystemNodeNumberForZone;
 		using DataZoneEquipment::GetReturnAirNodeForZone;
 		using DataEnvironment::StdBaroPress;
 		using General::RoundSigDigits;
 		using FluidProperties::GetSupHeatEnthalpyRefrig;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using Psychrometrics::PsyWFnTdbRhPb;
 		using Psychrometrics::PsyTdpFnWPb;
-		// USE ScheduleManager,   ONLY: CheckScheduleValueMinMax
 		using WaterManager::SetupTankDemandComponent;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
-
-		//USE FluidProperties,   ONLY: GetDensityGlycol, GetSpecificHeatGlycol
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const TrackMessage( "from refrigerated case" );
@@ -671,11 +657,6 @@ namespace RefrigeratedCase {
 		Real64 const PumpImpellerEfficiency( 0.78 ); // same as used in pump auto-sizing, dimensionless
 		Real64 const PumpMotorEfficiency( 0.85 ); // suggested as average value in ITT/Gould pump references,
 		//     dimensionless
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string Alphas; // Alpha items for object
@@ -687,8 +668,6 @@ namespace RefrigeratedCase {
 		Array1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
 		static bool CaseLoads( false ); // Flag to help verify load type with loads served by systems cooled by cascade condensers
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		static bool IsNotOK( false ); // Flag to verify name
-		static bool IsBlank( false ); // Flag for blank name
 		static bool StartCycle( false ); // Flag for counting defrost cycles
 
 		static int AlphaListNum( 0 ); // Index of Names in Case, Compressor et al Lists
@@ -864,25 +843,25 @@ namespace RefrigeratedCase {
 		Array1D< Real64 > Numbers; // Numeric items for object
 		Array2D< Real64 > DayValues; // Array of schedule values
 
-		NumSimulationCascadeCondensers = GetNumObjectsFound( "Refrigeration:Condenser:Cascade" );
-		NumSimulationCases = GetNumObjectsFound( "Refrigeration:Case" );
-		NumSimulationCaseAndWalkInLists = GetNumObjectsFound( "Refrigeration:CaseAndWalkInList" );
-		NumRefrigeratedRacks = GetNumObjectsFound( "Refrigeration:CompressorRack" );
-		NumSimulationSecondarySystems = GetNumObjectsFound( "Refrigeration:SecondarySystem" );
-		NumSimulationTransferLoadLists = GetNumObjectsFound( "Refrigeration:TransferLoadList" );
-		NumSimulationWalkIns = GetNumObjectsFound( "Refrigeration:WalkIn" );
-		NumRefrigSystems = GetNumObjectsFound( "Refrigeration:System" );
-		NumTransRefrigSystems = GetNumObjectsFound( "Refrigeration:TranscriticalSystem" );
-		NumSimulationCondAir = GetNumObjectsFound( "Refrigeration:Condenser:AirCooled" );
-		NumSimulationCondEvap = GetNumObjectsFound( "Refrigeration:Condenser:EvaporativeCooled" );
-		NumSimulationCondWater = GetNumObjectsFound( "Refrigeration:Condenser:WaterCooled" );
-		NumSimulationGasCooler = GetNumObjectsFound( "Refrigeration:GasCooler:AirCooled" );
+		NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:Cascade" );
+		NumSimulationCases = inputProcessor->getNumObjectsFound( "Refrigeration:Case" );
+		NumSimulationCaseAndWalkInLists = inputProcessor->getNumObjectsFound( "Refrigeration:CaseAndWalkInList" );
+		NumRefrigeratedRacks = inputProcessor->getNumObjectsFound( "Refrigeration:CompressorRack" );
+		NumSimulationSecondarySystems = inputProcessor->getNumObjectsFound( "Refrigeration:SecondarySystem" );
+		NumSimulationTransferLoadLists = inputProcessor->getNumObjectsFound( "Refrigeration:TransferLoadList" );
+		NumSimulationWalkIns = inputProcessor->getNumObjectsFound( "Refrigeration:WalkIn" );
+		NumRefrigSystems = inputProcessor->getNumObjectsFound( "Refrigeration:System" );
+		NumTransRefrigSystems = inputProcessor->getNumObjectsFound( "Refrigeration:TranscriticalSystem" );
+		NumSimulationCondAir = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:AirCooled" );
+		NumSimulationCondEvap = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:EvaporativeCooled" );
+		NumSimulationCondWater = inputProcessor->getNumObjectsFound( "Refrigeration:Condenser:WaterCooled" );
+		NumSimulationGasCooler = inputProcessor->getNumObjectsFound( "Refrigeration:GasCooler:AirCooled" );
 		NumRefrigCondensers = NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater + NumSimulationCascadeCondensers;
-		NumSimulationCompressors = GetNumObjectsFound( "Refrigeration:Compressor" );
-		NumSimulationSubcoolers = GetNumObjectsFound( "Refrigeration:Subcooler" );
-		NumCompressorLists = GetNumObjectsFound( "Refrigeration:CompressorList" );
-		NumRefrigChillerSets = GetNumObjectsFound( "ZoneHVAC:RefrigerationChillerSet" );
-		NumSimulationRefrigAirChillers = GetNumObjectsFound( "Refrigeration:AirChiller" );
+		NumSimulationCompressors = inputProcessor->getNumObjectsFound( "Refrigeration:Compressor" );
+		NumSimulationSubcoolers = inputProcessor->getNumObjectsFound( "Refrigeration:Subcooler" );
+		NumCompressorLists = inputProcessor->getNumObjectsFound( "Refrigeration:CompressorList" );
+		NumRefrigChillerSets = inputProcessor->getNumObjectsFound( "ZoneHVAC:RefrigerationChillerSet" );
+		NumSimulationRefrigAirChillers = inputProcessor->getNumObjectsFound( "Refrigeration:AirChiller" );
 
 		// Set flags used later to avoid unnecessary steps.
 		if ( NumRefrigeratedRacks == 0 ) HaveRefrigRacks = false;
@@ -911,6 +890,7 @@ namespace RefrigeratedCase {
 		if ( NumRefrigCondensers > 0 ) {
 			HeatReclaimRefrigCondenser.allocate( NumRefrigCondensers );
 			Condenser.allocate( NumRefrigCondensers );
+			UniqueCondenserNames.reserve( static_cast< unsigned >( NumRefrigCondensers ) );
 		}
 		if ( NumSimulationGasCooler > 0 ) {
 			GasCooler.allocate( NumSimulationGasCooler );
@@ -952,21 +932,21 @@ namespace RefrigeratedCase {
 		DayValues.allocate( NumOfTimeStepInHour, 24 );
 		RefrigPresentInZone.dimension( NumOfZones, false );
 
-		GetObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
-		GetObjectDefMaxArgs( "Refrigeration:CaseAndWalkInList", MaxNumArgs, MaxNumAlphasCaseAndWalkInList, MaxNumNumbersCaseAndWalkInList );
-		GetObjectDefMaxArgs( "Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack );
-		GetObjectDefMaxArgs( "Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys );
-		GetObjectDefMaxArgs( "Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys );
-		GetObjectDefMaxArgs( "Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda );
-		GetObjectDefMaxArgs( "Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde );
-		GetObjectDefMaxArgs( "Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw );
-		GetObjectDefMaxArgs( "Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera );
-		GetObjectDefMaxArgs( "Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp );
-		GetObjectDefMaxArgs( "Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList );
-		GetObjectDefMaxArgs( "Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn );
-		GetObjectDefMaxArgs( "Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond );
-		GetObjectDefMaxArgs( "ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet );
-		GetObjectDefMaxArgs( "Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:CaseAndWalkInList", MaxNumArgs, MaxNumAlphasCaseAndWalkInList, MaxNumNumbersCaseAndWalkInList );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:CompressorRack", MaxNumArgs, MaxNumAlphasRack, MaxNumNumbersRack );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:System", MaxNumArgs, MaxNumAlphasSys, MaxNumNumbersSys );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:TranscriticalSystem", MaxNumArgs, MaxNumAlphasTransSys, MaxNumNumbersTransSys );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Condenser:AirCooled", MaxNumArgs, MaxNumAlphasConda, MaxNumNumbersConda );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Condenser:EvaporativeCooled", MaxNumArgs, MaxNumAlphasConde, MaxNumNumbersConde );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Condenser:WaterCooled", MaxNumArgs, MaxNumAlphasCondw, MaxNumNumbersCondw );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:GasCooler:AirCooled", MaxNumArgs, MaxNumAlphasGasCoolera, MaxNumNumbersGasCoolera );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:Compressor", MaxNumArgs, MaxNumAlphasComp, MaxNumNumbersComp );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:CompressorList", MaxNumArgs, MaxNumAlphasCompressorList, MaxNumNumbersCompressorList );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:WalkIn", MaxNumArgs, MaxNumAlphasWalkIn, MaxNumNumbersWalkIn );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:SecondarySystem", MaxNumArgs, MaxNumAlphasSecond, MaxNumNumbersSecond );
+		inputProcessor->getObjectDefMaxArgs( "ZoneHVAC:RefrigerationChillerSet", MaxNumArgs, MaxNumAlphasChillerSet, MaxNumNumbersChillerSet );
+		inputProcessor->getObjectDefMaxArgs( "Refrigeration:AirChiller", MaxNumArgs, MaxNumAlphasAirChiller, MaxNumNumbersAirChiller );
 
 		MaxNumAlphasAll = max( MaxNumAlphasCase, MaxNumAlphasCaseAndWalkInList, MaxNumAlphasRack, MaxNumAlphasSys, MaxNumAlphasTransSys, MaxNumAlphasConda, MaxNumAlphasConde, MaxNumAlphasCondw, MaxNumAlphasGasCoolera, MaxNumAlphasComp, MaxNumAlphasCompressorList, MaxNumAlphasSecond, MaxNumAlphasWalkIn, MaxNumAlphasChillerSet, MaxNumAlphasAirChiller );
 		MaxNumNumbersAll = max( MaxNumNumbersCase, MaxNumNumbersCaseAndWalkInList, MaxNumNumbersRack, MaxNumNumbersSys, MaxNumNumbersTransSys, MaxNumNumbersConda, MaxNumNumbersConde, MaxNumNumbersCondw, MaxNumNumbersGasCoolera, MaxNumNumbersComp, MaxNumNumbersCompressorList, MaxNumNumbersSecond, MaxNumNumbersWalkIn, MaxNumNumbersChillerSet, MaxNumNumbersAirChiller );
@@ -981,18 +961,12 @@ namespace RefrigeratedCase {
 		if ( NumSimulationCases > 0 ) {
 			CurrentModuleObject = "Refrigeration:Case";
 			for ( CaseNum = 1; CaseNum <= NumSimulationCases; ++CaseNum ) {
-				GetObjectItem( CurrentModuleObject, CaseNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, CaseNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				++NumDisplayCases;
-				IsNotOK = false;
-				IsBlank = false;
+
 				AlphaNum = 1;
-				VerifyName( Alphas( AlphaNum ), RefrigCase, CaseNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( AlphaNum ) + "\", invalid " + cAlphaFieldNames( AlphaNum ) + "+\"" + Alphas( AlphaNum ) );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				RefrigCase( CaseNum ).Name = Alphas( AlphaNum );
 
 				AlphaNum = 2;
@@ -1018,7 +992,7 @@ namespace RefrigeratedCase {
 
 				//Get the Zone node number from the zone name entered by the user
 				RefrigCase( CaseNum ).ZoneName = Alphas( 3 );
-				RefrigCase( CaseNum ).ActualZoneNum = FindItemInList( Alphas( 3 ), Zone );
+				RefrigCase( CaseNum ).ActualZoneNum = UtilityRoutines::FindItemInList( Alphas( 3 ), Zone );
 
 				if ( RefrigCase( CaseNum ).ActualZoneNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 3 ) + " not valid: " + Alphas( 3 ) );
@@ -1072,11 +1046,11 @@ namespace RefrigeratedCase {
 					ErrorsFound = true;
 				}
 
-				if ( SameString( Alphas( 4 ), "CaseTemperatureMethod" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 4 ), "CaseTemperatureMethod" ) ) {
 					RefrigCase( CaseNum ).LatentEnergyCurveType = CaseTemperatureMethod;
-				} else if ( SameString( Alphas( 4 ), "RelativeHumidityMethod" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 4 ), "RelativeHumidityMethod" ) ) {
 					RefrigCase( CaseNum ).LatentEnergyCurveType = RHCubic;
-				} else if ( SameString( Alphas( 4 ), "DewpointMethod" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 4 ), "DewpointMethod" ) ) {
 					RefrigCase( CaseNum ).LatentEnergyCurveType = DPCubic;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 4 ) + "=\"" + Alphas( 4 ) + "\"." );
@@ -1089,7 +1063,7 @@ namespace RefrigeratedCase {
 					ErrorsFound = true;
 				}
 
-				if ( ! SameString( GetCurveType( RefrigCase( CaseNum ).LatCapCurvePtr ), "CUBIC" ) ) {
+				if ( ! UtilityRoutines::SameString( GetCurveType( RefrigCase( CaseNum ).LatCapCurvePtr ), "CUBIC" ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 5 ) + " object must be of type Cubic." );
 					ErrorsFound = true;
 				}
@@ -1184,16 +1158,16 @@ namespace RefrigeratedCase {
 					ErrorsFound = true;
 				}
 
-				if ( SameString( Alphas( 7 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 7 ), "None" ) ) {
 					RefrigCase( CaseNum ).AntiSweatControlType = ASNone;
 					RefrigCase( CaseNum ).AntiSweatPower = 0.0;
-				} else if ( SameString( Alphas( 7 ), "Constant" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 7 ), "Constant" ) ) {
 					RefrigCase( CaseNum ).AntiSweatControlType = ASConstant;
-				} else if ( SameString( Alphas( 7 ), "Linear" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 7 ), "Linear" ) ) {
 					RefrigCase( CaseNum ).AntiSweatControlType = ASLinear;
-				} else if ( SameString( Alphas( 7 ), "DewpointMethod" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 7 ), "DewpointMethod" ) ) {
 					RefrigCase( CaseNum ).AntiSweatControlType = ASDewPoint;
-				} else if ( SameString( Alphas( 7 ), "HeatBalanceMethod" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 7 ), "HeatBalanceMethod" ) ) {
 					RefrigCase( CaseNum ).AntiSweatControlType = ASHeatBalance;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 7 ) + "=\"" + Alphas( 7 ) + "\"." );
@@ -1253,21 +1227,21 @@ namespace RefrigeratedCase {
 					ErrorsFound = true;
 				}
 
-				if ( SameString( Alphas( 8 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 8 ), "None" ) ) {
 					RefrigCase( CaseNum ).DefrostType = DefNone;
-				} else if ( SameString( Alphas( 8 ), "OffCycle" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 8 ), "OffCycle" ) ) {
 					RefrigCase( CaseNum ).DefrostType = DefOffCycle;
-				} else if ( ( SameString( Alphas( 8 ), "HotFluid" ) ) || ( SameString( Alphas( 8 ), "HotGas" ) ) ) {
+				} else if ( ( UtilityRoutines::SameString( Alphas( 8 ), "HotFluid" ) ) || ( UtilityRoutines::SameString( Alphas( 8 ), "HotGas" ) ) ) {
 					RefrigCase( CaseNum ).DefrostType = DefHotFluid;
-				} else if ( ( SameString( Alphas( 8 ), "HotFluidWithTemperatureTermination" ) ) || ( SameString( Alphas( 8 ), "HotGasWithTemperatureTermination" ) ) ) {
+				} else if ( ( UtilityRoutines::SameString( Alphas( 8 ), "HotFluidWithTemperatureTermination" ) ) || ( UtilityRoutines::SameString( Alphas( 8 ), "HotGasWithTemperatureTermination" ) ) ) {
 					RefrigCase( CaseNum ).DefrostType = DefHotFluidTerm;
-					//   ELSEIF (SameString(Alphas(8),'Hot-Fluid On Demand')) THEN
+					//   ELSEIF (UtilityRoutines::SameString(Alphas(8),'Hot-Fluid On Demand')) THEN
 					//     RefrigCase(CaseNum)%DefrostType = DefHotFluidOnDemand
-				} else if ( SameString( Alphas( 8 ), "Electric" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 8 ), "Electric" ) ) {
 					RefrigCase( CaseNum ).DefrostType = DefElectric;
-				} else if ( SameString( Alphas( 8 ), "ElectricWithTemperatureTermination" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 8 ), "ElectricWithTemperatureTermination" ) ) {
 					RefrigCase( CaseNum ).DefrostType = DefElectricTerm;
-					//   ELSEIF (SameString(Alphas(8),'Electric On Demand')) THEN
+					//   ELSEIF (UtilityRoutines::SameString(Alphas(8),'Electric On Demand')) THEN
 					//     RefrigCase(CaseNum)%DefrostType = DefElectricOnDemand
 				} else {
 					ShowWarningError( CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 8 ) + "=\"" + Alphas( 8 ) + "\"." );
@@ -1361,13 +1335,13 @@ namespace RefrigeratedCase {
 					}
 				}
 
-				if ( SameString( Alphas( 11 ), "CaseTemperatureMethod" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 11 ), "CaseTemperatureMethod" ) ) {
 					RefrigCase( CaseNum ).DefrostEnergyCurveType = CaseTemperatureMethod;
-				} else if ( SameString( Alphas( 11 ), "RelativeHumidityMethod" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 11 ), "RelativeHumidityMethod" ) ) {
 					RefrigCase( CaseNum ).DefrostEnergyCurveType = RHCubic;
-				} else if ( SameString( Alphas( 11 ), "DewpointMethod" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 11 ), "DewpointMethod" ) ) {
 					RefrigCase( CaseNum ).DefrostEnergyCurveType = DPCubic;
-				} else if ( SameString( Alphas( 11 ), "None" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 11 ), "None" ) ) {
 					RefrigCase( CaseNum ).DefrostEnergyCurveType = None;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 11 ) + "=\"" + Alphas( 11 ) + "\"." );
@@ -1381,7 +1355,7 @@ namespace RefrigeratedCase {
 				}
 
 				if ( RefrigCase( CaseNum ).DefCapCurvePtr > 0 ) {
-					if ( ! SameString( GetCurveType( RefrigCase( CaseNum ).DefCapCurvePtr ), "CUBIC" ) ) {
+					if ( ! UtilityRoutines::SameString( GetCurveType( RefrigCase( CaseNum ).DefCapCurvePtr ), "CUBIC" ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", invalid  " + cAlphaFieldNames( 12 ) + " must be of type Cubic." );
 						ErrorsFound = true;
 					}
@@ -1527,17 +1501,9 @@ namespace RefrigeratedCase {
 		if ( NumSimulationWalkIns > 0 ) {
 			CurrentModuleObject = "Refrigeration:WalkIn";
 			for ( WalkInID = 1; WalkInID <= NumSimulationWalkIns; ++WalkInID ) {
-				GetObjectItem( CurrentModuleObject, WalkInID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, WalkInID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), WalkIn, WalkInID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
 				WalkIn( WalkInID ).Name = Alphas( 1 );
 
 				if ( ! lAlphaBlanks( 2 ) ) {
@@ -1656,13 +1622,13 @@ namespace RefrigeratedCase {
 				AlphaNum = 5;
 				if ( lAlphaBlanks( AlphaNum ) ) {
 					WalkIn( WalkInID ).DefrostType = WalkInDefrostElec;
-				} else if ( SameString( Alphas( AlphaNum ), "Electric" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Electric" ) ) {
 					WalkIn( WalkInID ).DefrostType = WalkInDefrostElec;
-				} else if ( SameString( Alphas( AlphaNum ), "HotFluid" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "HotFluid" ) ) {
 					WalkIn( WalkInID ).DefrostType = WalkInDefrostFluid;
-				} else if ( SameString( Alphas( AlphaNum ), "None" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "None" ) ) {
 					WalkIn( WalkInID ).DefrostType = WalkInDefrostNone;
-				} else if ( SameString( Alphas( AlphaNum ), "OffCycle" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "OffCycle" ) ) {
 					WalkIn( WalkInID ).DefrostType = WalkInDefrostOffCycle;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WalkIn( WalkInID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + "=\"" + Alphas( AlphaNum ) + "\"." );
@@ -1672,9 +1638,9 @@ namespace RefrigeratedCase {
 				AlphaNum = 6;
 				if ( lAlphaBlanks( AlphaNum ) ) {
 					WalkIn( WalkInID ).DefrostControlType = DefrostControlSched;
-				} else if ( SameString( Alphas( AlphaNum ), "TimeSchedule" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "TimeSchedule" ) ) {
 					WalkIn( WalkInID ).DefrostControlType = DefrostControlSched;
-				} else if ( SameString( Alphas( AlphaNum ), "TemperatureTermination" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "TemperatureTermination" ) ) {
 					WalkIn( WalkInID ).DefrostControlType = DefrostContTempTerm;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WalkIn( WalkInID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " not found: " + Alphas( AlphaNum ) );
@@ -1819,7 +1785,7 @@ namespace RefrigeratedCase {
 					//Get the Zone node number from the zone name
 					//The Zone Node is needed to get the zone's ambient conditions, NumOfZones from dataglobals
 					WalkIn( WalkInID ).ZoneName( ZoneID ) = Alphas( AStart );
-					WalkIn( WalkInID ).ZoneNum( ZoneID ) = FindItemInList( Alphas( AStart ), Zone );
+					WalkIn( WalkInID ).ZoneNum( ZoneID ) = UtilityRoutines::FindItemInList( Alphas( AStart ), Zone );
 
 					if ( WalkIn( WalkInID ).ZoneNum( ZoneID ) == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WalkIn( WalkInID ).Name + "\", invalid  " + cAlphaFieldNames( AStart ) + " not valid: " + Alphas( AStart ) );
@@ -1921,11 +1887,11 @@ namespace RefrigeratedCase {
 						if ( lAlphaBlanks( AStart + 3 ) ) {
 							//default air curtain
 							WalkIn( WalkInID ).StockDoorProtectType( ZoneID ) = WIStockDoorAirCurtain;
-						} else if ( SameString( Alphas( AStart + 3 ), "None" ) ) {
+						} else if ( UtilityRoutines::SameString( Alphas( AStart + 3 ), "None" ) ) {
 							WalkIn( WalkInID ).StockDoorProtectType( ZoneID ) = WIStockDoorNone;
-						} else if ( SameString( Alphas( AStart + 3 ), "AirCurtain" ) ) {
+						} else if ( UtilityRoutines::SameString( Alphas( AStart + 3 ), "AirCurtain" ) ) {
 							WalkIn( WalkInID ).StockDoorProtectType( ZoneID ) = WIStockDoorAirCurtain;
-						} else if ( SameString( Alphas( AStart + 3 ), "StripCurtain" ) ) {
+						} else if ( UtilityRoutines::SameString( Alphas( AStart + 3 ), "StripCurtain" ) ) {
 							WalkIn( WalkInID ).StockDoorProtectType( ZoneID ) = WIStockDoorStripCurtain;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WalkIn( WalkInID ).Name + "\", invalid  " + cAlphaFieldNames( AStart + 3 ) + "=\"" + Alphas( AStart + 3 ) + "\"." );
@@ -1946,17 +1912,9 @@ namespace RefrigeratedCase {
 			for ( CoilID = 1; CoilID <= NumSimulationRefrigAirChillers; ++CoilID ) {
 				//A1
 				AlphaNum = 1;
-				GetObjectItem( CurrentModuleObject, CoilID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, CoilID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( AlphaNum ), WarehouseCoil, CoilID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( AlphaNum ) + "\"." );
-					if ( IsBlank ) Alphas( AlphaNum ) = "xxxxx";
-					ErrorsFound = true;
-				}
 				WarehouseCoil( CoilID ).Name = Alphas( AlphaNum );
 
 				//A2
@@ -1994,29 +1952,29 @@ namespace RefrigeratedCase {
 				if ( lAlphaBlanks( AlphaNum ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + cAlphaFieldNames( AlphaNum ) + " is required and not found." );
 					ErrorsFound = true;
-				} else if ( SameString( Alphas( AlphaNum ), "UnitLoadFactorSensibleOnly" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "UnitLoadFactorSensibleOnly" ) ) {
 					WarehouseCoil( CoilID ).RatingType = UnitLoadFactorSens;
-				} else if ( SameString( Alphas( AlphaNum ), "CapacityTotalSpecificConditions" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "CapacityTotalSpecificConditions" ) ) {
 					WarehouseCoil( CoilID ).RatingType = RatedCapacityTotal;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC1Standard" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC1Standard" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC1Std;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC1NominalWet" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC1NominalWet" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC1Nom;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC2Standard" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC2Standard" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC2Std;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC2NominalWet" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC2NominalWet" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC2Nom;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC3Standard" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC3Standard" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC3Std;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC3NominalWet" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC3NominalWet" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC3Nom;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC4Standard" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC4Standard" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC4Std;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC4NominalWet" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC4NominalWet" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC4Nom;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC5Standard" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC5Standard" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC5Std;
-				} else if ( SameString( Alphas( AlphaNum ), "EuropeanSC5NominalWet" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "EuropeanSC5NominalWet" ) ) {
 					WarehouseCoil( CoilID ).RatingType = EuropeanSC5Nom;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + "=\"" + Alphas( AlphaNum ) + "\"." );
@@ -2218,18 +2176,18 @@ namespace RefrigeratedCase {
 					// For RatedCapacityTotal, the manufacturer's coil performance map is required
 					// Specify the performance map with TabularRHxDT1xTRoom
 					WarehouseCoil( CoilID ).SHRCorrectionType = TabularRH_DT1_TRoom;
-					if ( ! ( SameString( Alphas( AlphaNum ), "TabularRHxDT1xTRoom" ) ) ) {
+					if ( ! ( UtilityRoutines::SameString( Alphas( AlphaNum ), "TabularRHxDT1xTRoom" ) ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid " + cAlphaFieldNames( AlphaNum ) + "=\"" + Alphas( AlphaNum ) + "\"." );
 						ShowContinueError( "The \"CapacityTotalSpecificConditions\" Capacity Rating Type has been specified for this air chiller.  This rating type requires " );
 						ShowContinueError( "the \"TabularRHxDT1xTRoom\" correction curve.  Verify that a valid \"TabularRHxDT1xTRoom\" curve is specified in \"" + cAlphaFieldNames( AlphaNum + 1 ) + "\"." );
 					}
-				} else if ( SameString( Alphas( AlphaNum ), "LinearSHR60" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "LinearSHR60" ) ) {
 					WarehouseCoil( CoilID ).SHRCorrectionType = SHR60;
-				} else if ( SameString( Alphas( AlphaNum ), "QuadraticSHR" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "QuadraticSHR" ) ) {
 					WarehouseCoil( CoilID ).SHRCorrectionType = QuadraticSHR;
-				} else if ( SameString( Alphas( AlphaNum ), "European" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "European" ) ) {
 					WarehouseCoil( CoilID ).SHRCorrectionType = European;
-				} else if ( SameString( Alphas( AlphaNum ), "TabularRHxDT1xTRoom" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "TabularRHxDT1xTRoom" ) ) {
 					WarehouseCoil( CoilID ).SHRCorrectionType = TabularRH_DT1_TRoom;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + "=\"" + Alphas( AlphaNum ) + "\"." );
@@ -2265,7 +2223,7 @@ namespace RefrigeratedCase {
 						ErrorsFound = true;
 					}
 					//error checks for curve type entered and curve name
-					if ( ! SameString( GetCurveType( WarehouseCoil( CoilID ).SHRCorrectionCurvePtr ), "QUADRATIC" ) ) {
+					if ( ! UtilityRoutines::SameString( GetCurveType( WarehouseCoil( CoilID ).SHRCorrectionCurvePtr ), "QUADRATIC" ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " must be of type Quadratic." );
 						ErrorsFound = true;
 					}
@@ -2316,13 +2274,13 @@ namespace RefrigeratedCase {
 				++AlphaNum; //A7
 				if ( lAlphaBlanks( AlphaNum ) ) {
 					WarehouseCoil( CoilID ).FanType = FanConstantSpeed;
-				} else if ( SameString( Alphas( AlphaNum ), "Fixed" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Fixed" ) ) {
 					WarehouseCoil( CoilID ).FanType = FanConstantSpeed;
-				} else if ( SameString( Alphas( AlphaNum ), "FixedLinear" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "FixedLinear" ) ) {
 					WarehouseCoil( CoilID ).FanType = FanConstantSpeedLinear;
-				} else if ( SameString( Alphas( AlphaNum ), "VariableSpeed" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "VariableSpeed" ) ) {
 					WarehouseCoil( CoilID ).FanType = FanVariableSpeed;
-				} else if ( SameString( Alphas( AlphaNum ), "TwoSpeed" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "TwoSpeed" ) ) {
 					WarehouseCoil( CoilID ).FanType = FanTwoSpeed;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + "=\"" + Alphas( AlphaNum ) + "\"." );
@@ -2352,13 +2310,13 @@ namespace RefrigeratedCase {
 				++AlphaNum; //A8
 				if ( lAlphaBlanks( AlphaNum ) ) {
 					WarehouseCoil( CoilID ).DefrostType = DefrostElec;
-				} else if ( SameString( Alphas( AlphaNum ), "Electric" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Electric" ) ) {
 					WarehouseCoil( CoilID ).DefrostType = DefrostElec;
-				} else if ( SameString( Alphas( AlphaNum ), "HotFluid" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "HotFluid" ) ) {
 					WarehouseCoil( CoilID ).DefrostType = DefrostFluid;
-				} else if ( SameString( Alphas( AlphaNum ), "None" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "None" ) ) {
 					WarehouseCoil( CoilID ).DefrostType = DefrostNone;
-				} else if ( SameString( Alphas( AlphaNum ), "OffCycle" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "OffCycle" ) ) {
 					WarehouseCoil( CoilID ).DefrostType = DefrostOffCycle;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + "=\"" + Alphas( AlphaNum ) + "\"." );
@@ -2368,9 +2326,9 @@ namespace RefrigeratedCase {
 				++AlphaNum; //A9
 				if ( lAlphaBlanks( AlphaNum ) ) {
 					WarehouseCoil( CoilID ).DefrostControlType = DefrostControlSched;
-				} else if ( SameString( Alphas( AlphaNum ), "TimeSchedule" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "TimeSchedule" ) ) {
 					WarehouseCoil( CoilID ).DefrostControlType = DefrostControlSched;
-				} else if ( SameString( Alphas( AlphaNum ), "TemperatureTermination" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "TemperatureTermination" ) ) {
 					WarehouseCoil( CoilID ).DefrostControlType = DefrostContTempTerm;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " not found: " + Alphas( AlphaNum ) );
@@ -2442,11 +2400,11 @@ namespace RefrigeratedCase {
 				++AlphaNum; //A12
 				if ( lAlphaBlanks( AlphaNum ) ) {
 					WarehouseCoil( CoilID ).VerticalLocation = Middle; //default position
-				} else if ( SameString( Alphas( AlphaNum ), "Ceiling" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Ceiling" ) ) {
 					WarehouseCoil( CoilID ).VerticalLocation = Ceiling;
-				} else if ( SameString( Alphas( AlphaNum ), "Middle" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Middle" ) ) {
 					WarehouseCoil( CoilID ).VerticalLocation = Middle;
-				} else if ( SameString( Alphas( AlphaNum ), "Floor" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Floor" ) ) {
 					WarehouseCoil( CoilID ).VerticalLocation = Floor;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + WarehouseCoil( CoilID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " not found: " + Alphas( AlphaNum ) );
@@ -2468,18 +2426,10 @@ namespace RefrigeratedCase {
 
 			CurrentModuleObject = "ZoneHVAC:RefrigerationChillerSet";
 			for ( SetID = 1; SetID <= NumRefrigChillerSets; ++SetID ) {
-				GetObjectItem( CurrentModuleObject, SetID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
+				inputProcessor->getObjectItem( CurrentModuleObject, SetID, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				AlphaNum = 1;
-				VerifyName( Alphas( AlphaNum ), AirChillerSet, SetID - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined name=\"" + Alphas( AlphaNum ) + "\"." );
-					if ( IsBlank ) Alphas( AlphaNum ) = "xxxxx";
-					ErrorsFound = true;
-				}
 				AirChillerSet( SetID ).Name = Alphas( AlphaNum );
 
 				AlphaNum = 2;
@@ -2505,7 +2455,7 @@ namespace RefrigeratedCase {
 
 				++AlphaNum;
 				AirChillerSet( SetID ).ZoneName = Alphas( AlphaNum );
-				AirChillerSet( SetID ).ZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
+				AirChillerSet( SetID ).ZoneNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Zone );
 
 				if ( AirChillerSet( SetID ).ZoneNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AirChillerSet( SetID ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " not valid: " + Alphas( AlphaNum ) );
@@ -2546,7 +2496,7 @@ namespace RefrigeratedCase {
 				for ( ChillerIndex = 1; ChillerIndex <= NumChillersInSet; ++ChillerIndex ) {
 					AlphaListNum = AlphaStartList + ChillerIndex;
 					if ( ! lAlphaBlanks( AlphaListNum ) ) {
-						CoilNum = FindItemInList( Alphas( AlphaListNum ), WarehouseCoil );
+						CoilNum = UtilityRoutines::FindItemInList( Alphas( AlphaListNum ), WarehouseCoil );
 						if ( CoilNum == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AirChillerSet( SetID ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaListNum ) + " defined as " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -2565,15 +2515,8 @@ namespace RefrigeratedCase {
 		if ( NumSimulationCaseAndWalkInLists > 0 ) {
 			CurrentModuleObject = "Refrigeration:CaseAndWalkInList";
 			for ( ListNum = 1; ListNum <= NumSimulationCaseAndWalkInLists; ++ListNum ) {
-				GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), CaseAndWalkInList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
-
+				inputProcessor->getObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 				CaseAndWalkInList( ListNum ).Name = Alphas( 1 );
 
 				// CaseAndWalkInList alphas include CaseAndWalkInList name and one name for each Case or WalkIn in list
@@ -2594,9 +2537,9 @@ namespace RefrigeratedCase {
 						LoadWalkInNum = 0;
 						LoadCaseNum = 0;
 						LoadCoilNum = 0;
-						if ( NumSimulationWalkIns > 0 ) LoadWalkInNum = FindItemInList( Alphas( AlphaListNum ), WalkIn );
-						if ( NumSimulationCases > 0 ) LoadCaseNum = FindItemInList( Alphas( AlphaListNum ), RefrigCase );
-						if ( NumSimulationRefrigAirChillers > 0 ) LoadCoilNum = FindItemInList( Alphas( AlphaListNum ), WarehouseCoil );
+						if ( NumSimulationWalkIns > 0 ) LoadWalkInNum = UtilityRoutines::FindItemInList( Alphas( AlphaListNum ), WalkIn );
+						if ( NumSimulationCases > 0 ) LoadCaseNum = UtilityRoutines::FindItemInList( Alphas( AlphaListNum ), RefrigCase );
+						if ( NumSimulationRefrigAirChillers > 0 ) LoadCoilNum = UtilityRoutines::FindItemInList( Alphas( AlphaListNum ), WarehouseCoil );
 						if ( ( LoadWalkInNum == 0 ) && ( LoadCaseNum == 0 ) && ( LoadCoilNum == 0 ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaFieldNames( AlphaListNum ) + "\", has an invalid value of " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -2635,21 +2578,15 @@ namespace RefrigeratedCase {
 
 			for ( RackNum = 1; RackNum <= NumRefrigeratedRacks; ++RackNum ) {
 
-				GetObjectItem( CurrentModuleObject, RackNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), RefrigRack, RackNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
+				inputProcessor->getObjectItem( CurrentModuleObject, RackNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+
 				RefrigRack( RackNum ).Name = Alphas( 1 );
 				HeatReclaimRefrigeratedRack( RackNum ).Name = Alphas( 1 );
 				HeatReclaimRefrigeratedRack( RackNum ).SourceType = CurrentModuleObject;
-				if ( SameString( Alphas( 2 ), "Outdoors" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 2 ), "Outdoors" ) ) {
 					RefrigRack( RackNum ).HeatRejectionLocation = LocationOutdoors;
-				} else if ( SameString( Alphas( 2 ), "Zone" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 2 ), "Zone" ) ) {
 					RefrigRack( RackNum ).HeatRejectionLocation = LocationZone;
 					// don't need to set RefrigPresentInZone to .TRUE. here because only allowed to reject heat to zone
 					// holding all served cases,  so already set when case read in
@@ -2671,8 +2608,8 @@ namespace RefrigeratedCase {
 					ErrorsFound = true;
 				}
 
-				if ( ! SameString( GetCurveType( RefrigRack( RackNum ).COPFTempPtr ), "CUBIC" ) ) {
-					if ( ! SameString( GetCurveType( RefrigRack( RackNum ).COPFTempPtr ), "QUADRATIC" ) ) {
+				if ( ! UtilityRoutines::SameString( GetCurveType( RefrigRack( RackNum ).COPFTempPtr ), "CUBIC" ) ) {
+					if ( ! UtilityRoutines::SameString( GetCurveType( RefrigRack( RackNum ).COPFTempPtr ), "QUADRATIC" ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + "\", invalid  " + cAlphaFieldNames( 3 ) + " object must be of type cubic or quadratic." );
 						ErrorsFound = true;
 					}
@@ -2691,22 +2628,22 @@ namespace RefrigeratedCase {
 				}
 
 				if ( ! lAlphaBlanks( 4 ) ) {
-					if ( ! SameString( GetCurveType( RefrigRack( RackNum ).TotCondFTempPtr ), "CUBIC" ) ) {
-						if ( ! SameString( GetCurveType( RefrigRack( RackNum ).TotCondFTempPtr ), "QUADRATIC" ) ) {
+					if ( ! UtilityRoutines::SameString( GetCurveType( RefrigRack( RackNum ).TotCondFTempPtr ), "CUBIC" ) ) {
+						if ( ! UtilityRoutines::SameString( GetCurveType( RefrigRack( RackNum ).TotCondFTempPtr ), "QUADRATIC" ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + "\", invalid  " + cAlphaFieldNames( 4 ) + " object must be of type cubic or quadratic." );
 							ErrorsFound = true;
 						}
 					}
 				}
 
-				if ( SameString( Alphas( 5 ), "EvaporativelyCooled" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 5 ), "EvaporativelyCooled" ) ) {
 					RefrigRack( RackNum ).CondenserType = RefrigCondenserTypeEvap;
 					if ( RefrigRack( RackNum ).HeatRejectionLocation == LocationZone ) {
 						ShowWarningError( CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + "\" Evap cooled " + cAlphaFieldNames( 5 ) + " not available with " + cAlphaFieldNames( 2 ) + " = Zone." );
 						ShowContinueError( cAlphaFieldNames( 5 ) + " reset to Air Cooled and simulation continues." );
 						RefrigRack( RackNum ).CondenserType = RefrigCondenserTypeAir;
 					}
-				} else if ( SameString( Alphas( 5 ), "WaterCooled" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 5 ), "WaterCooled" ) ) {
 					RefrigRack( RackNum ).CondenserType = RefrigCondenserTypeWater;
 					if ( RefrigRack( RackNum ).HeatRejectionLocation == LocationZone ) {
 						ShowWarningError( CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + "\" Water cooled " + cAlphaFieldNames( 5 ) + " not available with " + cAlphaFieldNames( 2 ) + " = Zone." );
@@ -2723,9 +2660,9 @@ namespace RefrigeratedCase {
 					// Check node connections
 					TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), "RefrigRack Nodes" );
 					// Get loop flow type
-					if ( SameString( Alphas( 8 ), "VariableFlow" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 8 ), "VariableFlow" ) ) {
 						RefrigRack( RackNum ).FlowType = VariableFlow;
-					} else if ( SameString( Alphas( 8 ), "ConstantFlow" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 8 ), "ConstantFlow" ) ) {
 						RefrigRack( RackNum ).FlowType = ConstantFlow;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + "\", invalid  " + cAlphaFieldNames( 8 ) + " not recognized: " + Alphas( 8 ) );
@@ -2863,10 +2800,10 @@ namespace RefrigeratedCase {
 					CaseNum = 0;
 					WalkInNum = 0;
 					CoilNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
-					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WalkIn );
+					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -2960,7 +2897,7 @@ namespace RefrigeratedCase {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + cAlphaFieldNames( 15 ) + " must be input if walkins or AirChillers connected to rack and heat rejection location = zone." );
 							ErrorsFound = true;
 						} else { // alpha (15) not blank
-							RefrigRack( RackNum ).HeatRejectionZoneNum = FindItemInList( Alphas( 15 ), Zone );
+							RefrigRack( RackNum ).HeatRejectionZoneNum = UtilityRoutines::FindItemInList( Alphas( 15 ), Zone );
 							RefrigRack( RackNum ).HeatRejectionZoneNodeNum = GetSystemNodeNumberForZone( Alphas( 15 ) );
 							if ( RefrigRack( RackNum ).HeatRejectionZoneNum == 0 ) {
 								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigRack( RackNum ).Name + "\", invalid  " + cAlphaFieldNames( 15 ) + " not valid: " + Alphas( 15 ) );
@@ -3008,15 +2945,8 @@ namespace RefrigeratedCase {
 			if ( NumSimulationCondAir > 0 ) {
 				CurrentModuleObject = "Refrigeration:Condenser:AirCooled";
 				for ( CondNum = 1; CondNum <= NumSimulationCondAir; ++CondNum ) {
-					GetObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + " = " + Alphas( 1 ) );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					inputProcessor->getObjectItem( CurrentModuleObject, CondNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 					Condenser( CondNum ).CapCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -3054,13 +2984,13 @@ namespace RefrigeratedCase {
 					if ( ! lNumericBlanks( 1 ) ) Condenser( CondNum ).RatedSubcool = Numbers( 1 );
 
 					// Get fan control type
-					if ( SameString( Alphas( 3 ), "Fixed" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 3 ), "Fixed" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanConstantSpeed;
-					} else if ( SameString( Alphas( 3 ), "FixedLinear" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 3 ), "FixedLinear" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanConstantSpeedLinear;
-					} else if ( SameString( Alphas( 3 ), "VariableSpeed" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 3 ), "VariableSpeed" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanVariableSpeed;
-					} else if ( SameString( Alphas( 3 ), "TwoSpeed" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 3 ), "TwoSpeed" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanTwoSpeed;
 					} else {
 						Condenser( CondNum ).FanSpeedControlType = FanConstantSpeed; //default
@@ -3082,7 +3012,7 @@ namespace RefrigeratedCase {
 						Condenser( CondNum ).InletAirNodeNum = 0;
 					} else { //see if it's an outside air node name or an indoor zone name,
 						//have to check inside first because outside check automatically generates an error message
-						Condenser( CondNum ).InletAirZoneNum = FindItemInList( Alphas( 4 ), Zone );
+						Condenser( CondNum ).InletAirZoneNum = UtilityRoutines::FindItemInList( Alphas( 4 ), Zone );
 						//need to clearly id node number for air inlet conditions and zone number for casecredit assignment
 						if ( Condenser( CondNum ).InletAirZoneNum != 0 ) {
 							//set condenser flag (later used to set system flag) and zone flag
@@ -3117,16 +3047,9 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:EvaporativeCooled";
 				for ( CondIndex = 1; CondIndex <= NumSimulationCondEvap; ++CondIndex ) {
 					CondNum = CondIndex + NumSimulationCondAir;
-					GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3153,13 +3076,13 @@ namespace RefrigeratedCase {
 					if ( ( ! lNumericBlanks( 2 ) ) && ( Numbers( 2 ) > 0.0 ) ) Condenser( CondNum ).RatedSubcool = Numbers( 2 );
 
 					// Get fan control type
-					if ( SameString( Alphas( 2 ), "Fixed" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 2 ), "Fixed" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanConstantSpeed;
-					} else if ( SameString( Alphas( 3 ), "FixedLinear" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 3 ), "FixedLinear" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanConstantSpeedLinear;
-					} else if ( SameString( Alphas( 2 ), "VariableSpeed" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 2 ), "VariableSpeed" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanVariableSpeed;
-					} else if ( SameString( Alphas( 2 ), "TwoSpeed" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 2 ), "TwoSpeed" ) ) {
 						Condenser( CondNum ).FanSpeedControlType = FanTwoSpeed;
 					} else {
 						Condenser( CondNum ).FanSpeedControlType = FanConstantSpeed; //default
@@ -3317,16 +3240,9 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:WaterCooled";
 				for ( CondIndex = 1; CondIndex <= NumSimulationCondWater; ++CondIndex ) {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap;
-					GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3375,9 +3291,9 @@ namespace RefrigeratedCase {
 					// Check node connections
 					TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 2 ), Alphas( 3 ), "Water Cooled Condenser Nodes" );
 					// Get loop flow type
-					if ( SameString( Alphas( 4 ), "VariableFlow" ) ) { //set FlowType
+					if ( UtilityRoutines::SameString( Alphas( 4 ), "VariableFlow" ) ) { //set FlowType
 						Condenser( CondNum ).FlowType = VariableFlow;
-					} else if ( SameString( Alphas( 4 ), "ConstantFlow" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 4 ), "ConstantFlow" ) ) {
 						Condenser( CondNum ).FlowType = ConstantFlow;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Condenser( CondNum ).Name + "\", invalid  " + cAlphaFieldNames( 4 ) + " not recognized: " + Alphas( 4 ) );
@@ -3452,16 +3368,9 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Condenser:Cascade";
 				for ( CondIndex = 1; CondIndex <= NumSimulationCascadeCondensers; ++CondIndex ) {
 					CondNum = CondIndex + NumSimulationCondAir + NumSimulationCondEvap + NumSimulationCondWater;
-					GetObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, CondIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), Condenser, CondNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					GlobalNames::VerifyUniqueInterObjectName( UniqueCondenserNames, Alphas( 1 ), CurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 					Condenser( CondNum ).Name = Alphas( 1 );
 					HeatReclaimRefrigCondenser( CondNum ).Name = Alphas( 1 );
 
@@ -3499,9 +3408,9 @@ namespace RefrigeratedCase {
 
 					// Get condensing temperature type, either fixed by design or allowed to float to match other loads on supply system
 					if ( ! lAlphaBlanks( 2 ) ) {
-						if ( SameString( Alphas( 2 ), "Fixed" ) ) { //set Condenser Temperature Control Type
+						if ( UtilityRoutines::SameString( Alphas( 2 ), "Fixed" ) ) { //set Condenser Temperature Control Type
 							Condenser( CondNum ).CascadeTempControl = CascadeTempSet;
-						} else if ( SameString( Alphas( 2 ), "Float" ) ) {
+						} else if ( UtilityRoutines::SameString( Alphas( 2 ), "Float" ) ) {
 							Condenser( CondNum ).CascadeTempControl = CascadeTempFloat;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Condenser( CondNum ).Name + "\", invalid  " + cAlphaFieldNames( 2 ) + " not recognized: " + Alphas( 2 ) );
@@ -3532,15 +3441,8 @@ namespace RefrigeratedCase {
 			if ( NumSimulationGasCooler > 0 ) {
 				CurrentModuleObject = "Refrigeration:GasCooler:AirCooled";
 				for ( GCNum = 1; GCNum <= NumSimulationGasCooler; ++GCNum ) {
-					GetObjectItem( CurrentModuleObject, GCNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), GasCooler, GCNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + " = " + Alphas( 1 ) );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					} //IsNotOK on Verify Name
+					inputProcessor->getObjectItem( CurrentModuleObject, GCNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 					GasCooler( GCNum ).Name = Alphas( 1 );
 
 					GasCooler( GCNum ).CapCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -3571,13 +3473,13 @@ namespace RefrigeratedCase {
 					}
 
 					// Get fan control type
-					if ( SameString( Alphas( 3 ), "Fixed" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( 3 ), "Fixed" ) ) {
 						GasCooler( GCNum ).FanSpeedControlType = FanConstantSpeed;
-					} else if ( SameString( Alphas( 3 ), "FixedLinear" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 3 ), "FixedLinear" ) ) {
 						GasCooler( GCNum ).FanSpeedControlType = FanConstantSpeedLinear;
-					} else if ( SameString( Alphas( 3 ), "VariableSpeed" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 3 ), "VariableSpeed" ) ) {
 						GasCooler( GCNum ).FanSpeedControlType = FanVariableSpeed;
-					} else if ( SameString( Alphas( 3 ), "TwoSpeed" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 3 ), "TwoSpeed" ) ) {
 						GasCooler( GCNum ).FanSpeedControlType = FanTwoSpeed;
 					} else {
 						GasCooler( GCNum ).FanSpeedControlType = FanConstantSpeed; //default
@@ -3640,7 +3542,7 @@ namespace RefrigeratedCase {
 						GasCooler( GCNum ).InletAirNodeNum = 0;
 					} else { //see if it's an outside air node name or an indoor zone name,
 						//have to check inside first because outside check automatically generates an error message
-						GasCooler( GCNum ).InletAirZoneNum = FindItemInList( Alphas( 4 ), Zone );
+						GasCooler( GCNum ).InletAirZoneNum = UtilityRoutines::FindItemInList( Alphas( 4 ), Zone );
 						//need to clearly id node number for air inlet conditions and zone number for casecredit assignment
 						if ( GasCooler( GCNum ).InletAirZoneNum != 0 ) {
 							//set condenser flag (later used to set system flag) and zone flag
@@ -3677,15 +3579,9 @@ namespace RefrigeratedCase {
 			if ( NumSimulationSecondarySystems > 0 ) {
 				CurrentModuleObject = "Refrigeration:SecondarySystem";
 				for ( SecondaryNum = 1; SecondaryNum <= NumSimulationSecondarySystems; ++SecondaryNum ) {
-					GetObjectItem( CurrentModuleObject, SecondaryNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), Secondary, SecondaryNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					}
+					inputProcessor->getObjectItem( CurrentModuleObject, SecondaryNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+
 					Secondary( SecondaryNum ).Name = Alphas( 1 );
 
 					//   Find the loads on the secondary loop: can be input in form of case or walkin or CaseAndWalkInList names
@@ -3710,10 +3606,10 @@ namespace RefrigeratedCase {
 						CaseNum = 0;
 						WalkInNum = 0;
 						CoilNum = 0;
-						if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
-						if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
-						if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
-						if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
+						if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+						if ( NumSimulationCases > 0 ) CaseNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), RefrigCase );
+						if ( NumSimulationWalkIns > 0 ) WalkInNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WalkIn );
+						if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
 						NumNameMatches = 0;
 						if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 						if ( CaseNum != 0 ) ++NumNameMatches;
@@ -3812,9 +3708,9 @@ namespace RefrigeratedCase {
 					// Get circulating fluid type
 					AlphaNum = 3;
 					if ( ! lAlphaBlanks( AlphaNum ) ) {
-						if ( SameString( Alphas( AlphaNum ), "FluidAlwaysLiquid" ) ) {
+						if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "FluidAlwaysLiquid" ) ) {
 							Secondary( SecondaryNum ).FluidType = SecFluidTypeAlwaysLiquid;
-						} else if ( SameString( Alphas( AlphaNum ), "FluidPhaseChange" ) ) {
+						} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "FluidPhaseChange" ) ) {
 							Secondary( SecondaryNum ).FluidType = SecFluidTypePhaseChange;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Secondary( SecondaryNum ).Name + "\"  " + cAlphaFieldNames( AlphaNum ) + " not recognized = " + Alphas( AlphaNum ) );
@@ -3973,9 +3869,9 @@ namespace RefrigeratedCase {
 					AlphaNum = 5;
 					Secondary( SecondaryNum ).PumpControlType = SecPumpControlConstant; //default
 					if ( ! lAlphaBlanks( AlphaNum ) ) {
-						if ( SameString( Alphas( AlphaNum ), "Constant" ) ) {
+						if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Constant" ) ) {
 							Secondary( SecondaryNum ).PumpControlType = SecPumpControlConstant;
-						} else if ( SameString( Alphas( AlphaNum ), "Variable" ) ) {
+						} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Variable" ) ) {
 							Secondary( SecondaryNum ).PumpControlType = SecPumpControlVariable;
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Secondary( SecondaryNum ).Name + "\"  " + cAlphaFieldNames( AlphaNum ) + " not recognized = " + Alphas( AlphaNum ) );
@@ -4001,7 +3897,7 @@ namespace RefrigeratedCase {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Secondary( SecondaryNum ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " not found:" + Alphas( AlphaNum ) );
 							ErrorsFound = true;
 						}
-						if ( ! SameString( GetCurveType( Secondary( SecondaryNum ).VarSpeedCurvePtr ), "CUBIC" ) ) {
+						if ( ! UtilityRoutines::SameString( GetCurveType( Secondary( SecondaryNum ).VarSpeedCurvePtr ), "CUBIC" ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Secondary( SecondaryNum ).Name + "\", invalid  " + cAlphaFieldNames( AlphaNum ) + " object must be of type cubic." );
 							ErrorsFound = true;
 						}
@@ -4029,7 +3925,7 @@ namespace RefrigeratedCase {
 					NumNum = 12;
 					if ( ! lNumericBlanks( NumNum ) && ! lAlphaBlanks( AlphaNum ) ) {
 						Secondary( SecondaryNum ).SumUADistPiping = Numbers( NumNum );
-						Secondary( SecondaryNum ).DistPipeZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
+						Secondary( SecondaryNum ).DistPipeZoneNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Zone );
 						Secondary( SecondaryNum ).DistPipeZoneNodeNum = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 
 						if ( Secondary( SecondaryNum ).DistPipeZoneNum == 0 ) {
@@ -4059,7 +3955,7 @@ namespace RefrigeratedCase {
 					NumNum = 13;
 					if ( ! lNumericBlanks( NumNum ) && ! lAlphaBlanks( AlphaNum ) ) {
 						Secondary( SecondaryNum ).SumUAReceiver = Numbers( NumNum );
-						Secondary( SecondaryNum ).ReceiverZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
+						Secondary( SecondaryNum ).ReceiverZoneNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Zone );
 						Secondary( SecondaryNum ).ReceiverZoneNodeNum = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 
 						if ( Secondary( SecondaryNum ).ReceiverZoneNum == 0 ) {
@@ -4147,16 +4043,9 @@ namespace RefrigeratedCase {
 
 			CurrentModuleObject = "Refrigeration:Compressor";
 			for ( CompNum = 1; CompNum <= NumSimulationCompressors; ++CompNum ) {
-				GetObjectItem( CurrentModuleObject, CompNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, CompNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), Compressor, CompNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
 				Compressor( CompNum ).Name = Alphas( 1 );
 
 				Compressor( CompNum ).ElecPowerCurvePtr = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
@@ -4201,7 +4090,7 @@ namespace RefrigeratedCase {
 				if ( ! lAlphaBlanks( 4 ) ) Compressor( CompNum ).EndUseSubcategory = Alphas( 4 );
 
 				//  If the compressor is a transcritical CO compressor, get transcritical power and capacity curves
-				if ( SameString( Alphas( 5 ), "Transcritical" ) ) { // Mode of Operation = Transcritical
+				if ( UtilityRoutines::SameString( Alphas( 5 ), "Transcritical" ) ) { // Mode of Operation = Transcritical
 					Compressor( CompNum ).TransFlag = true;
 					Compressor( CompNum ).TransElecPowerCurvePtr = GetCurveIndex( Alphas( 6 ) ); // convert curve name to number
 					if ( lAlphaBlanks( 6 ) && Compressor( CompNum ).TransElecPowerCurvePtr == 0 ) {
@@ -4213,7 +4102,7 @@ namespace RefrigeratedCase {
 						ShowSevereError( RoutineName + CurrentModuleObject + '=' + Compressor( CompNum ).Name + ": " + cAlphaFieldNames( 7 ) + " not found." );
 						ErrorsFound = true;
 					}
-				} else if ( ( SameString( Alphas( 5 ), "Subcritical" ) ) || ( lAlphaBlanks( 5 ) ) ) { // Mode of Operation = Subcritical
+				} else if ( ( UtilityRoutines::SameString( Alphas( 5 ), "Subcritical" ) ) || ( lAlphaBlanks( 5 ) ) ) { // Mode of Operation = Subcritical
 					Compressor( CompNum ).TransFlag = false;
 					if ( ( ! lAlphaBlanks( 6 ) ) || ( ! lAlphaBlanks( 7 ) ) ) { // Transcritical compressor curves specified for subcritical compressor
 						ShowWarningError( RoutineName + CurrentModuleObject + '=' + Compressor( CompNum ).Name + " is specified to be a subcritical compressor, however transcritical compressor curve(s) are given." );
@@ -4233,24 +4122,17 @@ namespace RefrigeratedCase {
 				CurrentModuleObject = "Refrigeration:Subcooler";
 				NumSimulationMechSubcoolers = 0;
 				for ( SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum ) {
-					GetObjectItem( CurrentModuleObject, SubcoolerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					inputProcessor->getObjectItem( CurrentModuleObject, SubcoolerNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), Subcooler, SubcoolerNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					}
 					Subcooler( SubcoolerNum ).Name = Alphas( 1 );
 
 					// Get subcooler type
 					Subcooler( SubcoolerNum ).SubcoolerType = LiquidSuction; //default subcooler type
-					if ( SameString( Alphas( 2 ), "Mechanical" ) ) { //set subcooler type
+					if ( UtilityRoutines::SameString( Alphas( 2 ), "Mechanical" ) ) { //set subcooler type
 						Subcooler( SubcoolerNum ).SubcoolerType = Mechanical;
 						++NumSimulationMechSubcoolers;
-					} else if ( SameString( Alphas( 2 ), "LiquidSuction" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( 2 ), "LiquidSuction" ) ) {
 						Subcooler( SubcoolerNum ).SubcoolerType = LiquidSuction;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Subcooler( SubcoolerNum ).Name + "\", " + cAlphaFieldNames( 2 ) + " not recognized = " + Alphas( 2 ) );
@@ -4308,15 +4190,8 @@ namespace RefrigeratedCase {
 			if ( NumSimulationTransferLoadLists > 0 ) {
 				CurrentModuleObject = "Refrigeration:TransferLoadList";
 				for ( ListNum = 1; ListNum <= NumSimulationTransferLoadLists; ++ListNum ) {
-					GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-					IsNotOK = false;
-					IsBlank = false;
-					VerifyName( Alphas( 1 ), TransferLoadList, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-					if ( IsNotOK ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-						if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-						ErrorsFound = true;
-					}
+					inputProcessor->getObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+					UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 					TransferLoadList( ListNum ).Name = Alphas( 1 );
 
@@ -4332,8 +4207,8 @@ namespace RefrigeratedCase {
 						AlphaListNum = 1 + NumLoad;
 						LoadCascadeNum = 0;
 						LoadSecondaryNum = 0;
-						if ( NumRefrigCondensers > 0 ) LoadCascadeNum = FindItemInList( Alphas( AlphaListNum ), Condenser );
-						if ( NumSimulationSecondarySystems > 0 ) LoadSecondaryNum = FindItemInList( Alphas( AlphaListNum ), Secondary );
+						if ( NumRefrigCondensers > 0 ) LoadCascadeNum = UtilityRoutines::FindItemInList( Alphas( AlphaListNum ), Condenser );
+						if ( NumSimulationSecondarySystems > 0 ) LoadSecondaryNum = UtilityRoutines::FindItemInList( Alphas( AlphaListNum ), Secondary );
 						if ( ( LoadCascadeNum == 0 ) && ( LoadSecondaryNum == 0 ) ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + cAlphaFieldNames( AlphaListNum ) + "\" : has an invalid value of " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -4363,24 +4238,17 @@ namespace RefrigeratedCase {
 			//**** Read Compressor Lists **********************************************************
 			CurrentModuleObject = "Refrigeration:CompressorList";
 			for ( ListNum = 1; ListNum <= NumCompressorLists; ++ListNum ) {
-				GetObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-				IsNotOK = false;
-				IsBlank = false;
+				inputProcessor->getObjectItem( CurrentModuleObject, ListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
 				CompressorLists( ListNum ).NumCompressors = NumAlphas - 1;
-				VerifyName( Alphas( 1 ), CompressorLists, ListNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+
 				CompressorLists( ListNum ).Name = Alphas( 1 );
 				if ( ! allocated( CompressorLists( ListNum ).CompItemNum ) ) CompressorLists( ListNum ).CompItemNum.allocate( CompressorLists( ListNum ).NumCompressors );
 
 				for ( CompIndex = 1; CompIndex <= CompressorLists( ListNum ).NumCompressors; ++CompIndex ) {
 					AlphaListNum = CompIndex + 1; //same as do loop from 2 to end of list
 					if ( ! lAlphaBlanks( AlphaListNum ) ) {
-						CompressorLists( ListNum ).CompItemNum( CompIndex ) = FindItemInList( Alphas( AlphaListNum ), Compressor );
+						CompressorLists( ListNum ).CompItemNum( CompIndex ) = UtilityRoutines::FindItemInList( Alphas( AlphaListNum ), Compressor );
 						if ( CompressorLists( ListNum ).CompItemNum( CompIndex ) == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + CompressorLists( ListNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaListNum ) + " defined as " + Alphas( AlphaListNum ) );
 							ErrorsFound = true;
@@ -4395,17 +4263,9 @@ namespace RefrigeratedCase {
 			CurrentModuleObject = "Refrigeration:System";
 			for ( RefrigSysNum = 1; RefrigSysNum <= NumRefrigSystems; ++RefrigSysNum ) {
 
-				GetObjectItem( CurrentModuleObject, RefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( CurrentModuleObject, RefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-
-				VerifyName( Alphas( 1 ), System, RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
 				System( RefrigSysNum ).Name = Alphas( 1 );
 
 				//Read all loads on this System: cases, walk-ins, cascade loads, and secondary loops
@@ -4442,10 +4302,10 @@ namespace RefrigeratedCase {
 					CaseNum = 0;
 					WalkInNum = 0;
 					CoilNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
-					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WalkIn );
+					if ( NumSimulationRefrigAirChillers > 0 ) CoilNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WarehouseCoil );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -4569,9 +4429,9 @@ namespace RefrigeratedCase {
 					TransferLoadListNum = 0;
 					SecondaryNum = 0;
 					CascadeLoadNum = 0;
-					if ( NumSimulationTransferLoadLists > 0 ) TransferLoadListNum = FindItemInList( Alphas( AlphaNum ), TransferLoadList );
-					if ( NumSimulationSecondarySystems > 0 ) SecondaryNum = FindItemInList( Alphas( AlphaNum ), Secondary );
-					if ( NumRefrigCondensers > 0 ) CascadeLoadNum = FindItemInList( Alphas( AlphaNum ), Condenser );
+					if ( NumSimulationTransferLoadLists > 0 ) TransferLoadListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), TransferLoadList );
+					if ( NumSimulationSecondarySystems > 0 ) SecondaryNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Secondary );
+					if ( NumRefrigCondensers > 0 ) CascadeLoadNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Condenser );
 					NumNameMatches = 0;
 					if ( TransferLoadListNum != 0 ) ++NumNameMatches;
 					if ( SecondaryNum != 0 ) ++NumNameMatches;
@@ -4686,7 +4546,7 @@ namespace RefrigeratedCase {
 				if ( ! allocated( System( RefrigSysNum ).CondenserNum ) ) System( RefrigSysNum ).CondenserNum.allocate( NumCondensers );
 				System( RefrigSysNum ).NumCondensers = 1;
 				//Find condenser number, note condensers were read in one of four objects, but all read into same list
-				CondNum = FindItemInList( Alphas( AlphaNum ), Condenser );
+				CondNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Condenser );
 				if ( CondNum == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum ) + " defined as " + Alphas( AlphaNum ) );
 					ErrorsFound = true;
@@ -4729,12 +4589,12 @@ namespace RefrigeratedCase {
 					ErrorsFound = true;
 				} else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
 					if ( NumCompressorLists > 0 ) {
-						ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
+						ListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CompressorLists );
 					} else {
 						ListNum = 0;
 					}
 					if ( NumSimulationCompressors > 0 ) {
-						CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
+						CompNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Compressor );
 					} else {
 						CompNum = 0;
 					}
@@ -4775,9 +4635,9 @@ namespace RefrigeratedCase {
 
 				AlphaNum = 7;
 				if ( ! lAlphaBlanks( AlphaNum ) ) {
-					if ( SameString( Alphas( AlphaNum ), "ConstantSuctionTemperature" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "ConstantSuctionTemperature" ) ) {
 						System( RefrigSysNum ).CompSuctControl = ConstantSuctionTemperature;
-					} else if ( SameString( Alphas( AlphaNum ), "FloatSuctionTemperature" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "FloatSuctionTemperature" ) ) {
 						System( RefrigSysNum ).CompSuctControl = FloatSuctionTemperature;
 						if ( System( RefrigSysNum ).CoilFlag ) {
 							ShowWarningError( CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", The system specified a FloatSuctionTemperature, but that is not available with air chiller loads so ConstantSuctionTemperature will be used. " );
@@ -4804,7 +4664,7 @@ namespace RefrigeratedCase {
 					if ( ! allocated( System( RefrigSysNum ).SubcoolerNum ) ) System( RefrigSysNum ).SubcoolerNum.allocate( System( RefrigSysNum ).NumSubcoolers );
 					NumSubcooler = 1;
 					if ( ! lAlphaBlanks( AlphaNum ) ) {
-						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = GetObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum ) );
+						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = inputProcessor->getObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum ) );
 						if ( System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) <= 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum ) + " defined as \"" + Alphas( AlphaNum ) + "\"." );
 							ErrorsFound = true;
@@ -4814,7 +4674,7 @@ namespace RefrigeratedCase {
 						++NumSubcooler;
 					}
 					if ( ! lAlphaBlanks( AlphaNum + 1 ) ) {
-						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = GetObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum + 1 ) );
+						System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) = inputProcessor->getObjectItemNum( "Refrigeration:Subcooler", Alphas( AlphaNum + 1 ) );
 						if ( System( RefrigSysNum ).SubcoolerNum( NumSubcooler ) <= 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum + 1 ) + " defined as \"" + Alphas( AlphaNum + 1 ) + "\"." );
 							ErrorsFound = true;
@@ -4834,7 +4694,7 @@ namespace RefrigeratedCase {
 				System( RefrigSysNum ).SumUASuctionPiping = 0.0;
 				if ( ! lNumericBlanks( 2 ) && ! lAlphaBlanks( AlphaNum ) ) {
 					System( RefrigSysNum ).SumUASuctionPiping = Numbers( 2 );
-					System( RefrigSysNum ).SuctionPipeActualZoneNum = FindItemInList( Alphas( AlphaNum ), Zone );
+					System( RefrigSysNum ).SuctionPipeActualZoneNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Zone );
 					System( RefrigSysNum ).SuctionPipeZoneNodeNum = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 					if ( System( RefrigSysNum ).SuctionPipeZoneNodeNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", System Node Number not found for " + cAlphaFieldNames( AlphaNum ) + " = " + Alphas( AlphaNum ) + " even though " + cNumericFieldNames( 2 ) + " is greater than zero. Suction piping heat gain cannot be calculated unless a Zone is defined to deterimine the environmental temperature surrounding the piping." );
@@ -4867,11 +4727,11 @@ namespace RefrigeratedCase {
 				// Flash intercooler (1) or coil-and-shell intercooler (2) for two-stage compression systems
 				AlphaNum = 12;
 				if ( ! lAlphaBlanks( AlphaNum ) ) {
-					if ( SameString( Alphas( AlphaNum ), "None" ) ) {
+					if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "None" ) ) {
 						System( RefrigSysNum ).IntercoolerType = 0;
-					} else if ( SameString( Alphas( AlphaNum ), "Flash Intercooler" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Flash Intercooler" ) ) {
 						System( RefrigSysNum ).IntercoolerType = 1;
-					} else if ( SameString( Alphas( AlphaNum ), "Shell-and-Coil Intercooler" ) ) {
+					} else if ( UtilityRoutines::SameString( Alphas( AlphaNum ), "Shell-and-Coil Intercooler" ) ) {
 						System( RefrigSysNum ).IntercoolerType = 2;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", Invalid " + cAlphaFieldNames( AlphaNum ) + " specified." );
@@ -4916,8 +4776,8 @@ namespace RefrigeratedCase {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", " + cAlphaFieldNames( AlphaNum ) + " must be input for two-stage compression systems." );
 						ErrorsFound = true;
 					} else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
-						ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
-						CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
+						ListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CompressorLists );
+						CompNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Compressor );
 						if ( ( ListNum == 0 ) && ( CompNum == 0 ) ) { // name doesn't match either a compressor or a compressor list
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + System( RefrigSysNum ).Name + "\", " + cAlphaFieldNames( AlphaNum ) + " has an invalid or undefined value=\"" + Alphas( AlphaNum ) + "\"." );
 							ErrorsFound = true;
@@ -5063,7 +4923,7 @@ namespace RefrigeratedCase {
 		if ( NumSimulationSubcoolers > 0 ) {
 			for ( SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum ) {
 				if ( Subcooler( SubcoolerNum ).SubcoolerType == LiquidSuction ) continue;
-				Subcooler( SubcoolerNum ).MechSourceSysID = GetObjectItemNum( "Refrigeration:System", Subcooler( SubcoolerNum ).MechSourceSys );
+				Subcooler( SubcoolerNum ).MechSourceSysID = inputProcessor->getObjectItemNum( "Refrigeration:System", Subcooler( SubcoolerNum ).MechSourceSys );
 				if ( Subcooler( SubcoolerNum ).MechSourceSysID == 0 ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Subcooler( SubcoolerNum ).Name + "\", Mechanical Subcooler has an invalid Source Refrigeration:System=\"" + Subcooler( SubcoolerNum ).MechSourceSys + "\"." );
 					ErrorsFound = true;
@@ -5093,15 +4953,9 @@ namespace RefrigeratedCase {
 		if ( NumTransRefrigSystems > 0 ) {
 			CurrentModuleObject = "Refrigeration:TranscriticalSystem";
 			for ( TransRefrigSysNum = 1; TransRefrigSysNum <= NumTransRefrigSystems; ++TransRefrigSysNum ) {
-				GetObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), TransSystem, RefrigSysNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ShowSevereError( RoutineName + CurrentModuleObject + ", has an invalid or undefined " + cAlphaFieldNames( 1 ) + "=\"" + Alphas( 1 ) + "\"." );
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-					ErrorsFound = true;
-				}
+				inputProcessor->getObjectItem( CurrentModuleObject, TransRefrigSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
+
 				TransSystem( TransRefrigSysNum ).Name = Alphas( 1 );
 
 				// Read refrigerant for this system
@@ -5116,9 +4970,9 @@ namespace RefrigeratedCase {
 					ShowContinueError( "  System type must be specified as \"SingleStage\" or \"TwoStage\"." );
 					ErrorsFound = true;
 				}
-				if ( SameString( Alphas( 2 ), "SingleStage" ) ) {
+				if ( UtilityRoutines::SameString( Alphas( 2 ), "SingleStage" ) ) {
 					TransSystem( TransRefrigSysNum ).TransSysType = 1;
-				} else if ( SameString( Alphas( 2 ), "TwoStage" ) ) {
+				} else if ( UtilityRoutines::SameString( Alphas( 2 ), "TwoStage" ) ) {
 					TransSystem( TransRefrigSysNum ).TransSysType = 2;
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + "\", has an incorrect System Type specified as \"" + Alphas( 2 ) + "\"." );
@@ -5168,9 +5022,9 @@ namespace RefrigeratedCase {
 					CaseAndWalkInListNum = 0;
 					CaseNum = 0;
 					WalkInNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WalkIn );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -5261,9 +5115,9 @@ namespace RefrigeratedCase {
 					CaseAndWalkInListNum = 0;
 					CaseNum = 0;
 					WalkInNum = 0;
-					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
-					if ( NumSimulationCases > 0 ) CaseNum = FindItemInList( Alphas( AlphaNum ), RefrigCase );
-					if ( NumSimulationWalkIns > 0 ) WalkInNum = FindItemInList( Alphas( AlphaNum ), WalkIn );
+					if ( NumSimulationCaseAndWalkInLists > 0 ) CaseAndWalkInListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CaseAndWalkInList );
+					if ( NumSimulationCases > 0 ) CaseNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), RefrigCase );
+					if ( NumSimulationWalkIns > 0 ) WalkInNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), WalkIn );
 					NumNameMatches = 0;
 					if ( CaseAndWalkInListNum != 0 ) ++NumNameMatches;
 					if ( CaseNum != 0 ) ++NumNameMatches;
@@ -5355,7 +5209,7 @@ namespace RefrigeratedCase {
 				if ( ! allocated( TransSystem( TransRefrigSysNum ).GasCoolerNum ) ) TransSystem( TransRefrigSysNum ).GasCoolerNum.allocate( NumGasCoolers );
 				TransSystem( TransRefrigSysNum ).NumGasCoolers = 1;
 				//Find gascooler number
-				GCNum = FindItemInList( Alphas( AlphaNum ), GasCooler );
+				GCNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), GasCooler );
 
 				if ( GCNum == 0 ) { //  Invalid Gas Cooler attached to Transcritical Refrigeration System
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + "\", has an invalid " + cAlphaFieldNames( AlphaNum ) + " defined as \"" + Alphas( AlphaNum ) + "\"." );
@@ -5378,8 +5232,8 @@ namespace RefrigeratedCase {
 					ShowSevereError( RoutineName + CurrentModuleObject + ' ' + cAlphaFieldNames( AlphaNum ) + "\" : must be input." );
 					ErrorsFound = true;
 				} else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
-					ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
-					CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
+					ListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CompressorLists );
+					CompNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Compressor );
 					if ( ( ListNum == 0 ) && ( CompNum == 0 ) ) { // name doesn't match either a compressor or a compressor list
 						ShowSevereError( RoutineName + CurrentModuleObject + ", \"" + cAlphaFieldNames( AlphaNum ) + "\", has an invalid or undefined value=\"" + Alphas( AlphaNum ) + "\"." );
 						ErrorsFound = true;
@@ -5426,8 +5280,8 @@ namespace RefrigeratedCase {
 					ShowWarningError( RoutineName + CurrentModuleObject + ", The transcritical refrigeration system, \"" + TransSystem( TransRefrigSysNum ).Name + "\", is specified to be \"SingleStage\", however, a\"" + cAlphaFieldNames( AlphaNum ) + "\" was found.  The low pressure compressors will be ignored and will not simulated." );
 				} else if ( ( ! ( lAlphaBlanks( AlphaNum ) ) ) && ( TransSystem( TransRefrigSysNum ).TransSysType == 2 ) ) {
 					// TwoStage system with low pressure compressors specified
-					ListNum = FindItemInList( Alphas( AlphaNum ), CompressorLists );
-					CompNum = FindItemInList( Alphas( AlphaNum ), Compressor );
+					ListNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), CompressorLists );
+					CompNum = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Compressor );
 					if ( ( ListNum == 0 ) && ( CompNum == 0 ) ) { // name doesn't match either a compressor or a compressor list
 						ShowSevereError( RoutineName + CurrentModuleObject + ", \"" + cAlphaFieldNames( AlphaNum ) + "\", has an invalid or undefined value=\"" + Alphas( AlphaNum ) + "\"." );
 						ErrorsFound = true;
@@ -5510,7 +5364,7 @@ namespace RefrigeratedCase {
 				TransSystem( TransRefrigSysNum ).SumUASuctionPipingMT = 0.0;
 				if ( ! lNumericBlanks( 3 ) && ! lAlphaBlanks( AlphaNum ) ) {
 					TransSystem( TransRefrigSysNum ).SumUASuctionPipingMT = Numbers( 3 );
-					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumMT = FindItemInList( Alphas( AlphaNum ), Zone );
+					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumMT = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Zone );
 					TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumMT = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 					if ( TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumMT == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + "\", System Node Number not found for " + cAlphaFieldNames( AlphaNum ) + " = \"" + Alphas( AlphaNum ) + "\" even though " + cNumericFieldNames( 3 ) + " is greater than zero." );
@@ -5530,7 +5384,7 @@ namespace RefrigeratedCase {
 				TransSystem( TransRefrigSysNum ).SumUASuctionPipingLT = 0.0;
 				if ( ! lNumericBlanks( 4 ) && ! lAlphaBlanks( AlphaNum ) ) {
 					TransSystem( TransRefrigSysNum ).SumUASuctionPipingLT = Numbers( 4 );
-					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumLT = FindItemInList( Alphas( AlphaNum ), Zone );
+					TransSystem( TransRefrigSysNum ).SuctionPipeActualZoneNumLT = UtilityRoutines::FindItemInList( Alphas( AlphaNum ), Zone );
 					TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumLT = GetSystemNodeNumberForZone( Alphas( AlphaNum ) );
 					if ( TransSystem( TransRefrigSysNum ).SuctionPipeZoneNodeNumLT == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + TransSystem( TransRefrigSysNum ).Name + "\", System Node Number not found for " + cAlphaFieldNames( AlphaNum ) + " = \"" + Alphas( AlphaNum ) + "\" even though " + cNumericFieldNames( 4 ) + " is greater than zero." );
@@ -6892,7 +6746,7 @@ namespace RefrigeratedCase {
 
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_RefrigSystemWaterCondenser;
 		using DataPlant::TypeOf_RefrigerationWaterCoolRack;
 		using PlantUtilities::InitComponentNodes;
@@ -7915,14 +7769,10 @@ namespace RefrigeratedCase {
 		using PlantUtilities::SetComponentFlowRate;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataPlant::TypeOf_RefrigSystemWaterCondenser;
 		using DataPlant::TypeOf_RefrigerationWaterCoolRack;
 		using DataPlant::PlantLoop;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "SimRefrigCondenser" );
@@ -7957,10 +7807,10 @@ namespace RefrigeratedCase {
 		if ( CompIndex == 0 ) {
 			{ auto const SELECT_CASE_var( SysType );
 			if ( SELECT_CASE_var == TypeOf_RefrigerationWaterCoolRack ) {
-				Num = FindItemInList( CompName, RefrigRack );
+				Num = UtilityRoutines::FindItemInList( CompName, RefrigRack );
 
 			} else if ( SELECT_CASE_var == TypeOf_RefrigSystemWaterCondenser ) {
-				Num = FindItemInList( CompName, Condenser );
+				Num = UtilityRoutines::FindItemInList( CompName, Condenser );
 			} else {
 				ShowFatalError( "SimRefrigCondenser: invalid system type passed" );
 			}}
@@ -10602,35 +10452,12 @@ namespace RefrigeratedCase {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine sets an index for a given refrigerated rack or refrigeration condenser
 		//  -- issues error message if the rack or condenser is not found.
-		// METHODOLOGY EMPLOYED:
-		// na
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		//USE DataGlobals,    ONLY: ShowSevereError
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		CheckRefrigerationInput();
 
 		{ auto const SELECT_CASE_var( SysType );
 		if ( SELECT_CASE_var == RefrigSystemTypeRack ) {
-			IndexPtr = FindItemInList( Name, RefrigRack );
+			IndexPtr = UtilityRoutines::FindItemInList( Name, RefrigRack );
 			if ( IndexPtr == 0 ) {
 				if ( present( SuppressWarning ) ) {
 					//     No warning printed if only searching for the existence of a refrigerated rack
@@ -10644,7 +10471,7 @@ namespace RefrigeratedCase {
 				ErrorsFound = true;
 			}
 		} else if ( SELECT_CASE_var == RefrigSystemTypeDetailed ) {
-			IndexPtr = FindItemInList( Name, Condenser );
+			IndexPtr = UtilityRoutines::FindItemInList( Name, Condenser );
 			if ( IndexPtr == 0 ) {
 				if ( present( SuppressWarning ) ) {
 					//     No warning printed if only searching for the existence of a refrigeration Condenser
@@ -12042,13 +11869,9 @@ namespace RefrigeratedCase {
 
 		// Using/Aliasing
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-		using InputProcessor::FindItemInList;
 		using DataHeatBalFanSys::TempControlType;
 		using DataHVACGlobals::SingleHeatingSetPoint;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ChillerSetID;
@@ -12058,7 +11881,7 @@ namespace RefrigeratedCase {
 
 		// Find the correct Chiller set
 		if ( AirChillerSetPtr == 0 ) {
-			ChillerSetID = FindItemInList( AirChillerSetName, AirChillerSet );
+			ChillerSetID = UtilityRoutines::FindItemInList( AirChillerSetName, AirChillerSet );
 			if ( ChillerSetID == 0 ) {
 				ShowFatalError( "SimAirChillerSet: Unit not found=" + AirChillerSetName );
 			} // chillersetid ==0 because not in list
@@ -12126,7 +11949,7 @@ namespace RefrigeratedCase {
 
 		// USE STATEMENTS:
 		//unused  USE DataZoneEnergyDemands, ONLY: ZoneSysEnergyDemand
-		//unused  USE InputProcessor,    ONLY: FindItemInList
+		//unused  USE InputProcessor,    ONLY: UtilityRoutines::FindItemInList(
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

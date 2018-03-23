@@ -165,7 +165,7 @@ TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
 			"    Until: 24:00,1.0;        !- Field 3",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized

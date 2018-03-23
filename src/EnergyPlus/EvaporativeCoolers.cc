@@ -76,7 +76,8 @@
 #include <HVACFan.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -173,6 +174,7 @@ namespace EvaporativeCoolers {
 
 	// Object Data
 	Array1D< EvapConditions > EvapCond;
+	std::unordered_map< std::string, std::string > UniqueEvapCondNames;
 	Array1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
 	Array1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
 
@@ -199,27 +201,8 @@ namespace EvaporativeCoolers {
 		// It is called from the SimAirLoopComponent
 		// at the system time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapCoolNum; // The EvapCooler that you are currently loading input into
@@ -234,7 +217,7 @@ namespace EvaporativeCoolers {
 
 		// Find the correct EvapCoolNumber
 		if ( CompIndex == 0 ) {
-			EvapCoolNum = FindItemInList( CompName, EvapCond, &EvapConditions::EvapCoolerName );
+			EvapCoolNum = UtilityRoutines::FindItemInList( CompName, EvapCond, &EvapConditions::EvapCoolerName );
 			if ( EvapCoolNum == 0 ) {
 				ShowFatalError( "SimEvapCooler: Unit not found=" + CompName );
 			}
@@ -297,31 +280,13 @@ namespace EvaporativeCoolers {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankDemandComponent;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using CurveManager::GetCurveIndex;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapCoolNum; // The EvapCooler that you are currently loading input into
@@ -337,33 +302,29 @@ namespace EvaporativeCoolers {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
+		GetInputEvapComponentsFlag = false;
 		// Start getting the input data
-		NumDirectEvapCool = GetNumObjectsFound( "EvaporativeCooler:Direct:CelDekPad" );
-		NumDryInDirectEvapCool = GetNumObjectsFound( "EvaporativeCooler:Indirect:CelDekPad" );
-		NumWetInDirectEvapCool = GetNumObjectsFound( "EvaporativeCooler:Indirect:WetCoil" );
-		NumRDDEvapCool = GetNumObjectsFound( "EvaporativeCooler:Indirect:ResearchSpecial" );
-		NumDirectResearchSpecialEvapCool = GetNumObjectsFound( "EvaporativeCooler:Direct:ResearchSpecial" );
+		NumDirectEvapCool = inputProcessor->getNumObjectsFound( "EvaporativeCooler:Direct:CelDekPad" );
+		NumDryInDirectEvapCool = inputProcessor->getNumObjectsFound( "EvaporativeCooler:Indirect:CelDekPad" );
+		NumWetInDirectEvapCool = inputProcessor->getNumObjectsFound( "EvaporativeCooler:Indirect:WetCoil" );
+		NumRDDEvapCool = inputProcessor->getNumObjectsFound( "EvaporativeCooler:Indirect:ResearchSpecial" );
+		NumDirectResearchSpecialEvapCool = inputProcessor->getNumObjectsFound( "EvaporativeCooler:Direct:ResearchSpecial" );
 
 		//Sum up all of the Evap Cooler Types
 		NumEvapCool = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + NumDirectResearchSpecialEvapCool;
 
-		if ( NumEvapCool > 0 ) EvapCond.allocate( NumEvapCool );
+		if ( NumEvapCool > 0 ) {
+			EvapCond.allocate( NumEvapCool );
+			UniqueEvapCondNames.reserve( NumEvapCool );
+		}
 		CheckEquipName.dimension( NumEvapCool, true );
 
 		cCurrentModuleObject = "EvaporativeCooler:Direct:CelDekPad";
 
 		for ( EvapCoolNum = 1; EvapCoolNum <= NumDirectEvapCool; ++EvapCoolNum ) {
-			GetObjectItem( cCurrentModuleObject, EvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond, &EvapConditions::EvapCoolerName, EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, EvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerDirectCELDEKPAD;
 
@@ -413,14 +374,8 @@ namespace EvaporativeCoolers {
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumDryInDirectEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + IndEvapCoolNum;
 
-			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond, &EvapConditions::EvapCoolerName, EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectCELDEKPAD; //'EvaporativeCooler:Indirect:CelDekPad'
 
@@ -489,14 +444,8 @@ namespace EvaporativeCoolers {
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumWetInDirectEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + IndEvapCoolNum;
 
-			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond, &EvapConditions::EvapCoolerName, EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectWETCOIL; //'EvaporativeCooler:Indirect:WetCoil'
 
@@ -561,14 +510,8 @@ namespace EvaporativeCoolers {
 		cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
-			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond, &EvapConditions::EvapCoolerName, EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerInDirectRDDSpecial; //'EvaporativeCooler:Indirect:ResearchSpecial'
 
@@ -628,7 +571,7 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor = rNumericArgs( 6 );
 			EvapCond( EvapCoolNum ).IndirectFanPower = rNumericArgs( 7 );
 			EvapCond( EvapCoolNum ).FanSizingSpecificPower = rNumericArgs( 8 );
-			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 9 );
+			EvapCond( EvapCoolNum ).DesVolFlowRate = rNumericArgs( 9 );
 			EvapCond( EvapCoolNum ).DPBoundFactor = rNumericArgs( 10 );
 			if ( lNumericFieldBlanks( 11 ) ) {
 				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
@@ -669,14 +612,8 @@ namespace EvaporativeCoolers {
 		cCurrentModuleObject = "EvaporativeCooler:Direct:ResearchSpecial";
 		for ( DirectEvapCoolNum = 1; DirectEvapCoolNum <= NumDirectResearchSpecialEvapCool; ++DirectEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + DirectEvapCoolNum;
-			GetObjectItem( cCurrentModuleObject, DirectEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), EvapCond, &EvapConditions::EvapCoolerName, EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, DirectEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueEvapCondNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			EvapCond( EvapCoolNum ).EvapCoolerName = cAlphaArgs( 1 );
 			EvapCond( EvapCoolNum ).EvapCoolerType = iEvapCoolerDirectResearchSpecial;
 
@@ -710,7 +647,7 @@ namespace EvaporativeCoolers {
 			}
 			EvapCond( EvapCoolNum ).DirectEffectiveness = rNumericArgs( 1 );
 
-			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 2 );
+			EvapCond( EvapCoolNum ).DesVolFlowRate = rNumericArgs( 2 );
 			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 3 );
 			EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
 			if ( lNumericFieldBlanks( 5 ) ) {
@@ -957,31 +894,12 @@ namespace EvaporativeCoolers {
 		// Size calculations for Evap coolers
 		//  currently just for secondary side of Research Special Indirect evap cooler
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataAirSystems::PrimaryAirSystem;
-		using InputProcessor::SameString;
 		using ReportSizingManager::ReportSizingOutput;
 		using Fans::SetFanData;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool CoolerOnOApath( false );
@@ -1051,7 +969,7 @@ namespace EvaporativeCoolers {
 			for ( AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem( CurSysNum ).NumBranches; ++AirSysBranchLoop ) {
 				for ( BranchComp = 1; BranchComp <= PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).TotalComponents; ++BranchComp ) {
 
-					if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name, EvapCond( EvapCoolNum ).EvapCoolerName ) ) {
+					if ( UtilityRoutines::SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name, EvapCond( EvapCoolNum ).EvapCoolerName ) ) {
 						CoolerOnMainAirLoop = true;
 					}
 
@@ -1135,7 +1053,7 @@ namespace EvaporativeCoolers {
 
 		// Next up the other volume flow rate
 		IsAutoSize = false;
-		if ( EvapCond( EvapCoolNum ).VolFlowRate == AutoSize ) {
+		if ( EvapCond( EvapCoolNum ).DesVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
 		}
 		if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
@@ -1174,13 +1092,13 @@ namespace EvaporativeCoolers {
 		}
 		if ( !HardSizeNoDesRun ) {
 			if ( IsAutoSize ) {
-				EvapCond( EvapCoolNum ).VolFlowRate = volFlowRateDes;
+				EvapCond( EvapCoolNum ).DesVolFlowRate = volFlowRateDes;
 				// only these two evap coolers has primary air design flow rate
 				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
-					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).DesVolFlowRate );
 					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 				} else if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
-					ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+					ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).DesVolFlowRate );
 				}
 			} else {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
@@ -1325,7 +1243,7 @@ namespace EvaporativeCoolers {
 				// search for this component in Air loop branches.
 				for ( AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem( CurSysNum ).NumBranches; ++AirSysBranchLoop) {
 					for ( BranchComp = 1; BranchComp <= PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).TotalComponents; ++BranchComp ) {
-						if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name,
+						if ( UtilityRoutines::SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name,
 							EvapCond( EvapCoolNum ).EvapCoolerName ) ) {
 							CoolerOnMainAirLoop = true;
 						}
@@ -1442,7 +1360,7 @@ namespace EvaporativeCoolers {
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
 			// recirculating water pump sizing: Primary Air Design flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
 			if ( EvapCond( EvapCoolNum ).RecircPumpPower == AutoSize ) {
-				EvapCond( EvapCoolNum ).RecircPumpPower = EvapCond( EvapCoolNum ).VolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+				EvapCond( EvapCoolNum ).RecircPumpPower = EvapCond( EvapCoolNum ).DesVolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
 				ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).RecircPumpPower );
 			}
 		}
@@ -2646,21 +2564,6 @@ namespace EvaporativeCoolers {
 			// Uses regula falsi to minimize setpoint temperature residual to by varying the
 			// secondary air flow rate.
 
-			// REFERENCES:
-			//
-
-			// Using/Aliasing
-			// na
-
-			// SUBROUTINE PARAMETER DEFINITIONS:
-			//na
-
-			// INTERFACE BLOCK SPECIFICATIONS
-			// na
-
-			// DERIVED TYPE DEFINITIONS
-			// na
-
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			int EvapCoolIndex; // evaporative cooler index
 			int DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
@@ -3323,27 +3226,8 @@ namespace EvaporativeCoolers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// public simulation routine for managing zone hvac evaporative cooler unit
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
@@ -3355,7 +3239,7 @@ namespace EvaporativeCoolers {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			CompNum = FindItemInList( CompName, ZoneEvapUnit );
+			CompNum = UtilityRoutines::FindItemInList( CompName, ZoneEvapUnit );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimZoneEvaporativeCoolerUnit: Zone evaporative cooler unit not found." );
 			}
@@ -3394,12 +3278,6 @@ namespace EvaporativeCoolers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// get input for zone evap cooler unit
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Fans::GetFanType;
 		using Fans::GetFanIndex;
@@ -3408,11 +3286,6 @@ namespace EvaporativeCoolers {
 		using Fans::GetFanOutletNode;
 		using Fans::GetFanAvailSchPtr;
 		using General::TrimSigDigits;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
 		using DataHVACGlobals::FanType_SimpleOnOff;
@@ -3421,18 +3294,8 @@ namespace EvaporativeCoolers {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataGlobals::NumOfZones;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetInputZoneEvaporativeCoolerUnit: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentModuleObject; // Object type for getting and error messages
@@ -3449,8 +3312,6 @@ namespace EvaporativeCoolers {
 		int NumFields; // Total number of fields in object
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		Real64 FanVolFlow;
 		int UnitLoop;
@@ -3462,12 +3323,13 @@ namespace EvaporativeCoolers {
 			GetInputEvapComponentsFlag = false;
 		}
 
+		GetInputZoneEvapUnit = false;
 		MaxNumbers = 0;
 		MaxAlphas = 0;
 
 		CurrentModuleObject = "ZoneHVAC:EvaporativeCoolerUnit";
-		NumZoneEvapUnits = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumZoneEvapUnits = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		Alphas.allocate( MaxAlphas );
@@ -3483,19 +3345,14 @@ namespace EvaporativeCoolers {
 			ZoneEvapCoolerUnitFields.allocate( NumZoneEvapUnits );
 
 			for ( UnitLoop = 1; UnitLoop <= NumZoneEvapUnits; ++UnitLoop ) {
-				GetObjectItem( CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames.allocate( NumNumbers );
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = "";
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = cNumericFields;
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), ZoneEvapUnit, UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
+				UtilityRoutines::IsNameEmpty( Alphas( 1 ), CurrentModuleObject, ErrorsFound );
+
 				ZoneEvapUnit( UnitLoop ).Name = Alphas( 1 );
 				if ( lAlphaBlanks( 2 ) ) {
 					ZoneEvapUnit( UnitLoop ).AvailSchedIndex = ScheduleAlwaysOn;
@@ -3523,7 +3380,7 @@ namespace EvaporativeCoolers {
 				ZoneEvapUnit( UnitLoop ).FanObjectClassName = Alphas( 7 );
 				ZoneEvapUnit( UnitLoop ).FanName = Alphas( 8 );
 				errFlag = false;
-				if ( ! InputProcessor::SameString(ZoneEvapUnit( UnitLoop ).FanObjectClassName, "Fan:SystemModel" ) ) {
+				if ( ! UtilityRoutines::SameString(ZoneEvapUnit( UnitLoop ).FanObjectClassName, "Fan:SystemModel" ) ) {
 					GetFanType( ZoneEvapUnit( UnitLoop ).FanName, ZoneEvapUnit( UnitLoop ).FanType_Num, errFlag, CurrentModuleObject, ZoneEvapUnit( UnitLoop ).Name );
 					GetFanIndex( ZoneEvapUnit( UnitLoop ).FanName, ZoneEvapUnit( UnitLoop ).FanIndex, errFlag, CurrentModuleObject );
 					ZoneEvapUnit( UnitLoop ).FanInletNodeNum = GetFanInletNode( ZoneEvapUnit( UnitLoop ).FanObjectClassName, ZoneEvapUnit( UnitLoop ).FanName, errFlag );
@@ -3536,7 +3393,7 @@ namespace EvaporativeCoolers {
 						ShowContinueError( "...specified in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
 						ErrorsFound = true;
 					}
-				} else if ( InputProcessor::SameString(ZoneEvapUnit( UnitLoop ).FanObjectClassName, "Fan:SystemModel" ) ){
+				} else if ( UtilityRoutines::SameString(ZoneEvapUnit( UnitLoop ).FanObjectClassName, "Fan:SystemModel" ) ){
 
 					ZoneEvapUnit( UnitLoop ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( ZoneEvapUnit( UnitLoop ).FanName ) ); // call constructor
@@ -3618,7 +3475,7 @@ namespace EvaporativeCoolers {
 				}}
 
 				ZoneEvapUnit( UnitLoop ).EvapCooler_1_Name = Alphas( 12 );
-				ZoneEvapUnit( UnitLoop ).EvapCooler_1_Index = FindItemInList( Alphas( 12 ), EvapCond, &EvapConditions::EvapCoolerName );
+				ZoneEvapUnit( UnitLoop ).EvapCooler_1_Index = UtilityRoutines::FindItemInList( Alphas( 12 ), EvapCond, &EvapConditions::EvapCoolerName );
 				if ( ZoneEvapUnit( UnitLoop ).EvapCooler_1_Index == 0 ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
 					ShowContinueError( "invalid, not found " + cAlphaFields( 12 ) + "=\"" + Alphas( 12 ) + "\"." );
@@ -3650,7 +3507,7 @@ namespace EvaporativeCoolers {
 					}}
 					if ( ! lAlphaBlanks( 14 ) ) {
 						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Name = Alphas( 14 );
-						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Index = FindItemInList( Alphas( 14 ), EvapCond, &EvapConditions::EvapCoolerName );
+						ZoneEvapUnit( UnitLoop ).EvapCooler_2_Index = UtilityRoutines::FindItemInList( Alphas( 14 ), EvapCond, &EvapConditions::EvapCoolerName );
 						if ( ZoneEvapUnit( UnitLoop ).EvapCooler_2_Index == 0 ) {
 							ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
 							ShowContinueError( "invalid, not found " + cAlphaFields( 14 ) + "=\"" + Alphas( 14 ) + "\"." );
@@ -3665,7 +3522,7 @@ namespace EvaporativeCoolers {
 
 				ZoneEvapUnit( UnitLoop ).HVACSizingIndex = 0;
 				if ( !lAlphaBlanks( 15 ) ) {
-					ZoneEvapUnit( UnitLoop ).HVACSizingIndex = FindItemInList( Alphas( 15 ), ZoneHVACSizing );
+					ZoneEvapUnit( UnitLoop ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 15 ), ZoneHVACSizing );
 					if ( ZoneEvapUnit( UnitLoop ).HVACSizingIndex == 0 ) {
 						ShowSevereError( cAlphaFields( 15 ) + " = " + Alphas( 15 ) + " not found." );
 						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
@@ -4708,6 +4565,12 @@ namespace EvaporativeCoolers {
 
 	//        End of Reporting subroutines for the EvaporativeCoolers Module
 	// *****************************************************************************
+
+	void
+	clear_state() {
+		GetInputZoneEvapUnit = true;
+		UniqueEvapCondNames.clear();
+	}
 
 } // EvaporativeCoolers
 

@@ -56,7 +56,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -129,30 +129,9 @@ namespace MatrixDataManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// get input for Matrix objects
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumTwoDimMatrix; // count of Matrix:TwoDimension objects
@@ -162,14 +141,12 @@ namespace MatrixDataManager {
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int NumRows;
 		int NumCols;
 		int NumElements;
 
 		cCurrentModuleObject = "Matrix:TwoDimension";
-		NumTwoDimMatrix = GetNumObjectsFound( cCurrentModuleObject );
+		NumTwoDimMatrix = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		NumMats = NumTwoDimMatrix;
 
@@ -177,15 +154,10 @@ namespace MatrixDataManager {
 
 		MatNum = 0;
 		for ( MatIndex = 1; MatIndex <= NumTwoDimMatrix; ++MatIndex ) {
-			GetObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, MatIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
 			++MatNum;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), MatData, MatNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			MatData( MatNum ).Name = cAlphaArgs( 1 );
 			NumRows = std::floor( rNumericArgs( 1 ) );
 			NumCols = std::floor( rNumericArgs( 2 ) );
@@ -236,27 +208,10 @@ namespace MatrixDataManager {
 
 		// METHODOLOGY EMPLOYED:
 		// inputs name of matrix and returns integer index
-		// currently uses FindItemInList which is case sensitive
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
+		// currently uses UtilityRoutines::FindItemInList( which is case sensitive
 
 		// Return value
 		int MatrixIndexPtr; // Function result
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
@@ -267,7 +222,7 @@ namespace MatrixDataManager {
 		}
 
 		if ( NumMats > 0 ) {
-			MatrixIndexPtr = FindItemInList( MatrixName, MatData );
+			MatrixIndexPtr = UtilityRoutines::FindItemInList( MatrixName, MatData );
 		} else {
 			MatrixIndexPtr = 0;
 		}
@@ -291,31 +246,6 @@ namespace MatrixDataManager {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// pass matrix to calling routine
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( Idx > 0 ) { // protect hard crash
 			Mat2D = MatData( Idx ).Mat2D;
@@ -343,27 +273,6 @@ namespace MatrixDataManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( Idx > 0 ) {
 			NumRows = MatData( Idx ).Mat2D.isize( 2 );
 			NumCols = MatData( Idx ).Mat2D.isize( 1 );

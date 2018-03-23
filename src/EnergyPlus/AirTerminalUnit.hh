@@ -63,6 +63,7 @@ enum AirTerminalUnitType {
 	dualDuctVAV,
 	singleDuctVAVReheat,
 	singleDuctConstVolReheat,
+	singleDuctConstVolNoReheat,
 	singleDuctVAVNoReheat,
 	singleDuct_SeriesPIU_Reheat,
 	singleDuct_ParallelPIU_Reheat,
@@ -94,7 +95,9 @@ protected: // Creation
 		airInNodeNum( 0 ),
 		airOutNodeNum( 0 ),
 		zoneIndex( 0 ),
-		zoneNodeIndex( 0 )
+		zoneNodeIndex( 0 ),
+		ctrlZoneInNodeIndex( 0 ),
+		airLoopNum( 0 )
 	{}
 
 	// Copy Constructor
@@ -134,7 +137,21 @@ public: // Methods
 		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
 	) = 0;
 
+	virtual
+	int
+	getZoneIndex() = 0;
 
+	virtual
+	int
+	getAirLoopNum() = 0;
+
+	virtual
+	Real64
+	getPrimAirDesignVolFlow() = 0;
+
+	virtual
+	int
+	getTermUnitSizingIndex() = 0;
 
 protected: // Data
 
@@ -153,6 +170,7 @@ protected: // Data
 	int zoneNodeIndex; // index in node structure for the zone node for this air terminal
 	int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 	int airLoopNum; // index to airloop that this terminal unit is connected to
+	int termUnitSizingNum; // index to TermUnitSizing, TermUnitFinalZoneSizing, and more for this air distribution unit
 }; // AirTerminalUnit
 
 } // EnergyPlus

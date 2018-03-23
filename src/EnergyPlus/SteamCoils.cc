@@ -63,11 +63,13 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <FaultsManager.hh>
+#include <Fans.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <HVACFan.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -75,6 +77,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include <ReportCoilSelection.hh>
 
 namespace EnergyPlus {
 
@@ -112,11 +115,9 @@ namespace SteamCoils {
 	using namespace FluidProperties;
 	using DataEnvironment::StdBaroPress;
 	using DataPlant::TypeOf_CoilSteamAirHeating;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 	using DataPlant::PlantLoop;
-	using DataPlant::MyPlantSizingIndex;
-
-	// Use statements for access to subroutines in other modules
+	using PlantUtilities::MyPlantSizingIndex;
 	using namespace ScheduleManager;
 
 	// Data
@@ -181,27 +182,8 @@ namespace SteamCoils {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine manages SteamCoil component simulation.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 QCoilActualTemp; // coil load actually delivered returned to calling component
@@ -217,7 +199,7 @@ namespace SteamCoils {
 
 		// Find the correct SteamCoilNumber with the Coil Name
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, SteamCoil );
+			CoilNum = UtilityRoutines::FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "SimulateSteamCoilComponents: Coil not found=" + CompName );
 			}
@@ -279,28 +261,14 @@ namespace SteamCoils {
 		// METHODOLOGY EMPLOYED:
 		// Uses "Get" routines to read in data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using namespace InputProcessor;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::FindRefrigerant;
 		using GlobalNames::VerifyUniqueCoilName;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSteamCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilNum; // The SteamCoil that you are currently loading input into
@@ -310,8 +278,6 @@ namespace SteamCoils {
 		int NumNums;
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string AlphArray; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -324,14 +290,14 @@ namespace SteamCoils {
 		bool errFlag;
 
 		CurrentModuleObject = "Coil:Heating:Steam";
-		NumStmHeat = GetNumObjectsFound( CurrentModuleObject );
+		NumStmHeat = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumSteamCoils = NumStmHeat;
 		if ( NumSteamCoils > 0 ) {
 			SteamCoil.allocate( NumSteamCoils );
 			CheckEquipName.dimension( NumSteamCoils, true );
 		}
 
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
 		cAlphaFields.allocate( NumAlphas );
 		cNumericFields.allocate( NumNums );
@@ -344,14 +310,9 @@ namespace SteamCoils {
 
 			CoilNum = StmHeatNum;
 
-			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SteamCoil, CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
+
 			VerifyUniqueCoilName( CurrentModuleObject, AlphArray( 1 ), errFlag, CurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -381,7 +342,7 @@ namespace SteamCoils {
 			SteamCoil( CoilNum ).AirInletNodeNum = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 			SteamCoil( CoilNum ).AirOutletNodeNum = GetOnlySingleNode( AlphArray( 6 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 7 ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( AlphArray( 7 ) ) );
 			//TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
 			if ( SELECT_CASE_var == "TEMPERATURESETPOINTCONTROL" ) {
 				SteamCoil( CoilNum ).TypeOfCoil = TemperatureSetPointControl;
@@ -687,7 +648,7 @@ namespace SteamCoils {
 		Real64 DesVolFlow;
 		Real64 MinFlowFrac;
 		Real64 OutAirFrac;
-		Real64 TempSteamIn;
+		Real64 TempSteamIn( 100.0 );
 		Real64 EnthSteamInDry;
 		Real64 EnthSteamOutWet;
 		Real64 LatentHeatSteam;
@@ -711,13 +672,16 @@ namespace SteamCoils {
 		DesCoilLoad = 0.0;
 		MinFlowFrac = 0.0;
 		DesMassFlow = 0.0;
+		DesVolFlow = 0.0;
 		CpWater = 0.0;
 		RhoAirStd = PsyRhoAirFnPbTdbW( StdBaroPress, 20.0, 0.0 );
 		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
+		bool coilWasAutosized( false ); //coil report
 
 		// If this is a steam coil
 		// Find the appropriate steam Plant Sizing object
 		if ( SteamCoil( CoilNum ).MaxSteamVolFlowRate == AutoSize ) {
+			coilWasAutosized =  true; //coil report
 			PltSizSteamNum = MyPlantSizingIndex( "steam heating coil", SteamCoil( CoilNum ).Name, SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).SteamOutletNodeNum, ErrorsFound );
 		}
 
@@ -818,6 +782,28 @@ namespace SteamCoils {
 					ReportSizingOutput( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name, "Maximum Steam Flow Rate [m3/s]", SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 				}
 				DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
+				//Coil report, set fan info for airloopnum
+				switch ( DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum ){
+				case DataAirSystems::structArrayLegacyFanModels: {
+					int SupFanNum = DataAirSystems::PrimaryAirSystem( CurSysNum ).SupFanNum;
+					if (  SupFanNum > 0 ) {
+						coilSelectionReportObj->setCoilSupplyFanInfo( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", Fans::Fan( DataAirSystems::PrimaryAirSystem( CurSysNum ).SupFanNum ).FanName, DataAirSystems::structArrayLegacyFanModels, DataAirSystems::PrimaryAirSystem( CurSysNum ).SupFanNum );
+					}
+
+					break;
+				}
+				case DataAirSystems::objectVectorOOFanSystemModel: {
+					if ( DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanVecIndex >= 0 ) {
+						coilSelectionReportObj->setCoilSupplyFanInfo( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", HVACFan::fanObjs[ DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanVecIndex ]->name, DataAirSystems::objectVectorOOFanSystemModel, DataAirSystems::PrimaryAirSystem( CurSysNum ).supFanVecIndex );
+					}
+					break;
+				}
+				case DataAirSystems::fanModelTypeNotYetSet: {
+					// do nothing
+					break;
+				}
+				}
+
 				// if this is a zone coil
 			} else if ( CurZoneEqNum > 0 ) {
 				CheckZoneSizing( "Coil:Heating:Steam", SteamCoil( CoilNum ).Name );
@@ -831,14 +817,17 @@ namespace SteamCoils {
 							SteamCoil( CoilNum ).MaxSteamVolFlowRate = 0.0;
 						}
 						// if coil is part of a zonal unit, calc coil load to get hot Steam flow rate
+						DesCoilLoad = TermUnitSizing( CurTermUnitSizingNum ).DesHeatingLoad; //coil report
+						DesVolFlow = TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow * TermUnitSizing( CurTermUnitSizingNum ).ReheatAirFlowMult; //coil report
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
+						DesVolFlow = DesMassFlow / RhoAirStd;
 						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 						if ( DesCoilLoad >= SmallLoad ) {
-							TempSteamIn = 100.0; // DSU? Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
+							TempSteamIn = 100.0;
 							// RefrigIndex is set during GetInput for this module
 							EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, SteamCoil( CoilNum ).FluidIndex, RoutineName );
 							EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, SteamCoil( CoilNum ).FluidIndex, RoutineName );
@@ -880,10 +869,30 @@ namespace SteamCoils {
 		// save the design Steam volumetric flow rate for use by the Steam loop sizing algorithms
 		RegisterPlantCompDesignFlow( SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).MaxSteamVolFlowRate );
 
+		coilSelectionReportObj->setCoilHeatingCapacity( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, CurSysNum, CurZoneEqNum, CurOASysNum, 0.0, 1.0, -999.0,-999.0 );
+		coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", DesCoilLoad, coilWasAutosized, SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).SteamOutletNodeNum, SteamCoil( CoilNum ).LoopNum );
+		coilSelectionReportObj->setCoilWaterFlowNodeNums( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam", SteamCoil( CoilNum ).MaxSteamVolFlowRate, coilWasAutosized, SteamCoil( CoilNum ).SteamInletNodeNum, SteamCoil( CoilNum ).SteamOutletNodeNum, SteamCoil( CoilNum ).LoopNum );
+		coilSelectionReportObj->setCoilEntWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn ); //coil  report
+		coilSelectionReportObj->setCoilLvgWaterTemp( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , TempSteamIn - SteamCoil( CoilNum ).DegOfSubcooling ); //coil report
+		coilSelectionReportObj->setCoilWaterDeltaT( SteamCoil( CoilNum ).Name, "Coil:Heating:Steam" , SteamCoil( CoilNum ).DegOfSubcooling );  //coil report
+		SteamCoil( CoilNum ).DesCoilCapacity = DesCoilLoad;
+		SteamCoil( CoilNum ).DesAirVolFlow = DesVolFlow;
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding Steam coil sizing errors cause program termination" );
 		}
 
+		//There is no standard rating for heating coils at this point, so fill with dummy flag values
+		coilSelectionReportObj->setRatedCoilConditions(
+			SteamCoil( CoilNum ).Name,
+			"Coil:Heating:Steam",
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,
+			-999.0,-999.0,-999.0,
+			-999.0,-999.0, -999.0, -999.0 );
 	}
 
 	// End Initialization Section of the Module
@@ -983,7 +992,7 @@ namespace SteamCoils {
 			//update the TempSetPoint
 			TempSetPoint -= SteamCoil( CoilNum ).FaultyCoilSATOffset;
 		}
-		
+
 		//  adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
@@ -1445,32 +1454,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int IndexNum; // returned air inlet node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates SteamCoil related parameters from input file
 		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
@@ -1479,7 +1464,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilType == "COIL:HEATING:STEAM" ) {
-			IndexNum = FindItemInList( CoilName, SteamCoil );
+			IndexNum = UtilityRoutines::FindItemInList( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1511,27 +1496,8 @@ namespace SteamCoils {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Gets the correct schedule value for this coil
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilNum;
@@ -1544,7 +1510,7 @@ namespace SteamCoils {
 
 		// Find the correct Coil number
 		if ( CompIndex == 0 ) {
-			CoilNum = FindItemInList( CompName, SteamCoil );
+			CoilNum = UtilityRoutines::FindItemInList( CompName, SteamCoil );
 			if ( CoilNum == 0 ) {
 				ShowFatalError( "CheckSteamCoilSchedule: Coil not found=" + CompName );
 			}
@@ -1582,30 +1548,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
 		// as negative.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		Real64 MaxWaterFlowRate; // returned max water flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -1617,8 +1561,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				MaxWaterFlowRate = 0.0;
@@ -1656,31 +1600,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and flow rate is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		Real64 MaxSteamFlowRate; // returned max steam flow rate of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		// Obtains and Allocates SteamCoil related parameters from input file
 		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
@@ -1719,32 +1640,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int NodeNumber; // returned air inlet node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates SteamCoil related parameters from input file
 		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
@@ -1847,30 +1744,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned air inlet node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int IndexNum; // returned air inlet node number of matched coil
@@ -1881,8 +1756,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			IndexNum = UtilityRoutines::FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -1916,32 +1791,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int NodeNumber; // returned air inlet node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates SteamCoil related parameters from input file
 		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
@@ -1980,30 +1831,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned air inlet node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int IndexNum; // returned air inlet node number of matched coil
@@ -2014,8 +1843,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			IndexNum = UtilityRoutines::FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -2051,32 +1880,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int NodeNumber; // returned air inlet node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates SteamCoil related parameters from input file
 		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
@@ -2115,30 +1920,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned air inlet node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int IndexNum; // returned air inlet node number of matched coil
@@ -2149,8 +1932,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			IndexNum = FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			IndexNum = UtilityRoutines::FindItem( CoilName, SteamCoil );
 		} else {
 			IndexNum = 0;
 		}
@@ -2186,30 +1969,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		Real64 Capacity; // returned operating capacity of matched coil (W)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2220,8 +1981,8 @@ namespace SteamCoils {
 			GetSteamCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				// coil does not specify MaxWaterFlowRate
 				Capacity = SteamCoil( WhichCoil ).OperatingCapacity;
@@ -2259,15 +2020,6 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
 		// Return value
 		int TypeOfCoil; // returned coil type of matched coil (W)
 
@@ -2275,18 +2027,6 @@ namespace SteamCoils {
 		// FUNCTION ARGUMENT DEFINITIONS:
 		// 1 = TemperatureSetPointControl
 		// 3 = ZoneLoadControl
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
 
 		// Obtains and Allocates SteamCoil related parameters from input file
 		if ( GetSteamCoilsInputFlag ) { //First time subroutine has been entered
@@ -2325,30 +2065,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int NodeNumber; // returned node number of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2361,8 +2079,8 @@ namespace SteamCoils {
 
 		WhichCoil = 0;
 		NodeNumber = 0;
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				NodeNumber = SteamCoil( WhichCoil ).TempSetPointNodeNum;
 			}
@@ -2399,30 +2117,8 @@ namespace SteamCoils {
 		// incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
 		// as zero.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
-
 		// Return value
 		int AvailSchIndex; // returned availability schedule of matched coil
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
@@ -2436,8 +2132,8 @@ namespace SteamCoils {
 		WhichCoil = 0;
 		AvailSchIndex = 0;
 
-		if ( SameString( CoilType, "Coil:Heating:Steam" ) ) {
-			WhichCoil = FindItem( CoilName, SteamCoil );
+		if ( UtilityRoutines::SameString( CoilType, "Coil:Heating:Steam" ) ) {
+			WhichCoil = UtilityRoutines::FindItem( CoilName, SteamCoil );
 			if ( WhichCoil != 0 ) {
 				AvailSchIndex = SteamCoil( WhichCoil ).SchedPtr;
 			}
@@ -2460,7 +2156,7 @@ namespace SteamCoils {
 		int const CoilNum, // Number of hot water heating Coil
 		bool & ErrorsFound, // Set to true if certain errors found
 		Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used 
+		Optional_int DesiccantDehumIndex // Index for the desiccant dehum system where this caoil is used
 		) {
 
 		// FUNCTION INFORMATION:

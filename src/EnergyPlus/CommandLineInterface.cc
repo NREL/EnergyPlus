@@ -59,7 +59,6 @@
 #include <DisplayRoutines.hh>
 #include <EnergyPlus.hh>
 #include <FileSystem.hh>
-#include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
 #include <OutputReports.hh>
@@ -75,7 +74,6 @@ using namespace DataGlobals;
 using namespace DataStringGlobals;
 using namespace DataSystemVariables;
 using namespace FileSystem;
-using namespace InputProcessor;
 using namespace SimulationManager;
 using namespace OutputReportTabular;
 using namespace OutputProcessor;
@@ -151,6 +149,8 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
 
+	opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
+
 	opt.add("L", 0, 1, 0, "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: Dash (e.g., eplus-table.csv)", "-s", "--output-suffix");
 
 	opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
@@ -192,6 +192,8 @@ ProcessArgs(int argc, const char * argv[])
 
 	AnnualSimulation = opt.isSet("-a");
 
+	outputEpJSONConversion = opt.isSet("-c");
+
 	// Process standard arguments
 	if (opt.isSet("-h")) {
 		DisplayString(usage);
@@ -206,13 +208,13 @@ ProcessArgs(int argc, const char * argv[])
 	if (opt.lastArgs.size() == 1) {
 		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
 			std::string const & arg( *opt.lastArgs[i] );
-			inputIdfFileName = arg;
+			inputFileName = arg;
 		}
 	}
-	if (opt.lastArgs.size() == 0) inputIdfFileName = "in.idf";
+	if (opt.lastArgs.size() == 0) inputFileName = "in.idf";
 
 	// Convert all paths to native paths
-	makeNativePath(inputIdfFileName);
+	makeNativePath(inputFileName);
 	makeNativePath(inputWeatherFileName);
 	makeNativePath(inputIddFileName);
 	makeNativePath(outDirPathName);
@@ -241,8 +243,27 @@ ProcessArgs(int argc, const char * argv[])
 		}
 	}
 
-	idfFileNameOnly = removeFileExtension(getFileName(inputIdfFileName));
-	idfDirPathName = getParentDirectoryPath(inputIdfFileName);
+	inputFileNameOnly = removeFileExtension(getFileName(inputFileName));
+	inputDirPathName = getParentDirectoryPath(inputFileName);
+
+	auto inputFileExt = getFileExtension( inputFileName );
+	std::transform( inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper );
+
+	// TODO: figure out better logic for determining input file type
+	if ( inputFileExt == "EPJSON" || inputFileExt == "JSON" ) {
+		isEpJSON = true;
+	} else if ( inputFileExt == "IDF" || inputFileExt == "IMF" ) {
+		isEpJSON = false;
+	} else if ( inputFileExt == "CBOR" ) {
+		isEpJSON = true;
+		isCBOR = true;
+	} else if ( inputFileExt == "MSGPACK" ) {
+		isEpJSON = true;
+		isMsgPack = true;
+	} else {
+		DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
+		exit(EXIT_FAILURE);
+	}
 
 	std::string weatherFilePathWithoutExtension = removeFileExtension(inputWeatherFileName);
 
@@ -262,6 +283,8 @@ ProcessArgs(int argc, const char * argv[])
 		// Create directory if it doesn't already exist
 		makeDirectory(outDirPathName);
 	}
+
+	outputDirPathName = outDirPathName;
 
 	// File naming scheme
 	std::string outputFilePrefix;
@@ -392,7 +415,7 @@ ProcessArgs(int argc, const char * argv[])
 	EnergyPlusIniFileName = "Energy+.ini";
 	inStatFileName = weatherFilePathWithoutExtension + ".stat";
 	TarcogIterationsFileName = "TarcogIterations.dbg";
-	eplusADSFileName = idfDirPathName+"eplusADS.inp";
+	eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
 	// Readvars files
 	outputCsvFileName = outputFilePrefix + normalSuffix + ".csv";
@@ -486,9 +509,9 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	{ IOFlags flags; gio::inquire( inputIdfFileName, flags ); FileExists = flags.exists(); }
+	{ IOFlags flags; gio::inquire( inputFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputIdfFileName) + "." );
+		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + "." );
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
@@ -509,6 +532,8 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	//TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
+
 	// Preprocessors (These will likely move to a new file)
 	if (runEPMacro) {
 		std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
@@ -519,15 +544,15 @@ ProcessArgs(int argc, const char * argv[])
 		}
 		std::string epMacroCommand = "\"" + epMacroPath + "\"";
 		bool inputFileNamedIn =
-				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.imf"));
+				(getAbsolutePath(inputFileName) == getAbsolutePath("in.imf"));
 
-		if (!inputFileNamedIn) linkFile(inputIdfFileName.c_str(), "in.imf");
+		if (!inputFileNamedIn) linkFile(inputFileName.c_str(), "in.imf");
 		DisplayString("Running EPMacro...");
 		systemCall(epMacroCommand);
 		if (!inputFileNamedIn) removeFile("in.imf");
 		moveFile("audit.out",outputEpmdetFileName);
 		moveFile("out.idf",outputEpmidfFileName);
-	   inputIdfFileName = outputEpmidfFileName;
+		inputFileName = outputEpmidfFileName;
 	}
 
 	if (runExpandObjects) {
@@ -539,13 +564,13 @@ ProcessArgs(int argc, const char * argv[])
 		}
 		std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
 		bool inputFileNamedIn =
-				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.idf"));
+				(getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
 
 		bool iddFileNamedEnergy =
 				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 
 		if (!inputFileNamedIn)
-			linkFile(inputIdfFileName.c_str(), "in.idf");
+			linkFile(inputFileName.c_str(), "in.idf");
 		if (!iddFileNamedEnergy)
 			linkFile(inputIddFileName,"Energy+.idd");
 		systemCall(expandObjectsCommand);
@@ -557,7 +582,7 @@ ProcessArgs(int argc, const char * argv[])
 		{ IOFlags flags; gio::inquire( "expanded.idf", flags ); FileExists = flags.exists(); }
 		if (FileExists) {
 			moveFile("expanded.idf", outputExpidfFileName);
-		    inputIdfFileName = outputExpidfFileName;
+		    inputFileName = outputExpidfFileName;
 		}
 	}
 

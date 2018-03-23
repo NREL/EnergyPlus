@@ -66,7 +66,8 @@
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
@@ -1103,7 +1104,7 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetProjectControlData( ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
@@ -1141,11 +1142,11 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 	EXPECT_EQ( LowTempRadiantSystem::HydronicSystem, RadSysTypes( RadSysNum ).SystemType );
 
 	ErrorsFound = false;
-	ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).HWLoopNum, HydrRadSys( RadSysNum ).HWLoopSide, HydrRadSys( RadSysNum ).HWBranchNum, HydrRadSys( RadSysNum ).HWCompNum, _, _, _, HydrRadSys( RadSysNum ).HotWaterInNode, _, ErrorsFound );
+	PlantUtilities::ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).HWLoopNum, HydrRadSys( RadSysNum ).HWLoopSide, HydrRadSys( RadSysNum ).HWBranchNum, HydrRadSys( RadSysNum ).HWCompNum, _, _, _, HydrRadSys( RadSysNum ).HotWaterInNode, _, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
 
 	ErrorsFound = false;
-	ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).CWLoopNum, HydrRadSys( RadSysNum ).CWLoopSide, HydrRadSys( RadSysNum ).CWBranchNum, HydrRadSys( RadSysNum ).CWCompNum, _, _, _, HydrRadSys( RadSysNum ).ColdWaterInNode, _, ErrorsFound );
+	PlantUtilities::ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).CWLoopNum, HydrRadSys( RadSysNum ).CWLoopSide, HydrRadSys( RadSysNum ).CWBranchNum, HydrRadSys( RadSysNum ).CWCompNum, _, _, _, HydrRadSys( RadSysNum ).ColdWaterInNode, _, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
 
 	DataSizing::CurZoneEqNum = 1;
@@ -1437,7 +1438,7 @@ TEST_F( EnergyPlusFixture, LowTempElecRadSurfaceGroupTest ) {
 		"    Until: 24:00,20.0;       !- Field 3",
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	Zone.allocate( 2 );
 	Zone( 1 ).Name = "WEST ZONE";

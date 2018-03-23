@@ -68,7 +68,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -140,7 +140,7 @@ namespace ChillerAbsorption {
 	Real64 EvaporatorEnergy( 0.0 ); // J - heat transfer to the evaporator coil
 	Real64 QCondenser( 0.0 ); // W - rate of heat transfer to the condenser coil
 	Real64 CondenserEnergy( 0.0 ); // J - heat transfer to the condenser coil
-	
+
 	bool GetInput( true ); // when TRUE, calls subroutine to read input file.
 
 	static std::string const BlankString;
@@ -194,27 +194,10 @@ namespace ChillerAbsorption {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide;
 		using DataPlant::TypeOf_Chiller_Absorption;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ChillNum; // Chiller number pointer
@@ -227,7 +210,7 @@ namespace ChillerAbsorption {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			ChillNum = FindItemInList( AbsorberName, BLASTAbsorber );
+			ChillNum = UtilityRoutines::FindItemInList( AbsorberName, BLASTAbsorber );
 			if ( ChillNum == 0 ) {
 				ShowFatalError( "SimBLASTAbsorber: Specified Absorber not one of Valid Absorption Chillers=" + AbsorberName );
 			}
@@ -311,14 +294,7 @@ namespace ChillerAbsorption {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -340,15 +316,13 @@ namespace ChillerAbsorption {
 		int IOStat; // IO Status when calling get input subroutine
 		Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		//  CHARACTER(len=MaxNameLength) :: CurrentModuleObject  ! for ease in renaming.
 
 		//FLOW
 		cCurrentModuleObject = moduleObjectType;
 
-		NumBLASTAbsorbers = GetNumObjectsFound( cCurrentModuleObject );
+		NumBLASTAbsorbers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBLASTAbsorbers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -366,15 +340,8 @@ namespace ChillerAbsorption {
 
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumBLASTAbsorbers; ++AbsorberNum ) {
-			GetObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), BLASTAbsorber, AbsorberNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, AbsorberNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -403,9 +370,9 @@ namespace ChillerAbsorption {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 4 ), cAlphaArgs( 5 ), "Condenser (not tested) Nodes" );
 
 			if ( NumAlphas > 8 ) {
-				if ( SameString( cAlphaArgs( 9 ), "HotWater" ) || SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "HotWater" ) || UtilityRoutines::SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
-				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
@@ -585,10 +552,9 @@ namespace ChillerAbsorption {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Absorption;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-		using InputProcessor::SameString;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -802,7 +768,7 @@ namespace ChillerAbsorption {
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -1282,17 +1248,8 @@ namespace ChillerAbsorption {
 		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcBLASTAbsorberModel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D< Real64 > SteamLoadFactor( 3 ); // coefficients to poly curve fit
@@ -1381,18 +1338,18 @@ namespace ChillerAbsorption {
 		LoopSideNum = BLASTAbsorber( ChillNum ).CWLoopSideNum;
 
 		CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = BLASTAbsorber( ChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTemp_ff = TempEvapOut;
-			
+
 			//calculate the sensor offset using fault information
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the TempEvapOut
 			TempEvapOut = max( BLASTAbsorber( ChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTemp_ff - BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset ));
 			BLASTAbsorber( ChillNum ).FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOut;
-			
+
 		}
 
 		// If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
@@ -1523,7 +1480,7 @@ namespace ChillerAbsorption {
 					EvapOutletTemp = Node( EvapInletNode ).Temp;
 				}
 			}
-		
+
 			//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 			if( BLASTAbsorber( ChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) && ( EvapMassFlowRate > 0 )){
 				//calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -1584,24 +1541,35 @@ namespace ChillerAbsorption {
 		}
 
 		if ( GeneratorInletNode > 0 ) {
-			//         Hot water plant is used for the generator
 			if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
-				CpFluid = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, Node( GeneratorInletNode ).Temp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
-				if ( ( BLASTAbsorber( ChillNum ).FlowMode == ConstantFlow ) || ( BLASTAbsorber( ChillNum ).FlowMode == NotModulated ) ) {
-					SteamMassFlowRate = BLASTAbsorber( ChillNum ).GenMassFlowRateMax;
-				} else {
-					SteamMassFlowRate = QGenerator / CpFluid / BLASTAbsorber( ChillNum ).GeneratorDeltaTemp;
+				Real64 GenMassFlowRate = 0.0;
+				int GenLoopNum = BLASTAbsorber( ChillNum ).GenLoopNum;
+				int GenLoopSideNum = BLASTAbsorber( ChillNum ).GenLoopSideNum;
+				//  Hot water plant is used for the generator
+				CpFluid = GetSpecificHeatGlycol( PlantLoop( GenLoopNum ).FluidName, Node( GeneratorInletNode ).Temp, PlantLoop( GenLoopSideNum ).FluidIndex, RoutineName );
+				if ( PlantLoop( GenLoopNum ).LoopSide( GenLoopSideNum ).FlowLock == 0 ) {
+					if ( (BLASTAbsorber( ChillNum ).FlowMode == ConstantFlow) || (BLASTAbsorber( ChillNum ).FlowMode == NotModulated) ) {
+						GenMassFlowRate = BLASTAbsorber( ChillNum ).GenMassFlowRateMax;
+					} else { // LeavingSetpointModulated
+						// since the .FlowMode applies to the chiller evaporator, the generater mass flow rate will be proportional to the evaporator mass flow rate
+						Real64 GenFlowRatio = EvapMassFlowRate / BLASTAbsorber( ChillNum ).EvapMassFlowRateMax;
+						GenMassFlowRate = min( BLASTAbsorber( ChillNum ).GenMassFlowRateMax, GenFlowRatio * BLASTAbsorber( ChillNum ).GenMassFlowRateMax );
+					}
+				} else { // If FlowLock is True
+					GenMassFlowRate = Node( GeneratorInletNode ).MassFlowRate;
 				}
+				SetComponentFlowRate( GenMassFlowRate, GeneratorInletNode, GeneratorOutletNode, GenLoopNum, GenLoopSideNum, BLASTAbsorber( ChillNum ).GenBranchNum, BLASTAbsorber( ChillNum ).GenCompNum );
 
-				SetComponentFlowRate( SteamMassFlowRate, GeneratorInletNode, GeneratorOutletNode, BLASTAbsorber( ChillNum ).GenLoopNum, BLASTAbsorber( ChillNum ).GenLoopSideNum, BLASTAbsorber( ChillNum ).GenBranchNum, BLASTAbsorber( ChillNum ).GenCompNum );
-
-				if ( SteamMassFlowRate <= 0.0 ) {
+				if ( GenMassFlowRate <= 0.0 ) {
 					GenOutletTemp = Node( GeneratorInletNode ).Temp;
 					SteamOutletEnthalpy = Node( GeneratorInletNode ).Enthalpy;
 				} else {
-					GenOutletTemp = Node( GeneratorInletNode ).Temp - QGenerator / ( CpFluid * SteamMassFlowRate );
-					SteamOutletEnthalpy = Node( GeneratorInletNode ).Enthalpy - QGenerator / SteamMassFlowRate;
+					GenOutletTemp = Node( GeneratorInletNode ).Temp - QGenerator / ( CpFluid * GenMassFlowRate );
+					SteamOutletEnthalpy = Node( GeneratorInletNode ).Enthalpy - QGenerator / GenMassFlowRate;
 				}
+				Node( GeneratorOutletNode ).Temp = GenOutletTemp;
+				Node( GeneratorOutletNode ).Enthalpy = SteamOutletEnthalpy;
+				Node( GeneratorOutletNode ).MassFlowRate = GenMassFlowRate;
 
 			} else { // using a steam plant for the generator
 
@@ -1654,22 +1622,8 @@ namespace ChillerAbsorption {
 		// PURPOSE OF THIS SUBROUTINE:
 		// reporting
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// USE STATEMENTS: na
 		// Using/Aliasing
 		using PlantUtilities::SafeCopyPlantNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapInletNode; // evaporator inlet node number, water side

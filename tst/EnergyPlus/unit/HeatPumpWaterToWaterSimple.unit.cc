@@ -54,7 +54,7 @@
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
-#include <PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <PlantUtilities.hh>
 #include <BranchInputManager.hh>
 #include <WeatherManager.hh>
@@ -704,7 +704,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 		bool ErrorsFound =  false;
 
@@ -1462,7 +1462,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 		bool ErrorsFound =  false;
 

@@ -61,7 +61,7 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -140,27 +140,6 @@ namespace PlantValves {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Simulation manager for Plant valves
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int EqNum;
@@ -172,7 +151,7 @@ namespace PlantValves {
 
 		// Find the correct Equipment
 		if ( CompNum == 0 ) {
-			EqNum = FindItemInList( CompName, TemperValve );
+			EqNum = UtilityRoutines::FindItemInList( CompName, TemperValve );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimPlantValves: Unit not found=" + CompName );
 			}
@@ -223,28 +202,10 @@ namespace PlantValves {
 		// METHODOLOGY EMPLOYED:
 		// usual method using InputProcessor
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound; // might also use FindItemInList
-		using InputProcessor::GetObjectItem;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int Item; // Item to be "gotten"
@@ -257,14 +218,14 @@ namespace PlantValves {
 		std::string CurrentModuleObject; // for ease in renaming.
 
 		CurrentModuleObject = "TemperingValve";
-		NumTemperingValves = GetNumObjectsFound( CurrentModuleObject );
+		NumTemperingValves = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 
 		TemperValve.allocate( NumTemperingValves );
 		CheckEquipName.dimension( NumTemperingValves, true );
 
 		for ( Item = 1; Item <= NumTemperingValves; ++Item ) {
 
-			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus );
 			//  <process, noting errors>
 			TemperValve( Item ).Name = Alphas( 1 );
 			// Get Plant Inlet Node
@@ -313,33 +274,16 @@ namespace PlantValves {
 		// PURPOSE OF THIS SUBROUTINE:
 		// intialize data for valve modeling
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using DataLoopNode::Node;
 		using DataPlant::TypeOf_ValveTempering;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::GenEquipTypes_Pump;
 		using DataBranchAirLoopPlant::ControlType_Active;
-		using InputProcessor::SameString;
 		using DataHVACGlobals::NumPlantLoops;
 		using PlantUtilities::InitComponentNodes;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int InletNode; // local working variable for inlet node number
@@ -403,7 +347,7 @@ namespace PlantValves {
 
 										if ( ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).TypeOf_Num == CompTypeNum ) && ( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).CompNum == CompNum ) ) { // we found it.
 
-											if ( ! SameString( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).Name, TemperValve( CompNum ).Name ) ) {
+											if ( ! UtilityRoutines::SameString( PlantLoop( i ).LoopSide( j ).Branch( k ).Comp( l ).Name, TemperValve( CompNum ).Name ) ) {
 												// why not, maybe plant loop structures not completely filled with available data?
 												//write(*,*) 'Temper Valve names', PlantLoop(i)%LoopSide(j)%Branch(k)%Comp(l)%Name, TemperValve(CompNum)%Name
 											}

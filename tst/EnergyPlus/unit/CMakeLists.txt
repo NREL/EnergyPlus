@@ -16,13 +16,16 @@ set( test_src
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
   AirTerminalSingleDuct.unit.cc
+  AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
   ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
@@ -35,6 +38,7 @@ set( test_src
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
@@ -61,6 +65,7 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
+  FuelCellElectricGenerator.unit.cc
   Furnaces.unit.cc
   General.unit.cc
   GeneralRoutines.unit.cc
@@ -86,6 +91,7 @@ set( test_src
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
+  HVACUnitaryBypassVAV.unit.cc
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
@@ -111,17 +117,24 @@ set( test_src
   PackagedTerminalHeatPump.unit.cc
   Photovoltaics.unit.cc
   PierceSurface.unit.cc
+  Pipes.unit.cc
+  Plant/Branch.unit.cc
+  Plant/Subcomponent.unit.cc
   PlantHeatExchangerFluidToFluid.unit.cc
   PlantManager.unit.cc
   PlantPipingSystemsManager.unit.cc
+  PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
+  PVWatts.unit.cc
+  ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
+  RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
@@ -139,12 +152,14 @@ set( test_src
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
+  StandardRatings.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
+  UnitaryHybridAirConditioner.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
@@ -161,6 +176,7 @@ set( test_src
   WindowLayerEffectiveMultipliers.unit.cc
   WindowManager.unit.cc
   XingGroundTemperatureModel.unit.cc
+  ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc

@@ -70,11 +70,12 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <HeatingCoils.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
+#include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SteamCoils.hh>
@@ -125,8 +126,6 @@ namespace UnitHeater {
 	using DataHVACGlobals::cFanTypes;
 	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbW;
@@ -205,26 +204,10 @@ namespace UnitHeater {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using DataSizing::ZoneHeatingOnlyFan;
 		using General::TrimSigDigits;
 		using DataSizing::ZoneEqUnitHeater;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int UnitHeatNum; // index of unit heater being simulated
@@ -237,7 +220,7 @@ namespace UnitHeater {
 
 		// Find the correct Unit Heater Equipment
 		if ( CompIndex == 0 ) {
-			UnitHeatNum = FindItemInList( CompName, UnitHeat );
+			UnitHeatNum = UtilityRoutines::FindItemInList( CompName, UnitHeat );
 			if ( UnitHeatNum == 0 ) {
 				ShowFatalError( "SimUnitHeater: Unit not found=" + CompName );
 			}
@@ -294,12 +277,6 @@ namespace UnitHeater {
 		// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using Fans::GetFanType;
@@ -321,23 +298,9 @@ namespace UnitHeater {
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataSizing::ZoneHVACSizing;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
 		bool IsNotOK; // TRUE if there was a problem with a list name
 		static bool errFlag( false ); // interim error flag
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
@@ -361,8 +324,8 @@ namespace UnitHeater {
 
 		// Figure out how many unit heaters there are in the input file
 		CurrentModuleObject = cMO_UnitHeater;
-		NumOfUnitHeats = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
+		NumOfUnitHeats = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -381,19 +344,12 @@ namespace UnitHeater {
 
 		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) { // Begin looping over all of the unit heaters found in the input file...
 
-			GetObjectItem( CurrentModuleObject, UnitHeatNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, UnitHeatNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames.allocate( NumNumbers );
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = "";
 			UnitHeatNumericFields( UnitHeatNum ).FieldNames = cNumericFields;
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), UnitHeat, UnitHeatNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject, ErrorsFound);
 
 			UnitHeat( UnitHeatNum ).Name = Alphas( 1 );
 			UnitHeat( UnitHeatNum ).SchedName = Alphas( 2 );
@@ -423,7 +379,7 @@ namespace UnitHeater {
 				ShowContinueError( "specified in " + CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." );
 				ErrorsFound = true;
 			} else {
-				if ( ! InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+				if ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
 					GetFanType( UnitHeat( UnitHeatNum ).FanName, UnitHeat( UnitHeatNum ).FanType_Num, errFlag, CurrentModuleObject, UnitHeat( UnitHeatNum ).Name );
 
 					{ auto const SELECT_CASE_var( UnitHeat( UnitHeatNum ).FanType_Num );
@@ -461,7 +417,7 @@ namespace UnitHeater {
 						}
 						UnitHeat( UnitHeatNum ).FanAvailSchedPtr = GetFanAvailSchPtr( UnitHeat( UnitHeatNum ).FanType, UnitHeat( UnitHeatNum ).FanName, errFlag );
 					}
-				} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
+				} else if ( UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
 					UnitHeat( UnitHeatNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitHeat( UnitHeatNum ).FanName ) ); // call constructor
 					UnitHeat( UnitHeatNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitHeat( UnitHeatNum ).FanName ); //zero-based
@@ -558,11 +514,11 @@ namespace UnitHeater {
 			}
 
 			UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating = Alphas( 10 );
-			if ( ( ! SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
+			if ( ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "Yes" ) ) && ( ! UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) ) {
 				ErrorsFound = true;
 				ShowSevereError( "Illegal " + cAlphaFields( 10 ) + " = " + Alphas( 10 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + '=' + UnitHeat( UnitHeatNum ).Name );
-			} else if ( SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
+			} else if ( UtilityRoutines::SameString( UnitHeat( UnitHeatNum ).FanOperatesDuringNoHeating, "No" ) ) {
 				UnitHeat( UnitHeatNum ).FanOffNoHeating = true;
 			}
 
@@ -583,7 +539,7 @@ namespace UnitHeater {
 
 			UnitHeat( UnitHeatNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 12 )) {
-				UnitHeat( UnitHeatNum ).HVACSizingIndex = FindItemInList( Alphas( 12 ), ZoneHVACSizing );
+				UnitHeat( UnitHeatNum ).HVACSizingIndex = UtilityRoutines::FindItemInList( Alphas( 12 ), ZoneHVACSizing );
 				if (UnitHeat( UnitHeatNum ).HVACSizingIndex == 0) {
 					ShowSevereError( cAlphaFields( 12 ) + " = " + Alphas( 12 ) + " not found.");
 					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
@@ -657,6 +613,13 @@ namespace UnitHeater {
 			}
 		}
 
+		for ( UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum ) {
+			if ( UnitHeat( UnitHeatNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				coilSelectionReportObj->setCoilSupplyFanInfo( UnitHeat( UnitHeatNum ).HCoilName, UnitHeat( UnitHeatNum ).HCoilTypeCh, UnitHeat( UnitHeatNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel, UnitHeat( UnitHeatNum ).Fan_Index );
+			} else {
+				coilSelectionReportObj->setCoilSupplyFanInfo( UnitHeat( UnitHeatNum ).HCoilName, UnitHeat( UnitHeatNum ).HCoilTypeCh, UnitHeat( UnitHeatNum ).FanName, DataAirSystems::structArrayLegacyFanModels, UnitHeat( UnitHeatNum ).Fan_Index );
+			}
+		}
 	}
 
 	void
@@ -692,7 +655,7 @@ namespace UnitHeater {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -890,7 +853,6 @@ namespace UnitHeater {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetCoilWaterInletNode;
 		using WaterCoils::GetCoilWaterOutletNode;
@@ -899,7 +861,7 @@ namespace UnitHeater {
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using Psychrometrics::CPHW;
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;

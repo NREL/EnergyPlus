@@ -104,9 +104,6 @@ namespace OutputReportTabular {
 	extern int const unitsStyleInchPound;
 	extern int const unitsStyleNotFound;
 
-	extern int const isAverage;
-	extern int const isSum;
-
 	extern int const stepTypeZone;
 	extern int const stepTypeHVAC;
 
@@ -411,7 +408,7 @@ namespace OutputReportTabular {
 		int resIndex; // result index - pointer to BinResults array
 		int numTables;
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
-		int avgSum; // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
 		OutputProcessor::Unit units; // the units enumeration
 		std::string ScheduleName; // the name of the schedule
@@ -425,7 +422,7 @@ namespace OutputReportTabular {
 			resIndex( 0 ),
 			numTables( 0 ),
 			typeOfVar( 0 ),
-			avgSum( 0 ),
+			avgSum( OutputProcessor::StoreType::Averaged ),
 			stepType( 0 ),
 			scheduleIndex( 0 )
 		{}
@@ -523,7 +520,7 @@ namespace OutputReportTabular {
 		std::string variMeterUpper; // the name of the variable or meter uppercased
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
 		int keyCount; // noel
-		int varAvgSum; // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType varAvgSum; // Variable  is Averaged=1 or Summed=2
 		int varStepType; // Variable time step is Zone=1 or HVAC=2
 		Array1D_string NamesOfKeys; // keyNames !noel
 		Array1D_int IndexesForKeyVar; // keyVarIndexes !noel
@@ -534,7 +531,7 @@ namespace OutputReportTabular {
 			varUnits( OutputProcessor::Unit::None ),
 			typeOfVar( 0 ),
 			keyCount( 0 ),
-			varAvgSum( 1 ),
+			varAvgSum( OutputProcessor::StoreType::Averaged ),
 			varStepType( 1 )
 		{}
 
@@ -562,7 +559,7 @@ namespace OutputReportTabular {
 		std::string colHead; // column header (not used for user defined monthly)
 		int varNum; // variable or meter number
 		int typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
-		int avgSum; // Variable  is Averaged=1 or Summed=2
+		OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
 		int stepType; // Variable time step is Zone=1 or HVAC=2
 		OutputProcessor::Unit units; // the units string, may be blank
 		int aggType; // index to the type of aggregation (see list of parameters)
@@ -576,7 +573,7 @@ namespace OutputReportTabular {
 		MonthlyColumnsType() :
 			varNum( 0 ),
 			typeOfVar( 0 ),
-			avgSum( 0 ),
+			avgSum( OutputProcessor::StoreType::Averaged ),
 			stepType( 0 ),
 			units( OutputProcessor::Unit::None ),
 			aggType( 0 ),
@@ -981,15 +978,9 @@ namespace OutputReportTabular {
 	void
 	CollectPeakZoneConditions(
 		CompLoadTablesType & compLoad,
+		int const & desDaySelected,
 		int const & timeOfMax,
 		int const & zoneIndex,
-		bool const & isCooling
-	);
-
-	void
-	CollectPeakAirLoopConditions(
-		CompLoadTablesType & compLoad,
-		int const & airLoopIndex,
 		bool const & isCooling
 	);
 
@@ -1053,7 +1044,7 @@ namespace OutputReportTabular {
 	WriteReportHeaders(
 		std::string const & reportName,
 		std::string const & objectName,
-		int const averageOrSum
+		OutputProcessor::StoreType const averageOrSum
 	);
 
 	void

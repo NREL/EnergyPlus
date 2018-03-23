@@ -229,6 +229,8 @@ namespace DataHVACGlobals {
 	extern int const CoilVRF_FluidTCtrl_Heating;
 
 	extern Array1D_string const cAllCoilTypes;
+	extern Array1D_string const cCoolingCoilTypes;
+	extern Array1D_string const cHeatingCoilTypes;
 
 	// Water to air HP coil types
 	extern int const WatertoAir_Simple;
@@ -412,6 +414,7 @@ namespace DataHVACGlobals {
 	extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
 	extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAV;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat;
 	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat;
