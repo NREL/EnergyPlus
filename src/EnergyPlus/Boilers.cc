@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,7 +70,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -104,7 +104,7 @@ namespace Boilers {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_Boiler_Simple;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 	using DataBranchAirLoopPlant::ControlType_SeriesActive;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
@@ -138,7 +138,8 @@ namespace Boilers {
 	Real64 BoilerMassFlowRate( 0.0 ); // kg/s - Boiler mass flow rate
 	Real64 BoilerOutletTemp( 0.0 ); // W - Boiler outlet temperature
 	Real64 BoilerPLR( 0.0 ); // Boiler operating part-load ratio
-
+	bool GetBoilerInputFlag( true );
+	bool BoilerOneTimeFlag( true );
 	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
@@ -167,6 +168,8 @@ namespace Boilers {
 		CheckEquipName.deallocate();
 		Boiler.deallocate();
 		BoilerReport.deallocate();
+		GetBoilerInputFlag = true;
+		BoilerOneTimeFlag = true;
 	}
 
 	void
@@ -194,36 +197,19 @@ namespace Boilers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subrountine controls the boiler component simulation
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true ); // if TRUE read user input
 		int BoilerNum; // boiler counter/identifier
 
 		//FLOW
 
 		//Get Input
-		if ( GetInput ) {
+		if ( GetBoilerInputFlag ) {
 			GetBoilerInput();
-			GetInput = false;
+			GetBoilerInputFlag = false;
 		}
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			BoilerNum = FindItemInList( BoilerName, Boiler );
+			BoilerNum = UtilityRoutines::FindItemInList( BoilerName, Boiler );
 			if ( BoilerNum == 0 ) {
 				ShowFatalError( "SimBoiler: Unit not found=" + BoilerName );
 			}
@@ -284,10 +270,6 @@ namespace Boilers {
 		// Using/Aliasing
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using namespace DataGlobalConstants;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -307,14 +289,12 @@ namespace Boilers {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // Flag to show errors were found during GetInput
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag; // Flag to show errors were found during function call
 		Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
 		//GET NUMBER OF ALL EQUIPMENT
 		cCurrentModuleObject = "Boiler:HotWater";
-		NumBoilers = GetNumObjectsFound( cCurrentModuleObject );
+		NumBoilers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumBoilers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " Equipment specified in input file" );
@@ -334,15 +314,8 @@ namespace Boilers {
 		//LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
-			GetObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Boiler, BoilerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			VerifyUniqueBoilerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -534,7 +507,7 @@ namespace Boilers {
 		for ( BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum ) {
 			SetupOutputVariable( "Boiler Heating Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).BoilerLoad, "System", "Average", Boiler( BoilerNum ).Name );
 			SetupOutputVariable( "Boiler Heating Energy", OutputProcessor::Unit::J, BoilerReport( BoilerNum ).BoilerEnergy, "System", "Sum", Boiler( BoilerNum ).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant" );
-			if ( SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
+			if ( UtilityRoutines::SameString( BoilerFuelTypeForOutputVariable( BoilerNum ), "Electric" ) ) {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Power", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
 			} else {
 				SetupOutputVariable( "Boiler " + BoilerFuelTypeForOutputVariable( BoilerNum ) + " Rate", OutputProcessor::Unit::W, BoilerReport( BoilerNum ).FuelUsed, "System", "Average", Boiler( BoilerNum ).Name );
@@ -589,7 +562,6 @@ namespace Boilers {
 		static std::string const RoutineName( "InitBoiler" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // one time flag
 		static Array1D_bool MyEnvrnFlag; // environment flag
 		static Array1D_bool MyFlag;
 		Real64 rho;
@@ -597,12 +569,12 @@ namespace Boilers {
 		bool errFlag;
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( BoilerOneTimeFlag ) {
 			MyFlag.allocate( NumBoilers );
 			MyEnvrnFlag.allocate( NumBoilers );
 			MyFlag = true;
 			MyEnvrnFlag = true;
-			MyOneTimeFlag = false;
+			BoilerOneTimeFlag = false;
 		}
 
 		// Init more variables
@@ -942,22 +914,22 @@ namespace Boilers {
 			if ( EquipFlowCtrl == ControlType_SeriesActive ) BoilerMassFlowRate = Node( BoilerInletNode ).MassFlowRate;
 			return;
 		}
-		
+
 		//If there is a fault of boiler fouling (zrp_Nov2016)
 		if( Boiler( BoilerNum ).FaultyBoilerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = Boiler( BoilerNum ).FaultyBoilerFoulingIndex;
 			Real64 NomCap_ff = BoilerNomCap;
 			Real64 BoilerEff_ff = BoilerEff;
-			
+
 			//calculate the Faulty Boiler Fouling Factor using fault information
 			Boiler( BoilerNum ).FaultyBoilerFoulingFactor = FaultsBoilerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the boiler nominal capacity at faulty cases
 			BoilerNomCap = NomCap_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
 			BoilerEff = BoilerEff_ff * Boiler( BoilerNum ).FaultyBoilerFoulingFactor;
-			
+
 		}
- 
+
 		//Set the current load equal to the boiler load
 		BoilerLoad = MyLoad;
 

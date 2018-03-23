@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,6 @@
 #include <DXCoils.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <SQLiteProcedures.hh>
@@ -76,6 +75,8 @@
 #include <Fans.hh>
 #include <DesiccantDehumidifiers.hh>
 #include <HVACFan.hh>
+#include <ReportCoilSelection.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -344,7 +345,6 @@ namespace ReportSizingManager {
 		using General::RoundSigDigits;
 		using General::TrimSigDigits;
 		using General::SolveRoot;
-		using InputProcessor::SameString;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyWFnTdpPb;
@@ -423,6 +423,13 @@ namespace ReportSizingManager {
 		Real64 const RatedInletAirTemp( 26.6667 ); // 26.6667C or 80F
 		Real64 const RatedInletAirHumRat( 0.01125 ); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
 
+		std::string DDNameFanPeak;
+		DDNameFanPeak = " test my Design Day";
+		std::string dateTimeFanPeak;
+		dateTimeFanPeak = " test 1/2 00:00:00 ";
+		Real64 DXFlowPerCapMinRatio(1.0);
+		Real64 DXFlowPerCapMaxRatio(1.0);
+
 		AutosizeDes = 0.0;
 		AutosizeUser = 0.0;
 		IsAutoSize = false;
@@ -436,6 +443,10 @@ namespace ReportSizingManager {
 		RetFanNum = 0;
 		FanCoolLoad = 0;
 		SizingDesValueFromParent = false;
+		TotCapTempModFac = 1.0;
+		CoilOutTemp = -999.0;
+		DesVolFlow = 0.0;
+		CoilInTemp = 0.0;
 
 		if ( SysSizingRunDone || ZoneSizingRunDone ) {
 			HardSizeNoDesRun = false;
@@ -481,7 +492,7 @@ namespace ReportSizingManager {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
 				if ( PrintWarningFlag && SizingResult > 0.0 && !DataScalableCapSizingON ) {
-					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+					if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 						SizingResult *= ( 1 - DataBypassFrac ); // now reapply for second message and remianing simulation calcs
@@ -498,93 +509,284 @@ namespace ReportSizingManager {
 
 						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
 							AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).AirVolFlow, FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							} else if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).AirVolFlow ) {
+								DDNameFanPeak = "Unknown";
+							}
 						} else {
 							if ( ZoneCoolingOnlyFan ) {
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
 							} else if ( ZoneHeatingOnlyFan ) {
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
 							} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
 							} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
 							} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 								AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+								if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+									}
+								} else if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+									}
+								}
 							} else {
 								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+								if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+									}
+								} else if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+									}
+								}
 							}
 						}
 					} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) { 
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else {
 						if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
 								AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).AirVolFlow, ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
 							} else if ( ZoneCoolingOnlyFan ) {
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
 							} else if ( ZoneHeatingOnlyFan ) {
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
 							} else {
 								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+								if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+									}
+								} else if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+									}
+								}
 							}
 						}
 						if ( DataFractionUsedForSizing > 0.0 ) AutosizeDes = AutosizeDes * DataFractionUsedForSizing;
@@ -595,76 +797,249 @@ namespace ReportSizingManager {
 					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) || ( SELECT_CASE_var == FlowPerFloorArea ) ) {
 						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
 							AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).AirVolFlow, ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							if ( SizingType == CoolingAirflowSizing ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( SizingType == HeatingAirflowSizing ) {
+
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							} else {
+
+								if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+									}
+								} else if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+									}
+								} else if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).AirVolFlow ) {
+									DDNameFanPeak = "Unknown";
+								}
+							}
 						} else {
 							if ( ZoneCoolingOnlyFan ) {
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
 							} else if ( ZoneHeatingOnlyFan ) {
 								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
 							} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
 							} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
 							} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 								AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+								if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+									}
+								} else if ( AutosizeDes == ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+									}
+								}
 							} else {
 								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+								if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+									}
+								} else if ( AutosizeDes == FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+									if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+									}
+								}
 							}
 						}
 					} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							if ( AutosizeDes == DataFracOfAutosizedCoolingAirflow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFracOfAutosizedHeatingAirflow * FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
 						if ( ZoneCoolingOnlyFan ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneHeatingOnlyFan ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow ) {
 							AutosizeDes = DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity;
+							if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+								DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+							}
 						} else if ( ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						} else {
 							AutosizeDes = max( DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity, DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity );
+							if ( AutosizeDes == DataFlowPerCoolingCapacity * DataAutosizedCoolingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).CoolDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).CoolDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).CoolDDNum ).Title;
+								}
+							} else if ( AutosizeDes == DataFlowPerHeatingCapacity * DataAutosizedHeatingCapacity ) {
+								if ( FinalZoneSizing( CurZoneEqNum ).HeatDDNum > 0 && FinalZoneSizing( CurZoneEqNum ).HeatDDNum <=	DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalZoneSizing( CurZoneEqNum ).HeatDDNum ).Title;
+								}
+							}
 						}
 					} else {
 						if ( ZoneCoolingOnlyFan ) {
@@ -835,11 +1210,11 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingWaterDesAirInletTempSizing ) {
 					if ( TermUnitPIU && ( CurTermUnitSizingNum > 0 ) ) {
 						MinFlowFrac = TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac;
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU * MinFlowFrac + FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - MinFlowFrac );
-					} else if ( TermUnitIU ) {
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-					} else if ( TermUnitSingDuct ) {
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
+						AutosizeDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * MinFlowFrac + FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - MinFlowFrac );
+					} else if ( TermUnitIU && ( CurTermUnitSizingNum > 0 ) ) {
+						AutosizeDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak;
+					} else if ( TermUnitSingDuct && ( CurTermUnitSizingNum > 0 ) ) {
+						AutosizeDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU;
 					} else {
 						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
 							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
@@ -859,11 +1234,11 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingWaterDesAirInletHumRatSizing ) {
 					if ( TermUnitPIU && ( CurTermUnitSizingNum > 0 ) ) {
 						MinFlowFrac = TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac;
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU * MinFlowFrac + FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak * ( 1.0 - MinFlowFrac );
-					} else if ( TermUnitIU ) {
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
-					} else if ( TermUnitSingDuct ) {
-						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRatTU;
+						AutosizeDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInHumRatTU * MinFlowFrac + FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak * ( 1.0 - MinFlowFrac );
+					} else if ( TermUnitIU && ( CurTermUnitSizingNum > 0 ) ) {
+						AutosizeDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneHumRatAtHeatPeak;
+					} else if ( TermUnitSingDuct && ( CurTermUnitSizingNum > 0 ) ) {
+						AutosizeDes = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInHumRatTU;
 					} else {
 						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
 							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
@@ -947,7 +1322,7 @@ namespace ReportSizingManager {
 					} else {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 					}
-					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && SameString( CompType, "COIL:COOLING:WATER" ) ) { // zone coil uses mDot>0, sys coil uses cap > 0
+					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER" ) ) { // zone coil uses mDot>0, sys coil uses cap > 0
 						ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 						ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 						ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -964,7 +1339,7 @@ namespace ReportSizingManager {
 					DesSatEnthAtWaterInTemp = PsyHFnTdbW( DataDesInletWaterTemp, PsyWFnTdpPb( DataDesInletWaterTemp, StdBaroPress ) );
 					DesHumRatAtWaterInTemp = PsyWFnTdbH( DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine );
 					if ( AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) {
-						if ( DataDesInletAirHumRat > AutosizeDes && SameString( CompType, "COIL:COOLING:WATER" ) ) {
+						if ( DataDesInletAirHumRat > AutosizeDes && UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER" ) ) {
 							ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
 							ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 							ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -1012,7 +1387,7 @@ namespace ReportSizingManager {
 						AutosizeDes = ZoneEqSizing ( CurZoneEqNum ).DesCoolingLoad;
 						DesVolFlow = DataFlowUsedForSizing;
 					} else {
-						if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") || SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
+						if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER" ) || UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") || UtilityRoutines::SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
 							if ( TermUnitIU && ( CurTermUnitSizingNum > 0 ) ) {
 								AutosizeDes = TermUnitSizing( CurTermUnitSizingNum ).DesCoolingLoad;
 							} else if ( ZoneEqFanCoil ) {
@@ -1089,7 +1464,7 @@ namespace ReportSizingManager {
 						if ( ZoneEqSizing( CurZoneEqNum ).CoolingCapacity ) {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						} else {
-							if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
+							if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER" ) || UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || UtilityRoutines::SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
 								if ( TermUnitIU || ZoneEqFanCoil ) {
 									ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 								} else {
@@ -1124,33 +1499,33 @@ namespace ReportSizingManager {
 						if ( TermUnitPIU && ( CurTermUnitSizingNum > 0 ) ) {
 							MinPriFlowFrac = TermUnitSizing( CurTermUnitSizingNum ).MinFlowFrac;
 							if ( TermUnitSizing( CurTermUnitSizingNum ).InducesPlenumAir ) {
-								CoilInTemp = ( FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU * MinPriFlowFrac ) + ( FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtHeatPeak * ( 1.0 - MinPriFlowFrac ) );
+								CoilInTemp = ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * MinPriFlowFrac ) + ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneRetTempAtHeatPeak * ( 1.0 - MinPriFlowFrac ) );
 							} else {
-								CoilInTemp = ( FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU * MinPriFlowFrac ) + ( FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak * ( 1.0 - MinPriFlowFrac ) );
+								CoilInTemp = ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU * MinPriFlowFrac ) + ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak * ( 1.0 - MinPriFlowFrac ) );
 							}
 						} else if ( ZoneEqFanCoil ) {
 								DesOAFlowFrac = FinalZoneSizing( CurZoneEqNum ).DesHeatOAFlowFrac;
 								CoilInTemp = DesOAFlowFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak + (1.0 - DesOAFlowFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak;
-						} else if ( TermUnitIU ) {
-							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
-						} else if ( TermUnitSingDuct ) {
-							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU;
+						} else if ( TermUnitIU && ( CurTermUnitSizingNum > 0 ) ) {
+							CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak;
+						} else if ( TermUnitSingDuct && ( CurTermUnitSizingNum > 0 ) ) {
+							CoilInTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU;
 						} else {
 							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						}
 						if ( ( TermUnitSingDuct || TermUnitPIU ) && ( CurTermUnitSizingNum > 0 ) ) {
-							CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-							CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
+							CoilOutTemp = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesTemp;
+							CoilOutHumRat = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesHumRat;
 							CpAir = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
 							DesCoilLoad = CpAir * StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow * ( CoilOutTemp - CoilInTemp );
 							DesVolFlow = TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow;
 						} else if ( TermUnitIU && ( CurTermUnitSizingNum > 0 ) ) {
 							if ( TermUnitSizing( CurTermUnitSizingNum ).InducRat > 0.01 ) {
 								DesVolFlow = TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow / TermUnitSizing( CurTermUnitSizingNum ).InducRat;
-								CpAir = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat, FinalZoneSizing( CurZoneEqNum ).HeatDesTemp );
+								CpAir = PsyCpAirFnWTdb( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesHumRat, TermUnitFinalZoneSizing( CurTermUnitSizingNum ).HeatDesTemp );
 								// the design heating coil load is the zone load minus whatever the central system does.Note that
 								// DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
-								DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad - ( CpAir * StdRhoAir * DesVolFlow * ( FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU - FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak ) );
+								DesCoilLoad = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatLoad - ( CpAir * StdRhoAir * DesVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak ) );
 							} else {
 								DesCoilLoad = 0.0;
 							}
@@ -1236,6 +1611,7 @@ namespace ReportSizingManager {
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataWaterFlowUsedForSizing * DataWaterCoilSizHeatDeltaT * Cp * rho;
+						coilSelectionReportObj->setCoilReheatMultiplier( CompName, CompType, 1.0 );
 					} else if ( ( TermUnitPIU || TermUnitIU ) && ( CurTermUnitSizingNum > 0 ) )  {
 						DesMassFlow = StdRhoAir * TermUnitSizing( CurTermUnitSizingNum ).AirVolFlow * TermUnitSizing( CurTermUnitSizingNum ).ReheatAirFlowMult;
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
@@ -1245,6 +1621,7 @@ namespace ReportSizingManager {
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						AutosizeDes = DataWaterFlowUsedForSizing * DataWaterCoilSizHeatDeltaT * Cp * rho;
+						coilSelectionReportObj->setCoilReheatMultiplier( CompName, CompType, 1.0 );
 					} else {
 						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
 							DesMassFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow * StdRhoAir;
@@ -1267,10 +1644,14 @@ namespace ReportSizingManager {
 				} else if ( SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing ) {
 					if ( TermUnitSingDuct ) {
 						AutosizeDes = DataWaterFlowUsedForSizing;
+						coilSelectionReportObj->setCoilReheatMultiplier( CompName, CompType, 1.0 );
 					} else if ( ( TermUnitPIU || TermUnitIU )  && ( CurTermUnitSizingNum > 0 ) ) {
 						AutosizeDes = DataWaterFlowUsedForSizing * TermUnitSizing( CurTermUnitSizingNum ).ReheatLoadMult;
+						coilSelectionReportObj->setCoilReheatMultiplier( CompName, CompType, TermUnitSizing( CurTermUnitSizingNum ).ReheatLoadMult );
+
 					} else if ( ZoneEqFanCoil ) {
 						AutosizeDes = DataWaterFlowUsedForSizing;
+						coilSelectionReportObj->setCoilReheatMultiplier( CompName, CompType, 1.0 );
 					} else {
 						AutosizeDes = DataWaterFlowUsedForSizing;
 					}
@@ -1415,7 +1796,7 @@ namespace ReportSizingManager {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
 				if ( PrintWarningFlag && SizingResult > 0.0 ) {
-					if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing && DataIsDXCoil ) {
+					if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing && DataIsDXCoil ) {
 						SizingResult /= ( 1 - DataBypassFrac ); // back out bypass fraction applied in GetInput
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 						SizingResult *= ( 1 - DataBypassFrac ); // now reapply for second message and remianing simulation calcs
@@ -1476,7 +1857,7 @@ namespace ReportSizingManager {
 							AutosizeDes = UnitarySysEqSizing(CurSysNum).HeatingAirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
-								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
+								if ( UtilityRoutines::SameString ( CompType, "COIL:HEATING:WATER" ) ) {
 									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && ! DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
 									} else {
@@ -1486,7 +1867,7 @@ namespace ReportSizingManager {
 									AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
 							} else if ( CurDuctType == Cooling ) {
-								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
+								if ( UtilityRoutines::SameString ( CompType, "COIL:HEATING:WATER" ) ) {
 									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 && !DataDesicRegCoil ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 									} else {
@@ -1544,21 +1925,64 @@ namespace ReportSizingManager {
 						if ( AirLoopSysFlag ) {
 							if ( UnitarySysEqSizing( CurSysNum ).CoolingAirFlow && UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {
 								AutosizeDes = std::max( UnitarySysEqSizing( CurSysNum ).CoolingAirVolFlow, UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow );
+								if ( AutosizeDes == UnitarySysEqSizing( CurSysNum ).CoolingAirVolFlow ) {
+									if ( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD > 0 && DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Title;
+										dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( DataSizing::SysSizPeakDDNum( CurSysNum ).TimeStepAtCoolFlowPk( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ) );
+									}
+
+								} else if ( AutosizeDes == UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow ){
+									if ( FinalSysSizing( CurSysNum ).HeatDDNum > 0 && FinalSysSizing( CurSysNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Title;
+										dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( FinalSysSizing( CurSysNum ).SysHeatAirTimeStepPk );
+									}
+								}
 							} else if ( UnitarySysEqSizing( CurSysNum ).CoolingAirFlow ) {
 								AutosizeDes = UnitarySysEqSizing( CurSysNum ).CoolingAirVolFlow;
+								if ( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD > 0 && DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Title;
+									dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( DataSizing::SysSizPeakDDNum( CurSysNum ).TimeStepAtCoolFlowPk( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ) );
+								}
 							} else if ( UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {
 								AutosizeDes = UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow;
+								if ( FinalSysSizing( CurSysNum ).HeatDDNum > 0 && FinalSysSizing( CurSysNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Title;
+									dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( FinalSysSizing( CurSysNum ).SysHeatAirTimeStepPk );
+								}
+
 							} else {
 								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+								if ( AutosizeDes == FinalSysSizing( CurSysNum ).DesHeatVolFlow ) {
+									if ( FinalSysSizing( CurSysNum ).HeatDDNum > 0 && FinalSysSizing( CurSysNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Title;
+										dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( FinalSysSizing( CurSysNum ).SysHeatAirTimeStepPk );
+									}
+								} else if ( AutosizeDes == FinalSysSizing( CurSysNum ).DesCoolVolFlow ) {
+									if ( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD > 0 && DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD <= DataEnvironment::TotDesDays ) {
+										DDNameFanPeak = WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Title;
+										dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( DataSizing::SysSizPeakDDNum( CurSysNum ).TimeStepAtCoolFlowPk( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ) );
+									}
+								}
 							}
 						} else {
 							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							if ( AutosizeDes == FinalSysSizing( CurSysNum ).DesHeatVolFlow ) {
+								if ( FinalSysSizing( CurSysNum ).HeatDDNum > 0 && FinalSysSizing( CurSysNum ).HeatDDNum <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Title;
+									dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( FinalSysSizing( CurSysNum ).HeatDDNum ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( FinalSysSizing( CurSysNum ).SysHeatAirTimeStepPk );
+								}
+							} else if ( AutosizeDes == FinalSysSizing( CurSysNum ).DesCoolVolFlow ) {
+								if ( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD > 0 && DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD <= DataEnvironment::TotDesDays ) {
+									DDNameFanPeak = WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Title;
+									dateTimeFanPeak = General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( DataSizing::SysSizPeakDDNum( CurSysNum ).TimeStepAtCoolFlowPk( DataSizing::SysSizPeakDDNum( CurSysNum ).CoolFlowPeakDD ) );
+								}
+							}
 						}
 						if ( DataFractionUsedForSizing > 0.0 ) AutosizeDes = AutosizeDes * DataFractionUsedForSizing;
 					}
 				} else if ( SizingType == CoolingWaterflowSizing ) {
 					if ( CurOASysNum > 0 ) {
-						CoilDesWaterDeltaT = 0.5 * DataWaterCoilSizCoolDeltaT;						 
+						CoilDesWaterDeltaT = 0.5 * DataWaterCoilSizCoolDeltaT;
 					} else {
 						CoilDesWaterDeltaT = DataWaterCoilSizCoolDeltaT;
 					}
@@ -1686,7 +2110,7 @@ namespace ReportSizingManager {
 					} else {
 						AutosizeDes = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 					}
-					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && SameString( CompType, "COIL:COOLING:WATER" ) ) { // flow here is water vol flow rate
+					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER" ) ) { // flow here is water vol flow rate
 						ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 						ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 						ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -1703,7 +2127,7 @@ namespace ReportSizingManager {
 					DesSatEnthAtWaterInTemp = PsyHFnTdbW( DataDesInletWaterTemp, PsyWFnTdpPb( DataDesInletWaterTemp, StdBaroPress ) );
 					DesHumRatAtWaterInTemp = PsyWFnTdbH( DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine );
 					if ( AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) { // flow here is water vol flow rate
-						if ( DataDesInletAirHumRat > AutosizeDes && SameString( CompType, "COIL:COOLING:WATER" ) ) {
+						if ( DataDesInletAirHumRat > AutosizeDes && UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER" ) ) {
 							ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
 							ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 							ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -1831,7 +2255,7 @@ namespace ReportSizingManager {
 								}
 							}
 							OutTemp = FinalSysSizing ( CurSysNum ).OutTempAtCoolPeak;
-							if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) ) {
+							if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER" ) || UtilityRoutines::SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) ) {
 								rhoair = StdRhoAir;
 							} else {
 								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
@@ -1851,10 +2275,17 @@ namespace ReportSizingManager {
 							switch ( PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum ){
 								case DataAirSystems::structArrayLegacyFanModels: {
 									FanCoolLoad = FanDesHeatGain( PrimaryAirSystem( CurSysNum ).SupFanNum, DesVolFlow );
+									if ( coilSelectionReportObj->isCompTypeCoil( CompType ) && ( SupFanNum > 0 ) ) {
+										coilSelectionReportObj->setCoilSupplyFanInfo( CompName, CompType, Fans::Fan( PrimaryAirSystem( CurSysNum ).SupFanNum ).FanName, DataAirSystems::structArrayLegacyFanModels, PrimaryAirSystem( CurSysNum ).SupFanNum );
+									}
+									
 									break;
 								}
 								case DataAirSystems::objectVectorOOFanSystemModel: {
 									FanCoolLoad = HVACFan::fanObjs[ PrimaryAirSystem( CurSysNum ).supFanVecIndex ]->getFanDesignHeatGain( DesVolFlow );
+									if ( coilSelectionReportObj->isCompTypeCoil( CompType ) && ( PrimaryAirSystem( CurSysNum ).supFanVecIndex >= 0 ) ) {
+										coilSelectionReportObj->setCoilSupplyFanInfo( CompName, CompType, HVACFan::fanObjs[ PrimaryAirSystem( CurSysNum ).supFanVecIndex ]->name, DataAirSystems::objectVectorOOFanSystemModel, PrimaryAirSystem( CurSysNum ).supFanVecIndex );
+									}
 									break;
 								}
 								case DataAirSystems::fanModelTypeNotYetSet: {
@@ -1997,7 +2428,7 @@ namespace ReportSizingManager {
 							// TRUE for all air loop parent equipment except UnitarySystem where flag is reset to FALSE after simulating
 							// This method allows downstream heating coils to size individually.Probably should do this for all air loop equipment
 							// ChangoverBypass model always sets AirLoopControlInfo%UnitarySys to FALSE so heating coil can individually size
-							if ( AirLoopControlInfo( CurSysNum ).UnitarySysSimulating && ! SameString( CompType, "COIL:HEATING:WATER" ) ) {
+							if ( AirLoopControlInfo( CurSysNum ).UnitarySysSimulating && ! UtilityRoutines::SameString( CompType, "COIL:HEATING:WATER" ) ) {
 								NominalCapacityDes = UnitaryHeatCap;
 							} else {
 								if ( DesCoilLoad >= SmallLoad ) {
@@ -2038,6 +2469,25 @@ namespace ReportSizingManager {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( DesCoilLoad, 2 ) + " [W]" );
 						}
 					}
+
+					switch ( PrimaryAirSystem( CurSysNum ).supFanModelTypeEnum ){
+						case DataAirSystems::structArrayLegacyFanModels: {
+							if ( coilSelectionReportObj->isCompTypeCoil( CompType ) && ( PrimaryAirSystem( CurSysNum ).SupFanNum > 0 ) ) {
+								coilSelectionReportObj->setCoilSupplyFanInfo(CompName, CompType, Fans::Fan( PrimaryAirSystem( CurSysNum ).SupFanNum ).FanName, DataAirSystems::structArrayLegacyFanModels, PrimaryAirSystem( CurSysNum ).SupFanNum );
+							}
+							break;
+						}
+						case DataAirSystems::objectVectorOOFanSystemModel: {
+							if ( coilSelectionReportObj->isCompTypeCoil( CompType ) && ( PrimaryAirSystem( CurSysNum ).supFanVecIndex >= 0 ) ) {
+								coilSelectionReportObj->setCoilSupplyFanInfo(CompName, CompType, HVACFan::fanObjs[ PrimaryAirSystem( CurSysNum ).supFanVecIndex ]->name, DataAirSystems::objectVectorOOFanSystemModel, PrimaryAirSystem( CurSysNum ).supFanVecIndex );
+							}
+							break;
+						}
+						case DataAirSystems::fanModelTypeNotYetSet: {
+							// do nothing
+							break;
+						}
+					} // end switch
 
 				} else if ( SizingType == HeatingWaterDesCoilLoadUsedForUASizing ) {
 					if ( CurOASysNum > 0 ) {
@@ -2331,11 +2781,11 @@ namespace ReportSizingManager {
 			if ( !HardSizeNoDesRun || DataScalableSizingON || DataScalableCapSizingON ) {
 				if ( IsAutoSize ) { // Design Size values are available for both autosized and hard - sized
 					// check capacity to make sure design volume flow per total capacity is within range
-					
+
 					// Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and determines capacity using physical calculations instead of emperical curves
 					bool FlagCheckVolFlowPerRatedTotCap = true;
-					if ( SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) || SameString( CompType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ) FlagCheckVolFlowPerRatedTotCap = false;
-						
+					if ( UtilityRoutines::SameString( CompType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) || UtilityRoutines::SameString( CompType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl" ) ) FlagCheckVolFlowPerRatedTotCap = false;
+
 					if ( DataIsDXCoil && FlagCheckVolFlowPerRatedTotCap && ( SizingType == CoolingCapacitySizing || SizingType == HeatingCapacitySizing ) ) {
 						if ( SizingResult > 0.0 ) {
 							RatedVolFlowPerRatedTotCap = DesVolFlow / SizingResult;
@@ -2351,7 +2801,10 @@ namespace ReportSizingManager {
 								ShowContinueError( "...Requested flow/capacity ratio (m3/s/W ) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
 								ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W ) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
 							}
+
+							DXFlowPerCapMinRatio = (DesVolFlow / MinRatedVolFlowPerRatedTotCap(DXCT)) / SizingResult; //set DX Coil Capacity Increase Ratio from Too Low Flow/Capacity Ratio
 							SizingResult = DesVolFlow / MinRatedVolFlowPerRatedTotCap( DXCT );
+
 							if ( !DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag ) {
 								ShowContinueError( "...Adjusted capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
 							}
@@ -2364,7 +2817,10 @@ namespace ReportSizingManager {
 								ShowContinueError( "...Requested flow/capacity ratio ( m3/s/W ) = " + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) );
 								ShowContinueError( "...Maximum flow/capacity ratio ( m3/s/W ) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
 							}
+
+							DXFlowPerCapMaxRatio = DesVolFlow / MaxRatedVolFlowPerRatedTotCap(DXCT) / SizingResult; // set DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio
 							SizingResult = DesVolFlow / MaxRatedVolFlowPerRatedTotCap( DXCT );
+							
 							if ( !DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag ) {
 								ShowContinueError( "...Adjusted capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
 							}
@@ -2372,7 +2828,7 @@ namespace ReportSizingManager {
 						}
 					}
 					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+						if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 							ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 							SizingResult *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
 							AutosizeUser *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
@@ -2390,7 +2846,7 @@ namespace ReportSizingManager {
 							}
 						}
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 && PrintWarningFlag ) {
-						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
+						if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
@@ -2398,7 +2854,7 @@ namespace ReportSizingManager {
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else if (PrintWarningFlag ) {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+						if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
 							SizingResult *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString + " ( non-bypassed )", SizingResult );
@@ -2430,7 +2886,7 @@ namespace ReportSizingManager {
 							}
 						}
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 && PrintWarningFlag ) {
-						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
+						if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
@@ -2438,7 +2894,7 @@ namespace ReportSizingManager {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeUser > 0.0 && PrintWarningFlag ) {
-						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
+						if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
@@ -2446,7 +2902,7 @@ namespace ReportSizingManager {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else if ( PrintWarningFlag ) {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+						if ( UtilityRoutines::SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 							SizingResult *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString + " (non-bypassed)", SizingResult );
@@ -2459,6 +2915,127 @@ namespace ReportSizingManager {
 //				eventually move hardsize reporting here? [up in calcs, 3 places at e.g., if ( !IsAutoSize && !SizingDesRunThisAirSys )]
 			}
 //		}
+		// Coil summary Reporting
+		if ( SizingType == CoolingAirflowSizing ) {
+			if ( coilSelectionReportObj->isCompTypeCoil( CompType ) ) {
+				//SizingResult is airflow in m3/s
+				coilSelectionReportObj->setCoilAirFlow( CompName, CompType, SizingResult, IsAutoSize );
+			}
+
+			//  fill fan peak day and time here
+			if ( coilSelectionReportObj->isCompTypeFan( CompType ) ) {
+				if ( DataScalableSizingON ) {
+					DDNameFanPeak = "Scaled size, not from any peak";
+					dateTimeFanPeak = "Scaled size, not from any peak";
+				}
+				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanDesDay, CompName, DDNameFanPeak );
+				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanPkTime, CompName, dateTimeFanPeak );
+			}
+		} else if ( SizingType == CoolingWaterflowSizing ) { // used by watercoils.cc
+			//SizingResult is water flow in m3/s
+			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizCoolNum, DataWaterLoopNum );
+			coilSelectionReportObj->setCoilWaterDeltaT( CompName, CompType , CoilDesWaterDeltaT );
+			if ( DataDesInletWaterTemp > 0.0 ) {
+				coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataDesInletWaterTemp );
+				coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataDesInletWaterTemp + CoilDesWaterDeltaT );
+			} else {
+				coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp );
+				coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataGlobals::CWInitConvTemp + CoilDesWaterDeltaT );
+			}
+
+		} else if ( SizingType == HeatingWaterflowSizing ) {
+			//SizingResult is water flow in m3/s
+			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum  );
+			coilSelectionReportObj->setCoilWaterDeltaT( CompName, CompType , PlantSizData( DataPltSizHeatNum ).DeltaT );
+			coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType , DataGlobals::HWInitConvTemp );
+			coilSelectionReportObj->setCoilLvgWaterTemp( CompName, CompType , DataGlobals::HWInitConvTemp - PlantSizData( DataPltSizHeatNum ).DeltaT );
+		} else if ( SizingType == CoolingWaterDesAirInletTempSizing ) {
+			coilSelectionReportObj->setCoilEntAirTemp( CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum );
+		} else if ( SizingType == CoolingWaterDesAirInletHumRatSizing ) {
+			coilSelectionReportObj->setCoilEntAirHumRat( CompName, CompType, SizingResult );
+		} else if ( SizingType == CoolingWaterDesWaterInletTempSizing ) {
+			coilSelectionReportObj->setCoilEntWaterTemp( CompName, CompType, SizingResult );
+		} else if ( SizingType == CoolingWaterDesAirOutletTempSizing ) {
+			coilSelectionReportObj->setCoilLvgAirTemp( CompName, CompType, SizingResult );
+		} else if ( SizingType == CoolingWaterDesAirOutletHumRatSizing ) {
+			coilSelectionReportObj->setCoilLvgAirHumRat( CompName, CompType, SizingResult );
+		} else if ( SizingType == CoolingWaterNumofTubesPerRowSizing ) {
+			// do nothing
+		} else if ( SizingType == HeatingWaterDesAirInletTempSizing ) {
+			coilSelectionReportObj->setCoilEntAirTemp( CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum );
+		} else if ( SizingType == HeatingWaterDesAirInletHumRatSizing ) {
+			coilSelectionReportObj->setCoilEntAirHumRat( CompName, CompType, SizingResult );
+		} else if ( SizingType == HeatingWaterDesCoilLoadUsedForUASizing ) {
+			coilSelectionReportObj->setCoilHeatingCapacity( CompName, CompType, SizingResult, IsAutoSize,CurSysNum, CurZoneEqNum,CurOASysNum, FanCoolLoad, TotCapTempModFac, DXFlowPerCapMinRatio, DXFlowPerCapMaxRatio );
+		} else if ( SizingType == HeatingWaterDesCoilWaterVolFlowUsedForUASizing ) {
+			coilSelectionReportObj->setCoilWaterFlowPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum  );
+		} else if ( SizingType == HeatingAirflowSizing ) {
+			if ( coilSelectionReportObj->isCompTypeCoil( CompType ) ) {
+				//SizingResult is airflow in m3/s
+				coilSelectionReportObj->setCoilAirFlow( CompName, CompType, SizingResult, IsAutoSize );
+			}
+			//  fill fan peak day and time here
+			if ( coilSelectionReportObj->isCompTypeFan( CompType ) ) {
+				if ( DataScalableSizingON ) {
+					DDNameFanPeak = "Scaled size, not from any peak";
+					dateTimeFanPeak = "Scaled size, not from any peak";
+				}
+				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanDesDay, CompName, DDNameFanPeak );
+				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanPkTime, CompName, dateTimeFanPeak );
+			}
+		} else if ( SizingType == HeatingAirflowUASizing ) {
+
+			// do nothing
+		} else if ( SizingType == SystemAirflowSizing ) {
+			//  fill fan peak day and time here
+			if ( coilSelectionReportObj->isCompTypeFan( CompType ) ) {
+				if ( DataScalableSizingON ) {
+					DDNameFanPeak = "Scaled size, not from any peak";
+					dateTimeFanPeak = "Scaled size, not from any peak";
+				}
+				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanDesDay, CompName, DDNameFanPeak );
+				OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanPkTime, CompName, dateTimeFanPeak );
+			}
+
+		} else if ( SizingType == CoolingCapacitySizing ) {
+			if ( coilSelectionReportObj->isCompTypeCoil( CompType ) ) {
+				coilSelectionReportObj->setCoilCoolingCapacity( CompName, CompType, SizingResult, IsAutoSize ,CurSysNum, CurZoneEqNum, CurOASysNum, FanCoolLoad , TotCapTempModFac, DXFlowPerCapMinRatio, DXFlowPerCapMaxRatio );
+			}
+		} else if ( SizingType == HeatingCapacitySizing ) {
+			if ( coilSelectionReportObj->isCompTypeCoil( CompType ) ) {
+				coilSelectionReportObj->setCoilHeatingCapacity( CompName, CompType, SizingResult, IsAutoSize, CurSysNum, CurZoneEqNum,CurOASysNum,FanCoolLoad, TotCapTempModFac, DXFlowPerCapMinRatio, DXFlowPerCapMaxRatio );
+			}
+		} else if ( SizingType == WaterHeatingCapacitySizing ) {
+			if ( coilSelectionReportObj->isCompTypeCoil( CompType ) ) {
+				coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum( CompName, CompType, SizingResult, IsAutoSize, DataPltSizHeatNum, DataWaterLoopNum );
+			}
+		} else if ( SizingType == WaterHeatingCoilUASizing ) {
+			coilSelectionReportObj->setCoilUA( CompName, CompType, SizingResult, DataCapacityUsedForSizing, IsAutoSize,  CurSysNum, CurZoneEqNum );
+
+		} else if ( SizingType == CoolingSHRSizing ) {
+		
+		} else if ( SizingType == HeatingDefrostSizing ) {
+		
+		} else if ( SizingType == MaxHeaterOutletTempSizing ) {
+		
+		} else if ( SizingType == AutoCalculateSizing ) {
+			// do nothing
+		} else if ( SizingType == ZoneCoolingLoadSizing ) {
+			// do nothing
+		} else if ( SizingType == ZoneHeatingLoadSizing ) {
+			// do nothing
+		} else if ( SizingType == MinSATempCoolingSizing ) {
+		
+		} else if ( SizingType == MaxSATempHeatingSizing ) {
+		
+		} else if ( SizingType == HeatingCoilDesAirInletTempSizing ) {
+			coilSelectionReportObj->setCoilEntAirTemp( CompName, CompType, SizingResult, CurSysNum, CurZoneEqNum );
+		} else if ( SizingType == HeatingCoilDesAirOutletTempSizing ) {
+			coilSelectionReportObj->setCoilLvgAirTemp( CompName, CompType, SizingResult );
+		} else if ( SizingType == HeatingCoilDesAirInletHumRatSizing ) {
+			coilSelectionReportObj->setCoilEntAirHumRat( CompName, CompType, SizingResult );
+		}
+
 	}
 
 	void

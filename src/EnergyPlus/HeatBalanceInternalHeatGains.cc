@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,6 @@
 #include <HeatBalanceInternalHeatGains.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -90,26 +89,12 @@ SetupZoneInternalGain(
 	// devices are internal gains like people, lights, electric equipment
 	// and HVAC components with skin loss models like thermal tanks, and power conditioning.
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataHeatBalance;
-	using InputProcessor::MakeUPPERCase;
-	using InputProcessor::SameString;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	int const DeviceAllocInc( 100 );
-
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
-
-	// DERIVED TYPE DEFINITIONS:
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int IntGainsNum;
@@ -122,11 +107,11 @@ SetupZoneInternalGain(
 
 	FoundIntGainsType = false;
 	FoundDuplicate = false;
-	UpperCaseObjectType = MakeUPPERCase( cComponentObject );
-	UpperCaseObjectName = MakeUPPERCase( cComponentName );
+	UpperCaseObjectType = UtilityRoutines::MakeUPPERCase( cComponentObject );
+	UpperCaseObjectName = UtilityRoutines::MakeUPPERCase( cComponentName );
 
 	// Check if IntGainComp_TypeOfNum and cComponentObject are consistent
-	if ( ! SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
+	if ( ! UtilityRoutines::SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
 		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain" );
 		ShowContinueError( "Object type character = " + cComponentObject );
 		ShowContinueError( "Type of Num object name = " + ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) );

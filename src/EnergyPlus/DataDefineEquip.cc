@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -82,19 +82,20 @@ namespace DataDefineEquip {
 	int const DualDuctConstVolume( 1 );
 	int const DualDuctVAV( 2 );
 	int const SingleDuctVAVReheat( 3 );
-	int const SingleDuctConstVolReheat( 4 );
-	int const SingleDuctVAVNoReheat( 5 );
-	int const SingleDuct_SeriesPIU_Reheat( 6 );
-	int const SingleDuct_ParallelPIU_Reheat( 7 );
-	int const SingleDuct_ConstVol_4PipeInduc( 8 );
-	int const SingleDuctVAVReheatVSFan( 9 );
-	int const SingleDuctCBVAVReheat( 10 );
-	int const SingleDuctCBVAVNoReheat( 11 );
-	int const SingleDuctConstVolCooledBeam( 12 );
-	int const DualDuctVAVOutdoorAir( 13 );
-	int const SingleDuctUserDefined( 14 );
-	int const SingleDuctATMixer( 15 );
-	int const SingleDuctConstVolFourPipeBeam( 16 );
+	int const SingleDuctVAVNoReheat( 4 );
+	int const SingleDuctConstVolReheat( 5 );
+	int const SingleDuctConstVolNoReheat( 6 );
+	int const SingleDuct_SeriesPIU_Reheat( 7 );
+	int const SingleDuct_ParallelPIU_Reheat( 8 );
+	int const SingleDuct_ConstVol_4PipeInduc( 9 );
+	int const SingleDuctVAVReheatVSFan( 10 );
+	int const SingleDuctCBVAVReheat( 11 );
+	int const SingleDuctCBVAVNoReheat( 12 );
+	int const SingleDuctConstVolCooledBeam( 13 );
+	int const DualDuctVAVOutdoorAir( 14 );
+	int const SingleDuctUserDefined( 15 );
+	int const SingleDuctATMixer( 16 );
+	int const SingleDuctConstVolFourPipeBeam( 17 );
 
 	// DERIVED TYPE DEFINITIONS
 

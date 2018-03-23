@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,7 +64,8 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -136,8 +137,11 @@ namespace Humidifiers {
 	int const FixedInletWaterTemperature( 1 );
 	int const VariableInletWaterTemperature( 2 );
 
+	bool GetInputFlag = true; // moved up from a static function variable
+
 	// Object Data
 	Array1D< HumidifierData > Humidifier;
+	std::unordered_map< std::string, std::string > HumidifierUniqueNames;
 
 	// Clears the global data in Humidifiers.
 	// Needed for unit tests, should not be normally called.
@@ -149,6 +153,8 @@ namespace Humidifiers {
 		NumGasSteamHums = 0;
 		CheckEquipName.deallocate();
 		Humidifier.deallocate();
+		HumidifierUniqueNames.clear();
+		GetInputFlag = true;
 	}
 
 	void
@@ -168,31 +174,11 @@ namespace Humidifiers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manage the simulation of an air humidifier
 
-		// METHODOLOGY EMPLOYED:
-		// NA
-
-		// REFERENCES:
-		// NA
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HumNum; // index of humidifier unit being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		Real64 WaterAddNeeded; // output in kg/s needed from humidifier to meet humidity setpoint
 
 		if ( GetInputFlag ) {
@@ -202,7 +188,7 @@ namespace Humidifiers {
 
 		// Get the humidifier unit index
 		if ( CompIndex == 0 ) {
-			HumNum = FindItemInList( CompName, Humidifier );
+			HumNum = UtilityRoutines::FindItemInList( CompName, Humidifier );
 			if ( HumNum == 0 ) {
 				ShowFatalError( "SimHumidifier: Unit not found=" + CompName );
 			}
@@ -271,14 +257,7 @@ namespace Humidifiers {
 		// METHODOLOGY EMPLOYED:
 		// Uses InputProcessor "Get" routines to obtain data.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankDemandComponent;
@@ -287,18 +266,8 @@ namespace Humidifiers {
 		using CurveManager::GetCurveIndex;
 		using CurveManager::GetCurveType;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetHumidifierInputs: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HumidifierIndex; // loop index
@@ -309,8 +278,6 @@ namespace Humidifiers {
 		int MaxAlphas; // maximum Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in getting objects
 		Array1D_string Alphas; // Alpha input items for object
 		Array1D_string cAlphaFields; // Alpha field names
@@ -322,19 +289,20 @@ namespace Humidifiers {
 		//  certain object in the input file
 
 		CurrentModuleObject = "Humidifier:Steam:Electric";
-		NumElecSteamHums = GetNumObjectsFound( CurrentModuleObject );
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		NumElecSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = NumNumbers;
 		MaxAlphas = NumAlphas;
 		CurrentModuleObject = "Humidifier:Steam:Gas";
-		NumGasSteamHums = GetNumObjectsFound( CurrentModuleObject );
+		NumGasSteamHums = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		NumHumidifiers = NumElecSteamHums + NumGasSteamHums;
-		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		// allocate the data array
 		Humidifier.allocate( NumHumidifiers );
+		HumidifierUniqueNames.reserve( static_cast< unsigned >( NumHumidifiers ) );
 		CheckEquipName.dimension( NumHumidifiers, true );
 
 		Alphas.allocate( MaxAlphas );
@@ -347,15 +315,9 @@ namespace Humidifiers {
 		// loop over electric steam humidifiers and load the input data
 		CurrentModuleObject = "Humidifier:Steam:Electric";
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumElecSteamHums; ++HumidifierIndex ) {
-			GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = HumidifierIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			//    Humidifier(HumNum)%HumType = TRIM(CurrentModuleObject)
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Electric;
@@ -390,15 +352,9 @@ namespace Humidifiers {
 		// loop over gas fired steam humidifiers and load the input data
 		CurrentModuleObject = "Humidifier:Steam:Gas";
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumGasSteamHums; ++HumidifierIndex ) {
-			GetObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, HumidifierIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			HumNum = NumElecSteamHums + HumidifierIndex;
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( Alphas( 1 ), Humidifier, HumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( HumidifierUniqueNames, Alphas( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 			Humidifier( HumNum ).Name = Alphas( 1 );
 			Humidifier( HumNum ).HumType_Code = Humidifier_Steam_Gas;
 			Humidifier( HumNum ).Sched = Alphas( 2 );
@@ -1051,16 +1007,12 @@ namespace Humidifiers {
 		// Uses energy and mass balance as well as pschrometric relations. Adopted
 		// from routine CalcElecSteamHumidifier by Fred Buhl
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyWFnTdbRhPb;
 		using Psychrometrics::PsyTdbFnHW;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::RhoH2O;
 		using CurveManager::CurveValue;
-
 		using DataEnvironment::WaterMainsTemp;
 		using DataWater::WaterStorage;
 		using FluidProperties::GetSatEnthalpyRefrig;
@@ -1068,19 +1020,9 @@ namespace Humidifiers {
 		using FluidProperties::FindGlycol;
 		using FluidProperties::FindRefrigerant;
 
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcGasSteamHumidifier" );
 		Real64 const TSteam( 100.0 ); // saturated steam temperature generated by Humidifier [C]
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 

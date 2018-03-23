@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 	bool ErrorsFound( false );
 
 	std::string const idf_objects = delimited_string({
-		"Version,8.8;",
+		"Version,8.9;",
 
 		"  Construction:WindowEquivalentLayer,",
 		"  CLR CLR VB,                !- Name",
@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 		"  GLZCLR,                    !- Layer 3",
 		"  Air GAP SealedIndoor 20mm, !- Layer 4",
 		"  VBU8D6+45SW1;              !- Layer 5",
-		 
+
 		"WindowMaterial:Glazing:EquivalentLayer,",
 		"  GLZCLR,                    !-  Name",
 		"  SpectralAverage,           !-  Optical Data Type",
@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 		"  0.0,                       !-  Infrared Transmittance (front and back)",
 		"  0.84,                      !-  Front Side Infrared Emissivity",
 		"  0.84;                      !-  Back Side Infrared Emissivity",
-		  
+
 		"WindowMaterial:Blind:EquivalentLayer,",
 		"  VBU8D6+45SW1,           ! - Name",
 		"  Horizontal,             ! - Slat Orientation",
@@ -162,13 +162,13 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 		"  0.90,                   ! - Front Side Slat Infrared Emissivity",
 		"  0.90,                   ! - Back Side Slat Infrared Emissivity",
 		"  BlockBeamSolar;         ! - Slat Angle Control",
-		
+
 		" WindowMaterial:Gap:EquivalentLayer,",
 		"  Air GAP SealedOut 20mm,    !- Name",
 		"  Air,                       !- Gas Type",
 		"  0.0200,                    !- Thickness",
 		"  Sealed;                    !- Gap Vent Type",
-		 
+
 		" WindowMaterial:Gap:EquivalentLayer,",
 		"  Air GAP SealedIndoor 20mm, !- Name",
 		"  Air,                       !- Gas Type",
@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 		"  Sealed;                    !- Gap Vent Type ",
 	});
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	HeatBalanceManager::GetMaterialData( ErrorsFound );
 	HeatBalanceManager::GetConstructData( ErrorsFound );
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 	EXPECT_EQ( 1, DataHeatBalance::TotBlindsEQL );
 	EXPECT_EQ( DataHeatBalance::Material( VBMatNum ).Group, DataHeatBalance::BlindEquivalentLayer );
 	EXPECT_EQ( DataHeatBalance::Material( VBMatNum ).SlatAngleType, WindowEquivalentLayer::lscVBNOBM );
-	
+
 	int ConstrNum = 1;
 	int EQLNum = 0;
 	InitEquivalentLayerWindowCalculations();
@@ -210,7 +210,7 @@ TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar )
 
 	std::string const idf_objects = delimited_string( {
 
-		"  Version,8.8;",
+		"  Version,8.9;",
 
 		"  Timestep,1;",
 
@@ -524,7 +524,7 @@ TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar )
 		"  Sealed;                    !- Gap Vent Type ",
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 ); //
 	SimulationManager::ManageSimulation();
@@ -551,9 +551,9 @@ TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar )
 	CalcEQLOpticalProperty( SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam );
 	// check that the slat angle control type is set to MaximizeSolar
 	EXPECT_EQ( DataHeatBalance::Material( VBMatNum ).SlatAngleType, WindowEquivalentLayer::lscVBPROF );
-	// check the slat angle 
+	// check the slat angle
 	EXPECT_NEAR( -71.0772, DataSurfaces::SurfaceWindow( SurfNum ).SlatAngThisTSDeg, 0.0001 );
-	// check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle 
+	// check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
 	DaylightingManager::ProfileAngle( SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer );
 	EXPECT_NEAR( -DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfaceWindow( SurfNum ).SlatAngThisTSDeg, 0.0001 );
 }
@@ -568,7 +568,7 @@ TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar )
 
 	std::string const idf_objects = delimited_string( {
 
-		"  Version,8.8;",
+		"  Version,8.9;",
 
 		"  Timestep,1;",
 
@@ -882,7 +882,7 @@ TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar )
 		"  Sealed;                    !- Gap Vent Type ",
 
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	SimulationManager::ManageSimulation();
@@ -905,13 +905,13 @@ TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar )
 			break;
 		}
 	}
-	// calc window optical property 
+	// calc window optical property
 	CalcEQLOpticalProperty( SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam );
 	// check VB slat angle for BlockBeamSolar slat angle control
 	EXPECT_EQ( DataHeatBalance::Material( VBMatNum ).SlatAngleType, WindowEquivalentLayer::lscVBNOBM );
 	// check the VB slat angle
 	EXPECT_NEAR( 18.9228, DataSurfaces::SurfaceWindow( SurfNum ).SlatAngThisTSDeg, 0.0001 );
-	// check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer 
+	// check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
 	DaylightingManager::ProfileAngle( SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer );
 	EXPECT_NEAR( 90.0 - DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfaceWindow( SurfNum ).SlatAngThisTSDeg, 0.0001 );
 	// get the slat angle from profile angle

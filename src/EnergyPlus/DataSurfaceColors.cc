@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,7 +49,7 @@
 #include <DataSurfaceColors.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -130,38 +130,14 @@ namespace DataSurfaceColors {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem; // case insensitive Find
-
 		// Return value
 		bool WasSet;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int found;
 
 		WasSet = false;
-		found = FindItem( String, colorkeys, NumColors );
+		found = UtilityRoutines::FindItem( String, colorkeys, NumColors );
 
 		if ( found != 0 ) {
 			if ( present( ColorType ) ) {
@@ -203,25 +179,8 @@ namespace DataSurfaceColors {
 		// Worst case: the colors remain as default.  Note -- this allocates and deallocates
 		// the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectDefMaxArgs;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "OutputControl:SurfaceColorScheme" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas;
@@ -238,11 +197,11 @@ namespace DataSurfaceColors {
 
 		DXFcolorno = defaultcolorno;
 		// first see if there is a scheme name
-		numptr = GetObjectItemNum( CurrentModuleObject, SchemeName );
+		numptr = inputProcessor->getObjectItemNum( CurrentModuleObject, SchemeName );
 
 		if ( numptr > 0 ) {
 
-			GetObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, numargs, NumAlphas, numNumbers );
 
 			cAlphas.allocate( NumAlphas );
 			cAlphaFields.allocate( NumAlphas );
@@ -254,7 +213,7 @@ namespace DataSurfaceColors {
 			cAlphas( {1,NumAlphas} ) = "";
 			rNumerics( {1,numNumbers} ) = 0.0;
 
-			GetObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			inputProcessor->getObjectItem( CurrentModuleObject, numptr, cAlphas, NumAlphas, rNumerics, numNumbers, status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			for ( numargs = 1; numargs <= numNumbers; ++numargs ) {
 				numptr = rNumerics( numargs ); // set to integer
 				if ( lNumericBlanks( numargs ) ) {

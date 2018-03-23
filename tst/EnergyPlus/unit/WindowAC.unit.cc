@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,7 +69,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	// this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
 	// set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
 	std::string const idf_objects = delimited_string( {
-	" Version,8.8;",
+	" Version,8.9;",
 
 	"  Timestep,6;",
 
@@ -199,7 +199,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0.0,                     !- Coefficient3 x**2",
 	"    0.5,                     !- Minimum Value of x",
 	"    1.5;                     !- Maximum Value of x  ",
-   
+
 	"  Curve:Cubic,",
 	"    HPACFFF,                 !- Name",
 	"    1.0,                     !- Coefficient1 Constant",
@@ -208,7 +208,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"    0.0,                     !- Coefficient4 x**3",
 	"    0.5,                     !- Minimum Value of x",
 	"    1.5;                     !- Maximum Value of x",
-    
+
 	"  Curve:Biquadratic,",
 	"    HPCoolingEIRFTemp4,      !- Name",
 	"    0.0001514017,            !- Coefficient1 Constant",
@@ -255,6 +255,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	"  ZoneHVAC:EquipmentList,",
 	"    Zone1Equipment,          !- Name",
+	"    SequentialLoad,          !- Load Distribution Scheme",
 	"    ZoneHVAC:WindowAirConditioner,  !- Zone Equipment 1 Object Type",
 	"    Zone1WindAC,             !- Zone Equipment 1 Name",
 	"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -263,7 +264,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	"  NodeList,",
 	"    Zone1Exhausts,           !- Name",
 	"    Zone1WindACAirInletNode; !- Node 1 Name",
-		
+
 	"  OutdoorAir:NodeList,",
 	"    OutsideAirInletNodes;    !- Node or NodeList Name 1",
 
@@ -432,10 +433,10 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
-	DataGlobals::NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
-	DataGlobals::MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+	DataGlobals::NumOfTimeStepInHour = 6; // must initialize this to get schedules initialized
+	DataGlobals::MinutesPerTimeStep = 10; // must initialize this to get schedules initialized
 	ScheduleManager::ProcessScheduleInput(); // read schedule data
 
 	bool errorsFound( false );
@@ -447,7 +448,7 @@ TEST_F( EnergyPlusFixture, WindowAC_VStest1 )
 	SimulationManager::GetProjectData();
 	OutputReportPredefined::SetPredefinedTables();
 	HeatBalanceManager::SetPreConstructionInputParameters(); //establish array bounds for constructions early
-	
+
 	DataGlobals::BeginSimFlag = true;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataGlobals::ZoneSizingCalc = true;

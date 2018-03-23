@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -312,6 +312,8 @@ namespace DataAirLoop {
 		int NumComponents;
 		int NumControllers;
 		int NumSimpleControllers; // number of CONTROLLER:SIMPLE objects in OA Sys controller list
+		std::string OAControllerName; // OA controller name
+		int OAControllerIndex; // OA controller index in OAController
 		Array1D_string ComponentName;
 		Array1D_string ComponentType;
 		Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
@@ -326,7 +328,8 @@ namespace DataAirLoop {
 			ControllerListNum( 0 ),
 			NumComponents( 0 ),
 			NumControllers( 0 ),
-			NumSimpleControllers( 0 )
+			NumSimpleControllers( 0 ),
+			OAControllerIndex( 0 )
 		{}
 
 	};

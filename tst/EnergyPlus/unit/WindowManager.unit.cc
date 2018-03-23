@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,7 +88,6 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 {
 
 	DataIPShortCuts::lAlphaFieldBlanks = true;
-	bool ErrorsFound( false );
 
 	std::string const idf_objects = delimited_string({
 		"Version,8.4;",
@@ -111,95 +110,90 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 		"  WindowConstruction,      !- Name",
 		"  WindowMaterial;          !- Outside Layer",
 		"WindowProperty:FrameAndDivider,",
-	  "  WindowFrame,             !- Name",
-	  "  0.05,                    !- Frame Width {m}",
-	  "  0.00,                    !- Frame Outside Projection {m}",
-	  "  0.00,                    !- Frame Inside Projection {m}",
-	  "  5.0,                     !- Frame Conductance {W/m2-K}",
-	  "  1.2,                     !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
-	  "  0.8,                     !- Frame Solar Absorptance",
-	  "  0.8,                     !- Frame Visible Absorptance",
-	  "  0.9,                     !- Frame Thermal Hemispherical Emissivity",
-	  "  DividedLite,             !- Divider Type",
-	  "  0.02,                    !- Divider Width {m}",
-	  "  2,                       !- Number of Horizontal Dividers",
-	  "  2,                       !- Number of Vertical Dividers",
-	  "  0.00,                    !- Divider Outside Projection {m}",
-	  "  0.00,                    !- Divider Inside Projection {m}",
-	  "  5.0,                     !- Divider Conductance {W/m2-K}",
-	  "  1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
-	  "  0.8,                     !- Divider Solar Absorptance",
-	  "  0.8,                     !- Divider Visible Absorptance",
-	  "  0.9;                     !- Divider Thermal Hemispherical Emissivity",
+		"  WindowFrame,             !- Name",
+		"  0.05,                    !- Frame Width {m}",
+		"  0.00,                    !- Frame Outside Projection {m}",
+		"  0.00,                    !- Frame Inside Projection {m}",
+		"  5.0,                     !- Frame Conductance {W/m2-K}",
+		"  1.2,                     !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance",
+		"  0.8,                     !- Frame Solar Absorptance",
+		"  0.8,                     !- Frame Visible Absorptance",
+		"  0.9,                     !- Frame Thermal Hemispherical Emissivity",
+		"  DividedLite,             !- Divider Type",
+		"  0.02,                    !- Divider Width {m}",
+		"  2,                       !- Number of Horizontal Dividers",
+		"  2,                       !- Number of Vertical Dividers",
+		"  0.00,                    !- Divider Outside Projection {m}",
+		"  0.00,                    !- Divider Inside Projection {m}",
+		"  5.0,                     !- Divider Conductance {W/m2-K}",
+		"  1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance",
+		"  0.8,                     !- Divider Solar Absorptance",
+		"  0.8,                     !- Divider Visible Absorptance",
+		"  0.9;                     !- Divider Thermal Hemispherical Emissivity",
 		"FenestrationSurface:Detailed,",
 		"  FenestrationSurface,     !- Name",
 		"  Window,                  !- Surface Type",
-	  "  WindowConstruction,      !- Construction Name",
-	  "  Wall,                    !- Building Surface Name",
-	  "  ,                        !- Outside Boundary Condition Object",
-	  "  0.5000000,               !- View Factor to Ground",
-	  "  ,                        !- Shading Control Name",
-	  "  WindowFrame,             !- Frame and Divider Name",
-	  "  1.0,                     !- Multiplier",
-	  "  4,                       !- Number of Vertices",
-	  "  0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
-	  "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
-	  "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
-	  "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
+		"  WindowConstruction,      !- Construction Name",
+		"  Wall,                    !- Building Surface Name",
+		"  ,                        !- Outside Boundary Condition Object",
+		"  0.5000000,               !- View Factor to Ground",
+		"  ,                        !- Shading Control Name",
+		"  WindowFrame,             !- Frame and Divider Name",
+		"  1.0,                     !- Multiplier",
+		"  4,                       !- Number of Vertices",
+		"  0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
+		"  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
+		"  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
 		"BuildingSurface:Detailed,"
-	  "  Wall,                    !- Name",
-	  "  Wall,                    !- Surface Type",
-	  "  WallConstruction,        !- Construction Name",
-	  "  Zone,                    !- Zone Name",
-	  "  Outdoors,                !- Outside Boundary Condition",
-	  "  ,                        !- Outside Boundary Condition Object",
-	  "  SunExposed,              !- Sun Exposure",
-	  "  WindExposed,             !- Wind Exposure",
-	  "  0.5000000,               !- View Factor to Ground",
-	  "  4,                       !- Number of Vertices",
-	  "  0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
-	  "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-	  "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-	  "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
+		"  Wall,                    !- Name",
+		"  Wall,                    !- Surface Type",
+		"  WallConstruction,        !- Construction Name",
+		"  Zone,                    !- Zone Name",
+		"  Outdoors,                !- Outside Boundary Condition",
+		"  ,                        !- Outside Boundary Condition Object",
+		"  SunExposed,              !- Sun Exposure",
+		"  WindExposed,             !- Wind Exposure",
+		"  0.5000000,               !- View Factor to Ground",
+		"  4,                       !- Number of Vertices",
+		"  0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
+		"  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
 		"BuildingSurface:Detailed,"
-	  "  Floor,                   !- Name",
-	  "  Floor,                   !- Surface Type",
-	  "  WallConstruction,        !- Construction Name",
-	  "  Zone,                    !- Zone Name",
-	  "  Outdoors,                !- Outside Boundary Condition",
-	  "  ,                        !- Outside Boundary Condition Object",
-	  "  NoSun,                   !- Sun Exposure",
-	  "  NoWind,                  !- Wind Exposure",
-	  "  1.0,                     !- View Factor to Ground",
-	  "  4,                       !- Number of Vertices",
-	  "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-	  "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-	  "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-	  "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+		"  Floor,                   !- Name",
+		"  Floor,                   !- Surface Type",
+		"  WallConstruction,        !- Construction Name",
+		"  Zone,                    !- Zone Name",
+		"  Outdoors,                !- Outside Boundary Condition",
+		"  ,                        !- Outside Boundary Condition Object",
+		"  NoSun,                   !- Sun Exposure",
+		"  NoWind,                  !- Wind Exposure",
+		"  1.0,                     !- View Factor to Ground",
+		"  4,                       !- Number of Vertices",
+		"  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+		"  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+		"  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+		"  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
 		"Zone,"
-	  "  Zone,                    !- Name",
-	  "  0,                       !- Direction of Relative North {deg}",
-	  "  6.000000,                !- X Origin {m}",
-	  "  6.000000,                !- Y Origin {m}",
-	  "  0,                       !- Z Origin {m}",
-	  "  1,                       !- Type",
-	  "  1,                       !- Multiplier",
-	  "  autocalculate,           !- Ceiling Height {m}",
-	  "  autocalculate;           !- Volume {m3}"
+		"  Zone,                    !- Name",
+		"  0,                       !- Direction of Relative North {deg}",
+		"  6.000000,                !- X Origin {m}",
+		"  6.000000,                !- Y Origin {m}",
+		"  0,                       !- Z Origin {m}",
+		"  1,                       !- Type",
+		"  1,                       !- Multiplier",
+		"  autocalculate,           !- Ceiling Height {m}",
+		"  autocalculate;           !- Volume {m3}"
 	});
 
 
-	ASSERT_FALSE(process_idf(idf_objects));
+	ASSERT_TRUE(process_idf(idf_objects));
 
 	DataHeatBalance::ZoneIntGain.allocate(1);
 
 	createFacilityElectricPowerServiceObject();
 	HeatBalanceManager::SetPreConstructionInputParameters();
-	HeatBalanceManager::GetProjectControlData( ErrorsFound );
-	HeatBalanceManager::GetFrameAndDividerData( ErrorsFound );
-	HeatBalanceManager::GetMaterialData( ErrorsFound );
-	HeatBalanceManager::GetConstructData( ErrorsFound );
-	HeatBalanceManager::GetBuildingData( ErrorsFound );
 
 	Psychrometrics::InitializePsychRoutines();
 
@@ -437,7 +431,7 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 		"  autocalculate;           !- Volume {m3}"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataHeatBalance::ZoneIntGain.allocate( 1 );
 
@@ -550,7 +544,7 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataHeatBalSurface::QdotRadOutRepPerArea.allocate( 3 );
 	DataHeatBalSurface::QRadOutReport.allocate( 3 );
 	DataHeatBalSurface::QRadLWOutSrdSurfs.allocate( 3 );
-	
+
 	DataHeatBalance::QRadSWOutIncident = 0.0;
 	DataHeatBalance::QRadSWwinAbs = 0.0;
 	DataHeatBalance::QRadThermInAbs = 0.0;
@@ -597,7 +591,7 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 
 	std::string const idf_objects = delimited_string( {
 
-		"  Version,8.8;",
+		"  Version,8.9;",
 
 		"  Building,",
 		"    Small Office with AirflowNetwork model,  !- Name",
@@ -2336,9 +2330,9 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 		"    0.8,                     !- Divider Solar Absorptance",
 		"    0.8,                     !- Divider Visible Absorptance",
 		"    0.9;                     !- Divider Thermal Hemispherical Emissivity",
-	}); 
+	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	SimulationManager::GetProjectData( );
 	bool FoundError = false;
@@ -2539,7 +2533,7 @@ TEST_F( EnergyPlusFixture, WindowManager_SrdLWRTest )
 		"  autocalculate;           !- Volume {m3}"
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 	ScheduleManager::ProcessScheduleInput();
 	DataHeatBalance::ZoneIntGain.allocate( 1 );
 

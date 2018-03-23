@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,6 +108,7 @@ namespace EvaporativeCoolers {
 		std::string Schedule; // HeatingCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
 		Real64 VolFlowRate; // Volume Flow Rate in Evap Cooler needed for calculating SatEff
+		Real64 DesVolFlowRate; // Design volume flow rate (autosize or user input) - this is only used to compute design pump power
 		Real64 OutletTemp;
 		Real64 OuletWetBulbTemp;
 		Real64 OutletHumRat;
@@ -204,6 +205,7 @@ namespace EvaporativeCoolers {
 			EvapCoolerType( 0 ),
 			SchedPtr( 0 ),
 			VolFlowRate( 0.0 ),
+			DesVolFlowRate( 0.0 ),
 			OutletTemp( 0.0 ),
 			OuletWetBulbTemp( 0.0 ),
 			OutletHumRat( 0.0 ),
@@ -601,6 +603,10 @@ namespace EvaporativeCoolers {
 
 	//        End of Reporting subroutines for the EvaporativeCoolers Module
 	// *****************************************************************************
+
+	// Used to clear global data between Unit Tests, should not be normally called
+	void
+	clear_state();
 
 } // EvaporativeCoolers
 

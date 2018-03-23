@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,8 +68,9 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GlobalNames.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -169,6 +170,7 @@ namespace Pumps {
 
 	// Object Data
 	Array1D< PumpSpecs > PumpEquip;
+	std::unordered_map< std::string, std::string > PumpUniqueNames;
 	Array1D< ReportVars > PumpEquipReport;
 
 	//*************************************************************************!
@@ -187,6 +189,7 @@ namespace Pumps {
 		ShaftPower= 0.0 ;
 		PumpEquip.deallocate();
 		PumpEquipReport.deallocate();
+		PumpUniqueNames.clear();
 	}
 
 	void
@@ -213,13 +216,9 @@ namespace Pumps {
 		// the necessary loop and the PumpRunning has been correctly set.
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataPlant::PlantLoop;
 		using DataPlant::FlowPumpQuery;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -239,7 +238,7 @@ namespace Pumps {
 
 		// Setup pump component index if needed
 		if ( PumpIndex == 0 ) {
-			PumpNum = FindItemInList( PumpName, PumpEquip ); // Determine which pump to simulate
+			PumpNum = UtilityRoutines::FindItemInList( PumpName, PumpEquip ); // Determine which pump to simulate
 			if ( PumpNum == 0 ) {
 				ShowFatalError( "ManagePumps: Pump requested not found =" + PumpName ); // Catch any bad names before crashing
 			}
@@ -303,11 +302,6 @@ namespace Pumps {
 		//  Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
 		using DataIPShortCuts::lAlphaFieldBlanks;
 		using DataIPShortCuts::cAlphaFieldNames;
 		using DataIPShortCuts::cNumericFieldNames;
@@ -337,10 +331,6 @@ namespace Pumps {
 		using DataHeatBalance::IntGainTypeOf_PumpBank_ConSpeed;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StartTemp( 100.0 ); // Standard Temperature across code to calculated Steam density
 		static std::string const RoutineName( "GetPumpInput: " );
@@ -352,8 +342,6 @@ namespace Pumps {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		bool ErrorsFound;
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int TempCurveIndex;
 		std::string TempCurveType;
 		int NumVarSpeedPumps;
@@ -373,11 +361,11 @@ namespace Pumps {
 		ErrorsFound = false;
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
-		NumVarSpeedPumps = GetNumObjectsFound( cPump_VarSpeed );
-		NumConstSpeedPumps = GetNumObjectsFound( cPump_ConSpeed );
-		NumCondensatePumps = GetNumObjectsFound( cPump_Cond );
-		NumPumpBankSimpleVar = GetNumObjectsFound( cPumpBank_VarSpeed );
-		NumPumpBankSimpleConst = GetNumObjectsFound( cPumpBank_ConSpeed );
+		NumVarSpeedPumps = inputProcessor->getNumObjectsFound( cPump_VarSpeed );
+		NumConstSpeedPumps = inputProcessor->getNumObjectsFound( cPump_ConSpeed );
+		NumCondensatePumps = inputProcessor->getNumObjectsFound( cPump_Cond );
+		NumPumpBankSimpleVar = inputProcessor->getNumObjectsFound( cPumpBank_VarSpeed );
+		NumPumpBankSimpleConst = inputProcessor->getNumObjectsFound( cPumpBank_ConSpeed );
 		NumPumps = NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar + NumPumpBankSimpleConst;
 
 		if ( NumPumps <= 0 ) {
@@ -386,6 +374,7 @@ namespace Pumps {
 		}
 
 		PumpEquip.allocate( NumPumps );
+		PumpUniqueNames.reserve( static_cast< unsigned >( NumPumps ) );
 		PumpEquipReport.allocate( NumPumps );
 
 		//LOAD ARRAYS WITH VARIABLE SPEED CURVE FIT PUMP DATA
@@ -394,15 +383,9 @@ namespace Pumps {
 
 		for ( NumVarPump = 1; NumVarPump <= NumVarSpeedPumps; ++NumVarPump ) {
 			PumpNum = NumVarPump;
-			GetObjectItem( cCurrentModuleObject, NumVarPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumVarPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = Pump_VarSpeed; //'Pump:VariableSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpVariableSpeed;
@@ -413,9 +396,9 @@ namespace Pumps {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Water Nodes" );
 
 			//    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(4)
-			if ( SameString( cAlphaArgs( 4 ), "Continuous" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Continuous" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Continuous;
-			} else if ( SameString( cAlphaArgs( 4 ), "Intermittent" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Intermittent" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Intermittent;
 			} else {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 4 ) );
@@ -520,7 +503,7 @@ namespace Pumps {
 			}
 
 			if ( ! lAlphaFieldBlanks( 13 ) ) { // zone named for pump skin losses
-				PumpEquip( PumpNum ).ZoneNum = FindItemInList( cAlphaArgs( 13 ), Zone );
+				PumpEquip( PumpNum ).ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 13 ), Zone );
 				if ( PumpEquip( PumpNum ).ZoneNum > 0 ) {
 					PumpEquip( PumpNum ).HeatLossesToZone = true;
 					if ( ! lNumericFieldBlanks( 12 ) ) {
@@ -564,15 +547,9 @@ namespace Pumps {
 
 		for ( NumConstPump = 1; NumConstPump <= NumConstSpeedPumps; ++NumConstPump ) {
 			PumpNum = NumVarSpeedPumps + NumConstPump;
-			GetObjectItem( cCurrentModuleObject, NumConstPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumConstPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = Pump_ConSpeed; //'Pump:ConstantSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpConstantSpeed;
@@ -605,9 +582,9 @@ namespace Pumps {
 			PumpEquip( PumpNum ).Power = 0.0;
 
 			//    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(4)
-			if ( SameString( cAlphaArgs( 4 ), "Continuous" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Continuous" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Continuous;
-			} else if ( SameString( cAlphaArgs( 4 ), "Intermittent" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Intermittent" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Intermittent;
 			} else {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 4 ) );
@@ -649,7 +626,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).RotSpeed = PumpEquip( PumpNum ).RotSpeed_RPM / 60.0; //convert input[rpm] to calculation units[rps]
 
 			if ( ! lAlphaFieldBlanks( 7 ) ) { // zone named for pump skin losses
-				PumpEquip( PumpNum ).ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
+				PumpEquip( PumpNum ).ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), Zone );
 				if ( PumpEquip( PumpNum ).ZoneNum > 0 ) {
 					PumpEquip( PumpNum ).HeatLossesToZone = true;
 					if ( ! lNumericFieldBlanks( 8 ) ) {
@@ -686,15 +663,9 @@ namespace Pumps {
 		cCurrentModuleObject = cPump_Cond;
 		for ( NumCondPump = 1; NumCondPump <= NumCondensatePumps; ++NumCondPump ) {
 			PumpNum = NumCondPump + NumVarSpeedPumps + NumConstSpeedPumps;
-			GetObjectItem( cCurrentModuleObject, NumCondPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumCondPump, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + "  Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = Pump_Cond; //'Pump:VariableSpeed:Condensate'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpCondensate;
@@ -732,7 +703,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).PartLoadCoef( 4 ) = rNumericArgs( 9 );
 
 			if ( ! lAlphaFieldBlanks( 5 ) ) { // zone named for pump skin losses
-				PumpEquip( PumpNum ).ZoneNum = FindItemInList( cAlphaArgs( 5 ), Zone );
+				PumpEquip( PumpNum ).ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Zone );
 				if ( PumpEquip( PumpNum ).ZoneNum > 0 ) {
 					PumpEquip( PumpNum ).HeatLossesToZone = true;
 					if ( ! lNumericFieldBlanks( 10 ) ) {
@@ -783,15 +754,9 @@ namespace Pumps {
 		cCurrentModuleObject = cPumpBank_VarSpeed;
 		for ( NumVarPumpBankSimple = 1; NumVarPumpBankSimple <= NumPumpBankSimpleVar; ++NumVarPumpBankSimple ) {
 			PumpNum = NumVarPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps;
-			GetObjectItem( cCurrentModuleObject, NumVarPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumVarPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = PumpBank_VarSpeed; //'HeaderedPumps:VariableSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
@@ -802,11 +767,11 @@ namespace Pumps {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Water Nodes" );
 
 			//    PumpEquip(PumpNum)%PumpBankFlowSeqControl = cAlphaArgs(4)
-			if ( SameString( cAlphaArgs( 4 ), "Optimal" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Optimal" ) ) {
 				PumpEquip( PumpNum ).SequencingScheme = OptimalScheme;
-			} else if ( SameString( cAlphaArgs( 4 ), "Sequential" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Sequential" ) ) {
 				PumpEquip( PumpNum ).SequencingScheme = SequentialScheme;
-			} else if ( SameString( cAlphaArgs( 4 ), "SupplyEquipmentAssigned" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "SupplyEquipmentAssigned" ) ) {
 				PumpEquip( PumpNum ).SequencingScheme = UserDefined;
 			} else {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 4 ) );
@@ -815,9 +780,9 @@ namespace Pumps {
 			}
 
 			//    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(5)
-			if ( SameString( cAlphaArgs( 5 ), "Continuous" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Continuous" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Continuous;
-			} else if ( SameString( cAlphaArgs( 5 ), "Intermittent" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Intermittent" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Intermittent;
 			} else {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 5 ) );
@@ -853,7 +818,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).MinVolFlowRate = PumpEquip( PumpNum ).NomVolFlowRate * PumpEquip( PumpNum ).MinVolFlowRateFrac;
 
 			if ( ! lAlphaFieldBlanks( 7 ) ) { // zone named for pump skin losses
-				PumpEquip( PumpNum ).ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
+				PumpEquip( PumpNum ).ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), Zone );
 				if ( PumpEquip( PumpNum ).ZoneNum > 0 ) {
 					PumpEquip( PumpNum ).HeatLossesToZone = true;
 					if ( ! lNumericFieldBlanks( 12 ) ) {
@@ -891,15 +856,9 @@ namespace Pumps {
 		cCurrentModuleObject = cPumpBank_ConSpeed;
 		for ( NumConstPumpBankSimple = 1; NumConstPumpBankSimple <= NumPumpBankSimpleConst; ++NumConstPumpBankSimple ) {
 			PumpNum = NumConstPumpBankSimple + NumVarSpeedPumps + NumConstSpeedPumps + NumCondensatePumps + NumPumpBankSimpleVar;
-			GetObjectItem( cCurrentModuleObject, NumConstPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, NumConstPumpBankSimple, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), PumpEquip, PumpNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( PumpUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			PumpEquip( PumpNum ).Name = cAlphaArgs( 1 );
 			PumpEquip( PumpNum ).PumpType = PumpBank_ConSpeed; //'HeaderedPumps:ConstantSpeed'
 			PumpEquip( PumpNum ).TypeOf_Num = TypeOf_PumpBankConstantSpeed;
@@ -910,9 +869,9 @@ namespace Pumps {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Water Nodes" );
 
 			//    PumpEquip(PumpNum)%PumpBankFlowSeqControl = cAlphaArgs(4)
-			if ( SameString( cAlphaArgs( 4 ), "Optimal" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Optimal" ) ) {
 				PumpEquip( PumpNum ).SequencingScheme = OptimalScheme;
-			} else if ( SameString( cAlphaArgs( 4 ), "Sequential" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Sequential" ) ) {
 				PumpEquip( PumpNum ).SequencingScheme = SequentialScheme;
 			} else {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 4 ) );
@@ -922,9 +881,9 @@ namespace Pumps {
 			}
 
 			//    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(5)
-			if ( SameString( cAlphaArgs( 5 ), "Continuous" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Continuous" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Continuous;
-			} else if ( SameString( cAlphaArgs( 5 ), "Intermittent" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Intermittent" ) ) {
 				PumpEquip( PumpNum ).PumpControl = Intermittent;
 			} else {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 5 ) );
@@ -961,7 +920,7 @@ namespace Pumps {
 			//DSU?  need a value set for %MinVolFlowRate ?? zero? NomVolFlowRate?
 
 			if ( ! lAlphaFieldBlanks( 7 ) ) { // zone named for pump skin losses
-				PumpEquip( PumpNum ).ZoneNum = FindItemInList( cAlphaArgs( 7 ), Zone );
+				PumpEquip( PumpNum ).ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 7 ), Zone );
 				if ( PumpEquip( PumpNum ).ZoneNum > 0 ) {
 					PumpEquip( PumpNum ).HeatLossesToZone = true;
 					if ( ! lNumericFieldBlanks( 7 ) ) {
@@ -1082,7 +1041,7 @@ namespace Pumps {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
 		using DataPlant::PlantReSizingCompleted;

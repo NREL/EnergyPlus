@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -322,6 +322,7 @@ TEST_F( EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning )
 		"    SPACE4-1 Out Node;       !- Zone Return Air Node Name",
 		"  ZoneHVAC:EquipmentList,",
 		"    SPACE4-1 Eq,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type",
 		"    SPACE4-1 AirSys,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -341,7 +342,7 @@ TEST_F( EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning )
 		"    IdealLoadOutNode;      !- Node 1 Name",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	HeatBalanceManager::GetZoneData( ErrorsFound );
@@ -519,7 +520,7 @@ TEST_F( EnergyPlusFixture, HPWHWrappedDummyNodeConfig )
 	}
 	std::string const idf_objects = delimited_string(idf_lines);
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	WaterThermalTanks::GetWaterThermalTankInput();
 
@@ -719,7 +720,7 @@ TEST_F( EnergyPlusFixture, HPWHEnergyBalance )
 		"    Water Heating_1;         !- End-Use Subcategory",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	ASSERT_FALSE( WaterThermalTanks::GetWaterThermalTankInput() );
 
@@ -995,6 +996,7 @@ TEST_F( EnergyPlusFixture, HPWHSizing )
 		"    SPACE4-1 Out Node;       !- Zone Return Air Node Name",
 		"  ZoneHVAC:EquipmentList,",
 		"    SPACE4-1 Eq,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type",
 		"    SPACE4-1 AirSys,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1014,7 +1016,7 @@ TEST_F( EnergyPlusFixture, HPWHSizing )
 		"    IdealLoadOutNode;      !- Node 1 Name",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	int CompIndex = 1;
@@ -1207,7 +1209,7 @@ TEST_F( EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	ASSERT_FALSE( ErrorsFound );
@@ -1376,7 +1378,7 @@ TEST_F( EnergyPlusFixture, HPWHTestSPControl )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::OutputFileInits = GetNewUnitNumber();
 	DataHVACGlobals::TimeStepSys = 1;
@@ -1577,7 +1579,7 @@ TEST_F( EnergyPlusFixture, StratifiedTankUseEnergy )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	bool ErrorsFound = false;
 	EXPECT_FALSE( WaterThermalTanks::GetWaterThermalTankInputData( ErrorsFound ) );

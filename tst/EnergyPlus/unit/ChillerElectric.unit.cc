@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -107,7 +107,7 @@ TEST_F( EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize )
 			"    LeavingSetpointModulated;!- Chiller Flow Mode",
 		} );
 
-		EXPECT_FALSE( process_idf( idf_objects, false ) );
+		EXPECT_TRUE( process_idf( idf_objects, false ) );
 
 		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
 		DataPlant::PlantLoop.allocate( DataPlant::TotNumLoops );
@@ -123,7 +123,7 @@ TEST_F( EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize )
 		}
 
 		GetElectricChillerInput();
-		
+
 		DataPlant::PlantLoop( 1 ).Name = "ChilledWaterLoop";
 		DataPlant::PlantLoop( 1 ).FluidName = "ChilledWater";
 		DataPlant::PlantLoop( 1 ).FluidIndex = 1;

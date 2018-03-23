@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,12 +69,12 @@ namespace EnergyPlus {
 			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
 
 		EXPECT_EQ( HeatingCoils::HeatingCoil( 1 ).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypeInputError ) {
@@ -89,21 +89,22 @@ namespace EnergyPlus {
 			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		EXPECT_FALSE( process_idf( idf_objects, false ) );
 		ASSERT_THROW( HeatingCoils::GetHeatingCoilInput(), std::runtime_error );
 
 		std::string const error_string = delimited_string( {
+			"   ** Severe  ** <root>[Coil:Heating:Fuel][Furnace Coil][fuel_type] - \"Electric\" - Failed to match against any enum values.",
 			"   ** Severe  ** GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
 			"   **  Fatal  ** GetHeatingCoilInput: Errors found in input.  Program terminates.",
 			"   ...Summary of Errors that led to program termination:",
-			"   ..... Reference severe error count=1",
+			"   ..... Reference severe error count=2",
 			"   ..... Last severe error=GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
 		} );
 
 
 
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas ) {
@@ -118,7 +119,7 @@ namespace EnergyPlus {
 			 "  Air Loop Outlet Node;    !- Air Outlet Node Name"
 														 });
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
 

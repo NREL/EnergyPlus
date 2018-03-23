@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -209,11 +210,12 @@ namespace EnergyPlus {
 			"  0.78;                    !- Discharge Coefficient{ dimensionless }",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
+		ASSERT_TRUE (process_idf(idf_objects));
 		GetAirflowNetworkInput();
 
-		EXPECT_EQ( 2, MultizoneZoneData( 1 ).VentingSchNum );
+		//MultizoneZoneData has only 1 element so may be hardcoded
+		auto GetIndex = UtilityRoutines::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		EXPECT_EQ( GetIndex, MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate();
 		Surface.deallocate();
@@ -332,7 +334,7 @@ namespace EnergyPlus {
 			"  ReferenceCrackConditions; !- Reference Crack Conditions",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		GetAirflowNetworkInput( );
 		std::string const error_string = delimited_string( {
 			"   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
@@ -375,10 +377,10 @@ namespace EnergyPlus {
 
 			"  HeatBalanceAlgorithm,ConductionTransferFunction;",
 
-			"  Schedule:Constant,FanAndCoilAvailSched,1.0;",
-			"  Schedule:Constant,On,1.0;",
-			"  Schedule:Constant,WindowVentSched,21.0;",
-			"  Schedule:Constant,VentingSched,0.0;",
+			"  Schedule:Constant,FanAndCoilAvailSched,,1.0;",
+			"  Schedule:Constant,On,,1.0;",
+			"  Schedule:Constant,WindowVentSched,,21.0;",
+			"  Schedule:Constant,VentingSched,,0.0;",
 
 			"  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
 
@@ -2206,7 +2208,22 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf(  idf_objects ) );
+
+		using namespace EnergyPlus::DataIPShortCuts;
+
+		lNumericFieldBlanks.allocate ( 1000 );
+		lAlphaFieldBlanks.allocate( 1000 );
+		cAlphaFieldNames.allocate( 1000 );
+		cNumericFieldNames.allocate( 1000 );
+		cAlphaArgs.allocate( 1000 );
+		rNumericArgs.allocate( 1000 );
+		lNumericFieldBlanks = false;
+		lAlphaFieldBlanks = false;
+		cAlphaFieldNames = " ";
+		cNumericFieldNames = " ";
+		cAlphaArgs = " ";
+		rNumericArgs = 0.0;
 
 		bool ErrorsFound = false;
         // Read objects
@@ -2232,12 +2249,12 @@ namespace EnergyPlus {
 		GetAirflowNetworkInput( );
 
 		Real64 PresssureSet = 0.5;
-		// Assign values
-		Schedule( 1 ).CurrentValue = PresssureSet; // Pressure setpoint
-		Schedule( 2 ).CurrentValue = 1.0; // set availability and fan schedule to 1
-		Schedule( 3 ).CurrentValue = 1.0; // On
-		Schedule( 4 ).CurrentValue = 25.55; // WindowVentSched
-		Schedule( 5 ).CurrentValue = 1.0; // VentingSched
+
+		Schedule( UtilityRoutines::FindItemInList( "PRESSURE SETPOINT SCHEDULE", Schedule( {1,NumSchedules} )) ).CurrentValue = PresssureSet; // Pressure setpoint
+		Schedule( UtilityRoutines::FindItemInList( "FANANDCOILAVAILSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // set availability and fan schedule to 1
+		Schedule( UtilityRoutines::FindItemInList( "ON", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // On
+		Schedule( UtilityRoutines::FindItemInList( "VENTINGSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 25.55; // VentingSched
+		Schedule( UtilityRoutines::FindItemInList( "WINDOWVENTSCHED", Schedule( {1,NumSchedules} )) ).CurrentValue = 1.0; // WindowVentSched
 
 		AirflowNetworkFanActivated = true;
 		DataEnvironment::OutDryBulbTemp = -17.29025;
@@ -2246,11 +2263,12 @@ namespace EnergyPlus {
 		DataEnvironment::WindSpeed = 4.9;
 		DataEnvironment::WindDir = 270.0;
 
+		int index = UtilityRoutines::FindItemInList("OA INLET NODE", AirflowNetworkNodeData);
 		for ( i = 1; i <= 36; ++i ) {
 			AirflowNetworkNodeSimu( i ).TZ = 23.0;
 			AirflowNetworkNodeSimu( i ).WZ = 0.0008400;
-			if ( ( i > 4 && i < 10 ) || i == 32) {
-				AirflowNetworkNodeSimu( i ).TZ = DataEnvironment::OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );
+			if ( ( i > 4 && i < 10 ) || i == index) { // NFACADE, EFACADE, SFACADE, WFACADE, HORIZONTAL are always at indexes 5 through 9
+				AirflowNetworkNodeSimu( i ).TZ = DataEnvironment::OutDryBulbTempAt( AirflowNetworkNodeData( i ).NodeHeight );  //AirflowNetworkNodeData vals differ
 				AirflowNetworkNodeSimu( i ).WZ = DataEnvironment::OutHumRat;
 			}
 		}
@@ -2401,12 +2419,16 @@ namespace EnergyPlus {
 			"  0.78;                    !- Discharge Coefficient{ dimensionless }",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects) );
 
 		GetAirflowNetworkInput( );
 
 		// The original value before fix is zero. After the fix, the correct schedule number is assigned.
-		EXPECT_EQ( 2, MultizoneZoneData( 1 ).VentingSchNum );
+
+		//changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
+		// has index 1 which is the .VentSchNum
+		auto GetIndex = UtilityRoutines::FindItemInList( MultizoneZoneData( 1 ).VentingSchName, Schedule( {1,NumSchedules} ) );
+		EXPECT_EQ( GetIndex , MultizoneZoneData( 1 ).VentingSchNum );
 
 		Zone.deallocate( );
 		Surface.deallocate( );
@@ -2940,7 +2962,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetAirflowNetworkInput( );
 
@@ -2981,7 +3003,7 @@ namespace EnergyPlus {
 	TEST_F( EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFactors ) {
 
 		std::string const idf_objects = delimited_string( {
-			"  Version,8.8;",
+			"  Version,8.9;",
 			
 			"  SimulationControl,",
 			"    No,                      !- Do Zone Sizing Calculation",
@@ -4189,16 +4211,24 @@ namespace EnergyPlus {
 			"    Dual Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name",
 			"    Dual Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name",
 
-			"  AirTerminal:SingleDuct:Uncontrolled,",
+			"  ZoneHVAC:AirDistributionUnit,",
+			"    ZoneDirectAirADU,        !- Name",
+			"    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+			"    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+			"    ZoneDirectAir;           !- Air Terminal Name",
+
+			"  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
 			"    ZoneDirectAir,           !- Name",
 			"    HVACAvailSched,          !- Availability Schedule Name",
+			"    Zone Inlet Node 2AT,     !- Air Inlet Node Name",
 			"    Zone Inlet Node,         !- Zone Supply Air Node Name",
 			"    2.36;                    !- Maximum Air Flow Rate {m3/s}",
 
 			"  ZoneHVAC:EquipmentList,",
 			"    ZoneEquipment,           !- Name",
-			"    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-			"    ZoneDirectAir,           !- Zone Equipment 1 Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
+			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+			"    ZoneDirectAirADU,        !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
 			"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
 
@@ -4271,7 +4301,7 @@ namespace EnergyPlus {
 			"  AirLoopHVAC:ZoneSplitter,",
 			"    Zone Supply Air Splitter,!- Name",
 			"    Zone Equipment Inlet Node,  !- Inlet Node Name",
-			"    Zone Inlet Node;         !- Outlet 1 Node Name",
+			"    Zone Inlet Node 2AT;      !- Outlet 1 Node Name",
 
 			"  AirLoopHVAC:SupplyPath,",
 			"    TermReheatSupplyPath,    !- Name",
@@ -4321,7 +4351,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound = false;
         // Read objects
@@ -4509,7 +4539,7 @@ namespace EnergyPlus {
 			"  -0.56;                   !- N31" });
 
 		// Load and verify the table
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 		EXPECT_EQ(0, CurveManager::NumCurves);
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;
@@ -4593,7 +4623,7 @@ namespace EnergyPlus {
 			"  0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}"});
 
 		// Load and verify the table
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 		EXPECT_EQ(0, CurveManager::NumCurves);
 		CurveManager::GetCurveInput();
 		CurveManager::GetCurvesInputFlag = false;
@@ -5304,7 +5334,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -5973,7 +6003,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -6593,7 +6623,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool errors = false;
 
@@ -7248,7 +7278,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -7879,7 +7909,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -7963,7 +7993,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, TestExternalNodesWithLocalAirNode ) {
 		std::string const idf_objects = delimited_string({
-			"Version,8.8;",
+			"Version,8.9;",
 			"Material,",
 			"  A1 - 1 IN STUCCO,        !- Name",
 			"  Smooth,                  !- Roughness",
@@ -8557,7 +8587,7 @@ namespace EnergyPlus {
 			"HeatBalanceAlgorithm,ConductionTransferFunction;",
 			"ZoneAirHeatBalanceAlgorithm,",
 			"  AnalyticalSolution;      !- Algorithm" });
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool errors = false;
 
@@ -8656,7 +8686,7 @@ namespace EnergyPlus {
 
 	TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided) {
 		std::string const idf_objects = delimited_string({
-			"Version,8.8;",
+			"Version,8.9;",
 			"SimulationControl,",
 			"  No,                      !- Do Zone Sizing Calculation",
 			"  No,                      !- Do System Sizing Calculation",
@@ -9048,7 +9078,7 @@ namespace EnergyPlus {
 			1.5837385005116038, 1.5699546250680769, 1.4391966568855996, 1.1829453813575432, 0.81696925904461237,
 			0.37465991281286887, -0.041152159946210520, -0.28653692388308377, -0.56146269488642231 };
 
-		ASSERT_FALSE(process_idf(idf_objects));
+		ASSERT_TRUE(process_idf(idf_objects));
 
 		bool errors = false;
 
@@ -9101,7 +9131,7 @@ namespace EnergyPlus {
 		for (auto value : CurveManager::PerfCurveTableData(6).Y) {
 			EXPECT_NEAR(valsForRightWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
 		}
-		
+
 	}
 
 }

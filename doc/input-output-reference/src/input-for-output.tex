@@ -389,7 +389,7 @@ This alpha field is the variable name (you don't have to put on the units) that 
 
 \paragraph{Field: Reporting Frequency}\label{field-reporting-frequency}
 
-This field specifies how often the variable will be listed in the output file. ``\textbf{Detailed}'' will list the value each calculation step (i.e.~Zone or HVAC). ``\textbf{Timestep}'' will be the same as ``Detailed'' for Zone valued variables and will be aggregated to the Zone timestep (i.e.~Timestep in Hour value) for HVAC variables. ``\textbf{Hourly}'' will aggregate the value to the hour. ``\textbf{Daily}'' will aggregate to the day (i.e.~one value per day). ``\textbf{Monthly}'' will aggregate to the month (i.e.~one value per month). ``\textbf{RunPeriod}'' will aggregate to the runperiod specified (each Design Day is a runperiod as is each runperiod object). Default for this field if left blank or omitted is \textbf{Hourly}.
+This field specifies how often the variable will be listed in the output file. ``\textbf{Detailed}'' will list the value each calculation step (i.e.~Zone or HVAC). ``\textbf{Timestep}'' will be the same as ``Detailed'' for Zone valued variables and will be aggregated to the Zone timestep (i.e.~Timestep in Hour value) for HVAC variables. ``\textbf{Hourly}'' will aggregate the value to the hour. ``\textbf{Daily}'' will aggregate to the day (i.e.~one value per day). ``\textbf{Monthly}'' will aggregate to the month (i.e.~one value per month). ``\textbf{RunPeriod}'' will aggregate to the runperiod specified (each Design Day is a runperiod as is each runperiod object). ``\textbf{Annual}'' will aggregate to the year  (i.e.~one value per year) when used with a RunPeriod:CustomRange object. Default for this field if left blank or omitted is \textbf{Hourly}.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-004}
 
@@ -673,7 +673,7 @@ For the pollutant calculation only the total off-site or purchased electric ener
 
 Similar to the output variables and meters the environmental impact calculations can be reported at different frequencies. Their resolution is the Zone Timestep interval (Number of Timesteps input). For this frequency, the elemental value of the Environmental Impact Factors Calculation will be reported. For more inclusive frequencies, the summed value along with the maximum and minimum values for the time interval will be reported.
 
-Valid values are Timestep, Hourly, Daily, Monthly or RunPeriod.
+Valid values are Timestep, Hourly, Daily, Monthly, Annual, or RunPeriod.
 
 An example of specifying in the IDF:
 

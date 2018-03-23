@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -606,6 +606,8 @@ namespace DataSurfaces {
 		Real64 Width; // Width of the surface (m)
 		// Boundary conditions and interconnections
 		bool HeatTransSurf; // True if surface is a heat transfer surface,
+		int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+		int InsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
 		// False if a (detached) shadowing (sub)surface
 		int HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
 		std::string BaseSurfName; // Name of BaseSurf
@@ -765,6 +767,8 @@ namespace DataSurfaces {
 		bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
 		// LG added 1/6/12
 		Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
+
+		std::vector< int > DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
 		// the surface diffusion model
 
 		// Default Constructor
@@ -786,6 +790,8 @@ namespace DataSurfaces {
 			Tilt( 0.0 ),
 			Width( 0.0 ),
 			HeatTransSurf( false ),
+			OutsideHeatSourceTermSchedule( 0 ),
+			InsideHeatSourceTermSchedule( 0 ),
 			HeatTransferAlgorithm( HeatTransferModel_NotSet ),
 			BaseSurf( 0 ),
 			NumSubSurfaces( 0 ),
@@ -974,6 +980,7 @@ namespace DataSurfaces {
 		int ExtIntShadePrevTS; // 1 if exterior or interior blind or shade in place previous time step;
 		// 0 otherwise
 		int ShadedConstruction; // For windows with shading, the construction with shading
+		bool HasShadeOrBlindLayer; // mark as true if the window construction has a shade or a blind layer
 		bool SurfDayLightInit; // surface has been initialized for following 5 arrays
 		Array1D< Real64 > SolidAngAtRefPt; // Solid angle subtended by window from daylit ref points 1 and 2
 		Array1D< Real64 > SolidAngAtRefPtWtd; // Solid angle subtended by window from
@@ -1197,6 +1204,7 @@ namespace DataSurfaces {
 			FracTimeShadingDeviceOn( 0.0 ),
 			ExtIntShadePrevTS( 0 ),
 			ShadedConstruction( 0 ),
+			HasShadeOrBlindLayer( false ),
 			SurfDayLightInit( false ),
 			DaylFacPoint( 0 ),
 			VisTransSelected( 0.0 ),

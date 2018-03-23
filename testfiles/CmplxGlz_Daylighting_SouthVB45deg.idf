@@ -75,7 +75,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -225,7 +225,7 @@
 
  ! Chicago Ohare Intl Ap_IL_USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
  ! Coldest Month=JAN
- ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99.6%, MaxDB=-20°C
+ ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99.6%, MaxDB=-20Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -257,7 +257,7 @@
 
  ! Chicago Ohare Intl Ap Annual Cooling Design Conditions Wind Speed=5.2m/s Wind Dir=230
  ! Hottest Month=JUL
- ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.3°C MWB=23.7°C
+ ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.3Â°C MWB=23.7Â°C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -86148,10 +86148,11 @@
     COMFENZone Inlets,       !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     COMFENZone Zone Air Node,!- Zone Air Node Name
-    COMFENZone Return Outlet;!- Zone Return Air Node Name
+    COMFENZone Return Outlet;!- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     COMFENZone Equipment,    !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     COMFENZone Direct Air,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

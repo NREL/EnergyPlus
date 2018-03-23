@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,6 +155,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -254,7 +255,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -408,8 +409,17 @@ namespace EnergyPlus {
 		// expect inlet and outlet node air mass flow rates are equal
 		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
-	}
+		DataGlobals::DoingSizing = false;
 
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
+	}
 	TEST_F( EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest ) {
 
 		int FanCoilNum( 1 );
@@ -456,6 +466,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -557,7 +568,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -712,8 +723,17 @@ namespace EnergyPlus {
 		// expect inlet and outlet node air mass flow rates are equal
 		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
-	}
+		DataGlobals::DoingSizing = false;
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
 
+	}
 	TEST_F( EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest ) {
 
 		int FanCoilNum( 1 );
@@ -760,6 +780,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -859,7 +880,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1102,7 +1123,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 	}
-
 	TEST_F( EnergyPlusFixture, ElectricCoilFanCoilHeatingTest ) {
 
 		int FanCoilNum( 1 );
@@ -1149,6 +1169,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1239,7 +1260,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1402,8 +1423,16 @@ namespace EnergyPlus {
 		// expect inlet and outlet node air mass flow rates are equal
 		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
+		DataGlobals::DoingSizing = false;
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
 	}
-
 	TEST_F( EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest ) {
 
 		int FanCoilNum( 1 );
@@ -1450,6 +1479,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1551,7 +1581,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1757,7 +1787,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 	}
-
 	TEST_F( EnergyPlusFixture, FanCoil_ASHRAE90VariableFan ) {
 
 		int FanCoilNum( 1 );
@@ -1804,6 +1833,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1903,7 +1933,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -2139,6 +2169,17 @@ namespace EnergyPlus {
 		// expect inlet and outlet node air mass flow rates are equal
 		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
+		DataGlobals::DoingSizing = false;
+
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
+
 	}
 
 	Real64 ResidualFancoil(
@@ -2185,7 +2226,7 @@ namespace EnergyPlus {
 		std::string const idf_objects = delimited_string( {
 			" Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
 			" ZoneHVAC:EquipmentConnections, EAST ZONE, Zone1Equipment, Zone1Inlets, Zone1Exhausts, Zone 1 Node, Zone 1 Outlet Node;",
-			" ZoneHVAC:EquipmentList, Zone1Equipment, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
+			" ZoneHVAC:EquipmentList, Zone1Equipment, SequentialLoad, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
 			" OutdoorAir:NodeList, Zone1FCOAIn;",
 			" OutdoorAir:Mixer, Zone1FanCoilOAMixer, Zone1OAMixOut, Zone1FCOAIn, Zone1FCExh, Zone1FCAirIn;",
 			" Fan:ConstantVolume, Zone1FanCoilFan, FCAvailSch, 0.5, 75.0, 0.6, 0.9, 1.0, Zone1OAMixOut, Zone1FCFanOut;",
@@ -2224,7 +2265,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 
@@ -2299,7 +2340,7 @@ namespace EnergyPlus {
 		// fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
 		// When this happens, this routine will find tighter limits on min/max water flow rate passed to RegulaFalsi
 		// This routine is only called when RegulaFalsi returns -1
-		
+
 		// example usage of function
 		// if( SolFlag == -1 ) {
 		// tighten limits on water flow rate to see if this allows convergence
@@ -2428,6 +2469,7 @@ namespace EnergyPlus {
 
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -2537,7 +2579,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );

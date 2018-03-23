@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -280,6 +280,11 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 	CorrectZoneHumRat( 1 );
 	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
 
+	// Issue 6233
+	Zone( 1 ).IsControlled = true;
+	CorrectZoneHumRat( 1 );
+	EXPECT_NEAR( 0.008, Node( 5 ).HumRat, 0.00001 );
+
 	// Deallocate everything
 	ZoneEquipConfig( 1 ).InletNode.deallocate();
 	ZoneEquipConfig( 1 ).ExhaustNode.deallocate();
@@ -486,7 +491,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 			"  Until: 24:00,24.0;       !- Field 3",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 		GetZoneData( ErrorsFound );
@@ -500,11 +505,6 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 		ProcessScheduleInput(); // read schedules
-
-		DaySchedule( 1 ).TSValue = 1;
-		DaySchedule( 3 ).TSValue = 2;
-		DaySchedule( 5 ).TSValue = 3;
-		DaySchedule( 6 ).TSValue = 4;
 
 		GetZoneAirSetPoints();
 
@@ -545,7 +545,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 
 		ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired = 0.0; // no load and no thermostat since control type is set to 0 above
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( DualZoneNum, 1.0 );
+		CalcPredictedSystemLoad( DualZoneNum, 1.0, false );
 
 		EXPECT_EQ( 0.0, TempZoneThermostatSetPoint( DualZoneNum ) ); // Set point initialized to 0 and never set since thermostat control type = 0
 
@@ -561,7 +561,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempDepZnLd( HeatZoneNum ) = ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
 
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( HeatZoneNum, 1.0 );
+		CalcPredictedSystemLoad( HeatZoneNum, 1.0, false );
 
 		EXPECT_EQ( 20.0, TempZoneThermostatSetPoint( HeatZoneNum ) );
 		EXPECT_EQ( -1000.0, ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
@@ -590,25 +590,25 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempDepZnLd( DualZoneNum ) = ZoneSysEnergyDemand( DualZoneNum ).TotalOutputRequired / Schedule( SetPointTempSchedIndex ).CurrentValue;
 
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( HeatZoneNum, 1.0 );
+		CalcPredictedSystemLoad( HeatZoneNum, 1.0, false );
 
 		EXPECT_EQ( 21.0, TempZoneThermostatSetPoint( HeatZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( HeatZoneNum ) ); // Tstat should show there is load on a single heating SP
 		EXPECT_EQ( 1000.0, ZoneSysEnergyDemand( HeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-		CalcPredictedSystemLoad( CoolZoneNum, 1.0 );
+		CalcPredictedSystemLoad( CoolZoneNum, 1.0, false );
 
 		EXPECT_EQ( 23.0, TempZoneThermostatSetPoint( CoolZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( CoolZoneNum ) ); // Tstat should show there is load on a single cooling SP
 		EXPECT_EQ( -3000.0, ZoneSysEnergyDemand( CoolZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-		CalcPredictedSystemLoad( CoolHeatZoneNum, 1.0 );
+		CalcPredictedSystemLoad( CoolHeatZoneNum, 1.0, false );
 
 		ASSERT_EQ( 22.0, TempZoneThermostatSetPoint( CoolHeatZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( CoolHeatZoneNum ) ); // Tstat should show there is load on a single heating or cooling SP
 		EXPECT_EQ( -4000.0, ZoneSysEnergyDemand( CoolHeatZoneNum ).TotalOutputRequired ); // TotalOutputRequired gets updated in CalcPredictedSystemLoad based on the load
 
-		CalcPredictedSystemLoad( DualZoneNum, 1.0 );
+		CalcPredictedSystemLoad( DualZoneNum, 1.0, false );
 
 		EXPECT_EQ( 20.0, TempZoneThermostatSetPoint( DualZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( DualZoneNum ) ); // Tstat should show there is load on a dual SP
@@ -622,7 +622,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		TempIndZnLd( DualZoneNum ) = 3500.0; // results in a cooling load
 
 		CalcZoneAirTempSetPoints();
-		CalcPredictedSystemLoad( DualZoneNum, 1.0 );
+		CalcPredictedSystemLoad( DualZoneNum, 1.0, false );
 
 		EXPECT_EQ( 25.0, TempZoneThermostatSetPoint( DualZoneNum ) );
 		EXPECT_FALSE( CurDeadBandOrSetback( DualZoneNum ) ); // Tstat should show there is load on a dual SP
@@ -844,7 +844,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 			"  Until: 24:00,24.0;                     !- Field 3",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) ); // Tstat should show if the idf is legel
+		ASSERT_TRUE( process_idf( idf_objects ) ); // Tstat should show if the idf is legel
 
 		int ZoneNum( 4 );
 		int CoolZoneASHNum( 1 );
@@ -881,7 +881,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I( DayOfYear ) );
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II( DayOfYear ) );
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear ) );
-		 
+
 		Array1D< Real64 > runningAverageASH_2( 365, 40.0 );
 		Array1D< Real64 > runningAverageCEN_2( 365, 40.0 );
 		CalculateAdaptiveComfortSetPointSchl( runningAverageASH_2, runningAverageCEN_2 );
@@ -895,7 +895,7 @@ TEST_F( EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest )
 		ASSERT_EQ( -1, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III( DayOfYear ) );
 
 		Array1D< Real64 > runningAverageASH( 365, 25.0 );
-		Array1D< Real64 > runningAverageCEN( 365, 25.0 );	
+		Array1D< Real64 > runningAverageCEN( 365, 25.0 );
 		CalculateAdaptiveComfortSetPointSchl( runningAverageASH, runningAverageCEN );
 		ASSERT_TRUE( AdapComfortDailySetPointSchedule.initialized );// Tstat should show there adaptive model is initialized
 		ASSERT_EQ( 25.55, AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central( DayOfYear ) );// Tstat should show ASH 55 CENTRAL LINE model set point
@@ -1150,7 +1150,7 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 	// J.Glazer - August 2017
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.8;",
+		"Version,8.9;",
 		" ",
 		"ScheduleTypeLimits,",
 		"  Any Number;              !- Name",
@@ -1187,7 +1187,7 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -1250,6 +1250,173 @@ TEST_F( EnergyPlusFixture, temperatureAndCountInSch_test )
 	EXPECT_EQ( 31, numDays );
 	EXPECT_EQ( "January", monthAssumed );
 
+
+}
+
+TEST_F( EnergyPlusFixture, SetPointWithCutoutDeltaT_test )
+{
+	// On/Off thermostat
+	Schedule.allocate( 3 );
+
+	DataZoneControls::NumTempControlledZones = 1;
+
+	//SingleHeatingSetPoint
+	TempControlledZone.allocate( NumTempControlledZones );
+	TempZoneThermostatSetPoint.allocate( 1 );
+	MAT.allocate( 1 );
+	ZoneThermostatSetPointLo.allocate( 1 );
+	ZoneThermostatSetPointHi.allocate( 1 );
+	ZoneT1.allocate( 1 );
+	ZoneSysEnergyDemand.allocate( 1 );
+	AIRRAT.allocate( 1 );
+	TempDepZnLd.allocate( 1 );
+	TempIndZnLd.allocate( 1 );
+	DeadBandOrSetback.allocate( 1 );
+	DataHeatBalance::Zone.allocate( 1 );
+	ZoneSetPointLast.allocate( 1 );
+	DataZoneEnergyDemands::Setback.allocate( 1 );
+
+	SNLoadPredictedRate.allocate( 1 );
+	SNLoadPredictedHSPRate.allocate( 1 );
+	SNLoadPredictedCSPRate.allocate( 1 );
+	CurDeadBandOrSetback.allocate( 1 );
+	LoadCorrectionFactor.allocate( 1 );
+	DeadBandOrSetback.allocate( 1 );
+
+	ZoneAirSolutionAlgo = UseEulerMethod;
+
+	TempControlledZone( 1 ).DeltaTCutSet = 2.0;
+	TempControlledZone( 1 ).ActualZoneNum = 1;
+	TempControlledZone( 1 ).CTSchedIndex = 1;
+	Schedule( 1 ).CurrentValue = 1;
+	TempControlType.allocate( 1 );
+	TempControlledZone( 1 ).SchIndx_SingleHeatSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx.allocate( 4 );
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleHeating.allocate( 1 );
+	SetPointSingleHeating( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 22.0;
+	AIRRAT( 1 ) = 2000;
+	TempDepZnLd( 1 ) = 1.0;
+	TempIndZnLd( 1 ) = 1.0;
+	MAT( 1 ) = 20.0;
+	ZoneT1( 1 ) = MAT( 1 );
+
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+
+	MAT( 1 ) = 23.0;
+	ZoneT1( 1 ) = MAT( 1 );
+	TempControlledZone( 1 ).HeatModeLast = true;
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	TempControlledZone( 1 ).HeatModeLast = false;
+
+	// SingleCoolingSetPoint
+	Schedule( 1 ).CurrentValue = 2;
+	TempControlledZone( 1 ).SchIndx_SingleCoolSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleCooling.allocate( 1 );
+	SetPointSingleCooling( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 26.0;
+	MAT( 1 ) = 25.0;
+	ZoneT1( 1 ) = MAT( 1 );
+
+	TempControlledZone( 1 ).CoolModeLast = true;
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	TempControlledZone( 1 ).CoolModeLast = false;
+
+	MAT( 1 ) = 27.0;
+	ZoneT1( 1 ) = MAT( 1 );
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+
+	// SingleHeatCoolSetPoint
+	Schedule( 1 ).CurrentValue = 3;
+	TempControlledZone( 1 ).SchIndx_SingleHeatCoolSetPoint = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointSingleHeatCool.allocate( 1 );
+	SetPointSingleHeatCool( 1 ).TempSchedIndex = 3;
+	Schedule( 3 ).CurrentValue = 24.0;
+	MAT( 1 ) = 25.0;
+	ZoneT1( 1 ) = MAT( 1 );
+
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+
+	// DualSetPointWithDeadBand : Adjust cooling setpoint
+	SetPointDualHeatCool.allocate( 1 );
+	Schedule( 1 ).CurrentValue = 4;
+	TempControlledZone( 1 ).SchIndx_DualSetPointWDeadBand = 2;
+	TempControlledZone( 1 ).ControlTypeSchIndx( 2 ) = 1;
+	SetPointDualHeatCool( 1 ).HeatTempSchedIndex = 2;
+	SetPointDualHeatCool( 1 ).CoolTempSchedIndex = 3;
+	Schedule( 2 ).CurrentValue = 22.0;
+	Schedule( 3 ).CurrentValue = 26.0;
+	MAT( 1 ) = 25.0;
+	ZoneT1( 1 ) = MAT( 1 );
+
+	TempControlledZone( 1 ).CoolModeLast = true;
+	TempControlledZone( 1 ).HeatModeLast = true;
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+	TempControlledZone( 1 ).HeatModeLast = false;
+
+	// DualSetPointWithDeadBand : Adjust heating setpoint
+	MAT( 1 ) = 21.0;
+	ZoneT1( 1 ) = MAT( 1 );
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 26.0, ZoneThermostatSetPointHi( 1 ) );
+
+	// DualSetPointWithDeadBand : Adjust cooling setpoint
+	TempControlledZone( 1 ).CoolModeLast = true;
+	MAT( 1 ) = 27.0;
+	ZoneT1( 1 ) = MAT( 1 );
+	CalcZoneAirTempSetPoints( );
+	CalcPredictedSystemLoad( 1, 0.0, false );
+	EXPECT_EQ( 22.0, ZoneThermostatSetPointLo( 1 ) );
+	EXPECT_EQ( 24.0, ZoneThermostatSetPointHi( 1 ) );
+
+	TempControlledZone( 1 ).DeltaTCutSet = 0.0;
+	TempControlledZone( 1 ).HeatModeLast = false;
+	TempControlledZone( 1 ).CoolModeLast = false;
+
+	SNLoadPredictedRate.deallocate( );
+	SNLoadPredictedHSPRate.deallocate( );
+	SNLoadPredictedCSPRate.deallocate( );
+	CurDeadBandOrSetback.deallocate( );
+	LoadCorrectionFactor.deallocate( );
+	DeadBandOrSetback.deallocate( );
+	DataZoneEnergyDemands::Setback.deallocate( );
+	ZoneSetPointLast.deallocate( );
+	DataHeatBalance::Zone.deallocate( );
+	DeadBandOrSetback.deallocate( );
+	AIRRAT.deallocate( );
+	TempDepZnLd.deallocate( );
+	TempIndZnLd.deallocate( );
+	ZoneT1.deallocate( );
+	MAT.deallocate( );
+	Schedule.deallocate( );
+	TempZoneThermostatSetPoint.deallocate( );
+	TempControlledZone.deallocate( );
+	TempControlType.deallocate( );
+	SetPointSingleHeating.deallocate( );
+	ZoneThermostatSetPointLo.deallocate( );
+	ZoneThermostatSetPointHi.deallocate( );
+	SetPointSingleCooling.deallocate( );
+	SetPointSingleHeatCool.deallocate( );
+	SetPointDualHeatCool.deallocate( );
 
 }
 

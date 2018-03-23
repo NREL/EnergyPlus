@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,6 +102,7 @@ namespace DataSystemVariables {
 
 	std::string const DDOnlyEnvVar( "DDONLY" ); // Only run design days
 	std::string const ReverseDDEnvVar( "REVERSEDD" ); // Reverse DD during run
+	std::string const DisableGLHECachingEnvVar( "DISABLEGLHECACHING" );
 	std::string const FullAnnualSimulation( "FULLANNUALRUN" ); // Generate annual run
 	std::string const cDeveloperFlag( "DeveloperFlag" );
 	std::string const cDisplayAllWarnings( "DisplayAllWarnings" );
@@ -143,6 +144,7 @@ namespace DataSystemVariables {
 	// MODULE VARIABLE DECLARATIONS:
 	bool DDOnly( false ); // TRUE if design days (sizingperiod:*) only are to be run.
 	bool ReverseDD( false ); // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
+	bool DisableGLHECaching( false ); // TRUE if caching is to be disabled, for example, during unit tests.
 	bool FullAnnualRun( false ); // TRUE if full annual simulation is to be run.
 	bool DeveloperFlag( false ); // TRUE if developer flag is turned on. (turns on more displays to console)
 	bool TimingFlag( false ); // TRUE if timing flag is turned on. (turns on more timing displays to console)
@@ -161,12 +163,16 @@ namespace DataSystemVariables {
 	bool UpdateDataDuringWarmupExternalInterface( false ); // variable sets in the external interface.
 	bool UseScheduledSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are imported from schedule inputs
 	bool ReportExtShadingSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are exported as a csv format output
+	bool UseImportedSunlitFrac( false ); // when true, the sunlit fraction for all surfaces are imported altogether as a CSV/JSON file
+	
+	bool DisableGroupSelfShading( false ); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+	bool DisableAllSelfShading( false ); // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+
 	// This update the value during the warmup added for FMI
 	Real64 Elapsed_Time( 0.0 ); // For showing elapsed time at end of run
 	Real64 Time_Start( 0.0 ); // Call to CPU_Time for start time of simulation
 	Real64 Time_Finish( 0.0 ); // Call to CPU_Time for end time of simulation
-	std::string cMinReportFrequency; // String for minimum reporting frequency
-	int MinReportFrequency( -2 ); // Frequency var turned into integer during get report var input.
+	std::string MinReportFrequency; // String for minimum reporting frequency
 	bool SortedIDD( true ); // after processing, use sorted IDD to obtain Defs, etc.
 	bool lMinimalShadowing( false ); // TRUE if MinimalShadowing is to override Solar Distribution flag
 	std::string TempFullFileName;
@@ -265,14 +271,14 @@ namespace DataSystemVariables {
 		}
 
 		// Look relative to input file path
-		{ IOFlags flags; gio::inquire( DataStringGlobals::idfDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = DataStringGlobals::idfDirPathName + InputFileName;
-			gio::write(EchoInputFile, fmtA) << "found (idf)=" + getAbsolutePath(CheckedFileName);
+			CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "found (input file)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write(EchoInputFile, fmtA) << "not found (idf)=" + getAbsolutePath(DataStringGlobals::idfDirPathName + InputFileName);
+			gio::write(EchoInputFile, fmtA) << "not found (input file)=" + getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName);
 		}
 
 		// Look relative to input path
@@ -332,6 +338,50 @@ namespace DataSystemVariables {
 			gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
 		}
 
+	}
+
+	void
+	clear_state()
+	{
+		DDOnly = false;
+		ReverseDD = false;
+		DisableGLHECaching = false;
+		FullAnnualRun = false;
+		DeveloperFlag = false;
+		TimingFlag = false;
+		SutherlandHodgman = true;
+		DetailedSkyDiffuseAlgorithm = false;
+		DetailedSolarTimestepIntegration = false;
+		TrackAirLoopEnvFlag = false;
+		TraceAirLoopEnvFlag = false;
+		TraceHVACControllerEnvFlag = false;
+		ReportDuringWarmup = false;
+		ReportDuringHVACSizingSimulation = false;
+		ReportDetailedWarmupConvergence = false;
+		UpdateDataDuringWarmupExternalInterface = false;
+		UseScheduledSunlitFrac = false;
+		ReportExtShadingSunlitFrac = false;
+		UseImportedSunlitFrac = false;
+		DisableGroupSelfShading = false;
+		DisableAllSelfShading = false;
+		Elapsed_Time = 0.0;
+		Time_Start = 0.0;
+		Time_Finish = 0.0;
+		SortedIDD = true;
+		lMinimalShadowing = false;
+		TestAllPaths = false;
+		iEnvSetThreads = 0;
+		lEnvSetThreadsInput = false;
+		iepEnvSetThreads = 0;
+		lepSetThreadsInput = false;
+		iIDFSetThreads = 0;
+		lIDFSetThreadsInput = false;
+		inumActiveSims = 1;
+		lnumActiveSims = false;
+		MaxNumberOfThreads = 1;
+		NumberIntRadThreads = 1;
+		iNominalTotSurfaces = 0;
+		Threading = false;
 	}
 
 } // DataSystemVariables

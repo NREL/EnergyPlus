@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -92,7 +92,7 @@ namespace PlantLoadProfile {
 	using DataGlobals::BeginEnvrnFlag;
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_PlantLoadProfile;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 	using PlantUtilities::SetComponentFlowRate;
 	using PlantUtilities::InitComponentNodes;
 
@@ -151,7 +151,6 @@ namespace PlantLoadProfile {
 
 		// Using/Aliasing
 		using FluidProperties::GetSpecificHeatGlycol;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -363,10 +362,6 @@ namespace PlantLoadProfile {
 		// Standard EnergyPlus methodology.
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using ScheduleManager::GetScheduleIndex;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -378,8 +373,6 @@ namespace PlantLoadProfile {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int ProfileNum; // PLANT LOAD PROFILE (PlantProfile) object number
@@ -388,22 +381,15 @@ namespace PlantLoadProfile {
 
 		// FLOW:
 		cCurrentModuleObject = "LoadProfile:Plant";
-		NumOfPlantProfile = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPlantProfile = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfPlantProfile > 0 ) {
 			PlantProfile.allocate( NumOfPlantProfile );
 
 			for ( ProfileNum = 1; ProfileNum <= NumOfPlantProfile; ++ProfileNum ) {
-				GetObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, ProfileNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				// PlantProfile name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PlantProfile, ProfileNum - 1, IsNotOK, IsBlank, cCurrentModuleObject );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				PlantProfile( ProfileNum ).Name = cAlphaArgs( 1 );
 				PlantProfile( ProfileNum ).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
 

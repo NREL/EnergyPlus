@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -162,8 +162,8 @@ namespace DataHeatBalFanSys {
 	// return air flow = 0.
 	Array1D< Real64 > SysDepZoneLoadsLagged; // SysDepZoneLoads saved to be added to zone heat balance next
 	// HVAC time step
-	Array1D< Real64 > MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT
-	Array1D< Real64 > MDotOA; // Airbalance MASS FLOW rate
+	Array1D< Real64 > MDotCPOA; // Airbalance MASS FLOW * AIR SPECIFIC HEAT used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
+	Array1D< Real64 > MDotOA; // Airbalance MASS FLOW rate used at Air Balance Method = Quadrature in the ZoneAirBalance:OutdoorAir
 
 	Array1D< Real64 > MixingMassFlowZone; // Mixing MASS FLOW
 	Array1D< Real64 > MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio

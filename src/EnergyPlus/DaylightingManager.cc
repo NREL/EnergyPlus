@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,7 +81,7 @@
 #include <DElightManagerF.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -4020,8 +4020,8 @@ namespace DaylightingManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
+
+
 		// RJH DElight Modification Begin
 		using namespace DElightManagerF; // Module for managing DElight subroutines
 		// RJH DElight Modification End
@@ -4067,7 +4067,7 @@ namespace DaylightingManager {
 
 		ErrorsFound = false;
 		cCurrentModuleObject = "Daylighting:Controls";
-		TotDaylightingControls = GetNumObjectsFound( cCurrentModuleObject );
+		TotDaylightingControls = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotDaylightingControls > 0 ) {
 			GetInputDayliteRefPt( ErrorsFound );
 			GetDaylightingControls( TotDaylightingControls, ErrorsFound );
@@ -4253,9 +4253,9 @@ namespace DaylightingManager {
 
 		// TH 6/3/2010, added to report daylight factors
 		cCurrentModuleObject = "Output:DaylightFactors";
-		NumReports = GetNumObjectsFound( cCurrentModuleObject );
+		NumReports = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumReports > 0 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumNames, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			if ( has_prefix( cAlphaArgs( 1 ), "SIZINGDAYS" ) ) {
 				DFSReportSizingDays = true;
 			} else if ( has_prefix( cAlphaArgs( 1 ), "ALLSHADOWCALCULATIONDAYS" ) ) {
@@ -4275,9 +4275,6 @@ namespace DaylightingManager {
 		// Perform the GetInput function for the Output:IlluminanceMap
 		// Glazer - June 2016 (moved from GetDaylightingControls)
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
 		using DataStringGlobals::CharSpace;
@@ -4329,7 +4326,7 @@ namespace DaylightingManager {
 		CheckForGeometricTransform( doTransform, OldAspectRatio, NewAspectRatio );
 
 		cCurrentModuleObject = "Output:IlluminanceMap";
-		TotIllumMaps = GetNumObjectsFound( cCurrentModuleObject );
+		TotIllumMaps = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		IllumMap.allocate( TotIllumMaps );
 		IllumMapCalc.allocate( TotIllumMaps );
@@ -4337,9 +4334,9 @@ namespace DaylightingManager {
 
 		if ( TotIllumMaps > 0 ) {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
-				GetObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, MapNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IllumMap( MapNum ).Name = cAlphaArgs( 1 );
-				IllumMap( MapNum ).Zone = FindItemInList( cAlphaArgs( 2 ), Zone );
+				IllumMap( MapNum ).Zone = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 
 				if ( IllumMap( MapNum ).Zone == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
@@ -4388,14 +4385,13 @@ namespace DaylightingManager {
 				}
 			} // MapNum
 			cCurrentModuleObject = "OutputControl:IlluminanceMap:Style";
-			MapStyleIn = GetNumObjectsFound( cCurrentModuleObject );
+			MapStyleIn = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 			if ( MapStyleIn == 0 ) {
 				cAlphaArgs( 1 ) = "COMMA";
 				MapColSep = CharComma; //comma
-			}
-			else if ( MapStyleIn == 1 ) {
-				GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			} else if ( MapStyleIn == 1 ) {
+				inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				if ( cAlphaArgs( 1 ) == "COMMA" ) {
 					MapColSep = CharComma; //comma
 				}
@@ -4603,11 +4599,6 @@ namespace DaylightingManager {
 		//       MODIFIED       Glazer - July 2016 - Move geometry transformation portion, rearrange input, allow more than three reference points
 		// Obtain the user input data for Daylighting:Controls object in the input file.
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 
 		int IOStat;
@@ -4622,8 +4613,8 @@ namespace DaylightingManager {
 		for ( iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl ) {
 			cAlphaArgs = "";
 			rNumericArgs = 0.0;
-			GetObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			ZoneFound = FindItemInList( cAlphaArgs( 2 ), Zone );
+			inputProcessor->getObjectItem( cCurrentModuleObject, iDaylCntrl, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			ZoneFound = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneFound == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -4633,9 +4624,9 @@ namespace DaylightingManager {
 			zone_daylight.Name = cAlphaArgs( 1 );  // Field: Name
 			zone_daylight.ZoneName = cAlphaArgs( 2 );  // Field: Zone Name
 
-			if ( SameString( cAlphaArgs( 3 ), "SPLITFLUX" ) ){  // Field: Daylighting Method
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "SPLITFLUX" )){  // Field: Daylighting Method
 				zone_daylight.DaylightMethod = SplitFluxDaylighting;
-			} else if ( SameString( cAlphaArgs( 3 ), "DELIGHT" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DELIGHT" )) {
 				zone_daylight.DaylightMethod = DElightDaylighting;
 			} else if ( lAlphaFieldBlanks( 3 ) ) {
 				zone_daylight.DaylightMethod = SplitFluxDaylighting;
@@ -4655,11 +4646,11 @@ namespace DaylightingManager {
 				zone_daylight.AvailSchedNum = ScheduleAlwaysOn;
 			}
 
-			if ( SameString( cAlphaArgs( 5 ), "CONTINUOUS" ) ){  // Field: Lighting Control Type
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "CONTINUOUS" ) ){  // Field: Lighting Control Type
 				zone_daylight.LightControlType = Continuous;
-			} else if ( SameString( cAlphaArgs( 5 ), "STEPPED" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "STEPPED" ) ) {
 				zone_daylight.LightControlType = Stepped;
-			} else if ( SameString( cAlphaArgs( 5 ), "CONTINUOUSOFF" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "CONTINUOUSOFF" ) ) {
 				zone_daylight.LightControlType = ContinuousOff;
 			} else if ( lAlphaFieldBlanks( 5 ) ) {
 				zone_daylight.LightControlType = Continuous;
@@ -4673,8 +4664,8 @@ namespace DaylightingManager {
 			zone_daylight.LightControlSteps = rNumericArgs( 3 ); // Field: Number of Stepped Control Steps
 			zone_daylight.LightControlProbability = rNumericArgs( 4 ); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
 
-			if ( !lAlphaFieldBlanks( 6 ) ){ // Field: Glare Calculation Daylighting Reference Point Name
-				zone_daylight.glareRefPtNumber = FindItemInList( cAlphaArgs( 6 ), DaylRefPt, &RefPointData::Name );  // Field: Glare Calculation Daylighting Reference Point Name
+			if ( !lAlphaFieldBlanks( 6 )){ // Field: Glare Calculation Daylighting Reference Point Name
+				zone_daylight.glareRefPtNumber = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), DaylRefPt, &RefPointData::Name );  // Field: Glare Calculation Daylighting Reference Point Name
 				if ( zone_daylight.glareRefPtNumber == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" for object named: " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -4729,7 +4720,7 @@ namespace DaylightingManager {
 
 			int countRefPts = 0;
 			for ( refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum ){
-				zone_daylight.DaylRefPtNum( refPtNum ) = FindItemInList( cAlphaArgs( 6 + refPtNum ), DaylRefPt, &RefPointData::Name );  // Field: Daylighting Reference Point Name
+				zone_daylight.DaylRefPtNum( refPtNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( 6 + refPtNum ), DaylRefPt, &RefPointData::Name );  // Field: Daylighting Reference Point Name
 				if ( zone_daylight.DaylRefPtNum( refPtNum ) == 0 ) {
 					ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 + refPtNum ) + "=\"" + cAlphaArgs( 6 + refPtNum ) + "\" for object named: " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
@@ -4942,9 +4933,6 @@ namespace DaylightingManager {
 		// Perform GetInput function for the Daylighting:ReferencePoint object
 		// Glazer - July 2016
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 
 		int RefPtNum = 0;
 		int IOStat;
@@ -4952,12 +4940,12 @@ namespace DaylightingManager {
 		int NumNumber;
 
 		cCurrentModuleObject = "Daylighting:ReferencePoint";
-		TotRefPoints = GetNumObjectsFound( cCurrentModuleObject );
+		TotRefPoints = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		DaylRefPt.allocate( TotRefPoints );
 		for ( auto & pt : DaylRefPt ){
-			GetObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, ++RefPtNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			pt.Name = cAlphaArgs( 1 );
-			pt.ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			pt.ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( pt.ZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -5123,17 +5111,7 @@ namespace DaylightingManager {
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -5152,14 +5130,14 @@ namespace DaylightingManager {
 
 		// Get the total number of Light Well objects
 		cCurrentModuleObject = "DaylightingDevice:LightWell";
-		TotLightWells = GetNumObjectsFound( cCurrentModuleObject );
+		TotLightWells = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotLightWells == 0 ) return;
 
 		for ( loop = 1; loop <= TotLightWells; ++loop ) {
 
-			GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			SurfNum = FindItemInList( cAlphaArgs( 1 ), Surface );
+			SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 1 ), Surface );
 			if ( SurfNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" not found." );
 			}
@@ -10028,7 +10006,6 @@ Label903: ;
 
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using namespace InputProcessor;
 		using DataDaylighting::ZoneDaylight;
 
 		// Locals
@@ -10057,8 +10034,8 @@ Label903: ;
 		OldAspectRatio = 1.0;
 		NewAspectRatio = 1.0;
 
-		if ( GetNumObjectsFound( CurrentModuleObject ) == 1 ) {
-			GetObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+		if ( inputProcessor->getNumObjectsFound( CurrentModuleObject ) == 1 ) {
+			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphas, NAlphas, rNumerics, NNum, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			OldAspectRatio = rNumerics( 1 );
 			NewAspectRatio = rNumerics( 2 );
 			transformPlane = cAlphas( 1 );
@@ -10096,25 +10073,8 @@ Label903: ;
 		// PURPOSE OF THIS SUBROUTINE:
 		// The purpose of the routine is to allow the daylighting map data to be written in various formats
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt FmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string fullmapName; // for output to map units as well as SQL

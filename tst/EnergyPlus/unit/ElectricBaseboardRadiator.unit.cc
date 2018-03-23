@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,6 +111,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -118,6 +119,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -257,7 +259,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -305,7 +307,7 @@ namespace EnergyPlus {
 		bool FirstHVACIteration( false );
 
 		std::string const idf_objects = delimited_string( {
-			" Version,8.8;",
+			" Version,8.9;",
 
 			"  Zone,",
 			"    SPACE2-1,                !- Name",
@@ -366,6 +368,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -373,6 +376,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE3-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE3-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -380,6 +384,7 @@ namespace EnergyPlus {
 
 			"  ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Eq,             !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 Baseboard,      !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -471,7 +476,7 @@ namespace EnergyPlus {
 			"    0.0,15.2,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
 			"    0.0,0.0,0.0,   !- X,Y,Z ==> Vertex 3 {m}",
 			"    0.0,0.0,2.4;   !- X,Y,Z ==> Vertex 4 {m}",
-			
+
 			"  ScheduleTypeLimits,",
 			"    Fraction,                !- Name",
 			"    0.0,                     !- Lower Limit Value",
@@ -547,7 +552,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -574,7 +579,7 @@ namespace EnergyPlus {
 		SurfaceGeometry::CosZoneRelNorth( 2 ) = std::cos( -DataHeatBalance::Zone( 2 ).RelNorth * DataGlobals::DegToRadians );
 		SurfaceGeometry::CosZoneRelNorth( 3 ) = std::cos( -DataHeatBalance::Zone( 3 ).RelNorth * DataGlobals::DegToRadians );
 		SurfaceGeometry::SinZoneRelNorth( 1 ) = std::sin( -DataHeatBalance::Zone( 1 ).RelNorth * DataGlobals::DegToRadians );
-		SurfaceGeometry::SinZoneRelNorth( 2 ) = std::sin( -DataHeatBalance::Zone( 2 ).RelNorth * DataGlobals::DegToRadians );	
+		SurfaceGeometry::SinZoneRelNorth( 2 ) = std::sin( -DataHeatBalance::Zone( 2 ).RelNorth * DataGlobals::DegToRadians );
 		SurfaceGeometry::SinZoneRelNorth( 3 ) = std::sin( -DataHeatBalance::Zone( 3 ).RelNorth * DataGlobals::DegToRadians );
 
 		SurfaceGeometry::CosBldgRelNorth = 1.0;
@@ -592,7 +597,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( ElectricBaseboardRadiator::ElecBaseboard( 3 ).ZonePtr, 3 );
 
 		DataSizing::FinalZoneSizing.allocate( 3 );
-		DataSizing::ZoneEqSizing.allocate( 3 );	
+		DataSizing::ZoneEqSizing.allocate( 3 );
 		DataSizing::ZoneSizingRunDone = true;
 
 		BaseboardNum = 1;
@@ -602,7 +607,7 @@ namespace EnergyPlus {
 		DataSizing::ZoneEqSizing( CntrlZoneNum ).SizingMethod.allocate( DataHVACGlobals::NumOfSizingTypes );
 		DataSizing::ZoneEqSizing( CntrlZoneNum ).SizingMethod( DataHVACGlobals::HeatingCapacitySizing ) = ElectricBaseboardRadiator::ElecBaseboard( BaseboardNum ).HeatingCapMethod;
 		DataSizing::FinalZoneSizing( CntrlZoneNum ).NonAirSysDesHeatLoad = 2000.0;
-		// do electric baseboard sizing	
+		// do electric baseboard sizing
 		ElectricBaseboardRadiator::SizeElectricBaseboard( BaseboardNum );
 		// check user specified hardsized nominal capacity
 		EXPECT_EQ( ElectricBaseboardRadiator::ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity, 1000.0 );
@@ -651,7 +656,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( ElectricBaseboardRadiator::ElecBaseboard( BaseboardNum ).NominalCapacity, 3000.0 );
 
 	}
-	
+
 	TEST_F( EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOff ) {
 		// this unit test is related to issue #6276, unit was producing negative heating, new routines turning things off or calculating things when on were added
 		Real64 LoadMet;
@@ -661,7 +666,7 @@ namespace EnergyPlus {
 		Real64 ElecUseRate;
 		Real64 AirOutletTemp;
 		Real64 AirInletTemp;
-		
+
 		// Set conditions
 		LoadMet = -1000.0;
 		QBBCap = 500.0;
@@ -681,7 +686,7 @@ namespace EnergyPlus {
 		EXPECT_EQ( QBBElecRadSrc, 0.0 );
 		EXPECT_EQ( ElecUseRate, 0.0 );
 		EXPECT_EQ( AirOutletTemp, AirInletTemp );
-		
+
 	}
 
 	TEST_F( EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOn ) {
@@ -700,7 +705,7 @@ namespace EnergyPlus {
 		QBBCap = 1200.0;
 		CapacitanceAir = 1000.0;
 		Effic = 0.5;
-		
+
 		// Call the On routine
 		ElectricBaseboardRadiator::UpdateElectricBaseboardOn( AirOutletTemp, ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic );
 
@@ -709,7 +714,7 @@ namespace EnergyPlus {
 		// ElecUseRate = QBBCap / Effic;
 		EXPECT_NEAR( AirOutletTemp, 21.2, 0.0001 );
 		EXPECT_NEAR( ElecUseRate, 2400.0, 0.0001 );
-		
+
 	}
-	
+
 }

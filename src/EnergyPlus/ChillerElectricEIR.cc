@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,7 +73,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -248,27 +248,10 @@ namespace ChillerElectricEIR {
 		//  model, initializes simulation variables, calls the appropriate model and sets
 		//  up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using PlantUtilities::UpdateComponentHeatRecoverySide;
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EIRChillNum; // Chiller number pointer
@@ -281,7 +264,7 @@ namespace ChillerElectricEIR {
 
 		// Find the correct Chiller
 		if ( CompIndex == 0 ) {
-			EIRChillNum = FindItemInList( EIRChillerName, ElectricEIRChiller );
+			EIRChillNum = UtilityRoutines::FindItemInList( EIRChillerName, ElectricEIRChiller );
 			if ( EIRChillNum == 0 ) {
 				ShowFatalError( "SimElectricEIRChiller: Specified Chiller not one of Valid EIR Electric Chillers=" + EIRChillerName );
 			}
@@ -349,16 +332,8 @@ namespace ChillerElectricEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This routine will get the input required by the Electric EIR Chiller model.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using DataGlobals::MaxNameLength;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using BranchNodeConnections::TestCompSet;
 		using NodeInputManager::GetOnlySingleNode;
@@ -384,8 +359,6 @@ namespace ChillerElectricEIR {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // True when input errors are found
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 CurveVal; // Used to verify EIR-FT and CAP-FT curves equal 1 at reference conditions
 		static bool FoundNegValue( false ); // Used to evaluate PLFFPLR curve objects
 		static int CurveCheck( 0 ); // Used to evaluate PLFFPLR curve objects
@@ -404,7 +377,7 @@ namespace ChillerElectricEIR {
 
 		if ( getInputAllocatedFlag ) return;
 		cCurrentModuleObject = "Chiller:Electric:EIR";
-		NumElectricEIRChillers = GetNumObjectsFound( cCurrentModuleObject );
+		NumElectricEIRChillers = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumElectricEIRChillers <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -419,15 +392,9 @@ namespace ChillerElectricEIR {
 
 		// Load arrays with electric EIR chiller data
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ElectricEIRChiller, EIRChillerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			VerifyUniqueChillerName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -460,11 +427,11 @@ namespace ChillerElectricEIR {
 			ElectricEIRChiller( EIRChillerNum ).EvapOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Chilled Water Nodes" );
 
-			if ( SameString( cAlphaArgs( 9 ), "WaterCooled" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "WaterCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = WaterCooled;
-			} else if ( SameString( cAlphaArgs( 9 ), "AirCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "AirCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = AirCooled;
-			} else if ( SameString( cAlphaArgs( 9 ), "EvaporativelyCooled" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 9 ), "EvaporativelyCooled" ) ) {
 				ElectricEIRChiller( EIRChillerNum ).CondenserType = EvapCooled;
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + ": " + cAlphaArgs( 1 ) );
@@ -874,7 +841,7 @@ namespace ChillerElectricEIR {
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_ElectricEIR;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataPlant::SingleSetPoint;
@@ -1414,7 +1381,7 @@ namespace ChillerElectricEIR {
 					}
 					tempHeatRecVolFlowRate = nomHeatRecVolFlowRateUser;
 				}
-			
+
 			}
 			if ( ! ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tempHeatRecVolFlowRate = ElectricEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 			PlantUtilities::RegisterPlantCompDesignFlow( ElectricEIRChiller( EIRChillNum ).HeatRecInletNodeNum, tempHeatRecVolFlowRate );
@@ -1653,22 +1620,22 @@ namespace ChillerElectricEIR {
 		EvapOutletTemp = Node( ElectricEIRChiller( EIRChillNum ).EvapOutletNodeNum ).Temp;
 		TempLowLimitEout = ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut;
 		EvapMassFlowRateMax = ElectricEIRChiller( EIRChillNum ).EvapMassFlowRateMax;
-		
+
 		//If there is a fault of chiller fouling (zrp_Nov2016)
 		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation )){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingIndex;
 			Real64 NomCap_ff = ChillerRefCap;
 			Real64 ReferenceCOP_ff = ReferenceCOP;
-			
+
 			//calculate the Faulty Chiller Fouling Factor using fault information
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor = FaultsChillerFouling( FaultIndex ).CalFoulingFactor();
-			
+
 			//update the Chiller nominal capacity and COP at faulty cases
 			ChillerRefCap = NomCap_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 			ReferenceCOP = ReferenceCOP_ff * ElectricEIRChiller( EIRChillNum ).FaultyChillerFoulingFactor;
 
 		}
-		
+
 		// Set mass flow rates
 		if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
 			CondMassFlowRate = ElectricEIRChiller( EIRChillNum ).CondMassFlowRateMax;
@@ -1703,18 +1670,18 @@ namespace ChillerElectricEIR {
 		} else {
 			assert( false );
 		}}
-		
+
 		//If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
 		if( ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTFlag && ( ! WarmupFlag ) && ( ! DoingSizing ) && ( ! KickOffSimulation ) ){
 			int FaultIndex = ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTIndex;
 			Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
-			
+
 			//calculate the sensor offset using fault information
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = FaultsChillerSWTSensor( FaultIndex ).CalFaultOffsetAct();
 			//update the EvapOutletTempSetPoint
 			EvapOutletTempSetPoint = max( ElectricEIRChiller( EIRChillNum ).TempLowLimitEvapOut, min( Node( EvapInletNode ).Temp, EvapOutletTempSetPoint_ff - ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset ));
 			ElectricEIRChiller( EIRChillNum ).FaultyChillerSWTOffset = EvapOutletTempSetPoint_ff - EvapOutletTempSetPoint;
-			
+
 		}
 
 		// correct temperature if using heat recovery
@@ -1872,7 +1839,7 @@ namespace ChillerElectricEIR {
 			QEvaporator = max( 0.0, ( EvapMassFlowRate * Cp * EvapDeltaTemp ) );
 			EvapOutletTemp = EvapOutletTempSetPoint;
 		}
-		
+
 		//Check that the Evap outlet temp honors both plant loop temp low limit and also the chiller low limit
 		if ( EvapOutletTemp < TempLowLimitEout ) {
 			if ( ( Node( EvapInletNode ).Temp - TempLowLimitEout ) > DeltaTempTol ) {
@@ -2180,27 +2147,12 @@ namespace ChillerElectricEIR {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  Reporting
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
 		using Psychrometrics::PsyHFnTdbW;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapInletNode; // Evaporator inlet node number

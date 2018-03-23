@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -326,6 +326,47 @@ namespace DataSizing {
 	// used only for Facility Load Component Summary
 	Array1D< FacilitySizingData > CalcFacilitySizing; // Data for zone sizing 
 	FacilitySizingData CalcFinalFacilitySizing; // Final data for zone sizing 
+	Array1D< Real64 > VbzByZone; // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
+	Array1D< Real64 > VdzClgByZone; // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+	Array1D< Real64 > VdzMinClgByZone; // minimum discarge flow for cooling, Vdz includes secondary and primary flows for dual path
+	Array1D< Real64 > VdzHtgByZone; // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+	Array1D< Real64 > VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
+	Array1D< Real64 > ZdzClgByZone; // minimum discharge outdoor-air fraction for cooling
+	Array1D< Real64 > ZdzHtgByZone; // minimum discharge outdoor-air fraction for heating
+	Array1D< Real64 > VpzClgByZone; // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
+	Array1D< Real64 > VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
+	Array1D< Real64 > VpzHtgByZone; // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
+	Array1D< Real64 > VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
+	Array1D< Real64 > VpzClgSumBySys; // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
+	Array1D< Real64 > VpzHtgSumBySys; // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
+	Array1D< Real64 > PzSumBySys; // sum of design people for system, Pz_sum 
+	Array1D< Real64 > PsBySys; // sum of peak concurrent people by system, Ps
+	Array1D< Real64 > DBySys; // Population Diversity by system
+	Array1D< std::string > PeakPsOccurrenceDateTimeStringBySys; // string describing when Ps peak occurs
+	Array1D< std::string > PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
+	Array1D< Real64 > VouBySys; // uncorrected system outdoor air requirement, for std 62.1 VRP
+	Array1D< Real64 > VpsClgBySys; // System primary airflow Vps, for cooling for std 62.1 VRP
+	Array1D< Real64 > VpsHtgBySys; // system primary airflow Vps, for heating for std 62.1 VRP
+	Array1D< Real64 > FaByZoneHeat; // saved value of Fa used in 62.1 tabular report
+	Array1D< Real64 > FbByZoneCool; // saved value of Fb used in 62.1 tabular report
+	Array1D< Real64 > FbByZoneHeat; // saved value of Fb used in 62.1 tabular report
+	Array1D< Real64 > FcByZoneCool; // saved value of Fc used in 62.1 tabular report
+	Array1D< Real64 > FcByZoneHeat; // saved value of Fc used in 62.1 tabular report
+	Array1D< Real64 > XsBySysCool; // saved value of Xs used in 62.1 tabular report
+	Array1D< Real64 > XsBySysHeat; // saved value of Xs used in 62.1 tabular report
+	Array1D< Real64 > EvzByZoneCool; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+	Array1D< Real64 > EvzByZoneHeat; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+	Array1D< Real64 > EvzByZoneCoolPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+	Array1D< Real64 > EvzByZoneHeatPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+	Array1D< Real64 > VotClgBySys; // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
+	Array1D< Real64 > VotHtgBySys; // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
+	Array1D< Real64 > VozSumClgBySys; // saved value of cooling ventilation required at clg zones
+	Array1D< Real64 > VozSumHtgBySys; // saved value of cooling ventilation required at htg zones
+	Array1D< Real64 > TotCoolCapTemp; // scratch variable used for calulating peak load [W]
+	Array1D< Real64 > EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
+	Array1D< Real64 > EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
+	Array1D< Real64 > FaByZoneCool; // triggers allocation in UpdateSysSizing
+	Array1D< Real64 > SensCoolCapTemp; // triggers allocation in UpdateSysSizing
 
 	// Clears the global data in DataSizing.
 	// Needed for unit tests, should not be normally called.
@@ -458,6 +499,107 @@ namespace DataSizing {
 		DataWaterCoilSizCoolDeltaT = 0.0;
 		DataWaterCoilSizHeatDeltaT = 0.0;
 		DataNomCapInpMeth = false;
+		VbzByZone.deallocate();
+		VdzClgByZone.deallocate();
+		VdzMinClgByZone.deallocate();
+		VdzHtgByZone.deallocate();
+		VdzMinHtgByZone.deallocate();
+		ZdzClgByZone.deallocate();
+		ZdzHtgByZone.deallocate();
+		VpzClgByZone.deallocate();
+		VpzMinClgByZone.deallocate();
+		VpzHtgByZone.deallocate();
+		VpzMinHtgByZone.deallocate();
+		VpzClgSumBySys.deallocate();
+		VpzHtgSumBySys.deallocate();
+		PzSumBySys.deallocate();
+		PsBySys.deallocate();
+		DBySys.deallocate();
+		PeakPsOccurrenceDateTimeStringBySys.deallocate();
+		PeakPsOccurrenceEnvironmentStringBySys.deallocate();
+		VouBySys.deallocate();
+		VpsClgBySys.deallocate();
+		VpsHtgBySys.deallocate();
+		FaByZoneHeat.deallocate();
+		FbByZoneCool.deallocate();
+		FbByZoneHeat.deallocate();
+		FcByZoneCool.deallocate();
+		FcByZoneHeat.deallocate();
+		XsBySysCool.deallocate();
+		XsBySysHeat.deallocate();
+		EvzByZoneCool.deallocate();
+		EvzByZoneHeat.deallocate();
+		EvzByZoneCoolPrev.deallocate();
+		EvzByZoneHeatPrev.deallocate();
+		VotClgBySys.deallocate();
+		VotHtgBySys.deallocate();
+		VozSumClgBySys.deallocate();
+		VozSumHtgBySys.deallocate();
+		TotCoolCapTemp.deallocate();
+		EvzMinBySysHeat.deallocate();
+		EvzMinBySysCool.deallocate();
+		FaByZoneCool.deallocate();
+		SensCoolCapTemp.deallocate();
+	}
+
+	Real64
+	TermUnitSizingData::applyTermUnitSizingCoolFlow(
+		Real64 const & coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+		Real64 const & coolFlowNoOA // Cooling flow rate without MinOA limit applied
+	)
+	{
+		// Apply DesignSpecification:AirTerminal:Sizing to cooling flow (could be vol flow or mass flow)
+		Real64 coolFlowRatio = 1.0;
+		if ( this->SpecDesCoolSATRatio > 0.0 ) {
+			coolFlowRatio = this->SpecDesSensCoolingFrac / this->SpecDesCoolSATRatio;
+		} else {
+			coolFlowRatio = this->SpecDesSensCoolingFrac;
+		}
+		Real64 adjustedFlow = coolFlowNoOA * coolFlowRatio + ( coolFlowWithOA - coolFlowNoOA ) * this->SpecMinOAFrac;
+		return adjustedFlow;
+	}
+
+	Real64
+	TermUnitSizingData::applyTermUnitSizingHeatFlow(
+		Real64 const & heatFlowWithOA, // Heating flow rate with MinOA limit applied
+		Real64 const & heatFlowNoOA // Heating flow rate without MinOA limit applied
+	)
+	{
+		// Apply DesignSpecification:AirTerminal:Sizing to heating flow (could be vol flow or mass flow)
+		Real64 heatFlowRatio = 1.0;
+		if ( this->SpecDesHeatSATRatio > 0.0 ) {
+			heatFlowRatio = this->SpecDesSensHeatingFrac / this->SpecDesHeatSATRatio;
+		} else {
+			heatFlowRatio = this->SpecDesSensHeatingFrac;
+		}
+		Real64 adjustedFlow = heatFlowNoOA * heatFlowRatio + ( heatFlowWithOA - heatFlowNoOA ) * this->SpecMinOAFrac;
+		return adjustedFlow;
+	}
+
+	void
+	ZoneSizingData::scaleZoneCooling(
+		Real64 const ratio // Scaling ratio
+	)
+	{
+		// Apply scaling ratio to TermUnitFinalZoneSizing cooling flow and load
+		this->DesCoolVolFlow = this->DesCoolVolFlow * ratio;
+		this->DesCoolMassFlow = this->DesCoolMassFlow * ratio;
+		this->DesCoolLoad = this->DesCoolLoad * ratio;
+		this->CoolFlowSeq = this->CoolFlowSeq * ratio;
+		this->CoolLoadSeq = this->CoolLoadSeq * ratio;
+	}
+
+	void
+	ZoneSizingData::scaleZoneHeating(
+		Real64 const ratio // Scaling ratio
+	)
+	{
+		// Apply scaling ratio to TermUnitFinalZoneSizing heating flow and load
+		this->DesHeatVolFlow = this->DesHeatVolFlow * ratio;
+		this->DesHeatMassFlow = this->DesHeatMassFlow * ratio;
+		this->DesHeatLoad = this->DesHeatLoad * ratio;
+		this->HeatFlowSeq = this->HeatFlowSeq * ratio;
+		this->HeatLoadSeq = this->HeatLoadSeq * ratio;
 	}
 
 } // DataSizing

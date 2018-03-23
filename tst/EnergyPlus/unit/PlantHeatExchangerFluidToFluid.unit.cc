@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,7 @@
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
-#include <PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <BranchInputManager.hh>
 #include <WeatherManager.hh>
 #include <DataHVACGlobals.hh>
@@ -1057,9 +1057,8 @@ namespace EnergyPlus {
 		"    UNTIL: 24:00,1.0;        !- Field 3",
 		}) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-			bool ErrorsFound =  false;
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		bool ErrorsFound =  false;
 
 		DataGlobals::BeginSimFlag = true;
 		SimulationManager::GetProjectData();
@@ -1163,14 +1162,15 @@ namespace EnergyPlus {
 		} // ... End environment loop.
 
 
-		EXPECT_NEAR(DataLoopNode::Node(3).Temp, 20.0 , 0.01);
+		EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0 , 0.01);
 
 	}
 
 	TEST_F( EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo ) {
 
 		// this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be met
-		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX still heats up to 20.
+		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.
+        // This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX still heats up to 20.
 
 		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
@@ -2153,9 +2153,8 @@ namespace EnergyPlus {
 		"    UNTIL: 24:00,0.0;        !- Field 3",
 		}) ;
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
-
-			bool ErrorsFound =  false;
+		ASSERT_TRUE( process_idf( idf_objects ) );
+		bool ErrorsFound =  false;
 
 		DataGlobals::BeginSimFlag = true;
 		SimulationManager::GetProjectData();
@@ -2257,10 +2256,11 @@ namespace EnergyPlus {
 			} // ... End day loop.
 
 		} // ... End environment loop.
+        //
 
-
-		EXPECT_NEAR(DataLoopNode::Node(3).Temp, 20.0 , 0.01);
-
+        //Index 4 corresponds to NodeNumOut of "TRANSFER SUPPLY OUTLET PIPE", which is a component of
+        // "TRANSFER SUPPLY OUTLET BRANCH" in "TRANSFER SUPPLY BRANCHES" OF "TRANSFER LOOP" (part of PlantLoop data)
+		EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0 , 0.01);
 	}
 
 	TEST_F( EnergyPlusFixture, PlantHXControlWithFirstHVACIteration ) {
@@ -2363,7 +2363,7 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride ) {
-		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride. 
+		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride.
 		// unit test checks that the change for #5626 adjusts the temperature value used in central plant dispatch routines by the tolerance value.
 
 		PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
@@ -2482,7 +2482,7 @@ namespace EnergyPlus {
 		// check value in FreeCoolCntrlMinCntrlTemp
 		EXPECT_NEAR( DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 2 ).Comp( 1 ).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001 );
 
-		// change the tolerance and check the result, issue 5626 fix subtracts tolerance 
+		// change the tolerance and check the result, issue 5626 fix subtracts tolerance
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).TempControlTol = 1.5;
 		PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger( 1, 1 );
 

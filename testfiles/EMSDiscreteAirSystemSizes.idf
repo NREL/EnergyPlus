@@ -67,7 +67,7 @@
 ! ExtWallConstruction=Steel-Framed
 ! End SimMetaData
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,6;
 
@@ -213,7 +213,7 @@
     9.69,                    !- Annual Average Outdoor Air Temperature {C}
     28.10;                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -243,7 +243,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=23.8°C
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2Â°C MWB=23.8Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -1538,7 +1538,7 @@
     LGstore1 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LGstore1 Air Node,       !- Zone Air Node Name
-    LGstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     LGstore1 Inlet Nodes,    !- Name
@@ -1546,6 +1546,7 @@
 
   ZoneHVAC:EquipmentList,
     LGstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     LGstore1 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1923,7 +1924,7 @@
     SMstore1 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore1 Air Node,       !- Zone Air Node Name
-    SMstore1 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore1 Inlet Nodes,    !- Name
@@ -1931,6 +1932,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore1 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore1 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2308,7 +2310,7 @@
     SMstore2 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore2 Air Node,       !- Zone Air Node Name
-    SMstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore2 Inlet Nodes,    !- Name
@@ -2316,6 +2318,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore2 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2693,7 +2696,7 @@
     SMstore3 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore3 Air Node,       !- Zone Air Node Name
-    SMstore3 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore3 Inlet Nodes,    !- Name
@@ -2701,6 +2704,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore3 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore3 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3078,7 +3082,7 @@
     SMstore4 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore4 Air Node,       !- Zone Air Node Name
-    SMstore4 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore4 Inlet Nodes,    !- Name
@@ -3086,6 +3090,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore4 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore4 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3527,7 +3532,7 @@
     LGstore2 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LGstore2 Air Node,       !- Zone Air Node Name
-    LGstore2 Return Air Node Name;  !- Zone Return Air Node Name
+    LGstore2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     LGstore2 Inlet Nodes,    !- Name
@@ -3535,6 +3540,7 @@
 
   ZoneHVAC:EquipmentList,
     LGstore2 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     LGstore2 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3912,7 +3918,7 @@
     SMstore5 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore5 Air Node,       !- Zone Air Node Name
-    SMstore5 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore5 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore5 Inlet Nodes,    !- Name
@@ -3920,6 +3926,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore5 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore5 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4297,7 +4304,7 @@
     SMstore6 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore6 Air Node,       !- Zone Air Node Name
-    SMstore6 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore6 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore6 Inlet Nodes,    !- Name
@@ -4305,6 +4312,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore6 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore6 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4682,7 +4690,7 @@
     SMstore7 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore7 Air Node,       !- Zone Air Node Name
-    SMstore7 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore7 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore7 Inlet Nodes,    !- Name
@@ -4690,6 +4698,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore7 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore7 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5067,7 +5076,7 @@
     SMstore8 Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SMstore8 Air Node,       !- Zone Air Node Name
-    SMstore8 Return Air Node Name;  !- Zone Return Air Node Name
+    SMstore8 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     SMstore8 Inlet Nodes,    !- Name
@@ -5075,6 +5084,7 @@
 
   ZoneHVAC:EquipmentList,
     SMstore8 Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     SMstore8 Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -8014,7 +8024,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8031,7 +8041,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8046,7 +8056,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8054,7 +8064,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8062,7 +8072,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8070,7 +8080,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8078,7 +8088,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8086,7 +8096,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8094,7 +8104,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8102,7 +8112,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -8112,7 +8122,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -8138,7 +8148,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8155,7 +8165,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8163,7 +8173,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8171,7 +8181,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8179,7 +8189,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8187,7 +8197,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8195,7 +8205,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8203,7 +8213,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8211,7 +8221,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -8221,7 +8231,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -8245,7 +8255,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -8270,7 +8280,7 @@
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
