@@ -143,14 +143,12 @@ unsigned int instantiate(const char *input,
 
 unsigned int setupExperiment(double tStart,
                              bool stopTimeDefined,
-                             double tEnd,
                              const char *log)
 {
   UNUSED(log)
 
   fmutimeinfo.stopTimeDefined = stopTimeDefined;
   fmutimeinfo.tStart = tStart;
-  fmutimeinfo.tEnd = tEnd;
 
   {
     std::unique_lock<std::mutex> lk(time_mutex);

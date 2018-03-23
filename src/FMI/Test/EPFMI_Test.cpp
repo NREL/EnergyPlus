@@ -30,7 +30,7 @@ const unsigned int outputValueReferences[] = {6, 7, 8, 9, 10, 11};
   bool stopTimeDefined = true;
   double tEnd = 86400;
 
-  result = setupExperiment(tStart, stopTimeDefined, tEnd, nullptr);
+  result = setupExperiment(tStart, stopTimeDefined, nullptr);
 
   fmiEventInfo eventInfo;
   double time = tStart;

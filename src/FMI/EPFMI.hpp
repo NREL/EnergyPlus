@@ -30,7 +30,6 @@ unsigned int instantiate(const char *input,
 
 unsigned int setupExperiment(double tStart,
                              bool stopTimeDefined,
-                             double tEnd,
                              const char *log);
 
 unsigned int setTime(double time,
