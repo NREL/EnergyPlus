@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -64,7 +65,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -129,6 +130,7 @@ namespace DirectAirManager {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static Array1D_bool MyEnvrnFlag;
 		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyDirectAirInitFlag;
 	}
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
@@ -147,6 +149,7 @@ namespace DirectAirManager {
 		ZoneEquipmentListChecked = false;
 		MyEnvrnFlag.deallocate();
 		MySizeFlag.deallocate();
+		MyDirectAirInitFlag.deallocate();
 	}
 
 	// Functions
@@ -174,24 +177,8 @@ namespace DirectAirManager {
 
 		// METHODOLOGY EMPLOYED:
 
-		// REFERENCES:
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DirectAirNum;
@@ -203,7 +190,7 @@ namespace DirectAirManager {
 
 		// Find the correct Direct Air Equipment
 		if ( CompIndex == 0 ) {
-			DirectAirNum = FindItemInList( EquipName, DirectAir, &DirectAirProps::EquipID );
+			DirectAirNum = UtilityRoutines::FindItemInList( EquipName, DirectAir, &DirectAirProps::EquipID );
 			if ( DirectAirNum == 0 ) {
 				ShowFatalError( "SimDirectAir: Unit not found=" + EquipName );
 			}
@@ -252,13 +239,7 @@ namespace DirectAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Use the Get routines from the InputProcessor module.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
 		using DataGlobals::ScheduleAlwaysOn;
@@ -268,16 +249,6 @@ namespace DirectAirManager {
 		using namespace DataLoopNode;
 		using namespace DataIPShortCuts;
 
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:    INTEGER :: BaseboardNum
 		int NumNums; // Number of REAL(r64) numbers returned by GetObjectItem
 		int NumAlphas; // Number of alphanumerics returned by GetObjectItem
@@ -285,8 +256,6 @@ namespace DirectAirManager {
 		int IOStat;
 		static std::string const RoutineName( "GetDirectAirInput: " ); // include trailing blank space
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int Loop; // Do Loop Index
 		int CtrlZone; // controlled zome do loop index
 		int SupAirIn; // controlled zone supply air inlet index
@@ -295,7 +264,7 @@ namespace DirectAirManager {
 
 		cCurrentModuleObject = "AirTerminal:SingleDuct:Uncontrolled";
 
-		NumDirectAir = GetNumObjectsFound( cCurrentModuleObject );
+		NumDirectAir = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumDirectAir > 0 ) {
 
@@ -304,14 +273,8 @@ namespace DirectAirManager {
 
 			for ( DirectAirNum = 1; DirectAirNum <= NumDirectAir; ++DirectAirNum ) {
 				DirectAir( DirectAirNum ).cObjectName = cCurrentModuleObject; // push Object Name into data array
-				GetObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), DirectAir, &DirectAirProps::EquipID, DirectAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxxxxx";
-				}
+				inputProcessor->getObjectItem( cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				DirectAir( DirectAirNum ).EquipID = cAlphaArgs( 1 );
 				DirectAir( DirectAirNum ).Schedule = cAlphaArgs( 2 );
 				if ( lAlphaFieldBlanks( 2 ) ) {
@@ -333,7 +296,7 @@ namespace DirectAirManager {
 				if ( lAlphaFieldBlanks( 4 ) ) {
 					DirectAir( DirectAirNum ).NoOAFlowInputFromUser = true;
 				} else {
-					DirectAir( DirectAirNum ).OARequirementsPtr = InputProcessor::FindItemInList( cAlphaArgs( 4 ), DataSizing::OARequirements );
+					DirectAir( DirectAirNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), DataSizing::OARequirements );
 					if ( DirectAir( DirectAirNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
 						ShowContinueError( "..invalid " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
@@ -360,7 +323,7 @@ namespace DirectAirManager {
 				// DesignSpecification:AirTerminal:Sizing name
 				DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = 0;
 				if ( !lAlphaFieldBlanks( 6 )) {
-					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = InputProcessor::FindItemInList( cAlphaArgs( 5 ), DataSizing::AirTerminalSizingSpec );
+					DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 6 ), DataSizing::AirTerminalSizingSpec );
 					if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex == 0 ) {
 						ShowSevereError(cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + DirectAir( DirectAirNum ).cObjectName );
@@ -376,13 +339,15 @@ namespace DirectAirManager {
 						if ( DirectAir( DirectAirNum ).ZoneSupplyAirNode == ZoneEquipConfig( CtrlZone ).InletNode( SupAirIn ) ) {
 							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).InNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
 							thisZoneEqConfig.AirDistUnitCool( SupAirIn ).OutNode = DirectAir( DirectAirNum ).ZoneSupplyAirNode;
-							thisZoneEqConfig.SDUNum = DirectAirNum;
+							thisZoneEqConfig.InletNodeSDUNum( SupAirIn ) = DirectAirNum;
 							DirectAir( DirectAirNum ).TermUnitSizingNum = thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
 							DirectAir( DirectAirNum ).ZoneEqNum = CtrlZone;
+							DirectAir( DirectAirNum ).CtrlZoneInNodeIndex = SupAirIn;
+							{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( DirectAir( DirectAirNum ).TermUnitSizingNum ) );
+							thisTermUnitSizingData.ADUName = DirectAir( DirectAirNum ).EquipID;
 							// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing if there is one attached to this terminal unit
 							if ( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex > 0 ) {
 								{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( DirectAir( DirectAirNum ).AirTerminalSizingSpecIndex ) );
-								{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisZoneEqConfig.AirDistUnitCool( SupAirIn ).TermUnitSizingIndex ) );
 								thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 								thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
 								thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
@@ -417,10 +382,10 @@ namespace DirectAirManager {
 
 		//Setup output for the Direct Air Units.  This allows a comparison with
 		for ( Loop = 1; Loop <= NumDirectAir; ++Loop ) {
-			SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy [J]", DirectAir( Loop ).HeatEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy [J]", DirectAir( Loop ).CoolEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
-			SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate [W]", DirectAir( Loop ).HeatRate, "System", "Average", DirectAir( Loop ).EquipID );
-			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate [W]", DirectAir( Loop ).CoolRate, "System", "Average", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Heating Energy", OutputProcessor::Unit::J, DirectAir( Loop ).HeatEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, DirectAir( Loop ).CoolEnergy, "System", "Sum", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Heating Rate", OutputProcessor::Unit::W, DirectAir( Loop ).HeatRate, "System", "Average", DirectAir( Loop ).EquipID );
+			SetupOutputVariable( "Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, DirectAir( Loop ).CoolRate, "System", "Average", DirectAir( Loop ).EquipID );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "AirTerminal:SingleDuct:Uncontrolled", DirectAir( Loop ).EquipID, "Mass Flow Rate", "[kg/s]", DirectAir( Loop ).EMSOverrideAirFlow, DirectAir( Loop ).EMSMassFlowRateValue );
@@ -467,9 +432,10 @@ namespace DirectAirManager {
 
 			MyEnvrnFlag.allocate( NumDirectAir );
 			MySizeFlag.allocate( NumDirectAir );
+			MyDirectAirInitFlag.allocate( NumDirectAir );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
-
+			MyDirectAirInitFlag = true;
 			MyOneTimeFlag = false;
 
 		}
@@ -482,19 +448,23 @@ namespace DirectAirManager {
 				ShowWarningError( "InitDirectAir: [" + DirectAir( DirectAirNum ).cObjectName + " = " + DirectAir( Loop ).EquipID + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
 			}
 		}
+		if ( MyDirectAirInitFlag( DirectAirNum ) ) {
+			if ( DirectAir( DirectAirNum ).AirLoopNum == 0 ) {
+				if ( ( ControlledZoneNum > 0 ) && ( DirectAir( DirectAirNum ).CtrlZoneInNodeIndex > 0 ) ){
+					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( DirectAir( DirectAirNum ).ZoneEqNum ).InletNodeAirLoopNum( DirectAir( DirectAirNum ).CtrlZoneInNodeIndex );
+				}
+			} else {
+				MyDirectAirInitFlag( DirectAirNum ) = false;
+			}
+		}
+
 		if ( ! SysSizingCalc && MySizeFlag( DirectAirNum ) ) {
 
 			SizeDirectAir( DirectAirNum );
 
 			DirectAir( DirectAirNum ).ZoneEqNum = ControlledZoneNum;
 			DirectAir( DirectAirNum ).ZoneNum = ZoneEquipConfig( ControlledZoneNum ).ActualZoneNum;
-			if ( ControlledZoneNum > 0 ) { 
-				if ( DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum > 0  ) {  
-					DirectAir( DirectAirNum ).AirLoopNum = DataZoneEquipment::ZoneEquipConfig( ControlledZoneNum ).AirLoopNum; 
-					DirectAir( DirectAirNum ).CtrlZoneNum = ControlledZoneNum; 
-					MySizeFlag( DirectAirNum ) = false;
-				}
-			} 
+			MySizeFlag( DirectAirNum ) = false;
 		}
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( DirectAirNum ) ) {
@@ -520,9 +490,7 @@ namespace DirectAirManager {
 			mDotFromOARequirement = DirectAir( DirectAirNum ).AirMassFlowRateMax;
 			int airLoopNum( 0 );
 			Real64 airLoopOAFrac( 0.0 );
-			if ( DirectAir( DirectAirNum ).ZoneEqNum > 0) {
-				airLoopNum =ZoneEquipConfig( DirectAir( DirectAirNum ).ZoneEqNum ).AirLoopNum;
-			}
+			airLoopNum = DirectAir( DirectAirNum ).AirLoopNum;
 			if ( airLoopNum > 0 ) {
 				airLoopOAFrac = DataAirLoop::AirLoopFlow( airLoopNum ).OAFrac;
 				bool UseOccSchFlag = false;
@@ -541,13 +509,13 @@ namespace DirectAirManager {
 			//The first time through set the mass flow rate to the Max
 			if ( ( Node( ZoneNode ).MassFlowRateMaxAvail > 0.0 ) && ( GetCurrentScheduleValue( DirectAir( DirectAirNum ).SchedPtr ) > 0.0 ) ) {
 				if ( ! ( SimulateAirflowNetwork > AirflowNetworkControlMultizone && AirflowNetworkFanActivated ) ) {
-					if ( DirectAir( DirectAirNum ).NoOAFlowInputFromUser ) { 
+					if ( DirectAir( DirectAirNum ).NoOAFlowInputFromUser ) {
 						Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).AirMassFlowRateMax;
 						Node( ZoneNode ).MassFlowRateMaxAvail = DirectAir( DirectAirNum ).AirMassFlowRateMax;
-					} else { 
-						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement; 
-						Node( ZoneNode ).MassFlowRateMaxAvail = mDotFromOARequirement; 
-					} 
+					} else {
+						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement;
+						Node( ZoneNode ).MassFlowRateMaxAvail = mDotFromOARequirement;
+					}
 
 					if ( DirectAir( DirectAirNum ).EMSOverrideAirFlow ) Node( ZoneNode ).MassFlowRate = DirectAir( DirectAirNum ).EMSMassFlowRateValue;
 				}
@@ -568,13 +536,13 @@ namespace DirectAirManager {
 						} else {
 							Node( ZoneNode ).MassFlowRate = Node( ZoneNode ).MassFlowRateMaxAvail;
 						}
-					} else {  
-						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement;  
-						// but also apply constraints 
-						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMaxAvail );  
-						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMax );  
-						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMinAvail );  
-						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMin ); 
+					} else {
+						Node( ZoneNode ).MassFlowRate = mDotFromOARequirement;
+						// but also apply constraints
+						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMaxAvail );
+						Node( ZoneNode ).MassFlowRate = min( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMax );
+						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMinAvail );
+						Node( ZoneNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate, Node( ZoneNode ).MassFlowRateMin );
 					}
 				} else {
 					Node( ZoneNode ).MassFlowRate = 0.0;
@@ -618,26 +586,10 @@ namespace DirectAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MaxAirVolFlowRateDes; // Design maximum air volume flow rate for reporting

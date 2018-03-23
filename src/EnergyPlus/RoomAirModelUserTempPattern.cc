@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -66,7 +67,6 @@
 #include <DataZoneEquipment.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
@@ -278,7 +278,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::ZT;
 		using DataHeatBalFanSys::ZTAV;
-		using InputProcessor::FindItem;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -322,29 +321,11 @@ namespace RoomAirModelUserTempPattern {
 		// figure out which pattern is scheduled and call
 		// appropriate subroutine
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataSurfaces::ZoneMeanAirTemp;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::FindItem;
 		using OutputReportTabular::IntToStr;
 		using General::FindNumberInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused    INTEGER    :: thisZoneInfo
@@ -624,7 +605,7 @@ namespace RoomAirModelUserTempPattern {
 		}
 
 		if ( SetupOutputFlag( ZoneNum ) ) {
-			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient [K/m]", AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
+			SetupOutputVariable( "Room Air Zone Vertical Temperature Gradient", OutputProcessor::Unit::K_m, AirPatternZoneInfo( ZoneNum ).Gradient, "HVAC", "State", AirPatternZoneInfo( ZoneNum ).ZoneName );
 
 			SetupOutputFlag( ZoneNum ) = false;
 		}
@@ -994,11 +975,6 @@ namespace RoomAirModelUserTempPattern {
 		// METHODOLOGY EMPLOYED:
 		// sets values in Heat balance variables
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataEnvironment::OutBaroPress;
 		using DataLoopNode::Node;
@@ -1016,7 +992,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalFanSys::TempTstatAir;
 		using DataHeatBalFanSys::SysDepZoneLoads;
 		using DataHeatBalFanSys::ZoneLatentGain;
-		using InputProcessor::FindItem;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1027,18 +1002,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHVACGlobals::RetTempMin;
 		using DataGlobals::ZoneSizingCalc;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SurfFirst; // index number of the first surface in the zone
 		int SurfLast;
@@ -1046,7 +1009,6 @@ namespace RoomAirModelUserTempPattern {
 		Real64 CpAir; // Air heat capacity [J/kg-K]
 		Real64 TempRetAir; // Return air temperature [C]
 		Real64 TempZoneAir; // Zone air temperature [C]
-		int ReturnNode; // Node number of controlled zone's return air
 		int ZoneNode; // Node number of controlled zone
 		int SurfNum; // Surface number
 		Real64 MassFlowRA; // Return air mass flow [kg/s]
@@ -1075,9 +1037,10 @@ namespace RoomAirModelUserTempPattern {
 			Node( AirPatternZoneInfo( ZoneNum ).ZoneNodeID ).Temp = AirPatternZoneInfo( ZoneNum ).Tleaving;
 		}
 
-		if ( AirPatternZoneInfo( ZoneNum ).ReturnAirNodeID != 0 ) {
+		int zoneEquipNum = Zone( ZoneNum ).ZoneEqNum;
+		for ( int nodeCount = 1; nodeCount <= DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).NumReturnNodes; ++nodeCount ) {
 			//BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
-			ReturnNode = AirPatternZoneInfo( ZoneNum ).ReturnAirNodeID;
+			int ReturnNode = DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).ReturnNode( nodeCount );
 			ZoneNode = AirPatternZoneInfo( ZoneNum ).ZoneNodeID;
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 			//RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
@@ -1098,11 +1061,13 @@ namespace RoomAirModelUserTempPattern {
 			WinGapTtoRA = 0.0;
 			WinGapFlowTtoRA = 0.0;
 
-			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
-				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
-					FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
-					WinGapFlowToRA += FlowThisTS;
-					WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+			if ( DataZoneEquipment::ZoneEquipConfig( zoneEquipNum ).ZoneHasAirFlowWindowReturn ) {
+				for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
+						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
+						WinGapFlowToRA += FlowThisTS;
+						WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
+					}
 				}
 			}
 			if ( WinGapFlowToRA > 0.0 ) WinGapTtoRA = WinGapFlowTtoRA / WinGapFlowToRA;

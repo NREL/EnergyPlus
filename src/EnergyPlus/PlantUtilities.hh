@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -260,6 +261,57 @@ namespace PlantUtilities {
 		int const ThisLoopNum,
 		int const ThisLoopSide,
 		bool const FirstHVACIteration
+	);
+
+	void
+	ScanPlantLoopsForObject(
+			std::string const & CompName,
+			int const CompType,
+			int & LoopNum,
+			int & LoopSideNum,
+			int & BranchNum,
+			int & CompNum,
+			Optional< Real64 const > LowLimitTemp = _,
+			Optional< Real64 const > HighLimitTemp = _,
+			Optional_int CountMatchPlantLoops = _,
+			Optional_int_const InletNodeNumber = _,
+			Optional_int_const SingleLoopSearch = _,
+			Optional_bool errFlag = _
+	);
+
+	void
+	ScanPlantLoopsForNodeNum(
+			std::string const & CallerName, // really used for error messages
+			int const NodeNum, // index in Node structure of node to be scanned
+			int & LoopNum, // return value for plant loop
+			int & LoopSideNum, // return value for plant loop side
+			int & BranchNum,
+			Optional_int CompNum = _
+	);
+
+	bool
+	AnyPlantLoopSidesNeedSim();
+
+	void
+	SetAllPlantSimFlagsToValue( bool const Value );
+
+	void
+	ShowBranchesOnLoop( int const LoopNum ); // Loop number of loop
+
+	int
+	MyPlantSizingIndex(
+			std::string const & CompType, // component description
+			std::string const & CompName, // user name of component
+			int const NodeNumIn, // component water inlet node
+			int const NodeNumOut, // component water outlet node
+			bool & ErrorsFound, // set to true if there's an error
+			Optional_bool_const SupressErrors = _ // used for WSHP's where condenser loop may not be on a plant loop
+	);
+
+	bool
+	verifyTwoNodeNumsOnSamePlantLoop(
+			int const nodeIndexA,
+			int const nodeIndexB
 	);
 
 } // PlantUtilities

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -69,7 +70,8 @@
 #include <DataWater.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -99,7 +101,7 @@ namespace EvaporativeFluidCoolers {
 
 	// METHODOLOGY EMPLOYED:
 	// Based on cooling tower by Shirey, Raustad: Dec 2000; Shirey, Sept 2002
-	
+
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::KelvinConv;
@@ -115,8 +117,6 @@ namespace EvaporativeFluidCoolers {
 	using General::TrimSigDigits;
 	using DataPlant::PlantLoop;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyWFnTdbTwbPb;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbRhPb;
@@ -143,6 +143,7 @@ namespace EvaporativeFluidCoolers {
 	int const EvapFluidCooler_TwoSpeed( 2 );
 
 	static std::string const BlankString;
+	bool GetEvapFluidCoolerInputFlag( true );
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumSimpleEvapFluidCoolers( 0 ); // Number of similar evaporative fluid coolers
@@ -181,6 +182,7 @@ namespace EvaporativeFluidCoolers {
 
 	// Object Data
 	Array1D< EvapFluidCoolerspecs > SimpleEvapFluidCooler; // dimension to number of machines
+	std::unordered_map< std::string, std::string > UniqueSimpleEvapFluidCoolerNames;
 	Array1D< EvapFluidCoolerInletConds > SimpleEvapFluidCoolerInlet; // inlet conditions
 	Array1D< ReportVars > SimpleEvapFluidCoolerReport; // report variables
 
@@ -225,34 +227,18 @@ namespace EvaporativeFluidCoolers {
 		// REFERENCES:
 		// Based on SimTowers subroutine by Fred Buhl, May 2002
 
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInput( true );
 		int EvapFluidCoolerNum; // Pointer to EvapFluidCooler
 
 		//GET INPUT
-		if ( GetInput ) {
+		if ( GetEvapFluidCoolerInputFlag ) {
 			GetEvapFluidCoolerInput();
-			GetInput = false;
+			GetEvapFluidCoolerInputFlag = false;
 		}
 
 		// Find the correct EvapCooler
 		if ( CompIndex == 0 ) {
-			EvapFluidCoolerNum = FindItemInList( EvapFluidCoolerName, SimpleEvapFluidCooler );
+			EvapFluidCoolerNum = UtilityRoutines::FindItemInList( EvapFluidCoolerName, SimpleEvapFluidCooler );
 			if ( EvapFluidCoolerNum == 0 ) {
 				ShowFatalError( "SimEvapFluidCoolers: Unit not found = " + EvapFluidCoolerName );
 			}
@@ -351,12 +337,6 @@ namespace EvaporativeFluidCoolers {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using namespace DataLoopNode;
-		//  USE DataPlant,          ONLY: PlantLoop
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::MakeUPPERCase;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -371,19 +351,6 @@ namespace EvaporativeFluidCoolers {
 		using DataEnvironment::OutDryBulbTemp;
 		using DataEnvironment::OutRelHumValue;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapFluidCoolerNum; // Evaporative fluid cooler number,
 		// reference counter for SimpleEvapFluidCooler data array
@@ -394,26 +361,26 @@ namespace EvaporativeFluidCoolers {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
 		Array1D< Real64 > NumArray( 25 ); // Numeric input data array
 		Array1D_string AlphArray( 13 ); // Character string input data array
 		std::string FluidName;
 
 		// Get number of all evaporative fluid coolers specified in the input data file (idf)
-		NumSingleSpeedEvapFluidCoolers = GetNumObjectsFound( cEvapFluidCooler_SingleSpeed );
-		NumTwoSpeedEvapFluidCoolers = GetNumObjectsFound( cEvapFluidCooler_TwoSpeed );
+		NumSingleSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound( cEvapFluidCooler_SingleSpeed );
+		NumTwoSpeedEvapFluidCoolers = inputProcessor->getNumObjectsFound( cEvapFluidCooler_TwoSpeed );
 		NumSimpleEvapFluidCoolers = NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers;
 
 		if ( NumSimpleEvapFluidCoolers <= 0 ) ShowFatalError( "No evaporative fluid cooler objects found in input, however, a branch object has specified an evaporative fluid cooler. Search the input for evaporative fluid cooler to determine the cause for this error." );
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleEvapFluidCooler ) ) return;
+		GetEvapFluidCoolerInputFlag = false;
 
 		// Allocate data structures to hold evaporative fluid cooler input data,
 		// report data and evaporative fluid cooler inlet conditions
 		SimpleEvapFluidCooler.allocate( NumSimpleEvapFluidCoolers );
+		UniqueSimpleEvapFluidCoolerNames.reserve( static_cast< unsigned > (NumSimpleEvapFluidCoolers) );
 		SimpleEvapFluidCoolerReport.allocate( NumSimpleEvapFluidCoolers );
 		SimpleEvapFluidCoolerInlet.allocate( NumSimpleEvapFluidCoolers );
 		CheckEquipName.dimension( NumSimpleEvapFluidCoolers, true );
@@ -422,14 +389,9 @@ namespace EvaporativeFluidCoolers {
 		cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
 		for ( SingleSpeedEvapFluidCoolerNumber = 1; SingleSpeedEvapFluidCoolerNumber <= NumSingleSpeedEvapFluidCoolers; ++SingleSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = SingleSpeedEvapFluidCoolerNumber;
-			GetObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleEvapFluidCooler, EvapFluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, SingleSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num = EvapFluidCooler_SingleSpeed;
@@ -467,7 +429,7 @@ namespace EvaporativeFluidCoolers {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\" Performance input method is not specified. " );
 				ErrorsFound = true;
 			}
-			if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( FluidName != "WATER" ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\". StandardDesignCapacity performance input method is only valid for fluid type = \"Water\"." );
@@ -492,7 +454,7 @@ namespace EvaporativeFluidCoolers {
 			if ( lAlphaFieldBlanks( 6 ) || AlphArray( 6 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).CapacityControl = 0; // FanCycling
 			} else {
-				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 6 ) ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( AlphArray( 6 ) ) );
 				if ( SELECT_CASE_var == "FANCYCLING" ) {
 					SimpleEvapFluidCooler( EvapFluidCoolerNum ).CapacityControl = 0;
 				} else if ( SELECT_CASE_var == "FLUIDBYPASS" ) {
@@ -507,9 +469,9 @@ namespace EvaporativeFluidCoolers {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac <= 0.0 ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac = 1.0;
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 7 ), "LossFactor" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 7 ), "LossFactor" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 7 ), "SaturatedExit" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 7 ), "SaturatedExit" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( AlphArray( 7 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -538,9 +500,9 @@ namespace EvaporativeFluidCoolers {
 			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).ConcentrationRatio = NumArray( 15 ); //  N15, \field Blowdown Concentration Ratio
 
-			if ( SameString( AlphArray( 8 ), "ScheduledRate" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 8 ), "ScheduledRate" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 8 ), "ConcentrationRatio" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 8 ), "ConcentrationRatio" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( AlphArray( 8 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
@@ -583,7 +545,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 6 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -593,13 +555,13 @@ namespace EvaporativeFluidCoolers {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 7 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 5 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UserSpecifiedDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 7 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -639,15 +601,10 @@ namespace EvaporativeFluidCoolers {
 		cCurrentModuleObject = cEvapFluidCooler_TwoSpeed;
 		for ( TwoSpeedEvapFluidCoolerNumber = 1; TwoSpeedEvapFluidCoolerNumber <= NumTwoSpeedEvapFluidCoolers; ++TwoSpeedEvapFluidCoolerNumber ) {
 			EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + TwoSpeedEvapFluidCoolerNumber;
-			GetObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, TwoSpeedEvapFluidCoolerNumber, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), SimpleEvapFluidCooler, EvapFluidCoolerNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueSimpleEvapFluidCoolerNames, AlphArray( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
+
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name = AlphArray( 1 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType = cCurrentModuleObject;
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num = EvapFluidCooler_TwoSpeed;
@@ -706,7 +663,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( FluidName != "WATER" ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\". StandardDesignCapacity performance input method is only valid for fluid type = \"Water\"." );
@@ -731,9 +688,9 @@ namespace EvaporativeFluidCoolers {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac <= 0.0 ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac = 1.0;
 
 			// begin water use and systems get input
-			if ( SameString( AlphArray( 6 ), "LossFactor" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 6 ), "LossFactor" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByUserFactor;
-			} else if ( SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 6 ), "SaturatedExit" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else if ( lAlphaFieldBlanks( 6 ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
@@ -761,9 +718,9 @@ namespace EvaporativeFluidCoolers {
 
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).ConcentrationRatio = NumArray( 25 ); //  N25, \field Blowdown Concentration Ratio
 
-			if ( SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 7 ), "ScheduledRate" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownBySchedule;
-			} else if ( SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 7 ), "ConcentrationRatio" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
 			} else if ( lAlphaFieldBlanks( 7 ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
@@ -823,7 +780,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
+			if ( UtilityRoutines::SameString( AlphArray( 4 ), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 12 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -841,7 +798,7 @@ namespace EvaporativeFluidCoolers {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 15 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 4 ), "STANDARDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_StandardDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity <= 0.0 ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 9 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -855,7 +812,7 @@ namespace EvaporativeFluidCoolers {
 					ShowSevereError( cCurrentModuleObject + " = \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\". Low-Speed Standard Design Capacity must be less than the High-Speed Standard Design Capacity." );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
+			} else if ( UtilityRoutines::SameString( AlphArray( 4 ), "USERSPECIFIEDDESIGNCAPACITY" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num = PIM_UserSpecifiedDesignCapacity;
 				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate <= 0.0 && SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 15 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + " = \"" + AlphArray( 4 ) + "\"." );
@@ -925,24 +882,24 @@ namespace EvaporativeFluidCoolers {
 		// Set up output variables
 		// CurrentModuleObject='EvaporativeFluidCooler:SingleSpeed'
 		for ( EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers; ++EvapFluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 			// Added for fluid bypass
-			SetupOutputVariable( "Cooling Tower Bypass Fraction []", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BypassFraction, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Bypass Fraction", OutputProcessor::Unit::None, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BypassFraction, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
 		}
 
 		// CurrentModuleObject='EvaporativeFluidCooler:TwoSpeed'
 		for ( EvapFluidCoolerNum = NumSingleSpeedEvapFluidCoolers + 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers; ++EvapFluidCoolerNum ) {
-			SetupOutputVariable( "Cooling Tower Inlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Outlet Temperature [C]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Mass Flow Rate [kg/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Heat Transfer Rate [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Power [W]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Fan Electric Energy [J]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
+			SetupOutputVariable( "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).InletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).OutletWaterTemp, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).WaterMassFlowRate, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).Qactual, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanPower, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Fan Electric Energy", OutputProcessor::Unit::J, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).FanEnergy, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Electric", "HeatRejection", _, "Plant" );
 
 		}
 
@@ -950,25 +907,25 @@ namespace EvaporativeFluidCoolers {
 		// CurrentModuleObject='EvaporativeFluidCooler:*'
 		for ( EvapFluidCoolerNum = 1; EvapFluidCoolerNum <= NumSingleSpeedEvapFluidCoolers + NumTwoSpeedEvapFluidCoolers; ++EvapFluidCoolerNum ) {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).SuppliedByWaterSystem ) {
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
-				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
-				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).TankSupplyVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).StarvedMakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
 			} else { // Evaporative fluid cooler water from mains and gets metered
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Make Up Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
-				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+				SetupOutputVariable( "Cooling Tower Make Up Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).MakeUpVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
 			}
 
-			SetupOutputVariable( "Cooling Tower Water Evaporation Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Evaporation Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Drift Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Drift Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Blowdown Volume Flow Rate [m3/s]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-			SetupOutputVariable( "Cooling Tower Water Blowdown Volume [m3]", SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Evaporation Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Evaporation Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).EvaporationVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Drift Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Drift Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).DriftVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Blowdown Volume Flow Rate", OutputProcessor::Unit::m3_s, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVdot, "System", "Average", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+			SetupOutputVariable( "Cooling Tower Water Blowdown Volume", OutputProcessor::Unit::m3, SimpleEvapFluidCoolerReport( EvapFluidCoolerNum ).BlowdownVol, "System", "Sum", SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
 		} // loop all evaporative fluid coolers
 
 	}
@@ -1060,27 +1017,16 @@ namespace EvaporativeFluidCoolers {
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
 		using Psychrometrics::PsyTwbFnTdbWPb;
-		using InputProcessor::SameString;
-		//  USE FluidProperties, ONLY : GetDensityGlycol
 		using DataPlant::TypeOf_EvapFluidCooler_SingleSpd;
 		using DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitEvapFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
@@ -1213,24 +1159,14 @@ namespace EvaporativeFluidCoolers {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
-		using InputProcessor::SameString;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const CalledFrom( "SizeEvapFluidCooler" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizCondNum; // Plant Sizing index for condenser loop
@@ -2772,6 +2708,12 @@ namespace EvaporativeFluidCoolers {
 
 		// set
 
+	}
+
+	void
+	clear_state() {
+		UniqueSimpleEvapFluidCoolerNames.clear();
+		GetEvapFluidCoolerInputFlag = true;
 	}
 
 } // EvaporativeFluidCoolers

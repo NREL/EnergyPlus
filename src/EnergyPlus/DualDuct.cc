@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -73,7 +74,8 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -142,6 +144,7 @@ namespace DualDuct {
 
 	// Object Data
 	Array1D< DamperDesignParams > Damper;
+	std::unordered_map< std::string, std::string > UniqueDamperNames;
 	Array1D< DamperFlowConditions > DamperInlet;
 	Array1D< DamperFlowConditions > DamperHotAirInlet;
 	Array1D< DamperFlowConditions > DamperColdAirInlet;
@@ -170,27 +173,8 @@ namespace DualDuct {
 		// It is called from the SimAirLoopComponent
 		// at the system time step.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int DamperNum; // The Damper that you are currently loading input into
@@ -205,7 +189,7 @@ namespace DualDuct {
 
 		// Find the correct DamperNumber with the AirLoop & CompNum from AirLoop Derived Type
 		if ( CompIndex == 0 ) {
-			DamperNum = FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
+			DamperNum = UtilityRoutines::FindItemInList( CompName, Damper, &DamperDesignParams::DamperName );
 			if ( DamperNum == 0 ) {
 				ShowFatalError( "SimulateDualDuct: Damper not found=" + CompName );
 			}
@@ -266,7 +250,7 @@ namespace DualDuct {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Liesen
 		//       DATE WRITTEN   April 1998
-		//       MODIFIED       na
+		//       MODIFIED       Julien Marrec of EffiBEM, 2017-12-18
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -275,15 +259,7 @@ namespace DualDuct {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using BranchNodeConnections::TestCompSet;
@@ -294,18 +270,8 @@ namespace DualDuct {
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetDualDuctInput: " ); // include trailing bla
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -322,19 +288,18 @@ namespace DualDuct {
 		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		int CtrlZone; // controlled zone do loop index
 		int SupAirIn; // controlled zone supply air inlet index
 		int ADUNum; // loop control to search Air Distribution Units
 		static Real64 DummyOAFlow( 0.0 );
 
 		// Flow
-		NumDualDuctConstVolDampers = GetNumObjectsFound( cCMO_DDConstantVolume );
-		NumDualDuctVarVolDampers = GetNumObjectsFound( cCMO_DDVariableVolume );
-		NumDualDuctVarVolOA = GetNumObjectsFound( cCMO_DDVarVolOA );
+		NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound( cCMO_DDConstantVolume );
+		NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound( cCMO_DDVariableVolume );
+		NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound( cCMO_DDVarVolOA );
 		NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
 		Damper.allocate( NumDampers );
+		UniqueDamperNames.reserve( NumDampers );
 		CheckEquipName.dimension( NumDampers, true );
 
 		DamperInlet.allocate( NumDampers );
@@ -348,18 +313,14 @@ namespace DualDuct {
 		if ( NumDualDuctConstVolDampers > 0 ) {
 			for ( DamperIndex = 1; DamperIndex <= NumDualDuctConstVolDampers; ++DamperIndex ) {
 
+				// Load the info from the damper
 				CurrentModuleObject = cCMO_DDConstantVolume;
 
-				GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
+				// Anything below this line in this control block should use DamperNum
 				DamperNum = DamperIndex;
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_ConstantVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -384,25 +345,26 @@ namespace DualDuct {
 				TestCompSet( CurrentModuleObject + ":COOL", Damper( DamperNum ).DamperName, AlphArray( 5 ), AlphArray( 3 ), "Air Nodes" );
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
-						Damper( DamperIndex ).ADUNum = ADUNum;
+					if ( Damper( DamperNum ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperNum ).ColdAirInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperNum ).HotAirInletNodeNum;
+						Damper( DamperNum ).ADUNum = ADUNum;
 					}
 				}
 				// one assumes if there isn't one assigned, it's an error?
-				if ( Damper( DamperIndex ).ADUNum == 0 ) {
+				if ( Damper( DamperNum ).ADUNum == 0 ) {
 					// convenient String
-					if ( Damper( DamperIndex ).DamperType == DualDuct_ConstantVolume ) {
+					if ( Damper( DamperNum ).DamperType == DualDuct_ConstantVolume ) {
 						CurrentModuleObject = "ConstantVolume";
-					} else if ( Damper( DamperIndex ).DamperType == DualDuct_VariableVolume ) {
+					} else if ( Damper( DamperNum ).DamperType == DualDuct_VariableVolume ) {
 						CurrentModuleObject = "VAV";
-					} else if ( Damper( DamperIndex ).DamperType == DualDuct_OutdoorAir ) {
+					} else if ( Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
 						CurrentModuleObject = "VAV:OutdoorAir";
 					} else {
 						CurrentModuleObject = "*invalid*";
 					}
-					ShowSevereError( RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' + Damper( DamperIndex ).DamperName + "]." );
-					ShowContinueError( "...should have outlet node=" + NodeID( Damper( DamperIndex ).OutletNodeNum ) );
+					ShowSevereError( RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' + Damper( DamperNum ).DamperName + "]." );
+					ShowContinueError( "...should have outlet node=" + NodeID( Damper( DamperNum ).OutletNodeNum ) );
 					ErrorsFound = true;
 				} else {
 
@@ -422,8 +384,8 @@ namespace DualDuct {
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = Damper( DamperNum ).HotAirInletNodeNum;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
 									ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
-									AirDistUnit( Damper( DamperIndex ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
-									AirDistUnit( Damper( DamperIndex ).ADUNum ).ZoneEqNum = CtrlZone;
+									AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+									AirDistUnit( Damper( DamperNum ).ADUNum ).ZoneEqNum = CtrlZone;
 								}
 								Damper( DamperNum ).CtrlZoneNum = CtrlZone;
 								Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
@@ -434,8 +396,8 @@ namespace DualDuct {
 				}
 				//Setup the Average damper Position output variable
 				// CurrentModuleObject='AirTerminal:DualDuct:ConstantVolume'
-				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position []", Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position []", Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
 
 			} // end Number of Damper Loop
 		}
@@ -443,18 +405,14 @@ namespace DualDuct {
 		if ( NumDualDuctVarVolDampers > 0 ) {
 			for ( DamperIndex = 1; DamperIndex <= NumDualDuctVarVolDampers; ++DamperIndex ) {
 
+				// Load the info from the damper
 				CurrentModuleObject = cCMO_DDVariableVolume;
 
-				GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
+				// Anything below this line in this control block should use DamperNum
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers;
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_VariableVolume;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -479,25 +437,26 @@ namespace DualDuct {
 				TestCompSet( CurrentModuleObject + ":COOL", Damper( DamperNum ).DamperName, AlphArray( 5 ), AlphArray( 3 ), "Air Nodes" );
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
-						Damper( DamperIndex ).ADUNum = ADUNum;
+					if ( Damper( DamperNum ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperNum ).ColdAirInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperNum ).HotAirInletNodeNum;
+						Damper( DamperNum ).ADUNum = ADUNum;
 					}
 				}
 				// one assumes if there isn't one assigned, it's an error?
-				if ( Damper( DamperIndex ).ADUNum == 0 ) {
+				if ( Damper( DamperNum ).ADUNum == 0 ) {
 					// convenient String
-					if ( Damper( DamperIndex ).DamperType == DualDuct_ConstantVolume ) {
+					if ( Damper( DamperNum ).DamperType == DualDuct_ConstantVolume ) {
 						CurrentModuleObject = "ConstantVolume";
-					} else if ( Damper( DamperIndex ).DamperType == DualDuct_VariableVolume ) {
+					} else if ( Damper( DamperNum ).DamperType == DualDuct_VariableVolume ) {
 						CurrentModuleObject = "VAV";
-					} else if ( Damper( DamperIndex ).DamperType == DualDuct_OutdoorAir ) {
+					} else if ( Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
 						CurrentModuleObject = "VAV:OutdoorAir";
 					} else {
 						CurrentModuleObject = "*invalid*";
 					}
-					ShowSevereError( RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' + Damper( DamperIndex ).DamperName + "]." );
-					ShowContinueError( "...should have outlet node=" + NodeID( Damper( DamperIndex ).OutletNodeNum ) );
+					ShowSevereError( RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' + Damper( DamperNum ).DamperName + "]." );
+					ShowContinueError( "...should have outlet node=" + NodeID( Damper( DamperNum ).OutletNodeNum ) );
 					ErrorsFound = true;
 				} else {
 
@@ -510,8 +469,8 @@ namespace DualDuct {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = Damper( DamperNum ).HotAirInletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
-								AirDistUnit( Damper( DamperIndex ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
-								AirDistUnit( Damper( DamperIndex ).ADUNum ).ZoneEqNum = CtrlZone;
+								AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+								AirDistUnit( Damper( DamperNum ).ADUNum ).ZoneEqNum = CtrlZone;
 
 								Damper( DamperNum ).CtrlZoneNum = CtrlZone;
 								Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
@@ -521,7 +480,7 @@ namespace DualDuct {
 					}
 				}
 				if ( ! lAlphaBlanks( 6 ) ) {
-					Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
+					Damper( DamperNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( AlphArray( 6 ), OARequirements );
 					if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 						ShowContinueError( "Occurs in " + cCMO_DDVariableVolume + " = " + Damper( DamperNum ).DamperName );
@@ -533,27 +492,23 @@ namespace DualDuct {
 
 				//Setup the Average damper Position output variable
 				// CurrentModuleObject='AirTerminal:DualDuct:VAV'
-				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position []", Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position []", Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate [m3/s]", Damper( DamperNum ).OutdoorAirFlowRate, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Cold Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).ColdAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Hot Supply Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).HotAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Volume Flow Rate", OutputProcessor::Unit::m3_s, Damper( DamperNum ).OutdoorAirFlowRate, "System", "Average", Damper( DamperNum ).DamperName );
 			} // end Number of Damper Loop
 		}
 
 		if ( NumDualDuctVarVolOA > 0 ) {
 			for ( DamperIndex = 1; DamperIndex <= NumDualDuctVarVolOA; ++DamperIndex ) {
 
+				// Load the info from the damper
 				CurrentModuleObject = cCMO_DDVarVolOA;
 
-				GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
+				// Anything below this line in this control block should use DamperNum
 				DamperNum = DamperIndex + NumDualDuctConstVolDampers + NumDualDuctVarVolDampers;
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( AlphArray( 1 ), Damper, &DamperDesignParams::DamperName, DamperNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( UniqueDamperNames, AlphArray( 1 ), CurrentModuleObject, cAlphaFields( 1 ), ErrorsFound );
 				Damper( DamperNum ).DamperName = AlphArray( 1 );
 				Damper( DamperNum ).DamperType = DualDuct_OutdoorAir;
 				Damper( DamperNum ).Schedule = AlphArray( 2 );
@@ -595,25 +550,26 @@ namespace DualDuct {
 				// checks on this are done later
 
 				for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-					if ( Damper( DamperIndex ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
-						//          AirDistUnit(ADUNum)%InletNodeNum = Damper(DamperIndex)%InletNodeNum
-						Damper( DamperIndex ).ADUNum = ADUNum;
+					if ( Damper( DamperNum ).OutletNodeNum == AirDistUnit( ADUNum ).OutletNodeNum ) {
+						AirDistUnit( ADUNum ).InletNodeNum = Damper( DamperNum ).OAInletNodeNum;
+						AirDistUnit( ADUNum ).InletNodeNum2 = Damper( DamperNum ).RecircAirInletNodeNum;
+						Damper( DamperNum ).ADUNum = ADUNum;
 					}
 				}
 				// one assumes if there isn't one assigned, it's an error?
-				if ( Damper( DamperIndex ).ADUNum == 0 ) {
+				if ( Damper( DamperNum ).ADUNum == 0 ) {
 					// convenient String
-					if ( Damper( DamperIndex ).DamperType == DualDuct_ConstantVolume ) {
+					if ( Damper( DamperNum ).DamperType == DualDuct_ConstantVolume ) {
 						CurrentModuleObject = "ConstantVolume";
-					} else if ( Damper( DamperIndex ).DamperType == DualDuct_VariableVolume ) {
+					} else if ( Damper( DamperNum ).DamperType == DualDuct_VariableVolume ) {
 						CurrentModuleObject = "VAV";
-					} else if ( Damper( DamperIndex ).DamperType == DualDuct_OutdoorAir ) {
+					} else if ( Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
 						CurrentModuleObject = "VAV:OutdoorAir";
 					} else {
 						CurrentModuleObject = "*invalid*";
 					}
-					ShowSevereError( RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' + Damper( DamperIndex ).DamperName + "]." );
-					ShowContinueError( "...should have outlet node=" + NodeID( Damper( DamperIndex ).OutletNodeNum ) );
+					ShowSevereError( RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' + Damper( DamperNum ).DamperName + "]." );
+					ShowContinueError( "...should have outlet node=" + NodeID( Damper( DamperNum ).OutletNodeNum ) );
 					ErrorsFound = true;
 				} else {
 
@@ -630,8 +586,8 @@ namespace DualDuct {
 								ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).InNode = Damper( DamperNum ).OAInletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
 								ZoneEquipConfig( CtrlZone ).AirDistUnitHeat( SupAirIn ).OutNode = Damper( DamperNum ).OutletNodeNum;
-								AirDistUnit( Damper( DamperIndex ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
-								AirDistUnit( Damper( DamperIndex ).ADUNum ).ZoneEqNum = CtrlZone;
+								AirDistUnit( Damper( DamperNum ).ADUNum ).TermUnitSizingNum = ZoneEquipConfig( CtrlZone ).AirDistUnitCool( SupAirIn ).TermUnitSizingIndex;
+								AirDistUnit( Damper( DamperNum ).ADUNum ).ZoneEqNum = CtrlZone;
 
 								Damper( DamperNum ).CtrlZoneNum = CtrlZone;
 								Damper( DamperNum ).ActualZoneNum = ZoneEquipConfig( CtrlZone ).ActualZoneNum;
@@ -640,7 +596,7 @@ namespace DualDuct {
 						}
 					}
 				}
-				Damper( DamperNum ).OARequirementsPtr = FindItemInList( AlphArray( 6 ), OARequirements );
+				Damper( DamperNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( AlphArray( 6 ), OARequirements );
 				if ( Damper( DamperNum ).OARequirementsPtr == 0 ) {
 					ShowSevereError( cAlphaFields( 6 ) + " = " + AlphArray( 6 ) + " not found." );
 					ShowContinueError( "Occurs in " + cCMO_DDVarVolOA + " = " + Damper( DamperNum ).DamperName );
@@ -687,9 +643,9 @@ namespace DualDuct {
 				}
 
 				//Setup the Average damper Position output variable
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Duct Damper Position []", Damper( DamperNum ).OADamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Recirculated Air Duct Damper Position []", Damper( DamperNum ).RecircAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
-				SetupOutputVariable( "Zone Air Terminal Outdoor Air Fraction []", Damper( DamperNum ).OAFraction, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).OADamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Recirculated Air Duct Damper Position", OutputProcessor::Unit::None, Damper( DamperNum ).RecircAirDamperPosition, "System", "Average", Damper( DamperNum ).DamperName );
+				SetupOutputVariable( "Zone Air Terminal Outdoor Air Fraction", OutputProcessor::Unit::None, Damper( DamperNum ).OAFraction, "System", "Average", Damper( DamperNum ).DamperName );
 
 			} // end Number of Damper Loop
 		}
@@ -726,9 +682,6 @@ namespace DualDuct {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataConvergParams::HVACFlowRateToler;
@@ -736,21 +689,8 @@ namespace DualDuct {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataDefineEquip::AirDistUnit;
-		using InputProcessor::SameString;
 		using DataHeatBalance::TotPeople;
 		using DataHeatBalance::People;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HotInNode;
@@ -865,16 +805,13 @@ namespace DualDuct {
 			MyEnvrnFlag( DamperNum ) = true;
 		}
 
-		// Find air loop associated with VAV dual duct or VAV:OutdoorAir terminal units
+		// Find air loop associated with this terminal unit
 		if ( MyAirLoopFlag( DamperNum ) ) {
-			if ( Damper( DamperNum ).DamperType == DualDuct_VariableVolume || Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
-				if ( Damper( DamperNum ).AirLoopNum == 0 ) {
-					if ( ( Damper( DamperNum ).CtrlZoneNum > 0 ) && ( Damper( DamperNum ).CtrlZoneInNodeIndex > 0 ) ){
-						Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).InletNodeAirLoopNum( Damper( DamperNum ).CtrlZoneInNodeIndex );
-						AirDistUnit( Damper( DamperNum ).ADUNum ).AirLoopNum = Damper( DamperNum ).AirLoopNum;
-					}
-				} else {
-					MyAirLoopFlag( DamperNum ) = false;
+			if ( Damper( DamperNum ).AirLoopNum == 0 ) {
+				if ( ( Damper( DamperNum ).CtrlZoneNum > 0 ) && ( Damper( DamperNum ).CtrlZoneInNodeIndex > 0 ) ){
+					Damper( DamperNum ).AirLoopNum = ZoneEquipConfig( Damper( DamperNum ).CtrlZoneNum ).InletNodeAirLoopNum( Damper( DamperNum ).CtrlZoneInNodeIndex );
+					AirDistUnit( Damper( DamperNum ).ADUNum ).AirLoopNum = Damper( DamperNum ).AirLoopNum;
+					// Don't set MyAirLoopFlag to false yet because airloopnums might not be populated yet
 				}
 			} else {
 				MyAirLoopFlag( DamperNum ) = false;
@@ -1029,24 +966,8 @@ namespace DualDuct {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone or system sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using namespace InputProcessor;
 		using ReportSizingManager::ReportSizingOutput;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string DamperType;
@@ -2165,29 +2086,6 @@ namespace DualDuct {
 		// PURPOSE OF THIS SUBROUTINE:
 		// get routine to learn if a dual duct outdoor air unit is using its recirc deck
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER :: DamperNum
 		static bool FirstTimeOnly( true );
@@ -2214,7 +2112,7 @@ namespace DualDuct {
 		//  END IF
 
 		if ( FirstTimeOnly ) {
-			NumDualDuctVarVolOA = GetNumObjectsFound( cCMO_DDVarVolOA );
+			NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound( cCMO_DDVarVolOA );
 			RecircIsUsedARR.allocate( NumDualDuctVarVolOA );
 			DamperNamesARR.allocate( NumDualDuctVarVolOA );
 			if ( NumDualDuctVarVolOA > 0 ) {
@@ -2222,7 +2120,7 @@ namespace DualDuct {
 
 					CurrentModuleObject = cCMO_DDVarVolOA;
 
-					GetObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+					inputProcessor->getObjectItem( CurrentModuleObject, DamperIndex, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 					DamperNamesARR( DamperIndex ) = AlphArray( 1 );
 					if ( ! lAlphaBlanks( 5 ) ) {
 						RecircIsUsedARR( DamperIndex ) = true;
@@ -2234,7 +2132,7 @@ namespace DualDuct {
 			FirstTimeOnly = false;
 		}
 
-		DamperIndex = FindItemInList( CompName, DamperNamesARR, NumDualDuctVarVolOA );
+		DamperIndex = UtilityRoutines::FindItemInList( CompName, DamperNamesARR, NumDualDuctVarVolOA );
 		if ( DamperIndex > 0 ) {
 			RecircIsUsed = RecircIsUsedARR( DamperIndex );
 		}
@@ -2243,6 +2141,11 @@ namespace DualDuct {
 
 	//        End of Reporting subroutines for the Damper Module
 	// *****************************************************************************
+
+	void
+	clear_state() {
+		UniqueDamperNames.clear();
+	}
 
 } // DualDuct
 

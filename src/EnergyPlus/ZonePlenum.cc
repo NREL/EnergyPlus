@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -63,7 +64,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <PoweredInductionUnits.hh>
 #include <Psychrometrics.hh>
@@ -103,8 +104,6 @@ namespace ZonePlenum {
 	using namespace DataHVACGlobals;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::OutHumRat;
-
-	// Use statements for access to subroutines in other modules
 	using Psychrometrics::PsyTdbFnHW;
 	using Psychrometrics::PsyHFnTdbW;
 
@@ -175,7 +174,6 @@ namespace ZonePlenum {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataZoneEquipment::ZoneReturnPlenum_Type;
 		using DataZoneEquipment::ZoneSupplyPlenum_Type;
@@ -209,7 +207,7 @@ namespace ZonePlenum {
 		if ( iCompType == ZoneReturnPlenum_Type ) { // 'AirLoopHVAC:ReturnPlenum'
 			// Find the correct ZonePlenumNumber
 			if ( CompIndex == 0 ) {
-				ZonePlenumNum = FindItemInList( CompName, ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName );
+				ZonePlenumNum = UtilityRoutines::FindItemInList( CompName, ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName );
 				if ( ZonePlenumNum == 0 ) {
 					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName );
 				}
@@ -238,7 +236,7 @@ namespace ZonePlenum {
 		} else if ( iCompType == ZoneSupplyPlenum_Type ) { // 'AirLoopHVAC:SupplyPlenum'
 			// Find the correct ZonePlenumNumber
 			if ( CompIndex == 0 ) {
-				ZonePlenumNum = FindItemInList( CompName, ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName );
+				ZonePlenumNum = UtilityRoutines::FindItemInList( CompName, ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName );
 				if ( ZonePlenumNum == 0 ) {
 					ShowFatalError( "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName );
 				}
@@ -298,11 +296,6 @@ namespace ZonePlenum {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::GetNodeNums;
 		using NodeInputManager::InitUniqueNodeCheck;
@@ -349,18 +342,16 @@ namespace ZonePlenum {
 		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool NodeListError; // Flag for node list error
 		bool UniqueNodeError;
 		static std::string const RoutineName( "GetZonePlenumInput: " ); // include trailing blank space
 		std::string InducedNodeListName;
 
 		// Flow
-		GetObjectDefMaxArgs( "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums );
 		MaxNums = NumNums;
 		MaxAlphas = NumAlphas;
-		GetObjectDefMaxArgs( "AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "AirLoopHVAC:SupplyPlenum", NumArgs, NumAlphas, NumNums );
 		MaxNums = max( NumNums, MaxNums );
 		MaxAlphas = max( NumAlphas, MaxAlphas );
 		AlphArray.allocate( MaxAlphas );
@@ -369,13 +360,13 @@ namespace ZonePlenum {
 		NumArray.dimension( MaxNums, 0.0 );
 		lAlphaBlanks.dimension( MaxAlphas, true );
 		lNumericBlanks.dimension( MaxNums, true );
-		GetObjectDefMaxArgs( "NodeList", NumArgs, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( "NodeList", NumArgs, NumAlphas, NumNums );
 		NodeNums.dimension( NumArgs, 0 );
 
 		InducedNodeListName = "";
 
-		NumZoneReturnPlenums = GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" );
-		NumZoneSupplyPlenums = GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" );
+		NumZoneReturnPlenums = inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPlenum" );
+		NumZoneSupplyPlenums = inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPlenum" );
 		NumZonePlenums = NumZoneReturnPlenums + NumZoneSupplyPlenums;
 
 		if ( NumZoneReturnPlenums > 0 ) ZoneRetPlenCond.allocate( NumZoneReturnPlenums );
@@ -391,18 +382,12 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
-			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneRetPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another return plenum
-			IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1 );
+			IOStat = UtilityRoutines::FindItemInList( AlphArray( 2 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1 );
 			if ( IOStat != 0 ) {
 				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + '.' );
 				ShowContinueError( "..Only one " + CurrentModuleObject + " object may be connected to a given zone." );
@@ -411,14 +396,17 @@ namespace ZonePlenum {
 			}
 			ZoneRetPlenCond( ZonePlenumNum ).ZoneName = AlphArray( 2 );
 			// put the X-Ref to the zone heat balance data structure
-			ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone );
+			ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphArray( 2 ), Zone );
 			if ( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
+			} else {
+				Zone( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum ).IsReturnPlenum = true;
+				Zone( ZoneRetPlenCond( ZonePlenumNum ).ActualZoneNum ).PlenumCondNum = ZonePlenumNum;
 			}
 			//  Check if this zone is used as a controlled zone
-			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
+			ZoneEquipConfigLoop = UtilityRoutines::FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
 			if ( ZoneEquipConfigLoop != 0 ) {
 				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject );
 				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
@@ -523,19 +511,12 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
-			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName, ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneSupPlenCond( ZonePlenumNum ).ZonePlenumName = AlphArray( 1 );
 
 			// Check if this zone is also used in another plenum
-			IOStat = FindItemInList( AlphArray( 2 ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1 );
+			IOStat = UtilityRoutines::FindItemInList( AlphArray( 2 ), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1 );
 			if ( IOStat != 0 ) {
 				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + '.' );
 				ShowContinueError( "..Only one " + CurrentModuleObject + " object may be connected to a given zone." );
@@ -543,7 +524,7 @@ namespace ZonePlenum {
 				ErrorsFound = true;
 			}
 			if ( NumZoneReturnPlenums > 0 ) { // Check if this zone is also used in another plenum
-				IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName );
+				IOStat = UtilityRoutines::FindItemInList( AlphArray( 2 ), ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName );
 				if ( IOStat != 0 ) {
 					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
 					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone." );
@@ -553,15 +534,18 @@ namespace ZonePlenum {
 			}
 			ZoneSupPlenCond( ZonePlenumNum ).ZoneName = AlphArray( 2 );
 			// put the X-Ref to the zone heat balance data structure
-			ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum = FindItemInList( AlphArray( 2 ), Zone );
+			ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphArray( 2 ), Zone );
 			if ( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( "For " + CurrentModuleObject + " = " + AlphArray( 1 ) + ", " + cAlphaFields( 2 ) + " = " + AlphArray( 2 ) + " not found." );
 				ErrorsFound = true;
 				continue;
+			} else {
+				Zone( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum ).IsSupplyPlenum = true;
+				Zone( ZoneSupPlenCond( ZonePlenumNum ).ActualZoneNum ).PlenumCondNum = ZonePlenumNum;
 			}
 			//  Check if this zone is used as a controlled zone
 			if ( std::any_of( ZoneEquipConfig.begin(), ZoneEquipConfig.end(), []( EquipConfiguration const & e ){ return e.IsControlled; } ) ) {
-				ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
+				ZoneEquipConfigLoop = UtilityRoutines::FindItemInList( AlphArray( 2 ), ZoneEquipConfig, &EquipConfiguration::ZoneName );
 				if ( ZoneEquipConfigLoop != 0 ) {
 					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
 					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
@@ -571,7 +555,7 @@ namespace ZonePlenum {
 			// Check if this is also used as a return plenum
 			//  *** This next IF loop looks wrong.  Sent e-mail to Peter/Brent 8/14/08 for clarification ****
 			//      IF (NumZoneReturnPlenums > 0) THEN
-			//        IOSTAT=FindItemInList(AlphArray(1),ZoneRetPlenCond%ZoneName,NumZoneReturnPlenums)
+			//        IOSTAT=UtilityRoutines::FindItemInList(AlphArray(1),ZoneRetPlenCond%ZoneName,NumZoneReturnPlenums)
 			//        IF (IOStat /= 0) THEN
 			//          CALL ShowSevereError(RoutineName//'Plenum "'//TRIM(AlphArray(2))//  &
 			//                               '" is a controlled zone.  It cannot be used as a '//  &
@@ -721,14 +705,17 @@ namespace ZonePlenum {
 						// Loop through ZoneEquipConfig's and look for return air node value = InletNode
 						for ( ZoneEquipConfigLoop = 1; ZoneEquipConfigLoop <= NumOfZones; ++ZoneEquipConfigLoop ) {
 							if ( ! ZoneEquipConfig( ZoneEquipConfigLoop ).IsControlled ) continue;
-							if ( ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnAirNode == InletNode ) {
-								ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnZonePlenumCondNum = ZonePlenumLoop;
-								ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) = ZoneEquipConfigLoop;
+							for ( int retNode = 1; retNode <= ZoneEquipConfig( ZoneEquipConfigLoop ).NumReturnNodes; ++retNode ) {
+								if ( ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnNode( retNode ) == InletNode ) {
+									ZoneEquipConfig( ZoneEquipConfigLoop ).ReturnNodePlenumNum = ZonePlenumLoop;
+									ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) = ZoneEquipConfigLoop;
+								}
 							}
 						}
 						// count the ADUs that can leak to this plenum
 						for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
 							if ( AirDistUnit( ADUNum ).ZoneEqNum == ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) ) {
+								AirDistUnit( ADUNum ).RetPlenumNum = ZonePlenumLoop;
 								++NumADUsToPlen;
 							}
 						}
@@ -738,14 +725,26 @@ namespace ZonePlenum {
 				ZoneRetPlenCond( ZonePlenumLoop ).NumADUs = NumADUsToPlen;
 				// fill the list of air distribution units that can leak to this plenum
 				if ( NumADUsToPlen > 0 ) {
-					for ( InletNodeLoop = 1; InletNodeLoop <= ZoneRetPlenCond( ZonePlenumLoop ).NumInletNodes; ++InletNodeLoop ) {
-						for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
-							if ( AirDistUnit( ADUNum ).ZoneEqNum == ZoneRetPlenCond( ZonePlenumLoop ).ZoneEqNum( InletNodeLoop ) ) {
-								++ADUsToPlenIndex;
-								ZoneRetPlenCond( ZonePlenumLoop ).ADUIndex( ADUsToPlenIndex ) = ADUNum;
-							}
+					for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+						if ( AirDistUnit( ADUNum ).RetPlenumNum == ZonePlenumLoop ) {
+							++ADUsToPlenIndex;
+							ZoneRetPlenCond( ZonePlenumLoop ).ADUIndex( ADUsToPlenIndex ) = ADUNum;
 						}
 					}
+				}
+			}
+
+
+			// Check that all ADUs with leakage found a return plenum
+			for ( ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum ) {
+				auto & thisADU( AirDistUnit( ADUNum ) );
+				if ( ( thisADU.DownStreamLeak || thisADU.DownStreamLeak ) &&  ( thisADU.RetPlenumNum == 0 ) ) {
+					ShowWarningError( "No return plenum found for simple duct leakage for ZoneHVAC:AirDistributionUnit=" + thisADU.Name + " in Zone=" + ZoneEquipConfig( thisADU.ZoneEqNum ).ZoneName );
+					ShowContinueError( "Leakage will be ignored for this ADU." );
+					thisADU.UpStreamLeak = false;
+					thisADU.DownStreamLeak = false;
+					thisADU.UpStreamLeakFrac = 0.0;
+					thisADU.DownStreamLeakFrac = 0.0;
 				}
 			}
 
@@ -766,6 +765,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneRetPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			InitAirZoneReturnPlenumEnvrnFlag = false;
@@ -881,6 +890,16 @@ namespace ZonePlenum {
 				Node( ZoneNodeNum ).HumRat = OutHumRat;
 				Node( ZoneNodeNum ).Enthalpy = PsyHFnTdbW( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat );
 
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneTemp = 20.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).ZoneEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletTemp = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletHumRat = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletEnthalpy = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletPressure = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRate = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMaxAvail = 0.0;
+				ZoneSupPlenCond( PlenumZoneNum ).InletMassFlowRateMinAvail = 0.0;
 			}
 
 			MyEnvrnFlag = false;

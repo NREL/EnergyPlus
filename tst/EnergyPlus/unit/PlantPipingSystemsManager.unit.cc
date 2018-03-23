@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -52,8 +53,10 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "EnergyPlus/DataSurfaces.hh"
 #include "EnergyPlus/HeatBalanceManager.hh"
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include "EnergyPlus/PlantPipingSystemsManager.hh"
 #include "EnergyPlus/SurfaceGeometry.hh"
+#include "EnergyPlus/DataPlant.hh"
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
@@ -112,7 +115,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs ) {
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -183,7 +186,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName ) {
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -254,7 +257,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation ) {
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -325,7 +328,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName 
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -396,7 +399,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -467,7 +470,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialN
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -538,7 +541,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSe
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -609,7 +612,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationW
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -680,7 +683,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection 
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -751,7 +754,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNa
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -822,7 +825,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth ) {
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -893,7 +896,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -964,7 +967,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs ) 
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1035,7 +1038,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName ) {
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1106,7 +1109,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelec
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1177,7 +1180,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMater
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1248,7 +1251,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExten
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1319,7 +1322,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1390,7 +1393,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1461,7 +1464,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelect
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1532,7 +1535,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName )
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1603,7 +1606,7 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelec
 			"0.65;			!- Visible Absorptance",
 		});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	// Dummy surface
 	Surface.allocate( 1 );
@@ -1621,4 +1624,177 @@ TEST_F( EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelec
 	ReadBasementInputs( 1, 1, errorsFound );
 
 	EXPECT_TRUE( errorsFound );
+}
+
+TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
+
+	std::string const idf_objects = delimited_string({
+		"Site:GroundDomain:Basement,",
+			"CoupledBasement,	!- Name",
+			"5,				!- Ground Domain Depth {m}",
+			"1,				!- Aspect Ratio",
+			"5,				!- Domain Perimeter Offset {m}",
+			"1.8,			!- Soil Thermal Conductivity {W/m-K}",
+			"3200,			!- Soil Density {kg/m3}",
+			"836,			!- Soil Specific Heat {J/kg-K}",
+			"30,			!- Soil Moisture Content Volume Fraction {percent}",
+			"50,			!- Soil Moisture Content Volume Fraction at Saturation {percent}",
+			"Site:GroundTemperature:Undisturbed:KusudaAchenbach,	!- Type of Undisturbed Ground Temperature Model",
+			"KATemps,		!- Name of Undisturbed Ground Temperature Model",
+			"1,				!- Evapotranspiration Ground Cover Parameter",
+			"GroundCoupledOSCM,		!- Name of Basement Floor Boundary Condition Model",
+			"Yes,					!- Basement Horizontal Underfloor Insulation Present (Yes/No)",
+			"Dummy Material,		!- Basement Horizontal Insulation Underfloor Material Name",
+			"Perimeter,				!- Full Horizontal or Perimeter Only (Full/Perimeter)",
+			"1,						!- Perimeter width (m)",
+			"2.5,					!- Depth of Basement Wall In Ground Domain {m}",
+			"GroundCoupledOSCM,		!- Name of Basement Floor Boundary Condition Model",
+			"Yes,					!- Basement Wall Vertical Insulation Present(Yes/No)",
+			"Dummy Material,		!- Basement Wall Vertical Insulation Material Name",
+			"2.3,					!- Vertical insulation depth from surface (m)",
+			"timestep;				!- Domain Update interval. (Timestep, Hourly)",
+		"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+			"KATemps,		!- Name of object",
+			"1.8,			!- Soil Thermal Conductivity {W/m-K}",
+			"3200,			!- Soil Density {kg/m3}",
+			"836,			!- Soil Specific Heat {J/kg-K}",
+			"15.5,			!- Annual average surface temperature {C}",
+			"12.8,			!- Annual amplitude of surface temperature {delta C}",
+			"17.3;			!- Phase shift of minimum surface temperature {days}",
+		"SurfaceProperty:OtherSideConditionsModel,",
+			"GroundCoupledOSCM,		!- Name",
+			"GroundCoupledSurface;	!- Type of Modeling",
+		"Material,",
+			"Dummy Material, !- Name",
+			"MediumRough,	!- Roughness",
+			"0.1397,		!- Thickness {m}",
+			"1.8,			!- Conductivity {W/m-K}",
+			"2400,			!- Density {kg/m3}",
+			"750,			!- Specific Heat {J/kg-K}",
+			"0.9,			!- Thermal Absorptance",
+			"0.65,			!- Solar Absorptance",
+			"0.65;			!- Visible Absorptance",
+
+		"  PipingSystem:Underground:Domain,",
+		"    My Piping System,        !- Name",
+		"    4,                       !- Xmax {m}",
+		"    2.5,                     !- Ymax {m}",
+		"    75,                      !- Zmax {m}",
+		"    2,                       !- X-Direction Mesh Density Parameter",
+		"    Uniform,                 !- X-Direction Mesh Type",
+		"    ,                        !- X-Direction Geometric Coefficient",
+		"    2,                       !- Y-Direction Mesh Density Parameter",
+		"    Uniform,                 !- Y-Direction Mesh Type",
+		"    ,                        !- Y-Direction Geometric Coefficient",
+		"    6,                       !- Z-Direction Mesh Density Parameter",
+		"    Uniform,                 !- Z-Direction Mesh Type",
+		"    ,                        !- Z-Direction Geometric Coefficient",
+		"    1.08,                    !- Soil Thermal Conductivity {W/m-K}",
+		"    962,                     !- Soil Density {kg/m3}",
+		"    2576,                    !- Soil Specific Heat {J/kg-K}",
+		"    30,                      !- Soil Moisture Content Volume Fraction {percent}",
+		"    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}",
+		"    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+		"    KATemps,                 !- Undisturbed Ground Temperature Model Name",
+		"    No,                      !- This Domain Includes Basement Surface Interaction",
+		"    ,                        !- Width of Basement Floor in Ground Domain {m}",
+		"    ,                        !- Depth of Basement Wall In Ground Domain {m}",
+		"    ,                        !- Shift Pipe X Coordinates By Basement Width",
+		"    ,                        !- Name of Basement Wall Boundary Condition Model",
+		"    ,                        !- Name of Basement Floor Boundary Condition Model",
+		"    0.005,                   !- Convergence Criterion for the Outer Cartesian Domain Iteration Loop {deltaC}",
+		"    100,                     !- Maximum Iterations in the Outer Cartesian Domain Iteration Loop",
+		"    0.408,                   !- Evapotranspiration Ground Cover Parameter",
+		"    1,                       !- Number of Pipe Circuits Entered for this Domain",
+		"    My Pipe Circuit;         !- Pipe Circuit 1",
+
+		"  PipingSystem:Underground:PipeCircuit,",
+		"    My Pipe Circuit,         !- Name",
+		"    0.3895,                  !- Pipe Thermal Conductivity {W/m-K}",
+		"    641,                     !- Pipe Density {kg/m3}",
+		"    2405,                    !- Pipe Specific Heat {J/kg-K}",
+		"    0.016,                   !- Pipe Inner Diameter {m}",
+		"    0.02667,                 !- Pipe Outer Diameter {m}",
+		"    0.004,                   !- Design Flow Rate {m3/s}",
+		"    Plant Supply Intermediate Node,  !- Circuit Inlet Node",
+		"    Plant Supply Outlet Node,!- Circuit Outlet Node",
+		"    0.001,                   !- Convergence Criterion for the Inner Radial Iteration Loop {deltaC}",
+		"    100,                     !- Maximum Iterations in the Inner Radial Iteration Loop",
+		"    2,                       !- Number of Soil Nodes in the Inner Radial Near Pipe Mesh Region",
+		"    0.03,                    !- Radial Thickness of Inner Radial Near Pipe Mesh Region",
+		"    2,                       !- Number of Pipe Segments Entered for this Pipe Circuit",
+		"    Segment 1,               !- Pipe Segment 1",
+		"    Segment 2;               !- Pipe Segment 2",
+
+		"  PipingSystem:Underground:PipeSegment,",
+		"    Segment 1,               !- Name",
+		"    1.95,                    !- X Position {m}",
+		"    1.25,                    !- Y Position {m}",
+		"    IncreasingZ;             !- Flow Direction",
+
+		"  PipingSystem:Underground:PipeSegment,",
+		"    Segment 2,               !- Name",
+		"    2.05,                    !- X Position {m}",
+		"    1.25,                    !- Y Position {m}",
+		"    DecreasingZ;             !- Flow Direction"
+	});
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	// Setup the plant itself manually
+	DataPlant::TotNumLoops = 1;
+	DataPlant::PlantLoop.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide.allocate(2);
+	DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+	DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+	DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
+	DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+
+	// Dummy surface
+	DataSurfaces::TotSurfaces = 1;
+	Surface.allocate( 1 );
+	Surface( 1 ).OSCMPtr = 1;
+	Surface( 1 ).Area = 100;
+	HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+
+	// Other necessary inputs
+	bool errorsFound = false;
+	GetOSCMData( errorsFound );
+	GetMaterialData( errorsFound );
+
+	int compIndex = 0;
+	bool firstHVAC = true; // not used
+
+	// first call, set initLoopEquip to true; it will only call GetInput
+	bool initLoopEquip = true;
+	PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
+
+	EXPECT_EQ(2u, PlantPipingSystemsManager::PipingSystemDomains.size());
+
+	EXPECT_TRUE(PlantPipingSystemsManager::PipingSystemDomains(1).HasAPipeCircuit);
+	EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.X.RegionMeshCount);
+	EXPECT_EQ(2, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Y.RegionMeshCount);
+	EXPECT_EQ(6, PlantPipingSystemsManager::PipingSystemDomains(1).Mesh.Z.RegionMeshCount);
+
+	EXPECT_FALSE(PlantPipingSystemsManager::PipingSystemDomains(2).HasAPipeCircuit);
+	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.X.RegionMeshCount);
+	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Y.RegionMeshCount);
+	EXPECT_EQ(4, PlantPipingSystemsManager::PipingSystemDomains(2).Mesh.Z.RegionMeshCount);
+
+	// second call, turn off initLoopEquip so it tries to do a simulation
+	initLoopEquip = false;
+	PlantPipingSystemsManager::SimPipingSystemCircuit("MY PIPE CIRCUIT", compIndex, firstHVAC, initLoopEquip);
+
+	// we can also try to call from the Domain side
+	DataGlobals::BeginSimFlag = true;
+	DataGlobals::BeginEnvrnFlag = true;
+	PlantPipingSystemsManager::SimulateGroundDomains(false);
+
 }

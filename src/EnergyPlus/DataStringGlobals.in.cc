@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -135,11 +136,13 @@ namespace DataStringGlobals {
 	std::string outputTblTabFileName("eplustbl.tab");
 	std::string outputTblTxtFileName("eplustbl.txt");
 	std::string outputTblXmlFileName("eplustbl.xml");
-	std::string inputIdfFileName;
+	std::string inputFileName;
 	std::string inputIddFileName;
+	std::string inputEpJSONSchemaFileName;
 	std::string inputWeatherFileName;
 	std::string outputAdsFileName("eplusADS.out");
 	std::string outputDfsFileName("eplusout.dfs");
+	std::string outputGLHEFileName("eplusout.glhe");
 	std::string outputDelightInFileName("eplusout.delightin");
 	std::string outputDelightOutFileName("eplusout.delightout");
 	std::string outputDelightEldmpFileName("eplusout.delighteldmp");
@@ -174,6 +177,9 @@ namespace DataStringGlobals {
 	std::string idfFileNameOnly;
 	std::string idfDirPathName;
 	std::string outDirPathName;
+	std::string inputFileNameOnly;
+	std::string inputDirPathName;
+	std::string outputDirPathName;
 	std::string exeDirectory;
 
 	std::string ProgramPath; // Path for Program from INI file

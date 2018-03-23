@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -69,6 +70,7 @@
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -1040,6 +1042,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone2Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
 		"    Zone2UnitHeat,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1097,7 +1100,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		"    32.2,                    !- Rated Outlet Air Temperature {C}",
 		"    ;                        !- Rated Ratio for Air and Water Convection",
 	} );
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 		MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
@@ -1120,17 +1123,6 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		createFacilityElectricPowerServiceObject();
 		SizingManager::ManageSizing();
 
-		ErrorsFound = false;
-		GetWaterCoilInput();
-		EXPECT_FALSE( ErrorsFound );
-		GetWaterCoilsInputFlag = false;
-
-		ErrorsFound = false;
-		GetFanInput();
-		EXPECT_FALSE( ErrorsFound );
-
-		ErrorsFound = false;
-		GetUnitHeaterInput(); // get unit heaters data
 		EXPECT_FALSE( ErrorsFound );
 		EXPECT_EQ( 1, NumOfUnitHeats );
 		EXPECT_EQ( "ZONE2UNITHEAT", UnitHeat( 1 ).Name );
@@ -1142,7 +1134,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		InitUnitHeater( UnitHeatNum, ZoneNum, FirstHVACIteration );
 		InitWaterCoil( CoilNum, FirstHVACIteration ); // init hot water heating coil
 
-		PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
+		PltSizHeatNum = PlantUtilities::MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
 		EXPECT_FALSE( ErrorsFound );
 
 		HWMaxVolFlowRate = WaterCoils::WaterCoil( CoilNum ).MaxWaterVolFlowRate;
@@ -1214,6 +1206,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Zone2Equipment,          !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type",
 		"    Zone2UnitHeat,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1271,7 +1264,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 		"    32.2,                    !- Rated Outlet Air Temperature {C}",
 		"    ;                        !- Rated Ratio for Air and Water Convection",
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
 	MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
@@ -1378,7 +1371,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 
 	std::string const idf_objects = delimited_string( {
-		"Version,8.8;",
+		"Version,8.9;",
 
 		"Timestep,1;",
 
@@ -1846,6 +1839,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"    Main Zone Equipment,     !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Main Zone ATU,           !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2412,7 +2406,7 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 		"    Chilled Water Loop Outside Air Sensor,  !- Name",
 		"    -1;                      !- Height Above Ground {m}",
 	} );
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;

@@ -526,7 +526,7 @@ A unique user assigned name for an instance of a Fan Coil unit. Any reference to
 
 The name of the schedule (ref: Schedule) that denotes whether the fan coil unit can run during a given time period. A schedule value greater than 0 (usually 1 is used) indicates that the component can be on during the time period. A value less than or equal to 0 (usually 0 is used) denotes that the component must be off for the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-\textbf{\emph{Field: Capacity Control~Method}}
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
 
 This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{ConstantFanVariableFlow}}, \textbf{\emph{CyclingFan}}, \textbf{\emph{VariableFanVariableFlow}}, \textbf{\emph{VariableFanConstantFlow}}, \textbf{\emph{MultiSpeedFan}}, or \textbf{\emph{ASHRAE90VariableFan}}. For \emph{ConstantFanVariableFlow}, the fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. For \emph{CyclingFan}, the fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load. For \emph{VariableFanVariableFlow} ~both air and water flow rates are varied to match the load. For \emph{VariableFanConstantFlow,} the water flow rate is at full flow and the fan speed varies to meet the load. For \emph{MultiSpeedFan} the water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load. For \emph{ASHRAE90VariableFan}, the fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. The water coil water flow rate, or the electric heating coil part-load ratio, is modulated to meet the zone load. If the zone sensible load is greater than the zone sensible load multiplied by the low speed supply air flow ratio, then the air and water flow rate is increased to meet the load. If the zone load is greater than the design sensible load, the fan air flow rate is maintained at the maximum value while the water flow rate is further increased to the maximum available while electric heating coils are maintained at the maximum output.
 
@@ -1470,7 +1470,7 @@ This alpha input field defines the user-defined name of the fan used by this coo
 
 \paragraph{Field: Design Supply Air Flow Rate {[}m\(^{3}\)/s{]}}\label{field-design-supply-air-flow-rate-m3s}
 
-This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value is typically consistent with the maximum air flow rate of the fan, but it can be less if desired.
+This numeric input field defines the evaporative cooler unit's design supply air flow rate, in cubic meters per second.~ This value must be less than or equal to the maximum air flow rate of the fan.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-001}
 
@@ -1616,7 +1616,7 @@ The zone outdoor air unit (ZoneHVAC:OutdoorAirUnit) in EnergyPlus is intended to
 \caption{Zone Outdoor Air Unit Schematic \protect \label{fig:zone-outdoor-air-unit-schematic}}
 \end{figure}
 
-Zones may contain one or more zone outdoor air units.~ The user can choose to have each unit have its own exhaust fan or may choose to have only one unit have a exhaust fan that will handle the flow of all of the zone outdoor air units.~ Note that the user will need to account for any flow balance among the zone outdoor air units on the supply and exhaust sides.
+When an AirloopHVAC serves the same zone, it is strongly recommended that the outdoor and exhaust air flow rates are balanced. In addition, the exhaust airflow rate and air schedule should be the same as outdoor air flow rate and outdoor air schedule, respectively. Otherwise, possible unbalanced flows will cause improper return airflow unless ZoneAirMassFlowConservation is active.  
 
 The full input for zone outdoor air units is described below using a variety of fields.
 
@@ -2242,6 +2242,19 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 
 This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner~ zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-2}
+
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel and Coil:Heating:Electric. If alternate coil types are used they are modeled using the load based control method. 
+
+\paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-2}
+
+When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
+\paragraph{Field: Maximum Supply Air Temperature in Heating Mode}\label{field-maximum-supply-air-temperature-in-heating-mode-2}
+
+When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
+
 As shown in the example below, correct specification of the packaged terminal air conditioner requires the following objects in addition to the compound object itself:
 
 \begin{enumerate}
@@ -2614,6 +2627,19 @@ This optional input field is the name of an AvailabilityManagerAssignmentList ob
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-7}
 
 This optional input field is the name of a DesignSpecification:ZoneHVAC:Sizing object. The name must correspond to unique name of a DesignSpecification:ZoneHVAC:Sizing object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+
+\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-3}
+
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is Coil:Cooling:DX:SingleSpeed while the heating coil type is Coil:Heating:DX:SingleSpeed.
+
+\paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-3}
+
+When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
+\paragraph{Field: Maximum Supply Air Temperature in Heating Mode}\label{field-maximum-supply-air-temperature-in-heating-mode-3}
+
+When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+
 
 As shown in the example below, correct specification of the packaged terminal heat pump requires the following objects in addition to the compound object itself:
 
@@ -4118,3 +4144,442 @@ This output field is the electricity consumption of the zone terminal unit in Jo
 \paragraph{Zone VRF Air Terminal Fan Availability Status {[]}}\label{zone-vrf-air-terminal-fan-availability-status}
 
 This is the availability status of the Zone Terminal Unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the Zone Terminal Unit object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
+
+\subsection{ZoneHVAC:HybridUnitaryHVAC}
+
+ZoneHVAC:Hybrid UnitaryHVAC is a black-box model for packaged forced air equipment with multiple discrete operating modes. Generally, a ''hybrid`` is any system that exhibits both continuous and discrete dynamic behavior – a system that can both flow (as could be described by a differential equation) and jump (as must be described by distinct modes). Equipment in this category may utilize a wide variety technologies including, but not limited to: indirect evaporative cooling, desiccant dehumidification, heat recovery, vapor compression, adsorption, or ventilation cooling. Each hybrid system packages multiple technologies into a single integrated system. There are a multitude of unique hybrid system architectures, and each unique system may have numerous unique operating modes.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/hybrid001.jpg}
+\caption{Schematic of object links for ZoneHVAC:HybridUnitaryHVAC \protect \label{fig:hybrid001}}
+\end{figure}
+
+ZoneHVAC:HybridUnitaryHVAC is a black-box model designed to allow empirical representation of a wide variety of hybrid unitary systems. The model does not require information about internal system architecture, however it requires extensive data to describe the performance of a product in every operating mode. The model is intended for packed forced air equipment and can represent unitary systems that consume electricity, water, and up to two additional fuel types.
+
+Uncontrolled independent variables include outdoor and indoor air temperature and humidity ratio. Controlled independent variables include: operating mode, supply air flow rate, outdoor air fraction, and part runtime fraction. Dependent variables include supply air temperature, supply air humidity, electricity use, fuel uses, water use, fan electricity use, and external static pressure. Empirical data tables (see Table:MultiVariableLookup) are required to map each dependent variable in each discrete operating mode. The model can accommodate up to 26 discrete operating modes, including a standby mode. Each mode is limited to operate within independently specified ranges of indoor and outdoor psychrometric conditions.  The standby mode is not limited by either indoor or outdoor psychrometric conditions.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/hybrid002.jpg}
+\caption{Schematic explanation of the architecture and function of ZoneHVAC:HybridUnitaryHVAC \protect \label{fig:hybrid002}}
+\end{figure}
+
+ZoneHVAC:HybridUnitaryHVAC is structured as a constrained optimization problem – in each time step the model will choose one or more combinations of the controlled independent variables so as to best provide the predicted sensible load, the predicted latent load, and the scheduled zone ventilation requirement, with the least amount of resource consumption.
+
+A setting is defined as any unique combination of mode, outdoor air fraction, and supply air flow rate. The system may operate with multiple settings in each time step. The portion of each time step spent in a setting is described as the part runtime fraction for that setting. During any time step that the combination of settings can satisfy all of the soft constraints with part runtime fractions that sum to less than one, the system will operate in a standby mode (Mode 0) for the remainder of the timestep. If no combination of settings will satisfy all of  the soft constraints the system will choose the combination of settings that most nearly satisfies all soft constraints. If the indoor and outdoor psychrometric conditions are beyond the constraints that limit each operating mode, or if no setting will satisfy all constraints on supply air temperature and absolute humidity, the system will operate in standby mode (Mode 0).
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}
+
+This alpha input field specifies a unique user-assigned name for one ZoneHVAC:HybridUnitaryHVAC unit. Any reference to this unit by another object will use this name. The name must be specified in a ZoneHVAC:EquipmentList object to connect this unit to a zone. 
+
+\paragraph{Field: Availability Schedule Name}
+This alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies when the ZoneHVAC:HybridUnitaryHVAC unit can operate. A schedule value greater than 0 means the unit can be available. A schedule value equal to zero means the unit cannot operate. Availability of the unit is governed by the availability schedule and by availability managers. The availability schedule may be used to completely disable the unit.  If this field is blank, the unit can always be available. If the unit is available but there is no sensible load, no latent load, and no need for ventilation, the unit will operate in a standby mode (mode 0). 
+
+\paragraph{Field: Availability Manager List Name}
+This optional alpha input field is the name of an AvailabilityManagerAssignmentList object.
+(ref: Group - Air Distribution, AvailabilityManagerAssignmentList, and Group - System Availability Managers). Availability of the unit is governed by the availability schedule and by availability managers specified in the list named here. If the unit is available but there is no sensible load, no latent load, and no need for ventilation, the unit will operate in a standby mode (mode 0).
+
+\paragraph{Field: Minimum Supply Air Temperature Schedule Name}
+This optional alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies the minimum supply air temperature allowed in each time step. Values in this schedule are used as a constraint in choosing the feasible settings for supply air flow rate and outdoor air fraction in each operating mode. If this field is blank, no minimum is imposed.
+
+\paragraph{Field: Maximum Supply Air Temperature Schedule Name}
+This optional alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies the maximum supply air temperature allowed in each time step. Values in this schedule are used as a constraint in choosing the feasible settings for supply air flow rate and outdoor air fraction in each operating mode. If this field is blank, no maximum is imposed.
+
+\paragraph{Field: Minimum Supply Air Humidity Ratio Schedule Name}
+This optional alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies the minimum supply air humidity ratio allowed in each time step. Values in this schedule are used as a constraint in choosing the feasible settings for supply air flow rate and outdoor air fraction in each operating mode. If this field is blank, no minimum is imposed.
+
+\paragraph{Field: Maximum Supply Air Humidity Ratio Schedule Name}
+This optional alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies the maximum supply air humidity raio allowed in each time step. Values in this schedule are used as a constraint in choosing the feasible settings for supply air flow rate and outdoor air fraction in each operating mode. If this field is blank, no maximum is imposed.
+
+\paragraph{Field: Method to Choose Controlled Inputs and Part Runtime Fraction}
+This alpha input field specifies the method that will be used to choose operating mode(s), supply air flow rate(s), outdoor air fraction(s) and part runtime fraction(s) in each time step. The only valid choices are ''Automatic`` and ''User Defined``, ''Automatic`` chooses the controlled independent variables to minimize resource use within each time step, subject to constraints, while best satisfying zone sensible loads, latent loads, and the scheduled ventilation rate. ''User Defined`` indicates that the user will provide a custom control sequence, using Energy Management System objects or other means, to choose the controlled independent variables and determine system outputs in each time step.
+
+\paragraph{Field: Return Air Node Name}
+This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws return air. This node name must also be specified as a zone return air node in a ZoneHVAC:EquipmentConnections object. It may also be included in NodeList object that is specified as a zone return air node in a ZoneHVAC:EquipmentConnections object. (Ref. Group - Zone Equipment ZoneHVAC:EquipmentConnections and Group - Node-Branch Management NodeList).
+
+\paragraph{Field: Outdoor Air Node Name}
+This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws outdoor air. This node name must also be specified in an OutdoorAir:Node or OutdoorAir:NodeList object. If this field is blank, a node name will be created internally. (Ref. Group - Node-Branch Management OutdoorAir:Node and OutdoorAir:NodeList).
+
+\paragraph{Field: Supply Air Node Name}
+This alpha input field specifies the name of the HVAC system node to which the hybrid unit sends supply air. This node name must also be specified as zone inlet node in a ZoneHVAC:EquipmentConnections object. It may also be included in NodeList object that is specified as a zone inlet node in a ZoneHVAC:EquipmentConnections object. (Ref. Group - Zone Equipment ZoneHVAC:EquipmentConnections and Group - Node-Branch Management NodeList).
+
+\paragraph{Field: Relief Node Name}
+This optional alpha input field specifies the name of an HVAC system node which can extract air from the zone to balance the air supplied to the zone by the unit. This node name would match the name of a zone exhaust air node.
+
+\paragraph{Field: System Maximum Supply Air Volume Flow Rate}
+This numeric input field specifies the maximum standard density supply air volume flow rate among all operating modes. The field allows custom resizing of the hybrid unit. The values specified in each Table:MultiVariableLookup object associated with a hybrid unit represent performance data for a specific product of a particular size, but the value output from each Table:MultiVariableLookup object is augmented by a normalization reference (Ref: Group - Performance Tables Table:MultiVariableLookup). The normalization reference specified for all Table:MultiVariableLookup objects associated with a hybrid unit should be the maximum supply air mass flow rate for the real hybrid unit that was used to create the performance data included in each table object. The value in this field is used to rescale the normalized values output from tables for extensive dependent variables. If the standard density supply air volume flow rate input to this field is equivalent to the system maximum supply air mass flow rate used as the normalization reference – given appropriate unit conversions – then the resulting output from the model will exactly match the original performance data specified in each table. If the value in this field is larger or smaller, the values for extensive dependent variables will be scaled proportionally. The values of intensive dependent variables are rescaled by the normalization reference value, so will always match the original performance data specified in each table object. The value in this field should be specified as standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20ºC drybulb, and 101,325 Pa.
+
+\paragraph{Field: External Static Pressure at System Maximum Supply Air Flow Rate}
+This optional numeric input field specifies the external static pressure at the system maximum supply air flow rate specified in the previous field. Fan affinity laws are used to scale supply fan power from the scenario used to create the performance data included in each Table:MultiVariableLookup object, to a scenario that corresponds to the value specified in this field. The result is also used to adjust the system electric power accordingly. If this field is blank, the supply fan power is not scaled from the values specified in lookup tables.
+
+\paragraph{Field: Scaling Factor}
+This optional numeric field  scales all extensive dependent variables including: supply air mass flow rate, electricity use, fuel uses, and water use. The value in this field acts together with the value in field System Maximum Standard Density Supply Air Volume Flow Rate to allow custom resizing of the hybrid unit.
+
+\paragraph{Field: Number of Operating Modes}
+This numeric field specifies the number of discrete operating modes for the hybrid unit. Supply air mass flow rate ratio and outdoor air fraction are treated as continuous controlled independent variables within each discrete operating mode. All other independent parameters, such as compressor speed, must be described by discrete operating modes.  Mode 0 always describes standby operation. Mode 1 - Mode 25 describe active operating modes that provide ventilation, heating, cooling, humidification or dehumidification. 26 modes are allowed (including Mode 0). If the value input to this field is 1, only Mode 0 will be considered when the model choses setting to satisfy sensible loads, latent loads, or scheduled ventilation volume. If this field is blank, the default number of operating modes is 1.
+
+\paragraph{Field: Minimum Time Between Mode Change}
+This numeric field specifies the minimum time that must pass before the hybrid unit can change mode. If the value in this field is larger than each timestep, the mode selected in one time step will persist in later time steps until the minimum time between mode change is satisfied. If the value in this field is smaller than each timestep, it will determine the minimum part runtime fraction allowed for any mode. Supply air mass flow rate and outdoor air fraction within a mode are not subject to minimum runtime and may change in every time step, or with any part runtime fraction. Mode 0 does not have a minimum time. If this field is blank, the default minimum time between mode change is 10 minutes.
+
+\paragraph{Field: First Fuel Type}
+This alpha field specifies the fuel type associated with the Table:MultiVariableLookup object specified in field ''System Electric Power Power Lookup Table``. Valid choices include: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, DistrictHeating and DistrictCooling. If this field is blank, the default first fuel type is Electricity.
+
+\paragraph{Field: Second Fuel Type}
+This alpha field specifies the fuel type associated with the Table:MultiVariableLookup object specified in field ''System Second Fuel Consumption Lookup Table``. Valid choices include: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, DistrictHeating and DistrictCooling. If this field is blank, the default second fuel type is None.
+
+\paragraph{Field: Third Fuel Type}
+This alpha field specifies the fuel type associated with the Table:MultiVariableLookup object specified in field ''System Third Fuel Consumption Lookup Table``. Valid choices include: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, DistrictHeating and DistrictCooling. If this field is blank, the default second fuel type is None. 
+
+\paragraph{Field: Objective Function to Minimize}
+In each time step ZoneHVAC:HybridUnitaryHVAC will choose one or more combinations of the controlled independent variables, subject to constraints, so as to best satisfy sensible load, latent load, and scheduled ventilation with the least amount of resource consumption. This alpha field specifies which resource will be minimized by the optimization.  Valid choices include: Electricity Use, Second Fuel Use, Third Fuel Use, and Water Use.  If this field is blank, the objective function will minimize electricity use.
+
+
+\paragraph{Field: Design Specification Outdoor Air Object Name}
+This alpha field specifies the name of a DesignSpecification:OutdoorAir object which specifies the a schedule for the required standard density volume of outdoor air. If this field is blank, the system may still supply outdoor air, if it is capable, when doing so is the most efficient way to satisfy other constraints.
+
+\paragraph{Field: Mode 0 Name}
+This alpha input field specifies a unique user-assigned descriptive name for Mode 0. Mode 0 describes performance when the hybrid unit is in standby. Mode 0 is usually characterized by electricity use for controls and crankcase heaters, or other standby resource consumption. Mode 0 will be chosen for any timestep, or portion of timestep, when the unit is available, but there is no sensible load, latent load, or scheduled ventilation. Mode 0 is not constrained by limits on indoor or outdoor conditions.
+
+\paragraph{Field: Mode 0 Supply Air Temperature Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes supply air temperature for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction.  If this field is blank, Mode 0 will not be considered for any period that requires ventilation, heating, cooling, humidification, or dehumidification. If this field is blank, when Mode 0 is chosen (during standby periods) the supply air temperature will equal the return air temperature.
+
+\paragraph{Field: Mode 0 Supply Air Humidity Ratio Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes supply air humidity ratio for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode 0 will not be considered for any period that requires ventilation, heating, cooling, humidification, or dehumidification. If this field is blank, when Mode 0 is chosen (during standby periods) the supply air humidity ratio will equal the return air humidity ratio.
+
+\paragraph{Field: Mode 0 System Electric Power Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes electric power consumption for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode 0 does not consume electricity.
+
+\paragraph{Field: Mode 0 Supply Fan Electric Power Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes supply fan electric power consumption for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode 0 does not consume electricity for supply fan.
+
+\paragraph{Field: Mode 0 External Static Pressure Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes external static pressure for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, external static pressure will not be reported.
+
+\paragraph{Field: Mode 0 System Second Fuel Consumption Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes second fuel consumption for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode 0 does not consume a second fuel.
+
+\paragraph{Field: Mode 0 System Third Fuel Consumption Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes third fuel consumption for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode 0 does not consume a third fuel.
+
+\paragraph{Field: Mode 0 System Water Use Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes water consumption for Mode 0 as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode 0 does not consume water.
+
+\paragraph{Field: Mode 0 Outdoor Air Fraction}
+This optional numeric input field specifies the outdoor air fraction for Mode 0. Outdoor air fraction is not a controlled independent variable in Mode 0, it must be set to a particular value for all times that Mode 0 operates. Typically Mode 0 would have zero supply air, in which case this value would be irrelevant. If this field is blank, the outdoor air fraction for Mode 0 will be 0.00.
+
+\paragraph{Field: Mode 0 Supply Air Mass Flow Rate Ratio}
+This optional numeric field specifies the supply air mass flow rate ratio for Mode 0. Mass flow rate is not a controlled independent variable in Mode 0, it must be set to a particular value for all times that Mode 0 operates. Supply air mass flow rate ratio describes supply air mass flow rate as a fraction of the mass flow rate associated with the value in field: ''System Maximum Standard Density Supply Air Volume Flow Rate``. If this field is blank, the supply air mass flow rate ratio for Mode 0 will be 0.00.
+
+\paragraph{Field-Set: Mode Definition (extensible object)}
+The definition of each operating mode is given as inputs to 25 fields. The first field specifies a unique name for the mode. The following eight fields specify the names of Table:MultiVariableLookup objects that describe hybrid unit performance parameters. The remaining sixteen fields specify constraints on controlled independent variables, and constraints to describe the indoor and outdoor psychrometric conditions at which the mode is allowed. The definition of operating modes is extensible. To define multiple modes, repeat the following 25 fields with appropriate input values for each mode. The object does not require that modes be defined in a particular order. Up to 25 modes can be defined in this way.
+
+\paragraph{Field: Mode \# Name}
+This alpha input field specifies a unique user-assigned descriptive name for Mode \#.
+
+\paragraph{Field: Mode \# Supply Air Temperature Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes supply air temperature for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# will not be considered for any time step that requires ventilation, heating, cooling, humidification, or dehumidification.
+
+\paragraph{Field: Mode \# Supply Air Humidity Ratio Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes supply air humidity ratio for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# will not be considered for any period that requires ventilation, heating, cooling, humidification, or dehumidification.
+
+\paragraph{Field: Mode \# System Electric Power Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes system electric power consumption for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# does not consume electricity.
+
+\paragraph{Field: Mode \# Supply Fan Electric Power Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes supply fan electric power consumption for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# does not consume electricity for supply fan. 
+
+\paragraph{Field: Mode \# External Static Pressure Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes external static pressure for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, external static pressure will not be reported for Mode \#.
+
+\paragraph{Field: Mode \# System Second Fuel Consumption Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes second fuel consumption for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# does not consume a second fuel.
+
+\paragraph{Field: Mode \# System Third Fuel Consumption Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes third fuel consumption for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# does not consume a third fuel.
+
+\paragraph{Field: Mode \# System Water Use Lookup Table Name}
+This optional alpha input field specifies the name of a Table:MultiVariableLookup object that describes water consumption for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# does not consume water.
+
+\paragraph{Field: Mode \# Minimum Outdoor Air Temperature}
+This optional numeric input field specifies the minimum outdoor air temperature at which Mode \# is allowed. When outdoor air temperature is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the  data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no lower constraint on outdoor air temperature for Mode \#.
+
+\paragraph{Field: Mode \# Maximum Outdoor Air Temperature}
+This optional numeric input field specifies the maximum outdoor air temperature at which Mode \# is allowed. When outdoor air temperature is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the  data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no upper constraint on outdoor air temperature for Mode \#. 
+
+\paragraph{Field: Mode \# Minimum Outdoor Air Humidity Ratio}
+This optional numeric input field specifies the minimum outdoor air humidity ratio at which Mode \# is allowed. When outdoor air humidity ratio is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the  data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no lower constraint on outdoor air humidity ratio for Mode \#.
+
+\paragraph{Field: Mode \# Maximum Outdoor Air Humidity Ratio}
+This optional numeric input field specifies the maximum outdoor air humidity ratio at which Mode \# is allowed. When outdoor air humidity ratio is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no upper constraint on outdoor air humidity ratio for Mode \#.
+
+\paragraph{Field: Mode \# Minimum Outdoor Air Relative Humidity}
+This optional numeric input field specifies the minimum outdoor air relative humidity at which Mode \# is allowed. When outdoor air relative humidity is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the lower constraint on outdoor air relative humidity will be 0.00% for Mode \#.
+
+\paragraph{Field: Mode \# Maximum Outdoor Air Relative Humidity}
+This optional numeric input field specifies the maximum outdoor air relative humidity at which Mode \# is allowed. When outdoor air relative humidity is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the upper constraint on outdoor air relative humidity will be 100% for Mode \#.
+
+\paragraph{Field: Mode \# Minimum Return Air Temperature}
+This optional numeric input field specifies the minimum return air temperature at which Mode \# is allowed. When return air temperature is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond than the extents of the  data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no lower constraint on outdoor air temperature for Mode \#.
+       
+\paragraph{Field: Mode \# Maximum Return Air Temperature}
+This optional numeric input field specifies the maximum return air temperature at which Mode \# is allowed. When return air temperature is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no upper constraint on outdoor air temperature for Mode \#.
+
+\paragraph{Field: Mode \# Minimum Return Air Humidity Ratio}
+This optional numeric input field specifies the minimum return air humidity ratio at which Mode \# mode one is allowed. When return air humidity ratio is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no lower constraint on return air humidity ratio for Mode \#.
+
+\paragraph{Field: Mode \# Maximum Return Air Humidity Ratio}
+This optional numeric input field specifies the maximum return air humidity ratio at which Mode \# is allowed. When return air humidity ratio is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, there will be no upper constraint on return air humidity ratio for Mode \#.
+
+\paragraph{Field: Mode \# Minimum Return Air Relative Humidity}
+This optional numeric input field specifies the minimum return air relative humidity at which Mode \# is allowed. When return air relative humidity is below this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the lower constraint on return air relative humidity will be 0.00% for Mode \#.
+  
+\paragraph{Field: Mode \# Maximum Return Air Relative Humidity}
+This optional numeric input field specifies the maximum return air relative humidity at which Mode \# is allowed. When return air relative humidity is above this value all settings in Mode \# will be excluded from the feasible set. This value may be beyond than the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the upper constraint on return air relative humidity will be 100% for Mode \#
+
+\paragraph{Field: Mode \# Minimum Outdoor Air Fraction}
+This optional numeric input field specifies the minimum outdoor air fraction allowed in Mode \#. Outdoor air fractions below this value will be excluded from the feasible set within Mode \#. This value may be beyond than the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the lower constraint on outdoor air fraction will be 0.00 for Mode \#.
+
+\paragraph{Field: Mode \# Maximum Outdoor Air Fraction}
+This optional numeric input field specifies the maximum outdoor air fraction allowed in Mode \#. Outdoor air fractions above this value will be excluded from the feasible set within Mode \#. This value may be beyond than the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the upper constraint on outdoor air fraction will be 1.00 for Mode \#.
+
+\paragraph{Field: Mode \# Minimum Supply Air Mass Flow Rate Ratio}
+This optional numeric input field specifies the minimum supply air mass flow rate ratio allowed in Mode \#. Supply air mass flow rate ratios below this value will be excluded from the feasible set within Mode \#. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the lower constraint on supply air mass flow rate ratio will be 0.00 for Mode \#.
+
+\paragraph{Field: Mode \# Maximum Supply Air Mass Flow Rate Ratio}
+This optional numeric input field specifies the maximum supply air mass flow rate ratio allowed in Mode \#. Supply air mass flow rate ratios above this value will be excluded from the feasible set within Mode \#. This value may be beyond the extents of the data in Table:MultiVariableLookup objects associated with Mode1, in which case this value sets the limit for extrapolation from the data table. If this field is blank, the upper constraint on supply air mass flow rate ratio will be 1.00 for Mode \#.
+
+\subsubsection{Outputs}
+{\tiny
+\begin{lstlisting}
+HVAC,Average,Zone Hybrid Unitary HVAC System Total Cooling Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC System Total Cooling Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC System Sensible Cooling Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC System Sensible Cooling Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC System Latent Cooling Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC System Latent Cooling Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Total Cooling Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Total Cooling Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Sensible Cooling Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Sensible Cooling Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Latent Cooling Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Latent Cooling Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC System Total Heating Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC System Total Heating Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC System Sensible Heating Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC System Sensible Heating Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC System Latent Heating Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC System Latent Heating Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Total Heating Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Total Heating Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Sensible Heating Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Sensible Heating Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Latent Heating Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Zone Latent Heating Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Predicted Latent Load to Humidistat Setpoint Heat Transfer Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Predicted Moisture Load to Humidistat Setpoint Moisture Transfer Rate [kgWater/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Temperature [C]
+HVAC,Average,Zone Hybrid Unitary HVAC Return Air Temperature [C]
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Temperature [C]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Humidity Ratio [kgWater/kgDryAir]
+HVAC,Average,Zone Hybrid Unitary HVAC Return Air Humidity Ratio [kgWater/kgDryAir]
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Humidity Ratio [kgWater/kgDryAir]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Relative Humidity [%]
+HVAC,Average,Zone Hybrid Unitary HVAC Return Air Relative Humidity [%]
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Relative Humidity [%]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate [m3/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate [m3/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Electric Power [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Electric Energy [J]
+Water use
+Second Fuel Use
+Third Fuel Use
+Supply Fan Electric Power
+External Static Pressure
+HVAC,Average,Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Availability Status []
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Fraction []
+HVAC,Average,Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Moisture Transfer Rate [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Runtime Fraction in Setting 0 []
+HVAC,Average,Zone Hybrid Unitary HVAC Runtime Fraction in Setting 1 []
+HVAC,Average,Zone Hybrid Unitary HVAC Runtime Fraction in Setting 2 []
+HVAC,Average,Zone Hybrid Unitary HVAC Runtime Fraction in Setting 3 []
+HVAC,Average,Zone Hybrid Unitary HVAC Runtime Fraction in Setting 4 []
+HVAC,Average,Zone Hybrid Unitary HVAC Mode in Setting 0 []
+HVAC,Average,Zone Hybrid Unitary HVAC Mode in Setting 1 []
+HVAC,Average,Zone Hybrid Unitary HVAC Mode in Setting 2 []
+HVAC,Average,Zone Hybrid Unitary HVAC Mode in Setting 3 []
+HVAC,Average,Zone Hybrid Unitary HVAC Mode in Setting 4 []
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting 0 []
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting 1 []
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting 2 []
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting 3 []
+HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting 4 []
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting 0 [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting 1 [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting 2 [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting 3 [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting 4 [kg/s]
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting 0 []
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting 1 []
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting 2 []
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting 3 []
+HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting 4 []
+\end{lstlisting}
+}
+
+\paragraph{Zone Hybrid Unitary HVAC System Total Cooling Rate [W]}
+This output reports the rate at which enthalpy is removed by the system. It is calculated as the difference between the enthalpy of the mixture of return air and outdoor air and the enthalpy of the supply air. This output is positive when enthalpy is removed by the system, otherwise it is zero. This output is an  average rate over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC System Total Cooling Energy [J]}
+This output reports the amount of enthalpy removed by the system. It is calculated as the difference between the enthalpy of the mixture of return air and outdoor air, and the enthalpy of the supply air.  This output is positive when enthalpy is removed by the system, otherwise the output is zero.  This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC System Sensible Cooling Rate [W]}
+This output reports the rate at which sensible heat is removed by the system.  It is calculated as the difference between the enthalpy of dry air at the temperature of the mixture of return air and outdoor air, and the enthalpy of dry air at the temperature of the supply air. This output is positive when sensible heat is removed by the system, otherwise it is zero.  This output is an average rate over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC System Sensible Cooling Energy [J]}
+This output reports the amount of sensible heat removed by the system.  It is calculated as the difference between the enthalpy of dry air at the temperature of the mixture of return air and outdoor air, and the enthalpy of dry air at the temperature of the supply air. This output is positive when sensible heat is removed by the system, otherwise it is zero. This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC System Latent Cooling Rate [W]}
+This output reports the rate at which latent heat is removed by the system.  It is calculated as the enthalpy difference associated with the difference between absolute humidity of the mixture of return air and outdoor air, and the absolute humidity of the supply air. This is the phase change energy associated with moisture removed by the system. This output is positive when latent heat is removed by the system, otherwise it is zero.  This output is an average rate over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC System Latent Cooling Energy [J]}
+This output reports the amount of latent heat removed by the system.  It is calculated as the enthalpy difference associated with the difference between absolute humidity of the mixture of return air and outdoor air, and the absolute humidity of the supply air.  This is the phase change energy associated with moisture removed by the system. This output is positive when latent heat is removed by the system, otherwise it is zero. This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Total Cooling Rate [W]}
+This output reports the rate at which enthalpy is removed from the zone. It is calculated as the difference between the enthalpy of the return air and the enthalpy of the supply air. This output is positive when enthalpy is removed from the zone, otherwise it is zero. This output is an  average rate over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Total Cooling Energy [J]}
+This output reports the amount of enthalpy removed from the zone. It is calculated as the difference between the enthalpy of the return air and the enthalpy of the supply air. This output is positive when enthalpy is removed from the zone, otherwise it is zero. This output is a sum over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Sensible Cooling Rate [W]}
+This output reports the rate at which sensible heat is removed from the zone.  It is calculated as the difference between the enthalpy of dry air at the temperature of the return air and the enthalpy of dry air at the temperature of the supply air. This output is positive when sensible heat is removed from the zone, otherwise it is zero.  This output is an average rate over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Sensible Cooling Energy [J]}
+This output reports the amount of sensible heat removed from the zone. It is calculated as the difference between the enthalpy of dry air at the temperature of the return air and the enthalpy of dry air at the temperature of the supply air.  This output is positive when sensible heat is removed from the zone, otherwise it is zero.  This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Latent Cooling Rate [W]}
+This output reports the rate at which latent heat is removed from the zone. It is calculated as the enthalpy difference associated with the difference between the absolute humidity of the return air, and the absolute humidity of the supply air. This is the phase change energy associated with moisture removed from the zone. This output is positive when latent heat is removed from the zone, otherwise it is zero.  This output is an average rate over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Latent Cooling Energy [J]}
+This output reports the amount of latent heat removed from the zone. It is calculated as the enthalpy difference associated with the difference between the absolute humidity of the return air, and the absolute humidity of the supply air. This is the phase change energy associated with moisture removed from the zone. This output is positive when latent heat is removed from the zone, otherwise it is zero.  This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC System Total Heating Rate [W]}
+This output reports the rate at which enthalpy is added by the system. It is calculated as the difference between the enthalpy of the mixture of return air and outdoor air and the enthalpy of the supply air. This output is positive when enthalpy is added by the system, otherwise it is zero. This output is an  average rate over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC System Total Heating Energy [J]}
+This output reports the amount of enthalpy added by the system. It is calculated as the difference between the enthalpy of the mixture of return air and outdoor air, and the enthalpy of the supply air. This output is positive when enthalpy is added by the system, otherwise the output is zero.  This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC System Sensible Heating Rate [W]}
+This output reports the rate at which sensible heat is added by the system.  It is calculated as the difference between the enthalpy of dry air at the temperature of the mixture of return air and outdoor air, and the enthalpy of dry air at the temperature of the supply air. This output is positive when sensible heat is added by the system, otherwise it is zero.  This output is an average rate over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC System Sensible Heating Energy [J]}
+This output reports the amount of sensible heat added by the system. It is calculated as the difference between the enthalpy of dry air at the temperature of the mixture of return air and outdoor air, and the enthalpy of dry air at the temperature of the supply air. This output is positive when sensible heat is added by the system, otherwise it is zero. This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC System Latent Heating Rate [W]}
+This output reports the rate at which latent heat is added by the system.  It is calculated as the enthalpy difference associated with the difference between absolute humidity of the mixture of return air and outdoor air, and the absolute humidity of the supply air. This is the phase change energy associated with moisture added by the system. This output is positive when latent heat is added by the system, otherwise it is zero.  This output is an average rate over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC System Latent Heating Energy [J]}
+This output reports the amount of latent heat added by the system.  It is calculated as the enthalpy difference associated with the difference between absolute humidity of the mixture of return air and outdoor air, and the absolute humidity of the supply air.  This is the phase change energy associated with moisture added by the system. This output is positive when latent heat is added by the system, otherwise it is zero. This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Total Heating Rate [W]}
+This output reports the rate at which enthalpy is added to the zone. It is calculated as the difference between the enthalpy of the return air and the enthalpy of the supply air. This output is positive when enthalpy is added to the zone, otherwise it is zero. This output is an  average rate over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Total Heating Energy [J]}
+This output reports the amount of enthalpy added to the zone. It is calculated as the difference between the enthalpy of the return air and the enthalpy of the supply air. This output is positive when enthalpy is added to the zone, otherwise it is zero. This output is a sum over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Sensible Heating Rate [W]}
+This output reports the rate at which sensible heat is added to the zone.  It is calculated as the difference between the enthalpy of dry air at the temperature of the return air and the enthalpy of dry air at the temperature of the supply air. This output is positive when sensible heat is added to the zone, otherwise it is zero.  This output is an average rate over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Sensible Heating Energy [J]}
+This output reports the amount of sensible heat added to the zone. It is calculated as the difference between the enthalpy of dry air at the temperature of the return air and the enthalpy of dry air at the temperature of the supply air.  This output is positive when sensible heat is added to the zone, otherwise it is zero.  This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Latent Heating Rate [W]}
+This output reports the rate at which latent heat is added to the zone. It is calculated as the enthalpy difference associated with the difference between the absolute humidity of the return air, and the absolute humidity of the supply air. This is the phase change energy associated with moisture added to the zone. This output is positive when latent heat is added to the zone, otherwise it is zero.  This output is an average rate over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Zone Latent Heating Energy [J]}
+This output reports the amount of latent heat added to the zone. It is calculated as the enthalpy difference associated with the difference between the absolute humidity of the return air, and the absolute humidity of the supply air. This is the phase change energy associated with moisture added to the zone. This output is positive when latent heat is added to the zone, otherwise it is zero.  This output is a sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate [W]}
+This output reports the predicted sensible heat transfer rate required to meet the current zone thermostat setpoint. A positive value indicates a heating load, a negative value indicates a cooling load. For a dual setpoint thermostat, the value is zero when the controlled zone’s temperature is between the defined heating and cooling setpoints. See ZoneControl:Thermostat for further information. This value is used as a soft inequality constraint in the constrained optimization problem that determines system settings in each time step. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Predicted Latent Load to Humidistat Setpoint Heat Transfer Rate [W]}
+This output reports the predicted latent heat transfer rate required to meet the current zone humidistat setpoint. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone’s relative humidity is between the defined humidifying and dehumidifying setpoint. See ZoneControl:Humidistat for further information. This value is used as a soft inequality constraint in the constrained optimization problem that determines system settings in each time step. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Predicted Moisture Load to Humidistat Setpoint Moisture Transfer Rate [kgWater/s]}
+This output reports the predicted moisture transfer rate required to meet the current zone humidistat setpoint. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone’s relative humidity is between the defined humidifying and dehumidifying setpoints. See ZoneControl:Humidistat for further information. This value is used as a soft inequality constraint in the constrained optimization problem that determines system settings in each time step. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Temperature [C]}
+This output reports the supply air temperature. For each timestep the value is calculated as a supply air mass weighted average of the supply air temperature for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air temperature of 16 °C, and for half of the timestep at 2 kg/s and 10 °C, the supply air temperature calculated for the time step would be 12 °C. The output is the average over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Return Air Temperature [C]}
+This output reports the return air temperature. The return air temperature is inherited from the associated zone outlet node in each timestep. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Outdoor Air Temperature [C]}
+This output reports the outdoor air temperature.  The outdoor air temperature is inherited from the associated outdoor air node in each timestep.  The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Humidity Ratio [kgWater/kgDryAir]}
+This output reports the supply air humidity ratio. For each timestep the value is calculated as a supply air mass weighted average of the supply air humidity ratio for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air humidity ratio of 0.016 kg/kg, and for half of the timestep at 2 kg/s and 0.010 kg/kg, the supply air humidity ratio calculated for the time step would be 0.012 °C. The output is the average over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Return Air Humidity Ratio [kgWater/kgDryAir]}
+This output reports the return air humidity ratio. The return air humidity ratio is inherited from the associated zone outlet node in each timestep.  The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Outdoor Air Humidity Ratio [kgWater/kgDryAir]}
+This output reports the outdoor air humidity ratio.  The outdoor air humidity ratio is inherited from the associated outdoor air node in each timestep. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Relative Humidity [\%]}
+This output reports the supply air relative humidity. For each timestep the value is calculated  from the supply air temperature and supply air humidity ratio according to standard psychrometric relationships. The output is the time weighted average over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Return Air Relative Humidity [\%]}
+This output reports the return air relative humidity. The return air relative humidity is inherited from the associated zone outlet node in each timestep. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Outdoor Air Relative Humidity [\%]}
+This output reports the outdoor air relative humidity. The outdoor air relative humidity is inherited from the associated outdoor air node in each timestep. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate [kg/s]}
+This output reports the supply air mass flow rate. For each timestep the value is calculated as a time weighted average of the supply air mass flow rate for each of the settings selected for the time step. The output is the average over the reporting period. 
+
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate [m3/s]}
+This output reports the supply air flow as a standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20ºC drybulb, and 101,325 Pa. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate [m3/s]}
+This output reports the outdoor air (ventilation) flow as a standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20ºC drybulb, and 101,325 Pa. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Electric Power [W]}
+This output reports the electric power input to the system. For each timestep the value is calculated as a time weighted average of the electric power for each of the settings selected for the time step. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Electric Energy [J]}
+This output reports the electric energy consumed by the system. For each timestep the value is calculated from the average electric power. The output is the sum over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate [kg/s]}
+This output reports the mass flow rate of outdoor air (ventilation) that would be required to meet the standard density volume flow rate of ventilation air scheduled by DesignSpecification:OutdoorAir. This value is used as a soft constraint in the constrained optimization problem that determines system settings in each time step. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Ventilation Mass Flow Rate [kg/s]}
+This output reports the mass flow rate of outdoor air (ventilation) supplied by the system. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Availability Status []}
+This output reports whether or not the system is available. A value of 1.0 means the system will operate in an attempt to satisfy the predicted sensible load, latent load, and requested ventilation rate. For standby periods – when the system is available, but there are no loads, and no request for ventilation – the system operates in Mode 0. A value of 0.0 means the system will not operate under any circumstance.
+
+\paragraph{Zone Hybrid Unitary HVAC Outdoor Air Fraction []}
+This output reports the outdoor air fraction – the portion of the supply air mass flow rate that is composed of ventilation air. For each timestep the value is calculated as a time weighted average of the outdoor air fraction for each of the settings selected for the time step. The output is the average over the reporting period.
+
+\paragraph{Zone Hybrid Unitary HVAC Runtime Fraction in Setting X []}
+Thy hybrid system may operate in multiple settings within each time step. Each setting represents a combination of operating mode, supply air mass flow rate, and outdoor air fraction. The combination associated with each setting number may be unique in each time step. These outputs report the fraction of the time step that the system operates in each setting in each time step.
+
+\paragraph{Zone Hybrid Unitary HVAC Mode in Setting X []}
+Thy hybrid system may operate in multiple settings within each time step. Each setting represents a combination of operating mode, supply air mass flow rate, and outdoor air fraction. The combination associated with each setting number may be unique in each time step. These outputs report the mode number associated with each setting in each time step.
+
+\paragraph{Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting X []}
+Thy hybrid system may operate in multiple settings within each time step. Each setting represents a combination of operating mode, supply air mass flow rate, and outdoor air fraction. The combination associated with each setting number may be unique in each time step. These outputs report the outdoor air fraction associated with each setting in each time step.
+
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting X [kg/s]}
+Thy hybrid system may operate in multiple settings within each time step. Each setting represents a combination of operating mode, supply air mass flow rate, and outdoor air fraction. The combination associated with each setting number may be unique in each time step. These outputs report the supply air mass flow rate associated with each setting in each time step.
+
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting X []}
+Thy hybrid system may operate in multiple settings within each time step. Each setting represents a combination of operating mode, supply air mass flow rate, and outdoor air fraction. The combination associated with each setting number may be unique in each time step. These output reports the supply air mass flow rate ratio associated with each setting in each time step. The supply air mass flow rate ratio is the ratio of the current supply air mass flow rate to the system maximum supply air flow rate.
+

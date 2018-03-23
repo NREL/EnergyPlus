@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -54,7 +55,7 @@
 #include <EnergyPlus.hh>
 #include <DataPlant.hh>
 #include <DataGlobals.hh>
-#include <PlantLocation.hh>
+#include <Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -156,21 +157,14 @@ namespace PlantComponentTemperatureSources {
 	void
 	InitWaterSource(
 		int const SourceNum, // number of the current component being simulated
-		bool const RunFlag, // TRUE when component operating
-		Real64 const MyLoad,
-		bool const FirstHVACIteration // initialize variables when TRUE
+		Real64 const MyLoad
 	);
 
 	void
 	SizeWaterSource( int const SourceNum );
 
 	void
-	CalcWaterSource(
-		int const SourceNum,
-		Real64 const MyLoad,
-		bool const RunFlag,
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
+	CalcWaterSource( int const SourceNum );
 
 	void
 	UpdateWaterSource( int const SourceNum );

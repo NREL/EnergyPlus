@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -70,7 +71,7 @@
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
@@ -251,12 +252,8 @@ namespace ZoneContaminantPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleMinValue;
@@ -270,17 +267,8 @@ namespace ZoneContaminantPredictorCorrector {
 		using DataSurfaces::Surface;
 		using DataSurfaces::ExternalEnvironment;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSourcesAndSinks: " );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string AlphaName;
@@ -295,8 +283,6 @@ namespace ZoneContaminantPredictorCorrector {
 		int Loop;
 		int ZonePtr;
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		//  LOGICAL :: ValidScheduleType
 		Array1D_bool RepVarSet;
 		std::string CurrentModuleObject;
@@ -308,31 +294,31 @@ namespace ZoneContaminantPredictorCorrector {
 		MaxAlpha = -100;
 		MaxNumber = -100;
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-		GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-		GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-		GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-		GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-		GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-		GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-		GetObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObject, Loop, NumAlpha, NumNumber );
 		MaxAlpha = max( MaxAlpha, NumAlpha );
 		MaxNumber = max( MaxNumber, NumNumber );
 		IHGNumbers.allocate( MaxNumber );
@@ -341,25 +327,18 @@ namespace ZoneContaminantPredictorCorrector {
 		AlphaName = "";
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:Constant";
-		TotGCGenConstant = GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenConstant = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericConstant.allocate( TotGCGenConstant );
 
 		for ( Loop = 1; Loop <= TotGCGenConstant; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericConstant, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericConstant( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericConstant( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericConstant( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericConstant( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericConstant( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -421,38 +400,31 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( ZoneContamGenericConstant( Loop ).ActualZoneNum <= 0 ) continue; // Error, will be caught and terminated later
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Constant Source Generation Volume Flow Rate [m3/s]", ZoneContamGenericConstant( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericConstant( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Constant Source Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericConstant( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericConstant( Loop ).Name );
 
 			// Zone total report variables
 			ZonePtr = ZoneContamGenericConstant( Loop ).ActualZoneNum;
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericConstant( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericConstant( Loop ).GCGenRate );
 
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:PressureDriven";
-		TotGCGenPDriven = GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenPDriven = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericPDriven.allocate( TotGCGenPDriven );
 
 		for ( Loop = 1; Loop <= TotGCGenPDriven; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericPDriven, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericPDriven( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericPDriven( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName );
+			ZoneContamGenericPDriven( Loop ).SurfNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName );
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ShowContinueError( "which is not listed in AirflowNetwork:MultiZone:Surface." );
@@ -509,7 +481,7 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate [m3/s]", ZoneContamGenericPDriven( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericPDriven( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericPDriven( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericPDriven( Loop ).Name );
 
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 ) {
 				ZonePtr = Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).Zone;
@@ -519,31 +491,24 @@ namespace ZoneContaminantPredictorCorrector {
 			// Zone total report variables
 			if ( ZonePtr > 0 && RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			if ( ZonePtr > 0 ) SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericPDriven( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericPDriven( Loop ).GCGenRate );
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
-		TotGCGenCutoff = GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenCutoff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericCutoff.allocate( TotGCGenCutoff );
 
 		for ( Loop = 1; Loop <= TotGCGenCutoff; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericCutoff, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericCutoff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericCutoff( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericCutoff( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericCutoff( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericCutoff( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -589,37 +554,30 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Cutoff Model Generation Volume Flow Rate [m3/s]", ZoneContamGenericCutoff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericCutoff( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Cutoff Model Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericCutoff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericCutoff( Loop ).Name );
 
 			// Zone total report variables
 			ZonePtr = ZoneContamGenericCutoff( Loop ).ActualZoneNum;
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericCutoff( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericCutoff( Loop ).GCGenRate );
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
-		TotGCGenDecay = GetNumObjectsFound( CurrentModuleObject );
+		TotGCGenDecay = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDecay.allocate( TotGCGenDecay );
 
 		for ( Loop = 1; Loop <= TotGCGenDecay; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDecay, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDecay( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDecay( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDecay( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericDecay( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDecay( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -665,38 +623,31 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Volume Flow Rate [m3/s]", ZoneContamGenericDecay( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
-			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time [s]", ZoneContamGenericDecay( Loop ).GCTime, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericDecay( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time", OutputProcessor::Unit::s, ZoneContamGenericDecay( Loop ).GCTime, "Zone", "Average", ZoneContamGenericDecay( Loop ).Name );
 
 			// Zone total report variables
 			ZonePtr = ZoneContamGenericDecay( Loop ).ActualZoneNum;
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDecay( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDecay( Loop ).GCGenRate );
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
-		TotGCBLDiff = GetNumObjectsFound( CurrentModuleObject );
+		TotGCBLDiff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericBLDiff.allocate( TotGCBLDiff );
 
 		for ( Loop = 1; Loop <= TotGCBLDiff; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericBLDiff, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericBLDiff( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericBLDiff( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericBLDiff( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface );
+			ZoneContamGenericBLDiff( Loop ).SurfNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericBLDiff( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -741,38 +692,33 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate [m3/s]", ZoneContamGenericBLDiff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).Name );
-			if ( ZoneContamGenericBLDiff( Loop ).SurfNum > 0 ) SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration [ppm]", Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).SurfName );
+			SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericBLDiff( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).Name );
+			if ( ZoneContamGenericBLDiff( Loop ).SurfNum > 0 ) {
+				SetupOutputVariable( "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration", OutputProcessor::Unit::ppm, Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).GenericContam, "Zone", "Average", ZoneContamGenericBLDiff( Loop ).SurfName );
+			}
 
 			ZonePtr = Surface( ZoneContamGenericBLDiff( Loop ).SurfNum ).Zone;
 			// Zone total report variables
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericBLDiff( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericBLDiff( Loop ).GCGenRate );
 		}
 
 		CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
-		TotGCDVS = GetNumObjectsFound( CurrentModuleObject );
+		TotGCDVS = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDVS.allocate( TotGCDVS );
 
 		for ( Loop = 1; Loop <= TotGCDVS; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDVS, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDVS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDVS( Loop ).SurfName = AlphaName( 2 );
-			ZoneContamGenericDVS( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), Surface );
+			ZoneContamGenericDVS( Loop ).SurfNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Surface );
 			if ( ZoneContamGenericDVS( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -811,37 +757,30 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate [m3/s]", ZoneContamGenericDVS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDVS( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericDVS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDVS( Loop ).Name );
 
 			ZonePtr = Surface( ZoneContamGenericDVS( Loop ).SurfNum ).Zone;
 			// Zone total report variables
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDVS( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDVS( Loop ).GCGenRate );
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
-		TotGCDRS = GetNumObjectsFound( CurrentModuleObject );
+		TotGCDRS = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ZoneContamGenericDRS.allocate( TotGCDRS );
 
 		for ( Loop = 1; Loop <= TotGCDRS; ++Loop ) {
 			AlphaName = "";
 			IHGNumbers = 0.0;
-			GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphaName( 1 ), ZoneContamGenericDRS, Loop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphaName( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(AlphaName( 1 ), CurrentModuleObject, ErrorsFound);
 			ZoneContamGenericDRS( Loop ).Name = AlphaName( 1 );
 
 			ZoneContamGenericDRS( Loop ).ZoneName = AlphaName( 2 );
-			ZoneContamGenericDRS( Loop ).ActualZoneNum = FindItemInList( AlphaName( 2 ), Zone );
+			ZoneContamGenericDRS( Loop ).ActualZoneNum = UtilityRoutines::FindItemInList( AlphaName( 2 ), Zone );
 			if ( ZoneContamGenericDRS( Loop ).ActualZoneNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
 				ErrorsFound = true;
@@ -881,13 +820,13 @@ namespace ZoneContaminantPredictorCorrector {
 			}
 
 			// Object report variables
-			SetupOutputVariable( "Generic Air Contaminant Deposition Rate Removal Volume Flow Rate [m3/s]", ZoneContamGenericDRS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDRS( Loop ).Name );
+			SetupOutputVariable( "Generic Air Contaminant Deposition Rate Removal Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneContamGenericDRS( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericDRS( Loop ).Name );
 
 			ZonePtr = ZoneContamGenericDRS( Loop ).ActualZoneNum;
 			// Zone total report variables
 			if ( RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
-				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
+				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
 			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDRS( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDRS( Loop ).GCGenRate );
 		}
@@ -918,29 +857,14 @@ namespace ZoneContaminantPredictorCorrector {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger events.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using namespace InputProcessor;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using ScheduleManager::GetScheduleMinValue;
 		using ScheduleManager::GetScheduleMaxValue;
 		using ScheduleManager::CheckScheduleValue;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ContControlledZoneNum; // The Splitter that you are currently loading input into
@@ -950,8 +874,6 @@ namespace ZoneContaminantPredictorCorrector {
 		//unused1208  REAL(r64), DIMENSION(2) :: NumArray
 		//unused1208  CHARACTER(len=MaxNameLength), DIMENSION(29) :: AlphArray
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool ValidScheduleType;
 
 		struct NeededControlTypes
@@ -984,24 +906,19 @@ namespace ZoneContaminantPredictorCorrector {
 
 		// FLOW:
 		cCurrentModuleObject = "ZoneControl:ContaminantController";
-		NumContControlledZones = GetNumObjectsFound( cCurrentModuleObject );
+		NumContControlledZones = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumContControlledZones > 0 ) {
 			ContaminantControlledZone.allocate( NumContControlledZones );
 		}
 
 		for ( ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum ) {
-			GetObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ContaminantControlledZone, ContControlledZoneNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			ContaminantControlledZone( ContControlledZoneNum ).Name = cAlphaArgs( 1 );
 			ContaminantControlledZone( ContControlledZoneNum ).ZoneName = cAlphaArgs( 2 );
-			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ContaminantControlledZone( ContControlledZoneNum ).ActualZoneNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
@@ -1172,7 +1089,6 @@ namespace ZoneContaminantPredictorCorrector {
 		Real64 Sch; // Schedule value
 		Real64 Cs; // Surface concentration level for the Boundary Layer Diffusion Controlled Model
 		static bool MyConfigOneTimeFlag( true );
-		int AirLoopNum;
 		int ContZoneNum;
 		int I;
 		static bool ErrorsFound( false );
@@ -1224,10 +1140,10 @@ namespace ZoneContaminantPredictorCorrector {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				// Zone CO2
 				if ( Contaminant.CO2Simulation ) {
-					SetupOutputVariable( "Zone Air CO2 Concentration [ppm]", ZoneAirCO2( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate [kg/s]", CO2PredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Air CO2 Setpoint Concentration [ppm]", ZoneCO2SetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Air CO2 Internal Gain Volume Flow Rate [m3/s]", ZoneCO2Gain( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Concentration", OutputProcessor::Unit::ppm, ZoneAirCO2( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate", OutputProcessor::Unit::kg_s, CO2PredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Setpoint Concentration", OutputProcessor::Unit::ppm, ZoneCO2SetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air CO2 Internal Gain Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneCO2Gain( Loop ), "System", "Average", Zone( Loop ).Name );
 				}
 
 			} // Loop
@@ -1267,9 +1183,9 @@ namespace ZoneContaminantPredictorCorrector {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				// Zone CO2
 				if ( Contaminant.GenericContamSimulation ) {
-					SetupOutputVariable( "Zone Air Generic Air Contaminant Concentration [ppm]", ZoneAirGC( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate [kg/s]", GCPredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
-					SetupOutputVariable( "Zone Generic Air Contaminant Setpoint Concentration [ppm]", ZoneGCSetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Air Generic Air Contaminant Concentration", OutputProcessor::Unit::ppm, ZoneAirGC( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate", OutputProcessor::Unit::kg_s, GCPredictedRate( Loop ), "System", "Average", Zone( Loop ).Name );
+					SetupOutputVariable( "Zone Generic Air Contaminant Setpoint Concentration", OutputProcessor::Unit::ppm, ZoneGCSetPoint( Loop ), "System", "Average", Zone( Loop ).Name );
 				}
 			} // Loop
 
@@ -1343,27 +1259,35 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( allocated( ZoneEquipConfig ) && MyConfigOneTimeFlag ) {
 			for ( ContZoneNum = 1; ContZoneNum <= NumContControlledZones; ++ContZoneNum ) {
 				ZoneNum = ContaminantControlledZone( ContZoneNum ).ActualZoneNum;
-				AirLoopNum = ZoneEquipConfig( ZoneNum ).AirLoopNum;
-				ContaminantControlledZone( ContZoneNum ).NumOfZones = 0;
-				for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
-					if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
-					if ( AirLoopNum == ZoneEquipConfig( Loop ).AirLoopNum ) {
-						++ContaminantControlledZone( ContZoneNum ).NumOfZones;
-					}
-				}
-				if ( ContaminantControlledZone( ContZoneNum ).NumOfZones > 0 ) {
-					ContaminantControlledZone( ContZoneNum ).ControlZoneNum.allocate( ContaminantControlledZone( ContZoneNum ).NumOfZones );
-					I = 1;
+				for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig( ContZoneNum ).NumInletNodes; ++zoneInNode ) {
+					int AirLoopNum = ZoneEquipConfig( ContZoneNum ).InletNodeAirLoopNum( zoneInNode );
+					ContaminantControlledZone( ContZoneNum ).NumOfZones = 0;
 					for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 						if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
-						if ( AirLoopNum == ZoneEquipConfig( Loop ).AirLoopNum ) {
-							ContaminantControlledZone( ContZoneNum ).ControlZoneNum( I ) = Loop;
-							++I;
+						for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig( Loop ).NumInletNodes; ++zoneInNode2 ) {
+							if ( AirLoopNum == ZoneEquipConfig( Loop ).InletNodeAirLoopNum( zoneInNode2 ) ) {
+								++ContaminantControlledZone( ContZoneNum ).NumOfZones;
+								break; // only count a zone once
+							}
 						}
 					}
-				} else {
-					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
-					ErrorsFound = true;
+					if ( ContaminantControlledZone( ContZoneNum ).NumOfZones > 0 ) {
+						ContaminantControlledZone( ContZoneNum ).ControlZoneNum.allocate( ContaminantControlledZone( ContZoneNum ).NumOfZones );
+						I = 1;
+						for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
+							if ( ! ZoneEquipConfig( Loop ).IsControlled ) continue;
+							for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig( Loop ).NumInletNodes; ++zoneInNode2 ) {
+								if ( AirLoopNum == ZoneEquipConfig( Loop ).InletNodeAirLoopNum( zoneInNode2 ) ) {
+									ContaminantControlledZone( ContZoneNum ).ControlZoneNum( I ) = Loop;
+									++I;
+									break; // only count a zone once
+								}
+							}
+						}
+					} else {
+						ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
+						ErrorsFound = true;
+					}
 				}
 			}
 			MyConfigOneTimeFlag = false;
@@ -1662,10 +1586,10 @@ namespace ZoneContaminantPredictorCorrector {
 						B = CO2Gain + AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					} else {
-						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
-						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+						B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorCO2;
+						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of CO2 Load means that
@@ -1744,10 +1668,10 @@ namespace ZoneContaminantPredictorCorrector {
 						B = GCGain + AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC;
 						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 					} else {
-						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
-						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
+						B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorGC;
+						A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
 					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds; 
+					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 
 					// Use a 3rd Order derivative to predict zone moisture addition or removal and
 					// smooth the changes using the zone air capacitance.  Positive values of GC Load means that
@@ -2041,8 +1965,6 @@ namespace ZoneContaminantPredictorCorrector {
 		Real64 C;
 		Real64 CO2MassFlowRate;
 		Real64 GCMassFlowRate;
-		Real64 ExhMassFlowRate;
-		Real64 TotExitMassFlowRate;
 		Real64 ZoneMassFlowRate;
 		Real64 SysTimeStepInSeconds;
 		Real64 ZoneMult;
@@ -2112,8 +2034,6 @@ namespace ZoneContaminantPredictorCorrector {
 			CO2MassFlowRate = 0.0;
 			GCMassFlowRate = 0.0;
 			ZoneMassFlowRate = 0.0;
-			ExhMassFlowRate = 0.0;
-			TotExitMassFlowRate = 0.0;
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 			// Check to see if this is a controlled zone
@@ -2153,14 +2073,6 @@ namespace ZoneContaminantPredictorCorrector {
 					ZoneMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate / ZoneMult;
 				} // NodeNum
 
-				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
-					ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
-				} // NodeNum
-
-				if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
-					TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;
-				}
-
 				// Do the calculations for the plenum zone
 			} else if ( ZoneRetPlenumAirFlag ) {
 				for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
@@ -2197,9 +2109,6 @@ namespace ZoneContaminantPredictorCorrector {
 						ZoneMassFlowRate += AirDistUnit( ADUNum ).MassFlowRateDnStrLk / ZoneMult;
 					}
 				}
-				// Do not allow exhaust mass flow for a plenum zone
-				ExhMassFlowRate = 0.0;
-				TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 
 			} else if ( ZoneSupPlenumAirFlag ) {
 
@@ -2210,9 +2119,6 @@ namespace ZoneContaminantPredictorCorrector {
 					GCMassFlowRate += ( Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate * Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).GenContam ) / ZoneMult;
 				}
 				ZoneMassFlowRate += Node( ZoneSupPlenCond( ZoneSupPlenumNum ).InletNode ).MassFlowRate / ZoneMult;
-				// Do not allow exhaust mass flow for a plenum zone
-				ExhMassFlowRate = 0.0;
-				TotExitMassFlowRate = ExhMassFlowRate + ZoneMassFlowRate;
 			}
 
 			SysTimeStepInSeconds = SecInHour * TimeStepSys;
@@ -2230,29 +2136,15 @@ namespace ZoneContaminantPredictorCorrector {
 			if ( Contaminant.CO2Simulation ) CO2Gain = ZoneCO2Gain( ZoneNum ) * RhoAir * 1.0e6;
 			if ( Contaminant.GenericContamSimulation ) GCGain = ZoneGCGain( ZoneNum ) * RhoAir * 1.0e6;
 
-			// Check for the flow and NO flow condition
-			if ( ZoneMassFlowRate > 0.0 ) {
-				if ( Contaminant.CO2Simulation ) {
-					B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + ( CO2MassFlowRate ) + MixingMassFlowCO2( ZoneNum );
-					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
-						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
+			if ( Contaminant.CO2Simulation ) {
+				B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorCO2 ) + ( CO2MassFlowRate ) + MixingMassFlowCO2( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorCO2;
+				A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+				if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+					// Multizone airflow calculated in AirflowNetwork
+					B = CO2Gain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO ) + CO2MassFlowRate;
+					A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 				}
-			} else if ( ZoneMassFlowRate <= 0.0 ) {
-				if ( Contaminant.CO2Simulation ) {
-					B = CO2Gain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutdoorCO2 ) + MixingMassFlowCO2( ZoneNum );
-					A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = CO2Gain + AirflowNetworkExchangeData( ZoneNum ).SumMHrCO + AirflowNetworkExchangeData( ZoneNum ).SumMMHrCO;
-						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
-				}
+				C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpCO2 / SysTimeStepInSeconds; 
 			}
 
 			if ( Contaminant.CO2Simulation ) {
@@ -2292,28 +2184,15 @@ namespace ZoneContaminantPredictorCorrector {
 				}
 			}
 
-			if ( ZoneMassFlowRate > 0.0 ) {
-				if ( Contaminant.GenericContamSimulation ) {
-					B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + ( GCMassFlowRate ) + MixingMassFlowGC( ZoneNum );
-					A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;
-						A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
+			if ( Contaminant.GenericContamSimulation ) {
+				B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) ) * OutdoorGC ) + ( GCMassFlowRate ) + MixingMassFlowGC( ZoneNum ) + MDotOA( ZoneNum ) * OutdoorGC;
+				A = ZoneMassFlowRate + OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + MixingMassFlowZone( ZoneNum ) + MDotOA( ZoneNum );
+				if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
+					// Multizone airflow calculated in AirflowNetwork
+					B = GCGain + ( AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC ) + GCMassFlowRate;
+					A = ZoneMassFlowRate + AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
 				}
-			} else if ( ZoneMassFlowRate <= 0.0 ) {
-				if ( Contaminant.GenericContamSimulation ) {
-					B = GCGain + ( ( OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate ) * OutdoorGC ) + MixingMassFlowGC( ZoneNum );
-					A = OAMFL( ZoneNum ) + VAMFL( ZoneNum ) + EAMFL( ZoneNum ) + CTMFL( ZoneNum ) + ExhMassFlowRate + MixingMassFlowZone( ZoneNum );
-					if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
-						// Multizone airflow calculated in AirflowNetwork
-						B = GCGain + AirflowNetworkExchangeData( ZoneNum ).SumMHrGC + AirflowNetworkExchangeData( ZoneNum ).SumMMHrGC;
-						A = AirflowNetworkExchangeData( ZoneNum ).SumMHr + AirflowNetworkExchangeData( ZoneNum ).SumMMHr;
-					}
-					C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
-				}
+				C = RhoAir * Zone( ZoneNum ).Volume * Zone( ZoneNum ).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
 			}
 
 			if ( Contaminant.GenericContamSimulation ) {

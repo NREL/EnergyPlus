@@ -70,7 +70,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,4;
 
@@ -214,7 +214,7 @@
     9.69,                    !- Annual Average Outdoor Air Temperature {C}
     28.10;                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
- ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+ ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -244,7 +244,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
+ ! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2Â°C WB=25.5Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -1080,24 +1080,6 @@
     ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
 
   Construction,
-    INT-FLOOR-SLAB,          !- Name
-    Std MAT-CC05 4  MW CONCRETE;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Interior Floor Slab,     !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-SLAB,          !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    35,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
     DropCeiling,             !- Name
     Std AC02;                !- Outside Layer
 
@@ -1109,141 +1091,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     10,                      !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    INT-CEILING_SIMPLE,      !- Name
-    PW05_Plywood3/4_in;      !- Outside Layer
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    Std 1.5  MW CONCRETE,    !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std 1.5  MW CONCRETE;    !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Std Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Std Clear Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Std Diffusing Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05;                !- Layer 2
-
-  ComponentCost:LineItem,
-    Sloped Metal Roof,       !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Sloped_Metal_Roof,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Gable_Wall,              !- Name
-    Std PW05;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Gable Wall,              !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Gable_Wall,              !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  ComponentCost:LineItem,
-    Air Wall,                !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    AIR-WALL,                !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Std Swinging Door_con,   !- Name
-    Std Opaque Door panel_con;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_con,   !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Std Swinging Door_semi,  !- Name
-    Std Opaque Door panel_semi;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Semi-conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_semi,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ;                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-
-  Construction,
-    Std Overhead Door,       !- Name
-    Std Overhead Door Panel; !- Outside Layer
-
-  ComponentCost:LineItem,
-    Overhead Door,           !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Overhead Door,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1,                       !- Cost per Area {$/m2}
     ,                        !- Cost per Unit of Output Capacity {$/kW}
     ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
     ,                        !- Cost per Volume {$/m3}
@@ -1327,25 +1174,6 @@
     ;                        !- Quantity {dimensionless}
 
   Construction,
-    std_window_UValue_3.919_SHGC_0.49_VT_0.622,  !- Name
-    Theoretical Glass [81];  !- Outside Layer
-
-  ComponentCost:LineItem,
-    SkylightConst:std_window_UValue_3.919_SHGC_0.49_VT_0.622,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    std_window_UValue_3.919_SHGC_0.49_VT_0.622,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    215.9700,                !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
     IEAD_R-15 ci_Roof,       !- Name
     Roof Membrane,           !- Outside Layer
     Roof Insulation,         !- Layer 2
@@ -1421,69 +1249,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     24.8600,                 !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    Mass_R-8.3 ci_ExposedFloor,  !- Name
-    Floor Insulation [2],    !- Outside Layer
-    MAT-CC05 8 HW CONCRETE,  !- Layer 2
-    CP02 CARPET PAD;         !- Layer 3
-
-  ComponentCost:LineItem,
-    exposed-floor:Mass_R-8.3 ci_ExposedFloor,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Mass_R-8.3 ci_ExposedFloor,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    34.6727,                 !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    Swinging_NR_door,        !- Name
-    METAL Door Medium 18Ga_1,!- Outside Layer
-    AIR,                     !- Layer 2
-    METAL Door Medium 18Ga_2;!- Layer 3
-
-  ComponentCost:LineItem,
-    door:Swinging_NR_door,   !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Swinging_NR_door,        !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000,                  !- Cost per Area {$/m2}
-    ,                        !- Cost per Unit of Output Capacity {$/kW}
-    ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
-    ,                        !- Cost per Volume {$/m3}
-    ,                        !- Cost per Volume Rate {$/(m3/s)}
-    ,                        !- Cost per Energy per Temperature Difference {$/(W/K)}
-    ;                        !- Quantity {dimensionless}
-
-  Construction,
-    Non-Swinging_NR_door,    !- Name
-    METAL Door Medium 18Ga_1,!- Outside Layer
-    AIR [1],                 !- Layer 2
-    METAL Door Medium 18Ga_2;!- Layer 3
-
-  ComponentCost:LineItem,
-    non-swinging-door:Non-Swinging_NR_door,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Non-Swinging_NR_door,    !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000,                  !- Cost per Area {$/m2}
     ,                        !- Cost per Unit of Output Capacity {$/kW}
     ,                        !- Cost per Unit of Output Capacity per COP {$/kW}
     ,                        !- Cost per Volume {$/m3}
@@ -1818,7 +1583,7 @@
     Basement Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Basement Air Node,       !- Zone Air Node Name
-    Basement Return Air Node Name;  !- Zone Return Air Node Name
+    Basement Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Basement Inlet Nodes,    !- Name
@@ -1826,6 +1591,7 @@
 
   ZoneHVAC:EquipmentList,
     Basement Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Basement VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2137,7 +1903,7 @@
     Core_bottom Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_bottom Air Node,    !- Zone Air Node Name
-    Core_bottom Return Air Node Name;  !- Zone Return Air Node Name
+    Core_bottom Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Core_bottom Inlet Nodes, !- Name
@@ -2145,6 +1911,7 @@
 
   ZoneHVAC:EquipmentList,
     Core_bottom Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Core_bottom VAV Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2511,7 +2278,7 @@
     Core_mid Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_mid Air Node,       !- Zone Air Node Name
-    Core_mid Return Air Node Name;  !- Zone Return Air Node Name
+    Core_mid Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Core_mid Inlet Nodes,    !- Name
@@ -2519,6 +2286,7 @@
 
   ZoneHVAC:EquipmentList,
     Core_mid Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Core_mid VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2914,7 +2682,7 @@
     Core_top Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_top Air Node,       !- Zone Air Node Name
-    Core_top Return Air Node Name;  !- Zone Return Air Node Name
+    Core_top Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Core_top Inlet Nodes,    !- Name
@@ -2922,6 +2690,7 @@
 
   ZoneHVAC:EquipmentList,
     Core_top Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Core_top VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3333,7 +3102,7 @@
     Perimeter_bot_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_3 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_bot_ZN_3 Inlet Nodes,  !- Name
@@ -3341,6 +3110,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3697,7 +3467,7 @@
     Perimeter_bot_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_2 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_bot_ZN_2 Inlet Nodes,  !- Name
@@ -3705,6 +3475,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4061,7 +3832,7 @@
     Perimeter_bot_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_1 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_bot_ZN_1 Inlet Nodes,  !- Name
@@ -4069,6 +3840,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4425,7 +4197,7 @@
     Perimeter_bot_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_bot_ZN_4 Air Node,  !- Zone Air Node Name
-    Perimeter_bot_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_bot_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_bot_ZN_4 Inlet Nodes,  !- Name
@@ -4433,6 +4205,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_bot_ZN_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_bot_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4789,7 +4562,7 @@
     Perimeter_mid_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_3 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_mid_ZN_3 Inlet Nodes,  !- Name
@@ -4797,6 +4570,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5153,7 +4927,7 @@
     Perimeter_mid_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_2 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_mid_ZN_2 Inlet Nodes,  !- Name
@@ -5161,6 +4935,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5517,7 +5292,7 @@
     Perimeter_mid_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_1 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_mid_ZN_1 Inlet Nodes,  !- Name
@@ -5525,6 +5300,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5881,7 +5657,7 @@
     Perimeter_mid_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_mid_ZN_4 Air Node,  !- Zone Air Node Name
-    Perimeter_mid_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_mid_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_mid_ZN_4 Inlet Nodes,  !- Name
@@ -5889,6 +5665,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_mid_ZN_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_mid_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6245,7 +6022,7 @@
     Perimeter_top_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_3 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_top_ZN_3 Inlet Nodes,  !- Name
@@ -6253,6 +6030,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6609,7 +6387,7 @@
     Perimeter_top_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_2 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_top_ZN_2 Inlet Nodes,  !- Name
@@ -6617,6 +6395,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6973,7 +6752,7 @@
     Perimeter_top_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_1 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_top_ZN_1 Inlet Nodes,  !- Name
@@ -6981,6 +6760,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7337,7 +7117,7 @@
     Perimeter_top_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_top_ZN_4 Air Node,  !- Zone Air Node Name
-    Perimeter_top_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_top_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_top_ZN_4 Inlet Nodes,  !- Name
@@ -7345,6 +7125,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_top_ZN_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Perimeter_top_ZN_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -10537,7 +10318,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10554,7 +10335,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10569,7 +10350,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10577,7 +10358,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10585,7 +10366,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10593,7 +10374,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10601,7 +10382,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10609,7 +10390,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10617,7 +10398,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10625,7 +10406,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -10635,7 +10416,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -10661,7 +10442,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10678,7 +10459,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10686,7 +10467,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10694,7 +10475,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10702,7 +10483,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10710,7 +10491,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10718,7 +10499,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10726,7 +10507,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10734,7 +10515,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -10744,7 +10525,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -10768,7 +10549,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -10793,7 +10574,7 @@
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

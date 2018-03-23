@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -62,7 +63,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -117,10 +118,10 @@ namespace HeatPumpWaterToWaterCOOLING {
 	Real64 Power( 0.0 ); // power consumption Watts
 	Real64 QLoad( 0.0 ); // heat rejection from Load Side coil Watts
 	Real64 QSource( 0.0 ); // cooling capacity Watts
-	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature °C
-	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature °C
+	Real64 SourceSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 SourceSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterOutletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
+	Real64 LoadSideWaterInletTemp( 0.0 ); // Source Side outlet temperature ï¿½C
 
 	// Object Data
 	Array1D< GshpSpecs > GSHP; // dimension to number of machines
@@ -150,28 +151,11 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// It gets the input for the models, initializes simulation variables, calls
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using PlantUtilities::UpdateChillerComponentCondenserSide;
 		using DataPlant::TypeOf_HPWaterEFCooling;
-		using InputProcessor::FindItemInList;
 		using namespace DataEnvironment;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInput( true ); // then TRUE, calls subroutine to read input file.
@@ -186,7 +170,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			GSHPNum = FindItemInList( GSHPName, GSHP );
+			GSHPNum = UtilityRoutines::FindItemInList( GSHPName, GSHP );
 			if ( GSHPNum == 0 ) {
 				ShowFatalError( "SimHPWatertoWaterCOOLING: Unit not found=" + GSHPName );
 			}
@@ -240,33 +224,13 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// GSHPs and begin to fill the
 		// arrays associated with the typeGSHP.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPECooling;
-		using DataPlant::ScanPlantLoopsForObject;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using FluidProperties::FindRefrigerant;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GSHPNum; // Gshp counter
@@ -277,11 +241,9 @@ namespace HeatPumpWaterToWaterCOOLING {
 		Array1D< Real64 > NumArray( 23 ); // numeric data
 
 		static bool ErrorsFound( false );
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool errFlag;
 
-		NumGSHPs = GetNumObjectsFound( ModuleCompNameUC );
+		NumGSHPs = inputProcessor->getNumObjectsFound( ModuleCompNameUC );
 
 		if ( NumGSHPs <= 0 ) {
 			ShowSevereError( "No Equipment found in SimGshp" );
@@ -294,15 +256,9 @@ namespace HeatPumpWaterToWaterCOOLING {
 		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
-			IsNotOK = false;
-			IsBlank = true;
-			VerifyName( AlphArray( 1 ), GSHP, GSHPNum - 1, IsNotOK, IsBlank, "GHSP Name" );
+			inputProcessor->getObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
+			UtilityRoutines::IsNameEmpty(AlphArray( 1 ), ModuleCompNameUC, ErrorsFound);
 
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			GSHP( GSHPNum ).Name = AlphArray( 1 );
 
 			GSHP( GSHPNum ).WWHPPlantTypeOfNum = TypeOf_HPWaterPECooling;
@@ -435,21 +391,21 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		//CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Cooling'
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
-			SetupOutputVariable( "Water to Water Heat Pump Electric Power [W]", GSHPReport( GSHPNum ).Power, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Electric Energy [J]", GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Cooling", _, "Plant" );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Power", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).Power, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Electric Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).Energy, "System", "Sum", GSHP( GSHPNum ).Name, _, "Electricity", "Cooling", _, "Plant" );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate [W]", GSHPReport( GSHPNum ).QLoad, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).QLoad, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QLoadEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate [W]", GSHPReport( GSHPNum ).QSource, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy [J]", GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W, GSHPReport( GSHPNum ).QSource, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, GSHPReport( GSHPNum ).QSourceEnergy, "System", "Sum", GSHP( GSHPNum ).Name );
 
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature [C]", GSHPReport( GSHPNum ).LoadSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature [C]", GSHPReport( GSHPNum ).LoadSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature [C]", GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature [C]", GSHPReport( GSHPNum ).SourceSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate [kg/s]", GSHPReport( GSHPNum ).LoadSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
-			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate [kg/s]", GSHPReport( GSHPNum ).SourceSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).LoadSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).LoadSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).SourceSideWaterOutletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, GSHPReport( GSHPNum ).SourceSideWaterInletTemp, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, GSHPReport( GSHPNum ).LoadSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
+			SetupOutputVariable( "Water to Water Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s, GSHPReport( GSHPNum ).SourceSidemdot, "System", "Average", GSHP( GSHPNum ).Name );
 
 			//scan for loop connection data
 			errFlag = false;
@@ -480,7 +436,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 		// Using/Aliasing
 		using DataPlant::TypeOf_HPWaterPECooling;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;

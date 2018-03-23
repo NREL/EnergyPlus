@@ -170,6 +170,88 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
 
 There are no outputs for the constant volume reheat air terminal.
 
+
+\subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airterminalsingleductconstantvolumenoreheat}
+The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate. 
+
+This object allows the program to know what zone this branch of the air system is attached to, and input fields for availability schedule, air inlet and outlet nodes, the maximum air flow rate, and other two optional input fields. The air inlet node should be the same as one of the \emph{AirLoopHVAC:ZoneSplitter} or \emph{AirLoopHVAC:SupplyPlenum} component  outlet nodes. The air outlet node name should be same as zone air inlet node name and the air distribution unit air outlet node name. The last two optional input fields: \textit{Design Specification Outdoor Air Object Name}, and \textit{Per Person Ventilation Rate Mode} are used for modulating the outdoor air requirement of an air terminal unit depending on the method.
+
+\subsubsection{Inputs}\label{inputs-1-001}
+
+\paragraph{Field: Name}\label{field-name-1-000}
+
+A unique user assigned name for the single duct constant volume no reheat air terminal unit.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-1}
+
+Availability schedule name for this system. Schedule value > 0 means the system is available or else the system is off. If this field is blank, the system is always available.
+
+\paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name}
+
+The air inlet node name that connects the air splitter to the individual zone air distribution unit. This node should also be one of the outlet air node of an AirLoopHVAC:ZoneSplitter or AirLoopHVAC:SupplyPlenum component.
+
+\paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name}
+
+This is an air outlet node from the air distribution unit. This node name should be one of the supply air inlet node names of the zone served by this component.
+
+\paragraph{Field: Maximum Air Flow Rate}\label{field-maximum-air-flow-rate-1}
+
+The design maximum volume flow rate~ (m\(^{3}\)/sec). This field is autosizable.
+
+\paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
+
+This field is used to modulate the terminal unit flow rate based on the specified outdoor air requirement. When the name of a DesignSpecification:OutdoorAir object is entered, the terminal unit will adjust flow to meet this outdoor air requirement and no more. Load is still "Uncontrolled." If Outdoor Air Flow per Person is non-zero, then the outdoor air requirement will be computed based on either the current or design occupancy as specified in the \textit{Per Person Ventilation Rate Mode} input field below. At no time will the supply air flow rate exceed the value for Maximum Air Flow Rate. The requested flow rate may not be fully met if the system is operating with cycling fan. The volume flow rate is converted to mass flow rate using the standard density of air at Pressure = 101325 Pa, Temperature = 20C, and Humidity Ratio = 0.0. If this field is blank, then the terminal unit will not be controlled for outdoor air flow. This field is optional.
+
+\paragraph{Field: Per Person Ventilation Rate Mode}\label{field-per-person-ventilation-rate-mode}
+
+This field specifies the occupancy level to use when calculating the ventilation rate per person when a Design Specification Outdoor Air Object Name has been specified. \textit{CurrentOccupancy} uses the current number of people in the zone which may vary. \textit{DesignOccupancy} uses the total Number of People specified for the zone which is constant.
+
+An IDF example:
+
+\begin{lstlisting}
+
+AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+      NoReheat Zone 1,                !- Name of System
+      AlwaysOnFanAvailSched,          !- Availability Schedule Name
+      Zone 1 Unit Air Inlet Node,     !- Air Inlet Node Name
+      Zone 1 Unit Air Outlet Node,    !- Air Outlet Node Name
+      0.60,                           !- Maximum Air Flow Rate {m3/s}
+      ,                               !- Design Specification Outdoor Air Object Name
+      ;                               !- Per Person Ventilation Rate Mode
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-000}
+
+\begin{itemize}
+\item
+  HVAC,Sum,Zone Air Terminal Sensible Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air Terminal Sensible Heating Rate {[}W{]}
+\item
+  HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Sensible Heating Rate {[}W{]}}\label{zone-air-terminal-sensible-heating-rate-w}
+
+\paragraph{Zone Air Terminal Sensible Heating Energy~ {[}J{]}}\label{zone-air-terminal-sensible-heating-energy-j}
+
+These outputs are the sensible heating rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
+
+\paragraph{Zone Air Terminal Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-sensible-cooling-rate-w}
+
+\paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j}
+
+These outputs are the sensible cooling rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported.~ The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
+
 \subsection{AirTerminal:SingleDuct:VAV:Reheat}\label{airterminalsingleductvavreheat}
 
 AirTerminal:SingleDuct:VAV:Reheat - Variable air volume (VAV) systems control the dry-bulb temperature inside a zone by varying the supply air volume instead of the air temperature. At full cooling the VAV damper is fully open supplying the specified maximum air flow rate. As the cooling load decreases, the damper closes until it reaches the minimum stop specified by the zone minimum air flow fraction.
@@ -799,7 +881,8 @@ This output is the damper position required to meet the zone load. This is the a
 
 \subsection{AirTerminal:SingleDuct:SeriesPIU:Reheat}\label{airterminalsingleductseriespiureheat}
 
-The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan's availability schedule is on or it is activated by an availability manager). The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit's primary air supply inlet duct. This damper can move from fully open (100\% primary air. 0\% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum.
+The series powered induction unit is an air system terminal unit that mixes varying amounts of secondary (recirculated) air and primary (conditioned supply) air to produce a fixed flow of air to a zone. The unit contains a small fan that acts to induce the secondary air and a heating coil for heating the mixed secondary and primary air. The fan runs at a constant volume flow rate whenever the unit is on (and the fan's availability schedule is on or it is activated by an availability manager). The fan is downstream of the primary and secondary air inlets. The variable mixing is accomplished by a damper in the unit's primary air supply inlet duct. This damper can move from fully open (100\% primary air. 0\% secondary air) to a minimum stop that is specified in the input description. At full cooling the damper will be fully open. At minimum cooling and for heating the damper will be at the minimum stop and the secondary air flow will be at its maximum. During night cycle operation, if the availability manager status is CycleOnZoneFansOnly, then the fan will run only if there is a heating load.  If the status is CycleOn, then the fan will run according to the normal controls.
+
 
 The EnergyPlus model of the series PIU terminal unit is composed of three components: a zone mixer, a constant volume fan, and a heating coil (hot water, electric, or gas).
 
@@ -853,7 +936,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run according to the Availability Schedule specified in the fan object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the zone mixer's outlet node. The fan's outlet node should be the same as the heating coil's air inlet node. The secondary fan will run only when the Availability Schedule specified in the fan object is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-3}
 
@@ -984,9 +1067,7 @@ The minimum volumetric air flow rate of primary air through the unit expressed a
 
 \paragraph{Field: Fan On Flow Fraction}\label{field-fan-on-flow-fraction}
 
-If Fan On Flow Fraction is > 0, then this is the fraction of the primary air flow at which the fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off. Otherwise the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below), unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). The fan will operate whenever the availability status is CycleOn or CycleOnZoneFansOnly.
-
-If Fan On Flow Fraction = 0, then the fan is controlled based on the zone load requirement rather than primary air flow fraction. The fan will operate if there is a heating load or if reheat is required to maintain the zone at the thermostat heating setpoint. When the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below) is off, it may be overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). If the availability manager status is CycleOnZoneFansOnly, then the fan will run regardless of zone load.  If the status is CycleOn, then the fan will run only if there is a heating load or reheat is required.
+This is the fraction of the primary air flow at or below which the secondary fan turns on. In the parallel PIU the fan operation is intermittent. If the primary air flow is above this fraction of the maximum, the fan is off unless reheat is required. The fan will only operate if the Availability Schedule specified in the Fan:ConstantVolume object (see Fan Name below) is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). If the availability manager status is CycleOnZoneFansOnly, then the fan will run only if there is a heating load.  If the status is CycleOn, then the fan will run according to the normal controls (low flow or reheat required).
 
 \paragraph{Field: Supply Air Inlet Node Name}\label{field-supply-air-inlet-node-name-1}
 
@@ -1010,7 +1091,7 @@ The name of an zone mixer component (object: AirLoopHVAC:ZoneMixer) which compos
 
 \paragraph{Field: Fan Name}\label{field-fan-name-2}
 
-The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. When the primary air flow is below the Fan On Flow Fraction (above), the secondary fan will run according to the Availability Schedule specified in the Fan:ConstantVolume object, unless it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others).
+The name of a fan component which composes part of the unit. Note that the fan's maximum flow rate should be the same as the maximum secondary air flow rate of the PIU and the type of fan object must be Fan:SystemModel or Fan:ConstantVolume. The fan's inlet node should be the same as the PIU secondary air inlet node. The fan's outlet node should be the same as one of the zone mixer's inlet nodes. The secondary fan will run only when the Availability Schedule specified in the Fan:ConstantVolume object is >0 or when it is overridden by an availability manager (ref. AvailabilityManager:NightCycle and others). See description of fan controls under Fan On Flow Fraction above.
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-4}
 
@@ -1716,18 +1797,34 @@ The heat transfer energy for the chilled water serving the beams, in Joules.
 
 The air terminal mixer provides a means of supplying central system air either to air inlet or supply side of a ZoneHVAC equipment such as a four pipe fan coil. Normally the central air would be ventilation air from a dedicated outside air system (DOAS).
 
-This terminal mixer object mixes conditioned outdoor air (primary air) from DOAS air loop and recirculating (secondary air) and deliver it either to inlet or supply side of a local ZoneHVAC equipment. The terminal mixer can be connected either to the inlet or supply side of the local ZoneHVAC equipment and the connection type is specified in the input field \textit{Mixer Connection Type}. If the AirTerminal:SingleDuct:Mixer object is connected to the supply side, a mix of conditioned outdoor air from a central dedicated outdoor air system (DOAS) with conditioned recirculation air from the local ZoneHVAC equipment is supplied as a single stream to the conditioned zone at its inlet node. If the AirTerminal:SingleDuct:Mixer object is connected to the inlet side, a mix of outdoor air from the a central dedicated outdoor air system (DOAS) with un-conditioned recirculation air from a zone exhaust node is supplied to the ZoneHVAC equipment inlet node. The mixer model will sum the two air streams and average the air properties. The AirTerminal:SingleDuct:Mixer is used with the ZoneHVAC:FourPipeFanCoil, ZoneHVAC:WaterToAirHeatPump, ZoneHVAC:PackagedTerminalAirConditioner, ZoneHVAC:PackagedTerminalHeatPump, ZoneHVAC:TerminalUnit:VariableRefrigerantFlow, ZoneHVAC:UnitVentilator, and AirLoopHVAC:UnitarySystem objects. The AirLoopHVAC:UnitarySystem object is used as a ZoneHVAC equipment. Since the ZoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the ZoneHVAC equipment are set to zero and the OutdoorAir:Mixer object type and object name input fields are left blank.
+This terminal mixer object mixes conditioned outdoor air (primary air) from DOAS air loop and recirculating (secondary air) and deliver it either to inlet or supply side of a local ZoneHVAC equipment. The terminal mixer can be connected either to the inlet or supply side of the local ZoneHVAC equipment and the connection type is specified in the input field \textit{Mixer Connection Type}. If the AirTerminal:SingleDuct:Mixer object is connected to the supply side, a mix of conditioned outdoor air from a central dedicated outdoor air system (DOAS) with conditioned recirculation air from the local ZoneHVAC equipment is supplied as a single stream to the conditioned zone at its inlet node. If the AirTerminal:SingleDuct:Mixer object is connected to the inlet side, a mix of outdoor air from the a central dedicated outdoor air system (DOAS) with un-conditioned recirculation air from a zone exhaust node is supplied to the ZoneHVAC equipment inlet node. The mixer model will sum the two air streams and average the air properties. The AirTerminal:SingleDuct:Mixer is used with:
+
+\begin{itemize}
+\setlength{\parskip}{0pt}
+\setlength{\itemsep}{0pt plus 2pt}
+\item ZoneHVAC:FourPipeFanCoil
+\item ZoneHVAC:WaterToAirHeatPump
+\item ZoneHVAC:PackagedTerminalAirConditioner
+\item ZoneHVAC:PackagedTerminalHeatPump
+\item ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+\item ZoneHVAC:UnitVentilator 
+\item AirLoopHVAC:UnitarySystem
+\end{itemize}
+
+
+The AirLoopHVAC:UnitarySystem object must be specified as a ZoneHVAC equipment. Since the ZoneHVAC equipment gets the outdoor air or ventilation air from central dedicated OA system, the design outdoor air flow rate input fields in the ZoneHVAC equipment are set to zero and the OutdoorAir:Mixer object type and object name input fields are left blank.
 
 \begin{figure}[hbtp] % fig 108
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image275.png}
-\caption{Inlet Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:inlet-side-mixer-air-terminal-unit-with-fan}}
+\caption{Inlet Side Mixer Air Terminal Unit with ZoneHVAC Equipment \protect \label{fig:inlet-side-mixer-air-terminal-unit-with-ZoneHVAC-equipment}}
 \end{figure}
 \begin{figure}[hbtp] % fig 109
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image276.png}
-\caption{Supply Side Mixer Air Terminal Unit with Fan Coil \protect \label{fig:supply-side-mixer-air-terminal-unit-with-fan}}
+\caption{Supply Side Mixer Air Terminal Unit with ZoneHVAC equipment \protect \label{fig:supply-side-mixer-air-terminal-unit-with-ZoneHVAC-equipment}}
 \end{figure}
+
 
 
 \subsubsection{Inputs}\label{inputs-12-000}

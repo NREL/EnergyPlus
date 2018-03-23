@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -64,7 +65,8 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <ReportSizingManager.hh>
@@ -98,7 +100,7 @@ namespace OutsideEnergySources {
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_PurchHotWater;
 	using DataPlant::TypeOf_PurchChilledWater;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 
 	//MODULE PARAMETER DEFINITIONS
 	int const EnergyType_DistrictHeating( 1 );
@@ -119,6 +121,7 @@ namespace OutsideEnergySources {
 	// Object Data
 	Array1D< OutsideEnergySourceSpecs > EnergySource;
 	Array1D< ReportVars > EnergySourceReport;
+	std::unordered_map< std::string, std::string > EnergySourceUniqueNames;
 
 	// Functions
 	void
@@ -128,6 +131,7 @@ namespace OutsideEnergySources {
 		SimOutsideEnergyGetInputFlag = true;
 		EnergySource.deallocate();
 		EnergySourceReport.deallocate();
+		EnergySourceUniqueNames.clear();
 	}
 
 
@@ -156,27 +160,6 @@ namespace OutsideEnergySources {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manage the simulation of district (aka purchased) energy.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		/////////// hoisted into namespace SimOutsideEnergyGetInputFlag ////////////
 		// static bool GetInputFlag( true ); // Get input once and once only
@@ -195,7 +178,7 @@ namespace OutsideEnergySources {
 
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
-			EqNum = FindItemInList( EquipName, EnergySource );
+			EqNum = UtilityRoutines::FindItemInList( EquipName, EnergySource );
 			if ( EqNum == 0 ) {
 				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
 			}
@@ -253,9 +236,6 @@ namespace OutsideEnergySources {
 		// METHODOLOGY EMPLOYED: to be determined...
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -263,19 +243,6 @@ namespace OutsideEnergySources {
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using DataGlobals::ScheduleAlwaysOn;
 		using DataSizing::AutoSize;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EnergySourceNum;
@@ -286,19 +253,18 @@ namespace OutsideEnergySources {
 		int NumDistrictUnitsCool;
 		int IndexCounter;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 		cCurrentModuleObject = "DistrictHeating";
-		NumDistrictUnitsHeat = GetNumObjectsFound( cCurrentModuleObject );
+		NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		cCurrentModuleObject = "DistrictCooling";
-		NumDistrictUnitsCool = GetNumObjectsFound( cCurrentModuleObject );
+		NumDistrictUnitsCool = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
 		if ( allocated( EnergySource ) ) return;
 
 		EnergySource.allocate( NumDistrictUnits );
+		EnergySourceUniqueNames.reserve( static_cast< unsigned >( NumDistrictUnits ) );
 		EnergySourceReport.allocate( NumDistrictUnits );
 
 		cCurrentModuleObject = "DistrictHeating";
@@ -306,16 +272,10 @@ namespace OutsideEnergySources {
 		EnergySourceNum = 0;
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter ) {
 			++EnergySourceNum;
-			GetObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";
@@ -355,13 +315,13 @@ namespace OutsideEnergySources {
 		EnergySourceNum = 0;
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter ) {
 			++EnergySourceNum;
-			SetupOutputVariable( "District Heating Hot Water Energy [J]", EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictHeating", "Heating", _, "Plant" );
-			SetupOutputVariable( "District Heating Hot Water Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Hot Water Energy", OutputProcessor::Unit::J, EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictHeating", "Heating", _, "Plant" );
+			SetupOutputVariable( "District Heating Hot Water Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 
-			SetupOutputVariable( "District Heating Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Inlet Temperature [C]", EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Outlet Temperature [C]", EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Mass Flow Rate [kg/s]", EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Inlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Outlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 		}
 
 		cCurrentModuleObject = "DistrictCooling";
@@ -369,16 +329,10 @@ namespace OutsideEnergySources {
 		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter ) {
 			++EnergySourceNum;
-			GetObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
 
 			if ( EnergySourceNum > 1 ) {
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
+				GlobalNames::VerifyUniqueInterObjectName( EnergySourceUniqueNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			}
 			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
 			EnergySource( EnergySourceNum ).PlantLoopID = "";
@@ -419,13 +373,13 @@ namespace OutsideEnergySources {
 		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
 		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter ) {
 			++EnergySourceNum;
-			SetupOutputVariable( "District Cooling Chilled Water Energy [J]", EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictCooling", "Cooling", _, "Plant" );
-			SetupOutputVariable( "District Cooling Chilled Water Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Chilled Water Energy", OutputProcessor::Unit::J, EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictCooling", "Cooling", _, "Plant" );
+			SetupOutputVariable( "District Cooling Chilled Water Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 
-			SetupOutputVariable( "District Cooling Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Inlet Temperature [C]", EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Outlet Temperature [C]", EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Mass Flow Rate [kg/s]", EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Rate", OutputProcessor::Unit::W, EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Inlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Outlet Temperature", OutputProcessor::Unit::C, EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
+			SetupOutputVariable( "District Cooling Mass Flow Rate", OutputProcessor::Unit::kg_s, EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
 		}
 
 	}

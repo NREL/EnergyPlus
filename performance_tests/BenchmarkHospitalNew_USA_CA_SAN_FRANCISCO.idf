@@ -78,7 +78,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  VERSION,8.6;
+  Version,8.9;
 
 !
 !- Run Controls sections
@@ -1969,7 +1969,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam1_Mult4_Flr_1,  !- Name
@@ -2095,7 +2095,7 @@
     ER_Exam1_Mult4_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ER_Exam1_Mult4_Flr_1 Air Node,  !- Zone Air Node Name
-    ER_Exam1_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    ER_Exam1_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ER_Exam1_Mult4_Flr_1 Inlet Nodes,  !- Name
@@ -2103,6 +2103,7 @@
 
   ZoneHVAC:EquipmentList,
     ER_Exam1_Mult4_Flr_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ER_Exam1_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2372,7 +2373,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam2_Flr_1,   !- Name
@@ -2498,7 +2499,7 @@
     ER_Exam2_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ER_Exam2_Flr_1 Air Node, !- Zone Air Node Name
-    ER_Exam2_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    ER_Exam2_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ER_Exam2_Flr_1 Inlet Nodes,  !- Name
@@ -2506,6 +2507,7 @@
 
   ZoneHVAC:EquipmentList,
     ER_Exam2_Flr_1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ER_Exam2_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2775,7 +2777,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam3_Mult4_Flr_1,  !- Name
@@ -2901,7 +2903,7 @@
     ER_Exam3_Mult4_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ER_Exam3_Mult4_Flr_1 Air Node,  !- Zone Air Node Name
-    ER_Exam3_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    ER_Exam3_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ER_Exam3_Mult4_Flr_1 Inlet Nodes,  !- Name
@@ -2909,6 +2911,7 @@
 
   ZoneHVAC:EquipmentList,
     ER_Exam3_Mult4_Flr_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ER_Exam3_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3178,7 +3181,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam4_Flr_1,   !- Name
@@ -3304,7 +3307,7 @@
     ER_Exam4_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ER_Exam4_Flr_1 Air Node, !- Zone Air Node Name
-    ER_Exam4_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    ER_Exam4_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ER_Exam4_Flr_1 Inlet Nodes,  !- Name
@@ -3312,6 +3315,7 @@
 
   ZoneHVAC:EquipmentList,
     ER_Exam4_Flr_1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ER_Exam4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3581,7 +3585,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_Exam5_Mult4_Flr_1,  !- Name
@@ -3707,7 +3711,7 @@
     ER_Exam5_Mult4_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ER_Exam5_Mult4_Flr_1 Air Node,  !- Zone Air Node Name
-    ER_Exam5_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    ER_Exam5_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ER_Exam5_Mult4_Flr_1 Inlet Nodes,  !- Name
@@ -3715,6 +3719,7 @@
 
   ZoneHVAC:EquipmentList,
     ER_Exam5_Mult4_Flr_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ER_Exam5_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4000,7 +4005,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office1_Mult4_Flr_1,  !- Name
@@ -4126,7 +4131,7 @@
     Office1_Mult4_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Office1_Mult4_Flr_1 Air Node,  !- Zone Air Node Name
-    Office1_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    Office1_Mult4_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Office1_Mult4_Flr_1 Inlet Nodes,  !- Name
@@ -4134,6 +4139,7 @@
 
   ZoneHVAC:EquipmentList,
     Office1_Mult4_Flr_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Office1_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4452,7 +4458,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Lobby_Flr_1,      !- Name
@@ -4578,7 +4584,7 @@
     Lobby_Flr_1 Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Lobby_Flr_1 Air Node,    !- Zone Air Node Name
-    Lobby_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    Lobby_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Lobby_Flr_1 Inlet Nodes, !- Name
@@ -4586,6 +4592,7 @@
 
   ZoneHVAC:EquipmentList,
     Lobby_Flr_1 Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Lobby_Flr_1 VAV Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4816,7 +4823,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_Flr_1,   !- Name
@@ -4914,7 +4921,7 @@
     Corridor_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Flr_1 Air Node, !- Zone Air Node Name
-    Corridor_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    Corridor_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_Flr_1 Inlet Nodes,  !- Name
@@ -4922,6 +4929,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Flr_1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5224,7 +5232,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ER_NurseStat_Flr_1,  !- Name
@@ -5350,7 +5358,7 @@
     ER_NurseStat_Flr_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ER_NurseStat_Flr_1 Air Node,  !- Zone Air Node Name
-    ER_NurseStat_Flr_1 Return Air Node;  !- Zone Return Air Node Name
+    ER_NurseStat_Flr_1 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ER_NurseStat_Flr_1 Inlet Nodes,  !- Name
@@ -5358,6 +5366,7 @@
 
   ZoneHVAC:EquipmentList,
     ER_NurseStat_Flr_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ER_NurseStat_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5572,7 +5581,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR1_Flr_2,        !- Name
@@ -5698,7 +5707,7 @@
     OR1_Flr_2 Inlet Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     OR1_Flr_2 Air Node,      !- Zone Air Node Name
-    OR1_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    OR1_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     OR1_Flr_2 Inlet Nodes,   !- Name
@@ -5706,6 +5715,7 @@
 
   ZoneHVAC:EquipmentList,
     OR1_Flr_2 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     OR1_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5975,7 +5985,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR2_Mult5_Flr_2,  !- Name
@@ -6101,7 +6111,7 @@
     OR2_Mult5_Flr_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     OR2_Mult5_Flr_2 Air Node,!- Zone Air Node Name
-    OR2_Mult5_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    OR2_Mult5_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     OR2_Mult5_Flr_2 Inlet Nodes,  !- Name
@@ -6109,6 +6119,7 @@
 
   ZoneHVAC:EquipmentList,
     OR2_Mult5_Flr_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     OR2_Mult5_Flr_2 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6378,7 +6389,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR3_Flr_2,        !- Name
@@ -6504,7 +6515,7 @@
     OR3_Flr_2 Inlet Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     OR3_Flr_2 Air Node,      !- Zone Air Node Name
-    OR3_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    OR3_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     OR3_Flr_2 Inlet Nodes,   !- Name
@@ -6512,6 +6523,7 @@
 
   ZoneHVAC:EquipmentList,
     OR3_Flr_2 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     OR3_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -6781,7 +6793,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR4_Flr_2,        !- Name
@@ -6907,7 +6919,7 @@
     OR4_Flr_2 Inlet Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     OR4_Flr_2 Air Node,      !- Zone Air Node Name
-    OR4_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    OR4_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     OR4_Flr_2 Inlet Nodes,   !- Name
@@ -6915,6 +6927,7 @@
 
   ZoneHVAC:EquipmentList,
     OR4_Flr_2 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     OR4_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7200,7 +7213,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:IC_PatRoom1_Mult5_Flr_2,  !- Name
@@ -7326,7 +7339,7 @@
     IC_PatRoom1_Mult5_Flr_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     IC_PatRoom1_Mult5_Flr_2 Air Node,  !- Zone Air Node Name
-    IC_PatRoom1_Mult5_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    IC_PatRoom1_Mult5_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     IC_PatRoom1_Mult5_Flr_2 Inlet Nodes,  !- Name
@@ -7334,6 +7347,7 @@
 
   ZoneHVAC:EquipmentList,
     IC_PatRoom1_Mult5_Flr_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     IC_PatRoom1_Mult5_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7580,7 +7594,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:IC_PatRoom2_Flr_2,!- Name
@@ -7706,7 +7720,7 @@
     IC_PatRoom2_Flr_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     IC_PatRoom2_Flr_2 Air Node,  !- Zone Air Node Name
-    IC_PatRoom2_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    IC_PatRoom2_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     IC_PatRoom2_Flr_2 Inlet Nodes,  !- Name
@@ -7714,6 +7728,7 @@
 
   ZoneHVAC:EquipmentList,
     IC_PatRoom2_Flr_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     IC_PatRoom2_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -7944,7 +7959,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:IC_PatRoom3_Mult6_Flr_2,  !- Name
@@ -8070,7 +8085,7 @@
     IC_PatRoom3_Mult6_Flr_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     IC_PatRoom3_Mult6_Flr_2 Air Node,  !- Zone Air Node Name
-    IC_PatRoom3_Mult6_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    IC_PatRoom3_Mult6_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     IC_PatRoom3_Mult6_Flr_2 Inlet Nodes,  !- Name
@@ -8078,6 +8093,7 @@
 
   ZoneHVAC:EquipmentList,
     IC_PatRoom3_Mult6_Flr_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     IC_PatRoom3_Mult6_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -8308,7 +8324,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ICU_Flr_2,        !- Name
@@ -8434,7 +8450,7 @@
     ICU_Flr_2 Inlet Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ICU_Flr_2 Air Node,      !- Zone Air Node Name
-    ICU_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    ICU_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ICU_Flr_2 Inlet Nodes,   !- Name
@@ -8442,6 +8458,7 @@
 
   ZoneHVAC:EquipmentList,
     ICU_Flr_2 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ICU_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -8656,7 +8673,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:ICU_NurseSat_Flr_2,  !- Name
@@ -8782,7 +8799,7 @@
     ICU_NurseSat_Flr_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ICU_NurseSat_Flr_2 Air Node,  !- Zone Air Node Name
-    ICU_NurseSat_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    ICU_NurseSat_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     ICU_NurseSat_Flr_2 Inlet Nodes,  !- Name
@@ -8790,6 +8807,7 @@
 
   ZoneHVAC:EquipmentList,
     ICU_NurseSat_Flr_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ICU_NurseSat_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9004,7 +9022,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_Flr_2,   !- Name
@@ -9102,7 +9120,7 @@
     Corridor_Flr_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Flr_2 Air Node, !- Zone Air Node Name
-    Corridor_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    Corridor_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_Flr_2 Inlet Nodes,  !- Name
@@ -9110,6 +9128,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Flr_2 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9412,7 +9431,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:OR_NurseSat_Flr_2,!- Name
@@ -9538,7 +9557,7 @@
     OR_NurseSat_Flr_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     OR_NurseSat_Flr_2 Air Node,  !- Zone Air Node Name
-    OR_NurseSat_Flr_2 Return Air Node;  !- Zone Return Air Node Name
+    OR_NurseSat_Flr_2 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     OR_NurseSat_Flr_2 Inlet Nodes,  !- Name
@@ -9546,6 +9565,7 @@
 
   ZoneHVAC:EquipmentList,
     OR_NurseSat_Flr_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     OR_NurseSat_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -9776,7 +9796,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom1_Mult10_Flr_3,  !- Name
@@ -9902,7 +9922,7 @@
     PatRoom1_Mult10_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom1_Mult10_Flr_3 Air Node,  !- Zone Air Node Name
-    PatRoom1_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom1_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom1_Mult10_Flr_3 Inlet Nodes,  !- Name
@@ -9910,6 +9930,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom1_Mult10_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom1_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -10211,7 +10232,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom2_Flr_3,   !- Name
@@ -10337,7 +10358,7 @@
     PatRoom2_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom2_Flr_3 Air Node, !- Zone Air Node Name
-    PatRoom2_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom2_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom2_Flr_3 Inlet Nodes,  !- Name
@@ -10345,6 +10366,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom2_Flr_3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom2_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -10630,7 +10652,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom3_Mult10_Flr_3,  !- Name
@@ -10756,7 +10778,7 @@
     PatRoom3_Mult10_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom3_Mult10_Flr_3 Air Node,  !- Zone Air Node Name
-    PatRoom3_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom3_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom3_Mult10_Flr_3 Inlet Nodes,  !- Name
@@ -10764,6 +10786,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom3_Mult10_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom3_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -11065,7 +11088,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom4_Flr_3,   !- Name
@@ -11191,7 +11214,7 @@
     PatRoom4_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom4_Flr_3 Air Node, !- Zone Air Node Name
-    PatRoom4_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom4_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom4_Flr_3 Inlet Nodes,  !- Name
@@ -11199,6 +11222,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom4_Flr_3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom4_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -11484,7 +11508,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom5_Mult10_Flr_3,  !- Name
@@ -11610,7 +11634,7 @@
     PatRoom5_Mult10_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom5_Mult10_Flr_3 Air Node,  !- Zone Air Node Name
-    PatRoom5_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom5_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom5_Mult10_Flr_3 Inlet Nodes,  !- Name
@@ -11618,6 +11642,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom5_Mult10_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom5_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -11887,7 +11912,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PhysTherapy_Flr_3,!- Name
@@ -12013,7 +12038,7 @@
     PhysTherapy_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PhysTherapy_Flr_3 Air Node,  !- Zone Air Node Name
-    PhysTherapy_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PhysTherapy_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PhysTherapy_Flr_3 Inlet Nodes,  !- Name
@@ -12021,6 +12046,7 @@
 
   ZoneHVAC:EquipmentList,
     PhysTherapy_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PhysTherapy_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -12322,7 +12348,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom6_Flr_3,   !- Name
@@ -12448,7 +12474,7 @@
     PatRoom6_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom6_Flr_3 Air Node, !- Zone Air Node Name
-    PatRoom6_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom6_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom6_Flr_3 Inlet Nodes,  !- Name
@@ -12456,6 +12482,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom6_Flr_3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom6_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -12741,7 +12768,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom7_Mult10_Flr_3,  !- Name
@@ -12867,7 +12894,7 @@
     PatRoom7_Mult10_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom7_Mult10_Flr_3 Air Node,  !- Zone Air Node Name
-    PatRoom7_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom7_Mult10_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom7_Mult10_Flr_3 Inlet Nodes,  !- Name
@@ -12875,6 +12902,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom7_Mult10_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom7_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -13176,7 +13204,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom8_Flr_3,   !- Name
@@ -13302,7 +13330,7 @@
     PatRoom8_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom8_Flr_3 Air Node, !- Zone Air Node Name
-    PatRoom8_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom8_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom8_Flr_3 Inlet Nodes,  !- Name
@@ -13310,6 +13338,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom8_Flr_3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom8_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -13687,7 +13716,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:NurseSat_Lobby_Flr_3,  !- Name
@@ -13813,7 +13842,7 @@
     NurseSat_Lobby_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NurseSat_Lobby_Flr_3 Air Node,  !- Zone Air Node Name
-    NurseSat_Lobby_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    NurseSat_Lobby_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     NurseSat_Lobby_Flr_3 Inlet Nodes,  !- Name
@@ -13821,6 +13850,7 @@
 
   ZoneHVAC:EquipmentList,
     NurseSat_Lobby_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     NurseSat_Lobby_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14071,7 +14101,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Lab_Flr_3,        !- Name
@@ -14197,7 +14227,7 @@
     Lab_Flr_3 Inlet Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Lab_Flr_3 Air Node,      !- Zone Air Node Name
-    Lab_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    Lab_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Lab_Flr_3 Inlet Nodes,   !- Name
@@ -14205,6 +14235,7 @@
 
   ZoneHVAC:EquipmentList,
     Lab_Flr_3 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Lab_Flr_3 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14630,7 +14661,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_SE_Flr_3,!- Name
@@ -14728,7 +14759,7 @@
     Corridor_SE_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_SE_Flr_3 Air Node,  !- Zone Air Node Name
-    Corridor_SE_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    Corridor_SE_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_SE_Flr_3 Inlet Nodes,  !- Name
@@ -14736,6 +14767,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_SE_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_SE_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -15106,7 +15138,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_NW_Flr_3,!- Name
@@ -15204,7 +15236,7 @@
     Corridor_NW_Flr_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_NW_Flr_3 Air Node,  !- Zone Air Node Name
-    Corridor_NW_Flr_3 Return Air Node;  !- Zone Return Air Node Name
+    Corridor_NW_Flr_3 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_NW_Flr_3 Inlet Nodes,  !- Name
@@ -15212,6 +15244,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_NW_Flr_3 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_NW_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -15442,7 +15475,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom1_Mult10_Flr_4,  !- Name
@@ -15568,7 +15601,7 @@
     PatRoom1_Mult10_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom1_Mult10_Flr_4 Air Node,  !- Zone Air Node Name
-    PatRoom1_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom1_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom1_Mult10_Flr_4 Inlet Nodes,  !- Name
@@ -15576,6 +15609,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom1_Mult10_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom1_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -15877,7 +15911,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom2_Flr_4,   !- Name
@@ -16003,7 +16037,7 @@
     PatRoom2_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom2_Flr_4 Air Node, !- Zone Air Node Name
-    PatRoom2_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom2_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom2_Flr_4 Inlet Nodes,  !- Name
@@ -16011,6 +16045,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom2_Flr_4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom2_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -16296,7 +16331,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom3_Mult10_Flr_4,  !- Name
@@ -16422,7 +16457,7 @@
     PatRoom3_Mult10_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom3_Mult10_Flr_4 Air Node,  !- Zone Air Node Name
-    PatRoom3_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom3_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom3_Mult10_Flr_4 Inlet Nodes,  !- Name
@@ -16430,6 +16465,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom3_Mult10_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom3_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -16731,7 +16767,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom4_Flr_4,   !- Name
@@ -16857,7 +16893,7 @@
     PatRoom4_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom4_Flr_4 Air Node, !- Zone Air Node Name
-    PatRoom4_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom4_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom4_Flr_4 Inlet Nodes,  !- Name
@@ -16865,6 +16901,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom4_Flr_4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom4_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -17150,7 +17187,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom5_Mult10_Flr_4,  !- Name
@@ -17276,7 +17313,7 @@
     PatRoom5_Mult10_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom5_Mult10_Flr_4 Air Node,  !- Zone Air Node Name
-    PatRoom5_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom5_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom5_Mult10_Flr_4 Inlet Nodes,  !- Name
@@ -17284,6 +17321,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom5_Mult10_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom5_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -17553,7 +17591,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Radiology_Flr_4,  !- Name
@@ -17679,7 +17717,7 @@
     Radiology_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Radiology_Flr_4 Air Node,!- Zone Air Node Name
-    Radiology_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    Radiology_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Radiology_Flr_4 Inlet Nodes,  !- Name
@@ -17687,6 +17725,7 @@
 
   ZoneHVAC:EquipmentList,
     Radiology_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Radiology_Flr_4 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -17988,7 +18027,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom6_Flr_4,   !- Name
@@ -18114,7 +18153,7 @@
     PatRoom6_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom6_Flr_4 Air Node, !- Zone Air Node Name
-    PatRoom6_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom6_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom6_Flr_4 Inlet Nodes,  !- Name
@@ -18122,6 +18161,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom6_Flr_4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom6_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18407,7 +18447,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom7_Mult10_Flr_4,  !- Name
@@ -18533,7 +18573,7 @@
     PatRoom7_Mult10_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom7_Mult10_Flr_4 Air Node,  !- Zone Air Node Name
-    PatRoom7_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom7_Mult10_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom7_Mult10_Flr_4 Inlet Nodes,  !- Name
@@ -18541,6 +18581,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom7_Mult10_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom7_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -18842,7 +18883,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:PatRoom8_Flr_4,   !- Name
@@ -18968,7 +19009,7 @@
     PatRoom8_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     PatRoom8_Flr_4 Air Node, !- Zone Air Node Name
-    PatRoom8_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    PatRoom8_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     PatRoom8_Flr_4 Inlet Nodes,  !- Name
@@ -18976,6 +19017,7 @@
 
   ZoneHVAC:EquipmentList,
     PatRoom8_Flr_4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     PatRoom8_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19353,7 +19395,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:NurseSat_Lobby_Flr_4,  !- Name
@@ -19479,7 +19521,7 @@
     NurseSat_Lobby_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NurseSat_Lobby_Flr_4 Air Node,  !- Zone Air Node Name
-    NurseSat_Lobby_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    NurseSat_Lobby_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     NurseSat_Lobby_Flr_4 Inlet Nodes,  !- Name
@@ -19487,6 +19529,7 @@
 
   ZoneHVAC:EquipmentList,
     NurseSat_Lobby_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     NurseSat_Lobby_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -19737,7 +19780,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Lab_Flr_4,        !- Name
@@ -19863,7 +19906,7 @@
     Lab_Flr_4 Inlet Nodes,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Lab_Flr_4 Air Node,      !- Zone Air Node Name
-    Lab_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    Lab_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Lab_Flr_4 Inlet Nodes,   !- Name
@@ -19871,6 +19914,7 @@
 
   ZoneHVAC:EquipmentList,
     Lab_Flr_4 Equipment,     !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Lab_Flr_4 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -20296,7 +20340,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_SE_Flr_4,!- Name
@@ -20394,7 +20438,7 @@
     Corridor_SE_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_SE_Flr_4 Air Node,  !- Zone Air Node Name
-    Corridor_SE_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    Corridor_SE_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_SE_Flr_4 Inlet Nodes,  !- Name
@@ -20402,6 +20446,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_SE_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_SE_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -20772,7 +20817,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_NW_Flr_4,!- Name
@@ -20870,7 +20915,7 @@
     Corridor_NW_Flr_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_NW_Flr_4 Air Node,  !- Zone Air Node Name
-    Corridor_NW_Flr_4 Return Air Node;  !- Zone Return Air Node Name
+    Corridor_NW_Flr_4 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_NW_Flr_4 Inlet Nodes,  !- Name
@@ -20878,6 +20923,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_NW_Flr_4 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_NW_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -21108,7 +21154,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Dining_Flr_5,     !- Name
@@ -21234,7 +21280,7 @@
     Dining_Flr_5 Inlet Nodes,!- Zone Air Inlet Node or NodeList Name
     Dining_Flr_5 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Dining_Flr_5 Air Node,   !- Zone Air Node Name
-    Dining_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    Dining_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Dining_Flr_5 Inlet Nodes,!- Name
@@ -21246,6 +21292,7 @@
 
   ZoneHVAC:EquipmentList,
     Dining_Flr_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
     Dining_Flr_5 Exhaust Fan,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -21489,7 +21536,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:NurseSat_Flr_5,   !- Name
@@ -21615,7 +21662,7 @@
     NurseSat_Flr_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NurseSat_Flr_5 Air Node, !- Zone Air Node Name
-    NurseSat_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    NurseSat_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     NurseSat_Flr_5 Inlet Nodes,  !- Name
@@ -21623,6 +21670,7 @@
 
   ZoneHVAC:EquipmentList,
     NurseSat_Flr_5 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     NurseSat_Flr_5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -21853,7 +21901,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Kitchen_Flr_5,    !- Name
@@ -21935,7 +21983,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     149945.5066,             !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.0000,                  !- Fraction Latent
     0.5000,                  !- Fraction Radiant
     0.0000,                  !- Fraction Lost
@@ -22008,7 +22056,7 @@
     Kitchen_Flr_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Kitchen_Flr_5 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Kitchen_Flr_5 Air Node,  !- Zone Air Node Name
-    Kitchen_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    Kitchen_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Kitchen_Flr_5 Inlet Nodes,  !- Name
@@ -22020,6 +22068,7 @@
 
   ZoneHVAC:EquipmentList,
     Kitchen_Flr_5 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
     Kitchen_Flr_5 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -22197,7 +22246,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -22209,7 +22258,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -22596,7 +22645,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office1_Flr_5,    !- Name
@@ -22722,7 +22771,7 @@
     Office1_Flr_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Office1_Flr_5 Air Node,  !- Zone Air Node Name
-    Office1_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    Office1_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Office1_Flr_5 Inlet Nodes,  !- Name
@@ -22730,6 +22779,7 @@
 
   ZoneHVAC:EquipmentList,
     Office1_Flr_5 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Office1_Flr_5 VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -22960,7 +23010,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office2_Mult5_Flr_5,  !- Name
@@ -23086,7 +23136,7 @@
     Office2_Mult5_Flr_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Office2_Mult5_Flr_5 Air Node,  !- Zone Air Node Name
-    Office2_Mult5_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    Office2_Mult5_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Office2_Mult5_Flr_5 Inlet Nodes,  !- Name
@@ -23094,6 +23144,7 @@
 
   ZoneHVAC:EquipmentList,
     Office2_Mult5_Flr_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Office2_Mult5_Flr_5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -23340,7 +23391,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office3_Flr_5,    !- Name
@@ -23466,7 +23517,7 @@
     Office3_Flr_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Office3_Flr_5 Air Node,  !- Zone Air Node Name
-    Office3_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    Office3_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Office3_Flr_5 Inlet Nodes,  !- Name
@@ -23474,6 +23525,7 @@
 
   ZoneHVAC:EquipmentList,
     Office3_Flr_5 Equipment, !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Office3_Flr_5 VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -23704,7 +23756,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Office4_Mult6_Flr_5,  !- Name
@@ -23830,7 +23882,7 @@
     Office4_Mult6_Flr_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Office4_Mult6_Flr_5 Air Node,  !- Zone Air Node Name
-    Office4_Mult6_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    Office4_Mult6_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Office4_Mult6_Flr_5 Inlet Nodes,  !- Name
@@ -23838,6 +23890,7 @@
 
   ZoneHVAC:EquipmentList,
     Office4_Mult6_Flr_5 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Office4_Mult6_Flr_5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -24124,7 +24177,7 @@
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
-    No;                      !- Thermal Comfort Model 1 Type
+    ;                      !- Thermal Comfort Model 1 Type
 
   ComponentCost:LineItem,
     People:Corridor_Flr_5,   !- Name
@@ -24222,7 +24275,7 @@
     Corridor_Flr_5 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Flr_5 Air Node, !- Zone Air Node Name
-    Corridor_Flr_5 Return Air Node;  !- Zone Return Air Node Name
+    Corridor_Flr_5 Return Air Node;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Corridor_Flr_5 Inlet Nodes,  !- Name
@@ -24230,6 +24283,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Flr_5 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Flr_5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -26998,7 +27052,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeakDemandCharge,!- Name
+    SummerOnPeakDemandCharge,!- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     PeakDemand,              !- Source Variable
     Summer,                  !- Season
@@ -27006,7 +27060,7 @@
     13.51;                   !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerMidPeakDemandCharge,  !- Name
+    SummerMidPeakDemandCharge,  !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     MidPeakDemand,           !- Source Variable
     Summer,                  !- Season
@@ -27014,7 +27068,7 @@
     3.75;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerDemandCharge,      !- Name
+    SummerDemandCharge,      !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     totalDemand,             !- Source Variable
     Summer,                  !- Season
@@ -27022,7 +27076,7 @@
     3.18;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterMidPeakDemandCharge,  !- Name
+    WinterMidPeakDemandCharge,  !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     MidPeakDemand,           !- Source Variable
     Winter,                  !- Season
@@ -27030,7 +27084,7 @@
     3.69;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterDemandCharge,      !- Name
+    WinterDemandCharge,      !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     totalDemand,             !- Source Variable
     Winter,                  !- Season
@@ -27038,7 +27092,7 @@
     3.18;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerPeakEnergyCharge,  !- Name
+    SummerPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     PeakEnergy,              !- Source Variable
     Summer,                  !- Season
@@ -27046,7 +27100,7 @@
     0.15746;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerMidPeakEnergyCharge,  !- Name
+    SummerMidPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     MidPeakEnergy,           !- Source Variable
     Summer,                  !- Season
@@ -27054,7 +27108,7 @@
     0.09613;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakEnergyCharge,  !- Name
+    SummerOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Summer,                  !- Season
@@ -27062,7 +27116,7 @@
     0.08203;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterMidPeakEnergyCharge,  !- Name
+    WinterMidPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     MidPeakEnergy,           !- Source Variable
     Winter,                  !- Season
@@ -27070,7 +27124,7 @@
     0.10181;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterOffPeakEnergyCharge,  !- Name
+    WinterOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Winter,                  !- Season
@@ -27078,7 +27132,7 @@
     0.08203;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand500kw,          !- Name
+    MinDemand500kw,          !- Utility Cost Qualify Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -27088,7 +27142,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     PGE_E-19_MediumGeneralTOUDemandService,  !- Tariff Name
     subtotal,                !- Source Variable
     Annual,                  !- Season
@@ -27114,7 +27168,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerEnergyCharge,      !- Name
+    SummerEnergyCharge,      !- Utility Cost Charge Simple Name
     PGE_A-10MediumGeneralDemandService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -27122,7 +27176,7 @@
     0.1416;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Simple Name
     PGE_A-10MediumGeneralDemandService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -27130,7 +27184,7 @@
     0.1030;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerDemandCharge,      !- Name
+    SummerDemandCharge,      !- Utility Cost Charge Simple Name
     PGE_A-10MediumGeneralDemandService,  !- Tariff Name
     totalDemand,             !- Source Variable
     Summer,                  !- Season
@@ -27138,7 +27192,7 @@
     6.56;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterDemandCharge,      !- Name
+    WinterDemandCharge,      !- Utility Cost Charge Simple Name
     PGE_A-10MediumGeneralDemandService,  !- Tariff Name
     totalDemand,             !- Source Variable
     Winter,                  !- Season
@@ -27146,7 +27200,7 @@
     1.58;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand500kw,          !- Name
+    MaxDemand500kw,          !- Utility Cost Qualify Name
     PGE_A-10MediumGeneralDemandService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -27156,7 +27210,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     PGE_A-10MediumGeneralDemandService,  !- Tariff Name
     subtotal,                !- Source Variable
     Annual,                  !- Season
@@ -27182,7 +27236,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerEnergyCharge,      !- Name
+    SummerEnergyCharge,      !- Utility Cost Charge Simple Name
     PGE_A-1SmallGeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Summer,                  !- Season
@@ -27190,7 +27244,7 @@
     0.1794;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Simple Name
     PGE_A-1SmallGeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -27198,7 +27252,7 @@
     0.1179;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand500kw,          !- Name
+    MaxDemand500kw,          !- Utility Cost Qualify Name
     PGE_A-1SmallGeneralService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -27208,7 +27262,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Qualify,
-    MaxEnergy4200kwh,        !- Name
+    MaxEnergy4200kwh,        !- Utility Cost Qualify Name
     PGE_A-1SmallGeneralService,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -27218,7 +27272,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     PGE_A-1SmallGeneralService,  !- Tariff Name
     subtotal,                !- Source Variable
     Annual,                  !- Season
@@ -27244,7 +27298,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     CA_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -27268,7 +27322,7 @@
     7.64;                    !- November Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     CA_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -91,6 +92,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 		"    Zone 1 Return Node;       !- Zone Return Air Node Name",
 		"ZoneHVAC:EquipmentList,",
 		"    Zone 1 Equipment,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Zone 1 ADU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -119,7 +121,7 @@ TEST_F( EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule ) {
 
 	} ) ;
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -243,6 +245,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 		"    Zone 1 Return Node;       !- Zone Return Air Node Name",
 		"ZoneHVAC:EquipmentList,",
 		"    Zone 1 Equipment,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    Zone 1 ADU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -290,7 +293,7 @@ TEST_F( EnergyPlusFixture, VAVReheatTerminalUnitSchedule ) {
 
 	} ) ;
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -621,6 +624,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space Eq,                !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -634,6 +638,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space2 Eq,               !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1249,7 +1254,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 
@@ -1313,7 +1318,6 @@ TEST_F( EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir ) {
 	SingleDuct::Sys( 1 ).OARequirementsPtr = 1;
 	SingleDuct::Sys( 1 ).AirLoopNum = 1;
 
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
  	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;	
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 0.4;
@@ -1560,6 +1564,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space Eq,                !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -1573,6 +1578,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 
 		"  ZoneHVAC:EquipmentList,",
 		"    Space2 Eq,               !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
 		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 		"    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
 		"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -2443,7 +2449,7 @@ TEST_F( EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing )
 		"  Temperature;             !- Output Unit Type",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 
@@ -2507,8 +2513,6 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 	SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false;
 	SysATMixer( ATMixerNum ).OARequirementsPtr = 1;
 
-	DataZoneEquipment::ZoneEquipConfig( 1 ).AirLoopNum = 1;
-
 	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 1.0;
 
 	Zone( 1 ).FloorArea = 10.0;
@@ -2546,3 +2550,173 @@ TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest ) {
 	DataHeatBalance::ZoneIntGain.deallocate( );
 
 }
+TEST_F( EnergyPlusFixture, TerminalUnitMixerInitTest2 ) {
+
+	// Address #6205
+	// Address #6241
+
+	using SingleDuct::SysATMixer;
+	int ATMixerNum = 1;
+	SingleDuct::NumATMixers = 1;
+	DataHeatBalance::TotPeople = 1;
+
+	SysATMixer.allocate( ATMixerNum );
+	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
+	DataAirLoop::AirLoopFlow.allocate( 1 );
+	DataLoopNode::Node.allocate( 3 );
+	DataSizing::OARequirements.allocate( 1 );
+	Zone.allocate( 1 );
+	DataHeatBalance::ZoneIntGain.allocate( 1 );
+
+	SysATMixer( ATMixerNum ).SecInNode = 1;
+	SysATMixer( ATMixerNum ).PriInNode = 2;
+	SysATMixer( ATMixerNum ).MixedAirOutNode = 3;
+	SysATMixer( ATMixerNum ).AirLoopNum = 1;
+	SysATMixer( ATMixerNum ).ZoneNum = 1;
+	SysATMixer( ATMixerNum ).ZoneEqNum = 1;
+	SysATMixer( ATMixerNum ).NoOAFlowInputFromUser = false;
+	SysATMixer( ATMixerNum ).OARequirementsPtr = 1;
+
+	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+ 	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;	
+
+	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 1.0;
+
+	Zone( 1 ).FloorArea = 10.0;
+	OARequirements( 1 ).OAFlowMethod = OAFlowSum;
+	OARequirements( 1 ).OAFlowPerZone = 0.5;
+	OARequirements( 1 ).OAFlowPerPerson = 0.0;
+	OARequirements( 1 ).OAFlowPerArea = 0.0;
+	OARequirements( 1 ).OAFlowACH = 0.0;
+
+	DataLoopNode::Node( 2 ).Press = 101325.0;
+	DataLoopNode::Node( 2 ).Temp = 23.0;
+	DataLoopNode::Node( 2 ).HumRat = 0.001;
+
+	DataHeatBalance::ZoneIntGain( 1 ).NOFOCC = 5.0;
+
+	DataEnvironment::StdRhoAir = 1.0;
+	SysATMixer( 1 ).MassFlowRateMaxAvail = 1.0;
+	// No airloop data exists, so skip these parts of the init
+	SysATMixer( 1 ).OneTimeInitFlag = false;
+	SysATMixer( 1 ).OneTimeInitFlag2 = false;
+	// Current occupancy
+	SysATMixer( 1 ).OAPerPersonMode = 1;
+
+	// InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
+	SysATMixer( 1 ).MixerType = DataHVACGlobals::ATMixer_InletSide;
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 1.0;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.5, 0.0001 );
+
+	// InletSideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal mixed air flow
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 0.10;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.10, 0.0001 );
+
+	// SupplySideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
+	SysATMixer( 1 ).MixerType = DataHVACGlobals::ATMixer_SupplySide;
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 1.0;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.5, 0.0001 );
+
+	// SupplySideMixer, Mixed air outlet mass flow < OA requirement, expect primary flow to equal OA requirement
+	DataLoopNode::Node( SysATMixer( 1 ).MixedAirOutNode ).MassFlowRate = 0.10;
+	SysATMixer( 1 ).InitATMixer( true );
+	EXPECT_NEAR( DataLoopNode::Node( SysATMixer( 1 ).PriInNode ).MassFlowRate, 0.5, 0.0001 );
+	SysATMixer.deallocate( );
+	DataZoneEquipment::ZoneEquipConfig.deallocate( );
+	DataAirLoop::AirLoopFlow.deallocate( );
+	DataLoopNode::Node.deallocate( );
+	DataSizing::OARequirements.deallocate( );
+	Zone.deallocate( );
+	DataHeatBalance::ZoneIntGain.deallocate( );
+
+}
+
+TEST_F( EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac ) {
+	std::string const idf_objects = delimited_string( {
+		"Version,8.8;",
+		"  Zone,",
+		"    Zone 1;                !- Name",
+		"ZoneHVAC:EquipmentConnections,",
+		"    Zone 1,                !- Zone Name",
+		"    Zone 1 Equipment,             !- Zone Conditioning Equipment List Name",
+		"    Zone 1 Supply Inlet,       !- Zone Air Inlet Node or NodeList Name",
+		"    ,      !- Zone Air Exhaust Node or NodeList Name",
+		"    Zone 1 Air Node,           !- Zone Air Node Name",
+		"    Zone 1 Return Node;       !- Zone Return Air Node Name",
+		"ZoneHVAC:EquipmentList,",
+		"    Zone 1 Equipment,             !- Name",
+		"    SequentialLoad,          !- Load Distribution Scheme",
+		"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+		"    Zone 1 ADU,            !- Zone Equipment 1 Name",
+		"    1,                       !- Zone Equipment 1 Cooling Sequence",
+		"    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+		"ZoneHVAC:AirDistributionUnit,",
+		"    Zone 1 ADU,    !- Name",
+		"    Zone 1 Supply Inlet,     !- Air Distribution Unit Outlet Node Name",
+		"    AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type",
+		"    Zone 1 VAV Reheat;           !- Air Terminal Name",
+		"AirTerminal:SingleDuct:VAV:Reheat,",
+		"    Zone 1 VAV Reheat,       !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    Zone 1 VAV Reheat Coil Air Inlet,  !- Damper Air Outlet Node Name",
+		"    Zone 1 Zone Equip Inlet, !- Air Inlet Node Name",
+		"    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+		"    Constant,                !- Zone Minimum Air Flow Input Method",
+		"    autosize,                !- Constant Minimum Air Flow Fraction",
+		"    ,                        !- Fixed Minimum Air Flow Rate{m3/s}",
+		"    ,                        !- Minimum Air Flow Fraction Schedule Name",
+		"    Coil:Heating:Electric,   !- Reheat Coil Object Type",
+		"    Zone 1 Reheat Coil,      !- Reheat Coil Name",
+		"    ,                        !- Maximum Hot Water or Steam Flow Rate{m3/s}",
+		"    ,                        !- Minimum Hot Water or Steam Flow Rate{m3/s}",
+		"    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+		"    0.001,                   !- Convergence Tolerance",
+		"    ,                        !- Damper Heating Action",
+		"    ,                        !- Maximum Flow per Zone Floor Area During Reheat",
+		"    ;                        !- Maximum Flow Fraction During Reheat",
+		"Coil:Heating:Electric,",
+		"    Zone 1 Reheat Coil,      !- Name",
+		"    ,                        !- Availability Schedule Name",
+		"    1,                       !- Efficiency",
+		"    100,                     !- Nominal Capacity of the Coil {W}",
+		"    Zone 1 VAV Reheat Coil Air Inlet,  !- Air Inlet Node Name",
+		"    Zone 1 Supply Inlet,     !- Air Outlet Node Name",
+		"    ;                        !- Temperature Setpoint Node Name",
+	} ) ;
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	bool ErrorsFound = false;
+	HeatBalanceManager::GetZoneData(ErrorsFound);
+	ASSERT_FALSE(ErrorsFound);
+	DataZoneEquipment::GetZoneEquipmentData1();
+	DataSizing::TermUnitFinalZoneSizing.allocate( 1 );
+	DataSizing::TermUnitSizing.allocate( 1 );
+	DataSizing::FinalZoneSizing.allocate( 1 );
+	ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+	SingleDuct::GetSysInput();
+	EXPECT_TRUE( compare_err_stream( "" ) );
+
+	int SysNum = 1;
+
+	// First test -  design min flow < max flow
+	ZoneSizingRunDone = true;
+	CurZoneEqNum = 1;
+	CurTermUnitSizingNum = 1;
+	DataSizing::TermUnitFinalZoneSizing( 1 ).DesCoolVolFlowMin = 0.5;
+	SingleDuct::SizeSys( SysNum );
+	EXPECT_EQ( 0.5, SingleDuct::Sys( SysNum ).ZoneMinAirFrac );
+
+	// Second test -  design min flow > max flow
+	ZoneSizingRunDone = true;
+	CurZoneEqNum = 1;
+	CurTermUnitSizingNum = 1;
+	SingleDuct::Sys( SysNum ).ZoneMinAirFrac = AutoSize; // need to reset this so it sizes again
+	DataSizing::TermUnitFinalZoneSizing( 1 ).DesCoolVolFlowMin = 1.5;
+	SingleDuct::SizeSys( SysNum );
+	EXPECT_EQ( 1.0, SingleDuct::Sys( SysNum ).ZoneMinAirFrac );
+}
+

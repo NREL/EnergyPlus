@@ -83,7 +83,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 46
 
-  Version,8.8;
+  Version,8.9;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -267,7 +267,7 @@
     -6.00,                   !- Time Zone {hr}
     190;                     !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+ ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -297,7 +297,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
+ ! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2Â°C WB=25.5Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
@@ -464,14 +464,6 @@
     ;                        !- Visible Transmittance
 
 ! ***COMMON CONSTRUCTIONS AND MATERIALS***
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
 
   Construction,
     InteriorFurnishings,     !- Name
@@ -11324,7 +11316,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     241713,                  !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0.1000,                  !- Fraction Latent
     0.2000,                  !- Fraction Radiant
     0.7000,                  !- Fraction Lost
@@ -14570,6 +14562,7 @@
 
   ZoneHVAC:EquipmentList,
     Auditorium_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Auditorium_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14577,6 +14570,7 @@
 
   ZoneHVAC:EquipmentList,
     Aux_Gym_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Aux_Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14584,6 +14578,7 @@
 
   ZoneHVAC:EquipmentList,
     Bathrooms_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
     Bathrooms_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14595,6 +14590,7 @@
 
   ZoneHVAC:EquipmentList,
     Bathrooms_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
     Bathrooms_ZN_1_FLR_2 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14606,6 +14602,7 @@
 
   ZoneHVAC:EquipmentList,
     Cafeteria_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
     Cafeteria_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14617,6 +14614,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14624,6 +14622,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14631,6 +14630,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14638,6 +14638,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14645,6 +14646,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14652,6 +14654,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_1_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14659,6 +14662,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14666,6 +14670,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14673,6 +14678,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14680,6 +14686,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14687,6 +14694,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14694,6 +14702,7 @@
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corner_Class_2_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14701,6 +14710,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14708,6 +14718,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14715,6 +14726,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14722,6 +14734,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14729,6 +14742,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14736,6 +14750,7 @@
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Corridor_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14743,6 +14758,7 @@
 
   ZoneHVAC:EquipmentList,
     Gym_ZN_1_FLR_1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14750,6 +14766,7 @@
 
   ZoneHVAC:EquipmentList,
     Kitchen_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
     Kitchen_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14761,6 +14778,7 @@
 
   ZoneHVAC:EquipmentList,
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14768,6 +14786,7 @@
 
   ZoneHVAC:EquipmentList,
     Lobby_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Lobby_ZN_1_FLR_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14775,6 +14794,7 @@
 
   ZoneHVAC:EquipmentList,
     Lobby_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Lobby_ZN_1_FLR_2 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14782,6 +14802,7 @@
 
   ZoneHVAC:EquipmentList,
     Main_Corridor_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Main_Corridor_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14789,6 +14810,7 @@
 
   ZoneHVAC:EquipmentList,
     Main_Corridor_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Main_Corridor_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14796,6 +14818,7 @@
 
   ZoneHVAC:EquipmentList,
     Mech_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mech_ZN_1_FLR_1 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14803,6 +14826,7 @@
 
   ZoneHVAC:EquipmentList,
     Mech_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mech_ZN_1_FLR_2 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14810,6 +14834,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14817,6 +14842,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14824,6 +14850,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14831,6 +14858,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14838,6 +14866,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14845,6 +14874,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_1_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14852,6 +14882,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14859,6 +14890,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14866,6 +14898,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14873,6 +14906,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14880,6 +14914,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14887,6 +14922,7 @@
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Mult_Class_2_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14894,6 +14930,7 @@
 
   ZoneHVAC:EquipmentList,
     Offices_ZN_1_FLR_1 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Offices_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -14901,6 +14938,7 @@
 
   ZoneHVAC:EquipmentList,
     Offices_ZN_1_FLR_2 Equipment,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Offices_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -17889,7 +17927,7 @@
     Auditorium_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Auditorium_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Auditorium_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Auditorium_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
@@ -17897,7 +17935,7 @@
     Aux_Gym_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Aux_Gym_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Aux_Gym_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Aux_Gym_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
@@ -17905,7 +17943,7 @@
     Bathrooms_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Bathrooms_ZN_1_FLR_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Bathrooms_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Bathrooms_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Bathrooms_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
@@ -17913,7 +17951,7 @@
     Bathrooms_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Bathrooms_ZN_1_FLR_2 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Bathrooms_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Bathrooms_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Bathrooms_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Cafeteria_ZN_1_FLR_1,    !- Zone Name
@@ -17921,7 +17959,7 @@
     Cafeteria_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Cafeteria_ZN_1_FLR_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Cafeteria_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Cafeteria_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Cafeteria_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
@@ -17929,7 +17967,7 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_1_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_1_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
@@ -17937,7 +17975,7 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corner_Class_1_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_1_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
@@ -17945,7 +17983,7 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_1_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_1_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
@@ -17953,7 +17991,7 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corner_Class_1_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_1_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
@@ -17961,7 +17999,7 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_1_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_1_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
@@ -17969,7 +18007,7 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corner_Class_1_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_1_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
@@ -17977,7 +18015,7 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_2_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_2_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
@@ -17985,7 +18023,7 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corner_Class_2_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_2_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
@@ -17993,7 +18031,7 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_2_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_2_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
@@ -18001,7 +18039,7 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corner_Class_2_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_2_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
@@ -18009,7 +18047,7 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corner_Class_2_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_2_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
@@ -18017,7 +18055,7 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corner_Class_2_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corner_Class_2_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
@@ -18025,7 +18063,7 @@
     Corridor_Pod_1_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Pod_1_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corridor_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corridor_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
@@ -18033,7 +18071,7 @@
     Corridor_Pod_1_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Pod_1_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corridor_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corridor_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
@@ -18041,7 +18079,7 @@
     Corridor_Pod_2_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Pod_2_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corridor_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corridor_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
@@ -18049,7 +18087,7 @@
     Corridor_Pod_2_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Pod_2_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corridor_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corridor_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
@@ -18057,7 +18095,7 @@
     Corridor_Pod_3_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Pod_3_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Corridor_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Corridor_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
@@ -18065,7 +18103,7 @@
     Corridor_Pod_3_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Corridor_Pod_3_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Corridor_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Corridor_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Gym_ZN_1_FLR_1,          !- Zone Name
@@ -18073,7 +18111,7 @@
     Gym_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Gym_ZN_1_FLR_1 Air Node, !- Zone Air Node Name
-    Gym_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Gym_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Kitchen_ZN_1_FLR_1,      !- Zone Name
@@ -18081,7 +18119,7 @@
     Kitchen_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     Kitchen_ZN_1_FLR_1 Exhaust Nodes,  !- Zone Air Exhaust Node or NodeList Name
     Kitchen_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Kitchen_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Kitchen_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
@@ -18089,7 +18127,7 @@
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Lobby_ZN_1_FLR_1,        !- Zone Name
@@ -18097,7 +18135,7 @@
     Lobby_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Lobby_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Lobby_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Lobby_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Lobby_ZN_1_FLR_2,        !- Zone Name
@@ -18105,7 +18143,7 @@
     Lobby_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Lobby_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Lobby_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Lobby_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
@@ -18113,7 +18151,7 @@
     Main_Corridor_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main_Corridor_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Main_Corridor_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Main_Corridor_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
@@ -18121,7 +18159,7 @@
     Main_Corridor_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Main_Corridor_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Main_Corridor_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Main_Corridor_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mech_ZN_1_FLR_1,         !- Zone Name
@@ -18129,7 +18167,7 @@
     Mech_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mech_ZN_1_FLR_1 Air Node,!- Zone Air Node Name
-    Mech_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mech_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mech_ZN_1_FLR_2,         !- Zone Name
@@ -18137,7 +18175,7 @@
     Mech_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mech_ZN_1_FLR_2 Air Node,!- Zone Air Node Name
-    Mech_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Mech_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
@@ -18145,7 +18183,7 @@
     Mult_Class_1_Pod_1_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_1_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_1_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
@@ -18153,7 +18191,7 @@
     Mult_Class_1_Pod_1_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Mult_Class_1_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_1_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
@@ -18161,7 +18199,7 @@
     Mult_Class_1_Pod_2_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_1_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_1_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
@@ -18169,7 +18207,7 @@
     Mult_Class_1_Pod_2_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Mult_Class_1_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_1_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
@@ -18177,7 +18215,7 @@
     Mult_Class_1_Pod_3_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_1_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_1_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
@@ -18185,7 +18223,7 @@
     Mult_Class_1_Pod_3_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Mult_Class_1_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_1_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
@@ -18193,7 +18231,7 @@
     Mult_Class_2_Pod_1_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_2_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_2_Pod_1_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
@@ -18201,7 +18239,7 @@
     Mult_Class_2_Pod_1_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Mult_Class_2_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_2_Pod_1_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
@@ -18209,7 +18247,7 @@
     Mult_Class_2_Pod_2_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_2_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_2_Pod_2_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
@@ -18217,7 +18255,7 @@
     Mult_Class_2_Pod_2_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Mult_Class_2_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_2_Pod_2_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
@@ -18225,7 +18263,7 @@
     Mult_Class_2_Pod_3_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Mult_Class_2_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_2_Pod_3_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
@@ -18233,7 +18271,7 @@
     Mult_Class_2_Pod_3_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Mult_Class_2_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Mult_Class_2_Pod_3_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Offices_ZN_1_FLR_1,      !- Zone Name
@@ -18241,7 +18279,7 @@
     Offices_ZN_1_FLR_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Offices_ZN_1_FLR_1 Air Node,  !- Zone Air Node Name
-    Offices_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Offices_ZN_1_FLR_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     Offices_ZN_1_FLR_2,      !- Zone Name
@@ -18249,7 +18287,7 @@
     Offices_ZN_1_FLR_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Offices_ZN_1_FLR_2 Air Node,  !- Zone Air Node Name
-    Offices_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Offices_ZN_1_FLR_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:AirDistributionUnit,
     Bathrooms_ZN_1_FLR_1 VAV Box,  !- Name
@@ -21277,7 +21315,7 @@
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -21289,7 +21327,7 @@
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -21928,7 +21966,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21945,7 +21983,7 @@
     0.058320;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Block,
-    AnnualDemandBaseCharge,  !- Name
+    AnnualDemandBaseCharge,  !- Utility Cost Charge Block Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21960,7 +21998,7 @@
     0.046965;                !- Block 3 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21968,7 +22006,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21976,7 +22014,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21984,7 +22022,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -21992,7 +22030,7 @@
     -0.000370;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22000,7 +22038,7 @@
     -0.000031;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22008,7 +22046,7 @@
     -0.000216;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22016,7 +22054,7 @@
     0.000833;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand75kw,           !- Name
+    MinDemand75kw,           !- Utility Cost Qualify Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -22026,7 +22064,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_LLF_LowLoadFactorService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -22052,7 +22090,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Block,
-    AnnualEnergyCharge,      !- Name
+    AnnualEnergyCharge,      !- Utility Cost Charge Block Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22069,7 +22107,7 @@
     0.041179;                !- Block 4 Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FuelCostAdjustEnergyCharge,  !- Name
+    FuelCostAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22077,7 +22115,7 @@
     0.002028;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    QualPollutionControlAdjustEnergyCharge,  !- Name
+    QualPollutionControlAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22085,7 +22123,7 @@
     0.000536;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SoxNoxRiderAdjustEnergyCharge,  !- Name
+    SoxNoxRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22093,7 +22131,7 @@
     0.001127;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DSMRiderAdjustEnergyCharge,  !- Name
+    DSMRiderAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22101,7 +22139,7 @@
     0.000021;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    PurchPowerTrackerAdjustEnergyCharge,  !- Name
+    PurchPowerTrackerAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22109,7 +22147,7 @@
     0.000034;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    MidwestISOAdjustEnergyCharge,  !- Name
+    MidwestISOAdjustEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22117,7 +22155,7 @@
     -0.000203;               !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    CleanCoalRiderEnergyCharge,  !- Name
+    CleanCoalRiderEnergyCharge,  !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22125,7 +22163,7 @@
     0.000807;                !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand75kw,           !- Name
+    MaxDemand75kw,           !- Utility Cost Qualify Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -22135,7 +22173,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofeightPercent,       !- Name
+    TaxofeightPercent,       !- Utility Cost Charge Simple Name
     PSI_CS_CommercialElectricService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -22159,7 +22197,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -22184,7 +22222,7 @@
     7.63;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofEightPercent,       !- Name
+    TaxofEightPercent,       !- Utility Cost Charge Simple Name
     IN_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season

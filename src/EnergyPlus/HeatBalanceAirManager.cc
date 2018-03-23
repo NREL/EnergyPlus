@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,8 +69,9 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <GlobalNames.hh>
 #include <HVACManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
@@ -118,6 +120,8 @@ namespace HeatBalanceAirManager {
 	using Psychrometrics::PsyTdbFnHW;
 
 	// Data
+	std::unordered_set< std::string > UniqueZoneNames;
+	std::unordered_map< std::string, std::string > UniqueInfiltrationNames;
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
 
@@ -148,6 +152,8 @@ namespace HeatBalanceAirManager {
 	clear_state()
 	{
 		ManageAirHeatBalanceGetInputFlag =  true;
+		UniqueZoneNames.clear();
+		UniqueInfiltrationNames.clear();
 	}
 
 
@@ -283,30 +289,11 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Modelled after 'Modual Example' in Guide for Module Developers
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
 		using ScheduleManager::GetScheduleIndex;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// Formats
 		static gio::Fmt Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -334,32 +321,12 @@ namespace HeatBalanceAirManager {
 			// PURPOSE OF THIS SUBROUTINE :
 			// This subroutine sets the zone mass conservation flag to true.
 
-			// METHODOLOGY EMPLOYED :
-			// na
-
-			// REFERENCES :
-			// na
-
 			// Using/Aliasing
 			using DataHeatBalance::TotMixing;
 			using DataHeatBalance::Mixing;
 			using DataHeatBalance::ZoneAirMassFlow;
 			using DataHeatBalFanSys::MixingMassFlowZone;
 			using DataHeatBalFanSys::ZoneMassBalanceFlag;
-
-
-			// locals
-			// SUBROUTINE ARGUMENT DEFINITIONS :
-			// na
-
-			// SUBROUTINE PARAMETER DEFINITIONS :
-			// na
-
-			// INTERFACE BLOCK SPECIFICATIONS :
-			// na
-
-			// DERIVED TYPE DEFINITIONS :
-			// na
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS :
 			int Loop;
@@ -391,9 +358,6 @@ namespace HeatBalanceAirManager {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the "simple" air flow model.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
 		// REFERENCES:
 		// IDD Statements
 		// INFILTRATION,A1 [Zone Name],A2 [SCHEDULE Name],N1 [Design level KW],
@@ -407,11 +371,6 @@ namespace HeatBalanceAirManager {
 		//     A3 [Source Zone Name], N2 [Delta Temperature delta C];
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::VerifyName;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::GetScheduleValuesForDay;
 		using ScheduleManager::CheckScheduleValueMinMax;
@@ -419,11 +378,8 @@ namespace HeatBalanceAirManager {
 		using ScheduleManager::GetScheduleName;
 		using General::RoundSigDigits;
 		using General::CheckCreatedZoneItemName;
-		//  USE DataIPShortCuts
 		using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 		using DataGlobals::NumOfZones;
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
@@ -435,11 +391,6 @@ namespace HeatBalanceAirManager {
 		Real64 const RefDoorNone( 0.0 );
 		Real64 const RefDoorAirCurtain( 0.5 );
 		Real64 const RefDoorStripCurtain( 0.9 );
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array2D< Real64 > SVals1;
@@ -463,7 +414,7 @@ namespace HeatBalanceAirManager {
 		int Loop1;
 		Array1D_bool RepVarSet;
 		bool IsNotOK;
-		bool IsBlank;
+
 		int ZoneNum;
 		std::string StringOut;
 		std::string NameThisObject;
@@ -503,58 +454,58 @@ namespace HeatBalanceAirManager {
 
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 			// CurrentModuleObject='Zone'
-			SetupOutputVariable( "Zone Mean Air Temperature [C]", ZnAirRpt( Loop ).MeanAirTemp, "Zone", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Operative Temperature [C]", ZnAirRpt( Loop ).OperativeTemp, "Zone", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Mean Air Dewpoint Temperature [C]", ZnAirRpt( Loop ).MeanAirDewPointTemp, "Zone", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Mean Air Humidity Ratio [kgWater/kgDryAir]", ZnAirRpt( Loop ).MeanAirHumRat, "Zone", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Air Heat Balance Internal Convective Heat Gain Rate [W]", ZnAirRpt( Loop ).SumIntGains, "System", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Air Heat Balance Surface Convection Rate [W]", ZnAirRpt( Loop ).SumHADTsurfs, "System", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Air Heat Balance Interzone Air Transfer Rate [W]", ZnAirRpt( Loop ).SumMCpDTzones, "System", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Air Heat Balance Outdoor Air Transfer Rate [W]", ZnAirRpt( Loop ).SumMCpDtInfil, "System", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Air Heat Balance System Air Transfer Rate [W]", ZnAirRpt( Loop ).SumMCpDTsystem, "System", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Air Heat Balance System Convective Heat Gain Rate [W]", ZnAirRpt( Loop ).SumNonAirSystem, "System", "Average", Zone( Loop ).Name );
-			SetupOutputVariable( "Zone Air Heat Balance Air Energy Storage Rate [W]", ZnAirRpt( Loop ).CzdTdt, "System", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Mean Air Temperature", OutputProcessor::Unit::C, ZnAirRpt( Loop ).MeanAirTemp, "Zone", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Operative Temperature", OutputProcessor::Unit::C, ZnAirRpt( Loop ).OperativeTemp, "Zone", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Mean Air Dewpoint Temperature", OutputProcessor::Unit::C, ZnAirRpt( Loop ).MeanAirDewPointTemp, "Zone", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Mean Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir, ZnAirRpt( Loop ).MeanAirHumRat, "Zone", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Air Heat Balance Internal Convective Heat Gain Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).SumIntGains, "System", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Air Heat Balance Surface Convection Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).SumHADTsurfs, "System", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Air Heat Balance Interzone Air Transfer Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).SumMCpDTzones, "System", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Air Heat Balance Outdoor Air Transfer Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).SumMCpDtInfil, "System", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Air Heat Balance System Air Transfer Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).SumMCpDTsystem, "System", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Air Heat Balance System Convective Heat Gain Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).SumNonAirSystem, "System", "Average", Zone( Loop ).Name );
+			SetupOutputVariable( "Zone Air Heat Balance Air Energy Storage Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).CzdTdt, "System", "Average", Zone( Loop ).Name );
 			if ( DisplayAdvancedReportVariables ) {
-				SetupOutputVariable( "Zone Phase Change Material Melting Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyM, "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Phase Change Material Freezing Enthalpy [J/kg]", ZnAirRpt( Loop ).SumEnthalpyH, "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Air Heat Balance Deviation Rate [W]", ZnAirRpt( Loop ).imBalance, "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Phase Change Material Melting Enthalpy", OutputProcessor::Unit::J_kg, ZnAirRpt( Loop ).SumEnthalpyM, "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Phase Change Material Freezing Enthalpy", OutputProcessor::Unit::J_kg, ZnAirRpt( Loop ).SumEnthalpyH, "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Air Heat Balance Deviation Rate", OutputProcessor::Unit::W, ZnAirRpt( Loop ).imBalance, "System", "Average", Zone( Loop ).Name );
 			}
 		}
 
 		cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = NumAlpha;
 		maxNumber = NumNumber;
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneMixing";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneCrossMixing";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlpha, NumNumber );
 		maxAlpha = max( NumAlpha, maxAlpha );
 		maxNumber = max( NumNumber, maxNumber );
 
@@ -566,27 +517,22 @@ namespace HeatBalanceAirManager {
 		lNumericFieldBlanks.dimension( maxNumber, true );
 
 		cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-		TotZoneAirBalance = GetNumObjectsFound( cCurrentModuleObject );
+		TotZoneAirBalance = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		ZoneAirBalance.allocate( TotZoneAirBalance );
 
 		for ( Loop = 1; Loop <= TotZoneAirBalance; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ZoneAirBalance, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			UtilityRoutines::IsNameEmpty( cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound );
 			ZoneAirBalance( Loop ).Name = cAlphaArgs( 1 );
 			ZoneAirBalance( Loop ).ZoneName = cAlphaArgs( 2 );
-			ZoneAirBalance( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			ZoneAirBalance( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneAirBalance( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}
-			VerifyName( cAlphaArgs( 2 ), ZoneAirBalance, &ZoneAirBalanceData::ZoneName, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
+			GlobalNames::IntraObjUniquenessCheck( cAlphaArgs( 2 ), cCurrentModuleObject, cAlphaFieldNames( 2 ), UniqueZoneNames, IsNotOK );
 			if ( IsNotOK ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", a duplicated object " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" is found." );
 				ShowContinueError( "A zone can only have one " + cCurrentModuleObject + " object." );
@@ -601,7 +547,7 @@ namespace HeatBalanceAirManager {
 			} else {
 				ZoneAirBalance( Loop ).BalanceMethod = AirBalanceNone;
 				ShowWarningError( RoutineName + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) + " not valid choice for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "The dafualt choice \"NONE\" is assigned" );
+				ShowContinueError( "The default choice \"NONE\" is assigned" );
 			}}
 
 			ZoneAirBalance( Loop ).InducedAirRate = rNumericArgs( 1 );
@@ -634,51 +580,45 @@ namespace HeatBalanceAirManager {
 			}
 
 			if ( ZoneAirBalance( Loop ).BalanceMethod == AirBalanceQuadrature ) {
-				SetupOutputVariable( "Zone Combined Outdoor Air Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceHeatLoss, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Sensible Heat Gain Energy [J]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceHeatGain, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Latent Heat Loss Energy [J]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceLatentLoss, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Latent Heat Gain Energy [J]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceLatentGain, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Total Heat Loss Energy [J]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceTotalLoss, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Total Heat Gain Energy [J]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceTotalGain, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVdotCurDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVdotStdDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Current Density Volume [m3]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVolumeCurDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Standard Density Volume [m3]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVolumeStdDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Mass [kg]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceMass, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Mass Flow Rate [kg/s]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceMdot, "System", "Average", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Changes per Hour [ach]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceAirChangeRate, "System", "Average", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
-				SetupOutputVariable( "Zone Combined Outdoor Air Fan Electric Energy [J]", ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceFanElec, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name, _, "Electricity", "Fans", "Ventilation (simple)", "Building", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceHeatLoss, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceHeatGain, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceLatentLoss, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceLatentGain, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceTotalLoss, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceTotalGain, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVdotCurDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVdotStdDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Current Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVolumeCurDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Standard Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceVolumeStdDensity, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Mass", OutputProcessor::Unit::kg, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceMass, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceMdot, "System", "Average", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Changes per Hour", OutputProcessor::Unit::ach, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceAirChangeRate, "System", "Average", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
+				SetupOutputVariable( "Zone Combined Outdoor Air Fan Electric Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneAirBalance( Loop ).ZonePtr ).OABalanceFanElec, "System", "Sum", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name, _, "Electricity", "Fans", "Ventilation (simple)", "Building", Zone( ZoneAirBalance( Loop ).ZonePtr ).Name );
 			}
 
 		}
 
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-		TotShermGrimsInfiltration = GetNumObjectsFound( cCurrentModuleObject );
+		TotShermGrimsInfiltration = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-		TotAIM2Infiltration = GetNumObjectsFound( cCurrentModuleObject );
+		TotAIM2Infiltration = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-		NumInfiltrationStatements = GetNumObjectsFound( cCurrentModuleObject );
+		NumInfiltrationStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		InfiltrationObjects.allocate( NumInfiltrationStatements );
 
 		TotDesignFlowInfiltration = 0;
 		errFlag = false;
 		for ( Item = 1; Item <= NumInfiltrationStatements; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), InfiltrationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			InfiltrationObjects( Item ).Name = cAlphaArgs( 1 );
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				InfiltrationObjects( Item ).StartPtr = TotDesignFlowInfiltration + 1;
 				++TotDesignFlowInfiltration;
@@ -707,13 +647,14 @@ namespace HeatBalanceAirManager {
 		TotInfiltration = TotDesignFlowInfiltration + TotShermGrimsInfiltration + TotAIM2Infiltration;
 
 		Infiltration.allocate( TotInfiltration );
+		UniqueInfiltrationNames.reserve( static_cast< unsigned > ( TotInfiltration ) );
 
 		if ( TotDesignFlowInfiltration > 0 ) {
 			Loop = 0;
 			cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
 			for ( Item = 1; Item <= NumInfiltrationStatements; ++Item ) {
 
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= InfiltrationObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -865,19 +806,12 @@ namespace HeatBalanceAirManager {
 		cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
 		InfiltCount = TotDesignFlowInfiltration;
 		for ( Loop = 1; Loop <= TotShermGrimsInfiltration; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
-			IsNotOK = false;
-			IsBlank = false;
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationShermanGrimsrud;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Infiltration( InfiltCount ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -920,18 +854,12 @@ namespace HeatBalanceAirManager {
 
 		cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
 		for ( Loop = 1; Loop <= TotAIM2Infiltration; ++Loop ) {
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++InfiltCount;
-			VerifyName( cAlphaArgs( 1 ), Infiltration, InfiltCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			GlobalNames::VerifyUniqueInterObjectName( UniqueInfiltrationNames, cAlphaArgs( 1 ), cCurrentModuleObject, cAlphaFieldNames( 1 ), ErrorsFound );
 			Infiltration( InfiltCount ).Name = cAlphaArgs( 1 );
 			Infiltration( InfiltCount ).ModelType = InfiltrationAIM2;
-			Infiltration( InfiltCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Infiltration( InfiltCount ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Infiltration( InfiltCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -980,19 +908,19 @@ namespace HeatBalanceAirManager {
 			if ( Infiltration( Loop ).ZonePtr > 0 && ! Infiltration( Loop ).QuadratureSum ) {
 				if ( RepVarSet( Infiltration( Loop ).ZonePtr ) ) {
 					RepVarSet( Infiltration( Loop ).ZonePtr ) = false;
-					SetupOutputVariable( "Zone Infiltration Sensible Heat Loss Energy [J]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilHeatLoss, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Sensible Heat Gain Energy [J]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilHeatGain, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Latent Heat Loss Energy [J]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilLatentLoss, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Latent Heat Gain Energy [J]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilLatentGain, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy [J]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilTotalLoss, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Total Heat Gain Energy [J]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilTotalGain, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Current Density Volume Flow Rate [m3/s]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVdotCurDensity, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVdotStdDensity, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Current Density Volume [m3]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVolumeCurDensity, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Standard Density Volume [m3]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVolumeStdDensity, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Mass [kg]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilMass, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Mass Flow Rate [kg/s]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilMdot, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Infiltration Air Change Rate [ach]", ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilAirChangeRate, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilHeatLoss, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilHeatGain, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilLatentLoss, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilLatentGain, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilTotalLoss, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilTotalGain, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVdotCurDensity, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVdotStdDensity, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Current Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVolumeCurDensity, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Standard Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilVolumeStdDensity, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Mass", OutputProcessor::Unit::kg, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilMass, "System", "Sum", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilMdot, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Infiltration Air Change Rate", OutputProcessor::Unit::ach, ZnAirRpt( Infiltration( Loop ).ZonePtr ).InfilAirChangeRate, "System", "Average", Zone( Infiltration( Loop ).ZonePtr ).Name );
 				}
 			}
 
@@ -1006,10 +934,10 @@ namespace HeatBalanceAirManager {
 		RepVarSet = true;
 
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-		NumVentilationStatements = GetNumObjectsFound( cCurrentModuleObject );
+		NumVentilationStatements = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-		TotWindAndStackVentilation = GetNumObjectsFound( cCurrentModuleObject );
+		TotWindAndStackVentilation = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		VentilationObjects.allocate( NumVentilationStatements );
 
@@ -1017,20 +945,15 @@ namespace HeatBalanceAirManager {
 		errFlag = false;
 		cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
 		for ( Item = 1; Item <= NumVentilationStatements; ++Item ) {
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentilationObjects, Item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				errFlag = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+			errFlag = ErrorsFound;
+
 			VentilationObjects( Item ).Name = cAlphaArgs( 1 );
 
-			Item1 = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Item1 = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			ZLItem = 0;
-			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+			if ( Item1 == 0 && NumOfZoneLists > 0 ) ZLItem = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 			if ( Item1 > 0 ) {
 				VentilationObjects( Item ).StartPtr = TotDesignFlowVentilation + 1;
 				++TotDesignFlowVentilation;
@@ -1064,7 +987,7 @@ namespace HeatBalanceAirManager {
 			cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
 			for ( Item = 1; Item <= NumVentilationStatements; ++Item ) {
 
-				GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				for ( Item1 = 1; Item1 <= VentilationObjects( Item ).NumOfZones; ++Item1 ) {
 					++Loop;
@@ -1429,21 +1352,21 @@ namespace HeatBalanceAirManager {
 					if ( Ventilation( Loop ).ZonePtr > 0 ) {
 						if ( RepVarSet( Ventilation( Loop ).ZonePtr ) && ! Ventilation( Loop ).QuadratureSum ) {
 							RepVarSet( Ventilation( Loop ).ZonePtr ) = false;
-							SetupOutputVariable( "Zone Ventilation Sensible Heat Loss Energy [J]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilHeatLoss, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Sensible Heat Gain Energy [J]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilHeatGain, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Latent Heat Loss Energy [J]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilLatentLoss, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Latent Heat Gain Energy [J]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilLatentGain, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Total Heat Loss Energy [J]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilTotalLoss, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Total Heat Gain Energy [J]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilTotalGain, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Current Density Volume Flow Rate [m3/s]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVdotCurDensity, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVdotStdDensity, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Current Density Volume [m3]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVolumeCurDensity, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Standard Density Volume [m3]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVolumeStdDensity, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Mass [kg]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilMass, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Mass Flow Rate [kg/s]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilMdot, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Air Change Rate [ach]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilAirChangeRate, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Fan Electric Energy [J]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilFanElec, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name, _, "Electricity", "Fans", "Ventilation (simple)", "Building", Zone( Ventilation( Loop ).ZonePtr ).Name );
-							SetupOutputVariable( "Zone Ventilation Air Inlet Temperature [C]", ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilAirTemp, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilHeatLoss, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilHeatGain, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilLatentLoss, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilLatentGain, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilTotalLoss, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilTotalGain, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVdotCurDensity, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVdotStdDensity, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Current Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVolumeCurDensity, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Standard Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilVolumeStdDensity, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Mass", OutputProcessor::Unit::kg, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilMass, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilMdot, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Air Change Rate", OutputProcessor::Unit::ach, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilAirChangeRate, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Fan Electric Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilFanElec, "System", "Sum", Zone( Ventilation( Loop ).ZonePtr ).Name, _, "Electricity", "Fans", "Ventilation (simple)", "Building", Zone( Ventilation( Loop ).ZonePtr ).Name );
+							SetupOutputVariable( "Zone Ventilation Air Inlet Temperature", OutputProcessor::Unit::C, ZnAirRpt( Ventilation( Loop ).ZonePtr ).VentilAirTemp, "System", "Average", Zone( Ventilation( Loop ).ZonePtr ).Name );
 						}
 					}
 
@@ -1459,20 +1382,15 @@ namespace HeatBalanceAirManager {
 		VentiCount = TotDesignFlowVentilation;
 		for ( Loop = 1; Loop <= TotWindAndStackVentilation; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			IsNotOK = false;
-			IsBlank = false;
 			VentiCount = TotDesignFlowVentilation + Loop;
-			VerifyName( cAlphaArgs( 1 ), Ventilation, VentiCount - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			Ventilation( VentiCount ).Name = cAlphaArgs( 1 );
 			Ventilation( VentiCount ).ModelType = VentilationWindAndStack;
 
-			Ventilation( VentiCount ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Ventilation( VentiCount ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Ventilation( VentiCount ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1685,21 +1603,21 @@ namespace HeatBalanceAirManager {
 			if ( Ventilation( VentiCount ).ZonePtr > 0 ) {
 				if ( RepVarSet( Ventilation( VentiCount ).ZonePtr ) && ! Ventilation( Loop ).QuadratureSum ) {
 					RepVarSet( Ventilation( VentiCount ).ZonePtr ) = false;
-					SetupOutputVariable( "Zone Ventilation Sensible Heat Loss Energy [J]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilHeatLoss, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Sensible Heat Gain Energy [J]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilHeatGain, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Latent Heat Loss Energy [J]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilLatentLoss, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Latent Heat Gain Energy [J]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilLatentGain, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Total Heat Loss Energy [J]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilTotalLoss, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Total Heat Gain Energy [J]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilTotalGain, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Current Density Volume Flow Rate [m3/s]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVdotCurDensity, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVdotStdDensity, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Current Density Volume [m3]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVolumeCurDensity, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Standard Density Volume [m3]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVolumeStdDensity, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Mass [kg]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilMass, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Mass Flow Rate [kg/s]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilMdot, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Air Change Rate [ach]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilAirChangeRate, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Fan Electric Energy [J]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilFanElec, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name, _, "Electricity", "Fans", "Ventilation (simple)", "Building", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Ventilation Air Inlet Temperature [C]", ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilAirTemp, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilHeatLoss, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilHeatGain, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilLatentLoss, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilLatentGain, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilTotalLoss, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilTotalGain, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVdotCurDensity, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVdotStdDensity, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Current Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVolumeCurDensity, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Standard Density Volume", OutputProcessor::Unit::m3, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilVolumeStdDensity, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Mass", OutputProcessor::Unit::kg, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilMass, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilMdot, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Air Change Rate", OutputProcessor::Unit::ach, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilAirChangeRate, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Fan Electric Energy", OutputProcessor::Unit::J, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilFanElec, "System", "Sum", Zone( Ventilation( VentiCount ).ZonePtr ).Name, _, "Electricity", "Fans", "Ventilation (simple)", "Building", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Ventilation Air Inlet Temperature", OutputProcessor::Unit::C, ZnAirRpt( Ventilation( VentiCount ).ZonePtr ).VentilAirTemp, "System", "Average", Zone( Ventilation( VentiCount ).ZonePtr ).Name );
 				}
 			}
 
@@ -1712,23 +1630,17 @@ namespace HeatBalanceAirManager {
 		RepVarSet = true;
 
 		cCurrentModuleObject = "ZoneMixing";
-		TotMixing = GetNumObjectsFound( cCurrentModuleObject );
+		TotMixing = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		Mixing.allocate( TotMixing );
 
 		for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Mixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			Mixing( Loop ).Name = cAlphaArgs( 1 );
 
-			Mixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			Mixing( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( Mixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -1806,7 +1718,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			Mixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
+			Mixing( Loop ).FromZone = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( Mixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cAlphaFieldNames( 5 ) + " not found=" + cAlphaArgs( 5 ) + " for " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
@@ -1937,17 +1849,17 @@ namespace HeatBalanceAirManager {
 			if ( Mixing( Loop ).ZonePtr > 0 ) {
 				if ( RepVarSet( Mixing( Loop ).ZonePtr ) ) {
 					RepVarSet( Mixing( Loop ).ZonePtr ) = false;
-					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatGain, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixLatentLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixLatentGain, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixTotalLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixTotalGain, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Volume", OutputProcessor::Unit::m3, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Mass", OutputProcessor::Unit::kg, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatGain, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixLatentLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixLatentGain, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixTotalLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( Mixing( Loop ).ZonePtr ).MixTotalGain, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
 				}
 			}
 			if ( AnyEnergyManagementSystemInModel ) {
@@ -2035,24 +1947,17 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneCrossMixing";
-		TotCrossMixing = GetNumObjectsFound( cCurrentModuleObject );
+		TotCrossMixing = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		CrossMixing.allocate( TotCrossMixing );
 
 		for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
 
-			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), CrossMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
 			CrossMixing( Loop ).Name = cAlphaArgs( 1 );
 
-			CrossMixing( Loop ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
+			CrossMixing( Loop ).ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( CrossMixing( Loop ).ZonePtr == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
@@ -2129,7 +2034,7 @@ namespace HeatBalanceAirManager {
 				ErrorsFound = true;
 			}}
 
-			CrossMixing( Loop ).FromZone = FindItemInList( cAlphaArgs( 5 ), Zone );
+			CrossMixing( Loop ).FromZone = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Zone );
 			if ( CrossMixing( Loop ).FromZone == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 				ErrorsFound = true;
@@ -2260,33 +2165,33 @@ namespace HeatBalanceAirManager {
 			if ( CrossMixing( Loop ).ZonePtr > 0 ) {
 				if ( RepVarSet( CrossMixing( Loop ).ZonePtr ) ) {
 					RepVarSet( CrossMixing( Loop ).ZonePtr ) = false;
-					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixHeatGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixLatentLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixLatentGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixTotalLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Volume", OutputProcessor::Unit::m3, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Mass", OutputProcessor::Unit::kg, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixHeatGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixLatentLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixLatentGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixTotalLoss, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).ZonePtr ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).ZonePtr ).Name );
 				}
 			}
 			if ( CrossMixing( Loop ).FromZone > 0 ) {
 				if ( RepVarSet( CrossMixing( Loop ).FromZone ) ) {
 					RepVarSet( CrossMixing( Loop ).FromZone ) = false;
-					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
-					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Volume", OutputProcessor::Unit::m3, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVolume, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotCurDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixVdotStdDensity, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass", OutputProcessor::Unit::kg, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMass, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixMdot, "System", "Average", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixHeatGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixLatentGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalLoss, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
+					SetupOutputVariable( "Zone Mixing Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( CrossMixing( Loop ).FromZone ).MixTotalGain, "System", "Sum", Zone( CrossMixing( Loop ).FromZone ).Name );
 				}
 			}
 
@@ -2298,33 +2203,27 @@ namespace HeatBalanceAirManager {
 		}
 
 		cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-		TotRefDoorMixing = GetNumObjectsFound( cCurrentModuleObject );
+		TotRefDoorMixing = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( TotRefDoorMixing > 0 ) {
 			RefDoorMixing.allocate( NumOfZones );
 			for ( auto & e : RefDoorMixing ) e.NumRefDoorConnections = 0;
 
 			for ( Loop = 1; Loop <= TotRefDoorMixing; ++Loop ) {
 
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), RefDoorMixing, Loop - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				NameThisObject = cAlphaArgs( 1 );
 
 				AlphaNum = 2;
-				Zone1Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
+				Zone1Num = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone1Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
 				}
 
 				++AlphaNum; //3
-				Zone2Num = FindItemInList( cAlphaArgs( AlphaNum ), Zone );
+				Zone2Num = UtilityRoutines::FindItemInList( cAlphaArgs( AlphaNum ), Zone );
 				if ( Zone2Num == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid (not found) " + cAlphaFieldNames( AlphaNum ) + "=\"" + cAlphaArgs( AlphaNum ) + "\"." );
 					ErrorsFound = true;
@@ -2472,17 +2371,17 @@ namespace HeatBalanceAirManager {
 				if ( ZoneNumA > 0 ) {
 					if ( RepVarSet( ZoneNumA ) ) {
 						RepVarSet( ZoneNumA ) = false;
-						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumA ).MixVolume, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumA ).MixMass, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumA ).MixMdot, "System", "Average", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumA ).MixHeatLoss, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( ZoneNumA ).MixHeatGain, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( ZoneNumA ).MixLatentLoss, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( ZoneNumA ).MixLatentGain, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( ZoneNumA ).MixTotalLoss, "System", "Sum", Zone( ZoneNumA ).Name );
-						SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( ZoneNumA ).MixTotalGain, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Volume", OutputProcessor::Unit::m3, ZnAirRpt( ZoneNumA ).MixVolume, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( ZoneNumA ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( ZoneNumA ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Mass", OutputProcessor::Unit::kg, ZnAirRpt( ZoneNumA ).MixMass, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( ZoneNumA ).MixMdot, "System", "Average", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumA ).MixHeatLoss, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumA ).MixHeatGain, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumA ).MixLatentLoss, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumA ).MixLatentGain, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumA ).MixTotalLoss, "System", "Sum", Zone( ZoneNumA ).Name );
+						SetupOutputVariable( "Zone Mixing Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumA ).MixTotalGain, "System", "Sum", Zone( ZoneNumA ).Name );
 					}
 				}
 				if ( AnyEnergyManagementSystemInModel ) {
@@ -2492,17 +2391,17 @@ namespace HeatBalanceAirManager {
 				if ( ZoneNumB > 0 ) {
 					if ( RepVarSet( ZoneNumB ) ) {
 						RepVarSet( ZoneNumB ) = false;
-						SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( ZoneNumB ).MixVolume, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate [m3/s]", ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( ZoneNumB ).MixMass, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( ZoneNumB ).MixMdot, "System", "Average", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( ZoneNumB ).MixHeatLoss, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy [J]", ZnAirRpt( ZoneNumB ).MixHeatGain, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy [J]", ZnAirRpt( ZoneNumB ).MixLatentLoss, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy [J]", ZnAirRpt( ZoneNumB ).MixLatentGain, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Total Heat Loss Energy [J]", ZnAirRpt( ZoneNumB ).MixTotalLoss, "System", "Sum", Zone( ZoneNumB ).Name );
-						SetupOutputVariable( "Zone Mixing Total Heat Gain Energy [J]", ZnAirRpt( ZoneNumB ).MixTotalGain, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Volume", OutputProcessor::Unit::m3, ZnAirRpt( ZoneNumB ).MixVolume, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( ZoneNumB ).MixVdotCurDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnAirRpt( ZoneNumB ).MixVdotStdDensity, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Mass", OutputProcessor::Unit::kg, ZnAirRpt( ZoneNumB ).MixMass, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, ZnAirRpt( ZoneNumB ).MixMdot, "System", "Average", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumB ).MixHeatLoss, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Sensible Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumB ).MixHeatGain, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Latent Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumB ).MixLatentLoss, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Latent Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumB ).MixLatentGain, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Total Heat Loss Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumB ).MixTotalLoss, "System", "Sum", Zone( ZoneNumB ).Name );
+						SetupOutputVariable( "Zone Mixing Total Heat Gain Energy", OutputProcessor::Unit::J, ZnAirRpt( ZoneNumB ).MixTotalGain, "System", "Sum", Zone( ZoneNumB ).Name );
 					}
 				}
 				if ( AnyEnergyManagementSystemInModel ) {
@@ -2755,18 +2654,18 @@ namespace HeatBalanceAirManager {
 			}
 			// Set up zone air mass balance output variables
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Supply Mass Flow Rate", OutputProcessor::Unit::kg_s, MassConservation( ZoneNum ).InMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::Unit::kg_s, MassConservation( ZoneNum ).ExhMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+				SetupOutputVariable( "Zone Air Mass Balance Return Mass Flow Rate", OutputProcessor::Unit::kg_s, MassConservation( ZoneNum ).RetMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
 				if ( ZoneAirMassFlow.BalanceMixing && ( ( MassConservation( ZoneNum ).NumSourceZonesMixingObject + MassConservation( ZoneNum ).NumReceivingZonesMixingObject ) > 0 ) ) {
-					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Receiving Mass Flow Rate", OutputProcessor::Unit::kg_s, MassConservation( ZoneNum ).MixingMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+					SetupOutputVariable( "Zone Air Mass Balance Mixing Source Mass Flow Rate", OutputProcessor::Unit::kg_s, MassConservation( ZoneNum ).MixingSourceMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
 				}
 				if ( ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow ) {
 					if ( ZoneAirMassFlow.InfiltrationZoneType == AllZones || (MassConservation( ZoneNum ).NumSourceZonesMixingObject > 0 ) ) {
 						if ( MassConservation( ZoneNum ).InfiltrationPtr > 0 ) {
-							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate [kg/s]", MassConservation( ZoneNum ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
-							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status []", MassConservation( ZoneNum ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Mass Flow Rate", OutputProcessor::Unit::kg_s, MassConservation( ZoneNum ).InfiltrationMassFlowRate, "System", "Average", Zone( ZoneNum ).Name );
+							SetupOutputVariable( "Zone Air Mass Balance Infiltration Status", OutputProcessor::Unit::None, MassConservation( ZoneNum ).IncludeInfilToZoneMassBal, "System", "Average", Zone( ZoneNum ).Name );
 						}
 					}
 				}
@@ -2800,13 +2699,7 @@ namespace HeatBalanceAirManager {
 		// METHODOLOGY EMPLOYED:
 		//     Use input processer to get input from idf file
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts;
 		using DataGlobals::NumOfZones;
 		using DataHeatBalance::Zone;
@@ -2826,18 +2719,9 @@ namespace HeatBalanceAirManager {
 		using DataRoomAirModel::RoomAirModel_UCSDUFE;
 		using DataRoomAirModel::RoomAirModel_AirflowNetwork;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
 		static gio::Fmt RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumAlphas; // States which alpha value to read from a
@@ -2858,15 +2742,15 @@ namespace HeatBalanceAirManager {
 		ErrorsFound = false;
 
 		cCurrentModuleObject = "RoomAirModelType";
-		NumOfAirModels = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfAirModels = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		if ( NumOfAirModels > NumOfZones ) {
 			ShowSevereError( "Too many " + cCurrentModuleObject + ".  Cannot exceed the number of Zones." );
 			ErrorsFound = true;
 		}
 
 		for ( AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum ) {
-			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
-			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone );
+			inputProcessor->getObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
+			ZoneNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
 			if ( ZoneNum != 0 ) {
 				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
@@ -2888,7 +2772,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					MundtModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:OneNodeDisplacementVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:OneNodeDisplacementVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2898,7 +2782,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:ThreeNodeDisplacementVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:ThreeNodeDisplacementVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2908,7 +2792,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
 					IsNotOK = false;
-					ValidateComponent( "RoomAirSettings:CrossVentilation", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:CrossVentilation", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2917,7 +2801,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UCSDUFI;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
-					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionInterior", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionInterior","zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2926,7 +2810,7 @@ namespace HeatBalanceAirManager {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_UCSDUFE;
 					AirModel( ZoneNum ).SimAirModel = true;
 					UCSDModelUsed = true;
-					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionExterior", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
+					ValidateComponent( "RoomAirSettings:UnderFloorAirDistributionExterior", "zone_name", cAlphaArgs( 2 ), IsNotOK, "GetRoomAirModelParameters" );
 					if ( IsNotOK ) {
 						ShowContinueError( "In " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) + '.' );
 						ErrorsFound = true;
@@ -2938,7 +2822,7 @@ namespace HeatBalanceAirManager {
 				} else if ( SELECT_CASE_var == "AIRFLOWNETWORK" ) {
 					AirModel( ZoneNum ).AirModelType = RoomAirModel_AirflowNetwork;
 					AirModel( ZoneNum ).SimAirModel = true;
-					if ( GetNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
+					if ( inputProcessor->getNumObjectsFound( "AirflowNetwork:SimulationControl" ) == 0 ) {
 						ShowSevereError( "In " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": " + cAlphaFieldNames( 3 ) + " = AIRFLOWNETWORK."  );
 						ShowContinueError( "This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage." );
 						ShowContinueError( "AirflowNetwork:SimulationControl not found." );

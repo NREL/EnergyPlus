@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -154,6 +155,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -253,7 +255,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -404,9 +406,20 @@ namespace EnergyPlus {
 		CalcMultiStage4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut );
 
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
+		DataGlobals::DoingSizing = false;
+
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
 	}
-
 	TEST_F( EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest ) {
 
 		int FanCoilNum( 1 );
@@ -453,6 +466,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -554,7 +568,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -706,9 +720,20 @@ namespace EnergyPlus {
 		CalcMultiStage4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut );
 
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
+
+		DataGlobals::DoingSizing = false;
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
 
 	}
-
 	TEST_F( EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest ) {
 
 		int FanCoilNum( 1 );
@@ -755,6 +780,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -854,7 +880,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1031,6 +1057,8 @@ namespace EnergyPlus {
 		// Normal heating simulation for fan coil with constant fan, variable water flow
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 		FirstHVACIteration = false;
 		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 1;
 		Node( FanCoil( 1 ).HotControlNode ).MassFlowRate = 0.2;
@@ -1038,16 +1066,22 @@ namespace EnergyPlus {
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_NEAR( 55.31, Node( 10 ).Temp, 0.1 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 		// heating simulation with flow lock on and locked flow < flow required for load; use locked flow
 		Node( FanCoil( 1 ).HotControlNode ).MassFlowRate = 0.05;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( 3780.0, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 		// normal heating, no flow lock, heating capacity exceeded
 		QZnReq = 5000.0;
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 5000.00;
 		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( 4420.0, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
 		QZnReq = 80.0;
@@ -1059,6 +1093,8 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 75.0, FanCoil( 1 ).QUnitOutNoHC, 1.0 );
 		// water mass flow rate needed to provide output of 80 W (including 75 W coil off capacity)
 		EXPECT_NEAR( 0.0000315, Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, 0.000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// Coil Off Capacity Test #2 - lock plant flow after previous call
 		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 1;
@@ -1071,6 +1107,8 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 75.0, FanCoil( 1 ).QUnitOutNoHC, 1.0 );
 		// same water flow rate as before
 		EXPECT_NEAR( 0.0000315, Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, 0.000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
 		PlantLoop( 1 ).LoopSide( 1 ).FlowLock = 0;
@@ -1081,9 +1119,10 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 48.0, FanCoil( 1 ).QUnitOutNoHC, 1.0 ); // interesting that this is very different for a heating system (from Coil Off Capacity Test #1)
 		// water flow rate had to increase to get to 80 W since coil off capacity was much different at -1752 W
 		EXPECT_NEAR( 0.000219, Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, 0.000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 	}
-
 	TEST_F( EnergyPlusFixture, ElectricCoilFanCoilHeatingTest ) {
 
 		int FanCoilNum( 1 );
@@ -1130,6 +1169,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1220,7 +1260,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1373,14 +1413,26 @@ namespace EnergyPlus {
 		// Normal heating simulation for fan coil with constant fan, electric heating
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 		// normal heating, heating capacity exceeded
 		QZnReq = 5000.0;
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 5000.00;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( 4575.0, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
+		DataGlobals::DoingSizing = false;
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
 	}
-
 	TEST_F( EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest ) {
 
 		int FanCoilNum( 1 );
@@ -1427,6 +1479,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1528,7 +1581,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -1704,6 +1757,9 @@ namespace EnergyPlus {
 		// normal cooling simulation for constant fan variable flow fan coil
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
+
 		FirstHVACIteration = false;
 		PlantLoop( 2 ).LoopSide( 1 ).FlowLock = 1;
 		Node( FanCoil( 1 ).ColdControlNode ).MassFlowRate = 0.2;
@@ -1711,19 +1767,26 @@ namespace EnergyPlus {
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_NEAR( 10.86, Node(13).Temp, 0.1 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
+
 		// cooling simulation with flow lock on and locked flow < flow required for load; use locked flow
 		Node( FanCoil( 1 ).ColdControlNode ).MassFlowRate = 0.05;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( -3000.0, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
+
 		// normal cooling, no flow lock, cooling capacity exceeded
 		QZnReq = -5000.0;
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -5000.00;
 		PlantLoop( 2 ).LoopSide( 1 ).FlowLock = 0;
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided );
 		EXPECT_NEAR( -4420.0, QUnitOut, 5.0 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 	}
-
 	TEST_F( EnergyPlusFixture, FanCoil_ASHRAE90VariableFan ) {
 
 		int FanCoilNum( 1 );
@@ -1770,6 +1833,7 @@ namespace EnergyPlus {
 			"	Zone 1 Outlet Node;      !- Zone Return Air Node Name",
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -1869,7 +1933,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );
@@ -2044,6 +2108,8 @@ namespace EnergyPlus {
 		// expect full flow and meet capacity
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow, 0.0000000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// expect minimum flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 1000.0;
@@ -2051,6 +2117,8 @@ namespace EnergyPlus {
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio, 0.0000000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// expect modulated flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 2500.0;
@@ -2059,6 +2127,8 @@ namespace EnergyPlus {
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_GT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio );
 		EXPECT_LT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// expect full flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
@@ -2067,6 +2137,8 @@ namespace EnergyPlus {
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow, 0.0000000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// expect full flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToHeatSP = 0.0;
@@ -2075,6 +2147,8 @@ namespace EnergyPlus {
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow, 0.0000000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// expect minimum flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -1000.0;
@@ -2082,6 +2156,8 @@ namespace EnergyPlus {
 		Sim4PipeFanCoil( FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut );
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_NEAR( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio, 0.0000000001 );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
 
 		// expect modulated flow and meet capacity
 		ZoneSysEnergyDemand( 1 ).RemainingOutputReqToCoolSP = -2500.0;
@@ -2090,6 +2166,19 @@ namespace EnergyPlus {
 		EXPECT_NEAR( QZnReq, QUnitOut, 5.0 );
 		EXPECT_GT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow * FanCoil( 1 ).LowSpeedRatio );
 		EXPECT_LT( Node( 1 ).MassFlowRate, FanCoil( 1 ).MaxAirMassFlow );
+		// expect inlet and outlet node air mass flow rates are equal
+		EXPECT_EQ( Node( FanCoil( 1 ).AirInNode ).MassFlowRate, Node( FanCoil( 1 ).AirOutNode ).MassFlowRate );
+
+		DataGlobals::DoingSizing = false;
+
+		PlantLoop.deallocate();
+		ZoneSysEnergyDemand.deallocate();
+		FanCoil.deallocate();
+		Node.deallocate();
+		WaterCoil.deallocate();
+		ZoneEquipConfig.deallocate();
+		Zone.deallocate();
+		CoilNames.clear();
 
 	}
 
@@ -2137,7 +2226,7 @@ namespace EnergyPlus {
 		std::string const idf_objects = delimited_string( {
 			" Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
 			" ZoneHVAC:EquipmentConnections, EAST ZONE, Zone1Equipment, Zone1Inlets, Zone1Exhausts, Zone 1 Node, Zone 1 Outlet Node;",
-			" ZoneHVAC:EquipmentList, Zone1Equipment, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
+			" ZoneHVAC:EquipmentList, Zone1Equipment, SequentialLoad, ZoneHVAC:FourPipeFanCoil, Zone1FanCoil, 1, 1;",
 			" OutdoorAir:NodeList, Zone1FCOAIn;",
 			" OutdoorAir:Mixer, Zone1FanCoilOAMixer, Zone1OAMixOut, Zone1FCOAIn, Zone1FCExh, Zone1FCAirIn;",
 			" Fan:ConstantVolume, Zone1FanCoilFan, FCAvailSch, 0.5, 75.0, 0.6, 0.9, 1.0, Zone1OAMixOut, Zone1FCFanOut;",
@@ -2176,7 +2265,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutputProcessor::TimeValue.allocate( 2 );
 
@@ -2251,7 +2340,7 @@ namespace EnergyPlus {
 		// fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
 		// When this happens, this routine will find tighter limits on min/max water flow rate passed to RegulaFalsi
 		// This routine is only called when RegulaFalsi returns -1
-		
+
 		// example usage of function
 		// if( SolFlag == -1 ) {
 		// tighten limits on water flow rate to see if this allows convergence
@@ -2380,6 +2469,7 @@ namespace EnergyPlus {
 
 			"	ZoneHVAC:EquipmentList,",
 			"	Zone1Equipment, !- Name",
+			"   SequentialLoad,          !- Load Distribution Scheme",
 			"	ZoneHVAC:FourPipeFanCoil, !- Zone Equipment 1 Object Type",
 			"	Zone1FanCoil, !- Zone Equipment 1 Name",
 			"	1, !- Zone Equipment 1 Cooling Sequence",
@@ -2489,7 +2579,7 @@ namespace EnergyPlus {
 
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetZoneData( ErrorsFound );
 		EXPECT_EQ( "EAST ZONE", Zone( 1 ).Name );

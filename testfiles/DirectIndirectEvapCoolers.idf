@@ -73,7 +73,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     barracks2,               !- Name
@@ -1811,59 +1811,8 @@
 ! **** Interior Constructions  ****
 
   Construction,
-    insul_frame,             !- Name
-    Beige_ptd_st:0.00300,    !- Outside Layer
-    EPS:0.02500,             !- Layer 2
-    Beige_ptd_st:0.00300;    !- Layer 3
-
-  Construction,
     susp_ceil,               !- Name
     Ceiling__min:0.00999;    !- Outside Layer
-
-  Construction,
-    susp_floor_rev,          !- Name
-    Grey_cord_sy:0.00600,    !- Outside Layer
-    Heavy_mix_co:0.10160,    !- Layer 2
-    Steel:0.00300;           !- Layer 3
-
-  Construction,
-    susp_floor,              !- Name
-    Steel:0.00300,           !- Outside Layer
-    Heavy_mix_co:0.10160,    !- Layer 2
-    Grey_cord_sy:0.00600;    !- Layer 3
-
-  Construction,
-    ceiling,                 !- Name
-    Glasswool:0.00200,       !- Outside Layer
-    Ceiling__min:0.00999;    !- Layer 2
-
-  Construction,
-    ceiling_rev,             !- Name
-    Ceiling__min:0.00999,    !- Outside Layer
-    Glasswool:0.00200;       !- Layer 2
-
-  Construction:InternalSource,
-    RadCeilingPanel,         !- Name
-    1,                       !- Source Present After Layer Number
-    1,                       !- Temperature Calculation Requested After Layer Number
-    1,                       !- Dimensions for the CTF Calculation
-    0.0015,                  !- Tube Spacing {m}
-    Glasswool:0.00200,       !- Outside Layer
-    White_ptd_Gy:0.01300;    !- Layer 2
-
-  Construction,
-    gyp_blk_ptn,             !- Name
-    White_ptd_Gy:0.01300,    !- Outside Layer
-    Air-gap:0.17000,         !- Layer 2
-    Block_inner_:0.10000,    !- Layer 3
-    Air-gap:0.17000,         !- Layer 4
-    White_ptd_Gy:0.01300;    !- Layer 5
-
-  Construction,
-    gyp_gyp_ptn,             !- Name
-    White_ptd_Gy:0.01200,    !- Outside Layer
-    Air-gap:0.17000,         !- Layer 2
-    White_ptd_Gy:0.01200;    !- Layer 3
 
   Construction,
     IntWall,                 !- Name
@@ -1876,17 +1825,6 @@
     Std Wood 6inch;          !- Outside Layer
 
 ! **** Envelope Constructions  ****
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05,                !- Layer 2
-    Roof Insulation 3;       !- Layer 3
-
-  Construction,
-    GableWall,               !- Name
-    Std PW05,                !- Outside Layer
-    Roof Insulation 3;       !- Layer 2
 
   Construction,
     ExtWall,                 !- Name
@@ -1904,8 +1842,6 @@
   Construction,
     Window,                  !- Name
     COM_GREEN 6MM;           !- Outside Layer
-
-!
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -2614,7 +2550,7 @@
     units_gr_lf Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     units_gr_lf Air Node,    !- Zone Air Node Name
-    units_gr_lf Return Air Node Name;  !- Zone Return Air Node Name
+    units_gr_lf Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     units_gr_lf Inlet Nodes, !- Name
@@ -2622,6 +2558,7 @@
 
   ZoneHVAC:EquipmentList,
     units_gr_lf Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     units_gr_lf Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3144,7 +3081,7 @@
     units_gr_rt Inlet Nodes, !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     units_gr_rt Air Node,    !- Zone Air Node Name
-    units_gr_rt Return Air Node Name;  !- Zone Return Air Node Name
+    units_gr_rt Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     units_gr_rt Inlet Nodes, !- Name
@@ -3152,6 +3089,7 @@
 
   ZoneHVAC:EquipmentList,
     units_gr_rt Equipment,   !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     units_gr_rt Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3500,7 +3438,7 @@
     unit_s_g Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     unit_s_g Air Node,       !- Zone Air Node Name
-    unit_s_g Return Air Node Name;  !- Zone Return Air Node Name
+    unit_s_g Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     unit_s_g Inlet Nodes,    !- Name
@@ -3508,6 +3446,7 @@
 
   ZoneHVAC:EquipmentList,
     unit_s_g Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     unit_s_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3856,7 +3795,7 @@
     unit_n_g Inlet Nodes,    !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     unit_n_g Air Node,       !- Zone Air Node Name
-    unit_n_g Return Air Node Name;  !- Zone Return Air Node Name
+    unit_n_g Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     unit_n_g Inlet Nodes,    !- Name
@@ -3864,6 +3803,7 @@
 
   ZoneHVAC:EquipmentList,
     unit_n_g Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     unit_n_g Direct Air,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -4358,8 +4298,8 @@
     FURNACE_PACU_CAV:2_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
-    autosize,                !- Effectiveness Flow Ratio Modifier Curve Name
-    ,                        !- Primary Air Design Flow Rate {m3/s}
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     30.0,                    !- Recirculating Water Pump Design Power {W}
     ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name

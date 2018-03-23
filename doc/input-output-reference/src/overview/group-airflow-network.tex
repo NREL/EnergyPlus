@@ -77,7 +77,7 @@ The Airflow Network input objects are:
 
 \textbf{AirflowNetwork:Distribution:Component:ConstantPressureDrop}
 
-\textbf{AirflowNetwork:Distribution:Component:ConstantVolumeFan}
+\textbf{AirflowNetwork:Distribution:Component:Fan}
 
 \textbf{AirflowNetwork:Distribution:Component:Coil}
 
@@ -101,7 +101,7 @@ The Airflow Network input objects are:
 \item
   \textbf{AirflowNetwork:Distribution:Node} represents air distribution system nodes for the AirflowNetwork model. A set of an AirLoopHVAC and ZoneHVAC:EquipmentList nodes is a subset of the AirflowNetwork:Distribution:Nodes.
 \item
-  \textbf{AirflowNetwork:Distribution:Component} objects consist of \textbf{Leak, LeakageRatio, Duct, ConstantPressureDrop, ConstantVolumeFan, Coil,} and \textbf{TerminalUnit.} The components provide a relationship between pressure and airflow. The \textbf{Leak} and \textbf{Leakage} components can be used to simulate supply and/or return leaks in an air distribution system\textbf{.} The \textbf{Duct} and \textbf{ConstantPressureDrop components} can be used to deliver forced air into conditioned spaces. The components \textbf{ConstantVolumeFan, Coil, and TerminalUnit} reference normal EnergyPlus objects. The Airflow Network model gets information from these objects to perform an airflow network simulation.
+  \textbf{AirflowNetwork:Distribution:Component} objects consist of \textbf{Leak, LeakageRatio, Duct, ConstantPressureDrop, Fan, Coil,} and \textbf{TerminalUnit.} The components provide a relationship between pressure and airflow. The \textbf{Leak} and \textbf{Leakage} components can be used to simulate supply and/or return leaks in an air distribution system\textbf{.} The \textbf{Duct} and \textbf{ConstantPressureDrop components} can be used to deliver forced air into conditioned spaces. The components \textbf{Fan, Coil, and TerminalUnit} reference normal EnergyPlus objects. The Airflow Network model gets information from these objects to perform an airflow network simulation.
 \item
   \textbf{AirflowNetwork:Distribution:Linkage} object represents a connection between two node objects and an AirflowNetwork component. The node objects can be an AirflowNetwork:Distribution:Node, AirflowNetwork:MultiZone:ExternalNode or AirflowNetwork:MultiZone:Zone.
 \end{itemize}
@@ -1718,7 +1718,7 @@ The next section describes AirflowNetwork Distribution Components, with 7 availa
 \item
   AirflowNetwork:Distribution:Component:Duct
 \item
-  AirflowNetwork:Distribution:Component:ConstantVolumeFan
+  AirflowNetwork:Distribution:Component:Fan
 \item
   AirflowNetwork:Distribution:Component:Coil
 \item

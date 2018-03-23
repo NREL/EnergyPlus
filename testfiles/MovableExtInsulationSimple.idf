@@ -12,7 +12,7 @@
 ! Plant:    None
 ! SolDis=FullInteriorAndExterior, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,6;
 
@@ -59,7 +59,7 @@
     -7.00,                   !- Time Zone {hr}
     1611.00;                 !- Elevation {m}
 
-! DENVER_STAPLETON_CO_USA Annual Heating 99.6%, MaxDB=-20°C
+! DENVER_STAPLETON_CO_USA Annual Heating 99.6%, MaxDB=-20Â°C
 
   SizingPeriod:DesignDay,
     DENVER_STAPLETON Ann Htg 99.6% Condns DB,  !- Name
@@ -89,7 +89,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1°C MWB=15.8°C
+! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1Â°C MWB=15.8Â°C
 
   SizingPeriod:DesignDay,
     DENVER_STAPLETON Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -257,12 +257,6 @@
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
 
   Construction,
-    PARTITION06,             !- Name
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
-    C6 - 8 IN CLAY TILE,     !- Layer 2
-    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
-
-  Construction,
     FLOOR SLAB 8 IN,         !- Name
     C10 - 8 IN HW CONCRETE;  !- Outside Layer
 
@@ -272,10 +266,6 @@
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
     B5 - 1 IN DENSE INSULATION,  !- Layer 3
     C12 - 2 IN HW CONCRETE;  !- Layer 4
-
-  Construction,
-    WIN-CON-SINGLEPANE,      !- Name
-    SINGLEPANE;              !- Outside Layer
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -442,10 +432,11 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     NODE_4,                  !- Zone Air Node Name
-    NODE_5;                  !- Zone Return Air Node Name
+    NODE_5;                  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -509,8 +500,6 @@
   Output:Surfaces:Drawing,dxf;
 
   Output:Constructions,Constructions;
-
-  Output:Meter:MeterFileOnly,Carbon Equivalent:Facility,hourly;
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Building,hourly;
 

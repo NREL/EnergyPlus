@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -240,7 +241,7 @@ TEST_F( EnergyPlusFixture, IdealLoadsAirSystem_GetInput )
 		"; !- Latent Heat Recovery Effectiveness{ dimensionless }",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::DoWeathSim = true;
 
@@ -324,6 +325,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 
 		"ZoneHVAC:EquipmentList,",
 		"  ZoneEquipment,                  !- Name",
+		"  SequentialLoad,                 !- Load Distribution Scheme",
 		"  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
 		"  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
 		"  1,                              !- Zone Equipment 1 Cooling Sequence",
@@ -339,7 +341,7 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) ); // read idf objects
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
 
 	DataGlobals::DoWeathSim = true;
 
@@ -375,3 +377,98 @@ TEST_F( ZoneIdealLoadsTest, IdealLoads_PlenumTest ) {
 	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).PlenumExhaustAirNodeNum ).MassFlowRate );
 
 }
+
+TEST_F( ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest ) {
+
+	std::string const idf_objects = delimited_string( {
+
+		"Zone,",
+		"  EAST ZONE,                      !- Name",
+		"  0,                              !- Direction of Relative North{ deg }",
+		"  0,                              !- X Origin{ m }",
+		"  0,                              !- Y Origin{ m }",
+		"  0,                              !- Z Origin{ m }",
+		"  1,                              !- Type",
+		"  1,                              !- Multiplier",
+		"  autocalculate,                  !- Ceiling Height{ m }",
+		"  autocalculate;                  !- Volume{ m3 }",
+
+		"ZoneHVAC:IdealLoadsAirSystem,",
+		"  ZONE 1 IDEAL LOADS,             !- Name",
+		"  ,                               !- Availability Schedule Name",
+		"  Zone Inlet Node,                !- Zone Supply Air Node Name",
+		"  Zone Exhaust Node,              !- Zone Exhaust Air Node Name",
+		"  ,             !- System Inlet Air Node Name",
+		"  50,                             !- Maximum Heating Supply Air Temperature{ C }",
+		"  13,                             !- Minimum Cooling Supply Air Temperature{ C }",
+		"  0.015,                          !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"  0.009,                          !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+		"  NoLimit,                        !- Heating Limit",
+		"  autosize,                       !- Maximum Heating Air Flow Rate{ m3 / s }",
+		"  ,                               !- Maximum Sensible Heating Capacity{ W }",
+		"  NoLimit,                        !- Cooling Limit",
+		"  autosize,                       !- Maximum Cooling Air Flow Rate{ m3 / s }",
+		"  ,                               !- Maximum Total Cooling Capacity{ W }",
+		"  ,                               !- Heating Availability Schedule Name",
+		"  ,                               !- Cooling Availability Schedule Name",
+		"  ConstantSupplyHumidityRatio,    !- Dehumidification Control Type",
+		"  ,                               !- Cooling Sensible Heat Ratio{ dimensionless }",
+		"  ConstantSupplyHumidityRatio,    !- Humidification Control Type",
+		"  ,                               !- Design Specification Outdoor Air Object Name",
+		"  ,                               !- Outdoor Air Inlet Node Name",
+		"  ,                               !- Demand Controlled Ventilation Type",
+		"  ,                               !- Outdoor Air Economizer Type",
+		"  ,                               !- Heat Recovery Type",
+		"  ,                               !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+		"  ;                               !- Latent Heat Recovery Effectiveness{ dimensionless }",
+
+		"ZoneHVAC:EquipmentConnections,",
+		"  EAST ZONE,                      !- Zone Name",
+		"  ZoneEquipment,                  !- Zone Conditioning Equipment List Name",
+		"  Zone Inlet Node,                !- Zone Air Inlet Node or NodeList Name",
+		"  Zone Exhaust Node,              !- Zone Air Exhaust Node or NodeList Name",
+		"  Zone Node,                      !- Zone Air Node Name",
+		"  Zone Outlet Node;               !- Zone Return Air Node Name",
+
+		"ZoneHVAC:EquipmentList,",
+		"  ZoneEquipment,                  !- Name",
+		"  SequentialLoad,                 !- Load Distribution Scheme",
+		"  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
+		"  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
+		"  1,                              !- Zone Equipment 1 Cooling Sequence",
+		"  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
+
+		"AirLoopHVAC:ReturnPlenum,",
+		"  DOAS Zone Return Plenum,        !- Name",
+		"  PLENUM ZONE,                    !- Zone Name",
+		"  Plenum Node,                    !- Zone Node Name", // illegal use of non-unique zone node name
+		"  Plenum Outlet Node,             !- Outlet Node Name",
+		"  ,                               !- Induced Air Outlet Node or NodeList Name",
+		"  Zone Exhaust Node;              !- Inlet 1 Node Name",
+
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) ); // read idf objects
+
+	DataGlobals::DoWeathSim = true;
+
+	bool ErrorsFound = false;
+	GetZoneData( ErrorsFound );
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 1;
+	ScheduleManager::Schedule.allocate( 1 );
+	AllocateHeatBalArrays( );
+	EXPECT_FALSE( ErrorsFound ); // expect no errors
+
+	bool FirstHVACIteration( true );
+	bool SimZone( true );
+	bool SimAir( false );
+	ManageZoneEquipment( FirstHVACIteration, SimZone, SimAir ); // read zone equipment configuration and list objects and simulate ideal loads air system
+
+	EXPECT_EQ( PurchAir( 1 ).Name, "ZONE 1 IDEAL LOADS" );
+	// Ideal loads air system found the plenum it is attached to
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).ZoneSupplyAirNodeNum ).MassFlowRate );
+	EXPECT_EQ( PurchAir( 1 ).SupplyAirMassFlowRate, Node( PurchAir( 1 ).ZoneExhaustAirNodeNum ).MassFlowRate );
+
+}
+

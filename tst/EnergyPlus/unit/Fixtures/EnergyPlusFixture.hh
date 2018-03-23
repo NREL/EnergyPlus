@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -53,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
@@ -94,81 +95,10 @@ namespace EnergyPlus {
 			std::unique_ptr<std::streambuf> m_old_buffer;
 	};
 
-	// struct to implement the caching of InputProcessor namespace variables
-	// This reads all the variables in the InputProcessor namespace in the constructor and stores them in member variables.
-	// Then when use_cached_namespace_variables() is called, it copies the member variables into the InputProcessor namespace variables.
-	struct InputProcessorCache {
-		InputProcessorCache();
-
-		void use_cached_namespace_variables();
-
-	private:
-		int m_NumObjectDefs = 0;
-		int m_NumSectionDefs = 0;
-		int m_MaxObjectDefs = 0;
-		int m_MaxSectionDefs = 0;
-		int m_NumLines = 0;
-		int m_MaxIDFRecords = 0;
-		int m_NumIDFRecords = 0;
-		int m_MaxIDFSections = 0;
-		int m_NumIDFSections = 0;
-		int m_EchoInputFile = 0;
-		int m_InputLineLength = 0;
-		int m_MaxAlphaArgsFound = 0;
-		int m_MaxNumericArgsFound = 0;
-		int m_NumAlphaArgsFound = 0;
-		int m_NumNumericArgsFound = 0;
-		int m_MaxAlphaIDFArgsFound = 0;
-		int m_MaxNumericIDFArgsFound = 0;
-		int m_MaxAlphaIDFDefArgsFound = 0;
-		int m_MaxNumericIDFDefArgsFound = 0;
-		int m_NumOutOfRangeErrorsFound = 0;
-		int m_NumBlankReqFieldFound = 0;
-		int m_NumMiscErrorsFound = 0;
-		int m_MinimumNumberOfFields = 0;
-		int m_NumObsoleteObjects = 0;
-		int m_TotalAuditErrors = 0;
-		int m_NumSecretObjects = 0;
-		bool m_ProcessingIDD = false;
-		std::string m_InputLine;
-		Array1D_string m_ListOfSections;
-		Array1D_string m_ListOfObjects;
-		Array1D_int m_iListOfObjects;
-		Array1D_int m_ObjectGotCount;
-		Array1D_int m_ObjectStartRecord;
-		std::string m_CurrentFieldName;
-		Array1D_string m_ObsoleteObjectsRepNames;
-		std::string m_ReplacementName;
-		bool m_OverallErrorFlag = false;
-		bool m_EchoInputLine = true;
-		bool m_ReportRangeCheckErrors = true;
-		bool m_FieldSet = false;
-		bool m_RequiredField = false;
-		bool m_RetainCaseFlag = false;
-		bool m_ObsoleteObject = false;
-		bool m_RequiredObject = false;
-		bool m_UniqueObject = false;
-		bool m_ExtensibleObject = false;
-		int m_ExtensibleNumFields = 0;
-		Array1D_bool m_IDFRecordsGotten;
-		Array1D< InputProcessor::ObjectsDefinition > m_ObjectDef;
-		Array1D< InputProcessor::SectionsDefinition > m_SectionDef;
-		Array1D< InputProcessor::FileSectionsDefinition > m_SectionsOnFile;
-		InputProcessor::LineDefinition m_LineItem;
-		Array1D< InputProcessor::LineDefinition > m_IDFRecords;
-		Array1D< InputProcessor::SecretObjects > m_RepObjects;
-		Array1D_string m_cAlphaFieldNames;
-		Array1D_string m_cNumericFieldNames;
-		Array1D_bool m_lNumericFieldBlanks;
-		Array1D_bool m_lAlphaFieldBlanks;
-		Array1D_string m_cAlphaArgs;
-		Array1D< Real64 > m_rNumericArgs;
-	};
-
 	class EnergyPlusFixture : public testing::Test
 	{
 	protected:
-		static void SetUpTestCase() { }
+		static void SetUpTestCase();
 		static void TearDownTestCase() { }
 
 		// This is run every unit test for this fixture.
@@ -192,11 +122,6 @@ namespace EnergyPlus {
 			const ::testing::TestInfo* const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
 			ShowMessage( "Begin Test: " + std::string( test_info->test_case_name() ) + ", " + std::string( test_info->name() ) );
 		}
-
-		// This first lazy initializes the IDD cache. It is only initialized if it is needed and used by any unit test.
-		// After the first initialization, it uses the cached IDD. The run time of individual unit tests can vary depending on
-		// which unit tests first calls use_cached_idd(), since that first call will take more time.
-		static void use_cached_idd();
 
 		// This will compare either a STL container or ObjexxFCL container
 		// Pass a container you want to compare against an expected container. You can pass in an existing
@@ -226,6 +151,9 @@ namespace EnergyPlus {
 		// delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
 		std::string delimited_string( std::vector<std::string> const & strings, std::string const & delimiter = DataStringGlobals::NL );
 
+		// This function reads all the lines in the supplied filePath. It puts each line into the vector.
+		std::vector< std::string > read_lines_in_file( std::string const & filePath );
+
 		// Compare an expected string against the ESO stream. The default is to reset the ESO stream after every call.
 		// It is easier to test successive functions if the ESO stream is 'empty' before the next call.
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -246,13 +174,6 @@ namespace EnergyPlus {
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return true if string matches the stream and false if it does not
 		bool compare_mtr_stream( std::string const & expected_string, bool reset_stream = true );
-
-		// Compare an expected string against the ECHO stream. The default is to reset the ECHO stream after every call.
-		// It is easier to test successive functions if the ECHO stream is 'empty' before the next call.
-		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-		// if it makes sense for the unit test to continue after returning from function.
-		// Will return true if string matches the stream and false if it does not
-		bool compare_echo_stream( std::string const & expected_string, bool reset_stream = true );
 
 		// Compare an expected string against the ERR stream. The default is to reset the ERR stream after every call.
 		// It is easier to test successive functions if the ERR stream is 'empty' before the next call.
@@ -291,9 +212,6 @@ namespace EnergyPlus {
 		// Check if MTR stream has any output. Useful to make sure there are or are not outputs to MTR.
 		bool has_mtr_output( bool reset_stream = true );
 
-		// Check if ECHO stream has any output. Useful to make sure there are or are not outputs to ECHO.
-		bool has_echo_output( bool reset_stream = true );
-
 		// Check if ERR stream has any output. Useful to make sure there are or are not outputs to ERR.
 		bool has_err_output( bool reset_stream = true );
 
@@ -308,11 +226,11 @@ namespace EnergyPlus {
 
 		// This function processes an idf snippet and defaults to using the idd cache for the fixture.
 		// The cache should be used for nearly all calls to this function.
-		// This more or less replicates InputProcessor::ProcessInput() but in a more usable fashion for unit testing
+		// This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return false if no errors found and true if errors found
-		bool process_idf( std::string const & idf_snippet, bool use_assertions = true, bool use_idd_cache = true );
+		bool process_idf( std::string const & idf_snippet, bool use_assertions = true );
 
 		// This is a helper function to easily compare an expected IDF data structure with the actual IDFRecords data structure
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -333,29 +251,25 @@ namespace EnergyPlus {
 	private:
 		friend class InputProcessorFixture;
 
-		// Function to process the Energy+.idd, should not normally be called.
-		// This will always grab the Energy+.idd that is part of the Products folder
+		// Function to process the Energy+.schema.epJSON, should not normally be called.
+		// This will always grab the Energy+.schema.epJSON that is part of the Products folder
 		// This function should be called by process_idf() so unit tests can take advantage of caching
 		// To test this function use InputProcessorFixture
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return false if no errors found and true if errors found
-		static bool process_idd( std::string const & idd, bool & errors_found );
 
-		// This sets up the InputProcessor cache specificaly to store the processed full IDD for subsequent runs.
-		static void setup_cache();
+		static bool process_idd( std::string const & idd, bool & errors_found );
 
 		std::unique_ptr< std::ostringstream > eso_stream;
 		std::unique_ptr< std::ostringstream > eio_stream;
 		std::unique_ptr< std::ostringstream > mtr_stream;
-		std::unique_ptr< std::ostringstream > echo_stream;
 		std::unique_ptr< std::ostringstream > err_stream;
 		std::unique_ptr< std::ostringstream > m_cout_buffer;
 		std::unique_ptr< std::ostringstream > m_cerr_buffer;
 		std::unique_ptr< std::ostringstream > m_delightin_stream;
 		std::unique_ptr< RedirectCout > m_redirect_cout;
 		std::unique_ptr< RedirectCerr > m_redirect_cerr;
-		static std::unique_ptr< InputProcessorCache > m_idd_cache;
 
 	};
 

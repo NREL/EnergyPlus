@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -63,7 +64,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -133,25 +134,8 @@ namespace CTElectricGenerator {
 		// gets the input for the models, initializes simulation variables, call
 		// the appropriate model and sets up reporting variables.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -164,7 +148,7 @@ namespace CTElectricGenerator {
 
 		//SELECT and CALL MODELS
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, CTGenerator );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, CTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -211,25 +195,6 @@ namespace CTElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN)          :: FlowLock !unused1208 !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-
-		// DERIVED TYPE DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		if ( GetCTInput ) {
@@ -238,7 +203,7 @@ namespace CTElectricGenerator {
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, CTGenerator );
+			CompNum = UtilityRoutines::FindItemInList( CompName, CTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimCTPlantHeatRecovery: CT Generator Unit not found=" + CompName );
 				return;
@@ -271,12 +236,7 @@ namespace CTElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// EnergyPlus input processor
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using CurveManager::GetCurveIndex;
 		using NodeInputManager::GetOnlySingleNode;
@@ -284,9 +244,6 @@ namespace CTElectricGenerator {
 		using OutAirNodeManager::CheckOutAirNodeNumber;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
-
-		// Locals
-		// PARAMETERS
 
 		//LOCAL VARIABLES
 		int GeneratorNum; // Generator counter
@@ -296,13 +253,11 @@ namespace CTElectricGenerator {
 		Array1D_string AlphArray( 12 ); // character string data
 		Array1D< Real64 > NumArray( 12 ); // numeric data
 		static bool ErrorsFound( false ); // error flag
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 
 		//FLOW
 
 		cCurrentModuleObject = "Generator:CombustionTurbine";
-		NumCTGenerators = GetNumObjectsFound( cCurrentModuleObject );
+		NumCTGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumCTGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -317,15 +272,9 @@ namespace CTElectricGenerator {
 
 		//LOAD ARRAYS WITH CT CURVE FIT Generator DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
-			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty( AlphArray( 1 ), cCurrentModuleObject, ErrorsFound );
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), CTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
 			CTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			CTGenerator( GeneratorNum ).RatedPowerOutput = NumArray( 1 );
@@ -476,33 +425,33 @@ namespace CTElectricGenerator {
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum ) {
-			SetupOutputVariable( "Generator Produced Electric Power [W]", CTGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", CTGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator Produced Electric Energy [J]", CTGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Rate [W]", CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Energy [J]", CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, CTGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, CTGenerator( GeneratorNum ).FuelType, "COGENERATION", _, "Plant" );
 
 			//    general fuel use report (to match other generators)
-			SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
-			SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).FuelEnergyUseRate, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).FuelEnergy, "System", "Sum", CTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Mass Flow Rate [kg/s]", CTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + CTGenerator( GeneratorNum ).FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, CTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator Exhaust Air Temperature [C]", CTGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, CTGeneratorReport( GeneratorNum ).ExhaustStackTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
 
 			if ( CTGenerator( GeneratorNum ).HeatRecActive ) {
-				SetupOutputVariable( "Generator Exhaust Heat Recovery Rate [W]", CTGeneratorReport( GeneratorNum ).QExhaustRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Exhaust Heat Recovery Energy [J]", CTGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).QExhaustRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Exhaust Heat Recovery Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Lube Heat Recovery Rate [W]", CTGeneratorReport( GeneratorNum ).QLubeOilRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Lube Heat Recovery Energy [J]", CTGeneratorReport( GeneratorNum ).LubeOilEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).QLubeOilRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Lube Heat Recovery Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).LubeOilEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Produced Thermal Rate [W]", CTGeneratorReport( GeneratorNum ).QTotalHeatRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", CTGeneratorReport( GeneratorNum ).TotalHeatEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, CTGeneratorReport( GeneratorNum ).QTotalHeatRecovered, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, CTGeneratorReport( GeneratorNum ).TotalHeatEnergyRec, "System", "Sum", CTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature [C]", CTGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature [C]", CTGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Heat Recovery Mass Flow Rate [kg/s]", CTGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, CTGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, CTGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", CTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, CTGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", CTGenerator( GeneratorNum ).Name );
 			}
 
 		}
@@ -536,36 +485,17 @@ namespace CTElectricGenerator {
 		// curve fit of performance data.  This model was originally
 		// developed by Dale Herron for the BLAST program
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-
 		using DataEnvironment::OutDryBulbTemp;
 		using CurveManager::CurveValue;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat (J/kg-K)
 		Real64 const KJtoJ( 1000.0 ); // convert Kjoules to joules
 		static std::string const RoutineName( "CalcCTGeneratorModel" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// INTERFACE
-
-		//  REAL(r64) FUNCTION CurveValue(CurveIndex,Var1,Var2)
-		//    INTEGER, INTENT (IN)        :: CurveIndex  ! index of curve in curve array
-		//    REAL(r64), INTENT (IN)           :: Var1        ! 1st independent variable
-		//    REAL(r64), INTENT (IN), OPTIONAL :: Var2        ! 2nd independent variable
-		//  END FUNCTION CurveValue
-		// END INTERFACE
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MinPartLoadRat; // min allowed operating frac full load
@@ -780,28 +710,16 @@ namespace CTElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// Uses the status flags to trigger initializations.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_CTurbine;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitICEngineGenerators" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatRecInletNode; // inlet node number in heat recovery loop

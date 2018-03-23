@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -78,7 +79,7 @@
 #include <GeneralRoutines.hh>
 #include <HVACSingleDuctInduc.hh>
 #include <HWBaseboardRadiator.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <MixerComponent.hh>
 #include <OutdoorAirUnit.hh>
 #include <PlantUtilities.hh>
@@ -99,6 +100,21 @@
 namespace EnergyPlus {
 
 static gio::Fmt fmtLD( "*" );
+
+// Integer constants for different system types handled by the routines in this file
+enum GeneralRoutinesEquipNums {
+	ParallelPIUReheatNum = 1,
+	SeriesPIUReheatNum = 2,
+	HeatingCoilWaterNum = 3,
+	BBWaterConvOnlyNum = 4,
+	BBSteamRadConvNum = 5,
+	BBWaterRadConvNum = 6,
+	FourPipeFanCoilNum = 7,
+	OutdoorAirUnitNum = 8,
+	UnitHeaterNum = 9,
+	UnitVentilatorNum = 10,
+	VentilatedSlabNum = 11
+};
 
 void
 ControlCompOutput(
@@ -138,15 +154,11 @@ ControlCompOutput(
 	// METHODOLOGY EMPLOYED:
 	// Currently this is using an intervasl halving scheme to a control tolerance
 
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::WarmupFlag;
 	using DataBranchAirLoopPlant::MassFlowTolerance;
-	using InputProcessor::FindItemInSortedList;
 	using WaterCoils::SimulateWaterCoilComponents;
 	using FanCoilUnits::Calc4PipeFanCoil;
 	using UnitVentilator::CalcUnitVentilatorComponents;
@@ -161,9 +173,6 @@ ControlCompOutput(
 	using OutdoorAirUnit::CalcOAUnitCoilComps;
 	using PlantUtilities::SetActuatedBranchFlowRate;
 
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	//Iteration maximum for reheat control
 	static int const MaxIter( 25 );
@@ -175,9 +184,6 @@ ControlCompOutput(
 	//  Plus -- order in ListOfComponents array must be in sorted order.
 	int const NumComponents( 11 );
 	static Array1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
 
 	// DERIVED TYPE DEFINITIONS
 	//Interval Half Type used for Controller
@@ -193,6 +199,7 @@ ControlCompOutput(
 	bool WaterCoilAirFlowControl; // True if controlling air flow through water coil, water flow fixed
 	int SimCompNum; // internal number for case statement
 	static Real64 HalvingPrec( 0.0 ); // precision of halving algorithm
+	bool BBConvergeCheckFlag; // additional check on convergence specifically for radiant/convective baseboard units
 
 	struct IntervalHalf
 	{
@@ -276,7 +283,7 @@ ControlCompOutput(
 	if ( ControlCompTypeNum != 0 ) {
 		SimCompNum = ControlCompTypeNum;
 	} else {
-		SimCompNum = FindItemInSortedList( CompType, ListOfComponents, NumComponents );
+		SimCompNum = UtilityRoutines::FindItemInSortedList( CompType, ListOfComponents, NumComponents );
 		ControlCompTypeNum = SimCompNum;
 	}
 
@@ -484,7 +491,7 @@ ControlCompOutput(
 		}
 
 		switch ( SimCompNum ) { //Tuned If block changed to switch
-		case 1: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
+		case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -493,7 +500,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 2: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
+		case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
 			// simulate series piu reheat coil
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -502,7 +509,7 @@ ControlCompOutput(
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 3: // 'COIL:HEATING:WATER'
+		case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
 			// Simulate reheat coil for the VAV system
 			SimulateWaterCoilComponents( CompName, FirstHVACIteration, CompNum );
 			// Calculate the control signal (the variable we are forcing to zero)
@@ -517,56 +524,56 @@ ControlCompOutput(
 			}
 			break;
 
-		case 4: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
+		case BBWaterConvOnlyNum: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
 			// Simulate baseboard
 			SimHWConvective( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 5: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
+		case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
 			// Simulate baseboard
 			CalcSteamBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 6: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
+		case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
 			// Simulate baseboard
 			CalcHWBaseboard( CompNum, LoadMet );
 			// Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 7: // 'ZONEHVAC:FOURPIPEFANCOIL'
+		case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
 			// Simulate fancoil unit
 			Calc4PipeFanCoil( CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 8: //'ZONEHVAC:OUTDOORAIRUNIT'
+		case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
 			// Simulate outdoor air unit components
 			CalcOAUnitCoilComps( CompNum, FirstHVACIteration, EquipIndex, LoadMet ); //Autodesk:OPTIONAL EquipIndex used without PRESENT check
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 9: // 'ZONEHVAC:UNITHEATER'
+		case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
 			// Simulate unit heater components
 			CalcUnitHeaterComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 10: // 'ZONEHVAC:UNITVENTILATOR'
+		case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
 			// Simulate unit ventilator components
 			CalcUnitVentilatorComponents( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
 			ZoneController.SensedValue = ( LoadMet - QZnReq ) / Denom;
 			break;
 
-		case 11: // 'ZONEHVAC:VENTILATEDSLAB'
+		case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
 			// Simulate unit ventilator components
 			CalcVentilatedSlabComps( CompNum, FirstHVACIteration, LoadMet );
 			//Calculate the control signal (the variable we are forcing to zero)
@@ -590,6 +597,20 @@ ControlCompOutput(
 			ZoneInterHalf.MaxResult = 1.0;
 			ZoneInterHalf.MinResult = 0.0;
 			break;
+		}
+		if ( !Converged ) {
+			BBConvergeCheckFlag = BBConvergeCheck( SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow );
+			if ( BBConvergeCheckFlag ) {
+				//Set to converged controller
+				Converged = true;
+				ZoneInterHalf.MaxFlowCalc = true;
+				ZoneInterHalf.MinFlowCalc = false;
+				ZoneInterHalf.NormFlowCalc = false;
+				ZoneInterHalf.MinFlowResult = false;
+				ZoneInterHalf.MaxResult = 1.0;
+				ZoneInterHalf.MinResult = 0.0;
+				break;
+			}
 		}
 
 		++Iter;
@@ -615,6 +636,50 @@ ControlCompOutput(
 
 }
 
+bool
+BBConvergeCheck(
+	int const SimCompNum,
+	Real64 const MaxFlow,
+	Real64 const MinFlow
+)
+{
+
+	// FUNCTION INFORMATION:
+	//       AUTHOR         Rick Strand
+	//       DATE WRITTEN   November 2017
+	
+	// PURPOSE OF THIS SUBROUTINE:
+	// This is an additional check for the radiant/convective baseboard units
+	// to see if they are converged or the flow is sufficiently converged to
+	// procede with the simulation.  With the radiant component to these systems,
+	// the impact on the load met is more difficult to calculate and the impact
+	// on the actual system output is not as well behaved as for convective
+	// systems.  This additional check avoids excessive iterations and max
+	// iteration warnings and provides sufficiently converged results.  It is
+	// only called from ControlCompOutput.
+
+	// Return Value
+	bool BBConvergeCheck;
+	
+	// SUBROUTINE PARAMETER DEFINITIONS:
+	static Real64 const BBIterLimit( 0.00001 );
+	
+	if ( SimCompNum != BBSteamRadConvNum && SimCompNum != BBWaterRadConvNum ) {
+		// For all zone equipment except radiant/convective baseboard (steam and water) units:
+		BBConvergeCheck = false;
+	} else {
+		// For steam and water radiant/convective baseboard units:
+		if ( ( MaxFlow - MinFlow ) > BBIterLimit ) {
+			BBConvergeCheck = false;
+		} else {
+			BBConvergeCheck = true;
+		}
+	}
+	
+	return BBConvergeCheck;
+	
+}
+	
 void
 CheckSysSizing(
 	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
@@ -863,30 +928,12 @@ ValidateComponent(
 	// Uses existing routines in InputProcessor.  GetObjectItemNum uses the "standard"
 	// convention of the Name of the item/object being the first Alpha Argument.
 
-	// REFERENCES:
-	// na
-
-	// Using/Aliasing
-	using InputProcessor::GetObjectItemNum;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
-
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int ItemNum;
 
 	IsNotOK = false;
 
-	ItemNum = GetObjectItemNum( CompType, CompName );
+	ItemNum = inputProcessor->getObjectItemNum( CompType, CompName );
 
 	if ( ItemNum < 0 ) {
 		ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
@@ -899,6 +946,54 @@ ValidateComponent(
 	}
 
 }
+
+
+	void
+	ValidateComponent(
+			std::string const & CompType, // Component Type (e.g. Chiller:Electric)
+			std::string const & CompValType, //Component "name" field type
+			std::string const & CompName, // Component Name (e.g. Big Chiller)
+			bool & IsNotOK, // .TRUE. if this component pair is invalid
+			std::string const & CallString // Context of this pair -- for error message
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda Lawrie
+		//       DATE WRITTEN   October 2002
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine can be called to validate the component type-name pairs that
+		// are so much a part of the EnergyPlus input.  The main drawback to this validation
+		// has been that the "GetInput" routine may not have been called and/or exists in
+		// another module from the one with the list.  This means that validation must be
+		// done later, perhaps after simulation has already started or perhaps raises an
+		// array bound error instead.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses existing routines in InputProcessor.  GetObjectItemNum uses the "standard"
+		// convention of the Name of the item/object being the first Alpha Argument.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int ItemNum;
+
+		IsNotOK = false;
+
+		ItemNum = inputProcessor->getObjectItemNum( CompType, CompValType, CompName );
+
+		if ( ItemNum < 0 ) {
+			ShowSevereError( "During " + CallString + " Input, Invalid Component Type input=" + CompType );
+			ShowContinueError( "Component name=" + CompName );
+			IsNotOK = true;
+		} else if ( ItemNum == 0 ) {
+			ShowSevereError( "During " + CallString + " Input, Invalid Component Name input=" + CompName );
+			ShowContinueError( "Component type=" + CompType );
+			IsNotOK = true;
+		}
+
+	}
 
 void
 CalcPassiveExteriorBaffleGap(
@@ -1458,12 +1553,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	// This subroutine tests supply air path integrity and displays the loop for each branch.
 	// Also, input and output nodes.
 
-	// METHODOLOGY EMPLOYED:
-	// na
-
-	// REFERENCES:
-	// na
-
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::OutputFileBNDetails;
@@ -1475,21 +1564,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	using namespace ZonePlenum;
 	using DataAirLoop::AirToZoneNodeInfo;
 	using DataHVACGlobals::NumPrimaryAirSys;
-	using InputProcessor::SameString;
-	using InputProcessor::MakeUPPERCase;
-	using InputProcessor::GetNumObjectsFound;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Count;
@@ -1561,7 +1635,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Supply Air Path Component," + ChrOut + ',' + SupplyAirPath( BCount ).ComponentType( Count ) + ',' + SupplyAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( SupplyAirPath( BCount ).ComponentType( Count ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:SUPPLYPLENUM" ) {
 				for ( Count2 = 1; Count2 <= NumZoneSupplyPlenums; ++Count2 ) {
@@ -1630,12 +1704,12 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 
 	if ( NumSplitters == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ZoneSplitter" ) > 0 ) {
 			GetZoneSplitterInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:SupplyPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}
@@ -1717,8 +1791,6 @@ TestReturnAirPathIntegrity(
 	// SUBROUTINE INFORMATION:
 	//       AUTHOR         Linda Lawrie
 	//       DATE WRITTEN   March 2003
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS SUBROUTINE:
 	// This subroutine tests return air path integrity and displays the loop for each branch.
@@ -1758,29 +1830,12 @@ TestReturnAirPathIntegrity(
 	using DataAirLoop::AirToZoneNodeInfo;
 	using namespace ZonePlenum;
 	using DataHVACGlobals::NumPrimaryAirSys;
-	using InputProcessor::SameString;
-	using InputProcessor::MakeUPPERCase;
-	using InputProcessor::GetNumObjectsFound;
 	using MixerComponent::MixerCond;
 	using MixerComponent::NumMixers;
 	auto & GetZoneMixerInput( MixerComponent::GetMixerInput );
 	using PoweredInductionUnits::PIUnitHasMixer;
 	using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
 	using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
-
-	// Argument array dimensioning
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int Loop;
@@ -1863,7 +1918,7 @@ TestReturnAirPathIntegrity(
 			strip( ChrOut );
 			gio::write( OutputFileBNDetails, Format_701 ) << "   Return Air Path Component," + ChrOut + ',' + ReturnAirPath( BCount ).ComponentType( Count ) + ',' + ReturnAirPath( BCount ).ComponentName( Count ) + ',' + PrimaryAirLoopName;
 
-			if ( SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
+			if ( UtilityRoutines::SameString( ReturnAirPath( BCount ).ComponentType( Count ), "AirLoopHVAC:ZoneMixer" ) ) {
 				HasMixer = true;
 				MixerComp = Count;
 				++MixerCount;
@@ -1883,7 +1938,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 0 ) {
 
-			{ auto const SELECT_CASE_var( MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
+			{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( NumComp ) ) );
 
 			if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 				for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {
@@ -1947,7 +2002,7 @@ TestReturnAirPathIntegrity(
 
 		if ( NumComp > 1 ) {
 			for ( Count3 = 1; Count3 <= NumComp - 1; ++Count3 ) {
-				{ auto const SELECT_CASE_var( MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
+				{ auto const SELECT_CASE_var( UtilityRoutines::MakeUPPERCase( ReturnAirPath( BCount ).ComponentType( Count3 ) ) );
 
 				if ( SELECT_CASE_var == "AIRLOOPHVAC:ZONEMIXER" ) {
 					for ( Count2 = 1; Count2 <= NumMixers; ++Count2 ) {
@@ -1997,22 +2052,7 @@ TestReturnAirPathIntegrity(
 					WAirLoop = Count2;
 					ValRetAPaths( _, WAirLoop ) = 0;
 					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
-					for ( int RetPathNode = 1; RetPathNode <= CountNodes; ++RetPathNode ){
-						bool RetNodeFound = false;
-						for ( int CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
-							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
-							for ( int ZoneOutNum = 1; ZoneOutNum <= ZoneEquipConfig( CtrlZoneNum ).NumReturnNodes; ++ZoneOutNum ) {
-								if ( ZoneEquipConfig( CtrlZoneNum ).ReturnNode( ZoneOutNum ) == AllNodes( RetPathNode ) ) {
-									ZoneEquipConfig( CtrlZoneNum ).ReturnNodeAirLoopNum( ZoneOutNum ) = WAirLoop;
-									RetNodeFound = true;
-									break; // leave zone return node loop
-								}
-							if ( RetNodeFound ) break; // leave controlled zone loop
-							}
-						}
-
-					}
-					break; // leave air loops loop
+					break;
 				}
 			} else {
 				ShowWarningError( "TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo( Count2 ).AirLoopName );
@@ -2024,12 +2064,12 @@ TestReturnAirPathIntegrity(
 	AllNodes.deallocate();
 
 	if ( NumMixers == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ZoneMixer" ) > 0 ) {
 			GetZoneMixerInput();
 		}
 	}
 	if ( NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0 ) {
-		if ( GetNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
+		if ( inputProcessor->getNumObjectsFound( "AirLoopHVAC:ReturnPlenum" ) > 0 ) {
 			GetZonePlenumInput();
 		}
 	}

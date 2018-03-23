@@ -14,8 +14,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5�C
-!                          Denver Centennial  Golden CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32�C MWB=15.5�C
+! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5°C
+!                          Denver Centennial  Golden CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
 !
 ! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
 !
@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,4;
 
@@ -139,7 +139,7 @@
  !  Data Source=ASHRAE 2009 Annual Design Conditions
  ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
  ! Coldest Month=DEC
- ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5�C
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5°C
 
   SizingPeriod:DesignDay,
     Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name
@@ -171,7 +171,7 @@
 
  ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=JUL
- ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32�C MWB=15.5�C
+ ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
 
   SizingPeriod:DesignDay,
     Denver Centennial  Golden   N Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -431,7 +431,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     352,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost
@@ -444,7 +444,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     -352,                    !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost

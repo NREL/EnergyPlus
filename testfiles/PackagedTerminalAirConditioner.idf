@@ -24,7 +24,7 @@
 !           There is a single 3 mm clear window in the West zone south wall. The walls are 1 in stucco over 4 in
 !           common brick and 1 in dense insulation with gypboard on the interior. The roof is a built up roof with
 !           1/2 in stone over 3/8 in felt over 4 in dense insulation supported by 2 in heavy weight concrete. The
-!           floor is 8 in heavy weight concrete with carpeting. The window to wall ratio is approxomately 0.07.
+!           floor is 8 in heavy weight concrete with carpeting. The window to wall ratio is approximately 0.07.
 !           Infiltration is fixed at 0.02 m3/s in East zone in winter.
 !
 !           The building is oriented due north.
@@ -127,7 +127,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1514,6 +1514,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     Zone1PTAC,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1521,6 +1522,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     Zone2PTAC,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1528,6 +1530,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:PackagedTerminalAirConditioner,  !- Zone Equipment 1 Object Type
     Zone3PTAC,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1541,7 +1544,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1549,7 +1552,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone2Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1557,7 +1560,7 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     Zone3Exhausts,           !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   Fan:SystemModel,
     Zone1PTACFan,            !- Name
@@ -2172,7 +2175,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio,Hourly;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,Hourly;
+  Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
   Output:Variable,*,Heating Coil Electric Power,Hourly;
 
@@ -2185,8 +2188,6 @@
   Output:Variable,*,Heating Coil Runtime Fraction,Hourly;
 
   Output:Variable,*,Heating Coil Ancillary Gas Rate,Hourly;
-
-  Output:Variable,*,Heating Coil Air Heating Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
 

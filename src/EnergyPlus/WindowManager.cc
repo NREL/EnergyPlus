@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -72,7 +73,7 @@
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -1581,6 +1582,50 @@ namespace WindowManager {
 		// shade. These are used to calculate zone MRT contribution from window when
 		// interior blind/shade is deployed.
 
+		// Loop for BSDF windows
+		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+			auto& surfaceWindow( SurfaceWindow( SurfNum ) );
+
+			if ( surfaceWindow.WindowModelType == WindowBSDFModel ) {
+				// Set shading flags for BSDF windows
+				// Set shading flags. This could be also done inside SurfaceWindow structure, however, order is important
+				if ( Construct( Surface( SurfNum ).Construction ).BSDFInput.BasisType != 0 ) {
+					surfaceWindow.WindowModelType = WindowBSDFModel;
+					// Set shading layer flags for windows
+					auto& construction( Construct( Surface( SurfNum ).Construction ) );
+					auto& surface_window( SurfaceWindow( SurfNum ) );
+					int TotLayers = construction.TotLayers;
+					for ( auto Lay = 1; Lay <= TotLayers; ++Lay ) {
+						int LayPtr = construction.LayerPoint( Lay );
+						auto& material( Material( LayPtr ) );
+						bool isShading = material.Group == ComplexWindowShade;
+						if ( isShading && Lay == 1 ) surface_window.ShadingFlag = ExtShadeOn;
+						if ( isShading && Lay == TotLayers ) surface_window.ShadingFlag = IntShadeOn;
+					}
+				}
+				if ( surfaceWindow.ShadingFlag == IntShadeOn ) {
+					auto& construction( Construct( Surface( SurfNum ).Construction ) );
+					int TotLay = construction.TotLayers;
+					int ShadingLayerPtr = construction.LayerPoint( TotLay );
+					ShadingLayerPtr = Material( ShadingLayerPtr ).ComplexShadePtr;
+					auto& complexShade = ComplexShade( ShadingLayerPtr );
+					auto TauShadeIR = complexShade.IRTransmittance;
+					auto EpsShadeIR = complexShade.BackEmissivity;
+					auto RhoShadeIR = max( 0.0, 1.0 - TauShadeIR - EpsShadeIR );
+					// Get properties of glass next to inside shading layer
+					int GlassLayPtr = construction.LayerPoint( TotLay - 2 );
+					auto EpsGlassIR = Material( GlassLayPtr ).AbsorpThermalBack;
+					auto RhoGlassIR = 1 - EpsGlassIR;
+
+					auto EffShBlEmiss = EpsShadeIR * ( 1.0 + RhoGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR ) );
+					surfaceWindow.EffShBlindEmiss[ 0 ] = EffShBlEmiss;
+					auto EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR );
+					surfaceWindow.EffGlassEmiss[ 0 ] = EffGlEmiss;
+				}
+			}
+		}
+
+		// Loop for ordinary windows
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 			if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
@@ -2300,7 +2345,6 @@ namespace WindowManager {
 		using DataHeatBalSurface::QdotRadOutRepPerArea;
 		using DataHeatBalSurface::QRadLWOutSrdSurfs;
 		//unused0909  USE DataEnvironment, ONLY: CurMnDyHr
-		using InputProcessor::SameString;
 		using WindowComplexManager::CalcComplexWindowThermal;
 		using WindowEquivalentLayer::EQLWindowSurfaceHeatBalance;
 		using ScheduleManager::GetCurrentScheduleValue;
@@ -2365,6 +2409,7 @@ namespace WindowManager {
 		int SrdSurfNum; // Surrounding surface number DO loop counter
 		Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
 		Real64 SrdSurfViewFac; // View factor of a surrounding surface
+		Real64 OutSrdIR; // LWR from surrouding srfs
 
 		// New variables for thermochromic windows calc
 		Real64 locTCSpecTemp; // The temperature corresponding to the specified optical properties of the TC layer
@@ -2404,6 +2449,8 @@ namespace WindowManager {
 				thetas( i ) = window.ThetaFace( i );
 			}
 			hcout = HextConvCoeff;
+			hcin = HConvIn( SurfNum );
+			tin = MAT( surface.Zone ) + TKelvin; // Inside air temperature
 
 			// This is code repeating and it is necessary to calculate report variables.  Do not know
 			// how to solve this in more elegant way :(
@@ -2416,6 +2463,10 @@ namespace WindowManager {
 			} else { // Window not exposed to wind
 				tout = surface.OutDryBulbTemp + TKelvin;
 			}
+
+			Ebout = sigma * pow_4( tout );
+			Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + 
+				( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout;
 
 		} else if ( window.WindowModelType == WindowEQLModel ) {
 
@@ -2755,11 +2806,10 @@ namespace WindowManager {
 
 			} else { // Exterior window (Ext BoundCond = 0)
 				// Calculate LWR from surrounding surfaces if defined for an exterior window
-				QRadLWOutSrdSurfs( SurfNum ) = 0;
+				OutSrdIR = 0;
 				if ( AnyLocalEnvironmentsInModel ) {
 					if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
 						SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;
-						// Real64 test = surface.ViewFactorSkyIR;
 						if ( SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor != -1 ) {
 							surface.ViewFactorSkyIR = SurroundingSurfsProperty( SrdSurfsNum ).SkyViewFactor;
 						}
@@ -2769,7 +2819,7 @@ namespace WindowManager {
 						for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
 							SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
 							SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
-							QRadLWOutSrdSurfs( SurfNum ) += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
+							OutSrdIR += sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) );
 						}
 					}
 				}
@@ -2783,7 +2833,7 @@ namespace WindowManager {
 					tout = surface.OutDryBulbTemp + TKelvin;
 				}
 				Ebout = sigma * pow_4( tout );
-				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout + QRadLWOutSrdSurfs( SurfNum );
+				Outir = surface.ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( SkyTempKelvin ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + surface.ViewFactorGroundIR * Ebout + OutSrdIR;
 
 			}
 
@@ -2887,6 +2937,18 @@ namespace WindowManager {
 		QdotConvOutRep( SurfNum ) = -surface.Area * hcout * ( Tsout - tout );
 		QdotConvOutRepPerArea( SurfNum ) = -hcout * ( Tsout - tout );
 		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * TimeStepZoneSec;
+
+		QRadLWOutSrdSurfs( SurfNum ) = 0;
+		if ( AnyLocalEnvironmentsInModel ) {
+			if ( Surface( SurfNum ).HasSurroundingSurfProperties ) {
+				SrdSurfsNum = Surface( SurfNum ).SurroundingSurfacesNum;					
+				for ( SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty( SrdSurfsNum ).TotSurroundingSurface; SrdSurfNum++ ) {
+					SrdSurfViewFac = SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).ViewFactor;
+					SrdSurfTempAbs = GetCurrentScheduleValue( SurroundingSurfsProperty( SrdSurfsNum ).SurroundingSurfs( SrdSurfNum ).TempSchNum ) + KelvinConv;
+					QRadLWOutSrdSurfs( SurfNum ) += SurfOutsideEmiss * sigma * SrdSurfViewFac * ( pow_4( SrdSurfTempAbs ) - pow_4( Tsout ) );
+				}
+			}
+		}
 
 		Real64 const Tsout_4( pow_4( Tsout ) ); //Tuned To reduce pow calls and redundancies
 		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) + QRadLWOutSrdSurfs( SurfNum ) ) );
@@ -3075,7 +3137,6 @@ namespace WindowManager {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyHFnTdbW;
 		using Psychrometrics::PsyTdbFnHW;
-		using InputProcessor::SameString;
 		using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
 
 		// Locals
@@ -4268,7 +4329,6 @@ namespace WindowManager {
 
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4391,27 +4451,9 @@ namespace WindowManager {
 		// Based on ISO/DIS 15099, "Thermal Performance of Windows, Doors and Shading Devices --
 		// Detailed Calculations," 1/12/2000, Chapter 7, "Shading Devices."
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
 		// Argument array dimensioning
 		TGapNew.dim( 2 );
 		hcv.dim( 2 );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ConstrNumSh; // Shaded construction number
@@ -7703,16 +7745,6 @@ namespace WindowManager {
 		// "Solar-Thermal Window Blind Model for DOE-2," H. Simmler, U. Fischer and
 		// F. Winkelmann, Lawrence Berkeley National Laboratory, Jan. 1996.
 
-		// USE STATEMENTS:na
-		// Using/Aliasing
-		using InputProcessor::SameString;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:na
-		// SUBROUTINE PARAMETER DEFINITIONS:na
-		// INTERFACE BLOCK SPECIFICATIONS:na
-		// DERIVED TYPE DEFINITIONS:na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		Array1D< Real64 > bld_pr( 15 ); // Slat properties
@@ -7885,7 +7917,6 @@ namespace WindowManager {
 		// REFERENCES: na
 
 		// Using/Aliasing
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 
 		// Locals
@@ -7980,11 +8011,11 @@ namespace WindowManager {
 					//     Material(MaterNum)%Trans = (1 - MaterialProps(7)/MaterialProps(6))**2.0
 					SurfaceScreens( ScreenNum ).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt( Material( MatNum ).Trans );
 
-					if ( SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
+					if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "DoNotModel" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = DoNotModel;
-					} else if ( SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
+					} else if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDirectBeam" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDirectBeam;
-					} else if ( SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
+					} else if ( UtilityRoutines::SameString( Material( MatNum ).ReflectanceModeling, "ModelAsDiffuse" ) ) {
 						SurfaceScreens( ScreenNum ).ScreenBeamReflectanceAccounting = ModelAsDiffuse;
 					}
 
@@ -9061,28 +9092,6 @@ Label99999: ;
 		// METHODOLOGY EMPLOYED:
 		// Overwriting the default values
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Using/Aliasing
-		using namespace InputProcessor;
-		//USE DataGlobals ,    ONLY: AnyEnergyManagementSystemInModel
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // If errors detected in input
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
@@ -9106,7 +9115,7 @@ Label99999: ;
 
 		// Step 1 - check whether there is custom solar or visible spectrum
 		cCurrentModuleObject = "Site:SolarAndVisibleSpectrum";
-		NumSiteSpectrum = GetNumObjectsFound( cCurrentModuleObject );
+		NumSiteSpectrum = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		// no custom spectrum data, done!
 		if ( NumSiteSpectrum == 0 ) {
@@ -9120,15 +9129,15 @@ Label99999: ;
 			ErrorsFound = true;
 		}
 
-		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+		inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
 		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
 
 			// use default spectrum data, done!
-			if ( SameString( cAlphaArgs( 2 ), "Default" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "Default" ) ) {
 				RunMeOnceFlag = true;
 				return;
 			}
@@ -9138,7 +9147,7 @@ Label99999: ;
 			cVisibleSpectrum = cAlphaArgs( 4 );
 
 			cCurrentModuleObject = "Site:SpectrumData";
-			NumSiteSpectrum = GetNumObjectsFound( cCurrentModuleObject );
+			NumSiteSpectrum = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 			if ( NumSiteSpectrum == 0 ) { // throw error
 				ShowSevereError( "No " + cCurrentModuleObject + " object is found" );
 				ErrorsFound = true;
@@ -9147,7 +9156,7 @@ Label99999: ;
 			cAlphaArgs.deallocate();
 			rNumericArgs.deallocate();
 
-			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
+			inputProcessor->getObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
 			rNumericArgs.dimension( NumNumbers, 0.0 );
 
@@ -9155,8 +9164,8 @@ Label99999: ;
 			iVisibleSpectrum = 0;
 			for ( Loop = 1; Loop <= NumSiteSpectrum; ++Loop ) {
 				// Step 2 - read user-defined spectrum data
-				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
-				if ( SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
+				inputProcessor->getObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), cSolarSpectrum ) ) {
 					iSolarSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * nume ) {
@@ -9175,7 +9184,7 @@ Label99999: ;
 						}
 					}
 				}
-				if ( SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), cVisibleSpectrum ) ) {
 					iVisibleSpectrum = Loop;
 					// overwrite the default solar spectrum
 					if ( NumNumbers > 2 * numt3 ) {

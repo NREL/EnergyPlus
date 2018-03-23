@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -121,6 +122,7 @@ namespace EnergyPlus {
 			" ",
 			"ZoneHVAC:EquipmentList,",
 			"  SPACE1-1 Eq,             !- Name",
+			"  SequentialLoad,          !- Load Distribution Scheme",
 			"  ZoneHVAC:OutdoorAirUnit, !- Zone Equipment 1 Object Type",
 			"  Zone1OutAir,             !- Zone Equipment 1 Name",
 			"  1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -272,7 +274,7 @@ namespace EnergyPlus {
 			" ",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::BeginEnvrnFlag = true;
 		DataSizing::CurZoneEqNum = 1;
@@ -303,6 +305,7 @@ namespace EnergyPlus {
 		FinalZoneSizing.allocate( 1 );
 		FinalZoneSizing( CurZoneEqNum ).MinOA = 0.5;
 		FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak = 26.66667;
+		FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak = 26.66667;
 		FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
 		FinalZoneSizing( CurZoneEqNum ).CoolDDNum = 1;
 		FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax = 1;
@@ -337,6 +340,20 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( SAFanPower, 75.0 );
 		EXPECT_DOUBLE_EQ( EAFanPower, 75.0 );
 		EXPECT_DOUBLE_EQ( SAFanPower + EAFanPower, OutAirUnit( OAUnitNum ).ElecFanRate );
+
+		// #6173
+		OutAirUnit( OAUnitNum ).ExtAirMassFlow = 0.0;
+		CalcOutdoorAirUnit( OAUnitNum, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided );
+
+		std::string const error_string = delimited_string( {
+			"   ** Warning ** Air mass flow between zone supply and exhaust is not balanced. Only the first occurrence is reported.",
+			"   **   ~~~   ** Occurs in ZoneHVAC:OutdoorAirUnit Object= ZONE1OUTAIR",
+			"   **   ~~~   ** Air mass balance is required by other outdoor air units: Fan:ZoneExhaust, ZoneMixing, ZoneCrossMixing, or other air flow control inputs.",
+			"   **   ~~~   ** The outdoor mass flow rate = 0.602 and the exhaust mass flow rate = 0.000.",
+			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+		} );
+
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 	}
 }

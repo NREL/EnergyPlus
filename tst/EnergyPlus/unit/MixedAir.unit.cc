@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -67,6 +68,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -131,7 +133,7 @@ namespace EnergyPlus {
 			"    ProportionalMinimum;     !- Minimum Limit Type",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false ); // If errors detected in input
 		int ControllerNum( 0 ); // Controller number
@@ -141,7 +143,7 @@ namespace EnergyPlus {
 		int IOStat( 0 );
 		std::string const CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 
 		Array1D< Real64 > NumArray( NumNums, 0.0 );
 		Array1D_string AlphArray( NumAlphas );
@@ -150,12 +152,12 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_bool lNumericBlanks( NumNums, true );
 
-		NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOAControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OAController.allocate( NumOAControllers );
 
 		ControllerNum = 1;
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 
@@ -164,7 +166,7 @@ namespace EnergyPlus {
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
 
 		ControllerNum = 2;
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ErrorsFound = false;
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
@@ -443,7 +445,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		GetOAControllerInputs();
 		EXPECT_EQ( 2, OAController( 1 ).OANode );
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
@@ -681,7 +683,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
 		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
@@ -750,7 +752,46 @@ namespace EnergyPlus {
 		EXPECT_NEAR( 0.0194359, OAController( 1 ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( 0.009527, OAController( 1 ).MinOAFracLimit, 0.00001 );
 
-		ZoneAirCO2.deallocate();
+		OARequirements( 1 ).OAFlowMethod = 9;
+		VentilationMechanical( 1 ).ZoneOAFlowMethod( 1 ) = OARequirements( 1 ).OAFlowMethod;
+		DataAirLoop::NumOASystems = 1;
+
+		OutsideAirSys.allocate( 1 );
+		OutsideAirSys( 1 ).Name = "AIRLOOP OASYSTEM";
+		OutsideAirSys( 1 ).NumControllers = 1;
+		OutsideAirSys( 1 ).ControllerName.allocate( 1 );
+		OutsideAirSys( 1 ).ControllerName( 1 ) = "OA CONTROLLER 1";
+		OutsideAirSys( 1 ).ComponentType.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentType( 1 ) = "OutdoorAir:Mixer";
+		OutsideAirSys( 1 ).ComponentName.allocate( 1 );
+		OutsideAirSys( 1 ).ComponentName( 1 ) = "OAMixer";
+		OAMixer.allocate( 1 );
+		OAMixer( 1 ).Name = "OAMixer";
+		OAMixer( 1 ).InletNode = 2;
+
+		DataHVACGlobals::NumPrimaryAirSys = 1;
+		PrimaryAirSystem.allocate( 1 );
+		PrimaryAirSystem( 1 ).Name = "PrimaryAirLoop";
+		PrimaryAirSystem( 1 ).NumBranches = 1;
+		PrimaryAirSystem( 1 ).Branch.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).TotalComponents = 1;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp.allocate( 1 );
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).Name = OutsideAirSys( 1 ).Name;
+		PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 1 ).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+
+		AirLoopZoneInfo.allocate( 1 );
+		AirLoopZoneInfo( 1 ).NumZones = 1;
+		AirLoopZoneInfo( 1 ).ActualZoneNumber.allocate( 1 );
+		AirLoopZoneInfo( 1 ).ActualZoneNumber( 1 ) = 1;
+
+		InitOAController( 1, true, 1 );
+		EXPECT_EQ( "ProportionalControlBasedOnDesignOccupancy", DataSizing::cOAFlowMethodTypes( VentilationMechanical( 1 ).ZoneOAFlowMethod( 1 ) ) );
+
+		OutsideAirSys.deallocate( );
+		OAMixer.deallocate( );
+		AirLoopZoneInfo.deallocate( );
+		PrimaryAirSystem.deallocate( );
+		ZoneAirCO2.deallocate( );
 		ZoneCO2GainFromPeople.deallocate();
 	}
 
@@ -856,7 +897,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
 		AirLoopControlInfo( 1 ).LoopFlowRateSet = true;
@@ -979,7 +1020,7 @@ namespace EnergyPlus {
 			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetOASysInputFlag = true;
 		DataGlobals::BeginEnvrnFlag = true;
@@ -1125,7 +1166,7 @@ namespace EnergyPlus {
 			"    DOAS OA Controller;      !- Controller 1 Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::NumOfTimeStepInHour = 1;
 		DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
@@ -1223,7 +1264,7 @@ namespace EnergyPlus {
 			"    OAFractionSched;                        !- Minimum Outdoor Air Schedule Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetOAControllerInputs( );
 
@@ -1359,7 +1400,7 @@ namespace EnergyPlus {
 			"    1;                        !- High Humidity Outdoor Air Flow Ratio",
 		});
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		compare_err_stream( "" ); // just for debugging
 
@@ -1371,7 +1412,7 @@ namespace EnergyPlus {
 		int IOStat( 0 );
 		std::string const CurrentModuleObject = CurrentModuleObjects( CMO_OAController );
 
-		InputProcessor::GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
+		inputProcessor->getObjectDefMaxArgs( CurrentModuleObjects( CMO_OAController ), NumArg, NumAlphas, NumNums );
 
 		Array1D< Real64 > NumArray( NumNums, 0.0 );
 		Array1D_string AlphArray( NumAlphas );
@@ -1380,7 +1421,7 @@ namespace EnergyPlus {
 		Array1D_bool lAlphaBlanks( NumAlphas, true );
 		Array1D_bool lNumericBlanks( NumNums, true );
 
-		NumOAControllers = InputProcessor::GetNumObjectsFound( CurrentModuleObject );
+		NumOAControllers = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		OAController.allocate( NumOAControllers );
 
 		ControllerNum = 1;
@@ -1390,7 +1431,9 @@ namespace EnergyPlus {
 		ZoneEquipConfig.allocate( 1 );
 		ZoneEquipConfig( 1 ).ActualZoneNum = 1;
 		ZoneEquipConfig( 1 ).ZoneNode = 2;
-		ZoneEquipConfig( 1 ).AirLoopNum = 1;
+		ZoneEquipConfig( 1 ).NumInletNodes = 1;
+		ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
+		ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
 		PrimaryAirSystem.allocate( 1 );
 		PrimaryAirSystem( 1 ).NumBranches = 1;
 		PrimaryAirSystem( 1 ).Branch.allocate( 1 );
@@ -1410,7 +1453,7 @@ namespace EnergyPlus {
 		HumidityControlZone( 1 ).ActualZoneNum = 1;
 		NumHumidityControlZones = 1;
 
-		InputProcessor::GetObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 		//compare_err_stream( "" ); // just for debugging
@@ -1463,7 +1506,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopFlow.allocate( 1 );
 		AirLoopControlInfo.allocate( 1 );
@@ -1614,7 +1657,7 @@ namespace EnergyPlus {
 			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		GetOAControllerInputs();
 
 		EXPECT_EQ( 1, GetNumOAMixers() );
@@ -1655,7 +1698,7 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-			"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C",
+			"! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ï¿½C MCWB=  23.0ï¿½C",
 			"SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
 			"    7,                       !- Month",
@@ -1685,7 +1728,7 @@ namespace EnergyPlus {
 			"    1.0;                     !- Sky Clearness",
 
 
-			"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C",
+			"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ï¿½C",
 			"SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -3710,6 +3753,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE1-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3721,6 +3765,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE2-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3732,6 +3777,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE3-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3743,6 +3789,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE4-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -3754,6 +3801,7 @@ namespace EnergyPlus {
 
 			"ZoneHVAC:EquipmentList,",
 			"    SPACE5-1 Equipment,      !- Name",
+			"    SequentialLoad,          !- Load Distribution Scheme",
 			"    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
 			"    SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name",
 			"    1,                       !- Zone Equipment 1 Cooling Sequence",
@@ -4927,12 +4975,14 @@ namespace EnergyPlus {
 		} );
 
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 			GetOAControllerInputs();
 
 			EXPECT_EQ( 6, GetNumOAMixers() );
 			EXPECT_EQ( 1, GetNumOAControllers() );
 			EXPECT_EQ( 18, GetOAMixerReliefNodeNumber( 1 ) );
+
+			//indexes can be found in  OAMixer array for these feild names
 			EXPECT_EQ( 1, GetOAMixerIndex( "SPACE1-1 OA Mixing Box" ) );
 			EXPECT_EQ( 2, GetOAMixerIndex( "SPACE2-1 OA Mixing Box" ) );
 			EXPECT_EQ( 3, GetOAMixerIndex( "SPACE3-1 OA Mixing Box" ) );
@@ -4966,7 +5016,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );
@@ -5158,7 +5208,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		bool ErrorsFound( false );
 		GetZoneData( ErrorsFound );
@@ -5312,7 +5362,7 @@ namespace EnergyPlus {
 		} );
 
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		ContaminantControlledZone.allocate( 1 );
 		ContaminantControlledZone( 1 ).AvaiSchedPtr = 4;
@@ -5412,4 +5462,250 @@ namespace EnergyPlus {
 		ZoneIntGain.deallocate( );
 	}
 
+	TEST_F( EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest )
+	{
+		std::string const idf_objects = delimited_string( {
+			"  Version,8.8;",
+
+			"  AvailabilityManagerAssignmentList,",
+			"    VAV Sys 1 Avail List,    !- Name",
+			"    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type",
+			"    VAV Sys 1 Avail;         !- Availability Manager 1 Name",
+
+			"  AvailabilityManager:Scheduled,",
+			"    VAV Sys 1 Avail,         !- Name",
+			"    FanAvailSched;           !- Schedule Name",
+
+			"  BranchList,",
+			"    VAV Sys 1 Branches,      !- Name",
+			"    VAV Sys 1 Main Branch;   !- Branch 1 Name",
+
+			"  Branch,",
+			"    VAV Sys 1 Main Branch,   !- Name",
+			"    ,                        !- Pressure Drop Curve Name",
+			"    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
+			"    OA Sys 1,                !- Component 1 Name",
+			"    VAV Sys 1 Inlet Node,    !- Component 1 Inlet Node Name",
+			"    Mixed Air Node 1,        !- Component 1 Outlet Node Name",
+			"    Coil:Cooling:Water,      !- Component 2 Object Type",
+			"    Main Cooling Coil 1,     !- Component 2 Name",
+			"    Mixed Air Node 1,        !- Component 2 Inlet Node Name",
+			"    Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name",
+			"    Coil:Heating:Water,      !- Component 3 Object Type",
+			"    Main Heating Coil 1,     !- Component 3 Name",
+			"    Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name",
+			"    Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name",
+			"    Fan:VariableVolume,      !- Component 4 Object Type",
+			"    Supply Fan 1,            !- Component 4 Name",
+			"    Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name",
+			"    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
+
+			"  AirLoopHVAC:OutdoorAirSystem,",
+			"    OA Sys 1,                !- Name",
+			"    OA Sys 1 Controllers,    !- Controller List Name",
+			"    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
+			"    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+
+			"  AirLoopHVAC:ControllerList,",
+			"    OA Sys 1 Controllers,    !- Name",
+			"    Controller:WaterCoil,    !- Controller 1 Object Type",
+			"    OA CC Controller 1,      !- Controller 1 Name",
+			"    Controller:OutdoorAir,   !- Controller 2 Object Type",
+			"    OA Controller 1,         !- Controller 2 Name",
+			"    Controller:WaterCoil,    !- Controller 3 Object Type",
+			"    OA HC Controller 1;      !- Controller 3 Name",
+
+			"  AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+			"    OA Sys 1 Equipment,      !- Name",
+			"    Coil:Heating:Water,      !- Component 1 Object Type",
+			"    OA Heating Coil 1,       !- Component 1 Name",
+			"    Coil:Cooling:Water,      !- Component 2 Object Type",
+			"    OA Cooling Coil 1,       !- Component 2 Name",
+			"    OutdoorAir:Mixer,        !- Component 3 Object Type",
+			"    OA Mixing Box 1;         !- Component 3 Name",
+
+			"  Coil:Heating:Water,",
+			"    OA Heating Coil 1,       !- Name",
+			"    CoolingCoilAvailSched,   !- Availability Schedule Name",
+			"    autosize,                !- U-Factor Times Area Value {W/K}",
+			"    autosize,                !- Maximum Water Flow Rate {m3/s}",
+			"    OA Heating Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+			"    OA Heating Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+			"    Outside Air Inlet Node 1,!- Air Inlet Node Name",
+			"    OA Heating Coil 1 Air Outlet Node,  !- Air Outlet Node Name",
+			"    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+			"    autosize,                !- Rated Capacity {W}",
+			"    82.2,                    !- Rated Inlet Water Temperature {C}",
+			"    16.6,                    !- Rated Inlet Air Temperature {C}",
+			"    71.1,                    !- Rated Outlet Water Temperature {C}",
+			"    32.2,                    !- Rated Outlet Air Temperature {C}",
+			"    ;                        !- Rated Ratio for Air and Water Convection",
+
+			"  Coil:Cooling:Water,",
+			"    OA Cooling Coil 1,       !- Name",
+			"    CoolingCoilAvailSched,   !- Availability Schedule Name",
+			"    autosize,                !- Design Water Flow Rate {m3/s}",
+			"    autosize,                !- Design Air Flow Rate {m3/s}",
+			"    autosize,                !- Design Inlet Water Temperature {C}",
+			"    autosize,                !- Design Inlet Air Temperature {C}",
+			"    autosize,                !- Design Outlet Air Temperature {C}",
+			"    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    OA Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+			"    OA Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+			"    OA Heating Coil 1 Air Outlet Node,  !- Air Inlet Node Name",
+			"    OA Mixing Box 1 Inlet Node,  !- Air Outlet Node Name",
+			"    SimpleAnalysis,          !- Type of Analysis",
+			"    CrossFlow;               !- Heat Exchanger Configuration",
+
+			"  OutdoorAir:Mixer,",
+			"    OA Mixing Box 1,         !- Name",
+			"    Mixed Air Node 1,        !- Mixed Air Node Name",
+			"    OA Mixing Box 1 Inlet Node,  !- Outdoor Air Stream Node Name",
+			"    Relief Air Outlet Node 1,!- Relief Air Stream Node Name",
+			"    VAV Sys 1 Inlet Node;    !- Return Air Stream Node Name",
+
+			"  Coil:Cooling:Water,",
+			"    Main Cooling Coil 1,     !- Name",
+			"    CoolingCoilAvailSched,   !- Availability Schedule Name",
+			"    autosize,                !- Design Water Flow Rate {m3/s}",
+			"    autosize,                !- Design Air Flow Rate {m3/s}",
+			"    autosize,                !- Design Inlet Water Temperature {C}",
+			"    autosize,                !- Design Inlet Air Temperature {C}",
+			"    autosize,                !- Design Outlet Air Temperature {C}",
+			"    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}",
+			"    Main Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+			"    Main Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+			"    Mixed Air Node 1,        !- Air Inlet Node Name",
+			"    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
+			"    SimpleAnalysis,          !- Type of Analysis",
+			"    CrossFlow;               !- Heat Exchanger Configuration",
+
+			"  Coil:Heating:Water,",
+			"    Main Heating Coil 1,     !- Name",
+			"    ReheatCoilAvailSched,    !- Availability Schedule Name",
+			"    autosize,                !- U-Factor Times Area Value {W/K}",
+			"    autosize,                !- Maximum Water Flow Rate {m3/s}",
+			"    Main Heating Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+			"    Main Heating Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+			"    Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name",
+			"    Main Heating Coil 1 Outlet Node,  !- Air Outlet Node Name",
+			"    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+			"    autosize,                !- Rated Capacity {W}",
+			"    82.2,                    !- Rated Inlet Water Temperature {C}",
+			"    16.6,                    !- Rated Inlet Air Temperature {C}",
+			"    71.1,                    !- Rated Outlet Water Temperature {C}",
+			"    32.2,                    !- Rated Outlet Air Temperature {C}",
+			"    ;                        !- Rated Ratio for Air and Water Convection",
+
+			"  Fan:VariableVolume,",
+			"    Supply Fan 1,            !- Name",
+			"    FanAvailSched,           !- Availability Schedule Name",
+			"    0.7,                     !- Fan Total Efficiency",
+			"    600.0,                   !- Pressure Rise {Pa}",
+			"    autosize,                !- Maximum Flow Rate {m3/s}",
+			"    Fraction,                !- Fan Power Minimum Flow Rate Input Method",
+			"    0.25,                    !- Fan Power Minimum Flow Fraction",
+			"    ,                        !- Fan Power Minimum Air Flow Rate {m3/s}",
+			"    0.9,                     !- Motor Efficiency",
+			"    1.0,                     !- Motor In Airstream Fraction",
+			"    0.35071223,              !- Fan Power Coefficient 1",
+			"    0.30850535,              !- Fan Power Coefficient 2",
+			"    -0.54137364,             !- Fan Power Coefficient 3",
+			"    0.87198823,              !- Fan Power Coefficient 4",
+			"    0.000,                   !- Fan Power Coefficient 5",
+			"    Main Heating Coil 1 Outlet Node,  !- Air Inlet Node Name",
+			"    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name",
+
+			"  Controller:WaterCoil,",
+			"    OA HC Controller 1,      !- Name",
+			"    Temperature,             !- Control Variable",
+			"    Normal,                  !- Action",
+			"    FLOW,                    !- Actuator Variable",
+			"    OA Heating Coil 1 Air Outlet Node,  !- Sensor Node Name",
+			"    OA Heating Coil 1 Water Inlet Node,  !- Actuator Node Name",
+			"    0.002,                   !- Controller Convergence Tolerance {deltaC}",
+			"    autosize,                !- Maximum Actuated Flow {m3/s}",
+			"    0.0;                     !- Minimum Actuated Flow {m3/s}",
+
+			"  Controller:WaterCoil,",
+			"    OA CC Controller 1,      !- Name",
+			"    Temperature,             !- Control Variable",
+			"    Reverse,                 !- Action",
+			"    FLOW,                    !- Actuator Variable",
+			"    OA Mixing Box 1 Inlet Node,  !- Sensor Node Name",
+			"    OA Cooling Coil 1 Water Inlet Node,  !- Actuator Node Name",
+			"    0.002,                   !- Controller Convergence Tolerance {deltaC}",
+			"    autosize,                !- Maximum Actuated Flow {m3/s}",
+			"    0.0;                     !- Minimum Actuated Flow {m3/s}",
+
+			"  Controller:WaterCoil,",
+			"    Central Cooling Coil Controller 1,  !- Name",
+			"    Temperature,             !- Control Variable",
+			"    Reverse,                 !- Action",
+			"    FLOW,                    !- Actuator Variable",
+			"    Main Cooling Coil 1 Outlet Node,  !- Sensor Node Name",
+			"    Main Cooling Coil 1 Water Inlet Node,  !- Actuator Node Name",
+			"    0.002,                   !- Controller Convergence Tolerance {deltaC}",
+			"    autosize,                !- Maximum Actuated Flow {m3/s}",
+			"    0.0;                     !- Minimum Actuated Flow {m3/s}",
+
+			"  Controller:OutdoorAir,",
+			"    OA Controller 1,         !- Name",
+			"    Relief Air Outlet Node 1,!- Relief Air Outlet Node Name",
+			"    VAV Sys 1 Inlet Node,    !- Return Air Node Name",
+			"    Mixed Air Node 1,        !- Mixed Air Node Name",
+			"    Outside Air Inlet Node 1,!- Actuator Node Name",
+			"    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+			"    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+			"    NoEconomizer,            !- Economizer Control Type",
+			"    ModulateFlow,            !- Economizer Control Action Type",
+			"    19.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+			"    ,                        !- Electronic Enthalpy Limit Curve Name",
+			"    4.6,                     !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+			"    NoLockout,               !- Lockout Type",
+			"    FixedMinimum,            !- Minimum Limit Type",
+			"    ;                        !- Minimum Outdoor Air Schedule Name",
+
+			"  Controller:WaterCoil,",
+			"    Central Heating Coil Controller 1,  !- Name",
+			"    Temperature,             !- Control Variable",
+			"    Normal,                  !- Action",
+			"    FLOW,                    !- Actuator Variable",
+			"    Main Heating Coil 1 Outlet Node,  !- Sensor Node Name",
+			"    Main Heating Coil 1 Water Inlet Node,  !- Actuator Node Name",
+			"    0.002,                   !- Controller Convergence Tolerance {deltaC}",
+			"    autosize,                !- Maximum Actuated Flow {m3/s}",
+			"    0.0;                     !- Minimum Actuated Flow {m3/s}",
+
+		} );
+
+		ASSERT_TRUE( process_idf( idf_objects ) );
+
+		GetOAControllerInputs();
+
+		GetOutsideAirSysInputs();
+
+		auto & CurrentOASystem( DataAirLoop::OutsideAirSys[0] );
+
+		EXPECT_EQ( CurrentOASystem.NumControllers, 3 );
+		EXPECT_EQ( CurrentOASystem.ControllerType( 1 ), "CONTROLLER:WATERCOIL" );
+		EXPECT_EQ( CurrentOASystem.ControllerName( 1 ), "OA CC CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.ControllerType( 2 ), "CONTROLLER:OUTDOORAIR" );
+		EXPECT_EQ( CurrentOASystem.ControllerName( 2 ), "OA CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.ControllerType( 3 ), "CONTROLLER:WATERCOIL" );
+		EXPECT_EQ( CurrentOASystem.ControllerName( 3 ), "OA HC CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.OAControllerName, "OA CONTROLLER 1" );
+		EXPECT_EQ( CurrentOASystem.OAControllerIndex, 0 );
+		int AirLoopNum = 0;
+		bool FirstHVACIteration = true;
+		// sim OAController with OAControllerIndex = 0 for the first time only
+		SimOAController( CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum );
+		// OAControllerIndex is set during first time InitOAController run
+		EXPECT_EQ( CurrentOASystem.OAControllerIndex, 1 );
+
+	}
 }

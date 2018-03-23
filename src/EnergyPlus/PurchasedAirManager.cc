@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -68,7 +69,7 @@
 #include <EMSManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutAirNodeManager.hh>
@@ -126,8 +127,6 @@ namespace PurchasedAirManager {
 	using DataEnvironment::OutHumRat;
 	using DataEnvironment::OutEnthalpy;
 	using DataEnvironment::StdRhoAir;
-
-	// Use statements for access to subroutines in other modules
 	using namespace ScheduleManager;
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyHFnTdbW;
@@ -228,26 +227,8 @@ namespace PurchasedAirManager {
 		// It is called from SimZoneEquipment in the ZoneEquipmentManager
 		// at the system time step.
 
-		// METHODOLOGY EMPLOYED:
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -262,7 +243,7 @@ namespace PurchasedAirManager {
 
 		// Find the correct PurchasedAir Equipment
 		if ( CompIndex == 0 ) {
-			PurchAirNum = FindItemInList( PurchAirName, PurchAir );
+			PurchAirNum = UtilityRoutines::FindItemInList( PurchAirName, PurchAir );
 			if ( PurchAirNum == 0 ) {
 				ShowFatalError( "SimPurchasedAir: Unit not found=" + PurchAirName );
 			}
@@ -305,18 +286,7 @@ namespace PurchasedAirManager {
 		// Get the input data for the Purchased Air objects.
 		// Set up output variables.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using NodeInputManager::InitUniqueNodeCheck;
 		using NodeInputManager::CheckUniqueNodes;
@@ -330,19 +300,6 @@ namespace PurchasedAirManager {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using ZonePlenum::GetReturnPlenumIndex;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PurchAirNum;
 		int NumAlphas;
@@ -352,14 +309,12 @@ namespace PurchasedAirManager {
 		int NodeNum; // node index
 		static std::string const RoutineName( "GetPurchasedAir: " ); // include trailing blank space
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		bool IsOANodeListed; // Flag for OA node name listed in OutdoorAir:Node or Nodelist
 		bool UniqueNodeError; // Flag for non-unique node error(s)
 
 		cCurrentModuleObject = "ZoneHVAC:IdealLoadsAirSystem";
 
-		NumPurchAir = GetNumObjectsFound( cCurrentModuleObject );
+		NumPurchAir = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		PurchAir.allocate( NumPurchAir );
 		CheckEquipName.allocate( NumPurchAir );
@@ -371,19 +326,13 @@ namespace PurchasedAirManager {
 			for ( PurchAirNum = 1; PurchAirNum <= NumPurchAir; ++PurchAirNum ) {
 				PurchAir( PurchAirNum ).cObjectName = cCurrentModuleObject;
 
-				GetObjectItem( cCurrentModuleObject, PurchAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PurchAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				PurchAirNumericFields( PurchAirNum ).FieldNames.allocate( NumNums );
 				PurchAirNumericFields( PurchAirNum ).FieldNames = "";
 				PurchAirNumericFields( PurchAirNum ).FieldNames = cNumericFieldNames;
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), PurchAir, PurchAirNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				PurchAir( PurchAirNum ).Name = cAlphaArgs( 1 );
 				// get optional  availability schedule
 				PurchAir( PurchAirNum ).AvailSched = cAlphaArgs( 2 );
@@ -421,21 +370,21 @@ namespace PurchasedAirManager {
 				PurchAir( PurchAirNum ).MaxHeatSuppAirHumRat = rNumericArgs( 3 );
 				PurchAir( PurchAirNum ).MinCoolSuppAirHumRat = rNumericArgs( 4 );
 
-				if ( SameString( cAlphaArgs( 6 ), "NoLimit" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "NoLimit" ) ) {
 					PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
-				} else if ( SameString( cAlphaArgs( 6 ), "LimitFlowRate" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitFlowRate" ) ) {
 					if ( lNumericFieldBlanks( 5 ) ) {
 						PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).HeatingLimit = LimitFlowRate;
 					}
-				} else if ( SameString( cAlphaArgs( 6 ), "LimitCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitCapacity" ) ) {
 					if ( lNumericFieldBlanks( 6 ) ) {
 						PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).HeatingLimit = LimitCapacity;
 					}
-				} else if ( SameString( cAlphaArgs( 6 ), "LimitFlowRateAndCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "LimitFlowRateAndCapacity" ) ) {
 					if ( lNumericFieldBlanks( 5 ) && lNumericFieldBlanks( 6 ) ) {
 						PurchAir( PurchAirNum ).HeatingLimit = NoLimit;
 					} else if ( lNumericFieldBlanks( 5 ) ) {
@@ -454,21 +403,21 @@ namespace PurchasedAirManager {
 				PurchAir( PurchAirNum ).MaxHeatVolFlowRate = rNumericArgs( 5 );
 				PurchAir( PurchAirNum ).MaxHeatSensCap = rNumericArgs( 6 );
 
-				if ( SameString( cAlphaArgs( 7 ), "NoLimit" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "NoLimit" ) ) {
 					PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
-				} else if ( SameString( cAlphaArgs( 7 ), "LimitFlowRate" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "LimitFlowRate" ) ) {
 					if ( lNumericFieldBlanks( 7 ) ) {
 						PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).CoolingLimit = LimitFlowRate;
 					}
-				} else if ( SameString( cAlphaArgs( 7 ), "LimitCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "LimitCapacity" ) ) {
 					if ( lNumericFieldBlanks( 8 ) ) {
 						PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
 					} else {
 						PurchAir( PurchAirNum ).CoolingLimit = LimitCapacity;
 					}
-				} else if ( SameString( cAlphaArgs( 7 ), "LimitFlowRateAndCapacity" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "LimitFlowRateAndCapacity" ) ) {
 					if ( lNumericFieldBlanks( 7 ) && lNumericFieldBlanks( 8 ) ) {
 						PurchAir( PurchAirNum ).CoolingLimit = NoLimit;
 					} else if ( lNumericFieldBlanks( 7 ) ) {
@@ -512,13 +461,13 @@ namespace PurchasedAirManager {
 					}
 				}
 				// get Dehumidification control type
-				if ( SameString( cAlphaArgs( 10 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "None" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = None;
-				} else if ( SameString( cAlphaArgs( 10 ), "ConstantSensibleHeatRatio" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ConstantSensibleHeatRatio" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = ConstantSensibleHeatRatio;
-				} else if ( SameString( cAlphaArgs( 10 ), "Humidistat" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "Humidistat" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = Humidistat;
-				} else if ( SameString( cAlphaArgs( 10 ), "ConstantSupplyHumidityRatio" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 10 ), "ConstantSupplyHumidityRatio" ) ) {
 					PurchAir( PurchAirNum ).DehumidCtrlType = ConstantSupplyHumidityRatio;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -529,11 +478,11 @@ namespace PurchasedAirManager {
 				PurchAir( PurchAirNum ).CoolSHR = rNumericArgs( 9 );
 
 				// get Humidification control type
-				if ( SameString( cAlphaArgs( 11 ), "None" ) ) {
+				if ( UtilityRoutines::SameString( cAlphaArgs( 11 ), "None" ) ) {
 					PurchAir( PurchAirNum ).HumidCtrlType = None;
-				} else if ( SameString( cAlphaArgs( 11 ), "Humidistat" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 11 ), "Humidistat" ) ) {
 					PurchAir( PurchAirNum ).HumidCtrlType = Humidistat;
-				} else if ( SameString( cAlphaArgs( 11 ), "ConstantSupplyHumidityRatio" ) ) {
+				} else if ( UtilityRoutines::SameString( cAlphaArgs( 11 ), "ConstantSupplyHumidityRatio" ) ) {
 					PurchAir( PurchAirNum ).HumidCtrlType = ConstantSupplyHumidityRatio;
 				} else {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -544,7 +493,7 @@ namespace PurchasedAirManager {
 
 				// get Design specification outdoor air object
 				if ( ! lAlphaFieldBlanks( 12 ) ) {
-					PurchAir( PurchAirNum ).OARequirementsPtr = FindItemInList( cAlphaArgs( 12 ), OARequirements );
+					PurchAir( PurchAirNum ).OARequirementsPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 12 ), OARequirements );
 					if ( PurchAir( PurchAirNum ).OARequirementsPtr == 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
 						ShowContinueError( "Invalid-not found" + cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\"." );
@@ -583,11 +532,11 @@ namespace PurchasedAirManager {
 					if ( UniqueNodeError ) ErrorsFound = true;
 
 					// get Demand controlled ventilation type
-					if ( SameString( cAlphaArgs( 14 ), "None" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "None" ) ) {
 						PurchAir( PurchAirNum ).DCVType = NoDCV;
-					} else if ( SameString( cAlphaArgs( 14 ), "OccupancySchedule" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "OccupancySchedule" ) ) {
 						PurchAir( PurchAirNum ).DCVType = OccupancySchedule;
-					} else if ( SameString( cAlphaArgs( 14 ), "CO2Setpoint" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 14 ), "CO2Setpoint" ) ) {
 						if ( Contaminant.CO2Simulation ) {
 							PurchAir( PurchAirNum ).DCVType = CO2SetPoint;
 						} else {
@@ -604,11 +553,11 @@ namespace PurchasedAirManager {
 						ErrorsFound = true;
 					}
 					// get Outdoor air economizer type
-					if ( SameString( cAlphaArgs( 15 ), "NoEconomizer" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "NoEconomizer" ) ) {
 						PurchAir( PurchAirNum ).EconomizerType = NoEconomizer;
-					} else if ( SameString( cAlphaArgs( 15 ), "DifferentialDryBulb" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "DifferentialDryBulb" ) ) {
 						PurchAir( PurchAirNum ).EconomizerType = DifferentialDryBulb;
-					} else if ( SameString( cAlphaArgs( 15 ), "DifferentialEnthalpy" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 15 ), "DifferentialEnthalpy" ) ) {
 						PurchAir( PurchAirNum ).EconomizerType = DifferentialEnthalpy;
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -617,11 +566,11 @@ namespace PurchasedAirManager {
 						ErrorsFound = true;
 					}
 					// get Outdoor air heat recovery type and effectiveness
-					if ( SameString( cAlphaArgs( 16 ), "None" ) ) {
+					if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "None" ) ) {
 						PurchAir( PurchAirNum ).HtRecType = NoHeatRecovery;
-					} else if ( SameString( cAlphaArgs( 16 ), "Sensible" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "Sensible" ) ) {
 						PurchAir( PurchAirNum ).HtRecType = Sensible;
-					} else if ( SameString( cAlphaArgs( 16 ), "Enthalpy" ) ) {
+					} else if ( UtilityRoutines::SameString( cAlphaArgs( 16 ), "Enthalpy" ) ) {
 						PurchAir( PurchAirNum ).HtRecType = Enthalpy;
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -649,7 +598,7 @@ namespace PurchasedAirManager {
 
 				PurchAir( PurchAirNum ).HVACSizingIndex = 0;
 				if ( ! lAlphaFieldBlanks( 17 ) ) {
-					PurchAir(PurchAirNum).HVACSizingIndex = FindItemInList( cAlphaArgs( 17 ), ZoneHVACSizing );
+					PurchAir(PurchAirNum).HVACSizingIndex = UtilityRoutines::FindItemInList( cAlphaArgs( 17 ), ZoneHVACSizing );
 					if ( PurchAir(PurchAirNum).HVACSizingIndex == 0 ) {
 						ShowSevereError( cAlphaFieldNames( 17 ) + " = " + cAlphaArgs( 17 ) + " not found.");
 						ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + PurchAir( PurchAirNum ).Name);
@@ -722,67 +671,67 @@ namespace PurchasedAirManager {
 
 			// Setup Output variables
 			//    energy variables
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Energy [J]", PurchAir( PurchAirNum ).SenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Energy [J]", PurchAir( PurchAirNum ).LatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy [J]", PurchAir( PurchAirNum ).TotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Energy [J]", PurchAir( PurchAirNum ).SenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Energy [J]", PurchAir( PurchAirNum ).LatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Energy [J]", PurchAir( PurchAirNum ).TotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTCOOLING", "Cooling", _, "System" );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Energy [J]", PurchAir( PurchAirNum ).ZoneSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Energy [J]", PurchAir( PurchAirNum ).ZoneLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Energy [J]", PurchAir( PurchAirNum ).ZoneTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Energy [J]", PurchAir( PurchAirNum ).ZoneSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Energy [J]", PurchAir( PurchAirNum ).ZoneLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Energy [J]", PurchAir( PurchAirNum ).ZoneTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Energy [J]", PurchAir( PurchAirNum ).OASenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Energy [J]", PurchAir( PurchAirNum ).OALatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Energy [J]", PurchAir( PurchAirNum ).OATotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Energy [J]", PurchAir( PurchAirNum ).OASenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Energy [J]", PurchAir( PurchAirNum ).OALatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Energy [J]", PurchAir( PurchAirNum ).OATotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Energy [J]", PurchAir( PurchAirNum ).HtRecSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Energy [J]", PurchAir( PurchAirNum ).HtRecLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Energy [J]", PurchAir( PurchAirNum ).HtRecTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Energy [J]", PurchAir( PurchAirNum ).HtRecSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Energy [J]", PurchAir( PurchAirNum ).HtRecLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Energy [J]", PurchAir( PurchAirNum ).HtRecTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).SenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).LatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).TotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTHEATING", "Heating", _, "System" );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).SenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).LatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).TotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name, _, "DISTRICTCOOLING", "Cooling", _, "System" );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).ZoneTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OASenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OALatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OATotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OASenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OALatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).OATotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecSenHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecLatHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecTotHeatEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecSenCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecLatCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Energy", OutputProcessor::Unit::J, PurchAir( PurchAirNum ).HtRecTotCoolEnergy, "System", "Sum", PurchAir( PurchAirNum ).Name );
 
 			//    rate variables
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Rate [W]", PurchAir( PurchAirNum ).SenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Rate [W]", PurchAir( PurchAirNum ).LatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Rate [W]", PurchAir( PurchAirNum ).TotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Rate [W]", PurchAir( PurchAirNum ).SenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Rate [W]", PurchAir( PurchAirNum ).LatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Rate [W]", PurchAir( PurchAirNum ).TotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Rate [W]", PurchAir( PurchAirNum ).ZoneSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Rate [W]", PurchAir( PurchAirNum ).ZoneLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Rate [W]", PurchAir( PurchAirNum ).ZoneTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Rate [W]", PurchAir( PurchAirNum ).ZoneSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Rate [W]", PurchAir( PurchAirNum ).ZoneLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Rate [W]", PurchAir( PurchAirNum ).ZoneTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Rate [W]", PurchAir( PurchAirNum ).OASenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Rate [W]", PurchAir( PurchAirNum ).OALatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Rate [W]", PurchAir( PurchAirNum ).OATotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Rate [W]", PurchAir( PurchAirNum ).OASenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Rate [W]", PurchAir( PurchAirNum ).OALatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Rate [W]", PurchAir( PurchAirNum ).OATotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Rate [W]", PurchAir( PurchAirNum ).HtRecSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Rate [W]", PurchAir( PurchAirNum ).HtRecLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Rate [W]", PurchAir( PurchAirNum ).HtRecTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Rate [W]", PurchAir( PurchAirNum ).HtRecSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Rate [W]", PurchAir( PurchAirNum ).HtRecLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Rate [W]", PurchAir( PurchAirNum ).HtRecTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).SenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).LatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).TotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).SenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).LatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).TotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Zone Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).ZoneTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OASenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OALatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OATotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OASenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OALatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).OATotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecSenHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecLatHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Heating Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecTotHeatRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Sensible Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecSenCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Latent Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecLatCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Total Cooling Rate", OutputProcessor::Unit::W, PurchAir( PurchAirNum ).HtRecTotCoolRate, "System", "Average", PurchAir( PurchAirNum ).Name );
 
-			SetupOutputVariable( "Zone Ideal Loads Economizer Active Time [hr]", PurchAir( PurchAirNum ).TimeEconoActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Active Time [hr]", PurchAir( PurchAirNum ).TimeHtRecActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Economizer Active Time", OutputProcessor::Unit::hr, PurchAir( PurchAirNum ).TimeEconoActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Heat Recovery Active Time", OutputProcessor::Unit::hr, PurchAir( PurchAirNum ).TimeHtRecActive, "System", "Sum", PurchAir( PurchAirNum ).Name );
 
-			SetupOutputVariable( "Zone Ideal Loads Hybrid Ventilation Available Status []", PurchAir( PurchAirNum ).AvailStatus, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Hybrid Ventilation Available Status", OutputProcessor::Unit::None, PurchAir( PurchAirNum ).AvailStatus, "System", "Average", PurchAir( PurchAirNum ).Name );
 
 			//air flows
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Mass Flow Rate [kg/s]", PurchAir( PurchAirNum ).OutdoorAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate [m3/s]", PurchAir( PurchAirNum ).OutdoorAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]", PurchAir( PurchAirNum ).SupplyAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
-			SetupOutputVariable( "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate [m3/s]", PurchAir( PurchAirNum ).SupplyAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Mass Flow Rate", OutputProcessor::Unit::kg_s, PurchAir( PurchAirNum ).OutdoorAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, PurchAir( PurchAirNum ).OutdoorAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Mass Flow Rate", OutputProcessor::Unit::kg_s, PurchAir( PurchAirNum ).SupplyAirMassFlowRate, "System", "Average", PurchAir( PurchAirNum ).Name );
+			SetupOutputVariable( "Zone Ideal Loads Supply Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s, PurchAir( PurchAirNum ).SupplyAirVolFlowRateStdRho, "System", "Average", PurchAir( PurchAirNum ).Name );
 
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSActuator( "Ideal Loads Air System", PurchAir( PurchAirNum ).Name, "Air Mass Flow Rate", "[kg/s]", PurchAir( PurchAirNum ).EMSOverrideMdotOn, PurchAir( PurchAirNum ).EMSValueMassFlowRate );
@@ -930,8 +879,12 @@ namespace PurchasedAirManager {
 				UseReturnNode = true;
 			}
 			if ( UseReturnNode ) {
-				if ( ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode > 0 ) {
-					PurchAir( PurchAirNum ).ZoneRecircAirNodeNum = ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode;
+				if ( ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes == 1 ) {
+					PurchAir( PurchAirNum ).ZoneRecircAirNodeNum = ZoneEquipConfig( ControlledZoneNum ).ReturnNode( 1 );
+				} else if ( ZoneEquipConfig( ControlledZoneNum ).NumReturnNodes > 1 ) {
+					ShowWarningError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
+					ShowContinueError( "No Zone Exhaust Air Node Name has been specified for this system and the zone has more than one Return Air Node." );
+					ShowContinueError( "Using the first return air node =" + NodeID( ZoneEquipConfig( ControlledZoneNum ).ReturnNode( 1 ) ) );
 				} else {
 					ShowFatalError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
 					ShowContinueError( " Invalid recirculation node. No exhaust or return node has been specified for this zone in ZoneHVAC:EquipmentConnections." );
@@ -1060,12 +1013,8 @@ namespace PurchasedAirManager {
 		// METHODOLOGY EMPLOYED:
 		// Obtains flow rates from the zone sizing arrays.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSizing;
-		using namespace InputProcessor;
 		using ReportSizingManager::RequestSizing;
 		using ReportSizingManager::ReportSizingOutput;
 		using Psychrometrics::PsyCpAirFnWTdb;
@@ -1080,17 +1029,8 @@ namespace PurchasedAirManager {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHeatBalance::Zone;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizePurchasedAir: "); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool IsAutoSize; // Indicator to autosize
@@ -2301,8 +2241,8 @@ namespace PurchasedAirManager {
 
 		if ( PurchAir( PurchAirNum ).PlenumExhaustAirNodeNum > 0 ) {
 			Node( PurchAir( PurchAirNum ).PlenumExhaustAirNodeNum ).MassFlowRate = SupplyMassFlowRate;
-			Node( RecircNodeNum ).MassFlowRate = SupplyMassFlowRate;
 		}
+		Node( RecircNodeNum ).MassFlowRate = SupplyMassFlowRate;
 
 	}
 
@@ -2506,11 +2446,6 @@ namespace PurchasedAirManager {
 			PurchAir( PurchAirNum ).HtRecSenOutput = 0.0;
 			PurchAir( PurchAirNum ).HtRecLatOutput = 0.0;
 		}
-		// If exhaust node is specified, then set massflow on exhaust node, otherwise return node sets its own massflow
-		if ( PurchAir( PurchAirNum ).ZoneExhaustAirNodeNum > 0 ) {
-			Node( RecircNodeNum ).MassFlowRate = RecircMassFlowRate;
-		}
-
 	}
 
 	void
@@ -3038,7 +2973,7 @@ namespace PurchasedAirManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int ReturnPlenumIndex; // index to ZoneHVAC:ReturnPlenum object
 		int ReturnPlenumNum; // loop counter
-		bool PlenumNotFound; // logical to determine if same plenum is used by other ideal loads air systems 
+		bool PlenumNotFound; // logical to determine if same plenum is used by other ideal loads air systems
 		int Loop; // loop counters
 		int Loop2; // loop counters
 		Array1D_int TempPurchArray; // temporary array used for dynamic allocation

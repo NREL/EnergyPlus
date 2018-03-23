@@ -6,7 +6,7 @@ Begin VB.MDIForm parentMDI
    Caption         =   "IDF Editor"
    ClientHeight    =   8460
    ClientLeft      =   165
-   ClientTop       =   750
+   ClientTop       =   810
    ClientWidth     =   13065
    Icon            =   "MDI-Parent.frx":0000
    LinkTopic       =   "MDIForm1"
@@ -445,6 +445,7 @@ specialFormatOptDefault = GetSetting("IDF Editor", "Option", "SpecialFormatDef",
 checkRangeOnSave = GetSetting("IDF Editor", "Option", "CheckRangeOnSave", checkRangeNo)
 useWordWrap = GetSetting("IDF Editor", "Option", "WordWrap", False)
 previousVersion = GetSetting("IDF Editor", "Option", "Version", "")
+ignoreValidatingMacros = GetSetting("IDF EDitor", "Option", "IgnoreValidatingMacros", False)
 'get recently used files
 For i = maxRecentFiles To 1 Step -1
   fileNameFromRegistry = GetSetting("IDF Editor", "RecentFiles", Trim$(CStr(i)), "")
@@ -473,6 +474,7 @@ SaveSetting "IDF Editor", "Option", "SpecialFormatDef", specialFormatOptDefault
 SaveSetting "IDF Editor", "Option", "CheckRangeOnSave", checkRangeOnSave
 SaveSetting "IDF Editor", "Option", "WordWrap", useWordWrap
 SaveSetting "IDF Editor", "Option", "Version", ver
+SaveSetting "IDF Editor", "Option", "IgnoreValidatingMacros", ignoreValidatingMacros
 'save recently used file list
 If numRecentFiles > 0 Then
   For i = 1 To numRecentFiles

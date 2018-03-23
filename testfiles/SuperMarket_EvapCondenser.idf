@@ -29,8 +29,8 @@
 !
 ! Location:                Phoenix, AZ USA
 !
-! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=3.7캜
-!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=3.7째C
+!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_FL_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3
 !
@@ -42,7 +42,7 @@
 !           block covered with gypsum board on each surface. The roof is a built up roof with 1/2 in slag over 3/8 in
 !           felt and membrane with R-11 insulation over 6 in lightweight concrete, an air gap separates the interior
 !           acoustical tiles. The windows are single pane 6mm clear and double pane 6mm clear with 6mm air gap.
-!           The window to wall ratio is approxomately 0.0016.
+!           The window to wall ratio is approximately 0.0016.
 !
 !           The building is oriented due north with front of building facing east.
 !
@@ -123,7 +123,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -174,10 +174,10 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Phoenix Sky Harbor Intl Ap_AZ_USA Extreme Annual Wind Speeds, 1%=8.2m/s, 2.5%=7.1m/s, 5%=5.8m/s
- ! Phoenix Sky Harbor Intl Ap_AZ_USA Extreme Annual Temperatures, Max Drybulb=1.3캜 Min Drybulb=45.8캜
+ ! Phoenix Sky Harbor Intl Ap_AZ_USA Extreme Annual Temperatures, Max Drybulb=1.3째C Min Drybulb=45.8째C
  ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating Design Conditions Wind Speed=1.7m/s Wind Dir=100
  ! Coldest Month=DEC
- ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating 99.6%, MaxDB=3.7캜
+ ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating 99.6%, MaxDB=3.7째C
 
   SizingPeriod:DesignDay,
     Phoenix Sky Harbor Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -209,7 +209,7 @@
 
  ! Phoenix Sky Harbor Intl Ap Annual Cooling Design Conditions Wind Speed=4.1m/s Wind Dir=260
  ! Hottest Month=JUL
- ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+ ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 
   SizingPeriod:DesignDay,
     Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -606,7 +606,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:17,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -618,7 +618,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:22,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -630,7 +630,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:17,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -642,7 +642,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:22,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -654,7 +654,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -666,7 +666,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1384,6 +1384,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1391,6 +1392,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1404,7 +1406,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SalesFloor Node,         !- Zone Air Node Name
-    SalesFloor Outlet Node;  !- Zone Return Air Node Name
+    SalesFloor Outlet Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     BackRoom,                !- Zone Name
@@ -1412,7 +1414,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     BackRoom Node,           !- Zone Air Node Name
-    BackRoom Outlet Node;    !- Zone Return Air Node Name
+    BackRoom Outlet Node;    !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 

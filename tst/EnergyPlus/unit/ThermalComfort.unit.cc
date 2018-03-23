@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -65,6 +66,8 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
@@ -78,6 +81,8 @@ using namespace EnergyPlus::InternalHeatGains;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::DataSurfaces;
+using namespace EnergyPlus::DataHeatBalSurface;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
@@ -98,6 +103,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1 )
 	TimeStepZone = 0.25;
 	ThermalComfortInASH55.allocate( NumOfZones );
 	ThermalComfortInASH55( 1 ).ZoneIsOccupied = true;
+	Zone.allocate( NumOfZones );
 
 	// SingleHeatingSetPoint thermostat
 
@@ -389,7 +395,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
 		" ,                         !- Lighting Level{ W }",
 		" 10.0,                     !- Watts per Zone Floor Area{ W / m2 }",
 		" ,                         !- Watts per Person{ W / person }",
-		" 0.1,                      !- Return Air Fraction",
+		" 0.0,                      !- Return Air Fraction",
 		" 0.59,                     !- Fraction Radiant",
 		" 0.2,                      !- Fraction Visible",
 		" 0,                        !- Fraction Replaceable",
@@ -403,7 +409,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
 		" ,                         !- Lighting Level{ W }",
 		" 10.0,                     !- Watts per Zone Floor Area{ W / m2 }",
 		" ,                         !- Watts per Person{ W / person }",
-		" 0.1,                      !- Return Air Fraction",
+		" 0.0,                      !- Return Air Fraction",
 		" 0.59,                     !- Fraction Radiant",
 		" 0.2,                      !- Fraction Visible",
 		" 0,                        !- Fraction Replaceable",
@@ -702,7 +708,7 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutputProcessor::TimeValue.allocate( 2 );
 	DataGlobals::DDOnlySimulation = true;
@@ -748,4 +754,145 @@ TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger )
 	EXPECT_NEAR( ThermalComfortData( 1 ).FangerPPD, 35.3, 0.1 );
 }
 
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT )
+{
 
+	int ZoneNum( 1 );
+	int SurfNum( 1 );
+	Real64 RadTemp;
+	
+	TH.deallocate();
+	Surface.deallocate();
+	Construct.deallocate();
+	Zone.deallocate();
+	AngleFactorList.allocate( 1 );
+	TotSurfaces = 3;
+	NumOfZones = 1;
+	TH.allocate( 2, 2, TotSurfaces );
+	Surface.allocate( TotSurfaces );
+	Construct.allocate( TotSurfaces );
+	Zone.allocate( 1 );
+	
+	Surface( 1 ).Area = 20.0;
+	Surface( 2 ).Area = 15.0;
+	Surface( 3 ).Area = 10.0;
+	Surface( 1 ).HeatTransSurf = true;
+	Surface( 2 ).HeatTransSurf = true;
+	Surface( 3 ).HeatTransSurf = true;
+	Surface( 1 ).Construction = 1;
+	Surface( 2 ).Construction = 2;
+	Surface( 3 ).Construction = 3;
+	Construct( 1 ).InsideAbsorpThermal = 1.0;
+	Construct( 2 ).InsideAbsorpThermal = 0.9;
+	Construct( 3 ).InsideAbsorpThermal = 0.8;
+	Surface( 1 ).Zone = 1;
+	Surface( 2 ).Zone = 1;
+	Surface( 3 ).Zone = 1;
+	Zone( 1 ).SurfaceFirst = 1;
+	Zone( 1 ).SurfaceLast = 3;
+	TH( 2, 1, 1 ) = 20.0;
+	TH( 2, 1, 2 ) = 15.0;
+	TH( 2, 1, 3 ) = 10.0;
+	
+	SurfNum = 1;
+	ThermalComfort::clear_state( );
+	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
+	EXPECT_NEAR( RadTemp, 16.6, 0.1 );
+	
+	SurfNum = 2;
+	ThermalComfort::clear_state( );
+	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
+	EXPECT_NEAR( RadTemp, 16.1, 0.1 );
+
+	SurfNum = 3;
+	ThermalComfort::clear_state( );
+	RadTemp = CalcSurfaceWeightedMRT( ZoneNum, SurfNum );
+	EXPECT_NEAR( RadTemp, 14.0, 0.1 );
+	
+}
+
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT )
+{
+
+	Real64 RadTemp;
+	
+	AngleFactorList.allocate( 1 );
+	AngleFactorList( 1 ).TotAngleFacSurfaces = 3;
+	AngleFactorList( 1 ).SurfacePtr.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
+	AngleFactorList( 1 ).AngleFactor.allocate( AngleFactorList( 1 ).TotAngleFacSurfaces );
+
+	AngleFactorList( 1 ).SurfacePtr( 1 ) = 1;
+	AngleFactorList( 1 ).SurfacePtr( 2 ) = 2;
+	AngleFactorList( 1 ).SurfacePtr( 3 ) = 3;
+	AngleFactorList( 1 ).AngleFactor( 1 ) = 0.5;
+	AngleFactorList( 1 ).AngleFactor( 2 ) = 0.3;
+	AngleFactorList( 1 ).AngleFactor( 3 ) = 0.2;
+	
+	TH.deallocate();
+	TotSurfaces = AngleFactorList( 1 ).TotAngleFacSurfaces;
+	TH.allocate( 2, 2, TotSurfaces );
+	Surface.deallocate();
+	Construct.deallocate();
+	Surface.allocate( TotSurfaces );
+	Construct.allocate( TotSurfaces );
+
+	TH( 2, 1, 1 ) = 20.0;
+	TH( 2, 1, 2 ) = 15.0;
+	TH( 2, 1, 3 ) = 10.0;
+	Surface( 1 ).Construction = 1;
+	Surface( 2 ).Construction = 2;
+	Surface( 3 ).Construction = 3;
+	Construct( 1 ).InsideAbsorpThermal = 1.0;
+	Construct( 2 ).InsideAbsorpThermal = 0.9;
+	Construct( 3 ).InsideAbsorpThermal = 0.8;
+
+	RadTemp = CalcAngleFactorMRT( 1 );
+	EXPECT_NEAR( RadTemp, 16.9, 0.1 );
+
+	
+}
+
+TEST_F( EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test )
+{
+	// 5381
+	useEpwData = true;
+
+	DailyAveOutTemp( 1 ) = 8.704166667;
+	DailyAveOutTemp( 2 ) = 9.895833333;
+	DailyAveOutTemp( 3 ) = 12.2;
+	DailyAveOutTemp( 4 ) = 8.445833333;
+	DailyAveOutTemp( 5 ) = 7.8;
+	DailyAveOutTemp( 6 ) = 7.158333333;
+	DailyAveOutTemp( 7 ) = 8.0125;
+	DailyAveOutTemp( 8 ) = 8.279166667;
+	DailyAveOutTemp( 9 ) = 8.166666667;
+	DailyAveOutTemp( 10 ) = 7.141666667;
+	DailyAveOutTemp( 11 ) = 7.433333333;
+	DailyAveOutTemp( 12 ) = 9.0625;
+	DailyAveOutTemp( 13 ) = 9.741666667;
+	DailyAveOutTemp( 14 ) = 9.545833333;
+	DailyAveOutTemp( 15 ) = 11.43333333;
+	DailyAveOutTemp( 16 ) = 12.375;
+	DailyAveOutTemp( 17 ) = 12.59583333;
+	DailyAveOutTemp( 18 ) = 12.6625;
+	DailyAveOutTemp( 19 ) = 13.50833333;
+	DailyAveOutTemp( 20 ) = 12.99583333;
+	DailyAveOutTemp( 21 ) = 11.58333333;
+	DailyAveOutTemp( 22 ) = 11.72083333;
+	DailyAveOutTemp( 23 ) = 9.1875;
+	DailyAveOutTemp( 24 ) = 6.8;
+	DailyAveOutTemp( 25 ) = 9.391666667;
+	DailyAveOutTemp( 26 ) = 8.1125;
+	DailyAveOutTemp( 27 ) = 8.4;
+	DailyAveOutTemp( 28 ) = 8.475;
+	DailyAveOutTemp( 29 ) = 7.941666667;
+	DailyAveOutTemp( 30 ) = 9.316666667;
+
+	DataGlobals::BeginDayFlag = true;
+
+	CalcThermalComfortAdaptiveASH55( false );
+	EXPECT_NEAR( ThermalComfort::runningAverageASH, 9.29236111, 0.001 );
+	useEpwData = false;
+	DataGlobals::BeginDayFlag = false;
+
+}

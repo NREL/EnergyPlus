@@ -1,13 +1,12 @@
 ! ShipShoebox.idf
-
 !***********************************************************
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
-    Shoebox,               !- Name
+    Shoebox,                 !- Name
     0.0,                     !- North Axis {deg}
     Suburbs,                 !- Terrain
     0.05,                    !- Loads Convergence Tolerance Value
@@ -27,7 +26,7 @@
     Annual Run,              !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    2,                      !- End Month
+    2,                       !- End Month
     28,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -44,8 +43,8 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   ShadowCalculation,
-    AverageOverDaysInFrequency, !- Calculation Method
-    1;                         !- Calculation Frequency
+    AverageOverDaysInFrequency,  !- Calculation Method
+    1;                       !- Calculation Frequency
 
 !***********************************************************
 !****** LOCATION SPECIFIC OBJECTS **************************
@@ -115,61 +114,51 @@
     1.00;                    !- Sky Clearness
 
   Site:VariableLocation,
-    VaryingLatitude,
-    VaryingLongitude,
-    VaryingOrientation;
+    VaryingLatitude,         !- Name
+    VaryingLongitude,        !- Building Location Latitude Schedule
+    VaryingOrientation;      !- Building Location Longitude Schedule
 
   Schedule:Compact,
-    VaryingLatitude,
-    Any Number,
-    Through: 01/31,
-    For: AllDays,
-    Until: 24:00,
-    25,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00,
-    45;
+    VaryingLatitude,         !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 01/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,25,         !- Field 3
+    Through: 12/31,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,45;         !- Field 7
 
   Schedule:Compact,
-    VaryingLongitude,
-    Any Number,
-    Through: 01/31,
-    For: AllDays,
-    Until: 24:00,
-    -95,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00,
-    -102;
+    VaryingLongitude,        !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 01/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,-95,        !- Field 3
+    Through: 12/31,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,-102;       !- Field 7
 
   Schedule:Compact,
-    VaryingOrientation,
-    Any Number,
-    Through: 01/31,
-    For: AllDays,
-    Until: 24:00,
-    0,
-    Through: 02/28,
-    For: AllDays,
-    Until: 24:00,
-    90,
-    Through: 03/31,
-    For: AllDays,
-    Until: 24:00,
-    180,
-    Through: 04/30,
-    For: AllDays,
-    Until: 24:00,
-    270,
-    Through: 05/31,
-    For: AllDays,
-    Until: 24:00,
-    360,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00,
-    0;
+    VaryingOrientation,      !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 01/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0,          !- Field 3
+    Through: 02/28,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,90,         !- Field 7
+    Through: 03/31,          !- Field 9
+    For: AllDays,            !- Field 10
+    Until: 24:00,180,        !- Field 11
+    Through: 04/30,          !- Field 13
+    For: AllDays,            !- Field 14
+    Until: 24:00,270,        !- Field 15
+    Through: 05/31,          !- Field 17
+    For: AllDays,            !- Field 18
+    Until: 24:00,360,        !- Field 19
+    Through: 12/31,          !- Field 21
+    For: AllDays,            !- Field 22
+    Until: 24:00,0;          !- Field 23
 
   Zone,
     Main Floor,              !- Name
@@ -189,10 +178,10 @@
   BuildingSurface:Detailed,
     Main Floor Wall 1,       !- Name
     Wall,                    !- Surface Type
-    Main Construction,  !- Construction Name
+    Main Construction,       !- Construction Name
     Main Floor,              !- Zone Name
-    OtherSideConditionsModel,                !- Outside Boundary Condition
-    Underwater,                        !- Outside Boundary Condition Object
+    OtherSideConditionsModel,!- Outside Boundary Condition
+    Underwater,              !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -205,10 +194,10 @@
   BuildingSurface:Detailed,
     Main Floor Wall 2,       !- Name
     Wall,                    !- Surface Type
-    Main Construction,  !- Construction Name
+    Main Construction,       !- Construction Name
     Main Floor,              !- Zone Name
-    OtherSideConditionsModel,                !- Outside Boundary Condition
-    Underwater,                        !- Outside Boundary Condition Object
+    OtherSideConditionsModel,!- Outside Boundary Condition
+    Underwater,              !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -221,10 +210,10 @@
   BuildingSurface:Detailed,
     Main Floor Wall 3,       !- Name
     Wall,                    !- Surface Type
-    Main Construction,  !- Construction Name
+    Main Construction,       !- Construction Name
     Main Floor,              !- Zone Name
-    OtherSideConditionsModel,                !- Outside Boundary Condition
-    Underwater,                        !- Outside Boundary Condition Object
+    OtherSideConditionsModel,!- Outside Boundary Condition
+    Underwater,              !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -237,10 +226,10 @@
   BuildingSurface:Detailed,
     Main Floor Wall 4,       !- Name
     Wall,                    !- Surface Type
-    Main Construction,  !- Construction Name
+    Main Construction,       !- Construction Name
     Main Floor,              !- Zone Name
-    OtherSideConditionsModel,                !- Outside Boundary Condition
-    Underwater,                        !- Outside Boundary Condition Object
+    OtherSideConditionsModel,!- Outside Boundary Condition
+    Underwater,              !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -255,8 +244,8 @@
     Roof,                    !- Surface Type
     Main Construction,       !- Construction Name
     Main Floor,              !- Zone Name
-    OtherSideConditionsModel,                !- Outside Boundary Condition
-    Underwater,                        !- Outside Boundary Condition Object
+    OtherSideConditionsModel,!- Outside Boundary Condition
+    Underwater,              !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
@@ -268,10 +257,10 @@
 
   BuildingSurface:Detailed,
     Main Floor Floor,        !- Name
-    Floor,                 !- Surface Type
-    Main Construction,    !- Construction Name
-    Main Floor,                !- Zone Name
-    OtherSideConditionsModel,                    !- Outside Boundary Condition
+    Floor,                   !- Surface Type
+    Main Construction,       !- Construction Name
+    Main Floor,              !- Zone Name
+    OtherSideConditionsModel,!- Outside Boundary Condition
     Underwater,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
@@ -288,19 +277,13 @@
 
   SurfaceProperty:Underwater,
     Underwater,              !- Name
-    140,                     !- Distance from surface centroid to leading edge of building or ship
-    WaterTempSchedule,       !- Water Temperature Schedule
-    VelocitySchedule;        !- Free stream velocity schedule
+    140,                     !- Distance from Surface Centroid to Leading Edge of Boundary Layer {m}
+    WaterTempSchedule,       !- Free Stream Water Temperature Schedule
+    VelocitySchedule;        !- Free Stream Water Velocity Schedule
 
-  Schedule:Constant,
-    WaterTempSchedule,
-    Any Number,
-    23;
+  Schedule:Constant,WaterTempSchedule,Any Number,23;
 
-  Schedule:Constant,
-    VelocitySchedule,
-    Any Number,
-    10.2;
+  Schedule:Constant,VelocitySchedule,Any Number,10.2;
 
 !***********************************************************
 !****** ABOVE-GROUND MATERIALS/CONSTRUCTIONS ***************
@@ -313,7 +296,7 @@
 ! Material layer names follow:
 
   Construction,
-    Main Construction,  !- Name
+    Main Construction,       !- Name
     Composite 2x6 Wood Stud R19 #3,  !- Outside Layer
     Composite 2x6 Wood Stud R19 #2,  !- Layer 2
     Composite 2x6 Wood Stud R19 #1;  !- Layer 3
@@ -358,9 +341,7 @@
   Output:VariableDictionary,IDF;
 
 !  Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly,ReportingSchedule;
-
 !  Output:Variable,*,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient,hourly,ReportingSchedule;
-
 !  Output:Variable,*,Zone Air Temperature,hourly,ReportingSchedule;
 
   OutputControl:Table:Style,
@@ -372,20 +353,23 @@
   Output:Diagnostics,
     DisplayUnusedSchedules;  !- Key 1
 
-Output:Variable,*,Site Solar Azimuth Angle,hourly,ReportingSchedule; !- Zone Average [deg]
-Output:Variable,*,Site Solar Altitude Angle,hourly,ReportingSchedule; !- Zone Average [deg]
-Output:Variable,*,Site Solar Hour Angle,hourly,ReportingSchedule; !- Zone Average [deg]
-Output:Variable,*,Surface Outside Face Beam Solar Incident Angle Cosine Value,hourly,ReportingSchedule; !- Zone Average []
+  Output:Variable,*,Site Solar Azimuth Angle,hourly,ReportingSchedule;
+
+  Output:Variable,*,Site Solar Altitude Angle,hourly,ReportingSchedule;
+
+  Output:Variable,*,Site Solar Hour Angle,hourly,ReportingSchedule;
+
+  Output:Variable,*,Surface Outside Face Beam Solar Incident Angle Cosine Value,hourly,ReportingSchedule;
 
 ! Reporting schedule, since our CMake forces a full annual
-Schedule:Compact,
-    ReportingSchedule,
-    Any Number,
-    Through: 02/28,
-    For: AllDays,
-    Until: 24:00,
-    1,
-    Through: 12/31,
-    For: AllDays,
-    Until: 24:00,
-    0;
+
+  Schedule:Compact,
+    ReportingSchedule,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 02/28,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1,          !- Field 3
+    Through: 12/31,          !- Field 5
+    For: AllDays,            !- Field 6
+    Until: 24:00,0;          !- Field 7
+

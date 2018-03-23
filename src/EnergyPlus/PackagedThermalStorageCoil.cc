@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -72,11 +73,12 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <PlantUtilities.hh>
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -186,27 +188,8 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TESCoilNum;
@@ -217,7 +200,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( CompIndex == 0 ) {
-			TESCoilNum = FindItemInList( CompName, TESCoil );
+			TESCoilNum = UtilityRoutines::FindItemInList( CompName, TESCoil );
 			if ( TESCoilNum == 0 ) {
 				ShowFatalError( "Thermal Energy Storage Cooling Coil not found=" + CompName );
 			}
@@ -270,20 +253,8 @@ namespace PackagedThermalStorageCoil {
 		// PURPOSE OF THIS SUBROUTINE:
 		// <description>
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::GetObjectItemNum;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
-		using InputProcessor::GetObjectDefMaxArgs;
 		using WaterManager::SetupTankDemandComponent;
 		using WaterManager::SetupTankSupplyComponent;
 		using GlobalNames::VerifyUniqueCoilName;
@@ -298,26 +269,14 @@ namespace PackagedThermalStorageCoil {
 		using DataZoneEquipment::FindControlledZoneIndexFromSystemNodeNumberForZone;
 		using DataHeatBalance::IntGainTypeOf_PackagedTESCoilTank;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetTESCoilInput: " ); // include trailing blank space
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int item; // do loop counter
 		int NumAlphas; // Number of alphas in input
 		int NumNumbers; // Number of numeric items in input
 		int IOStatus; // Input status returned from GetObjectItem
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool errFlag;
 		Real64 TminRho;
@@ -327,20 +286,15 @@ namespace PackagedThermalStorageCoil {
 		int ZoneIndexTrial;
 
 		cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage";
-		NumTESCoils = GetNumObjectsFound( cCurrentModuleObject );
+		NumTESCoils = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		TESCoil.allocate( NumTESCoils );
 		CheckEquipName.dimension( NumTESCoils, true );
 
 		for ( item = 1; item <= NumTESCoils; ++item ) {
-			GetObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), TESCoil, item - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
+
 			VerifyUniqueCoilName( cCurrentModuleObject, cAlphaArgs( 1 ), errFlag, cCurrentModuleObject + " Name" );
 			if ( errFlag ) {
 				ErrorsFound = true;
@@ -397,7 +351,7 @@ namespace PackagedThermalStorageCoil {
 				ErrorsFound = true;
 			}}
 
-			if ( SameString( cAlphaArgs( 5 ), "USERDEFINEDFLUIDTYPE" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "USERDEFINEDFLUIDTYPE" ) ) {
 				if ( ! ( lAlphaFieldBlanks( 6 ) ) ) {
 					TESCoil( item ).StorageFluidName = cAlphaArgs( 6 );
 					if ( CheckFluidPropertyName( cAlphaArgs( 6 ) ) == 0 ) {
@@ -1623,62 +1577,62 @@ namespace PackagedThermalStorageCoil {
 
 		// setup reporting
 		for ( item = 1; item <= NumTESCoils; ++item ) {
-			SetupOutputVariable( "Cooling Coil Operating Mode Index []", TESCoil( item ).CurControlMode, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Operating Mode Index", OutputProcessor::Unit::None, TESCoil( item ).CurControlMode, "System", "Average", TESCoil( item ).Name );
 
 			// cCurrentModuleObject = "Coil:Cooling:DX:SingleSpeed:ThermalStorage"
-			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", TESCoil( item ).EvapTotCoolingRate, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", TESCoil( item ).EvapTotCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", TESCoil( item ).EvapSensCoolingRate, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy [J]", TESCoil( item ).EvapSensCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", TESCoil( item ).EvapLatCoolingRate, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Latent Cooling Energy [J]", TESCoil( item ).EvapLatCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Power [W]", TESCoil( item ).ElecCoolingPower, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Electric Energy [J]", TESCoil( item ).ElecCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
+			SetupOutputVariable( "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, TESCoil( item ).EvapTotCoolingRate, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapTotCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System" );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, TESCoil( item ).EvapSensCoolingRate, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapSensCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, TESCoil( item ).EvapLatCoolingRate, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapLatCoolingEnergy, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Electric Power", OutputProcessor::Unit::W, TESCoil( item ).ElecCoolingPower, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).ElecCoolingEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
 
-			SetupOutputVariable( "Cooling Coil Runtime Fraction []", TESCoil( item ).RuntimeFraction, "System", "Average", TESCoil( item ).Name );
-			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Energy [J]", TESCoil( item ).ElectColdWeatherEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
-			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Power [W]", TESCoil( item ).ElectColdWeatherPower, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, TESCoil( item ).RuntimeFraction, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).ElectColdWeatherEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
+			SetupOutputVariable( "Cooling Coil Cold Weather Protection Electric Power", OutputProcessor::Unit::W, TESCoil( item ).ElectColdWeatherPower, "System", "Average", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Rate [W]", TESCoil( item ).QdotTES, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Rate", OutputProcessor::Unit::W, TESCoil( item ).QdotTES, "System", "Average", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Energy [J]", TESCoil( item ).Q_TES, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Mechanical Heat Transfer Energy", OutputProcessor::Unit::J, TESCoil( item ).Q_TES, "System", "Sum", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Rate [W]", TESCoil( item ).QdotAmbient, "System", "Average", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Rate", OutputProcessor::Unit::W, TESCoil( item ).QdotAmbient, "System", "Average", TESCoil( item ).Name );
 
-			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Energy [J]", TESCoil( item ).Q_Ambient, "System", "Sum", TESCoil( item ).Name );
+			SetupOutputVariable( "Cooling Coil Thermal Storage Ambient Heat Transfer Energy", OutputProcessor::Unit::J, TESCoil( item ).Q_Ambient, "System", "Sum", TESCoil( item ).Name );
 
 			if ( TESCoil( item ).TESPlantConnectionAvailable ) {
-				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Rate [W]", TESCoil( item ).QdotPlant, "System", "Average", TESCoil( item ).Name );
-				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Energy [J]", TESCoil( item ).Q_Plant, "System", "Sum", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Rate", OutputProcessor::Unit::W, TESCoil( item ).QdotPlant, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Thermal Storage Plant Heat Transfer Energy", OutputProcessor::Unit::J, TESCoil( item ).Q_Plant, "System", "Sum", TESCoil( item ).Name );
 
 			}
 
 			if ( TESCoil( item ).CondenserType == EvapCooled ) {
-				SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature [C]", TESCoil( item ).CondInletTemp, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, TESCoil( item ).CondInletTemp, "System", "Average", TESCoil( item ).Name );
 
 				if ( TESCoil( item ).EvapWaterSupplyMode == WaterSupplyFromMains ) {
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume [m3]", TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume [m3]", TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Mains Supply Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
 				} else if ( TESCoil( item ).EvapWaterSupplyMode == WaterSupplyFromTank ) {
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Storage Tank Water Volume [m3]", TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Water Volume [m3]", TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
-					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Mains Water Volume [m3]", TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Storage Tank Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterConsump, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "Water", "Cooling", _, "System" );
+					SetupOutputVariable( "Cooling Coil Evaporative Condenser Starved Mains Water Volume", OutputProcessor::Unit::m3, TESCoil( item ).EvapWaterStarvMakup, "System", "Sum", TESCoil( item ).Name, _, "MainsWater", "Cooling", _, "System" );
 
 				}
 
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power [W]", TESCoil( item ).EvapCondPumpElecPower, "System", "Average", TESCoil( item ).Name );
-				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy [J]", TESCoil( item ).EvapCondPumpElecConsumption, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
+				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Power", OutputProcessor::Unit::W, TESCoil( item ).EvapCondPumpElecPower, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Evaporative Condenser Pump Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).EvapCondPumpElecConsumption, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", _, "System" );
 
-				SetupOutputVariable( "Cooling Coil Basin Heater Electric Power [W]", TESCoil( item ).ElectEvapCondBasinHeaterPower, "System", "Average", TESCoil( item ).Name );
-				SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy [J]", TESCoil( item ).ElectEvapCondBasinHeaterEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
+				SetupOutputVariable( "Cooling Coil Basin Heater Electric Power", OutputProcessor::Unit::W, TESCoil( item ).ElectEvapCondBasinHeaterPower, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Basin Heater Electric Energy", OutputProcessor::Unit::J, TESCoil( item ).ElectEvapCondBasinHeaterEnergy, "System", "Sum", TESCoil( item ).Name, _, "Electric", "COOLING", "Thermal Protection", "System" );
 
 			}
 
 			if ( TESCoil( item ).StorageMedia == FluidBased ) {
-				SetupOutputVariable( "Cooling Coil Fluid Thermal Storage End Temperature [C]", TESCoil( item ).FluidTankTempFinal, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Fluid Thermal Storage End Temperature", OutputProcessor::Unit::C, TESCoil( item ).FluidTankTempFinal, "System", "Average", TESCoil( item ).Name );
 
 			} else if ( TESCoil( item ).StorageMedia == IceBased ) {
-				SetupOutputVariable( "Cooling Coil Ice Thermal Storage End Fraction []", TESCoil( item ).IceFracRemain, "System", "Average", TESCoil( item ).Name );
+				SetupOutputVariable( "Cooling Coil Ice Thermal Storage End Fraction", OutputProcessor::Unit::None, TESCoil( item ).IceFracRemain, "System", "Average", TESCoil( item ).Name );
 			}
 
 		}
@@ -1714,7 +1668,7 @@ namespace PackagedThermalStorageCoil {
 		// Using/Aliasing
 		using DataPlant::TypeOf_PackagedTESCoolingCoil;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using General::RoundSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4691,30 +4645,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine sets an index for a given TES Cooling Coil -- issues error message if that
 		// coil is not a legal TES Cooling Coil.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		// Obtains and allocates TESCoil related parameters from input file
 		if ( GetTESInputFlag ) { // First time subroutine has been called, get input data
 			GetTESCoilInput();
@@ -4722,7 +4652,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4757,27 +4687,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's air inlet node -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns inlet air node number.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4788,7 +4697,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4822,27 +4731,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's air outlet node -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air node to 0, otherwise, returns outlet air node number.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4853,7 +4741,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4887,27 +4775,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's cooling only capacity -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets capacity to 0, otherwise, returns cooling capacity.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4918,7 +4785,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}
@@ -4960,27 +4827,6 @@ namespace PackagedThermalStorageCoil {
 		// This subroutine gets a given TES Cooling Coil's evaporator air flow rate -- issues error message if that
 		// coil is not a legal TES Cooling Coil and sets air flow to 0, otherwise, returns cooling air flow rate.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItem;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex;
 
@@ -4991,7 +4837,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( NumTESCoils > 0 ) {
-			CoilIndex = FindItem( CoilName, TESCoil, NumTESCoils );
+			CoilIndex = UtilityRoutines::FindItem( CoilName, TESCoil, NumTESCoils );
 		} else {
 			CoilIndex = 0;
 		}

@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -53,7 +54,7 @@
 #include <OutputReportPredefined.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
-#include <PlantManager.hh>
+#include <Plant/PlantManager.hh>
 #include <PlantUtilities.hh>
 #include <BranchInputManager.hh>
 #include <WeatherManager.hh>
@@ -68,8 +69,8 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, PlantLoopSourceSideTest ) {
 		// this test is related to issue #4385 and #4972, test change that added plant loop interconnects
-		// entire IDF file from defect file used to set up model and run it some. 
-		std::string const idf_objects = delimited_string( { 
+		// entire IDF file from defect file used to set up model and run it some.
+		std::string const idf_objects = delimited_string( {
 		"Version,8.3;",
 		"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
 		"Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
@@ -301,7 +302,7 @@ namespace EnergyPlus {
 
 		"PlantEquipmentList,",
 		"    Heat sources,            !- Name",
-		"    GroundHeatExchanger:Vertical,  !- Equipment 1 Object Type",
+		"    GroundHeatExchanger:System,  !- Equipment 1 Object Type",
 		"    Vertical GHE JL2015;     !- Equipment 1 Name",
 
 		"PlantEquipmentOperation:HeatingLoad,",
@@ -317,57 +318,76 @@ namespace EnergyPlus {
 		"    FOR: AllDays,            !- Field 2",
 		"    UNTIL: 24:00, 1;         !- Field 4",
 
-		"GroundHeatExchanger:Vertical,",
-		"    Vertical GHE JL2015,     !- Name",
-		"    GHEV Borehole Inlet Node,!- Inlet Node Name",
-		"    GHEV Borehole Outlet Node,  !- Outlet Node Name",
-		"    0.000303,                !- Design Flow Rate {m3/s}",
-		"    1,                       !- Number of Bore Holes",
-		"    160,                     !- Bore Hole Length {m}",
-		"    0.05715,                 !- Bore Hole Radius {m",
-		"    2.493,                   !- Ground Thermal Conductivity {W/m-K}",
-		"    2495700,                 !- Ground Thermal Heat Capacity {J/m3-K}",
-		"    8,                       !- Ground Temperature {C}",
-		"    0.000303,                !- Grout Thermal Conductivity {W/m-K}",
-		"    0.744,                   !- Pipe Thermal Conductivity {W/m-K}",
-		"    0.389,                   !- Pipe Out Diameter {m}",
-		"    0.0267,                  !- U-Tube Distance {m}",
-		"    0.0254,                  !- Pipe Thickness {m}",
-		"    5,                  !- Maximum Length of Simulation",
-		"    0.0005,                  ",
-		"    16,                      ",
-		"    -4.5,          ",
-		"    4.7,                ",
-		"    -4,                    ",
-		"    4.85,           ",
-		"    -3.5,             ",
-		"    5.1,                  ",
-		"    -3,             ",
-		"    5.3,          ",
-		"    -2.5,           ",
-		"    5.56,            ",
-		"    -2,               ",
-		"    5.76,            ",
-		"    -1.5,             ",
-		"    5.97,             ",
-		"    -1,               ",
-		"    6.19,           ",
-		"    -.5,        ",
-		"    6.31,         ",
-		"    0,              ",
-		"    6.42,             ",
-		"    0.5,         ",
-		"    6.56,          ",
-		"    1,              ",
-		"    6.61,      ",
-		"    1.5,              ",
-		"    6.66,             ",
-		"    2,                ",
-		"    6.7,            ",
-		"    2.5,               ",
-		"    6.72,               ",
-		"    3,                  ",
-		"    6.73;              ",
+		"  GroundHeatExchanger:System,",
+		"    Vertical GHE JL2015,      !- Name",
+		"    GHEV Borehole Inlet Node, !- Inlet Node Name",
+		"    GHEV Borehole Outlet Node, !- Outlet Node Name",
+		"    0.000303,                 !- Design Flow Rate {m3/s}",
+		"    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Undisturbed Ground Temperature Model Type",
+		"    Vertical GHE JL2015 Ground Temps, !- Undisturbed Ground Temperature Model Name",
+		"    2.493,                    !- Ground Thermal Conductivity {W/m-K}",
+		"    2495700,                  !- Ground Thermal Heat Capacity {J/m3-K}",
+		"    Vertical GHE JL2015 g-functions; !- Response Factors Object Name",
+
+		"  GroundHeatExchanger:Vertical:Properties,",
+		"    Vertical GHE JL2015 Props,        !- Name",
+		"    1,                  !- Depth of Top of Borehole {m}",
+		"    160,                !- Borehole Length {m}",
+		"    0.1143,             !- Borehole Diameter {m}",
+		"    0.744,              !- Grout Thermal Conductivity {W/m-K}",
+		"    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}",
+		"    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+		"    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}",
+		"    0.0267,             !- Pipe Outer Diameter {m}",
+		"    0.00243,            !- Pipe Thickness {m}",
+		"    0.04556;            !- U-Tube Distance {m}",
+
+		"  Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+		"    Vertical GHE JL2015 Ground Temps, !- Undisturbed Ground Temperature Model Name",
+		"    2.493,                    !- Soil Thermal Conductivity {W/m-K}",
+		"    920,                      !- Soil Density {kg/m3}",
+		"    2712.72,                  !- Soil Specific Heat {J/kg-K}",
+		"    8,                        !- Average Soil Surface Temperature {C}",
+		"    3.2,                      !- Average Amplitude of Surface Temperature {deltaC}",
+		"    8;                        !- Phase Shift of Minimum Surface Temperature {days}",
+
+		"  GroundHeatExchanger:ResponseFactors,",
+		"    Vertical GHE JL2015 g-functions, !- Name",
+		"    Vertical GHE JL2015 Props, !- Name",
+		"    1,                        !- Number of Bore Holes",
+		"    0.0005,                   !- G-Function Reference Ratio {dimensionless}",
+		"    -4.5,                     !- G-Function Ln(T/Ts) Value 1",
+		"    4.7,                      !- G-Function G Value 1",
+		"    -4,                       !- G-Function Ln(T/Ts) Value 2",
+		"    4.85,                     !- G-Function G Value 2",
+		"    -3.5,                     !- G-Function Ln(T/Ts) Value 3",
+		"    5.1,                      !- G-Function G Value 3",
+		"    -3,                       !- G-Function Ln(T/Ts) Value 4",
+		"    5.3,                      !- G-Function G Value 4",
+		"    -2.5,                     !- G-Function Ln(T/Ts) Value 5",
+		"    5.56,                     !- G-Function G Value 5",
+		"    -2,                       !- G-Function Ln(T/Ts) Value 6",
+		"    5.76,                     !- G-Function G Value 6",
+		"    -1.5,                     !- G-Function Ln(T/Ts) Value 7",
+		"    5.97,                     !- G-Function G Value 7",
+		"    -1,                       !- G-Function Ln(T/Ts) Value 8",
+		"    6.19,                     !- G-Function G Value 8",
+		"    -.5,                      !- G-Function Ln(T/Ts) Value 9",
+		"    6.31,                     !- G-Function G Value 9",
+		"    0,                        !- G-Function Ln(T/Ts) Value 10",
+		"    6.42,                     !- G-Function G Value 10",
+		"    0.5,                      !- G-Function Ln(T/Ts) Value 11",
+		"    6.56,                     !- G-Function G Value 11",
+		"    1,                        !- G-Function Ln(T/Ts) Value 12",
+		"    6.61,                     !- G-Function G Value 12",
+		"    1.5,                      !- G-Function Ln(T/Ts) Value 13",
+		"    6.66,                     !- G-Function G Value 13",
+		"    2,                        !- G-Function Ln(T/Ts) Value 14",
+		"    6.7,                      !- G-Function G Value 14",
+		"    2.5,                      !- G-Function Ln(T/Ts) Value 15",
+		"    6.72,                     !- G-Function G Value 15",
+		"    3,                        !- G-Function Ln(T/Ts) Value 16",
+		"    6.73;                     !- G-Function G Value 16",
 
 		"LoadProfile:Plant,",
 		"    Radiator load,           !- Name",
@@ -495,7 +515,7 @@ namespace EnergyPlus {
 		"Branch,",
 		"    GHEV Supply Borehole Branch,  !- Name",
 		"    ,                        !- Pressure Drop Curve Name",
-		"    GroundHeatExchanger:Vertical,  !- Component 1 Object Type",
+		"    GroundHeatExchanger:System,  !- Component 1 Object Type",
 		"    Vertical GHE JL2015,     !- Component 1 Name",
 		"    GHEV Borehole Inlet Node,!- Component 1 Inlet Node Name",
 		"    GHEV Borehole Outlet Node;  !- Component 1 Outlet Node Name",
@@ -684,7 +704,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 		bool ErrorsFound =  false;
 
@@ -800,7 +820,7 @@ namespace EnergyPlus {
 
 	TEST_F( EnergyPlusFixture, WWHP_AutosizeTest1 ) {
 		// this test is for checking autosizing of heating WWHP. derived from unit test PlantLoopSourceSideTest
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		"Version,8.6;",
 		"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
 		"Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
@@ -1032,7 +1052,7 @@ namespace EnergyPlus {
 
 		"PlantEquipmentList,",
 		"    Heat sources,            !- Name",
-		"    GroundHeatExchanger:Vertical,  !- Equipment 1 Object Type",
+		"    GroundHeatExchanger:System,  !- Equipment 1 Object Type",
 		"    Vertical GHE JL2015;     !- Equipment 1 Name",
 
 		"PlantEquipmentOperation:HeatingLoad,",
@@ -1048,57 +1068,76 @@ namespace EnergyPlus {
 		"    FOR: AllDays,            !- Field 2",
 		"    UNTIL: 24:00, 1;         !- Field 4",
 
-		"GroundHeatExchanger:Vertical,",
-		"    Vertical GHE JL2015,     !- Name",
-		"    GHEV Borehole Inlet Node,!- Inlet Node Name",
-		"    GHEV Borehole Outlet Node,  !- Outlet Node Name",
-		"    0.000303,                !- Design Flow Rate {m3/s}",
-		"    1,                       !- Number of Bore Holes",
-		"    160,                     !- Bore Hole Length {m}",
-		"    0.05715,                 !- Bore Hole Radius {m",
-		"    2.493,                   !- Ground Thermal Conductivity {W/m-K}",
-		"    2495700,                 !- Ground Thermal Heat Capacity {J/m3-K}",
-		"    8,                       !- Ground Temperature {C}",
-		"    0.000303,                !- Grout Thermal Conductivity {W/m-K}",
-		"    0.744,                   !- Pipe Thermal Conductivity {W/m-K}",
-		"    0.389,                   !- Pipe Out Diameter {m}",
-		"    0.0267,                  !- U-Tube Distance {m}",
-		"    0.0254,                  !- Pipe Thickness {m}",
-		"    5,                  !- Maximum Length of Simulation",
-		"    0.0005,                  ",
-		"    16,                      ",
-		"    -4.5,          ",
-		"    4.7,                ",
-		"    -4,                    ",
-		"    4.85,           ",
-		"    -3.5,             ",
-		"    5.1,                  ",
-		"    -3,             ",
-		"    5.3,          ",
-		"    -2.5,           ",
-		"    5.56,            ",
-		"    -2,               ",
-		"    5.76,            ",
-		"    -1.5,             ",
-		"    5.97,             ",
-		"    -1,               ",
-		"    6.19,           ",
-		"    -.5,        ",
-		"    6.31,         ",
-		"    0,              ",
-		"    6.42,             ",
-		"    0.5,         ",
-		"    6.56,          ",
-		"    1,              ",
-		"    6.61,      ",
-		"    1.5,              ",
-		"    6.66,             ",
-		"    2,                ",
-		"    6.7,            ",
-		"    2.5,               ",
-		"    6.72,               ",
-		"    3,                  ",
-		"    6.73;              ",
+		"  GroundHeatExchanger:System,",
+		"    Vertical GHE JL2015,      !- Name",
+		"    GHEV Borehole Inlet Node, !- Inlet Node Name",
+		"    GHEV Borehole Outlet Node, !- Outlet Node Name",
+		"    0.000303,                 !- Design Flow Rate {m3/s}",
+		"    Site:GroundTemperature:Undisturbed:KusudaAchenbach, !- Undisturbed Ground Temperature Model Type",
+		"    Vertical GHE JL2015 Ground Temps, !- Undisturbed Ground Temperature Model Name",
+		"    2.493,                    !- Ground Thermal Conductivity {W/m-K}",
+		"    2495700,                  !- Ground Thermal Heat Capacity {J/m3-K}",
+		"    Vertical GHE JL2015 g-functions; !- Response Factors Object Name",
+
+		"  GroundHeatExchanger:Vertical:Properties,",
+		"    Vertical GHE JL2015 Props,        !- Name",
+		"    1,                  !- Depth of Top of Borehole {m}",
+		"    160,                !- Borehole Length {m}",
+		"    0.1143,             !- Borehole Diameter {m}",
+		"    0.744,              !- Grout Thermal Conductivity {W/m-K}",
+		"    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}",
+		"    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+		"    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}",
+		"    0.0267,             !- Pipe Outer Diameter {m}",
+		"    0.00243,            !- Pipe Thickness {m}",
+		"    0.04556;            !- U-Tube Distance {m}",
+
+		"  Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+		"    Vertical GHE JL2015 Ground Temps, !- Undisturbed Ground Temperature Model Name",
+		"    2.493,                    !- Soil Thermal Conductivity {W/m-K}",
+		"    920,                      !- Soil Density {kg/m3}",
+		"    2712.72,                  !- Soil Specific Heat {J/kg-K}",
+		"    8,                        !- Average Soil Surface Temperature {C}",
+		"    3.2,                      !- Average Amplitude of Surface Temperature {deltaC}",
+		"    8;                        !- Phase Shift of Minimum Surface Temperature {days}",
+
+		"  GroundHeatExchanger:ResponseFactors,",
+		"    Vertical GHE JL2015 g-functions, !- Name",
+		"    Vertical GHE JL2015 Props, !- Name",
+		"    1,                        !- Number of Bore Holes",
+		"    0.0005,                   !- G-Function Reference Ratio {dimensionless}",
+		"    -4.5,                     !- G-Function Ln(T/Ts) Value 1",
+		"    4.7,                      !- G-Function G Value 1",
+		"    -4,                       !- G-Function Ln(T/Ts) Value 2",
+		"    4.85,                     !- G-Function G Value 2",
+		"    -3.5,                     !- G-Function Ln(T/Ts) Value 3",
+		"    5.1,                      !- G-Function G Value 3",
+		"    -3,                       !- G-Function Ln(T/Ts) Value 4",
+		"    5.3,                      !- G-Function G Value 4",
+		"    -2.5,                     !- G-Function Ln(T/Ts) Value 5",
+		"    5.56,                     !- G-Function G Value 5",
+		"    -2,                       !- G-Function Ln(T/Ts) Value 6",
+		"    5.76,                     !- G-Function G Value 6",
+		"    -1.5,                     !- G-Function Ln(T/Ts) Value 7",
+		"    5.97,                     !- G-Function G Value 7",
+		"    -1,                       !- G-Function Ln(T/Ts) Value 8",
+		"    6.19,                     !- G-Function G Value 8",
+		"    -.5,                      !- G-Function Ln(T/Ts) Value 9",
+		"    6.31,                     !- G-Function G Value 9",
+		"    0,                        !- G-Function Ln(T/Ts) Value 10",
+		"    6.42,                     !- G-Function G Value 10",
+		"    0.5,                      !- G-Function Ln(T/Ts) Value 11",
+		"    6.56,                     !- G-Function G Value 11",
+		"    1,                        !- G-Function Ln(T/Ts) Value 12",
+		"    6.61,                     !- G-Function G Value 12",
+		"    1.5,                      !- G-Function Ln(T/Ts) Value 13",
+		"    6.66,                     !- G-Function G Value 13",
+		"    2,                        !- G-Function Ln(T/Ts) Value 14",
+		"    6.7,                      !- G-Function G Value 14",
+		"    2.5,                      !- G-Function Ln(T/Ts) Value 15",
+		"    6.72,                     !- G-Function G Value 15",
+		"    3,                        !- G-Function Ln(T/Ts) Value 16",
+		"    6.73;                     !- G-Function G Value 16",
 
 		"LoadProfile:Plant,",
 		"    Radiator load,           !- Name",
@@ -1188,7 +1227,7 @@ namespace EnergyPlus {
 		"    Heating,",
 		"    40.0,",
 		"    7.0;"
-		
+
 		"BranchList,",
 		"    GHEV Supply Branches,    !- Name",
 		"    GHEV Supply Pump Branch, !- Branch 1 Name",
@@ -1234,7 +1273,7 @@ namespace EnergyPlus {
 		"Branch,",
 		"    GHEV Supply Borehole Branch,  !- Name",
 		"    ,                        !- Pressure Drop Curve Name",
-		"    GroundHeatExchanger:Vertical,  !- Component 1 Object Type",
+		"    GroundHeatExchanger:System,  !- Component 1 Object Type",
 		"    Vertical GHE JL2015,     !- Component 1 Name",
 		"    GHEV Borehole Inlet Node,!- Component 1 Inlet Node Name",
 		"    GHEV Borehole Outlet Node;  !- Component 1 Outlet Node Name",
@@ -1423,7 +1462,7 @@ namespace EnergyPlus {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		SimulationManager::PostIPProcessing();
 		bool ErrorsFound =  false;
 
@@ -1439,7 +1478,7 @@ namespace EnergyPlus {
 		OutputProcessor::GetReportVariableInput();
 		PlantManager::CheckIfAnyPlant();
 
-		BranchInputManager::ManageBranchInput(); // just gets input and 
+		BranchInputManager::ManageBranchInput(); // just gets input and
 		SizingManager::ManageSizing( );
 		DataGlobals::DoingSizing = false;
 		DataGlobals::KickOffSimulation = true;

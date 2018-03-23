@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -151,7 +152,7 @@ TEST_F( EnergyPlusFixture, Dual_NodeTempSetpoints ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutAirNodeManager::SetOutAirNodes();
 
@@ -186,7 +187,7 @@ TEST_F( EnergyPlusFixture, CheckActuatorInit ) {
 
 		"EnergyManagementSystem:ProgramCallingManager,",
 		"Dual Setpoint Test Manager,  !- Name",
-		"EndSystemTimestepBeforeHVACReporting,  !- EnergyPlus Model Calling Point",
+		"EndOfSystemTimestepBeforeHVACReporting,  !- EnergyPlus Model Calling Point",
 		"DualSetpointTestControl;  !- Program Name 1",
 
 		"EnergyManagementSystem:Program,",
@@ -195,7 +196,7 @@ TEST_F( EnergyPlusFixture, CheckActuatorInit ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 		OutAirNodeManager::SetOutAirNodes();
 		EMSManager::GetEMSInput();
 
@@ -209,7 +210,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		// test EMS actuator for Plant Component
 		// test SetActuatedBranchFlowRate for expected response
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
 		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
@@ -227,7 +228,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
@@ -311,7 +312,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFl
 		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
-	
+
 		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
@@ -373,7 +374,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		// test EMS actuator for Plant Component
 		// test SetComponentFlowRate for expected response
 
-		std::string const idf_objects = delimited_string( { 
+		std::string const idf_objects = delimited_string( {
 		" EnergyManagementSystem:Actuator,",
 		"  CoilActuator,          !- Name",
 		"  Zone1FanCoilHeatingCoil,  !- Actuated Component Unique Name",
@@ -391,7 +392,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		// sets number of EMS objects
 		EMSManager::CheckIfAnyEMS();
@@ -474,7 +475,7 @@ TEST_F( EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRat
 		EXPECT_EQ(Node( 3 ).MassFlowRateMax, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateMaxAvail, NodeMdot );
 		EXPECT_EQ(Node( 3 ).MassFlowRateRequest, NodeMdot );
-	
+
 		//set dummy EMS value
 		PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).EMSLoadOverrideValue = 1.0;
 
@@ -698,7 +699,7 @@ TEST_F( EnergyPlusFixture, Test_EMSLogic ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -769,7 +770,7 @@ TEST_F( EnergyPlusFixture, Debug_EMSLogic ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -810,7 +811,7 @@ TEST_F( EnergyPlusFixture, TestAnyRanArgument ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 		OutAirNodeManager::SetOutAirNodes();
 		NodeInputManager::SetupNodeVarsForReporting();
@@ -850,7 +851,7 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	EMSManager::CheckIfAnyEMS();
 	EMSManager::FinishProcessingUserInput = true;
@@ -869,7 +870,7 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable1 ) {
 
 TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
 	// this tests the new initialized variable added to Erl variable value data structure in a slightly different way
-	// we call the routine EvaluateExpression and examine the new bool argument for fatal errors.  
+	// we call the routine EvaluateExpression and examine the new bool argument for fatal errors.
 	std::string const idf_objects = delimited_string( {
 		"Version,8.6;",
 
@@ -904,7 +905,7 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	OutAirNodeManager::SetOutAirNodes();
 
@@ -917,14 +918,14 @@ TEST_F( EnergyPlusFixture, TestUnInitializedEMSVariable2 ) {
 	ErlValueType ReturnValue;
 	bool seriousErrorFound = false;
 	EMSManager::FinishProcessingUserInput = false;
-	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); // we just check the logic and don't throw the fatal errors.
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack) ).Instruction( 1 ).Argument2, seriousErrorFound ); // we just check the logic and don't throw the fatal errors.
 	EXPECT_TRUE ( seriousErrorFound );
 
 	// next run a small program that sets the global variable value
 	EMSManager::ManageEMS( DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan );
 	// now check that it worked, should stay false
 	seriousErrorFound = false;
-	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( 1 ).Instruction( 1 ).Argument2, seriousErrorFound ); 
+	ReturnValue = RuntimeLanguageProcessor::EvaluateExpression( ErlStack( UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack) ).Instruction( 1 ).Argument2, seriousErrorFound );
 	EXPECT_FALSE ( seriousErrorFound );
 }
 
@@ -939,7 +940,7 @@ TEST_F( EnergyPlusFixture, EMSManager_CheckIfAnyEMS_OutEMS ) {
 		"    Verbose;                 !- EMS Runtime Language Debug Output Level                         ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	CheckIfAnyEMS();
 	EXPECT_TRUE( AnyEnergyManagementSystemInModel );
@@ -1075,7 +1076,7 @@ TEST_F( EnergyPlusFixture, EMSManager_TestFuntionCall ) {
 
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		DataGlobals::TimeStepZone = 0.25;
 

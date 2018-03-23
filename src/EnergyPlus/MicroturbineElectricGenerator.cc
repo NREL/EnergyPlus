@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -63,7 +64,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
@@ -140,26 +141,8 @@ namespace MicroturbineElectricGenerator {
 
 		// METHODOLOGY EMPLOYED:       Uses empirical models based on manufacturers data
 
-		// REFERENCES:
-		//  na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int GenNum; // Generator number counter
@@ -172,7 +155,7 @@ namespace MicroturbineElectricGenerator {
 
 		// SELECT and CALL GENERATOR MODEL
 		if ( GeneratorIndex == 0 ) {
-			GenNum = FindItemInList( GeneratorName, MTGenerator );
+			GenNum = UtilityRoutines::FindItemInList( GeneratorName, MTGenerator );
 			if ( GenNum == 0 ) ShowFatalError( "SimMTGenerator: Specified Generator not a valid COMBUSTION Turbine Generator " + GeneratorName );
 			GeneratorIndex = GenNum;
 		} else {
@@ -220,38 +203,13 @@ namespace MicroturbineElectricGenerator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Fill data needed in PlantLoopEquipments
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// INTEGER, INTENT(IN)          :: FlowLock !unused1208 !DSU
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
 		if ( GetMTInput ) {
 			GetMTGeneratorInput();
 			GetMTInput = false;
 		}
 
 		if ( InitLoopEquip ) {
-			CompNum = FindItemInList( CompName, MTGenerator );
+			CompNum = UtilityRoutines::FindItemInList( CompName, MTGenerator );
 			if ( CompNum == 0 ) {
 				ShowFatalError( "SimMTPlantHeatRecovery: Microturbine Generator Unit not found=" + CompName );
 				return;
@@ -285,19 +243,12 @@ namespace MicroturbineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		//  EnergyPlus input processor.
 
-		// REFERENCES:
-		//  na
-
 		// Using/Aliasing
 		using BranchNodeConnections::TestCompSet;
 		using CurveManager::GetCurveIndex;
 		using CurveManager::CurveValue;
 		using CurveManager::GetCurveType;
 		using CurveManager::GetCurveMinMaxValues;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -307,18 +258,12 @@ namespace MicroturbineElectricGenerator {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 
-		// Locals
-		// PARAMETERS:
-		//  na
-
 		// LOCAL VARIABLES:
 		int GeneratorNum; // Index to generator
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false ); // Error flag... trips fatal error message at end of get input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
 		Real64 ElectOutFTempElevOutput; // Output of Electrical Power Output Modifier Curve (function of temp and elev)
 		Real64 ElecEfficFTempOutput; // Output of Electrical Efficiency Modifier Curve (function of temp)
 		Real64 ElecEfficFPLROutput; // Output of Electrical Efficiency Modifier Curve (function of PLR)
@@ -343,7 +288,7 @@ namespace MicroturbineElectricGenerator {
 
 		// FLOW:
 		cCurrentModuleObject = "Generator:MicroTurbine";
-		NumMTGenerators = GetNumObjectsFound( cCurrentModuleObject );
+		NumMTGenerators = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumMTGenerators <= 0 ) {
 			ShowSevereError( "No " + cCurrentModuleObject + " equipment specified in input file" );
@@ -357,14 +302,8 @@ namespace MicroturbineElectricGenerator {
 
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
-			GetObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( AlphArray( 1 ), MTGenerator, GeneratorNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
-			}
+			inputProcessor->getObjectItem( cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 			MTGenerator( GeneratorNum ).Name = AlphArray( 1 );
 
 			MTGenerator( GeneratorNum ).RefElecPowerOutput = NumArray( 1 );
@@ -687,11 +626,11 @@ namespace MicroturbineElectricGenerator {
 
 				MTGenerator( GeneratorNum ).RefInletWaterTemp = NumArray( 13 );
 
-				if ( SameString( AlphArray( 9 ), "InternalControl" ) ) {
+				if ( UtilityRoutines::SameString( AlphArray( 9 ), "InternalControl" ) ) {
 					MTGenerator( GeneratorNum ).InternalFlowControl = true; //  A9, \field Heat Recovery Water Flow Operating Mode
 					MTGenerator( GeneratorNum ).PlantFlowControl = false;
 				}
-				if ( ( ! ( SameString( AlphArray( 9 ), "InternalControl" ) ) ) && ( ! ( SameString( AlphArray( 9 ), "PlantControl" ) ) ) ) {
+				if ( ( ! ( UtilityRoutines::SameString( AlphArray( 9 ), "InternalControl" ) ) ) && ( ! ( UtilityRoutines::SameString( AlphArray( 9 ), "PlantControl" ) ) ) ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphArray( 9 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + AlphArray( 1 ) );
 					ShowContinueError( "Operating Mode must be INTERNAL CONTROL or PLANT CONTROL." );
@@ -1042,56 +981,56 @@ namespace MicroturbineElectricGenerator {
 		}
 
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
-			SetupOutputVariable( "Generator Produced Electric Power [W]", MTGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", MTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Produced Electric Power", OutputProcessor::Unit::W, MTGeneratorReport( GeneratorNum ).PowerGen, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator Produced Electric Energy [J]", MTGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator Produced Electric Energy", OutputProcessor::Unit::J, MTGeneratorReport( GeneratorNum ).EnergyGen, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Generator LHV Basis Electric Efficiency []", MTGeneratorReport( GeneratorNum ).ElectricEfficiencyLHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator LHV Basis Electric Efficiency", OutputProcessor::Unit::None, MTGeneratorReport( GeneratorNum ).ElectricEfficiencyLHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
 			//    Fuel specific report variables
-			SetupOutputVariable( "Generator " + FuelType + " HHV Basis Rate [W]", MTGeneratorReport( GeneratorNum ).FuelEnergyUseRateHHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + FuelType + " HHV Basis Rate", OutputProcessor::Unit::W, MTGeneratorReport( GeneratorNum ).FuelEnergyUseRateHHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator " + FuelType + " HHV Basis Energy [J]", MTGeneratorReport( GeneratorNum ).FuelEnergyHHV, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, FuelType, "COGENERATION", _, "Plant" );
+			SetupOutputVariable( "Generator " + FuelType + " HHV Basis Energy", OutputProcessor::Unit::J, MTGeneratorReport( GeneratorNum ).FuelEnergyHHV, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, FuelType, "COGENERATION", _, "Plant" );
 
-			SetupOutputVariable( "Generator " + FuelType + " Mass Flow Rate [kg/s]", MTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", MTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator " + FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, MTGeneratorReport( GeneratorNum ).FuelMdot, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
 			//    general fuel use report (to match other generators)
-			SetupOutputVariable( "Generator Fuel HHV Basis Rate [W]", MTGeneratorReport( GeneratorNum ).FuelEnergyUseRateHHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, MTGeneratorReport( GeneratorNum ).FuelEnergyUseRateHHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-			SetupOutputVariable( "Generator Fuel HHV Basis Energy [J]", MTGeneratorReport( GeneratorNum ).FuelEnergyHHV, "System", "Sum", MTGenerator( GeneratorNum ).Name );
+			SetupOutputVariable( "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, MTGeneratorReport( GeneratorNum ).FuelEnergyHHV, "System", "Sum", MTGenerator( GeneratorNum ).Name );
 
 			//    Heat recovery (to water) report variables
 			if ( MTGenerator( GeneratorNum ).HeatRecActive ) {
 
-				SetupOutputVariable( "Generator Produced Thermal Rate [W]", MTGeneratorReport( GeneratorNum ).QHeatRecovered, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Produced Thermal Rate", OutputProcessor::Unit::W, MTGeneratorReport( GeneratorNum ).QHeatRecovered, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Produced Thermal Energy [J]", MTGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
+				SetupOutputVariable( "Generator Produced Thermal Energy", OutputProcessor::Unit::J, MTGeneratorReport( GeneratorNum ).ExhaustEnergyRec, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, "ENERGYTRANSFER", "HEATRECOVERY", _, "Plant" );
 
-				SetupOutputVariable( "Generator Thermal Efficiency LHV Basis []", MTGeneratorReport( GeneratorNum ).ThermalEfficiencyLHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Thermal Efficiency LHV Basis", OutputProcessor::Unit::None, MTGeneratorReport( GeneratorNum ).ThermalEfficiencyLHV, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature [C]", MTGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, MTGeneratorReport( GeneratorNum ).HeatRecInletTemp, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature [C]", MTGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, MTGeneratorReport( GeneratorNum ).HeatRecOutletTemp, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Heat Recovery Water Mass Flow Rate [kg/s]", MTGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Heat Recovery Water Mass Flow Rate", OutputProcessor::Unit::kg_s, MTGeneratorReport( GeneratorNum ).HeatRecMdot, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
 			}
 
 			if ( MTGenerator( GeneratorNum ).StandbyPower > 0.0 ) { // Report Standby Power if entered by user
-				SetupOutputVariable( "Generator Standby Electric Power [W]", MTGeneratorReport( GeneratorNum ).StandbyPowerRate, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Standby Electric Power", OutputProcessor::Unit::W, MTGeneratorReport( GeneratorNum ).StandbyPowerRate, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Standby Electric Energy [J]", MTGeneratorReport( GeneratorNum ).StandbyEnergy, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, "Electricity", "Cogeneration", _, "Plant" );
+				SetupOutputVariable( "Generator Standby Electric Energy", OutputProcessor::Unit::J, MTGeneratorReport( GeneratorNum ).StandbyEnergy, "System", "Sum", MTGenerator( GeneratorNum ).Name, _, "Electricity", "Cogeneration", _, "Plant" );
 			}
 
 			if ( MTGenerator( GeneratorNum ).AncillaryPower > 0.0 ) { // Report Ancillary Power if entered by user
-				SetupOutputVariable( "Generator Ancillary Electric Power [W]", MTGeneratorReport( GeneratorNum ).AncillaryPowerRate, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Ancillary Electric Power", OutputProcessor::Unit::W, MTGeneratorReport( GeneratorNum ).AncillaryPowerRate, "System", "Average", MTGenerator( GeneratorNum ).Name );
 
-				SetupOutputVariable( "Generator Ancillary Electric Energy [J]", MTGeneratorReport( GeneratorNum ).AncillaryEnergy, "System", "Sum", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Ancillary Electric Energy", OutputProcessor::Unit::J, MTGeneratorReport( GeneratorNum ).AncillaryEnergy, "System", "Sum", MTGenerator( GeneratorNum ).Name );
 			}
 			//   Report combustion air outlet conditions if exhaust air calculations are active
 			if ( MTGenerator( GeneratorNum ).ExhAirCalcsActive ) {
-				SetupOutputVariable( "Generator Exhaust Air Mass Flow Rate [kg/s]", MTGeneratorReport( GeneratorNum ).ExhAirMassFlowRate, "System", "Average", MTGenerator( GeneratorNum ).Name );
-				SetupOutputVariable( "Generator Exhaust Air Temperature  [C]", MTGeneratorReport( GeneratorNum ).ExhAirTemperature, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Exhaust Air Mass Flow Rate", OutputProcessor::Unit::kg_s, MTGeneratorReport( GeneratorNum ).ExhAirMassFlowRate, "System", "Average", MTGenerator( GeneratorNum ).Name );
+				SetupOutputVariable( "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, MTGeneratorReport( GeneratorNum ).ExhAirTemperature, "System", "Average", MTGenerator( GeneratorNum ).Name );
 			}
 
 		}
@@ -1132,7 +1071,7 @@ namespace MicroturbineElectricGenerator {
 		using FluidProperties::GetDensityGlycol;
 		using CurveManager::CurveValue;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_Generator_MicroTurbine;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
@@ -2020,24 +1959,6 @@ namespace MicroturbineElectricGenerator {
 		// METHODOLOGY EMPLOYED:
 		// <description>
 
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompNum;
 
@@ -2049,7 +1970,7 @@ namespace MicroturbineElectricGenerator {
 
 		ExhaustOutletNodeNum = 0;
 
-		CompNum = FindItemInList( CompName, MTGenerator );
+		CompNum = UtilityRoutines::FindItemInList( CompName, MTGenerator );
 
 		if ( CompNum == 0 ) {
 			ShowFatalError( "GetMTGeneratorExhaustNode: Unit not found=" + CompName );

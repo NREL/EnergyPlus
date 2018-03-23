@@ -77,7 +77,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,6;
 
@@ -221,7 +221,7 @@
     19.48,                   !- Annual Average Outdoor Air Temperature {C}
     25.60;                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
-! LAS_VEGAS_NV_USA Annual Heating 99.6%, MaxDB=-1.7°C
+! LAS_VEGAS_NV_USA Annual Heating 99.6%, MaxDB=-1.7Â°C
 
   SizingPeriod:DesignDay,
     LAS_VEGAS Ann Htg 99.6% Condns DB,  !- Name
@@ -251,7 +251,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! LAS_VEGAS_NV_USA Annual Cooling (DB=>MWB) .4%, MaxDB=42.4°C MWB=19.4°C
+! LAS_VEGAS_NV_USA Annual Cooling (DB=>MWB) .4%, MaxDB=42.4Â°C MWB=19.4Â°C
 
   SizingPeriod:DesignDay,
     LAS_VEGAS Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -1057,137 +1057,6 @@
     15;                      !- Cost per Area {$/m2}
 
   Construction,
-    INT-FLOOR-SLAB,          !- Name
-    Std MAT-CC05 4  MW CONCRETE;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Interior Floor Slab,     !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    INT-FLOOR-SLAB,          !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    35;                      !- Cost per Area {$/m2}
-
-  Construction,
-    DropCeiling,             !- Name
-    Std AC02;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Drop Ceiling,            !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    DropCeiling,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    10;                      !- Cost per Area {$/m2}
-
-  Construction,
-    INT-CEILING_SIMPLE,      !- Name
-    PW05_Plywood3/4_in;      !- Outside Layer
-
-  Construction,
-    Raised-Floor-TopSide,    !- Name
-    Std 1.5  MW CONCRETE,    !- Outside Layer
-    Std CP02 CARPET PAD;     !- Layer 2
-
-  Construction,
-    Raised-Floor-UnderSide,  !- Name
-    Std CP02 CARPET PAD,     !- Outside Layer
-    Std 1.5  MW CONCRETE;    !- Layer 2
-
-  Construction,
-    TDD_Pipe,                !- Name
-    Std Very High Reflectivity Surface;  !- Outside Layer
-
-  Construction,
-    TDD_Dome,                !- Name
-    Std Clear Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    TDD_Diffuser,            !- Name
-    Std Diffusing Acrylic Plastic;  !- Outside Layer
-
-  Construction,
-    Sloped_Metal_Roof,       !- Name
-    Std Steel_Brown_Regular, !- Outside Layer
-    Std PW05;                !- Layer 2
-
-  ComponentCost:LineItem,
-    Sloped Metal Roof,       !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Sloped_Metal_Roof,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Gable_Wall,              !- Name
-    Std PW05;                !- Outside Layer
-
-  ComponentCost:LineItem,
-    Gable Wall,              !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Gable_Wall,              !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    AIR-WALL,                !- Name
-    MAT-AIR-WALL;            !- Outside Layer
-
-  ComponentCost:LineItem,
-    Air Wall,                !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    AIR-WALL,                !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Swinging Door_con,   !- Name
-    Std Opaque Door panel_con;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_con,   !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Swinging Door_semi,  !- Name
-    Std Opaque Door panel_semi;  !- Outside Layer
-
-  ComponentCost:LineItem,
-    Swinging Door Semi-conditioned,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Swinging Door_semi,  !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
-    Std Overhead Door,       !- Name
-    Std Overhead Door Panel; !- Outside Layer
-
-  ComponentCost:LineItem,
-    Overhead Door,           !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    Std Overhead Door,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1;                       !- Cost per Area {$/m2}
-
-  Construction,
     window_south,            !- Name
     Theoretical Glass [68];  !- Outside Layer
 
@@ -1238,19 +1107,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     243.6230;                !- Cost per Area {$/m2}
-
-  Construction,
-    window_SkylightConst,    !- Name
-    Theoretical Glass [63];  !- Outside Layer
-
-  ComponentCost:LineItem,
-    SkylightConst:window_SkylightConst,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    window_SkylightConst,    !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    205.7480;                !- Cost per Area {$/m2}
 
   Construction,
     roofs,                   !- Name
@@ -1326,65 +1182,6 @@
     ,                        !- Object End-Use Key
     ,                        !- Cost per Each {$}
     32.9966;                 !- Cost per Area {$/m2}
-
-  Construction,
-    attic-floor,             !- Name
-    1/2IN Gypsum Top,        !- Outside Layer
-    AtticFloor Insulation,   !- Layer 2
-    1/2IN Gypsum Bottom;     !- Layer 3
-
-  ComponentCost:LineItem,
-    attic-floor:attic-floor, !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    attic-floor,             !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    15.0182;                 !- Cost per Area {$/m2}
-
-  Construction,
-    attic-roof,              !- Name
-    Roof Membrane,           !- Outside Layer
-    Metal Decking;           !- Layer 2
-
-  ComponentCost:LineItem,
-    attic-roof:attic-roof,   !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    attic-roof,              !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    34.3904;                 !- Cost per Area {$/m2}
-
-  Construction,
-    door,                    !- Name
-    METAL Door Medium 18Ga_1,!- Outside Layer
-    AIR,                     !- Layer 2
-    METAL Door Medium 18Ga_2;!- Layer 3
-
-  ComponentCost:LineItem,
-    door:door,               !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    door,                    !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000;                  !- Cost per Area {$/m2}
-
-  Construction,
-    non-swinging-door,       !- Name
-    METAL Door Medium 18Ga_1,!- Outside Layer
-    AIR [1],                 !- Layer 2
-    METAL Door Medium 18Ga_2;!- Layer 3
-
-  ComponentCost:LineItem,
-    non-swinging-door:non-swinging-door,  !- Name
-    ,                        !- Type
-    Construction,            !- Line Item Type
-    non-swinging-door,       !- Item Name
-    ,                        !- Object End-Use Key
-    ,                        !- Cost per Each {$}
-    1.0000;                  !- Cost per Area {$/m2}
 
   Zone,
     Core_ZN,                 !- Name
@@ -1644,7 +1441,7 @@
     Core_ZN Inlet Nodes,     !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Core_ZN Air Node,        !- Zone Air Node Name
-    Core_ZN Return Air Node Name;  !- Zone Return Air Node Name
+    Core_ZN Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Core_ZN Inlet Nodes,     !- Name
@@ -1652,6 +1449,7 @@
 
   ZoneHVAC:EquipmentList,
     Core_ZN Equipment,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Core_ZN Direct Air,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2127,7 +1925,7 @@
     Perimeter_ZN_1 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_1 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_1 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_1 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_1 Inlet Nodes,  !- Name
@@ -2135,6 +1933,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_1 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2507,7 +2306,7 @@
     Perimeter_ZN_2 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_2 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_2 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_2 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_2 Inlet Nodes,  !- Name
@@ -2515,6 +2314,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_2 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -2919,7 +2719,7 @@
     Perimeter_ZN_3 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_3 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_3 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_3 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_3 Inlet Nodes,  !- Name
@@ -2927,6 +2727,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_3 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -3299,7 +3100,7 @@
     Perimeter_ZN_4 Inlet Nodes,  !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Perimeter_ZN_4 Air Node, !- Zone Air Node Name
-    Perimeter_ZN_4 Return Air Node Name;  !- Zone Return Air Node Name
+    Perimeter_ZN_4 Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
   NodeList,
     Perimeter_ZN_4 Inlet Nodes,  !- Name
@@ -3307,6 +3108,7 @@
 
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_4 Equipment,!- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Perimeter_ZN_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -5394,7 +5196,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    SummerPeakEnergyCharge,  !- Name
+    SummerPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     PeakEnergy,              !- Source Variable
     Summer,                  !- Season
@@ -5402,7 +5204,7 @@
     0.0858;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakEnergyCharge,  !- Name
+    SummerOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Summer,                  !- Season
@@ -5410,7 +5212,7 @@
     0.0484;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderEnergyCharge,  !- Name
+    SummerShoulderEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     ShoulderEnergy,          !- Source Variable
     Summer,                  !- Season
@@ -5418,7 +5220,7 @@
     0.0706;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -5426,7 +5228,7 @@
     0.04925;                 !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DeferredAccountingEnergyCharge,  !- Name
+    DeferredAccountingEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5434,7 +5236,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FacilitiesDemandCharge,  !- Name
+    FacilitiesDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5442,7 +5244,7 @@
     2.94;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterDemandCharge,      !- Name
+    WinterDemandCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Winter,                  !- Season
@@ -5450,7 +5252,7 @@
     0.50;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeakDemandCharge,!- Name
+    SummerOnPeakDemandCharge,!- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     PeakDemand,              !- Source Variable
     Summer,                  !- Season
@@ -5458,7 +5260,7 @@
     8.36;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderDemandCharge,  !- Name
+    SummerShoulderDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     ShoulderDemand,          !- Source Variable
     Summer,                  !- Season
@@ -5466,7 +5268,7 @@
     0.43;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand1000kw,         !- Name
+    MinDemand1000kw,         !- Utility Cost Qualify Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5476,7 +5278,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Qualify,
-    MinEnergy3500kwh,        !- Name
+    MinEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5486,7 +5288,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_LGS-3_LargeGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5536,7 +5338,7 @@
     Until: 24:00,3;          !- Field 11
 
   UtilityCost:Charge:Simple,
-    SummerPeakEnergyCharge,  !- Name
+    SummerPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     PeakEnergy,              !- Source Variable
     Summer,                  !- Season
@@ -5544,7 +5346,7 @@
     0.0889;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOffPeakEnergyCharge,  !- Name
+    SummerOffPeakEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     OffPeakEnergy,           !- Source Variable
     Summer,                  !- Season
@@ -5552,7 +5354,7 @@
     0.0502;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderEnergyCharge,  !- Name
+    SummerShoulderEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     ShoulderEnergy,          !- Source Variable
     Summer,                  !- Season
@@ -5560,7 +5362,7 @@
     0.0725;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterEnergyCharge,      !- Name
+    WinterEnergyCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Winter,                  !- Season
@@ -5568,7 +5370,7 @@
     0.0509;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    DeferredAccountingEnergyCharge,  !- Name
+    DeferredAccountingEnergyCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5576,7 +5378,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    FacilitiesDemandCharge,  !- Name
+    FacilitiesDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5584,7 +5386,7 @@
     2.74;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    WinterDemandCharge,      !- Name
+    WinterDemandCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Winter,                  !- Season
@@ -5592,7 +5394,7 @@
     0.25;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerOnPeakDemandCharge,!- Name
+    SummerOnPeakDemandCharge,!- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     PeakDemand,              !- Source Variable
     Summer,                  !- Season
@@ -5600,7 +5402,7 @@
     7.16;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    SummerShoulderDemandCharge,  !- Name
+    SummerShoulderDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     ShoulderDemand,          !- Source Variable
     Summer,                  !- Season
@@ -5608,7 +5410,7 @@
     0.39;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MinDemand300kw,          !- Name
+    MinDemand300kw,          !- Utility Cost Qualify Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5618,7 +5420,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Qualify,
-    MinEnergy3500kwh,        !- Name
+    MinEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5628,7 +5430,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Qualify,
-    MaxDemand1000kw,         !- Name
+    MaxDemand1000kw,         !- Utility Cost Qualify Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5638,7 +5440,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_LGS-2_LargeGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5664,7 +5466,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualElectConsumpCharge,!- Name
+    AnnualElectConsumpCharge,!- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5672,7 +5474,7 @@
     0.0646;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualDefferredAccountingCharge,  !- Name
+    AnnualDefferredAccountingCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5680,7 +5482,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualFacilitiesDemandCharge,  !- Name
+    AnnualFacilitiesDemandCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5688,7 +5490,7 @@
     3.77;                    !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualDemandCharge,      !- Name
+    AnnualDemandCharge,      !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     totalDemand,             !- Source Variable
     Annual,                  !- Season
@@ -5696,7 +5498,7 @@
     1.1;                     !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand300kw,          !- Name
+    MaxDemand300kw,          !- Utility Cost Qualify Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5706,7 +5508,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Qualify,
-    MinEnergy3500kwh,        !- Name
+    MinEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Minimum,                 !- Qualify Type
@@ -5716,7 +5518,7 @@
     12;                      !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_LGS-1_LargeGeneral,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5742,7 +5544,7 @@
     Comm Elect;              !- Group Name
 
   UtilityCost:Charge:Simple,
-    AnnualElectConsumpCharge,!- Name
+    AnnualElectConsumpCharge,!- Utility Cost Charge Simple Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5750,7 +5552,7 @@
     0.0783;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Charge:Simple,
-    AnnualDefferredAccountingCharge,  !- Name
+    AnnualDefferredAccountingCharge,  !- Utility Cost Charge Simple Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5758,7 +5560,7 @@
     0.0128;                  !- Cost per Unit Value or Variable Name
 
   UtilityCost:Qualify,
-    MaxDemand300kw,          !- Name
+    MaxDemand300kw,          !- Utility Cost Qualify Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     TotalDemand,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5768,7 +5570,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Qualify,
-    MaxEnergy3500kwh,        !- Name
+    MaxEnergy3500kwh,        !- Utility Cost Qualify Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     TotalEnergy,             !- Variable Name
     Maximum,                 !- Qualify Type
@@ -5778,7 +5580,7 @@
     1;                       !- Number of Months
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NevadaPower_GS_GeneralService,  !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5804,7 +5606,7 @@
     Comm Gas;                !- Group Name
 
   UtilityCost:Charge:Simple,
-    MonthlyRateGasCharge,    !- Name
+    MonthlyRateGasCharge,    !- Utility Cost Charge Simple Name
     NV_EIAMonthlyRateGas,    !- Tariff Name
     totalEnergy,             !- Source Variable
     Annual,                  !- Season
@@ -5829,7 +5631,7 @@
     7.24;                    !- December Value
 
   UtilityCost:Charge:Simple,
-    TaxofSixPtfivePercent,   !- Name
+    TaxofSixPtfivePercent,   !- Utility Cost Charge Simple Name
     NV_EIAMonthlyRateGas,    !- Tariff Name
     SubTotal,                !- Source Variable
     Annual,                  !- Season
@@ -5980,9 +5782,10 @@
 
   Output:Variable,Perimeter_ZN_1_wall_south_Window_1,Surface Window Transmitted Solar Radiation Rate,timestep;
 
-  Output:Variable,*,SURFACE CONSTRUCTION INDEX ,timestep;
+  Output:Variable,*,SURFACE CONSTRUCTION INDEX,timestep;
 
-  Output:Diagnostics, DisplayAdvancedReportVariables;
+  Output:Diagnostics,
+    DisplayAdvancedReportVariables;  !- Key 1
 
 !  Thermochromic Window Constructions and Erl pointer variables.
 

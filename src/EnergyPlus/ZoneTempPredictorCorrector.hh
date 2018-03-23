@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -253,7 +254,7 @@ namespace ZoneTempPredictorCorrector {
 	CalculateAdaptiveComfortSetPointSchl( Array1D< Real64 > const & runningAverageASH, Array1D< Real64 > const & runningAverageCEN );
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac );
+	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac, bool const ShortenTimeStepSys );
 
 	void
 	CalcPredictedHumidityRatio( int const ZoneNum, Real64 RAFNFrac );
@@ -277,8 +278,7 @@ namespace ZoneTempPredictorCorrector {
 
 	void
 	CorrectZoneHumRat(
-		int const ZoneNum,
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		int const ZoneNum
 	);
 
 	void
@@ -307,8 +307,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		Real64 & SumSysMCpT // Zone sum of air system MassFlowRate*Cp*T
 	);
 
 	void
@@ -323,8 +322,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
-		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+		Real64 & imBalance // put all terms in eq. 5 on RHS , should be zero
 	);
 
 	bool

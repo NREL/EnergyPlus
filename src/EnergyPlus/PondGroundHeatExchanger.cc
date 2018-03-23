@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -64,7 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <PlantUtilities.hh>
@@ -209,15 +210,7 @@ namespace PondGroundHeatExchanger {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -227,19 +220,6 @@ namespace PondGroundHeatExchanger {
 		using DataEnvironment::GroundTemp_DeepObjInput;
 		using General::RoundSigDigits;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input,
@@ -251,7 +231,7 @@ namespace PondGroundHeatExchanger {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Pond";
-		NumOfPondGHEs = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPondGHEs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( PondGHE ) ) PondGHE.deallocate();
 
@@ -261,7 +241,7 @@ namespace PondGroundHeatExchanger {
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
 
 			// get the input data
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			PondGHE( Item ).WaterIndex = FindGlycol( fluidNameWater );
 
@@ -369,12 +349,12 @@ namespace PondGroundHeatExchanger {
 
 		// Set up the output variables
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
-			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Rate [W]", PondGHE( Item ).HeatTransferRate, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Energy [J]", PondGHE( Item ).Energy, "Plant", "Sum", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Mass Flow Rate [kg/s]", PondGHE( Item ).MassFlowRate, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Inlet Temperature [C]", PondGHE( Item ).InletTemp, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Outlet Temperature [C]", PondGHE( Item ).OutletTemp, "Plant", "Average", PondGHE( Item ).Name );
-			SetupOutputVariable( "Pond Heat Exchanger Bulk Temperature [C]", PondGHE( Item ).PondTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, PondGHE( Item ).HeatTransferRate, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Heat Transfer Energy", OutputProcessor::Unit::J, PondGHE( Item ).Energy, "Plant", "Sum", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, PondGHE( Item ).MassFlowRate, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, PondGHE( Item ).InletTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, PondGHE( Item ).OutletTemp, "Plant", "Average", PondGHE( Item ).Name );
+			SetupOutputVariable( "Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, PondGHE( Item ).PondTemp, "Plant", "Average", PondGHE( Item ).Name );
 		}
 
 		if ( ! GroundTemp_DeepObjInput ) {
@@ -420,7 +400,7 @@ namespace PondGroundHeatExchanger {
 		using DataEnvironment::GroundTemp_Deep;
 		using DataEnvironment::OutDryBulbTempAt;
 		using DataPlant::TypeOf_GrndHtExchgPond;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;

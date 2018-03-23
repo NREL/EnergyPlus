@@ -1,7 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -56,7 +57,6 @@
 #include <DataEnvironment.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -442,6 +442,10 @@ namespace DataHeatBalance {
 	bool AnyConstructInternalSourceInInput( false ); // true if the user has entered any constructions with internal sources
 	bool AdaptiveComfortRequested_CEN15251( false ); // true if people objects have adaptive comfort requests. CEN15251
 	bool AdaptiveComfortRequested_ASH55( false ); // true if people objects have adaptive comfort requests. ASH55
+
+	bool NoFfactorConstructionsUsed( true );
+	bool NoCfactorConstructionsUsed( true );
+
 	int NumRefrigeratedRacks( 0 ); // Total number of refrigerated case compressor racks in input
 	int NumRefrigSystems( 0 ); // Total number of detailed refrigeration systems in input
 	int NumRefrigCondensers( 0 ); // Total number of detailed refrigeration condensers in input
@@ -766,6 +770,8 @@ namespace DataHeatBalance {
 		AnyConstructInternalSourceInInput = false;
 		AdaptiveComfortRequested_CEN15251 = false;
 		AdaptiveComfortRequested_ASH55 = false;
+		NoFfactorConstructionsUsed = true;
+		NoCfactorConstructionsUsed = true;
 		NumRefrigeratedRacks = 0;
 		NumRefrigSystems = 0;
 		NumRefrigCondensers = 0;
@@ -1596,7 +1602,6 @@ namespace DataHeatBalance {
 
 		// Using/Aliasing
 		using General::RoundSigDigits;
-		using InputProcessor::FindItemInList;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1619,7 +1624,7 @@ namespace DataHeatBalance {
 
 		// maybe it's already there
 		errFlag = false;
-		Found = FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
+		Found = UtilityRoutines::FindItemInList( "~" + Blind( inBlindNumber ).Name, Blind );
 		if ( Found == 0 ) {
 			// Add a new blind
 			Blind.redimension( ++TotBlinds );
@@ -2159,6 +2164,73 @@ namespace DataHeatBalance {
 		}
 
 		return NominalUwithConvCoeffs;
+	}
+
+	void
+	SetFlagForWindowConstructionWithShadeOrBlindLayer()
+	{
+
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// check fenestrations with shading control and set a flag to true if its construction has 
+		// either shade or blind material layer
+
+
+		// METHODOLOGY EMPLOYED:
+		// Loop through Surface and register any shading controls, and loop through the construction 
+		// material layer
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataSurfaces::ExternalEnvironment;
+		using DataSurfaces::Surface;
+		using DataSurfaces::SurfaceWindow;
+		using DataSurfaces::SurfaceClass_Window;
+		using DataSurfaces::TotSurfaces;
+		using DataHeatBalance::Construct;
+		using DataHeatBalance::Material;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static int loopSurfNum( 0 ); // surface index
+		static int ConstrNum( 0 ); // construction index
+		static int NumLayers( 0 ); // number of material layers in a construction
+		static int Layer( 0 ); // construction material layer index
+		static int MaterNum( 0 ); // construction material index
+
+		for ( loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum ) {
+
+			if ( Surface( loopSurfNum ).Class != SurfaceClass_Window ) continue;
+			if ( Surface( loopSurfNum ).ExtBoundCond != ExternalEnvironment ) continue;
+			if ( Surface( loopSurfNum ).WindowShadingControlPtr == 0 ) continue;
+			if ( SurfaceWindow( loopSurfNum ).ShadedConstruction == 0 ) continue;
+
+			ConstrNum = SurfaceWindow( loopSurfNum ).ShadedConstruction;
+			if ( Construct( ConstrNum ).TypeIsWindow ) {
+				NumLayers = Construct( ConstrNum ).TotLayers;
+				for ( Layer = 1; Layer <= NumLayers; ++Layer ) {
+					MaterNum = Construct( ConstrNum ).LayerPoint( Layer );
+					if ( MaterNum == 0 ) continue;
+					if ( Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind ) SurfaceWindow( loopSurfNum ).HasShadeOrBlindLayer = true;;
+				}
+			}
+
+		}
+
 	}
 
 } // DataHeatBalance
