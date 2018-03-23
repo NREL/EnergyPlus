@@ -2303,36 +2303,6 @@
 
   Output:Meter:MeterFileOnly,Gas:Building,runperiod;
 
-  Output:Table:Monthly,
-    Zone Cooling Summary,    !- Name
-    ,                        !- Digits After Decimal
-    Zone Air System Sensible Cooling Energy,  !- Variable or Meter 1 Name
-    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Air System Sensible Cooling Rate,  !- Variable or Meter 2 Name
-    Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
-    ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter 4 Name
-    ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
-    Zone Total Internal Latent Gain Energy,  !- Variable or Meter 5 Name
-    SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Zone Total Internal Latent Gain Energy,  !- Variable or Meter 6 Name
-    Maximum,                 !- Aggregation Type for Variable or Meter 6
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 7 Name
-    ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
-    Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter 8 Name
-    ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 8
-
-  Output:Table:Monthly,
-    Zone Heating Summary,    !- Name
-    ,                        !- Digits After Decimal
-    Zone Air System Sensible Heating Energy,  !- Variable or Meter 1 Name
-    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Air System Sensible Heating Rate,  !- Variable or Meter 2 Name
-    Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
-    ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3
-
   Output:Table:Annual,
     Zone Electric Annual Summary,  !- Name
     ,                        !- Filter

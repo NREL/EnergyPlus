@@ -50,58 +50,27 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
 
 #include <nlohmann/json.hpp>
 
-class State {
+class Validation {
 public:
 	using json = nlohmann::json;
 
-	enum class ErrorType {
-		Maximum,
-		ExclusiveMaximum,
-		Minimum,
-		ExclusiveMinimum
-	};
+	explicit Validation( json const * parsed_schema );
 
-	// friend class InputProcessorFixture;
-	// friend class EnergyPlusFixture;
+	bool validate( json const & parsed_input );
 
-	void initialize( json const * parsedSchema );
+	bool hasErrors();
 
-	void traverse( json::parse_event_t & event, json & parsed, unsigned lineNumber, unsigned lineIndex );
+	std::vector< std::string > const & errors();
 
-	void validate( json & parsed, unsigned lineNumber, unsigned lineIndex );
-
-	std::vector< std::string > const & validationErrors();
-
-	std::vector< std::string > const & validationWarnings();
+	std::vector< std::string > const & warnings();
 
 private:
-	void addError( ErrorType err, double val, unsigned lineNumber, unsigned lineIndex );
-
 	json const * schema;
-	std::vector< json const * > stack;
-	std::unordered_map< std::string, bool > obj_required;
-	std::unordered_map< std::string, bool > extensible_required;
-	std::unordered_map< std::string, bool > root_required;
-	// this design decision was made because
-	// the choice was between sorting a vector for binary searching or log time object lookup in a map
-	std::string cur_obj_name = "";
-
-	unsigned prev_line_index = 0;
-	unsigned prev_key_len = 0;
-	unsigned cur_obj_count = 0;
-	bool is_in_extensibles = false;
-	bool does_key_exist = true;
-	bool need_new_object_name = true;
-	json::parse_event_t last_seen_event = json::parse_event_t::object_start;
-	char s[ 129 ];
-	char s2[ 129 ];
-
-	std::vector< std::string > errors;
-	std::vector< std::string > warnings;
+	std::vector< std::string > errors_;
+	std::vector< std::string > warnings_;
 };
 
 #endif // InputValidation_hh_INCLUDED

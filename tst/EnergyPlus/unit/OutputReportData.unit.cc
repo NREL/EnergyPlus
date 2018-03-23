@@ -240,7 +240,7 @@ TEST_F( EnergyPlusFixture, OutputReportData_Regex_Brackets )
 		" Output:Variable,", "[A-Za-z ]{5,},", "Refrigeration Compressor Rack Electric Power,", "timestep;",
 		" Output:Variable,", "([A-Za-z] ?)+,", "System Node Mass Flow Rate,", "timestep;",
 	});
-	ASSERT_TRUE( process_idf( idf_objects ) );
+	EXPECT_FALSE( process_idf( idf_objects, false ) );
 
 	EXPECT_EQ( DataOutputs::NumConsideredOutputVariables, 6 );
 	EXPECT_TRUE( FindItemInVariableList( "SalesFloor Inlet Node", "System Node Mass Flow Rate" ));

@@ -25,6 +25,7 @@ set( test_src
   BranchInputManager.unit.cc
   BranchNodeConnections.unit.cc
   ChilledCeilingPanelSimple.unit.cc
+  ChillerAbsorption.unit.cc
   ChillerConstantCOP.unit.cc
   ChillerElectric.unit.cc
   ChillerElectricEIR.unit.cc
@@ -37,6 +38,7 @@ set( test_src
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
   DataSurfaces.unit.cc
@@ -63,6 +65,7 @@ set( test_src
   FiniteDifferenceGroundTemperatureModel.unit.cc
   FluidCoolers.unit.cc
   FluidProperties.unit.cc
+  FuelCellElectricGenerator.unit.cc
   Furnaces.unit.cc
   General.unit.cc
   GeneralRoutines.unit.cc
@@ -88,6 +91,7 @@ set( test_src
   HVACMultiSpeedHeatPump.unit.cc
   HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
+  HVACUnitaryBypassVAV.unit.cc
   HVACUnitarySystem.unit.cc
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
@@ -126,6 +130,7 @@ set( test_src
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
+  ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc

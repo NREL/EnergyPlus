@@ -67,7 +67,7 @@
 #include <InputProcessing/DataStorage.hh>
 
 class IdfParser;
-class State;
+class Validation;
 
 namespace EnergyPlus {
 
@@ -122,6 +122,15 @@ namespace EnergyPlus {
 
 		int
 		getNumObjectsFound( std::string const & ObjectWord );
+
+		bool
+		findDefault( std::string & default_value, json const & schema_field_obj );
+
+		bool
+		findDefault( Real64 & default_value, json const & schema_field_obj );
+
+		std::pair< std::string, bool >
+		getObjectItemValue( std::string const & field_value, json const & schema_field_obj );
 
 		void
 		getObjectItem(
@@ -257,6 +266,12 @@ namespace EnergyPlus {
 		std::vector < std::string > const &
 		validationWarnings();
 
+		void
+		checkVersionMatch();
+
+		bool
+		processErrors();
+
 		json const &
 		getFields( std::string const & objectType, std::string const & objectName );
 
@@ -280,7 +295,7 @@ namespace EnergyPlus {
 		using UnorderedUnusedObjectMap = std::map< const json::object_t * const, ObjectInfo >;
 
 		std::unique_ptr< IdfParser > idf_parser;
-		std::unique_ptr< State > state;
+		std::unique_ptr< Validation > validation;
 		std::unique_ptr< DataStorage > data;
 		json schema;
 		json epJSON;

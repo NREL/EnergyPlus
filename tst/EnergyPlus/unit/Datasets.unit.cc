@@ -139,16 +139,10 @@ namespace EnergyPlus {
 		DataGlobals::preserveIDFOrder = false;
 		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" ) ) ) );
 	}
-	TEST_F( DataSetFixture, RefrigerationCompressorCurves ) {
-		DataGlobals::preserveIDFOrder = false;
-		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" ) ) ) );
-	}
-	TEST_F( DataSetFixture, RefrigerationCompressorCurvesNeedFix ) {
-		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCompressorCurvesNeedFix.idf" ) ) ) );
-	}
-	TEST_F( DataSetFixture, RefrigerationCompressorCurvesOK ) {
-		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCompressorCurvesOK.idf" ) ) ) );
-	}
+	//TEST_F( DataSetFixture, RefrigerationCompressorCurves ) {
+	//	DataGlobals::preserveIDFOrder = false;
+	//	ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" ) ) ) );
+	//}
 	TEST_F( DataSetFixture, ResidentialACsAndHPsPerfCurves ) {
 		ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/ResidentialACsAndHPsPerfCurves.idf" ) ) ) );
 	}

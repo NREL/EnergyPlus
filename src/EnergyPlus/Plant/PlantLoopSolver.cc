@@ -246,156 +246,155 @@ namespace PlantLoopSolver {
 		}
 	}
 
-void
+	void
 	PlantLoopSolverClass::DisableAnyBranchPumpsConnectedToUnloadedEquipment(
-	int LoopNum,
-	int ThisSide
-)
-{
-	auto & loop_side = DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide );
-	for ( int branchNum = 2; branchNum <= loop_side.TotalBranches-1; ++branchNum ) {
-	    auto & branch = loop_side.Branch( branchNum );
-	    Real64 totalDispatchedLoadOnBranch = 0.0;
-	    int pumpCompIndexOnBranch = 0;
-	    for ( int compNum = 1; compNum <= branch.TotalComponents; ++ compNum ) {
-	        auto & component = branch.Comp( compNum );
-				// auto & comp_inlet_node = DataLoopNode::Node( component.NodeNumIn );
-				// auto & comp_outlet_node = DataLoopNode::Node( component.NodeNumOut );
-	        auto & t = component.TypeOf_Num;
-	        if ( t == DataPlant::TypeOf_PumpConstantSpeed || t == DataPlant::TypeOf_PumpBankConstantSpeed || t == DataPlant::TypeOf_PumpVariableSpeed || t == DataPlant::TypeOf_PumpBankVariableSpeed ) {
-	            pumpCompIndexOnBranch = compNum;
-	        } else {
-	            totalDispatchedLoadOnBranch += component.MyLoad;
-	        }
-	    }
-	    if ( abs(totalDispatchedLoadOnBranch) < 0.001 ) {
-				branch.disableOverrideForCSBranchPumping = true;
-	    }
+		int LoopNum,
+		int ThisSide
+	)
+	{
+		auto & loop_side = DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide );
+		for ( int branchNum = 2; branchNum <= loop_side.TotalBranches-1; ++branchNum ) {
+		    auto & branch = loop_side.Branch( branchNum );
+		    Real64 totalDispatchedLoadOnBranch = 0.0;
+		    int pumpCompIndexOnBranch = 0;
+		    for ( int compNum = 1; compNum <= branch.TotalComponents; ++ compNum ) {
+		        auto & component = branch.Comp( compNum );
+				auto & t = component.TypeOf_Num;
+		        if ( t == DataPlant::TypeOf_PumpConstantSpeed || t == DataPlant::TypeOf_PumpBankConstantSpeed || t == DataPlant::TypeOf_PumpVariableSpeed || t == DataPlant::TypeOf_PumpBankVariableSpeed ) {
+		            pumpCompIndexOnBranch = compNum;
+		        } else {
+		            totalDispatchedLoadOnBranch += component.MyLoad;
+		        }
+		    }
+		    if ( abs(totalDispatchedLoadOnBranch) < 0.001 ) {
+					branch.disableOverrideForCSBranchPumping = true;
+		    }
+		}
 	}
-}
-
-void
+	
+	void
 	PlantLoopSolverClass::DoFlowAndLoadSolutionPass(
-	int LoopNum,
-	int ThisSide,
-	int OtherSide,
-	int ThisSideInletNode,
-	bool FirstHVACIteration
-)
-{
-
-	// I don't think we need this actually
-	bool LoopShutDownFlag = false;
-
-	// First thing is to setup mass flow request information
-	Real64 ThisLoopSideFlowRequest = DataPlant::PlantLoop( LoopNum ).loopSolver.SetupLoopFlowRequest( LoopNum, ThisSide, OtherSide );
-
-	// Now we know what the loop would "like" to run at, let's see the pump
-	// operation range (min/max avail) to see whether it is possible this time around
-	Real64 ThisLoopSideFlow = DataPlant::PlantLoop( LoopNum ).loopSolver.DetermineLoopSideFlowRate( LoopNum, ThisSide, ThisSideInletNode, ThisLoopSideFlowRequest );
-
-	// We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
-	InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide );
-	UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
-
-	LoadToLoopSetPointThatWasntMet = 0.0;
-
-	// We now have a loop side flow request, along with inlet min/max avails.
-	// We can now make a first pass through the component simulation, requesting flow as necessary.
-	// Normal "supply side" components will set a mass flow rate on their outlet node to request flow,
-	// while "Demand side" components will set a a mass flow request on their inlet node to request flow.
-	DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowUnlocked;
+		int LoopNum,
+		int ThisSide,
+		int OtherSide,
+		int ThisSideInletNode,
+		bool FirstHVACIteration
+	)
+	{
+	
+		// I don't think we need this actually
+		bool LoopShutDownFlag = false;
+	
+		// First thing is to setup mass flow request information
+		Real64 ThisLoopSideFlowRequest = DataPlant::PlantLoop( LoopNum ).loopSolver.SetupLoopFlowRequest( LoopNum, ThisSide, OtherSide );
+	
+		// Now we know what the loop would "like" to run at, let's see the pump
+		// operation range (min/max avail) to see whether it is possible this time around
+		Real64 ThisLoopSideFlow = DataPlant::PlantLoop( LoopNum ).loopSolver.DetermineLoopSideFlowRate( LoopNum, ThisSide, ThisSideInletNode, ThisLoopSideFlowRequest );
+	
+		// We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
+		InitialDemandToLoopSetPoint = DataPlant::PlantLoop( LoopNum ).loopSolver.CalcOtherSideDemand( LoopNum, ThisSide, ThisLoopSideFlow );
+	
+		UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
+	
+		LoadToLoopSetPointThatWasntMet = 0.0;
+	
+		// We now have a loop side flow request, along with inlet min/max avails.
+		// We can now make a first pass through the component simulation, requesting flow as necessary.
+		// Normal "supply side" components will set a mass flow rate on their outlet node to request flow,
+		// while "Demand side" components will set a a mass flow request on their inlet node to request flow.
+		DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowUnlocked;
 		DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
-
-	// DSU? discussion/comments about loop solver/flow resolver interaction
-	// At this point, the components have been simulated.  They should have either:
-	//  - logged a massflowrequest
-	//  - or logged a MassFlowRate
-	// We need to decide what the components are going to do on FlowLock=0.
-	// If we want all control here at the solver level, the components just need to
-	//  log their MassFlowRate on their outlet nodes, or some other mechanism.
-	// Then the loop solver can scan the branch and get the max, and this will be the requested
-	//  flow rate for the branch.
-	// The loop solver will then set this as the branch outlet mass flow rate in preparation
-	//  for the flow resolver.
-	// The loop solver may need to do something to the inlet/outlet branch, but I'm not sure yet.
-	// The following comment block is what I had already thought of, and it may still make sense.
-
-	// Now that all the flow requests have been logged, we need to prepare them for the
-	//  flow resolver.  This will just take the requests and determine the desired flow
-	//  request for that branch according to pump placement, pump type, and other component
-	//  conditions.  In many cases, this will just be to simply take the max request from
-	//  the branch, which will already be within pumping limits for that flow path.
-	// We can then call the flow resolver to lock down branch inlet flow rates.
-
-	// The flow resolver takes information such as requested flows and min/max available flows and
-	//  sets the corrected flow on the inlet to each parallel branch
-		DataPlant::PlantLoop( LoopNum ).loopSolver.ResolveParallelFlows( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration );
-
-	// Re-Initialize variables for this next pass
-	InitialDemandToLoopSetPointSAVED = InitialDemandToLoopSetPoint;
-	CurrentAlterationsToDemand = 0.0;
-	UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
-
-	// Now that flow rates have been resolved, we just need to set the flow lock status
-	//  flag, and resimulate.  During this simulation each component will still use the
-	//  SetFlowRequest routine, but this routine will also set the outlet flow rate
-	//  equal to the inlet flow rate, accoridng to flowlock logic.
-	DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowLocked;
+	
+		// DSU? discussion/comments about loop solver/flow resolver interaction
+		// At this point, the components have been simulated.  They should have either:
+		//  - logged a massflowrequest
+		//  - or logged a MassFlowRate
+		// We need to decide what the components are going to do on FlowLock=0.
+		// If we want all control here at the solver level, the components just need to
+		//  log their MassFlowRate on their outlet nodes, or some other mechanism.
+		// Then the loop solver can scan the branch and get the max, and this will be the requested
+		//  flow rate for the branch.
+		// The loop solver will then set this as the branch outlet mass flow rate in preparation
+		//  for the flow resolver.
+		// The loop solver may need to do something to the inlet/outlet branch, but I'm not sure yet.
+		// The following comment block is what I had already thought of, and it may still make sense.
+	
+		// Now that all the flow requests have been logged, we need to prepare them for the
+		//  flow resolver.  This will just take the requests and determine the desired flow
+		//  request for that branch according to pump placement, pump type, and other component
+		//  conditions.  In many cases, this will just be to simply take the max request from
+		//  the branch, which will already be within pumping limits for that flow path.
+		// We can then call the flow resolver to lock down branch inlet flow rates.
+	
+		// The flow resolver takes information such as requested flows and min/max available flows and
+		//  sets the corrected flow on the inlet to each parallel branch
+        DataPlant::PlantLoop( LoopNum ).loopSolver.ResolveParallelFlows( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration );
+	
+		// Re-Initialize variables for this next pass
+		InitialDemandToLoopSetPointSAVED = InitialDemandToLoopSetPoint;
+		CurrentAlterationsToDemand = 0.0;
+		UpdatedDemandToLoopSetPoint = InitialDemandToLoopSetPoint;
+	
+		// Now that flow rates have been resolved, we just need to set the flow lock status
+		//  flag, and resimulate.  During this simulation each component will still use the
+		//  SetFlowRequest routine, but this routine will also set the outlet flow rate
+		//  equal to the inlet flow rate, accoridng to flowlock logic.
+		DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowLocked;
 		DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSideBranches( LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
-
-}
-
-Real64
-	PlantLoopSolverClass::DetermineLoopSideFlowRate(
-	int LoopNum,
-	int ThisSide,
-	int ThisSideInletNode,
-	Real64 ThisSideLoopFlowRequest
-)
-{
-	Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
-	Real64 TotalPumpMinAvailFlow = 0.0;
-	Real64 TotalPumpMaxAvailFlow = 0.0;
-	if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
-
-	    //~ Initialize pump values
-	    for ( auto & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
-	        e.CurrentMinAvail = 0.0;
-	        e.CurrentMaxAvail = 0.0;
-	    }
-	    DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowPumpQuery;
-
-	    //~ Simulate pumps
-			DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps( LoopNum, ThisSide );
-
-	    //~ Calculate totals
-	    for ( auto const & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
-	        TotalPumpMinAvailFlow += e.CurrentMinAvail;
-	        TotalPumpMaxAvailFlow += e.CurrentMaxAvail;
-	    }
-
-	    // Use the pump min/max avail to attempt to constrain the loop side flow
-	    ThisLoopSideFlow = PlantUtilities::BoundValueToWithinTwoValues( ThisLoopSideFlow, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
-
+	
 	}
-
-	// Now we check flow restriction from the other side, both min and max avail.
-	// Doing this last basically means it wins, so the pump should pull down to meet the flow restriction
-	ThisLoopSideFlow = PlantUtilities::BoundValueToNodeMinMaxAvail( ThisLoopSideFlow, ThisSideInletNode );
-
-	// Final preparation of loop inlet min/max avail if pumps exist
-	if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
-	    // At this point, the pump limits should have been obeyed unless a flow restriction was encountered from the other side
-	    // The pump may, however, have even tighter constraints than the other side
-	    // At this point, the inlet node doesn't know anything about those limits
-	    // Since we have already honored the other side flow restriction, try to honor the pump limits here
-	    PlantUtilities::TightenNodeMinMaxAvails( ThisSideInletNode, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
-	}
-
-	// Now reset the entering mass flow rate to the decided-upon flow rate
-	DataLoopNode::Node( ThisSideInletNode ).MassFlowRate = ThisLoopSideFlow;
-	return ThisLoopSideFlow;
+	
+	Real64
+		PlantLoopSolverClass::DetermineLoopSideFlowRate(
+		int LoopNum,
+		int ThisSide,
+		int ThisSideInletNode,
+		Real64 ThisSideLoopFlowRequest
+	)
+	{
+		Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
+		Real64 TotalPumpMinAvailFlow = 0.0;
+		Real64 TotalPumpMaxAvailFlow = 0.0;
+		if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
+	
+		    //~ Initialize pump values
+		    for ( auto & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+		        e.CurrentMinAvail = 0.0;
+		        e.CurrentMaxAvail = 0.0;
+		    }
+		    DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).FlowLock = DataPlant::FlowPumpQuery;
+	
+		    //~ Simulate pumps
+            DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateAllLoopSidePumps( LoopNum, ThisSide );
+	
+		    //~ Calculate totals
+		    for ( auto const & e : DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) {
+		        TotalPumpMinAvailFlow += e.CurrentMinAvail;
+		        TotalPumpMaxAvailFlow += e.CurrentMaxAvail;
+		    }
+	
+		    // Use the pump min/max avail to attempt to constrain the loop side flow
+		    ThisLoopSideFlow = PlantUtilities::BoundValueToWithinTwoValues( ThisLoopSideFlow, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
+	
+		}
+	
+		// Now we check flow restriction from the other side, both min and max avail.
+		// Doing this last basically means it wins, so the pump should pull down to meet the flow restriction
+		ThisLoopSideFlow = PlantUtilities::BoundValueToNodeMinMaxAvail( ThisLoopSideFlow, ThisSideInletNode );
+	
+		// Final preparation of loop inlet min/max avail if pumps exist
+		if ( allocated( DataPlant::PlantLoop( LoopNum ).LoopSide( ThisSide ).Pumps ) ) {
+		    // At this point, the pump limits should have been obeyed unless a flow restriction was encountered from the other side
+		    // The pump may, however, have even tighter constraints than the other side
+		    // At this point, the inlet node doesn't know anything about those limits
+		    // Since we have already honored the other side flow restriction, try to honor the pump limits here
+		    PlantUtilities::TightenNodeMinMaxAvails( ThisSideInletNode, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow );
+		}
+	
+		// Now reset the entering mass flow rate to the decided-upon flow rate
+		DataLoopNode::Node( ThisSideInletNode ).MassFlowRate = ThisLoopSideFlow;
+		return ThisLoopSideFlow;
 }
 
 	PlantLoopSolverClass::m_FlowControlValidator
@@ -1040,15 +1039,6 @@ Real64
 		//  updated on flowlock=0 to pass information through, then after the parallel branches the mixer is always
 		//  updated.  The outlet branch "group" is then simulated.
 
-		// Using/Aliasing
-		using PlantUtilities::UpdatePlantSplitter;
-		using PlantUtilities::UpdatePlantMixer;
-		using DataPlant::PlantLoop;
-		using DataPlant::FlowUnlocked;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const InletBranchOrOneBranchHalfLoop( 1 );
 		int const ParallelBranchSet( 2 );
@@ -1056,20 +1046,19 @@ Real64
 		bool const StartingNewLoopSidePass( true );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumBranchGroups;
-		int BranchesGreaterThanOne;
-		int BranchGroup;
+		auto & thisLoopSide = DataPlant::PlantLoop( LoopNum ).LoopSide( LoopSideNum );
 
-		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches > 1 ) {
+        int BranchesGreaterThanOne;
+        if ( thisLoopSide.TotalBranches > 1 ) {
 			BranchesGreaterThanOne = 1;
 		} else {
 			BranchesGreaterThanOne = 0;
 		}
-		NumBranchGroups = 1 + 2 * BranchesGreaterThanOne;
+		int NumBranchGroups = 1 + 2 * BranchesGreaterThanOne;
 
-		for ( BranchGroup = 1; BranchGroup <= NumBranchGroups; ++BranchGroup ) {
+		for ( int BranchGroup = 1; BranchGroup <= NumBranchGroups; ++BranchGroup ) {
 
-			if ( ( BranchGroup > 1 ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches == 1 ) ) break;
+			if ( ( BranchGroup > 1 ) && ( thisLoopSide.TotalBranches == 1 ) ) break;
 
 			{ auto const SELECT_CASE_var( BranchGroup );
 
@@ -1078,13 +1067,13 @@ Real64
 
 			} else if ( SELECT_CASE_var == ParallelBranchSet ) { // This group is the parallel set of branches, or the single branch between the mix/split
 
-				UpdatePlantSplitter( LoopNum, LoopSideNum, 1 );
+                PlantUtilities::UpdatePlantSplitter( LoopNum, LoopSideNum, 1 );
 
-				DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, 2, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches - 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
-				UpdatePlantMixer( LoopNum, LoopSideNum, 1 );
+				DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, 2, thisLoopSide.TotalBranches - 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
+                PlantUtilities::UpdatePlantMixer( LoopNum, LoopSideNum, 1 );
 
 			} else if ( SELECT_CASE_var == OutletBranch ) { // This group is the outlet branch
-				DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
+				DataPlant::PlantLoop( LoopNum ).loopSolver.SimulateLoopSideBranchGroup( LoopNum, LoopSideNum, thisLoopSide.TotalBranches, thisLoopSide.TotalBranches, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag );
 
 			}}
 
@@ -1146,9 +1135,6 @@ Real64
 		using PlantPressureSystem::SimPressureDropSystem;
 		using General::TrimSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//~ History values
 		static int LastLoopNum( -1 );
@@ -1165,7 +1151,6 @@ Real64
 		int NumBranchesInRegion;
 
 		//~ Flags
-
 		bool LoadDistributionWasPerformed;
 		bool DummyInit;
 		bool const DoNotGetCompSizFac( false );
@@ -1179,12 +1164,9 @@ Real64
 		int OpSchemePtr;
 
 		// Object Data
-//		static Array1D< Location > AccessibleBranches; // Set but never used
 		Location PumpLocation;
 
 		LoadToLoopSetPoint = 0.0; //Autodesk:Init Fix possible use uninitialized
-
-		//~ Debug variables
 
 		// We only need to reallocate the accessible array and reset the LastComponentSimulated if
 		//  either is currently NOT allocated, or if we are coming into this routine with a
@@ -1199,15 +1181,6 @@ Real64
 				LastComponentSimulated.allocate( NumBranchesInRegion );
 			}
 			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated( i ) = 0; // Only zero the active elements
-//			AccessibleBranches.allocate( NumBranchesInRegion );
-
-//			BranchIndex = 0;
-//			for ( BranchCounter = FirstBranchNum; BranchCounter <= LastBranchNum; ++BranchCounter ) {
-//				++BranchIndex;
-//				AccessibleBranches( BranchIndex ).LoopNum = LoopNum;
-//				AccessibleBranches( BranchIndex ).LoopSideNum = LoopSideNum;
-//				AccessibleBranches( BranchIndex ).BranchNum = BranchCounter;
-//			}
 
 		}
 
@@ -1430,21 +1403,12 @@ Real64
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
 		// Using/Aliasing
 		using DataPlant::LoopSidePumpInformation;
 		using DataPlant::PlantLoop;
 		using DataPlant::TotNumLoops;
 		using DataLoopNode::Node;
 		using Pumps::SimPumps;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopCounter;
@@ -1462,9 +1426,7 @@ Real64
 		int PumpBranchNum;
 		int PumpCompNum;
 		int PumpOutletNode;
-		/////////// hoisted into namespace
-		//static bool EstablishedCompPumpIndeces( false );
-		//////////////////////////////
+
 		//~ One time sweep through all loops/loopsides/pumps, assigning indeces to the pl%ls%br%comp%indexinloopsidepumps variable
 		if ( ! EstablishedCompPumpIndeces ) {
 			for ( LoopCounter = 1; LoopCounter <= TotNumLoops; ++LoopCounter ) {
@@ -1538,7 +1500,8 @@ Real64
 	Real64
 	PlantLoopSolverClass::CalcOtherSideDemand(
 		int const LoopNum,
-		int const ThisSide
+		int const ThisSide,
+        Real64 ThisLoopSideFlow
 	)
 	{
 
@@ -1555,16 +1518,10 @@ Real64
 		// This routine will simply call the evaluate loop setpoint routine but call it from
 		//  the very beginning of this loop side, so that it is basically for the entire loop side
 
-		// Return value
-		Real64 Demand;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
 		// FUNCTION PARAMETER DEFINITIONS:
 		static Array1D_int const InitCompArray( 1, 0 );
 
-		Demand = DataPlant::PlantLoop( LoopNum ).loopSolver.EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, InitCompArray );
+		Real64 Demand = DataPlant::PlantLoop( LoopNum ).loopSolver.EvaluateLoopSetPointLoad( LoopNum, ThisSide, 1, 1, ThisLoopSideFlow, InitCompArray );
 
 		return Demand;
 
@@ -1576,6 +1533,7 @@ Real64
 		int const LoopSideNum,
 		int const FirstBranchNum,
 		int const LastBranchNum,
+		Real64 ThisLoopSideFlow,
 		Array1S_int LastComponentSimulated
 	)
 	{
@@ -1586,116 +1544,82 @@ Real64
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS FUNCTION:
-		// <description>
-
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// Using/Aliasing
-		using DataPlant::PlantLoop;
-		using DataPlant::LoopDemandTol;
-		using DataPlant::SingleSetPoint;
-		using DataPlant::DualSetPointDeadBand;
-		using DataBranchAirLoopPlant::MassFlowTolerance;
-		using DataLoopNode::Node;
-		using DataLoopNode::NodeType_Water;
-		using DataLoopNode::NodeType_Steam;
-		using FluidProperties::GetSpecificHeatGlycol;
-		using FluidProperties::GetSatEnthalpyRefrig;
-		using General::RoundSigDigits;
-
 		// Return value
-		Real64 LoadToLoopSetPoint; // function result
-
-		// Argument array dimensioning
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		//~ Indexing variables
-		int BranchCounter; // ~ This contains the index for the %Branch(:) structure
-		int BranchIndex; // ~ This is a 1 - n value within the current branch group
-		int StartingComponent; // ~ The component which "would" be simulated next
+		Real64 LoadToLoopSetPoint = 0.0; // function result
 
 		static std::string const RoutineName( "PlantLoopSolver::EvaluateLoopSetPointLoad" );
 		static std::string const RoutineNameAlt( "PlantSupplySide:EvaluateLoopSetPointLoad" );
 
 		//~ General variables
-		Real64 EnteringTemperature;
-		Real64 MassFlowRate;
-		Real64 SumMdotTimesTemp;
-		Real64 SumMdot;
-		Real64 WeightedInletTemp;
-		Real64 LoopSetPointTemperature;
-		Real64 LoopSetPointTemperatureHi;
-		Real64 LoopSetPointTemperatureLo;
-		Real64 LoadToHeatingSetPoint;
-		Real64 LoadToCoolingSetPoint;
-		Real64 DeltaTemp;
-		int EnteringNodeNum;
-		Real64 Cp;
-		Real64 EnthalpySteamSatVapor; // Enthalpy of saturated vapor
-		Real64 EnthalpySteamSatLiquid; // Enthalpy of saturated liquid
-		Real64 LatentHeatSteam; // Latent heat of steam
+		Real64 SumMdotTimesTemp = 0.0;
+		Real64 SumMdot = 0.0;
 
-		// Initialize
-		LoadToLoopSetPoint = 0.0;
+		// We will place one specialized case in here for common pipe simulations.
+        // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
+        //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
+        //  as the flow going through the actual supply side
+        if ( CurrentLoopSideIsConstantSpeedBranchPumped && LoopSideNum == 2 && DataPlant::PlantLoop( LoopNum ).CommonPipeType != DataPlant::CommonPipe_No ) {
+            const int OtherSide = 3 - LoopSideNum;
+            const int otherSideOutletNodeNum = DataPlant::PlantLoop( LoopNum ).LoopSide( OtherSide ).NodeNumOut;
+            Real64 commonPipeFlow = DataLoopNode::Node( otherSideOutletNodeNum ).MassFlowRate - ThisLoopSideFlow;
+            Real64 otherSideExitingTemperature = DataLoopNode::Node( otherSideOutletNodeNum ).Temp;
+            SumMdotTimesTemp += otherSideExitingTemperature * commonPipeFlow;
+            SumMdot += commonPipeFlow;
+        }
+
+        auto & thisPlantLoop = DataPlant::PlantLoop( LoopNum );
 
 		// Sweep across flow paths in this group and calculate the deltaT and then the load
-		BranchIndex = 0;
-		SumMdotTimesTemp = 0.0;
-		SumMdot = 0.0;
-		for ( BranchCounter = FirstBranchNum; BranchCounter <= LastBranchNum; ++BranchCounter ) {
+		int BranchIndex = 0;  // ~ This is a 1 - n value within the current branch group
+		for ( int BranchCounter = FirstBranchNum; BranchCounter <= LastBranchNum; ++BranchCounter ) {
 
 			++BranchIndex;
 
 			//~ Always start from the last component we did the last time around + 1 and
 			//~  try to make it all the way to the end of the loop
-			StartingComponent = LastComponentSimulated( BranchIndex ) + 1;
-			EnteringNodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchCounter ).Comp( StartingComponent ).NodeNumIn;
+			int StartingComponent = LastComponentSimulated( BranchIndex ) + 1;
+			int EnteringNodeNum = thisPlantLoop.LoopSide( LoopSideNum ).Branch( BranchCounter ).Comp( StartingComponent ).NodeNumIn;
 
-			EnteringTemperature = Node( EnteringNodeNum ).Temp;
-			MassFlowRate = Node( EnteringNodeNum ).MassFlowRate;
+			Real64 EnteringTemperature = DataLoopNode::Node( EnteringNodeNum ).Temp;
+			Real64 MassFlowRate = DataLoopNode::Node( EnteringNodeNum ).MassFlowRate;
 
-			SumMdotTimesTemp += ( EnteringTemperature * MassFlowRate );
-			SumMdot += ( MassFlowRate );
+			SumMdotTimesTemp += EnteringTemperature * MassFlowRate;
+			SumMdot += MassFlowRate;
 
 		}
 
-		if ( SumMdot < MassFlowTolerance ) {
-			LoadToLoopSetPoint = 0.0;
-			return LoadToLoopSetPoint;
+		if ( SumMdot < DataBranchAirLoopPlant::MassFlowTolerance ) {
+			return 0.0;
 		}
 
-		WeightedInletTemp = SumMdotTimesTemp / SumMdot;
+		Real64 WeightedInletTemp = SumMdotTimesTemp / SumMdot;
 
-		if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
+		if ( thisPlantLoop.FluidType == DataLoopNode::NodeType_Water ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
+			Real64 Cp = FluidProperties::GetSpecificHeatGlycol( thisPlantLoop.FluidName, WeightedInletTemp, thisPlantLoop.FluidIndex, RoutineName );
 
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
+			{ auto const SELECT_CASE_var( thisPlantLoop.LoopDemandCalcScheme );
 
-			if ( SELECT_CASE_var == SingleSetPoint ) {
+			if ( SELECT_CASE_var == DataPlant::SingleSetPoint ) {
 
 				// Pick up the loop setpoint temperature
-				LoopSetPointTemperature = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPoint;
+				Real64 LoopSetPointTemperature = thisPlantLoop.LoopSide( LoopSideNum ).TempSetPoint;
 				// Calculate the delta temperature
-				DeltaTemp = LoopSetPointTemperature - WeightedInletTemp;
+				Real64 DeltaTemp = LoopSetPointTemperature - WeightedInletTemp;
 
 				// Calculate the demand on the loop
 				LoadToLoopSetPoint = SumMdot * Cp * DeltaTemp;
 
-			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
+			} else if ( SELECT_CASE_var == DataPlant::DualSetPointDeadBand ) {
 
 				// Get the range of setpoints
-				LoopSetPointTemperatureHi = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointHi;
-				LoopSetPointTemperatureLo = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointLo;
+				Real64 LoopSetPointTemperatureHi = DataLoopNode::Node( thisPlantLoop.TempSetPointNodeNum ).TempSetPointHi;
+				Real64 LoopSetPointTemperatureLo = DataLoopNode::Node( thisPlantLoop.TempSetPointNodeNum ).TempSetPointLo;
 
 				//Calculate the demand on the loop
 				if ( SumMdot > 0.0 ) {
-					LoadToHeatingSetPoint = SumMdot * Cp * ( LoopSetPointTemperatureLo - WeightedInletTemp );
-					LoadToCoolingSetPoint = SumMdot * Cp * ( LoopSetPointTemperatureHi - WeightedInletTemp );
+					Real64 LoadToHeatingSetPoint = SumMdot * Cp * ( LoopSetPointTemperatureLo - WeightedInletTemp );
+					Real64 LoadToCoolingSetPoint = SumMdot * Cp * ( LoopSetPointTemperatureHi - WeightedInletTemp );
 					// Possible combinations:
 					// 1  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
 					// 2  LoadToHeatingSetPoint < 0 & LoadToCoolingSetPoint < 0 -->  Cooling Required
@@ -1705,10 +1629,10 @@ Real64
 					if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
 						ShowSevereError( "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, but the heating-related low setpoint appears to be above the cooling-related high setpoint." );
 						ShowContinueError( "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the low setpoint is below the high setpoint." );
-						ShowContinueError( "Occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
-						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
-						ShowContinueError( "Loop Heating Low Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
-						ShowContinueError( "Loop Cooling High Setpoint=" + RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
+						ShowContinueError( "Occurs in PlantLoop=" + thisPlantLoop.Name );
+						ShowContinueError( "LoadToHeatingSetPoint=" + General::RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + General::RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+						ShowContinueError( "Loop Heating Low Setpoint=" + General::RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
+						ShowContinueError( "Loop Cooling High Setpoint=" + General::RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
 
 						ShowFatalError( "Program terminates due to above conditions." );
 					}
@@ -1720,10 +1644,10 @@ Real64
 						LoadToLoopSetPoint = 0.0;
 					} else {
 						ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team" );
-						ShowContinueError( "occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
-						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
-						ShowContinueError( "Loop Heating Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
-						ShowContinueError( "Loop Cooling Setpoint=" + RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
+						ShowContinueError( "occurs in PlantLoop=" + thisPlantLoop.Name );
+						ShowContinueError( "LoadToHeatingSetPoint=" + General::RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + General::RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
+						ShowContinueError( "Loop Heating Setpoint=" + General::RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
+						ShowContinueError( "Loop Cooling Setpoint=" + General::RoundSigDigits( LoopSetPointTemperatureHi, 2 ) );
 						ShowFatalError( "Program terminates due to above conditions." );
 					}
 				} else {
@@ -1732,24 +1656,24 @@ Real64
 
 			}}
 
-		} else if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
+		} else if ( thisPlantLoop.FluidType == DataLoopNode::NodeType_Steam ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
+			Real64 Cp = FluidProperties::GetSpecificHeatGlycol( thisPlantLoop.FluidName, WeightedInletTemp, thisPlantLoop.FluidIndex, RoutineName );
 
-			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
+			{ auto const SELECT_CASE_var( thisPlantLoop.LoopDemandCalcScheme );
 
-			if ( SELECT_CASE_var == SingleSetPoint ) {
+			if ( SELECT_CASE_var == DataPlant::SingleSetPoint ) {
 
 				// Pick up the loop setpoint temperature
-				LoopSetPointTemperature = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPoint;
+				Real64 LoopSetPointTemperature = thisPlantLoop.LoopSide( LoopSideNum ).TempSetPoint;
 
 				// Calculate the delta temperature
-				DeltaTemp = LoopSetPointTemperature - WeightedInletTemp;
+				Real64 DeltaTemp = LoopSetPointTemperature - WeightedInletTemp;
 
-				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 1.0, RefrigIndex, RoutineNameAlt );
-				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 0.0, RefrigIndex, RoutineNameAlt );
+				Real64 EnthalpySteamSatVapor = FluidProperties::GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 1.0, RefrigIndex, RoutineNameAlt );
+				Real64 EnthalpySteamSatLiquid = FluidProperties::GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 0.0, RefrigIndex, RoutineNameAlt );
 
-				LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
+				Real64 LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 
 				// Calculate the demand on the loop
 				LoadToLoopSetPoint = SumMdot * ( Cp * DeltaTemp + LatentHeatSteam );
@@ -1761,7 +1685,7 @@ Real64
 		}
 
 		// Trim the demand to zero if it is very small
-		if ( std::abs( LoadToLoopSetPoint ) < LoopDemandTol ) LoadToLoopSetPoint = 0.0;
+		if ( std::abs( LoadToLoopSetPoint ) < DataPlant::LoopDemandTol ) LoadToLoopSetPoint = 0.0;
 
 		return LoadToLoopSetPoint;
 
@@ -1808,19 +1732,8 @@ Real64
 		using DataLoopNode::Node;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "PlantLoopSolver::UpdateAnyLoopDemandAlterations" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Init to zero, so that if we don't find anything, we exit early
 		Real64 ComponentMassFlowRate( 0.0 );
@@ -1919,9 +1832,6 @@ Real64
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataLoopNode::Node;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Array1D_string const LoopSideName( 2, { "Demand", "Supply" } );
@@ -2339,21 +2249,12 @@ Real64
 		// Return value
 		Real64 OverallFlowRequest;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const OutletFlowRate( 1 );
 		int const InletFlowRequest( 2 );
 		int const MaximumRequest( 3 );
 		int const MaxNonLRBRequest( 4 );
 		int const WhichRequestCalculation( InletFlowRequest );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompCounter;
@@ -2449,26 +2350,11 @@ Real64
 		//  you would need to provide a mass flow and min/max avail to push
 		//  down the branch as well.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataPlant; // Use the entire module to allow all TypeOf's, would be a huge ONLY list
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataLoopNode::Node;
 		using PlantUtilities::CheckPlantConvergence;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CompCounter;
@@ -2583,8 +2469,6 @@ Real64
 		//  any of this side equipment alters it
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-		// store node data in plant
 		auto & this_supplyside( PlantLoop( LoopNum ).LoopSide( SupplySide ) );
 		auto & this_loop_report( PlantReport( LoopNum ) );
 
@@ -2631,11 +2515,6 @@ Real64
 		// using the loop setpoint node, look at target vs current and
 		// calculate a demand based on mass flow times specific heat times delta T
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantReport;
@@ -2649,18 +2528,9 @@ Real64
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetSatEnthalpyRefrig;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "PlantLoopSolver::EvaluateLoopSetPointLoad" );
 		static std::string const RoutineNameAlt( "PlantSupplySide:EvaluateLoopSetPointLoad" );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		//~ General variables
 		Real64 MassFlowRate;
@@ -2786,12 +2656,6 @@ Real64
 		// of operating plant equipment produced chilled/hot water
 		// at the loop setpoint temperature.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
@@ -2801,18 +2665,6 @@ Real64
 		using DataLoopNode::Node;
 		using DataLoopNode::NodeID;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopInlet; // plant loop inlet node num.
@@ -2858,26 +2710,8 @@ Real64
 		// PURPOSE OF THIS SUBROUTINE:
 		// modify flow request to pump simulation if EMS is overriding pump component
 
-		// METHODOLOGY EMPLOYED:
-		// <description>
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		auto & this_loopside( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );

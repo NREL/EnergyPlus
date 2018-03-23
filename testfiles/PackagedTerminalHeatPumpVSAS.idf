@@ -2551,7 +2551,7 @@
 
   Output:Variable,*,Heating Coil Electric Energy,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Houlry;
+  Output:Variable,*,Fan Electric Power,Hourly;
 
   Output:Variable,*,Fan Runtime Fraction,Hourly;
 

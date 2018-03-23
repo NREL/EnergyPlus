@@ -32,6 +32,7 @@ install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
+install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" DESTINATION ./ )
 
 # Some docs are generated on the fly here, create a dir for the 'built' files
 set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
@@ -56,7 +57,7 @@ if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
 	install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${CMAKE_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")")
   install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
 else()
-  message(WARNING "No GITHUB_TOKEN found in environment; package won't be complete")
+  message(WARNING "No GITHUB_TOKEN found in environment; package won't include the change log")
 endif()
 
 # Install files that are in the current repo
@@ -136,16 +137,16 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set( RULES_XLS Rules8-7-0-to-8-8-0.md )
+set( RULES_XLS Rules8-8-0-to-8-9-0.md )
 install(FILES "${CMAKE_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/release/ep.gif" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/release/readme.html" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/InputRulesFiles/${RULES_XLS}" DESTINATION "./")
-install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/OutputRulesFiles/OutputChanges8-7-0-to-8-8-0.md" DESTINATION "./")
+install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/OutputRulesFiles/OutputChanges8-8-0-to-8-9-0.md" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/SupportFiles/Report Variables 8-7-0 to 8-8-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-7-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V8-8-0-Energy+.idd" )
+install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/SupportFiles/Report Variables 8-8-0 to 8-9-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-8-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V8-9-0-Energy+.idd" )
 
 if( WIN32 )
   # calcsoilsurftemp is now built from source, just need to install the batch run script
