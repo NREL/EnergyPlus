@@ -150,7 +150,7 @@ namespace EnergyPlus {
 		} );
 
 		ASSERT_FALSE( process_idf( idf_objects, false ) ); // expect errors
-		EXPECT_TRUE(compare_err_stream( "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.\r\n" ) );
+		EXPECT_TRUE(compare_err_stream( "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.\n" ) );
 
 		bool ErrorsFound( false );
 
@@ -188,7 +188,7 @@ namespace EnergyPlus {
 		);
 
 		ASSERT_FALSE( process_idf( idf_objects, false ) ); // expect errors
-		EXPECT_TRUE(compare_err_stream( "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.\r\n" ) );
+		EXPECT_TRUE(compare_err_stream( "   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.\n" ) );
 
 		bool ErrorsFound( false );
 
