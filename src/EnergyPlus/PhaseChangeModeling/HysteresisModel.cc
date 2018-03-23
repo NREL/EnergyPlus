@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 #include <PhaseChangeModeling/HysteresisModel.hh>
 #include <DataIPShortCuts.hh>
 #include <UtilityRoutines.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -351,7 +351,7 @@ namespace EnergyPlus {
 
 			// convenience variables
 			DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-			numHysteresisModels = InputProcessor::GetNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
+			numHysteresisModels = inputProcessor->getNumObjectsFound( DataIPShortCuts::cCurrentModuleObject );
 
 			// loop over all hysteresis input instances, if zero, this will simply not do anything
 			for ( int hmNum = 1; hmNum <= numHysteresisModels; ++hmNum ) {
@@ -362,7 +362,7 @@ namespace EnergyPlus {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, hmNum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, hmNum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,

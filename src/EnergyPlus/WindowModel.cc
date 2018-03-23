@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "InputProcessor.hh"
+#include <InputProcessing/InputProcessor.hh>
 #include "DataIPShortCuts.hh"
 
 #include "WindowModel.hh"
@@ -85,9 +85,9 @@ namespace EnergyPlus {
 			int IOStat;
 
 			std::unique_ptr< CWindowModel > aModel = std::unique_ptr< CWindowModel >( new CWindowModel() );
-			int numCurrModels = InputProcessor::GetNumObjectsFound( objectName );
+			int numCurrModels = inputProcessor->getNumObjectsFound( objectName );
 			if ( numCurrModels > 0 ) {
-				InputProcessor::GetObjectItem( objectName, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+				inputProcessor->getObjectItem( objectName, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 				EnumParser< WindowsModel > aParser;
 				aModel->m_Model = aParser.StringToEnum( cAlphaArgs( 1 ) );
 			}
@@ -115,7 +115,7 @@ namespace EnergyPlus {
 			// Process input data and counts if number of complex fenestration objects is greater
 			// than zero in which case it will use BSDF window model
 			std::unique_ptr< CWindowOpticalModel > aModel = std::unique_ptr< CWindowOpticalModel >( new CWindowOpticalModel() );
-			int numCurrModels = InputProcessor::GetNumObjectsFound( "Construction:ComplexFenestrationState" );
+			int numCurrModels = inputProcessor->getNumObjectsFound( "Construction:ComplexFenestrationState" );
 
 			if ( numCurrModels > 0 ) {
 				aModel->m_Model = WindowsOpticalModel::BSDF;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,7 +54,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -129,37 +129,16 @@ namespace DataSurfaceLists {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Gets the surface lists for the Radiant System Surface Groups input.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using namespace DataSurfaces;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectDefMaxArgs;
-		using InputProcessor::VerifyName;
 		using DataHeatBalance::Zone;
 		using General::RoundSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject1( "ZoneHVAC:LowTemperatureRadiant:SurfaceGroup" );
 		static std::string const CurrentModuleObject2( "ZoneHVAC:VentilatedSlab:SlabGroup" );
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
 		Real64 const SurfListMinFlowFrac( 0.001 ); // Minimum allowed flow fraction (to avoid divide by zero)
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array1D_string Alphas; // Alpha items for object
@@ -183,22 +162,20 @@ namespace DataSurfaceLists {
 		int AlphaArray;
 		int NumArray;
 		int SrfList;
-		bool IsNotOK;
-		bool IsBlank;
 
 		// Obtain all of the user data related to surface lists.  Need to get
 		// this before getting the radiant system or ventilated slab data.
 
 		ErrorsFound = false;
-		NumOfSurfaceLists = GetNumObjectsFound( CurrentModuleObject1 );
-		NumOfSurfListVentSlab = GetNumObjectsFound( CurrentModuleObject2 );
+		NumOfSurfaceLists = inputProcessor->getNumObjectsFound( CurrentModuleObject1 );
+		NumOfSurfListVentSlab = inputProcessor->getNumObjectsFound( CurrentModuleObject2 );
 
 		SurfList.allocate( NumOfSurfaceLists );
 		SlabList.allocate( NumOfSurfListVentSlab );
 
 		if ( NumOfSurfaceLists > 0 ) {
 
-			GetObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
 			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
@@ -208,20 +185,13 @@ namespace DataSurfaceLists {
 
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
-				GetObjectItem( CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), SurfList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject1 + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( CurrentModuleObject1, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject1, ErrorsFound);
 
 				SurfList( Item ).Name = Alphas( 1 );
 				SurfList( Item ).NumOfSurfaces = NumAlphas - 1;
 
-				NameConflict = FindItemInList( SurfList( Item ).Name, Surface );
+				NameConflict = UtilityRoutines::FindItemInList( SurfList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject1 + " = " + SurfList( Item ).Name + " has the same name as a surface; this is not allowed." );
 					ErrorsFound = true;
@@ -239,7 +209,7 @@ namespace DataSurfaceLists {
 				SumOfAllFractions = 0.0;
 				for ( SurfNum = 1; SurfNum <= SurfList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SurfList( Item ).SurfName( SurfNum ) = Alphas( SurfNum + 1 );
-					SurfList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( SurfNum + 1 ), Surface );
+					SurfList( Item ).SurfPtr( SurfNum ) = UtilityRoutines::FindItemInList( Alphas( SurfNum + 1 ), Surface );
 					if ( SurfList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( SurfNum + 1 ) + " in " + CurrentModuleObject1 + " statement not found = " + SurfList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
@@ -283,7 +253,7 @@ namespace DataSurfaceLists {
 		}
 
 		if ( NumOfSurfListVentSlab > 0 ) {
-			GetObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
+			inputProcessor->getObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
 			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
@@ -293,20 +263,13 @@ namespace DataSurfaceLists {
 
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 
-				GetObjectItem( CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( Alphas( 1 ), SlabList, Item - 1, IsNotOK, IsBlank, CurrentModuleObject2 + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
-				}
+				inputProcessor->getObjectItem( CurrentModuleObject2, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				UtilityRoutines::IsNameEmpty(Alphas( 1 ), CurrentModuleObject2, ErrorsFound);
 
 				SlabList( Item ).Name = Alphas( 1 );
 				SlabList( Item ).NumOfSurfaces = ( ( NumAlphas - 1 ) / 4 );
 
-				NameConflict = FindItemInList( SlabList( Item ).Name, Surface );
+				NameConflict = UtilityRoutines::FindItemInList( SlabList( Item ).Name, Surface );
 				if ( NameConflict > 0 ) { // A surface list has the same name as a surface--not allowed
 					ShowSevereError( CurrentModuleObject2 + " = " + SlabList( Item ).Name + " has the same name as a slab; this is not allowed." );
 					ErrorsFound = true;
@@ -332,21 +295,21 @@ namespace DataSurfaceLists {
 				NumArray = 1;
 				for ( SurfNum = 1; SurfNum <= SlabList( Item ).NumOfSurfaces; ++SurfNum ) {
 					SlabList( Item ).ZoneName( SurfNum ) = Alphas( AlphaArray );
-					SlabList( Item ).ZonePtr = FindItemInList( Alphas( AlphaArray ), Zone );
+					SlabList( Item ).ZonePtr = UtilityRoutines::FindItemInList( Alphas( AlphaArray ), Zone );
 					if ( SlabList( Item ).ZonePtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " Zone not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 					}
 
 					SlabList( Item ).SurfName( SurfNum ) = Alphas( AlphaArray + 1 );
-					SlabList( Item ).SurfPtr( SurfNum ) = FindItemInList( Alphas( AlphaArray + 1 ), Surface );
+					SlabList( Item ).SurfPtr( SurfNum ) = UtilityRoutines::FindItemInList( Alphas( AlphaArray + 1 ), Surface );
 					if ( SlabList( Item ).SurfPtr( SurfNum ) == 0 ) {
 						ShowSevereError( cAlphaFields( AlphaArray + 1 ) + " in " + CurrentModuleObject2 + " statement not found = " + SlabList( Item ).SurfName( SurfNum ) );
 						ErrorsFound = true;
 
 					}
 					for ( SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList ) {
-						NameConflict = FindItemInList( SlabList( Item ).SurfName( SurfNum ), SurfList( SrfList ).SurfName, SurfList( SrfList ).NumOfSurfaces );
+						NameConflict = UtilityRoutines::FindItemInList( SlabList( Item ).SurfName( SurfNum ), SurfList( SrfList ).SurfName, SurfList( SrfList ).NumOfSurfaces );
 						if ( NameConflict > 0 ) { // A slab list includes a surface on a surface list--not allowed
 							ShowSevereError( CurrentModuleObject2 + "=\"" + SlabList( Item ).Name + "\", invalid surface specified." );
 							ShowContinueError( "Surface=\"" + SlabList( Item ).SurfName( SurfNum ) + "\" is also on a Surface List." );

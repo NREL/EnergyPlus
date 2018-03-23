@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -233,15 +233,8 @@ namespace loc {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
 		using DataHeatBalance::Construct;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -251,19 +244,6 @@ namespace loc {
 		using DataEnvironment::GroundTemp_SurfaceObjInput;
 		using General::RoundSigDigits;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -277,7 +257,7 @@ namespace loc {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Surface";
-		int NumOfSurfaceGHEs = GetNumObjectsFound( cCurrentModuleObject );
+		int NumOfSurfaceGHEs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( SurfaceGHE ) ) SurfaceGHE.deallocate();
 
@@ -290,12 +270,12 @@ namespace loc {
 		for ( Item = 1; Item <= NumOfSurfaceGHEs; ++Item ) {
 
 			// get the input data
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			// General user input data
 			SurfaceGHE( Item ).Name = cAlphaArgs( 1 );
 			SurfaceGHE( Item ).ConstructionName = cAlphaArgs( 2 );
-			SurfaceGHE( Item ).ConstructionNum = FindItemInList( cAlphaArgs( 2 ), Construct );
+			SurfaceGHE( Item ).ConstructionNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Construct );
 
 			if ( SurfaceGHE( Item ).ConstructionNum == 0 ) {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + '=' + cAlphaArgs( 2 ) );
@@ -366,9 +346,9 @@ namespace loc {
 			}
 
 			// get lower b.c. type
-			if ( SameString( cAlphaArgs( 5 ), "GROUND" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "GROUND" ) ) {
 				SurfaceGHE( Item ).LowerSurfCond = SurfCond_Ground;
-			} else if ( SameString( cAlphaArgs( 5 ), "EXPOSED" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "EXPOSED" ) ) {
 				SurfaceGHE( Item ).LowerSurfCond = SurfCond_Exposed;
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + '=' + cAlphaArgs( 5 ) );
@@ -429,11 +409,6 @@ namespace loc {
 		// METHODOLOGY EMPLOYED:
 		// Check flags and update data structure
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
 		using DataGlobals::Pi;
 		using DataGlobals::BeginEnvrnFlag;
@@ -442,29 +417,18 @@ namespace loc {
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
-		using InputProcessor::SameString;
 		using DataPlant::TypeOf_GrndHtExchgSurface;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		//INTEGER, INTENT(IN) :: FlowLock            ! flow initialization/condition flag    !DSU
-
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DesignVelocity( 0.5 ); // Hypothetical design max pipe velocity [m/s]
 		static std::string const RoutineName( "InitSurfaceGroundHeatExchanger" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -495,7 +459,7 @@ namespace loc {
 		// get QTF data - only once
 		if ( this->InitQTF ) {
 			for ( Cons = 1; Cons <= TotConstructs; ++Cons ) {
-				if ( SameString( Construct( Cons ).Name, this->ConstructionName ) ) {
+				if ( UtilityRoutines::SameString( Construct( Cons ).Name, this->ConstructionName ) ) {
 					// some error checking ??
 					// CTF stuff
 					LayerNum = Construct( Cons ).TotLayers;

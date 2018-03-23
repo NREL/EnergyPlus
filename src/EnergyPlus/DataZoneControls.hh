@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,6 +131,13 @@ namespace DataZoneControls {
 		//      below the original cooling setpoint, %RH/deltaC
 		std::string DehumidifyingSched; // Name of the schedule to determine the zone dehumidifying setpoint
 		int DehumidifyingSchedIndex; // Index for dehumidifying schedule
+		Real64 DeltaTCutSet; // Temperature difference between cutout and setpoint
+		Real64 ZoneThermostatSetPointHi; // Cooling setpoint
+		Real64 ZoneThermostatSetPointLo; // Heating setpoint
+		bool CoolModeLast;
+		bool HeatModeLast;
+		bool CoolModeLastSave;
+		bool HeatModeLastSave;
 
 		// Default Constructor
 		ZoneTempControls() :
@@ -160,7 +167,15 @@ namespace DataZoneControls {
 			ZoneOvercoolConstRange( 0.0 ),
 			ZoneOvercoolRangeSchedIndex( 0 ),
 			ZoneOvercoolControlRatio( 0.0 ),
-			DehumidifyingSchedIndex( 0 )
+			DehumidifyingSchedIndex( 0 ),
+			DeltaTCutSet( 0 ),
+			ZoneThermostatSetPointHi( 0.0 ),
+			ZoneThermostatSetPointLo( 0.0 ),
+			CoolModeLast( false ),
+			HeatModeLast( false ),
+			CoolModeLastSave( false ),
+			HeatModeLastSave( false )
+
 		{}
 
 	};

@@ -43,8 +43,8 @@
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_FL_Miami.Intl.AP_722020_TMY3
 !
@@ -195,10 +195,10 @@
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Miami Intl Ap FL USA Extreme Annual Wind Speeds, 1%=9.2m/s, 2.5%=8.4m/s, 5%=7.7m/s
- ! Miami Intl Ap FL USA Extreme Annual Temperatures, Max Drybulb=5.1캜 Min Drybulb=35캜
+ ! Miami Intl Ap FL USA Extreme Annual Temperatures, Max Drybulb=5.1째C Min Drybulb=35째C
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -230,7 +230,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -611,7 +611,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:17,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -623,7 +623,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:22,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -635,7 +635,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:17,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -647,7 +647,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:22,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -659,7 +659,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -671,7 +671,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -683,7 +683,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 07:00,0,          !- Field 4
     Until: 07:17,1,          !- Field 6
     Until: 17:00,0,          !- Field 8
@@ -695,7 +695,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 07:00,0,          !- Field 4
     Until: 07:22,1,          !- Field 6
     Until: 17:00,0,          !- Field 8
@@ -707,7 +707,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 06:00,0,          !- Field 4
     Until: 06:17,1,          !- Field 6
     Until: 16:00,0,          !- Field 8
@@ -719,7 +719,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 06:00,0,          !- Field 4
     Until: 06:22,1,          !- Field 6
     Until: 16:00,0,          !- Field 8
@@ -5782,7 +5782,7 @@
 
   Output:Variable,*,Cooling Coil Electric Energy,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 

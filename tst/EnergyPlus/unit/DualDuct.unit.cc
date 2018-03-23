@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,11 +56,16 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
-#include <DataHeatBalance.hh> 
+#include <DataHeatBalance.hh>
 #include <DataLoopNode.hh>
 #include <DataSizing.hh>
 #include <DataZoneEquipment.hh>
 #include <DualDuct.hh>
+
+#include <DataGlobals.hh>
+#include <ZoneAirLoopEquipmentManager.hh>
+#include <HeatBalanceManager.hh>
+#include <ScheduleManager.hh>
 
 using namespace EnergyPlus;
 using namespace DualDuct;
@@ -68,10 +73,10 @@ using namespace DualDuct;
 
 TEST_F( EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir ) {
 
-	// AUTHOR: L. Gu, FSEC  
-	// DATE WRITTEN: Jul. 2016  
-	// TEST: #5769  
-	
+	// AUTHOR: L. Gu, FSEC
+	// DATE WRITTEN: Jul. 2016
+	// TEST: #5769
+
 	Real64 SAMassFlow;
 	Real64 AirLoopOAFrac;
 	Real64 OAMassFlow;
@@ -130,4 +135,177 @@ TEST_F( EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir ) {
 	DataAirLoop::AirLoopFlow.deallocate( );
 
 }
+
+//TEST_F( EnergyPlusFixture, AirTerminalDualDuct_GetInputTest ) {
+//
+//		bool ErrorsFound( false );
+//
+//		std::string const idf_objects = delimited_string( {
+//			"Version, 8.9;",
+//			// Dual Duct CV
+//			"  ZoneHVAC:AirDistributionUnit,",
+//			"    ADU DualDuctCV,                   !- Name",
+//			"    Zone DualDuctCV Inlet Node,       !- Air Distribution Unit Outlet Node Name",
+//			"    AirTerminal:DualDuct:ConstantVolume,  !- Air Terminal Object Type",
+//			"    Air Terminal Dual Duct Constant Volume 1;  !- Air Terminal Name",
+//
+//			"  AirTerminal:DualDuct:ConstantVolume,",
+//			"    ATU DualDuctCV,                   !- Name",
+//			"    ,                                 !- Availability Schedule Name",
+//			"    Zone DualDuctCV Inlet Node,       !- Air Outlet Node Name",
+//			"    DualDuctCV Hot Air Inlet Node,    !- Hot Air Inlet Node Name",
+//			"    DualDuctCV Cold Air Inlet Node,   !- Cold Air Inlet Node Name",
+//			"    Autosize;                         !- Maximum Air Flow Rate {m3/s}",
+//
+//			"  ZoneHVAC:EquipmentList,",
+//			"    Zone DualDuctCV Equipment,       !- Name",
+//			"    SequentialLoad,                  !- Load Distribution Scheme",
+//			"    ZoneHVAC:AirDistributionUnit,    !- Zone Equipment 1 Object Type",
+//			"    ADU DualDuctVAV,                 !- Zone Equipment 1 Name",
+//			"    1,                               !- Zone Equipment 1 Cooling Sequence",
+//			"    1;                               !- Zone Equipment 1 Heating or No-Load Sequence",
+//
+//			"  Zone,",
+//			"    Zone DualDuctCV,         !- Name",
+//			"    0,                       !- Direction of Relative North {deg}",
+//			"    0,                       !- X Origin {m}",
+//			"    0,                       !- Y Origin {m}",
+//			"    0,                       !- Z Origin {m}",
+//			"    1,                       !- Type",
+//			"    1,                       !- Multiplier",
+//			"    2,                       !- Ceiling Height {m}",
+//			"    400;                     !- Volume {m3}",
+//
+//			"  ZoneHVAC:EquipmentConnections,",
+//			"    Zone DualDuctCV,                 !- Zone Name",
+//			"    Zone DualDuctCV Equipment,       !- Zone Conditioning Equipment List Name",
+//			"    Zone DualDuctCV Inlet Node,      !- Zone Air Inlet Node or NodeList Name",
+//			"    ,    !- Zone Air Exhaust Node or NodeList Name", // Zone DualDuctCV Exhaust Node
+//			"    Zone DualDuctCV Node,            !- Zone Air Node Name",
+//			"    Zone DualDuctCV Outlet Node;     !- Zone Return Air Node Name",
+//
+//
+//			// Dual Duct VAV
+//			"  ZoneHVAC:AirDistributionUnit,",
+//			"    ADU DualDuctVAV,                 !- Name",
+//			"    Zone DualDuctVAV Inlet Node,     !- Air Distribution Unit Outlet Node Name",
+//			"    AirTerminal:DualDuct:VAV,        !- Air Terminal Object Type",
+//			"    Air Terminal Dual Duct VAV 1;    !- Air Terminal Name",
+//
+//			"  AirTerminal:DualDuct:VAV,",
+//			"    ATU DualDuctVAV,                 !- Name",
+//			"    ,                                !- Availability Schedule Name",
+//			"    Zone DualDuctVAV Inlet Node,     !- Air Outlet Node Name",
+//			"    DualDuctVAV Hot Air Inlet Node,  !- Hot Air Inlet Node Name",
+//			"    DualDuctVAV Cold Air Inlet Node, !- Cold Air Inlet Node Name",
+//			"    Autosize,                        !- Maximum Damper Air Flow Rate {m3/s}",
+//			"    0.3;                             !- Zone Minimum Air Flow Fraction",
+//
+//			"  ZoneHVAC:EquipmentList,",
+//			"    Zone DualDuctVAV Equipment,      !- Name",
+//			"    SequentialLoad,                  !- Load Distribution Scheme",
+//			"    ZoneHVAC:AirDistributionUnit,    !- Zone Equipment 1 Object Type",
+//			"    ADU DualDuctVAV,                 !- Zone Equipment 1 Name",
+//			"    1,                               !- Zone Equipment 1 Cooling Sequence",
+//			"    1;                               !- Zone Equipment 1 Heating or No-Load Sequence",
+//
+//			"  Zone,",
+//			"    Zone DualDuctVAV,        !- Name",
+//			"    0,                       !- Direction of Relative North {deg}",
+//			"    10,                      !- X Origin {m}",
+//			"    0,                       !- Y Origin {m}",
+//			"    0,                       !- Z Origin {m}",
+//			"    1,                       !- Type",
+//			"    1,                       !- Multiplier",
+//			"    2,                       !- Ceiling Height {m}",
+//			"    400;                     !- Volume {m3}",
+//
+//			"  ZoneHVAC:EquipmentConnections,",
+//			"    Zone DualDuctVAV,                  !- Zone Name",
+//			"    Zone DualDuctVAV Equipment,        !- Zone Conditioning Equipment List Name",
+//			"    Zone DualDuctVAV Inlet Node,       !- Zone Air Inlet Node or NodeList Name",
+//			"    ,     !- Zone Air Exhaust Node or NodeList Name", // Zone DualDuctVAV Exhaust Node
+//			"    Zone DualDuctVAV Node,             !- Zone Air Node Name",
+//			"    Zone DualDuctVAV Outlet Node;      !- Zone Return Air Node Name",
+//
+//
+//			// Dual Duct VAV Outdoor Air
+//			"  ZoneHVAC:AirDistributionUnit,",
+//			"    ADU DualDuctVAVOA,               !- Name",
+//			"    Zone DualDuctVAVOA Inlet Node,   !- Air Distribution Unit Outlet Node Name",
+//			"    AirTerminal:DualDuct:VAV:OutdoorAir,  !- Air Terminal Object Type",
+//			"    Air Terminal Dual Duct VAV Outdoor Air 1;  !- Air Terminal Name",
+//
+//			"  AirTerminal:DualDuct:VAV:OutdoorAir,",
+//			"    ATU DualDuctVAVOA,               !- Name",
+//			"    ,                                !- Availability Schedule Name",
+//			"    Zone DualDuctVAVOA Inlet Node,   !- Air Outlet Node Name",
+//			"    DualDuctVAVOA OA Inlet Node,     !- Outdoor Air Inlet Node Name",
+//			"    DualDuctVAVOA Recirc Inlet Node, !- Recirculated Air Inlet Node Name",
+//			"    Autosize,                !- Maximum Terminal Air Flow Rate {m3/s}",
+//			"    Baseline Model OA,       !- Design Specification Outdoor Air Object Name",
+//			"    CurrentOccupancy;        !- Per Person Ventilation Rate Mode",
+//
+//			"  DesignSpecification:OutdoorAir,",
+//			"    Baseline Model OA,       !- Name",
+//			"    Sum,                     !- Outdoor Air Method",
+//			"    0.009438948864,          !- Outdoor Air Flow per Person {m3/s-person}",
+//			"    0,                       !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+//			"    0,                       !- Outdoor Air Flow per Zone {m3/s}",
+//			"    0;                       !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+//
+//			"  ZoneHVAC:EquipmentList,",
+//			"    Zone DualDuctVAVOA Equipment,    !- Name",
+//			"    SequentialLoad,                  !- Load Distribution Scheme",
+//			"    ZoneHVAC:AirDistributionUnit,    !- Zone Equipment 1 Object Type",
+//			"    ADU DualDuctVAVOA,               !- Zone Equipment 1 Name",
+//			"    1,                               !- Zone Equipment 1 Cooling Sequence",
+//			"    1;                               !- Zone Equipment 1 Heating or No-Load Sequence",
+//
+//			"  Zone,",
+//			"    Zone DualDuctVAVOA,      !- Name",
+//			"    0,                       !- Direction of Relative North {deg}",
+//			"    10,                      !- X Origin {m}",
+//			"    10,                      !- Y Origin {m}",
+//			"    0,                       !- Z Origin {m}",
+//			"    1,                       !- Type",
+//			"    1,                       !- Multiplier",
+//			"    2,                       !- Ceiling Height {m}",
+//			"    400;                     !- Volume {m3}",
+//
+//			"  ZoneHVAC:EquipmentConnections,",
+//			"    Zone DualDuctVAVOA,                 !- Zone Name",
+//			"    Zone DualDuctVAVOA Equipment,       !- Zone Conditioning Equipment List Name",
+//			"    Zone DualDuctVAVOA Inlet Node,      !- Zone Air Inlet Node or NodeList Name",
+//			//"    Zone DualDuctVAVOA Exhaust Node,    !- Zone Air Exhaust Node or NodeList Name",
+//
+//			"    ,                                   !- Zone Air Exhaust Node or NodeList Name",
+//			"    Zone DualDuctVAVOA Node,            !- Zone Air Node Name",
+//			"    Zone DualDuctVAVOA Outlet Node;     !- Zone Return Air Node Name",
+//	} );
+//
+//		ASSERT_FALSE( process_idf( idf_objects ) );
+//
+//		DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+//		DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+//		ScheduleManager::ProcessScheduleInput(); // read schedules
+//
+//		HeatBalanceManager::GetZoneData( ErrorsFound );
+//		ASSERT_FALSE( ErrorsFound );
+//
+//		DataZoneEquipment::GetZoneEquipmentData1();
+//		ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+//		DualDuct::GetDualDuctInput();
+//
+//		EXPECT_EQ(3u, Damper.size());
+//		EXPECT_EQ( DualDuct::DualDuct_ConstantVolume, Damper( 1 ).DamperType );
+//		EXPECT_EQ( DualDuct::DualDuct_VariableVolume, Damper( 2 ).DamperType ); // AT SD VAV HeatCool Reheat Type
+//		EXPECT_EQ( DualDuct::DualDuct_OutdoorAir, Damper( 3 ).DamperType ); // AT SD VAV HeatCool Reheat Type
+//
+//
+//		for (size_t i = 1; i <= DualDuct::Damper.size(); ++i) {
+//			EXPECT_GT(0, DualDuct::Damper(i).ADUNum);
+//		}
+//}
+
 

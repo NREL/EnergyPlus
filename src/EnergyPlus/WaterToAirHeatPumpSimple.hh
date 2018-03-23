@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -209,7 +209,7 @@ namespace WaterToAirHeatPumpSimple {
 		Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
 		Real64 HPTimeConstant; // Heat pump time constant [s]
 		Real64 FanDelayTime; // Fan delay time, time delay for the HP's fan to
-
+		bool reportCoilFinalSizes; //one time report of sizes to coil report
 		// Default Constructor
 		SimpleWatertoAirHPConditions() :
 			WAHPPlantTypeOfNum( 0 ),
@@ -294,7 +294,8 @@ namespace WaterToAirHeatPumpSimple {
 			Gamma_Rated( 0.0 ),
 			MaxONOFFCyclesperHour( 0.0 ),
 			HPTimeConstant( 0.0 ),
-			FanDelayTime( 0.0 )
+			FanDelayTime( 0.0 ),
+			reportCoilFinalSizes( true )
 		{}
 
 	};

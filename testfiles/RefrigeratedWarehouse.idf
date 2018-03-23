@@ -297,7 +297,7 @@
 
   Site:GroundTemperature:BuildingSurface,5.79,3.71,3.25,3.88,7.01,10.37,13.46,15.61,16.11,14.89,12.22,8.95;
 
- ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6캜
+ ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -329,7 +329,7 @@
 
  ! CHICAGO Annual Cooling Design Conditions Wind Speed=5.3m/s Wind Dir=230
  ! Hottest Month=JUL
- ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=23.8캜
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=23.8째C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -1029,7 +1029,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:20,1,           !- Field 6
     Until: 22:00,0,          !- Field 8
@@ -1041,7 +1041,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:30,1,           !- Field 6
     Until: 22:00,0,          !- Field 8
@@ -1053,7 +1053,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:20,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1065,7 +1065,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:30,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1077,7 +1077,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:20,1,           !- Field 6
     Until: 7:00,0,           !- Field 8
@@ -1089,7 +1089,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:30,1,           !- Field 6
     Until: 7:00,0,           !- Field 8
@@ -1101,7 +1101,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:20,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1113,7 +1113,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:30,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1125,7 +1125,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:20,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1137,7 +1137,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:30,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1149,7 +1149,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:20,0,           !- Field 4
     Until: 5:40,1,           !- Field 6
     Until: 22:30,0,          !- Field 8
@@ -1161,7 +1161,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:20,0,           !- Field 4
     Until: 5:50,1,           !- Field 6
     Until: 22:30,0,          !- Field 8
@@ -1173,7 +1173,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:20,0,           !- Field 4
     Until: 6:50,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1185,7 +1185,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:20,0,           !- Field 4
     Until: 7:00,1,           !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -1197,7 +1197,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:20,0,           !- Field 4
     Until: 0:40,1,           !- Field 6
     Until: 7:40,0,           !- Field 8
@@ -1209,7 +1209,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:20,0,           !- Field 4
     Until: 0:50,1,           !- Field 6
     Until: 7:40,0,           !- Field 8
@@ -1221,7 +1221,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:20,0,           !- Field 4
     Until: 1:40,1,           !- Field 6
     Until: 8:40,0,           !- Field 8
@@ -1233,7 +1233,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:20,0,           !- Field 4
     Until: 1:50,1,           !- Field 6
     Until: 8:40,0,           !- Field 8
@@ -1245,7 +1245,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:40,1,           !- Field 6
     Until: 9:40,0,           !- Field 8
@@ -1257,7 +1257,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:50,1,           !- Field 6
     Until: 9:40,0,           !- Field 8
@@ -1269,7 +1269,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:30,1,           !- Field 6
     Until: 10:00,0,          !- Field 8
@@ -1285,7 +1285,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:00,0,           !- Field 4
     Until: 5:40,1,           !- Field 6
     Until: 10:00,0,          !- Field 8
@@ -1301,7 +1301,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:30,1,           !- Field 6
     Until: 11:00,0,          !- Field 8
@@ -1317,7 +1317,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 6:00,0,           !- Field 4
     Until: 6:40,1,           !- Field 6
     Until: 11:00,0,          !- Field 8
@@ -1333,7 +1333,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:30,1,           !- Field 6
     Until: 7:01,0,           !- Field 8
@@ -1349,7 +1349,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 0:01,0,           !- Field 4
     Until: 0:40,1,           !- Field 6
     Until: 7:01,0,           !- Field 8
@@ -1365,7 +1365,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:30,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1381,7 +1381,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:00,0,           !- Field 4
     Until: 1:40,1,           !- Field 6
     Until: 8:00,0,           !- Field 8
@@ -1397,7 +1397,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:30,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1413,7 +1413,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:00,0,           !- Field 4
     Until: 2:40,1,           !- Field 6
     Until: 9:00,0,           !- Field 8
@@ -1429,7 +1429,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:30,0,           !- Field 4
     Until: 6:00,1,           !- Field 6
     Until: 10:30,0,          !- Field 8
@@ -1445,7 +1445,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 5:30,0,           !- Field 4
     Until: 6:10,1,           !- Field 6
     Until: 10:30,0,          !- Field 8
@@ -1461,7 +1461,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:30,0,           !- Field 4
     Until: 2:00,1,           !- Field 6
     Until: 4:30,0,           !- Field 8
@@ -1483,7 +1483,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 1:30,0,           !- Field 4
     Until: 2:10,1,           !- Field 6
     Until: 4:30,0,           !- Field 8
@@ -1505,7 +1505,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 2:50,1,           !- Field 6
     Until: 5:20,0,           !- Field 8
@@ -1529,7 +1529,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 2:20,0,           !- Field 4
     Until: 3:00,1,           !- Field 6
     Until: 5:20,0,           !- Field 8
@@ -1552,7 +1552,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 3:30,0,           !- Field 4
     Until: 4:00,1,           !- Field 6
     Until: 6:30,0,           !- Field 8
@@ -1574,7 +1574,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 3:30,0,           !- Field 4
     Until: 4:10,1,           !- Field 6
     Until: 6:30,0,           !- Field 8
@@ -6287,6 +6287,8 @@
     ,                        !- Maximum Value of X4
     ,                        !- Minimum Value of X5
     ,                        !- Maximum Value of X5
+    ,                        !- Minimum Value of X6
+    ,                        !- Maximum Value of X6
     0.35,                    !- Minimum Table Output
     1.5,                     !- Maximum Table Output
     Temperature,             !- Input Unit Type for X1
@@ -6294,6 +6296,7 @@
     Dimensionless,           !- Input Unit Type for X3
     ,                        !- Input Unit Type for X4
     ,                        !- Input Unit Type for X5
+    ,                        !- Input Unit Type for X6
     Dimensionless,           !- Output Unit Type
     3,                       !- Number of Independent Variables
     18,                      !- Number of Values for Independent Variable X1
@@ -9921,11 +9924,11 @@
 !Detailed Compressor: Bitzer OSNA7461-K,  Cooling capacity 55 kW
 !  Power input 39 kW , COP/EER 1.4
 !  Operating mode ECO , Mass flow LP 150 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) -19.25 캜, Mass flow ECO 193 kg/h
-!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 캜
-!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m�/h, Oil cooler outlet 48.7 캜
+!  Liquid temp. (sc) -19.25 째C, Mass flow ECO 193 kg/h
+!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 째C
+!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m째/h, Oil cooler outlet 48.7 째C
 !  Oil cooler load 29.8 kW , Necces. driving motor 75.0 kW
-!  DG w/o cooling 292 캜
+!  DG w/o cooling 292 째C
 !Detailed Compressor: Bitzer OSNA7461-K,   !cooling capacity = 79 KW, power input 73 kW at Tevap = -33C Tcond = 45C
 
   Refrigeration:Compressor,
@@ -9962,11 +9965,11 @@
 !Detailed Compressor: Bitzer OSKA8561-K,  Cooling capacity 295 kW
 !  Power input 90.2 kW , COP/EER 3.27
 !  Operating mode ECO , Mass flow LP 876 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) 12.32 캜, Mass flow ECO 124.8 kg/h
-!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 캜
-!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m�/h, Oil cooler outlet 41.9 캜
+!  Liquid temp. (sc) 12.32 째C, Mass flow ECO 124.8 kg/h
+!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 째C
+!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m째/h, Oil cooler outlet 41.9 째C
 !  Oil cooler load 55.4 kW , Necces. driving motor 110.0 kW
-!  DG w/o cooling 153.9 캜
+!  DG w/o cooling 153.9 째C
 
   Refrigeration:Compressor,
     MedTemp001Bitzer_OSKA8561_K,  !- Name
@@ -10324,14 +10327,14 @@
 
 ! For Dock compressors:Compressor model OSKA8591_K
 ! Input Values: Refrigerant R717 [NH3], Reference temperature Dew point temp.
-!               Evaporating SST 0캜, Condensing SDT 45캜, Operating mode Standard
-!               Liquid subcooling 0K, Discharge gas temp. 80캜
+!               Evaporating SST 0째C, Condensing SDT 45째C, Operating mode Standard
+!               Liquid subcooling 0K, Discharge gas temp. 80째C
 !               Suct. gas superheat 5K, Useful superheat 100%, Speed 2900 /min, Capacity Control 100%
 ! Output:       Cooling capacity 476 kW, Power input 127.6 kW, Condensing capacity 532 kW
 !               COP/EER 3.73, Mass flow LP 1616 kg/h, Mass flow HP 1616 kg/h
-!               Operating mode Standard, Liquid temp. 45.0 캜
-!               Oil volume flow 3.23 m�/h, Oil cooler outlet 33.7 캜, Oil cooler load 71.6 kW
-!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 캜
+!               Operating mode Standard, Liquid temp. 45.0 째C
+!               Oil volume flow 3.23 m째/h, Oil cooler outlet 33.7 째C, Oil cooler load 71.6 kW
+!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 째C
 !Detailed Compressor: Bitzer OSKA8591_K,   !nominal cooling capacity = 476 KW, !nominal power input 127.6 kW
 
   Refrigeration:Compressor,
@@ -10797,11 +10800,11 @@
 !Detailed Compressor: Bitzer OSKA8561-K,  Cooling capacity 295 kW
 !  Power input 90.2 kW , COP/EER 3.27
 !  Operating mode ECO , Mass flow LP 876 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) 12.32 캜, Mass flow ECO 124.8 kg/h
-!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 캜
-!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m�/h, Oil cooler outlet 41.9 캜
+!  Liquid temp. (sc) 12.32 째C, Mass flow ECO 124.8 kg/h
+!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 째C
+!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m째/h, Oil cooler outlet 41.9 째C
 !  Oil cooler load 55.4 kW , Necces. driving motor 110.0 kW
-!  DG w/o cooling 153.9 캜
+!  DG w/o cooling 153.9 째C
 ! Capacity Curve for Bitzer OSKA8561-K,   !nominal cooling capacity = 295 KW at -4C/45C conditions
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -10845,11 +10848,11 @@
 !Detailed Compressor: Bitzer OSNA7461-K,  Cooling capacity 55 kW
 !  Power input 39 kW , COP/EER 1.4
 !  Operating mode ECO , Mass flow LP 150 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) -19.25 캜, Mass flow ECO 193 kg/h
-!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 캜
-!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m�/h, Oil cooler outlet 48.7 캜
+!  Liquid temp. (sc) -19.25 째C, Mass flow ECO 193 kg/h
+!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 째C
+!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m째/h, Oil cooler outlet 48.7 째C
 !  Oil cooler load 29.8 kW , Necces. driving motor 75.0 kW
-!  DG w/o cooling 292 캜
+!  DG w/o cooling 292 째C
 ! Capacity Curve for Bitzer OSNA7461-K,   !nominal cooling capacity = 295 KW at -4C/45C conditions
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -10892,14 +10895,14 @@
 
 ! For Dock compressors:Compressor model OSKA8591_K
 ! Input Values: Refrigerant R717 [NH3], Reference temperature Dew point temp.
-!               Evaporating SST 0캜, Condensing SDT 45캜, Operating mode Standard
-!               Liquid subcooling 0K, Discharge gas temp. 80캜
+!               Evaporating SST 0째C, Condensing SDT 45째C, Operating mode Standard
+!               Liquid subcooling 0K, Discharge gas temp. 80째C
 !               Suct. gas superheat 5K, Useful superheat 100%, Speed 2900 /min, Capacity Control 100%
 ! Output:       Cooling capacity 476 kW, Power input 127.6 kW, Condensing capacity 532 kW
 !               COP/EER 3.73, Mass flow LP 1616 kg/h, Mass flow HP 1616 kg/h
-!               Operating mode Standard, Liquid temp. 45.0 캜
-!               Oil volume flow 3.23 m�/h, Oil cooler outlet 33.7 캜, Oil cooler load 71.6 kW
-!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 캜
+!               Operating mode Standard, Liquid temp. 45.0 째C
+!               Oil volume flow 3.23 m째/h, Oil cooler outlet 33.7 째C, Oil cooler load 71.6 kW
+!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 째C
 ! Capacity Curve for Bitzer OSKA8591-K,   !nominal cooling capacity = 476 KW
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 

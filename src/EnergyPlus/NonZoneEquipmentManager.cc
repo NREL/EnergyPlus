@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,7 +48,7 @@
 // EnergyPlus Headers
 #include <NonZoneEquipmentManager.hh>
 #include <DataGlobals.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <WaterThermalTanks.hh>
 #include <WaterUse.hh>
 
@@ -104,13 +104,8 @@ namespace NonZoneEquipmentManager {
 		// the NonZoneEquipmentManager, it does not yet have a list of non-zone equipment, so it must make
 		// one here before it knows what to call for simulation.
 
-		// METHODOLOGY EMPLOYED: na
-
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using DataGlobals::ZoneSizingCalc;
-		using InputProcessor::GetNumObjectsFound;
 		using WaterThermalTanks::SimulateWaterHeaterStandAlone;
 		using WaterUse::SimulateWaterUse;
 
@@ -124,7 +119,7 @@ namespace NonZoneEquipmentManager {
 
 		// FLOW:
 		if ( CountNonZoneEquip ) {
-			NumOfWaterHeater = GetNumObjectsFound( "WaterHeater:Mixed" ) + GetNumObjectsFound( "WaterHeater:Stratified" );
+			NumOfWaterHeater = inputProcessor->getNumObjectsFound( "WaterHeater:Mixed" ) + inputProcessor->getNumObjectsFound( "WaterHeater:Stratified" );
 			CountNonZoneEquip = false;
 		}
 

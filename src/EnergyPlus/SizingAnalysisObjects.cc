@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -654,7 +654,7 @@ namespace EnergyPlus {
 		}
 
 		if ( ! nullStampProblem ) {
-			if ( ! changedByDemand && ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )) { //Trane: bug fix #5665
+			if ( ! changedByDemand && ! CheckTimeStampForNull( newFoundMassFlowRateTimeStamp )) { // bug fix #5665
 				if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
 				}
@@ -664,7 +664,7 @@ namespace EnergyPlus {
 					newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
 				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
-			} else if ( changedByDemand && ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) {    //Trane: bug fix #5665
+			} else if ( changedByDemand && ! CheckTimeStampForNull( NewFoundMaxDemandTimeStamp ) ) { //bug fix #5665
 				if ( NewFoundMaxDemandTimeStamp.envrnNum > 0 ) { // protect against invalid index
 					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title );
 				}

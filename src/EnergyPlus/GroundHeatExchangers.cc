@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,7 +72,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -2271,9 +2271,6 @@ namespace GroundHeatExchangers {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using General::TrimSigDigits;
@@ -2283,12 +2280,12 @@ namespace GroundHeatExchangers {
 
 		//GET NUMBER OF ALL EQUIPMENT TYPES
 
-		numVerticalGLHEs = GetNumObjectsFound( "GroundHeatExchanger:System" );
-		numSlinkyGLHEs = GetNumObjectsFound( "GroundHeatExchanger:Slinky" );
-		numVertArray = GetNumObjectsFound ( "GroundHeatExchanger:Vertical:Array" );
-		numVertProps = GetNumObjectsFound ( "GroundHeatExchanger:Vertical:Properties" );
-		numResponseFactors = GetNumObjectsFound( "GroundHeatExchanger:ResponseFactors" );
-		numSingleBorehole = GetNumObjectsFound ( "GroundHeatExchanger:Vertical:Single" );
+		numVerticalGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:System" );
+		numSlinkyGLHEs = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:Slinky" );
+		numVertArray = inputProcessor->getNumObjectsFound ( "GroundHeatExchanger:Vertical:Array" );
+		numVertProps = inputProcessor->getNumObjectsFound ( "GroundHeatExchanger:Vertical:Properties" );
+		numResponseFactors = inputProcessor->getNumObjectsFound( "GroundHeatExchanger:ResponseFactors" );
+		numSingleBorehole = inputProcessor->getNumObjectsFound ( "GroundHeatExchanger:Vertical:Single" );
 
 		if ( numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0 ) {
 			ShowSevereError( "Error processing inputs for GLHE objects" );
@@ -2310,7 +2307,7 @@ namespace GroundHeatExchangers {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, propNum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, propNum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
@@ -2372,7 +2369,7 @@ namespace GroundHeatExchangers {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, rfNum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, rfNum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
@@ -2447,7 +2444,7 @@ namespace GroundHeatExchangers {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, arrayNum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, arrayNum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
@@ -2492,7 +2489,7 @@ namespace GroundHeatExchangers {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, bhNum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, bhNum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
@@ -2537,7 +2534,7 @@ namespace GroundHeatExchangers {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, GLHENum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, GLHENum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
@@ -2609,7 +2606,7 @@ namespace GroundHeatExchangers {
 					// Calculate response factors from individual boreholes
 					std::vector < std::shared_ptr < GLHEVertSingleStruct > > tempVectOfBHObjects;
 
-					for ( int index = 8; index < DataIPShortCuts::cAlphaArgs.u1(); ++index ) {
+					for ( int index = 8; index <= DataIPShortCuts::cAlphaArgs.u1(); ++index ) {
 						if ( !DataIPShortCuts::lAlphaFieldBlanks( index ) ) {
 							std::shared_ptr < GLHEVertSingleStruct > tempBHptr = GetSingleBH( DataIPShortCuts::cAlphaArgs( index ) );
 							if ( tempBHptr ) {
@@ -2720,7 +2717,7 @@ namespace GroundHeatExchangers {
 				int numNumbers;
 
 				// get the input data and store it in the Shortcuts structures
-				InputProcessor::GetObjectItem( DataIPShortCuts::cCurrentModuleObject, GLHENum,
+				inputProcessor->getObjectItem( DataIPShortCuts::cCurrentModuleObject, GLHENum,
 											   DataIPShortCuts::cAlphaArgs, numAlphas, DataIPShortCuts::rNumericArgs,
 											   numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
 											   DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
@@ -2771,9 +2768,9 @@ namespace GroundHeatExchangers {
 				thisGLHE.pipe.outDia = DataIPShortCuts::rNumericArgs( 8 );
 				thisGLHE.pipe.thickness = DataIPShortCuts::rNumericArgs( 9 );
 
-				if ( SameString( DataIPShortCuts::cAlphaArgs( 4 ), "VERTICAL" ) ) {
+				if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 4 ), "VERTICAL" ) ) {
 					thisGLHE.verticalConfig = true;
-				} else if ( SameString( DataIPShortCuts::cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
+				} else if ( UtilityRoutines::SameString( DataIPShortCuts::cAlphaArgs( 4 ), "HORIZONTAL" ) ) {
 					thisGLHE.verticalConfig = false;
 				}
 
@@ -3348,7 +3345,7 @@ namespace GroundHeatExchangers {
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_GrndHtExchgSystem;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 
 		// Locals
@@ -3456,7 +3453,7 @@ namespace GroundHeatExchangers {
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_GrndHtExchgSlinky;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 		using namespace GroundTemperatureManager;
 

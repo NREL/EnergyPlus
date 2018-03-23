@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,7 +73,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <PlantUtilities.hh>
@@ -183,29 +183,12 @@ namespace SteamBaseboardRadiator {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine simulates the steam baseboards or radiators.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 		using DataZoneEnergyDemands::CurDeadBandOrSetback;
 		using PlantUtilities::SetComponentFlowRate;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int BaseboardNum; // index of unit in baseboard array
@@ -222,7 +205,7 @@ namespace SteamBaseboardRadiator {
 
 		// Find the correct Baseboard Equipment
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( EquipName, SteamBaseboard, &SteamBaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( EquipName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "SimSteamBaseboard: Unit not found=" + EquipName );
 			}
@@ -308,11 +291,6 @@ namespace SteamBaseboardRadiator {
 		// HWBaseboardRadiator module
 
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::SameString;
-		using InputProcessor::VerifyName;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
 		using DataSurfaces::Surface;
@@ -325,10 +303,6 @@ namespace SteamBaseboardRadiator {
 		using namespace DataIPShortCuts;
 		using namespace DataSizing;
 		using ReportSizingManager::ReportSizingOutput;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSteamBaseboardInput:" );
@@ -343,12 +317,6 @@ namespace SteamBaseboardRadiator {
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AllFracsSummed; // Sum of the fractions radiant
 		int BaseboardNum; // Baseboard number
@@ -357,13 +325,10 @@ namespace SteamBaseboardRadiator {
 		int SurfNum; // Surface number Do loop counter
 		int IOStat;
 		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
-		bool errFlag;
 		bool SteamMessageNeeded;
 
 		SteamMessageNeeded = true;
-		NumSteamBaseboards = GetNumObjectsFound( cCMO_BBRadiator_Steam );
+		NumSteamBaseboards = inputProcessor->getNumObjectsFound( cCMO_BBRadiator_Steam );
 
 		// Count total number of baseboard units
 
@@ -374,23 +339,13 @@ namespace SteamBaseboardRadiator {
 		// Get the data from the user input related to baseboard heaters
 		for ( BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum ) {
 
-			GetObjectItem( cCMO_BBRadiator_Steam, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
+			inputProcessor->getObjectItem( cCMO_BBRadiator_Steam, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCMO_BBRadiator_Steam, ErrorsFound);
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames.allocate( NumNumbers );
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames = "";
 			SteamBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SteamBaseboard, &SteamBaseboardParams::EquipID, BaseboardNum, IsNotOK, IsBlank, cCMO_BBRadiator_Steam + " Name" );
-
-			if ( IsNotOK ) {
-				ErrorsFound = true;
-			}
-			VerifyUniqueBaseboardName( cCMO_BBRadiator_Steam, cAlphaArgs( 1 ), errFlag, cCMO_BBRadiator_Steam + " Name" );
-			if ( errFlag ) {
-				ErrorsFound = true;
-			}
+			VerifyUniqueBaseboardName( cCMO_BBRadiator_Steam, cAlphaArgs( 1 ), ErrorsFound, cCMO_BBRadiator_Steam + " Name" );
 
 			SteamBaseboard( BaseboardNum ).EquipID = cAlphaArgs( 1 ); // Name of the baseboard
 			SteamBaseboard( BaseboardNum ).EquipType = TypeOf_Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
@@ -415,7 +370,7 @@ namespace SteamBaseboardRadiator {
 			TestCompSet( cCMO_BBRadiator_Steam, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Hot Steam Nodes" );
 
 			// Determine steam baseboard radiator system heating design capacity sizing method
-			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 				SteamBaseboard( BaseboardNum ).HeatingCapMethod = HeatingDesignCapacity;
 
 				if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
@@ -431,7 +386,7 @@ namespace SteamBaseboardRadiator {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 				SteamBaseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
 				if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 					SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
@@ -452,7 +407,7 @@ namespace SteamBaseboardRadiator {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				SteamBaseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
@@ -552,7 +507,7 @@ namespace SteamBaseboardRadiator {
 			AllFracsSummed = SteamBaseboard( BaseboardNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= SteamBaseboard( BaseboardNum ).TotSurfToDistrib; ++SurfNum ) {
 				SteamBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 5 );
-				SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface );
+				SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = UtilityRoutines::FindItemInList( cAlphaArgs( SurfNum + 5 ), Surface );
 				SteamBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 8 );
 				if ( SteamBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 5 ) + "=\"" + cAlphaArgs( SurfNum + 5 ) + "\" invalid - not found." );
@@ -661,7 +616,7 @@ namespace SteamBaseboardRadiator {
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatDensityRefrig;
 		using PlantUtilities::InitComponentNodes;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -868,7 +823,7 @@ namespace SteamBaseboardRadiator {
 		if ( PltSizSteamNum > 0 ) {
 
 			DataScalableCapSizingON = false;
-			
+
 			if ( CurZoneEqNum > 0 ) {
 
 				if ( SteamBaseboard( BaseboardNum ).SteamVolFlowRateMax == AutoSize ) {
@@ -1467,22 +1422,8 @@ namespace SteamBaseboardRadiator {
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;
-		using InputProcessor::FindItemInList;
 		using General::TrimSigDigits;
 		using DataGlobals::KickOffSimulation;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1490,7 +1431,7 @@ namespace SteamBaseboardRadiator {
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
-			BaseboardNum = FindItemInList( BaseboardName, SteamBaseboard, &SteamBaseboardParams::EquipID );
+			BaseboardNum = UtilityRoutines::FindItemInList( BaseboardName, SteamBaseboard, &SteamBaseboardParams::EquipID );
 			if ( BaseboardNum == 0 ) {
 				ShowFatalError( "UpdateSteamBaseboardPlantConnection: Specified baseboard not valid =" + BaseboardName );
 			}

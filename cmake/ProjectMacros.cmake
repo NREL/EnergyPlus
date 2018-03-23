@@ -9,7 +9,7 @@ macro(ADD_GOOGLE_TESTS executable)
       string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
       foreach(hit ${found_tests})
         string(REGEX REPLACE ".*\\(( )*([A-Za-z_0-9]+)( )*,( )*([A-Za-z_0-9]+)( )*\\).*" "\\2.\\5" test_name ${hit})
-        add_test(NAME ${test_name} 
+        add_test(NAME ${test_name}
                  COMMAND "${executable}" "--gtest_filter=${test_name}")
       endforeach(hit)
     endif()
@@ -46,7 +46,7 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
     endif()
 
     CREATE_SRC_GROUPS( "${SRC}" )
-    
+
     get_target_property(BASE_NAME_TYPE ${BASE_NAME} TYPE)
     if ("${BASE_NAME_TYPE}" STREQUAL "EXECUTABLE")
       # don't link base name
@@ -55,20 +55,20 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
       # also link base name
       set(ALL_DEPENDENCIES ${BASE_NAME} ${DEPENDENCIES} )
     endif()
-      
-    target_link_libraries( ${BASE_NAME}_tests 
-      ${ALL_DEPENDENCIES} 
-      gtest 
+
+    target_link_libraries( ${BASE_NAME}_tests
+      ${ALL_DEPENDENCIES}
+      gtest
     )
 
     ADD_GOOGLE_TESTS( ${BASE_NAME}_tests ${SRC} )
   endif()
 endmacro()
 
-# Named arguments 
+# Named arguments
 # IDF_FILE <filename> IDF input file
 # EPW_FILE <filename> EPW weather file
-# 
+#
 # Optional Arguments
 # DESIGN_DAY_ONLY force design day simulation
 # ANNUAL_SIMULATION force annual simulation
@@ -97,7 +97,7 @@ function( ADD_SIMULATION_TEST )
   else()
    set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D -r" )
   endif()
-  
+
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
 
   if ( PROFILE_GENERATE AND IDF_NAME MATCHES "^(ChilledWaterStorage-Mixed|AirflowNetwork3zVent|AirflowNetwork3zVentAutoWPC|DElightCFSWindow|PipeHeatTransfer_Outair|RadHiTempElecTermReheat|RadLoTempCFloTermReheat|RadLoTempHydrMulti10|RefBldgSmallOfficeNew2004_Chicago|WindowTestsSimple|.*CentralChillerHeaterSystem.*|EMSCustomOutputVariable|EMSTestMathAndKill)$")
@@ -131,7 +131,7 @@ function( ADD_SIMULATION_TEST )
     -DRUN_CALLGRIND:BOOL=${RUN_CALLGRIND}
     -DVALGRIND=${VALGRIND}
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
-  )  
+  )
 
   # MSVC's profile generator does not work with parallel runs
   #if( MSVC AND PROFILE_GENERATE )
@@ -210,18 +210,12 @@ function(fixup_executable EXECUTABLE_PATH )
   endforeach()
 endfunction()
 
-# On Mac and linux this function copies in dependencies of target
-# On windows it just installs the target
-function(install_and_fixup_exe_target TARGET_NAME INSTALL_PATH)
-  install( TARGETS ${TARGET_NAME} DESTINATION ${INSTALL_PATH} )
-  #Warning this is only ok because we are counting on static linked executables on windows.
-  if(NOT WIN32)
-    if(NOT EXISTS "/etc/redhat-release")
-      install(CODE "
-        include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
-        fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
-      ")
-    endif()
-  endif()
+# On dynamic exes, this function copies in dependencies of the target
+function(install_target_prereqs TARGET_NAME INSTALL_PATH)
+  install(CODE "
+    include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
+    fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
+  ")
 endfunction()
+
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -313,13 +313,13 @@ namespace EnergyPlus {
 			"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 
 		// Set Parameters for Evap Cooler on Main Air Loop System
 		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp( 1 ).Name = EvapCond( EvapCoolNum ).EvapCoolerName;
-		EvapCond( EvapCoolNum ).VolFlowRate = DataSizing::AutoSize;
+		EvapCond( EvapCoolNum ).DesVolFlowRate = DataSizing::AutoSize;
 		EvapCond( EvapCoolNum ).IndirectVolFlowRate = DataSizing::AutoSize;
 		FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
 		FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
@@ -328,12 +328,12 @@ namespace EnergyPlus {
 
 		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
 		SizeEvapCooler( EvapCoolNum );
-		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).DesVolFlowRate );
 		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 
 		// Set Parameters for Evap Cooler on OA System
 		EvapCond( EvapCoolNum ).EvapCoolerName = "EvapCool On OA System",
-		EvapCond( EvapCoolNum ).VolFlowRate = DataSizing::AutoSize;
+		EvapCond( EvapCoolNum ).DesVolFlowRate = DataSizing::AutoSize;
 		EvapCond( EvapCoolNum ).IndirectVolFlowRate = DataSizing::AutoSize;
 		FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.0;
 		FinalSysSizing( CurSysNum ).DesOutAirVolFlow = 0.2;
@@ -343,7 +343,7 @@ namespace EnergyPlus {
 
 		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on OA System
 		SizeEvapCooler( EvapCoolNum );
-		EXPECT_EQ( 0.5, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( 0.5, EvapCond( EvapCoolNum ).DesVolFlowRate );
 		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 
 		EvapCond.deallocate();
@@ -395,11 +395,11 @@ namespace EnergyPlus {
 		"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 		// check autosized input fields from idf snippet read
-		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).DesVolFlowRate );
 		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).RecircPumpPower );
 
 		PrimaryAirSystem( CurSysNum ).Branch( 1 ).Comp( 1 ).Name = EvapCond( EvapCoolNum ).EvapCoolerName;
@@ -409,7 +409,7 @@ namespace EnergyPlus {
 
 		// Test Direct Evaporative Cooler Primary Air Design Flow Rate sizing
 		SizeEvapCooler( 1 );
-		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).DesVolFlowRate );
 
 		EXPECT_EQ( RecirWaterPumpDesignPower, EvapCond( EvapCoolNum ).RecircPumpPower );
 
@@ -640,7 +640,7 @@ namespace EnergyPlus {
 
 		// set up the structure to size the flow rates for an RDDSpecial
 		thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
-		thisEvapCooler.VolFlowRate = DataSizing::AutoSize;
+		thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
 		thisEvapCooler.PadArea = 0.0;
 		thisEvapCooler.PadDepth = 0.0;
 		thisEvapCooler.IndirectPadArea = 0.0;
@@ -651,11 +651,11 @@ namespace EnergyPlus {
 		// make the call for sizing the flow rates
 		EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
 		EXPECT_NEAR(0.3, thisEvapCooler.IndirectVolFlowRate, 0.0001);
-		EXPECT_NEAR(1.0, thisEvapCooler.VolFlowRate, 0.0001);
+		EXPECT_NEAR(1.0, thisEvapCooler.DesVolFlowRate, 0.0001);
 
 		// now let's try to size some of the pad properties
 		thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerDirectCELDEKPAD;
-		thisEvapCooler.VolFlowRate = 1.0;
+		thisEvapCooler.DesVolFlowRate = 1.0;
 		thisEvapCooler.PadArea = DataSizing::AutoSize;
 		thisEvapCooler.PadDepth = DataSizing::AutoSize;
 		thisEvapCooler.IndirectPadArea = 0.0;
@@ -672,7 +672,7 @@ namespace EnergyPlus {
 
 		// set up the structure to size the flow rates for an indirect celdekpad
 		thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectCELDEKPAD;
-		thisEvapCooler.VolFlowRate = DataSizing::AutoSize;
+		thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
 		thisEvapCooler.PadArea = 0.0;
 		thisEvapCooler.PadDepth = 0.0;
 		thisEvapCooler.IndirectPadArea = 0.0;
@@ -683,7 +683,7 @@ namespace EnergyPlus {
 		// make the call for sizing the flow rates
 		EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
 		EXPECT_NEAR(0.5, thisEvapCooler.IndirectVolFlowRate, 0.0001);
-		EXPECT_NEAR(0.5, thisEvapCooler.VolFlowRate, 0.0001);
+		EXPECT_NEAR(0.5, thisEvapCooler.DesVolFlowRate, 0.0001);
 
 		// clean up
 		EvaporativeCoolers::EvapCond.deallocate();
@@ -750,12 +750,12 @@ namespace EnergyPlus {
 			"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 
 		// check blank autosizable input fields default to autosize
-		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).DesVolFlowRate );
 		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectFanPower );
 		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
@@ -769,7 +769,7 @@ namespace EnergyPlus {
 
 		// Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
 		SizeEvapCooler( EvapCoolNum );
-		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).DesVolFlowRate );
 		EXPECT_EQ( SecondaryAirDesignFlow, EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 		// Test Secondary Fan Power and reciculating water pump power
 		SecondaryFanPower = SecondaryAirDesignFlow * EvapCond( EvapCoolNum ).FanSizingSpecificPower;
@@ -827,11 +827,11 @@ namespace EnergyPlus {
 			"	3;                   !- Blowdown Concentration Ratio",
 		} );
 
-		ASSERT_FALSE( process_idf( idf_objects ) );
+		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		GetEvapInput();
 		// check blank autosizable input fields default to autosize
-		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).DesVolFlowRate );
 		EXPECT_EQ( DataSizing::AutoSize, EvapCond( EvapCoolNum ).RecircPumpPower );
 
 		// do local sizing calculations
@@ -842,7 +842,7 @@ namespace EnergyPlus {
 
 		// Test Direct Evaporative Cooler Primary Air Design Flow Rate sizing
 		SizeEvapCooler( 1 );
-		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).VolFlowRate );
+		EXPECT_EQ( PrimaryAirDesignFlow, EvapCond( EvapCoolNum ).DesVolFlowRate );
 		EXPECT_EQ( RecirWaterPumpDesignPower, EvapCond( EvapCoolNum ).RecircPumpPower );
 
 		EvapCond.deallocate();

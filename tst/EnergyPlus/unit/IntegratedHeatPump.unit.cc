@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1021,7 +1021,7 @@ namespace EnergyPlus {
 			"    ASIHP1,    				 !- Heating DX Coil Name",
 			"    CoilSystem:IntegratedHeatPump:AirSource,  !- Coolinng Coil Object Type",
 			"    ASIHP1,    				 !- Cooling DX Coil Name",
-			"    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type",
+			"    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type",
 			"    Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name",
 			"    50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}",
 			"    21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
@@ -1567,7 +1567,7 @@ namespace EnergyPlus {
 			"    1.0;                     !- Maximum Value of x",
 			} );
 
-			ASSERT_FALSE( process_idf( idf_objects ) );
+			ASSERT_TRUE( process_idf( idf_objects ) );
 
 			EXPECT_NO_THROW( GetIHPInput() );
 			compare_err_stream("");

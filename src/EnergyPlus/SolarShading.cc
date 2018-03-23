@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,7 +83,7 @@
 #include <DaylightingManager.hh>
 #include <DisplayRoutines.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
@@ -575,48 +575,34 @@ namespace SolarShading {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the Shadowing Calculation object.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::SameString;
 		using General::RoundSigDigits;
 		using namespace DataIPShortCuts;
+		using ScheduleManager::ScheduleFileShadingProcessed;
 		using DataSystemVariables::SutherlandHodgman;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 		using DataSystemVariables::UseScheduledSunlitFrac;
 		using DataSystemVariables::ReportExtShadingSunlitFrac;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
+		using DataSystemVariables::UseImportedSunlitFrac;
+		using DataSystemVariables::DisableGroupSelfShading;
+		using DataSystemVariables::DisableAllSelfShading;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt fmtA( "(A)" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumItems;
 		int NumNumbers;
 		int NumAlphas;
 		int IOStat;
+		int Found = 0;
 
 		rNumericArgs( {1,4} ) = 0.0; // so if nothing gotten, defaults will be maintained.
 		cAlphaArgs( 1 ) = "";
 		cAlphaArgs( 2 ) = "";
 		cCurrentModuleObject = "ShadowCalculation";
-		NumItems = GetNumObjectsFound( cCurrentModuleObject );
+		NumItems = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		NumAlphas = 0;
 		NumNumbers = 0;
 		if ( NumItems > 1 ) {
@@ -624,7 +610,7 @@ namespace SolarShading {
 		}
 
 		if ( NumItems != 0 ) {
-			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ShadowingCalcFrequency = rNumericArgs( 1 );
 		}
 
@@ -644,10 +630,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 1 ) {
-			if ( SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "AverageOverDaysInFrequency" ) ) {
 				DetailedSolarTimestepIntegration = false;
 				cAlphaArgs( 1 ) = "AverageOverDaysInFrequency";
-			} else if ( SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), "TimestepFrequency" ) ) {
 				DetailedSolarTimestepIntegration = true;
 				cAlphaArgs( 1 ) = "TimestepFrequency";
 			} else {
@@ -662,10 +648,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 2 ) {
-			if ( SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "SutherlandHodgman" ) ) {
 				SutherlandHodgman = true;
 				cAlphaArgs( 2 ) = "SutherlandHodgman";
-			} else if ( SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 2 ), "ConvexWeilerAtherton" ) ) {
 				SutherlandHodgman = false;
 				cAlphaArgs( 2 ) = "ConvexWeilerAtherton";
 			} else if ( lAlphaFieldBlanks( 2 ) ) {
@@ -691,10 +677,10 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 3 ) {
-			if ( SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "SimpleSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = false;
 				cAlphaArgs( 3 ) = "SimpleSkyDiffuseModeling";
-			} else if ( SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 3 ), "DetailedSkyDiffuseModeling" ) ) {
 				DetailedSkyDiffuseAlgorithm = true;
 				cAlphaArgs( 3 ) = "DetailedSkyDiffuseModeling";
 			} else if ( lAlphaFieldBlanks( 3 ) ) {
@@ -710,12 +696,22 @@ namespace SolarShading {
 		}
 
 		if ( NumAlphas >= 4 ) {
-			if ( SameString( cAlphaArgs( 4 ), "ScheduledShading" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "ScheduledShading" ) ) {
 				UseScheduledSunlitFrac = true;
 				cAlphaArgs( 4 ) = "ScheduledShading";
 			}
-			else if ( SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "ImportedShading" ) ) {
+				if ( ScheduleFileShadingProcessed ) {
+					UseImportedSunlitFrac = true;
+					cAlphaArgs( 4 ) = "ImportedShading";
+				} else {
+					ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 4 ) );
+					ShowContinueError( "Value entered=\"" + cAlphaArgs( 4 ) + "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used." );
+				}
+			}
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "InternalCalculation" ) ) {
 				UseScheduledSunlitFrac = false;
+				UseImportedSunlitFrac = false;
 				cAlphaArgs( 4 ) = "InternalCalculation";
 			}
 			else {
@@ -726,14 +722,15 @@ namespace SolarShading {
 		else {
 			cAlphaArgs( 4 ) = "InternalCalculation";
 			UseScheduledSunlitFrac = false;
+			UseImportedSunlitFrac = false;
 		}
 
 		if ( NumAlphas >= 5 ) {
-			if ( SameString( cAlphaArgs( 5 ), "Yes" ) ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "Yes" ) ) {
 				ReportExtShadingSunlitFrac = true;
 				cAlphaArgs( 5 ) = "Yes";
 			}
-			else if ( SameString( cAlphaArgs( 5 ), "No" ) ) {
+			else if ( UtilityRoutines::SameString( cAlphaArgs( 5 ), "No" ) ) {
 				ReportExtShadingSunlitFrac = false;
 				cAlphaArgs( 5 ) = "No";
 			}
@@ -745,6 +742,104 @@ namespace SolarShading {
 		else {
 			cAlphaArgs( 5 ) = "No";
 			ReportExtShadingSunlitFrac = false;
+		}
+		int ExtShadingSchedNum;
+		if ( UseImportedSunlitFrac ) {
+			for ( auto surf : Surface ) {
+			    ExtShadingSchedNum = ScheduleManager::GetScheduleIndex( surf.Name + "_shading" );
+				if ( ExtShadingSchedNum ) {
+					surf.SchedExternalShadingFrac = true;
+					surf.ExternalShadingSchInd = ExtShadingSchedNum;
+				}
+			}
+		}
+
+		bool DisableSelfShadingWithinGroup = false;
+		bool DisableSelfShadingBetweenGroup = false;
+
+		if ( NumAlphas >= 6 ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "Yes" ) ) {
+				DisableSelfShadingWithinGroup = true;
+				cAlphaArgs( 6 ) = "Yes";
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 6 ), "No" ) ) {
+				cAlphaArgs( 6 ) = "No";
+			} else {
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 6 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 6 ) + "\", all shading effects would be considered." );
+			}
+		} else {
+			cAlphaArgs( 6 ) = "No";
+		}
+
+		if ( NumAlphas >= 7 ) {
+			if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "Yes" ) ) {
+				DisableSelfShadingBetweenGroup = true;
+				cAlphaArgs( 7 ) = "Yes";
+			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "No" ) ) {
+				cAlphaArgs( 7 ) = "No";
+			} else {
+				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 7 ) );
+				ShowContinueError( "Value entered=\"" + cAlphaArgs( 7 ) + "\", all shading effects would be considered." );
+			}
+		} else {
+			cAlphaArgs( 7 ) = "No";
+		}
+
+		if ( DisableSelfShadingBetweenGroup && DisableSelfShadingWithinGroup ) {
+			DisableAllSelfShading = true;
+		} else if ( DisableSelfShadingBetweenGroup || DisableSelfShadingWithinGroup ) {
+			DisableGroupSelfShading = true;
+		}
+
+		int SurfZoneGroup, CurZoneGroup;
+		if ( DisableGroupSelfShading ) {
+			Array1D_int DisableSelfShadingGroups;
+			int NumOfShadingGroups;
+			if ( NumAlphas >= 8 ) {
+				// Read all shading groups
+				NumOfShadingGroups = NumAlphas - 7;
+				DisableSelfShadingGroups.allocate( NumOfShadingGroups );
+				for ( int i = 1; i <= NumOfShadingGroups; i++ ) {
+					Found = UtilityRoutines::FindItemInList( cAlphaArgs( i + 7 ), ZoneList, NumOfZoneLists );
+					if ( Found != 0 ) DisableSelfShadingGroups( i ) = Found;
+				}
+
+				for ( int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++ ) {
+					if ( Surface( SurfNum ).ExtBoundCond == 0 ) { // Loop through all exterior surfaces
+						SurfZoneGroup = 0;
+						// Check the shading zone group of each exterior surface
+						for ( int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++ ) { // Loop through all defined shading groups
+							CurZoneGroup = DisableSelfShadingGroups( ZoneGroupLoop );
+							for ( int ZoneNum = 1; ZoneNum <= ZoneList( CurZoneGroup ).NumOfZones; ZoneNum++ ) { // Loop through all zones in the zone list
+								if ( Surface( SurfNum ).Zone == ZoneList( CurZoneGroup ).Zone( ZoneNum ) ) {
+									SurfZoneGroup = CurZoneGroup;
+									break;
+								}
+							}
+						}
+						// if a surface is not in any zone group, no self shading is disabled for this surface
+						if ( SurfZoneGroup != 0 ) {
+							// if DisableSelfShadingWithinGroup, add all zones in the same zone group to the surface's disabled zone list
+							// if DisableSelfShadingBetweenGroups, add all zones in all other zone groups to the surface's disabled zone list
+							for ( int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++ ) { // Loop through all defined shading groups
+								CurZoneGroup = DisableSelfShadingGroups( ZoneGroupLoop );
+								if ( SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup ) {
+									for ( int ZoneNum = 1; ZoneNum <= ZoneList( CurZoneGroup ).NumOfZones; ZoneNum++ ) { // Loop through all zones in the zone list
+										Surface( SurfNum ).DisabledShadowingZoneList.push_back( ZoneList( CurZoneGroup ).Zone( ZoneNum ) ) ;
+									}
+								} else if ( SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup ) {
+									for ( int ZoneNum = 1; ZoneNum <= ZoneList( CurZoneGroup ).NumOfZones; ZoneNum++ ) {
+										Surface( SurfNum ).DisabledShadowingZoneList.push_back( ZoneList( CurZoneGroup ).Zone( ZoneNum ) ) ;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else {
+				ShowFatalError( "No Shading groups are defined when disabling grouped self shading." );
+			}
 		}
 
 		if ( ! DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
@@ -764,8 +859,8 @@ namespace SolarShading {
 			}
 		}
 
-		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm";
-		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + cAlphaArgs( 4 ) + ',' + cAlphaArgs( 5 );
+		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
+		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + cAlphaArgs( 4 ) + ',' + cAlphaArgs( 5 ) + ',' + cAlphaArgs( 6 ) + ',' + cAlphaArgs( 7 );
 
 	}
 
@@ -3748,7 +3843,7 @@ namespace SolarShading {
 			}
 			CosIncAng( iTimeStep, iHour, SurfNum ) = CTHETA( SurfNum );
 		}
-		
+
 		if ( UseScheduledSunlitFrac ) {
 			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( Surface( SurfNum ).SchedExternalShadingFrac ) {
@@ -3757,7 +3852,7 @@ namespace SolarShading {
 				else {
 					SunlitFrac( iTimeStep, iHour, SurfNum ) = 1.0;
 				}
-			} 
+			}
 		} else {
 			SHADOW( iHour, iTimeStep ); // Determine sunlit areas and solar multipliers for all surfaces.
 			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -4529,6 +4624,8 @@ namespace SolarShading {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using ScheduleManager::GetScheduleMinValue;
 		using ScheduleManager::GetScheduleName;
+		using DataSystemVariables::DisableAllSelfShading;
+		using DataSystemVariables::DisableGroupSelfShading;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4600,6 +4697,22 @@ namespace SolarShading {
 							if ( LookUpScheduleValue( surface.SchedShadowSurfIndex, iHour, TS ) == 1.0 ) continue;
 						}
 					}
+				}
+				// Elimate shawdowing surfaces that is supposed to be disabled.
+				if ( DisableAllSelfShading ) {
+					if ( surface.Zone != 0 ) {
+						continue; // Disable all shadowing surfaces in all zones. Attached shading surfaces are not part of a zone, zone value is 0.
+					}
+				} else if ( DisableGroupSelfShading ) {
+					std::vector< int > DisabledZones = Surface( CurSurf ).DisabledShadowingZoneList;
+					bool isDisabledShadowSurf = false;
+					for ( int i : DisabledZones ) {
+						if ( surface.Zone == i ) {
+							isDisabledShadowSurf = true;
+							break;
+						}
+					}
+					if ( isDisabledShadowSurf ) continue; // Disable all shadowing surfaces in all disabled zones.
 				}
 
 				//      IF ((.NOT.Surface(GSSNR)%HeatTransSurf) .AND. &
@@ -6258,7 +6371,7 @@ namespace SolarShading {
 					// from this exterior window since the beam-beam transmittance of shades and diffusing glass
 					// is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
 					// assumed to be zero.
-					
+
 					if ( SurfaceWindow( SurfNum ).WindowModelType != WindowBSDFModel )
 						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || SurfaceWindow( SurfNum ).SolarDiffusing || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser || Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) continue;
 
@@ -10104,31 +10217,17 @@ namespace SolarShading {
 		// 3. surface absorptances, reflectances, and transmittances
 		// determined here using revised code from SUBROUTINE InitIntSolarDistribution
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using General::InterpSw;
 		using General::InterpSlatAng;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using namespace DataViewFactorInformation;
-
 		using DataHeatBalSurface::InitialDifSolInAbs;
 		using DataHeatBalSurface::InitialDifSolInTrans;
 		using DataHeatBalance::InitialDifSolwinAbs;
 		using DataHeatBalance::InitialZoneDifSolReflW;
-
 		using WindowEquivalentLayer::CalcEQLOpticalProperty;
 		using namespace DataWindowEquivalentLayer;
-
-		// Locals
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // DO loop counter for zones
@@ -10717,30 +10816,15 @@ namespace SolarShading {
 		// 3. surface absorptances, reflectances, and transmittances
 		// determined here using revised code from SUBROUTINE InitIntSolarDistribution
 
-		// REFERENCES:
-
 		// Using/Aliasing
 		using General::InterpSw;
 		using General::InterpSlatAng;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using namespace DataViewFactorInformation;
-
 		using DataHeatBalSurface::InitialDifSolInAbs;
 		using DataHeatBalSurface::InitialDifSolInTrans;
 		using DataHeatBalance::InitialDifSolwinAbs;
 		using DataHeatBalance::InitialZoneDifSolReflW;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AdjZoneNum; // Index for adjacent zones
