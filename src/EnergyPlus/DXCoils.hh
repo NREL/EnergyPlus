@@ -514,6 +514,8 @@ namespace DXCoils {
 		Real64 ActualSC; // Actual subcooling degrees [C]
 		Real64 RateBFVRFIUEvap; // VRF Iutdoor Unit Evaporator Rated Bypass Factor
 		Real64 RateBFVRFIUCond; // VRF Iutdoor Unit Condenser Rated Bypass Factor
+		int CAPFTErrIndex; // index/pointer to recurring error structure for CAPFT curve value <= 0.0
+		int EIRFTErrIndex; // index/pointer to recurring error structure for EIRFT curve value <= 0.0
 		bool reportCoilFinalSizes; // one time report of sizes to coil selection report
 		Real64 capModFacTotal; // current coil capacity modification factor
 
@@ -756,6 +758,8 @@ namespace DXCoils {
 			ActualSC( 0.0 ),
 			RateBFVRFIUEvap( 0.0592 ),
 			RateBFVRFIUCond( 0.1360 ),
+			CAPFTErrIndex( 0 ),
+			EIRFTErrIndex( 0 ),
 			reportCoilFinalSizes( true ),
 			capModFacTotal( 0.0 )
 		{}

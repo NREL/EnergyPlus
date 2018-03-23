@@ -1468,7 +1468,7 @@ namespace LowTempRadiantSystem {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_LowTempRadiant_VarFlow;
 		using DataPlant::TypeOf_LowTempRadiant_ConstFlow;
@@ -1931,7 +1931,7 @@ namespace LowTempRadiantSystem {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHVACGlobals::CoolingCapacitySizing;

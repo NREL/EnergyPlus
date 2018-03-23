@@ -119,21 +119,24 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_ZoneCoupled_Basement( "Site:GroundDomain:Basement" );
 
 	// MODULE VARIABLE DECLARATIONS:
-	Array1D< Direction > NeighborFieldCells( 6 );
-	Array1D< Direction > NeighborBoundaryCells( 6 );
+	Array1D< Direction > NeighborFieldCells;
+	Array1D< Direction > NeighborBoundaryCells;
 	Array1D< FullDomainStructureInfo > PipingSystemDomains;
 	Array1D< PipeCircuitInfo > PipingSystemCircuits;
 	Array1D< PipeSegmentInfo > PipingSystemSegments;
 	std::unordered_map< std::string, std::string > GroundDomainUniqueNames;
+	bool GetInputFlag( true ); // First time, input is "gotten"
 
 	void
 	clear_state()
 	{
+		GetInputFlag = true;
 		PipingSystemDomains.deallocate();
 		PipingSystemCircuits.deallocate();
 		PipingSystemSegments.deallocate();
 		NeighborFieldCells.deallocate();
 		NeighborBoundaryCells.deallocate();
+		GroundDomainUniqueNames.clear();
 	}
 
 	void
@@ -182,7 +185,6 @@ namespace PlantPipingSystemsManager {
 		static std::string const RoutineName( "SimPipingSystems" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int CircuitNum;
 
 		// Read input if necessary
@@ -259,7 +261,6 @@ namespace PlantPipingSystemsManager {
 		static std::string const RoutineName( "InitAndSimGroundDomain" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		static bool WriteEIOFlag( true ); // Set to false once eio information is written
 
 		static gio::Fmt DomainCellsToEIOHeader( "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')" );
@@ -275,7 +276,12 @@ namespace PlantPipingSystemsManager {
 		}
 
 		for ( int DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
+
 			auto & thisDomain( PipingSystemDomains( DomainNum ) );
+
+			// if the domain contains a pipe circuit, it shouldn't be initialized here, it has its own entry point
+			if ( thisDomain.HasAPipeCircuit ) continue;
+
 			if ( thisDomain.DomainNeedsToBeMeshed ) {
 				thisDomain.developMesh();
 			}
@@ -486,6 +492,9 @@ namespace PlantPipingSystemsManager {
 		int TotalNumSegments;
 		int ThisCircuitPipeSegmentCounter;
 		std::string ThisSegmentName;
+
+		NeighborFieldCells.allocate(6);
+		NeighborBoundaryCells.allocate(6);
 
 		// Read number of objects and allocate main data structures - first domains
 		NumGeneralizedDomains = inputProcessor->getNumObjectsFound( ObjName_ug_GeneralDomain );
@@ -2057,7 +2066,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			bool errFlag = false;
-			DataPlant::ScanPlantLoopsForObject( thisCircuit.Name, TypeToLookFor, thisCircuit.LoopNum, thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum, _, _, _, _, _, errFlag );
+			PlantUtilities::ScanPlantLoopsForObject( thisCircuit.Name, TypeToLookFor, thisCircuit.LoopNum, thisCircuit.LoopSideNum, thisCircuit.BranchNum, thisCircuit.CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s)." );
 			}
@@ -3855,7 +3864,7 @@ namespace PlantPipingSystemsManager {
 						break;
 					case CellType::Unknown:
 						cellType = CellType::GeneralField;
-						// [[fallthrough]];
+						// fallthrough
 					default:
 						++TotNumCells;
 					}

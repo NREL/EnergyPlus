@@ -201,6 +201,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64 SaveCompressorPLR( 0.0 ); // Holds DX compressor PLR from active DX coil
 	Real64 TempSteamIn( 100.0 ); // steam coil steam inlet temperature
 	Array1D_bool CheckEquipName;
+	bool GetInputFlag( true ); // Flag set to make sure you get input once
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -208,6 +209,26 @@ namespace HVACUnitaryBypassVAV {
 	Array1D< CBVAVData > CBVAV;
 
 	// Functions
+
+	void
+	clear_state()
+	{
+		CBVAV.deallocate();
+		NumCBVAV = 0;
+		CompOnMassFlow = 0.0;
+		OACompOnMassFlow = 0.0;
+		CompOffMassFlow = 0.0;
+		OACompOffMassFlow = 0.0;
+		CompOnFlowRatio = 0.0;
+		CompOffFlowRatio = 0.0;
+		FanSpeedRatio = 0.0;
+		BypassDuctFlowFraction = 0.0;
+		PartLoadFrac = 0.0;
+		SaveCompressorPLR = 0.0;
+		TempSteamIn = 100.0;
+		CheckEquipName.deallocate();
+		GetInputFlag = true;
+	}
 
 	void
 	SimUnitaryBypassVAV(
@@ -250,7 +271,6 @@ namespace HVACUnitaryBypassVAV {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int CBVAVNum; // Index of CBVAV system being simulated
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		Real64 OnOffAirFlowRatio; // Ratio of compressor ON airflow to average airflow over timestep
 		Real64 QUnitOut; // Sensible capacity delivered by this air loop system
 		Real64 QZnLoad; // Zone load required by all zones served by this air loop system
@@ -472,8 +492,6 @@ namespace HVACUnitaryBypassVAV {
 		using NodeInputManager::GetOnlySingleNode;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipList;
-		using DataZoneEquipment::AirDistUnit_Num;
-		using DataZoneEquipment::DirectAir_Num;
 		using BranchNodeConnections::SetUpCompSets;
 		using BranchNodeConnections::TestCompSet;
 		using DataZoneControls::TempControlledZone;
@@ -531,7 +549,6 @@ namespace HVACUnitaryBypassVAV {
 		Array1D_string cNumericFields( 11 ); // Numeric field names
 		Array1D_bool lAlphaBlanks( 19 ); // Logical array, alpha field input BLANK = .TRUE.
 		Array1D_bool lNumericBlanks( 11 ); // Logical array, numeric field input BLANK = .TRUE.
-		static int EquipNum( 0 ); // local do loop index for equipment listed for a zone
 		int HeatCoilInletNodeNum; // Heating coil air inlet node number
 		int HeatCoilOutletNodeNum; // Heating coil air outlet node number
 		int SteamIndex; // steam coil index
@@ -1174,7 +1191,7 @@ namespace HVACUnitaryBypassVAV {
 							ShowContinueError( "This zone will not be controlled to a temperature setpoint." );
 						}
 						int zoneNum = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
-						int zoneInlet = CBVAV( CBVAVNum ).ControlledZoneNum( AirLoopZoneNum );
+						int zoneInlet = CBVAV( CBVAVNum ).CBVAVBoxOutletNode( AirLoopZoneNum );
 						int coolingPriority = 0;
 						int heatingPriority = 0;
 						//setup zone equipment sequence information based on finding matching air terminal
@@ -1191,15 +1208,6 @@ namespace HVACUnitaryBypassVAV {
 						ShowSevereError( "Controlled Zone node not found." );
 						ErrorsFound = true;
 					}
-					if ( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex > 0 ) {
-						for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
-							if ( ( ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).EquipType_Num( EquipNum ) == AirDistUnit_Num ) || ( ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).EquipType_Num( EquipNum ) == DirectAir_Num ) ) {
-								CBVAV( CBVAVNum ).ZoneSequenceCoolingNum( AirLoopZoneNum ) = ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).CoolingPriority( EquipNum );
-								CBVAV( CBVAVNum ).ZoneSequenceHeatingNum( AirLoopZoneNum ) = ZoneEquipList( ZoneEquipConfig( CBVAV( CBVAVNum ).ActualZoneNum( AirLoopZoneNum ) ).EquipListIndex ).HeatingPriority( EquipNum );
-							}
-						}
-					}
-
 				}
 			} else {
 			}
@@ -1281,7 +1289,7 @@ namespace HVACUnitaryBypassVAV {
 		using WaterCoils::GetCoilMaxWaterFlowRate;
 		using WaterCoils::SimulateWaterCoilComponents;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetDensityGlycol;

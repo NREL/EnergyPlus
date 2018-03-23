@@ -55,7 +55,7 @@
 #include <EnergyPlus.hh>
 #include <DataPlant.hh>
 #include <DataGlobals.hh>
-#include <PlantLocation.hh>
+#include <Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -157,21 +157,14 @@ namespace PlantComponentTemperatureSources {
 	void
 	InitWaterSource(
 		int const SourceNum, // number of the current component being simulated
-		bool const RunFlag, // TRUE when component operating
-		Real64 const MyLoad,
-		bool const FirstHVACIteration // initialize variables when TRUE
+		Real64 const MyLoad
 	);
 
 	void
 	SizeWaterSource( int const SourceNum );
 
 	void
-	CalcWaterSource(
-		int const SourceNum,
-		Real64 const MyLoad,
-		bool const RunFlag,
-		int const EquipFlowCtrl // Flow control mode for the equipment
-	);
+	CalcWaterSource( int const SourceNum );
 
 	void
 	UpdateWaterSource( int const SourceNum );

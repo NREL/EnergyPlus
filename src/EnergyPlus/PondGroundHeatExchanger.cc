@@ -400,7 +400,7 @@ namespace PondGroundHeatExchanger {
 		using DataEnvironment::GroundTemp_Deep;
 		using DataEnvironment::OutDryBulbTempAt;
 		using DataPlant::TypeOf_GrndHtExchgPond;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;

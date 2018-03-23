@@ -2312,13 +2312,11 @@ namespace RuntimeLanguageProcessor {
 			} else if ( SELECT_CASE_var == FuncExp ) {
 				if ( ( Operand( 1 ).Number < 700.0 ) && ( Operand( 1 ).Number > -20.0 ) ) {
 					ReturnValue = SetErlValueNumber( std::exp( Operand( 1 ).Number ) );
+				} else if ( Operand( 1 ).Number <= -20.0 ) {
+					ReturnValue = SetErlValueNumber( 0.0 );
 				} else {
 					// throw Error
-					if ( Operand( 1 ).Number >= 700.0 ) {
-						ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
-					} else if (  Operand( 1 ).Number <= -20.0 ) {
-						ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too small a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
-					}
+					ReturnValue.Error = "EvaluateExpression: Attempted to calculate exponential value of too large a number: " + TrimSigDigits( Operand( 1 ).Number, 4 );
 					ReturnValue.Type = ValueError;
 					if ( ! DoingSizing && ! KickOffSimulation && ! EMSManager::FinishProcessingUserInput ) {
 						seriousErrorFound = true;

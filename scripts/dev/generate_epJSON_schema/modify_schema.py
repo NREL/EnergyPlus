@@ -206,16 +206,16 @@ def change_utility_cost(schema):
 
 
 def change_special_cased_name_fields(schema):
-    original_name = schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_names'].pop('zone_terminal_unit_name')
-    schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_names']['name'] = original_name
+    original_name = schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_info'].pop('zone_terminal_unit_name')
+    schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['field_info']['name'] = original_name
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
     del schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
     schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['name'] = \
          schema['properties']['ZoneHVAC:TerminalUnit:VariableRefrigerantFlow']['patternProperties']['.*']['properties'].pop('zone_terminal_unit_name')
 
-    original_name = schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_names'].pop('heat_pump_name')
-    schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_names']['name'] = original_name
+    original_name = schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_info'].pop('heat_pump_name')
+    schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['field_info']['name'] = original_name
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['fields'][0] = 'name'
     schema['properties']['AirConditioner:VariableRefrigerantFlow']['legacy_idd']['alphas']['fields'][0] = 'name'
     del schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['required'][0]
@@ -232,3 +232,37 @@ def change_extensions_name(schema):
 
     for key in remaining_objects:
         schema['properties'][key]['legacy_idd']['extension'] = 'extensions'
+
+def change_89_release_issues(schema):
+    curves = [
+        'Curve:Linear', 'Curve:Quadratic', 'Curve:Cubic', 'Curve:Quartic', 'Curve:Exponent',
+        'Curve:Bicubic', 'Curve:Biquadratic', 'Curve:QuadraticLinear', 'Curve:CubicLinear', 'Curve:Triquadratic',
+        'Curve:ExponentialSkewNormal', 'Curve:Sigmoid', 'Curve:RectangularHyperbola1', 'Curve:RectangularHyperbola2', 'Curve:ExponentialDecay',
+        'Curve:DoubleExponentialDecay', 'Curve:ChillerPartLoadWithLift', 'Table:OneIndependentVariable', 'Table:TwoIndependentVariables', 'Table:MultiVariableLookup'
+    ]
+    for curve in curves:
+        schema['properties'][curve]['patternProperties']['.*']['properties']['output_unit_type']['enum'] = [
+            '',
+            'Capacity',
+            'Dimensionless',
+            'Power',
+            'Pressure',
+            'Temperature'
+        ]
+    schema['properties']['OtherEquipment']['patternProperties']['.*']['properties']['fuel_type']['enum'].append('Water')
+    schema['properties']['WindowMaterial:Glazing:EquivalentLayer']['patternProperties']['.*']['properties']['optical_data_type']['enum'].append('SpectralAverage')
+    schema['properties']['ZoneHVAC:CoolingPanel:RadiantConvective:Water']['patternProperties']['.*']['properties']['control_type']['enum'].append('ZoneTotalLoad')
+    schema['properties']['ZoneHVAC:CoolingPanel:RadiantConvective:Water']['patternProperties']['.*']['properties']['control_type']['enum'].append('ZoneConvectiveLoad')
+
+    schema['properties']['FuelFactors']['patternProperties']['.*']['properties']['existing_fuel_resource_name'].pop('enum')
+    schema['properties']['LifeCycleCost:UsePriceEscalation']['patternProperties']['.*']['properties']['resource'].pop('enum')
+    schema['properties']['AirConditioner:VariableRefrigerantFlow']['patternProperties']['.*']['properties']['fuel_type'].pop('enum')
+    schema['properties']['GlobalGeometryRules']['patternProperties']['.*']['properties']['starting_vertex_position'].pop('enum')
+    schema['properties']['GlobalGeometryRules']['patternProperties']['.*']['properties']['vertex_entry_direction'].pop('enum')
+    schema['properties']['GlobalGeometryRules']['patternProperties']['.*']['properties']['coordinate_system'].pop('enum')
+    schema['properties']['WaterHeater:Mixed']['patternProperties']['.*']['properties']['heater_fuel_type'].pop('enum')
+    schema['properties']['Boiler:HotWater']['patternProperties']['.*']['properties']['fuel_type'].pop('enum')
+    schema['properties']['Schedule:Week:Compact']['patternProperties']['.*']['properties']['data']['items']['properties']['daytype_list'].pop('enum')
+    schema['properties']['Output:Table:SummaryReports']['patternProperties']['.*']['properties']['reports']['items']['properties']['report_name'].pop('enum')
+
+

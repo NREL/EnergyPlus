@@ -3566,7 +3566,7 @@ namespace EnergyPlus {
 				"Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
 				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
 				"Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
-				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,r;",
+				"Output:Meter:MeterFileOnly,DistrictHeating:HVAC,hourly;",
 			} );
 
 			ASSERT_TRUE( process_idf( idf_objects ) );

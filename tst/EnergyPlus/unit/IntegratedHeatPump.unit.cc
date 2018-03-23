@@ -1021,7 +1021,7 @@ namespace EnergyPlus {
 			"    ASIHP1,    				 !- Heating DX Coil Name",
 			"    CoilSystem:IntegratedHeatPump:AirSource,  !- Coolinng Coil Object Type",
 			"    ASIHP1,    				 !- Cooling DX Coil Name",
-			"    Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type",
+			"    Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type",
 			"    Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name",
 			"    50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}",
 			"    21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",

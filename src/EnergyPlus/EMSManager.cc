@@ -1682,6 +1682,9 @@ namespace EMSManager {
 		using DataSurfaces::TotSurfaces;
 		using DataSurfaces::SurfaceClass_Window;
 		using DataSurfaces::ExternalEnvironment;
+		using DataSurfaces::WindowShadingControl;
+		using DataSurfaces::WSC_ST_SwitchableGlazing;
+		using DataHeatBalance::Construct;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1705,11 +1708,17 @@ namespace EMSManager {
 			if ( Surface( loopSurfNum ).ExtBoundCond != ExternalEnvironment ) continue;
 			if ( Surface( loopSurfNum ).WindowShadingControlPtr == 0 ) continue;
 
-			SetupEMSActuator( "Window Shading Control", Surface( loopSurfNum ).Name, "Control Status", "[ShadeStatus]", SurfaceWindow( loopSurfNum ).ShadingFlagEMSOn, SurfaceWindow( loopSurfNum ).ShadingFlagEMSValue );
-
-			if ( SurfaceWindow( loopSurfNum ).MovableSlats ) {
-				SetupEMSActuator( "Window Shading Control", Surface( loopSurfNum ).Name, "Slat Angle", "[degrees]", SurfaceWindow( loopSurfNum ).SlatAngThisTSDegEMSon, SurfaceWindow( loopSurfNum ).SlatAngThisTSDegEMSValue );
-
+			if ( SurfaceWindow( loopSurfNum ).HasShadeOrBlindLayer ) {
+				SetupEMSActuator( "Window Shading Control", Surface( loopSurfNum ).Name, "Control Status", "[ShadeStatus]", SurfaceWindow( loopSurfNum ).ShadingFlagEMSOn, SurfaceWindow( loopSurfNum ).ShadingFlagEMSValue );
+				if ( SurfaceWindow( loopSurfNum ).MovableSlats ) {
+					SetupEMSActuator( "Window Shading Control", Surface( loopSurfNum ).Name, "Slat Angle", "[degrees]", SurfaceWindow( loopSurfNum ).SlatAngThisTSDegEMSon, SurfaceWindow( loopSurfNum ).SlatAngThisTSDegEMSValue );
+				}
+			} else {
+				if ( WindowShadingControl( Surface( loopSurfNum ).WindowShadingControlPtr ).ShadingType != WSC_ST_SwitchableGlazing ) {
+					ShowSevereError( "Missing shade or blind layer in window construction name = '" + Construct( SurfaceWindow( loopSurfNum ).ShadedConstruction ).Name + "', surface name = '" + Surface( loopSurfNum ).Name + "'." );
+					ShowContinueError( "...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade or a blind layer." );
+					ShowContinueError( "...Add shade or blind layer to this construction in order to be able to apply EMS Actuator." );
+				}
 			}
 
 		}

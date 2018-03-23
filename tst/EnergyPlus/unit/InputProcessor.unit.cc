@@ -307,11 +307,11 @@ namespace EnergyPlus {
 						{
 							"Ref Bldg Medium Office New2004_v1.3_5.0",
 							{
-								{"north_axis", ""},
-								{"terrain", ""},
-								{"loads_convergence_tolerance_value", ""},
+//								{"north_axis", ""},
+//								{"terrain", ""},
+//								{"loads_convergence_tolerance_value", ""},
 								{"temperature_convergence_tolerance_value", 0.2000},
-								{"solar_distribution", ""},
+//								{"solar_distribution", ""},
 								{"maximum_number_of_warmup_days", 25},
 								{"minimum_number_of_warmup_days", 6}
 							}
@@ -407,7 +407,7 @@ namespace EnergyPlus {
 					}
 				};
 
-		ASSERT_TRUE(process_idf(idf));
+		EXPECT_FALSE( process_idf( idf, false ) );
 		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -421,7 +421,7 @@ namespace EnergyPlus {
 			}
 		}
 		auto const & errors = validationErrors();
-		EXPECT_EQ(errors.size(), 0ul);
+		EXPECT_EQ( errors.size(), 1ul );
 	}
 
 
@@ -465,13 +465,13 @@ namespace EnergyPlus {
 									{"vertices",
 										{
 											{
-												{"vertex_x_coordinate", ""},
+//												{"vertex_x_coordinate", ""},
 												{"vertex_y_coordinate", 10},
 												{"vertex_z_coordinate", 0}
 											},
 											{
 												{"vertex_x_coordinate", 0.0},
-												{"vertex_y_coordinate", ""},
+//												{"vertex_y_coordinate", ""},
 												{"vertex_z_coordinate", 0}
 											},
 											{
@@ -480,9 +480,9 @@ namespace EnergyPlus {
 												{"vertex_z_coordinate", 0}
 											},
 											{
-												{"vertex_x_coordinate", ""},
+//												{"vertex_x_coordinate", ""},
 												{"vertex_y_coordinate", 10.0},
-												{"vertex_z_coordinate", ""}
+//												{"vertex_z_coordinate", ""}
 											}
 										}
 									}
@@ -524,7 +524,7 @@ namespace EnergyPlus {
 					}
 				};
 
-		ASSERT_TRUE( process_idf( idf ) );
+		EXPECT_FALSE( process_idf( idf, false ) );
 		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -988,7 +988,7 @@ namespace EnergyPlus {
 			}
 		};
 
-		ASSERT_TRUE( process_idf( idf ) );
+		EXPECT_FALSE( process_idf( idf, false ) );
 		json & epJSON = getEpJSON();
 		json tmp;
 		for (auto it = expected.begin(); it != expected.end(); ++it) {
@@ -1258,16 +1258,14 @@ namespace EnergyPlus {
 					"Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
 					";                        !- Constant Cooling Setpoint {C}"
 				}));
-		ASSERT_TRUE( process_idf( idf ) );
-		json & epJSON = getEpJSON();
-		json::parse( epJSON.dump(2) );
-		auto const & errors = validationErrors();
-		// auto const & warnings = validationWarnings();
-		// EXPECT_EQ(errors.size() + warnings.size(), 2ul);
-		if (errors.size() >= 2) {
-			EXPECT_NE(errors[0].find("You must run the ExpandObjects program for \"HVACTemplate:Thermostat\" at line"), std::string::npos);
-			EXPECT_NE(errors[1].find("You must run Parametric Preprocessor for \"Parametric:Logic\" at line"), std::string::npos);
-		}
+		EXPECT_FALSE( process_idf( idf, false ) );
+		std::string const error_string = delimited_string(
+			{
+				"   ** Severe  ** Line: 1 You must run Parametric Preprocessor for \"Parametric:Logic\"",
+				"   ** Severe  ** Line: 11 You must run the ExpandObjects program for \"HVACTemplate:Thermostat\"",
+			});
+
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 	}
 
 
@@ -2381,7 +2379,7 @@ namespace EnergyPlus {
 															"  Supply Fan 1,           !- Supply Fan Name",
 															"  BlowThrough,            !- Fan Placement",
 															"  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
-															"  Coil:Heating:Gas,       !- Heating Coil Object Type",
+															"  Coil:Heating:Fuel,      !- Heating Coil Object Type",
 															"  Furnace Heating Coil 1, !- Heating Coil Name",
 															"  ,                       !- DX Heating Coil Sizing Ratio",
 															"  Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type",
@@ -2389,7 +2387,7 @@ namespace EnergyPlus {
 															"  ,                       !- Use DOAS DX Cooling Coil",
 															"  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
 															"  ,                       !- Latent Load Control",
-															"  Coil:Heating:Gas,       !- Supplemental Heating Coil Object Type",
+															"  Coil:Heating:Fuel,      !- Supplemental Heating Coil Object Type",
 															"  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name",
 															"  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
 															"  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
@@ -2436,8 +2434,8 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 22, NumAlphas );
 		EXPECT_TRUE( compare_containers( std::vector< std::string >( { "GASHEAT DXAC FURNACE 1", "LOAD", "EAST ZONE", "NONE", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "ZONE 2 INLET NODE",
-																	   "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:GAS", "FURNACE HEATING COIL 1",
-																	   "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:GAS",
+																	   "FAN:ONOFF", "SUPPLY FAN 1", "BLOWTHROUGH", "CONTINUOUSFANSCHEDULE", "COIL:HEATING:FUEL", "FURNACE HEATING COIL 1",
+																	   "COIL:COOLING:DX:VARIABLESPEED", "FURNACE ACDXCOIL 1", "NO", "SENSIBLEONLYLOADCONTROL", "COIL:HEATING:FUEL",
 																	   "HUMIDISTAT REHEAT COIL 1", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "SUPPLYAIRFLOWRATE", "", "", "", "", ""} ), Alphas ) );
 		EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false, false, false, false, false, false,
 																false, false, false, false, false, true, true, false, false, false,

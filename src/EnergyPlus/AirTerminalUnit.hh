@@ -149,6 +149,10 @@ public: // Methods
 	Real64
 	getPrimAirDesignVolFlow() = 0;
 
+	virtual
+	int
+	getTermUnitSizingIndex() = 0;
+
 protected: // Data
 
 	AirTerminalUnitType terminalType; // Type of air distribution unit  //Legacy For use during transition to OO
@@ -166,6 +170,7 @@ protected: // Data
 	int zoneNodeIndex; // index in node structure for the zone node for this air terminal
 	int ctrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
 	int airLoopNum; // index to airloop that this terminal unit is connected to
+	int termUnitSizingNum; // index to TermUnitSizing, TermUnitFinalZoneSizing, and more for this air distribution unit
 }; // AirTerminalUnit
 
 } // EnergyPlus

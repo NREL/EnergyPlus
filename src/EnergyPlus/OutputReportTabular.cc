@@ -106,6 +106,7 @@
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
+#include <WeatherManager.hh>
 #include <ZonePlenum.hh>
 #include <ZoneTempPredictorCorrector.hh>
 
@@ -531,6 +532,7 @@ namespace OutputReportTabular {
 		bool UpdateTabularReportsGetInput( true );
 		bool GatherHeatGainReportfirstTime( true );
 		bool AllocateLoadComponentArraysDoAllocate( true );
+		bool initAdjFenDone( false );
 	}
 
 	// Functions
@@ -540,6 +542,7 @@ namespace OutputReportTabular {
 		UpdateTabularReportsGetInput = true;
 		GatherHeatGainReportfirstTime = true;
 		AllocateLoadComponentArraysDoAllocate = true;
+		initAdjFenDone = false ;
 		OutputTableBinnedCount = 0;
 		BinResultsTableCount = 0;
 		BinResultsIntervalCount = 0;
@@ -5391,6 +5394,16 @@ namespace OutputReportTabular {
 		// Using/Aliasing
 		using namespace OutputReportPredefined;
 
+<<<<<<< HEAD
+=======
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const degChar( "°" );
+
+>>>>>>> develop
 		// LineTypes for reading the stat file
 		int const StatisticsLine( 1 );
 		int const LocationLine( 2 );
@@ -5510,9 +5523,15 @@ namespace OutputReportTabular {
 						coolingDesignlinepassed = true;
 						lineType = coolingConditionsLine;
 					}
+<<<<<<< HEAD
 				} else if ( has( lineIn, "(standard) heating degree-days (18.3" + degChar + "C baseline)" ) ) {
 					lineType = stdHDDLine;
 				} else if ( has( lineIn, "(standard) cooling degree-days (10" + degChar + "C baseline)" ) ) {
+=======
+				} else if ( has( lineIn, "(standard) heating degree-days (18.3°C baseline)" ) ) {
+					lineType = stdHDDLine;
+				} else if ( has( lineIn, "(standard) cooling degree-days (10°C baseline)" ) ) {
+>>>>>>> develop
 					lineType = stdCDDLine;
 
 				} else if ( has( lineIn, "Maximum Dry Bulb" ) ) {
@@ -5523,15 +5542,21 @@ namespace OutputReportTabular {
 					lineType = maxDewPointLine;
 				} else if ( has( lineIn, "Minimum Dew Point" ) ) {
 					lineType = minDewPointLine;
+<<<<<<< HEAD
 				} else if ( has( lineIn, "(wthr file) heating degree-days (18" + degChar + "C baseline)" ) || has( lineIn, "heating degree-days (18" + degChar + "C baseline)" ) ) {
 					lineType = wthHDDLine;
 				} else if ( has( lineIn, "(wthr file) cooling degree-days (10" + degChar + "C baseline)" ) || has( lineIn, "cooling degree-days (10" + degChar + "C baseline)" ) ) {
+=======
+				} else if ( has( lineIn, "(wthr file) heating degree-days (18°C baseline)" ) || has( lineIn, "heating degree-days (18°C baseline)" ) ) {
+					lineType = wthHDDLine;
+				} else if ( has( lineIn, "(wthr file) cooling degree-days (10°C baseline)" ) || has( lineIn, "cooling degree-days (10°C baseline)" ) ) {
+>>>>>>> develop
 					lineType = wthCDDLine;
 				}
 				// these not part of big if/else because sequential
 				if ( lineType == KoppenDes1Line && isKoppen ) lineType = KoppenDes2Line;
 				if ( lineType == KoppenLine && isKoppen ) lineType = KoppenDes1Line;
-				if ( has( lineIn, "(KÃ¶ppen classification)" ) ) lineType = KoppenLine;
+				if ( has( lineIn, "(Köppen classification)" ) ) lineType = KoppenLine;
 				if ( lineType == AshStdDes2Line ) lineType = AshStdDes3Line;
 				if ( lineType == AshStdDes1Line ) lineType = AshStdDes2Line;
 				if ( lineType == AshStdLine ) lineType = AshStdDes1Line;
@@ -5542,7 +5567,7 @@ namespace OutputReportTabular {
 					PreDefTableEntry( pdchWthrVal, "Reference", lineIn.substr( 15 ) );
 				} else if ( SELECT_CASE_var == LocationLine ) { // Location -- SAN_FRANCISCO CA USA
 					PreDefTableEntry( pdchWthrVal, "Site:Location", lineIn.substr( 11 ) );
-				} else if ( SELECT_CASE_var == LatLongLine ) { //      {N 37Â° 37'} {W 122Â° 22'} {GMT -8.0 Hours}
+				} else if ( SELECT_CASE_var == LatLongLine ) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
 					// find the {}
 					sposlt = index( lineIn, '{' );
 					eposlt = index( lineIn, '}' );
@@ -5716,11 +5741,11 @@ namespace OutputReportTabular {
 							}
 						}
 					}
-				} else if ( SELECT_CASE_var == stdHDDLine ) { //  - 1745 annual (standard) heating degree-days (10Â°C baseline)
+				} else if ( SELECT_CASE_var == stdHDDLine ) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
 					storeASHRAEHDD = lineIn.substr( 2, 4 );
-				} else if ( SELECT_CASE_var == stdCDDLine ) { //  -  464 annual (standard) cooling degree-days (18.3Â°C baseline)
+				} else if ( SELECT_CASE_var == stdCDDLine ) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
 					storeASHRAECDD = lineIn.substr( 2, 4 );
-				} else if ( SELECT_CASE_var == maxDryBulbLine ) { //   - Maximum Dry Bulb temperature of  35.6Â°C on Jul  9
+				} else if ( SELECT_CASE_var == maxDryBulbLine ) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5743,7 +5768,7 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == minDryBulbLine ) { //   - Minimum Dry Bulb temperature of -22.8Â°C on Jan  7
+				} else if ( SELECT_CASE_var == minDryBulbLine ) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5766,8 +5791,12 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found" );
 					}
+<<<<<<< HEAD
 				} else if ( SELECT_CASE_var == maxDewPointLine ) { //   - Maximum Dew Point temperature of  25.6Â°C on Aug  4
 
+=======
+				} else if ( SELECT_CASE_var == maxDewPointLine ) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
+>>>>>>> develop
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5790,8 +5819,12 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Occurs on", "not found" );
 					}
+<<<<<<< HEAD
 				} else if ( SELECT_CASE_var == minDewPointLine ) { //   - Minimum Dew Point temperature of -28.9Â°C on Dec 31
 
+=======
+				} else if ( SELECT_CASE_var == minDewPointLine ) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
+>>>>>>> develop
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5814,9 +5847,10 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10Â°C baseline)
+				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
 					if ( storeASHRAEHDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
+<<<<<<< HEAD
 							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65" + degChar + "(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) );
@@ -5832,18 +5866,40 @@ namespace OutputReportTabular {
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
 						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65" + degChar + "(C)";
+=======
+							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
+							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) );
+						} else {
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD );
+						}
+					} else {
+						if ( unitsStyle == unitsStyleInchPound ) {
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found" );
+						} else {
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found" );
+						}
+					}
+					if ( unitsStyle == unitsStyleInchPound ) {
+						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
+>>>>>>> develop
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
+<<<<<<< HEAD
 						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18" + degChar + "C)", lineIn.substr( 2, 4 ) );
+=======
+						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr( 2, 4 ) );
+>>>>>>> develop
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", lineIn.substr( 2, 4 ) );
 					}
 					PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
 				}
-				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18Â°C baseline)
+				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
 					if ( storeASHRAECDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
+<<<<<<< HEAD
 							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50" + degChar + "(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) );
@@ -5859,39 +5915,60 @@ namespace OutputReportTabular {
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
 						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50" + degChar + "(C)";
+=======
+							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
+							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
+							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) );
+						} else {
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD );
+						}
+					} else {
+						if ( unitsStyle == unitsStyleInchPound ) {
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found" );
+						} else {
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found" );
+						}
+					}
+					if ( unitsStyle == unitsStyleInchPound ) {
+						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
+>>>>>>> develop
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
+<<<<<<< HEAD
 						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10" + degChar + "C)", lineIn.substr( 2, 4 ) );
+=======
+						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr( 2, 4 ) );
+>>>>>>> develop
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", lineIn.substr( 2, 4 ) );
 					}
-				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (KÃ¶ppen classification)
+				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (Köppen classification)
 					if ( ! has( lineIn, "not shown" ) ) {
 						isKoppen = true;
 						if ( lineIn[ 18 ] == '"' ) { // two character classification
-							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr( 16, 2 ) );
+							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 2 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr( 16, 3 ) );
+							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 3 ) );
 						}
 					} else {
 						isKoppen = false;
-						PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr( 2 ) );
+						PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
 					}
-				} else if ( SELECT_CASE_var == KoppenDes1Line ) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25Â°)
+				} else if ( SELECT_CASE_var == KoppenDes1Line ) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
 					if ( isKoppen ) {
-						PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Description", lineIn.substr( 2 ) );
+						PreDefTableEntry( pdchWthrVal, "Köppen Description", lineIn.substr( 2 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenDes2Line ) { // - Unbearably humid periods in summer, but passive cooling is possible
 					if ( isKoppen ) {
 						if ( len( lineIn ) > 3 ) { // avoid blank lines
 							if ( lineIn.substr( 2, 2 ) != "**" ) { // avoid line with warning
-								PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr( 2 ) );
+								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
 							} else {
-								PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", "" );
+								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", "" );
 							}
 						} else {
-							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", "" );
+							PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", "" );
 						}
 					}
 				} else if ( ( SELECT_CASE_var == AshStdLine ) || ( SELECT_CASE_var == AshStdDes1Line ) || ( SELECT_CASE_var == AshStdDes2Line ) || ( SELECT_CASE_var == AshStdDes3Line ) ) {
@@ -11845,7 +11922,7 @@ namespace OutputReportTabular {
 
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( ZoneCoolCompLoadTables(iZone).cells, ZoneCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					CollectPeakZoneConditions( ZoneCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+					CollectPeakZoneConditions( ZoneCoolCompLoadTables( iZone ), coolDesSelected, timeCoolMax, iZone, true );
 					//send latent load info to coil summary report
 					coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( iZone ,  ZoneCoolCompLoadTables(iZone).cells( cLatent, rGrdTot ) );
 
@@ -11856,7 +11933,7 @@ namespace OutputReportTabular {
 
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( ZoneHeatCompLoadTables( iZone ).cells, ZoneHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-					CollectPeakZoneConditions( ZoneHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+					CollectPeakZoneConditions( ZoneHeatCompLoadTables( iZone ), heatDesSelected, timeHeatMax, iZone, false );
 
 					//send latent load info to coil summary report
 					coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak( iZone , ZoneHeatCompLoadTables( iZone ).cells( cLatent, rGrdTot ) );
@@ -11888,11 +11965,27 @@ namespace OutputReportTabular {
 			for ( int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop ) {
 				zoneToAirLoopCool = 0;
 				zoneToAirLoopHeat = 0;
-				coolDesSelected = SysSizPeakDDNum( iAirLoop ).TotCoolPeakDD;
-				if ( coolDesSelected != 0 ) {
-					timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtTotCoolPk( coolDesSelected );
+				if ( DataSizing::FinalSysSizing( iAirLoop ).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad ) {
+					coolDesSelected = SysSizPeakDDNum( iAirLoop ).SensCoolPeakDD;
+					if ( coolDesSelected != 0 ) {
+						timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtSensCoolPk( coolDesSelected );
+					} else {
+						timeCoolMax = 0;
+					}
+				} else if ( DataSizing::FinalSysSizing( iAirLoop ).CoolingPeakLoadType == DataSizing::Ventilation ) {
+					coolDesSelected = SysSizPeakDDNum( iAirLoop ).CoolFlowPeakDD;
+					if ( coolDesSelected != 0 ) {
+						timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtCoolFlowPk( coolDesSelected );
+					} else {
+						timeCoolMax = 0;
+					}
 				} else {
-					timeCoolMax = 0;
+					coolDesSelected = SysSizPeakDDNum( iAirLoop ).TotCoolPeakDD;
+					if ( coolDesSelected != 0 ) {
+						timeCoolMax = SysSizPeakDDNum( iAirLoop ).TimeStepAtTotCoolPk( coolDesSelected );
+					} else {
+						timeCoolMax = 0;
+					}
 				}
 				heatDesSelected = SysSizPeakDDNum( iAirLoop ).HeatPeakDD;
 				if ( heatDesSelected != 0 ) {
@@ -11925,7 +12018,7 @@ namespace OutputReportTabular {
 				// now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute them for specific design day and time of max
 				for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 					if ( !ZoneEquipConfig( iZone ).IsControlled ) continue;
-					if  ( displayZoneComponentLoadSummary && (AirLoopZonesCoolCompLoadTables( iZone ).desDayNum == ZoneCoolCompLoadTables( iZone ).desDayNum) && (AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax == ZoneCoolCompLoadTables( iZone ).timeStepMax) ){
+					if  ( displayZoneComponentLoadSummary && ( AirLoopZonesCoolCompLoadTables( iZone ).desDayNum == ZoneCoolCompLoadTables( iZone ).desDayNum ) && ( AirLoopZonesCoolCompLoadTables( iZone ).timeStepMax == ZoneCoolCompLoadTables( iZone ).timeStepMax ) ){
 						AirLoopZonesCoolCompLoadTables( iZone ) = ZoneCoolCompLoadTables( iZone );
 					} else {
 						coolDesSelected = AirLoopZonesCoolCompLoadTables( iZone ).desDayNum;
@@ -11933,7 +12026,7 @@ namespace OutputReportTabular {
 
 						GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 						ComputeTableBodyUsingMovingAvg( AirLoopZonesCoolCompLoadTables( iZone ).cells, AirLoopZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-						CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+						CollectPeakZoneConditions( AirLoopZonesCoolCompLoadTables( iZone ), coolDesSelected, timeCoolMax, iZone, true );
 						AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables( iZone ) );
 					}
 					if ( displayZoneComponentLoadSummary && ( AirLoopZonesHeatCompLoadTables( iZone ).desDayNum == ZoneHeatCompLoadTables( iZone ).desDayNum ) && ( AirLoopZonesHeatCompLoadTables( iZone ).timeStepMax == ZoneHeatCompLoadTables( iZone ).timeStepMax ) ) {
@@ -11944,7 +12037,7 @@ namespace OutputReportTabular {
 
 						GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 						ComputeTableBodyUsingMovingAvg( AirLoopZonesHeatCompLoadTables( iZone ).cells, AirLoopZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-						CollectPeakZoneConditions( AirLoopZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+						CollectPeakZoneConditions( AirLoopZonesHeatCompLoadTables( iZone ), heatDesSelected, timeHeatMax, iZone, false );
 						AddAreaColumnForZone( iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables( iZone ) );
 					}
 				}
@@ -11962,9 +12055,6 @@ namespace OutputReportTabular {
 						CombineLoadCompResults( AirLoopHeatCompLoadTables( iAirLoop ), AirLoopZonesHeatCompLoadTables( iZone ), mult );
 					}
 				}
-
-				CollectPeakAirLoopConditions( AirLoopCoolCompLoadTables( iAirLoop ), iAirLoop, true );
-				CollectPeakAirLoopConditions( AirLoopHeatCompLoadTables( iAirLoop ), iAirLoop, false );
 
 				ComputeEngineeringChecks( AirLoopCoolCompLoadTables( iAirLoop ) );
 				ComputeEngineeringChecks( AirLoopHeatCompLoadTables( iAirLoop ) );
@@ -12004,7 +12094,7 @@ namespace OutputReportTabular {
 				} else {
 					GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesCoolCompLoadTables( iZone ).cells, FacilityZonesCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
-					CollectPeakZoneConditions( FacilityZonesCoolCompLoadTables( iZone ), timeCoolMax, iZone, true );
+					CollectPeakZoneConditions( FacilityZonesCoolCompLoadTables( iZone ), coolDesSelected, timeCoolMax, iZone, true );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables( iZone ) );
 				}
 				FacilityZonesCoolCompLoadTables( iZone ).timeStepMax = timeCoolMax;
@@ -12016,7 +12106,7 @@ namespace OutputReportTabular {
 				} else {
 					GetDelaySequences( heatDesSelected, false, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
 					ComputeTableBodyUsingMovingAvg( FacilityZonesHeatCompLoadTables( iZone ).cells, FacilityZonesHeatCompLoadTables( iZone ).cellUsed, heatDesSelected, timeHeatMax, iZone, peopleDelaySeqHeat, equipDelaySeqHeat, hvacLossDelaySeqHeat, powerGenDelaySeqHeat, lightDelaySeqHeat, feneSolarDelaySeqHeat, feneCondInstantSeq, surfDelaySeqHeat );
-					CollectPeakZoneConditions( FacilityZonesHeatCompLoadTables( iZone ), timeHeatMax, iZone, false );
+					CollectPeakZoneConditions( FacilityZonesHeatCompLoadTables( iZone ), heatDesSelected, timeHeatMax, iZone, false );
 					AddAreaColumnForZone( iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables( iZone ) );
 				}
 				FacilityZonesHeatCompLoadTables( iZone ).timeStepMax = timeHeatMax;
@@ -12085,12 +12175,23 @@ namespace OutputReportTabular {
 		using DataHeatBalance::Zone;
 		using DataSurfaces::Surface;
 		using DataSurfaces::SurfaceClass_Window;
+		using DataEnvironment::TotDesDays;
+		using DataEnvironment::TotRunDesPersDays;
+
+		// static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
+		static Array3D_bool adjFenDone;
 
 		Array1D< Real64 > peopleRadIntoSurf;
 		Array1D< Real64 > equipRadIntoSurf;
 		Array1D< Real64 > hvacLossRadIntoSurf;
 		Array1D< Real64 > powerGenRadIntoSurf;
 		Array1D< Real64 > lightLWRadIntoSurf;
+
+		if ( !initAdjFenDone ) {
+			adjFenDone.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones );
+			adjFenDone = false;
+			initAdjFenDone = true;
+		}
 
 		peopleRadIntoSurf.allocate( NumOfTimeStepInHour * 24 );
 		peopleRadIntoSurf = 0.;
@@ -12176,7 +12277,10 @@ namespace OutputReportTabular {
 				lightDelaySeq( kTimeStep ) = lightLWConvIntoZone + lightSWConvIntoZone;
 				feneSolarDelaySeq( kTimeStep ) = feneSolarConvIntoZone;
 				// also remove the net radiant component on the instanteous conduction for fenestration
-				feneCondInstantSeq( desDaySelected, kTimeStep, zoneIndex ) -= adjFeneSurfNetRadSeq;
+				if ( !adjFenDone( desDaySelected, kTimeStep, zoneIndex ) ) {
+					feneCondInstantSeq( desDaySelected, kTimeStep, zoneIndex ) -= adjFeneSurfNetRadSeq;
+					adjFenDone( desDaySelected, kTimeStep, zoneIndex ) = true;
+				}
 			} // for kTimeStep
 
 			decayCurve.deallocate();
@@ -12410,6 +12514,7 @@ namespace OutputReportTabular {
 	void
 	CollectPeakZoneConditions(
 		CompLoadTablesType & compLoad,
+		int const & desDaySelected,
 		int const & timeOfMax,
 		int const & zoneIndex,
 		bool const & isCooling
@@ -12432,7 +12537,7 @@ namespace OutputReportTabular {
 
 			if ( isCooling ) {
 				//Time of Peak Load
-				compLoad.peakDateHrMin = CoolPeakDateHrMin( zoneIndex );
+				compLoad.peakDateHrMin = General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( timeOfMax );
 
 				//Outside  Dry Bulb Temperature
 				compLoad.outsideDryBulb = CalcFinalZoneSizing( zoneIndex ).CoolOutTempSeq( timeOfMax );
@@ -12476,7 +12581,7 @@ namespace OutputReportTabular {
 
 			} else {
 				//Time of Peak Load
-				compLoad.peakDateHrMin = HeatPeakDateHrMin( zoneIndex );
+				compLoad.peakDateHrMin = General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).Month ) + "/" + General::TrimSigDigits( WeatherManager::DesDayInput( desDaySelected ).DayOfMonth ) + " " + coilSelectionReportObj->getTimeText( timeOfMax );
 
 				//Outside  Dry Bulb Temperature
 				compLoad.outsideDryBulb = CalcFinalZoneSizing( zoneIndex ).HeatOutTempSeq( timeOfMax );
@@ -12555,36 +12660,6 @@ namespace OutputReportTabular {
 			compLoad.numPeople = totNumPeople;
 
 		}
-	}
-
-	// for the load summary report add airloop related values the peak conditions subtable
-	void
-	CollectPeakAirLoopConditions(
-		CompLoadTablesType & compLoad,
-		int const & airLoopIndex,
-		bool const & isCooling
-	)
-	{
-		using DataSizing::FinalSysSizing;
-		using DataSizing::CalcSysSizing;
-
-		if ( isCooling ) {
-			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).CoolSupTemp;
-			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).MixTempAtCoolPeak;
-			compLoad.designPeakLoad = FinalSysSizing( airLoopIndex ).SensCoolCap;
-			compLoad.peakDesSensLoad = CalcSysSizing( airLoopIndex ).SensCoolCap;
-
-		} else {
-			compLoad.supAirTemp = FinalSysSizing( airLoopIndex ).HeatSupTemp;
-			compLoad.mixAirTemp = FinalSysSizing( airLoopIndex ).HeatMixTemp;
-			compLoad.designPeakLoad = -FinalSysSizing( airLoopIndex ).HeatCap;
-			compLoad.peakDesSensLoad = -CalcSysSizing( airLoopIndex ).HeatCap;
-		}
-		compLoad.diffDesignPeak = compLoad.designPeakLoad - compLoad.peakDesSensLoad;
-
-		compLoad.mainFanAirFlow = FinalSysSizing( airLoopIndex ).DesMainVolFlow;
-		compLoad.outsideAirFlow = FinalSysSizing( airLoopIndex ).DesOutAirVolFlow;
-
 	}
 
 	void
@@ -12760,6 +12835,7 @@ namespace OutputReportTabular {
 		compLoadTotal.zoneDryBulb = compLoadPartial.zoneDryBulb;
 		compLoadTotal.zoneRelHum = compLoadPartial.zoneRelHum;
 		compLoadTotal.zoneHumRatio = compLoadPartial.zoneHumRatio;
+		compLoadTotal.supAirTemp = compLoadPartial.supAirTemp;
 
 		// sum the peak related values
 		compLoadTotal.designPeakLoad += compLoadPartial.designPeakLoad * multiplier;
@@ -12781,6 +12857,11 @@ namespace OutputReportTabular {
 		CompLoadTablesType & compLoadTotal
 	)
 	{
+
+		// zero the grand total -total cell
+		compLoadTotal.cells( cTotal, rGrdTot ) = 0.;
+		compLoadTotal.cellUsed( cTotal, rGrdTot ) = true;
+
 		// zero the grand total row
 		for ( int col = 1; col <= cLatent; ++col ) {
 			compLoadTotal.cells( col, rGrdTot ) = 0.;
@@ -12800,7 +12881,6 @@ namespace OutputReportTabular {
 				}
 			}
 		}
-		compLoadTotal.cellUsed( cTotal, rGrdTot ) = true;
 
 		// compute the % grand total column
 		Real64 grandTotalTotal = compLoadTotal.cells( cTotal, rGrdTot );
@@ -14901,7 +14981,11 @@ Label900: ;
 		UnitConvSize = 115;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
+<<<<<<< HEAD
 		UnitConv( 2 ).siName = degChar + "C";
+=======
+		UnitConv( 2 ).siName = "°C";
+>>>>>>> develop
 		UnitConv( 3 ).siName = "0=OFF 1=ON";
 		UnitConv( 4 ).siName = "0-NO  1-YES";
 		UnitConv( 5 ).siName = "1-YES 0-NO";

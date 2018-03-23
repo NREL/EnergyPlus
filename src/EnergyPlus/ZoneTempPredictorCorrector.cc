@@ -2401,19 +2401,21 @@ namespace ZoneTempPredictorCorrector {
 
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				FirstSurfFlag = true;
-				for ( SurfNum = Zone( Loop ).SurfaceFirst; SurfNum <= Zone( Loop ).SurfaceLast; ++SurfNum ) {
-					if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+				if ( Zone( Loop ).SurfaceFirst > 0 ) {
+					for ( SurfNum = Zone( Loop ).SurfaceFirst; SurfNum <= Zone( Loop ).SurfaceLast; ++SurfNum ) {
+						if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
-					if ( FirstSurfFlag ) {
-						TRefFlag = Surface( SurfNum ).TAirRef;
-						FirstSurfFlag = false;
-					}
-					// for each particular zone, the reference air temperature(s) should be the same
-					// (either mean air, bulk air, or supply air temp).
-					if ( Surface( SurfNum ).TAirRef != TRefFlag ) {
-						ShowWarningError( "Different reference air temperatures for difference surfaces encountered in zone " + Zone( Loop ).Name );
-					}
+						if ( FirstSurfFlag ) {
+							TRefFlag = Surface( SurfNum ).TAirRef;
+							FirstSurfFlag = false;
+						}
+						// for each particular zone, the reference air temperature(s) should be the same
+						// (either mean air, bulk air, or supply air temp).
+						if ( Surface( SurfNum ).TAirRef != TRefFlag ) {
+							ShowWarningError( "Different reference air temperatures for difference surfaces encountered in zone " + Zone( Loop ).Name );
+						}
 
+					}
 				}
 			}
 
@@ -2438,8 +2440,8 @@ namespace ZoneTempPredictorCorrector {
 				SetupOutputVariable( "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate", OutputProcessor::Unit::kgWater_s, ZoneSysMoistureDemand( Loop ).OutputRequiredToDehumidifyingSP, "System", "Average", Zone( Loop ).Name );
 				// Zone thermostat setpoints
 				SetupOutputVariable( "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Heating Setpoint Temperature", OutputProcessor::Unit::C, ZoneThermostatSetPointLo( Loop ), "Zone", "Average", Zone( Loop ).Name );
-				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature", OutputProcessor::Unit::C, ZoneThermostatSetPointHi( Loop ), "Zone", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Thermostat Heating Setpoint Temperature", OutputProcessor::Unit::C, ZoneThermostatSetPointLo( Loop ), "System", "Average", Zone( Loop ).Name );
+				SetupOutputVariable( "Zone Thermostat Cooling Setpoint Temperature", OutputProcessor::Unit::C, ZoneThermostatSetPointHi( Loop ), "System", "Average", Zone( Loop ).Name );
 				SetupOutputVariable( "Zone Adaptive Comfort Operative Temperature Set Point", OutputProcessor::Unit::C, AdapComfortCoolingSetPoint( Loop ), "Zone", "Average", Zone( Loop ).Name);
 				SetupOutputVariable( "Zone Predicted Sensible Load Room Air Correction Factor", OutputProcessor::Unit::None, LoadCorrectionFactor( Loop ), "System", "Average", Zone( Loop ).Name );
 
@@ -2996,7 +2998,7 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 			// Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
-			CalcPredictedSystemLoad( ZoneNum, RAFNFrac );
+			CalcPredictedSystemLoad( ZoneNum, RAFNFrac, ShortenTimeStepSys );
 
 			// Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
 			CalcPredictedHumidityRatio( ZoneNum, RAFNFrac );
@@ -3076,15 +3078,7 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleHeating( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
-				TempControlledZone( RelativeZoneNum ).HeatOffFlag = false;
-				DeltaT = TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-				if ( DeltaT > 0.0 ) {
-					if ( MAT( ActualZoneNum ) < TempZoneThermostatSetPoint( ActualZoneNum ) ) {
-						TempZoneThermostatSetPoint( ActualZoneNum ) += DeltaT;
-					} else {
-						TempControlledZone( RelativeZoneNum ).HeatOffFlag = true;
-					}
-				}
+				TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo = TempZoneThermostatSetPoint( ActualZoneNum );
 
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint( ActualZoneNum ) );
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -3098,15 +3092,7 @@ namespace ZoneTempPredictorCorrector {
 
 				SetPointTempSchedIndex = SetPointSingleCooling( SchedTypeIndex ).TempSchedIndex;
 				TempZoneThermostatSetPoint( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndex );
-				TempControlledZone( RelativeZoneNum ).CoolOffFlag = false;
-				DeltaT = TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-				if ( DeltaT > 0.0 ) {
-					if ( MAT( ActualZoneNum ) > TempZoneThermostatSetPoint( ActualZoneNum ) ) {
-						TempZoneThermostatSetPoint( ActualZoneNum ) -= DeltaT;
-					} else {
-						TempControlledZone( RelativeZoneNum ).CoolOffFlag = true;
-					}
-				}
+				TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi = TempZoneThermostatSetPoint( ActualZoneNum );
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
@@ -3171,18 +3157,7 @@ namespace ZoneTempPredictorCorrector {
 				SetPointTempSchedIndexHot = SetPointDualHeatCool( SchedTypeIndex ).HeatTempSchedIndex;
 				SetPointTempSchedIndexCold = SetPointDualHeatCool( SchedTypeIndex ).CoolTempSchedIndex;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexCold );
-				TempControlledZone( RelativeZoneNum ).CoolOffFlag = false;
-				TempControlledZone( RelativeZoneNum ).HeatOffFlag = false;
-				DeltaT = TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
-				if ( DeltaT > 0.0 ) {
-					if ( MAT( ActualZoneNum ) > ZoneThermostatSetPointHi( ActualZoneNum ) ) {
-						ZoneThermostatSetPointHi( ActualZoneNum ) -= DeltaT;
-					} else {
-						TempControlledZone( RelativeZoneNum ).CoolOffFlag = true;
-					}
-				} else {
-					ZoneThermostatSetPointHi( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexCold );
-				}
+				TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi = ZoneThermostatSetPointHi( ActualZoneNum );
 
 				//Added Jan 17 (X. Luo)
 				//Adjust operative temperature based on adaptive comfort model
@@ -3194,18 +3169,7 @@ namespace ZoneTempPredictorCorrector {
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi( ActualZoneNum ) );
 
 				ZoneThermostatSetPointLo( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexHot );
-				if ( DeltaT > 0.0 ) {
-					if ( MAT( ActualZoneNum ) < ZoneThermostatSetPointLo( ActualZoneNum ) ) {
-						ZoneThermostatSetPointLo( ActualZoneNum ) += DeltaT;
-						if ( ZoneThermostatSetPointHi( ActualZoneNum ) < ZoneThermostatSetPointLo( ActualZoneNum ) ) {
-							ZoneThermostatSetPointLo( ActualZoneNum ) = ZoneThermostatSetPointHi( ActualZoneNum );
-						}
-					} else {
-						TempControlledZone( RelativeZoneNum ).HeatOffFlag = true;
-					}
-				} else {
-					ZoneThermostatSetPointLo( ActualZoneNum ) = GetCurrentScheduleValue( SetPointTempSchedIndexHot );
-				}
+				TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo = ZoneThermostatSetPointLo( ActualZoneNum );
 				AdjustAirSetPointsforOpTempCntrl( RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointLo( ActualZoneNum ) );
 
 				//Change the room set point to occupied set point during optimum start period--------------
@@ -3275,7 +3239,7 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac )
+	CalcPredictedSystemLoad( int const ZoneNum, Real64 RAFNFrac, bool const ShortenTimeStepSys ) 
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3300,15 +3264,34 @@ namespace ZoneTempPredictorCorrector {
 		Real64 LoadToCoolingSetPoint;
 		Real64 ZoneSetPoint;
 		int RelativeZoneNum;
+		bool CoolOffFlag;
+		bool HeatOffFlag;
+		Real64 Tprev;
 		// FLOW:
 		DeadBandOrSetback( ZoneNum ) = false;
 		ZoneSetPoint = 0.0;
 		LoadToHeatingSetPoint = 0.0;
 		LoadToCoolingSetPoint = 0.0;
+		Real64 TempTole = 0.02;
+		bool TempCtrlFound;
 
-
+		TempCtrlFound = false;
 		for ( RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum ) {
-			if ( TempControlledZone( RelativeZoneNum ).ActualZoneNum == ZoneNum ) break;
+			if ( TempControlledZone( RelativeZoneNum ).ActualZoneNum == ZoneNum ) {
+				TempCtrlFound = true;
+				break;
+			}
+		}
+		CoolOffFlag = false;
+		HeatOffFlag = false;
+		if ( TempCtrlFound ) {
+			if ( ShortenTimeStepSys ) {
+				TempControlledZone( RelativeZoneNum ).HeatModeLast = TempControlledZone( RelativeZoneNum ).HeatModeLastSave;
+				TempControlledZone( RelativeZoneNum ).CoolModeLast = TempControlledZone( RelativeZoneNum ).CoolModeLastSave;
+			} else {
+				TempControlledZone( RelativeZoneNum ).HeatModeLastSave = TempControlledZone( RelativeZoneNum ).HeatModeLast;
+				TempControlledZone( RelativeZoneNum ).CoolModeLastSave = TempControlledZone( RelativeZoneNum ).CoolModeLast;
+			}
 		}
 		{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
 
@@ -3319,7 +3302,26 @@ namespace ZoneTempPredictorCorrector {
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = 0.0;
 
 		} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
-			// Determine zone load based on
+			if ( TempCtrlFound && TempControlledZone( RelativeZoneNum ).DeltaTCutSet > 0.0 ) {
+				TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+				ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
+				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
+				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempTole ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
+				} else if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo && ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet - TempTole ) ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					ZoneThermostatSetPointLo( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
+				} else {
+					HeatOffFlag = true;
+				}
+			}
+			if ( TempControlledZone( RelativeZoneNum ).HeatModeLast && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
+				TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+				ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+				HeatOffFlag = true;
+			}			// Determine zone load based on
 			// Qload + Qsys = 0 and Qsys = mCp(Tsys-Tzone)
 			// System Load Sign Convention:
 			//     - -> Cooling required to reach setpoint
@@ -3340,9 +3342,6 @@ namespace ZoneTempPredictorCorrector {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 			}
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-			if ( TempControlledZone( RelativeZoneNum ).HeatOffFlag ) {
-				LoadToHeatingSetPoint = 0.0;
-			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToCoolingSetPoint = LoadToHeatingSetPoint;
@@ -3351,6 +3350,26 @@ namespace ZoneTempPredictorCorrector {
 			if ( ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired ) <= 0.0 ) DeadBandOrSetback( ZoneNum ) = true;
 
 		} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+			if ( TempCtrlFound && TempControlledZone( RelativeZoneNum ).DeltaTCutSet > 0.0 ) {
+				TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+				ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
+				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
+				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempTole ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
+				} else if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet + TempTole ) {
+					TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+					ZoneThermostatSetPointHi( ZoneNum ) = TempZoneThermostatSetPoint( ZoneNum );
+				} else {
+					CoolOffFlag = true;
+				}
+			}
+			if ( TempControlledZone( RelativeZoneNum ).CoolModeLast && Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
+				TempZoneThermostatSetPoint( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+				ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+				CoolOffFlag = true;
+			}
 
 			//PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
 			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
@@ -3368,9 +3387,6 @@ namespace ZoneTempPredictorCorrector {
 			if ( RAFNFrac > 0.0 ) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
 			if ( DataHeatBalance::Zone( ZoneNum ).HasAdjustedReturnTempByITE && !( DataGlobals::BeginSimFlag ) ) {
 				LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * DataHeatBalance::Zone( ZoneNum ).AdjustedReturnTempByITE - TempIndZnLd( ZoneNum );
-			}
-			if ( TempControlledZone( RelativeZoneNum ).CoolOffFlag ) {
-				LoadToCoolingSetPoint = 0.0;
 			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
@@ -3454,6 +3470,45 @@ namespace ZoneTempPredictorCorrector {
 
 		} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
 
+			if ( TempCtrlFound && TempControlledZone( RelativeZoneNum ).DeltaTCutSet > 0.0 ) {
+				ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+				ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+				if ( ZoneAirSolutionAlgo == Use3rdOrder ) Tprev = ZTM1( ZoneNum );
+				if ( ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod ) Tprev = ZoneT1( ZoneNum );
+
+				if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempTole ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				} else if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet + TempTole ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi - TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				} else {
+					CoolOffFlag = true;
+				}
+				if ( TempControlledZone( RelativeZoneNum ).CoolModeLast && Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi ) {
+					ZoneThermostatSetPointHi( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointHi;
+					CoolOffFlag = true;
+				}
+
+				if ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempTole ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				} else if ( Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo && ( Tprev < TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet - TempTole ) ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo + TempControlledZone( RelativeZoneNum ).DeltaTCutSet;
+				} else {
+					HeatOffFlag = true;
+				}
+				if ( TempControlledZone( RelativeZoneNum ).HeatModeLast && Tprev > TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo ) {
+					ZoneThermostatSetPointLo( ZoneNum ) = TempControlledZone( RelativeZoneNum ).ZoneThermostatSetPointLo;
+					HeatOffFlag = true;
+				}
+				// check setpoint for both and provde an error message
+				if ( ZoneThermostatSetPointLo( ZoneNum ) >= ZoneThermostatSetPointHi( ZoneNum ) ) {
+					ShowSevereError( "DualSetPointWithDeadBand: When Temperature Difference Between Cutout And Setpoint is applied, the heating setpoint is greater than the cooling setpoint. " );
+					ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
+					ShowContinueError( "Zone Heating ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
+					ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
+					ShowFatalError( "Program terminates due to above conditions." );
+				}
+			}
+
 			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 				LoadToHeatingSetPoint = ( TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
 				LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
@@ -3495,10 +3550,6 @@ namespace ZoneTempPredictorCorrector {
 				ShowContinueError( "Zone Cooling ThermostatSetPoint=" + RoundSigDigits( ZoneThermostatSetPointHi( ZoneNum ), 2 ) );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
-			if ( TempControlledZone( RelativeZoneNum ).CoolOffFlag && TempControlledZone( RelativeZoneNum ).HeatOffFlag ) {
-				LoadToHeatingSetPoint = 0.0;
-				LoadToCoolingSetPoint = 0.0;
-			}
 
 			if ( LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0 ) {
 				ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
@@ -3529,6 +3580,20 @@ namespace ZoneTempPredictorCorrector {
 			}
 
 		}}
+		if ( TempCtrlFound ) {
+			if ( TempControlledZone( RelativeZoneNum ).DeltaTCutSet > 0.0 ) {
+				if ( CoolOffFlag && ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired >= 0.0 ) {
+					TempControlledZone( RelativeZoneNum ).CoolModeLast = true;
+				} else {
+					TempControlledZone( RelativeZoneNum ).CoolModeLast = false;
+				}
+				if ( HeatOffFlag && ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired <= 0.0 ) {
+					TempControlledZone( RelativeZoneNum ).HeatModeLast = true;
+				} else {
+					TempControlledZone( RelativeZoneNum ).HeatModeLast = false;
+				}
+			}
+		}
 
 		// Staged control zone
 		if ( NumStageCtrZone > 0 ) {

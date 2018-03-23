@@ -90,6 +90,9 @@ namespace DataGlobals {
 	bool AnnualSimulation(false);
 	bool outputEpJSONConversion(false);
 	bool isEpJSON(false);
+	bool isCBOR(false);
+	bool isMsgPack(false);
+	bool preserveIDFOrder(true);
 
 	// MODULE PARAMETER DEFINITIONS:
 	int const BeginDay( 1 );
@@ -265,6 +268,10 @@ namespace DataGlobals {
 		DDOnlySimulation = false;
 		AnnualSimulation = false;
 		outputEpJSONConversion = false;
+		isEpJSON = false;
+		isCBOR = false;
+		isMsgPack = false;
+		preserveIDFOrder = true;
 		BeginDayFlag = false;
 		BeginEnvrnFlag = false;
 		BeginHourFlag = false;

@@ -240,7 +240,7 @@ namespace EnergyPlus {
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
 		// if it makes sense for the unit test to continue after returning from function.
 		// Will return false if no errors found and true if errors found
-		bool process_idf( std::string const & idf_snippet, bool use_assertions = true, bool use_idd_cache = true );
+		bool process_idf( std::string const & idf_snippet, bool use_assertions = true );
 
 		// This is a helper function to easily compare an expected IDF data structure with the actual IDFRecords data structure
 		// This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
