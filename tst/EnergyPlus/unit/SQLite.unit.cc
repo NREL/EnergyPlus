@@ -423,7 +423,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( "Daily", reportingFreqName( 2 ) );
 		EXPECT_EQ( "Monthly", reportingFreqName( 3 ) );
 		EXPECT_EQ( "Run Period", reportingFreqName( 4 ) );
-		EXPECT_EQ( "Unknown!!!", reportingFreqName( 5 ) );
+		EXPECT_EQ( "Annual", reportingFreqName( 5 ) );
+		EXPECT_EQ( "Unknown!!!", reportingFreqName( 6 ) );
 		EXPECT_EQ( "Unknown!!!", reportingFreqName( -2 ) );
 
 		EXPECT_EQ( 1, logicalToInteger( true ) );

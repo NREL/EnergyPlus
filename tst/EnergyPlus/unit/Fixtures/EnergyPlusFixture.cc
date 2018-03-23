@@ -120,6 +120,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidCoolers.hh>
@@ -145,6 +146,7 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HybridModel.hh>
@@ -172,8 +174,8 @@
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantLoopSolver.hh>
-#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Plant/PlantLoopSolver.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -348,6 +350,7 @@ namespace EnergyPlus {
 		ExteriorEnergyUse::clear_state();
 		FanCoilUnits::clear_state();
 		Fans::clear_state();
+		FaultsManager::clear_state();
 		FluidCoolers::clear_state();
 		FluidProperties::clear_state();
 		Furnaces::clear_state();
@@ -372,6 +375,7 @@ namespace EnergyPlus {
 		HVACManager::clear_state();
 		HVACSingleDuctInduc::clear_state();
 		HVACStandAloneERV::clear_state();
+		HVACUnitaryBypassVAV::clear_state();
 		HVACUnitarySystem::clear_state();
 		HVACVariableRefrigerantFlow::clear_state();
 		HybridModel::clear_state();
@@ -409,6 +413,7 @@ namespace EnergyPlus {
 		Pumps::clear_state();
 		PurchasedAirManager::clear_state();
 		PVWatts::clear_state();
+		clearCoilSelectionReportObj(); // ReportCoilSelection
 		ReturnAirPathManager::clear_state();
 		RoomAirModelAirflowNetwork::clear_state();
 		RoomAirModelManager::clear_state();
@@ -557,15 +562,16 @@ namespace EnergyPlus {
 	}
 
 
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool EP_UNUSED( use_assertions ), bool EP_UNUSED( use_idd_cache ) ) {
-		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema);
+	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions ) {
+		bool success = true;
+		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
 		if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
 			inputProcessor->epJSON["Building"] = {
 					{
 							"Bldg",
 							{
-									{"idfOrder", 0},
+									{"idf_order", 0},
 									{"north_axis", 0.0},
 									{"terrain", "Suburbs"},
 									{"loads_convergence_tolerance_value", 0.04},
@@ -582,7 +588,7 @@ namespace EnergyPlus {
 					{
 							"",
 							{
-									{"idfOrder", 0},
+									{"idf_order", 0},
 									{"starting_vertex_position", "UpperLeftCorner"},
 									{"vertex_entry_direction", "Counterclockwise"},
 									{"coordinate_system", "Relative"},
@@ -605,11 +611,20 @@ namespace EnergyPlus {
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
 
+		bool is_valid = inputProcessor->validation->validate( inputProcessor->epJSON );
+		bool hasErrors = inputProcessor->processErrors();
+
 		inputProcessor->initializeMaps();
 		SimulationManager::PostIPProcessing();
 		// inputProcessor->state->printErrors();
 
-		return true;
+		bool successful_processing = success && is_valid && !hasErrors;
+
+		if ( ! successful_processing && use_assertions ) {
+			EXPECT_TRUE( compare_err_stream( "" ) );
+		}
+
+		return successful_processing;
 	}
 
 	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {

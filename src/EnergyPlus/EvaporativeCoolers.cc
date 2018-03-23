@@ -571,7 +571,7 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor = rNumericArgs( 6 );
 			EvapCond( EvapCoolNum ).IndirectFanPower = rNumericArgs( 7 );
 			EvapCond( EvapCoolNum ).FanSizingSpecificPower = rNumericArgs( 8 );
-			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 9 );
+			EvapCond( EvapCoolNum ).DesVolFlowRate = rNumericArgs( 9 );
 			EvapCond( EvapCoolNum ).DPBoundFactor = rNumericArgs( 10 );
 			if ( lNumericFieldBlanks( 11 ) ) {
 				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
@@ -647,7 +647,7 @@ namespace EvaporativeCoolers {
 			}
 			EvapCond( EvapCoolNum ).DirectEffectiveness = rNumericArgs( 1 );
 
-			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 2 );
+			EvapCond( EvapCoolNum ).DesVolFlowRate = rNumericArgs( 2 );
 			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 3 );
 			EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
 			if ( lNumericFieldBlanks( 5 ) ) {
@@ -1053,7 +1053,7 @@ namespace EvaporativeCoolers {
 
 		// Next up the other volume flow rate
 		IsAutoSize = false;
-		if ( EvapCond( EvapCoolNum ).VolFlowRate == AutoSize ) {
+		if ( EvapCond( EvapCoolNum ).DesVolFlowRate == AutoSize ) {
 			IsAutoSize = true;
 		}
 		if ( CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys ) {
@@ -1092,13 +1092,13 @@ namespace EvaporativeCoolers {
 		}
 		if ( !HardSizeNoDesRun ) {
 			if ( IsAutoSize ) {
-				EvapCond( EvapCoolNum ).VolFlowRate = volFlowRateDes;
+				EvapCond( EvapCoolNum ).DesVolFlowRate = volFlowRateDes;
 				// only these two evap coolers has primary air design flow rate
 				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
-					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).DesVolFlowRate );
 					ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 				} else if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
-					ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
+					ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Primary Air Design Flow Rate [m3/s]", EvapCond( EvapCoolNum ).DesVolFlowRate );
 				}
 			} else {
 				// the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
@@ -1360,7 +1360,7 @@ namespace EvaporativeCoolers {
 		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
 			// recirculating water pump sizing: Primary Air Design flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
 			if ( EvapCond( EvapCoolNum ).RecircPumpPower == AutoSize ) {
-				EvapCond( EvapCoolNum ).RecircPumpPower = EvapCond( EvapCoolNum ).VolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+				EvapCond( EvapCoolNum ).RecircPumpPower = EvapCond( EvapCoolNum ).DesVolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
 				ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).RecircPumpPower );
 			}
 		}

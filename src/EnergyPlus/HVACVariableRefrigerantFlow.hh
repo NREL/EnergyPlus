@@ -166,21 +166,6 @@ namespace HVACVariableRefrigerantFlow {
 	extern Array1D< Real64 > SumHeatingLoads; // sum of heating loads
 
 	// Subroutine Specifications for the Module
-	// Driver/Manager Routines
-
-	// Get Input routines for module
-
-	// Initialization routines for module
-
-	// Algorithms for the module
-
-	// Update routine to check convergence and update nodes
-	//Private UpdateVRF
-
-	// Reporting routines for module
-
-	// Types
-
 	struct VRFCondenserEquipment
 	{
 		// Members
@@ -398,6 +383,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 OUFanPower; // Outdoor unit fan power at real conditions[W]
 		std::string RefrigerantName; // Name of refrigerant, must match name in FluidName (see fluidpropertiesrefdata.idf)
 		Real64 RatedEvapCapacity; // Rated Evaporative Capacity [W]
+		Real64 RatedHeatCapacity; // Rated Heating Capacity [W]
 		Real64 RatedCompPower; // Rated Compressor Power [W]
 		Real64 RatedCompPowerPerCapcity; // Rated Compressor Power per Evaporative Capacity [W]
 		Real64 RatedOUFanPower; // Outdoor unit fan power at rated conditions [W]
@@ -620,6 +606,7 @@ namespace HVACVariableRefrigerantFlow {
 			OUEvapHeatRate( 0.0 ),
 			OUFanPower( 0.0 ),
 			RatedEvapCapacity( 40000.0 ),
+			RatedHeatCapacity( 0.0 ),
 			RatedCompPower( 14000.0 ),
 			RatedCompPowerPerCapcity( 0.35 ),
 			RatedOUFanPower( 0.0 ),

@@ -106,7 +106,6 @@ namespace EnergyPlus {
 
 	InputProcessor::InputProcessor() :
 		idf_parser( std::unique_ptr< IdfParser >( new IdfParser() ) ),
-		state( std::unique_ptr< State >( new State() ) ),
 		data( std::unique_ptr< DataStorage >( new DataStorage() ) )
 	{
 		auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
@@ -118,13 +117,7 @@ namespace EnergyPlus {
 			caseInsensitiveObjectMap.emplace( convertToUpper( it.key() ), it.key() );
 		}
 
-		state->initialize( & schema );
-
-		const auto state_ptr = state.get();
-		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed ) -> bool {
-			state_ptr->traverse( event, parsed, 999999999, 999999999 );
-			return true;
-		};
+		validation = std::unique_ptr< Validation >( new Validation( & schema ) );
 	}
 
 	std::unique_ptr< InputProcessor > InputProcessor::factory()
@@ -181,21 +174,15 @@ namespace EnergyPlus {
 		objectCacheMap.clear();
 		unusedInputs.clear();
 
-		state = std::unique_ptr< State >( new State() );
-		state->initialize( & schema );
-		const auto state_ptr = state.get();
-		callback = [ state_ptr ]( int EP_UNUSED( depth ), json::parse_event_t event, json &parsed ) -> bool {
-			state_ptr->traverse( event, parsed, 999999999, 999999999 );
-			return true;
-		};
+		validation = std::unique_ptr< Validation >( new Validation( & schema ) );
 	}
 
 	std::vector < std::string > const & InputProcessor::validationErrors() {
-		return state->validationErrors();
+		return validation->errors();
 	}
 
 	std::vector < std::string > const & InputProcessor::validationWarnings() {
-		return state->validationWarnings();
+		return validation->warnings();
 	}
 
 	std::pair< bool, std::string >
@@ -270,19 +257,26 @@ namespace EnergyPlus {
 		}
 
 		if ( ! DataGlobals::isEpJSON ) {
-			json const input_file_json = idf_parser->decode( input_file, schema );
+			bool success = true;
+			epJSON = idf_parser->decode( input_file, schema, success );
+//			bool hasErrors = processErrors();
+//			if ( !success || hasErrors ) {
+//				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+//			}
 			if ( DataGlobals::outputEpJSONConversion ) {
-				input_file = input_file_json.dump( 4 );
+				input_file = epJSON.dump( 4 );
 				std::string convertedIDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON" );
 				FileSystem::makeNativePath( convertedIDF );
 				std::ofstream convertedFS( convertedIDF, std::ofstream::out );
 				convertedFS << input_file << std::endl;
-			} else {
-				input_file = input_file_json.dump( 4 );
 			}
+		} else if ( DataGlobals::isCBOR ) {
+			epJSON = json::from_cbor( input_file );
+		} else if ( DataGlobals::isMsgPack ) {
+			epJSON = json::from_msgpack( input_file );
+		} else {
+			epJSON = json::parse( input_file );
 		}
-
-		epJSON = json::parse( input_file );
 
 		if ( DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion ) {
 			std::string const encoded = idf_parser->encode( epJSON, schema );
@@ -292,9 +286,11 @@ namespace EnergyPlus {
 			convertedFS << encoded << std::endl;
 		}
 
-		auto const num_errors = state->validationErrors().size();
-		// TODO: Need to add error outputting for idf parsing and validation
-		if ( num_errors ) {
+		bool is_valid = validation->validate( epJSON );
+		bool hasErrors = processErrors();
+
+		if ( !is_valid || hasErrors ) {
+            checkVersionMatch();
 			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
 		}
 
@@ -311,6 +307,58 @@ namespace EnergyPlus {
 		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
 		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
 		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
+	}
+
+	void
+	InputProcessor::checkVersionMatch() {
+		using DataStringGlobals::MatchVersion;
+		auto it = epJSON.find("Version");
+		if (it != epJSON.end()) {
+			for ( auto const & version : it.value() ) {
+				std::string v = version["version_identifier"];
+				if (v.empty()) {
+					ShowWarningError("Input errors occurred and version ID was left blank, verify file version");
+				} else {
+					std::string::size_type const lenVer(len(MatchVersion));
+					int Which;
+					if ((lenVer > 0) && (MatchVersion[lenVer - 1] == '0')) {
+						Which = static_cast< int >( index(v.substr(0, lenVer - 2), MatchVersion.substr(0, lenVer - 2)));
+					} else {
+						Which = static_cast< int >( index(v, MatchVersion));
+					}
+					if (Which != 0) {
+						ShowWarningError(
+								"Version: in IDF=\"" + v + "\" not the same as expected=\"" + MatchVersion + "\"");
+					}
+				}
+			}
+		}
+	}
+
+	bool
+	InputProcessor::processErrors() {
+		auto const idf_parser_errors = idf_parser->errors();
+		auto const idf_parser_warnings = idf_parser->warnings();
+
+		auto const validation_errors = validation->errors();
+		auto const validation_warnings = validation->warnings();
+
+		for (auto const & error : idf_parser_errors ) {
+			ShowSevereError( error );
+		}
+		for (auto const & warning : idf_parser_warnings ) {
+			ShowWarningError( warning );
+		}
+		for (auto const & error : validation_errors ) {
+			ShowSevereError( error );
+		}
+		for (auto const & warning : validation_warnings ) {
+			ShowWarningError( warning );
+		}
+
+		bool has_errors = validation->hasErrors() || idf_parser->hasErrors();
+
+		return has_errors;
 	}
 
 	int
@@ -367,6 +415,64 @@ namespace EnergyPlus {
 			}
 		}
 		return 0;
+	}
+
+	bool
+	InputProcessor::findDefault( std::string & default_value, json const & schema_field_obj ) {
+		auto const & find_default = schema_field_obj.find( "default" );
+		if ( find_default != schema_field_obj.end() ) {
+			auto const & default_val = find_default.value();
+			if ( default_val.is_string() ) {
+				default_value = default_val.get< std::string >();
+			} else {
+				if ( default_val.is_number_integer() ) {
+					i64toa( default_val.get< std::int64_t >(), s );
+				} else {
+					dtoa( default_val.get< double >(), s );
+				}
+				default_value = s;
+			}
+			if ( schema_field_obj.find("retaincase") == schema_field_obj.end() ) {
+				default_value = UtilityRoutines::MakeUPPERCase( default_value );
+			}
+			return true;
+		}
+		return false;
+	}
+
+	bool
+	InputProcessor::findDefault( Real64 & default_value, json const & schema_field_obj ) {
+		auto const & find_default = schema_field_obj.find( "default" );
+		default_value = 0;
+		if ( find_default != schema_field_obj.end() ) {
+			auto const & default_val = find_default.value();
+			if ( default_val.is_string() && ! default_val.get< std::string >().empty() ) {
+				// autosize and autocalculate
+				default_value = -99999;
+			}  else if ( default_val.is_number_integer() ) {
+				default_value = default_val.get< std::int64_t >();
+			} else {
+				default_value = default_val.get< double >();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	std::pair< std::string, bool >
+	InputProcessor::getObjectItemValue( std::string const & field_value, json const & schema_field_obj ) {
+		std::pair< std::string, bool > output;
+		if ( field_value.empty() ) {
+			findDefault( output.first, schema_field_obj );
+			output.second = true;
+		} else {
+			output.first = field_value;
+			output.second = field_value.empty();
+		}
+		if ( schema_field_obj.find("retaincase") == schema_field_obj.end() ) {
+			output.first = UtilityRoutines::MakeUPPERCase( output.first );
+		}
+		return output;
 	}
 
 	void
@@ -429,9 +535,8 @@ namespace EnergyPlus {
 
 		// Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
 		auto const & legacy_idd = epJSON_schema_it_val[ "legacy_idd" ];
-		auto const & legacy_idd_field_names = legacy_idd[ "field_names" ];
-		auto const & legacy_idd_alphas = legacy_idd[ "alphas" ];
-		auto const & legacy_idd_numerics = legacy_idd[ "numerics" ];
+		auto const & legacy_idd_field_info = legacy_idd[ "field_info" ];
+		auto const & legacy_idd_fields = legacy_idd[ "fields" ];
 		auto const & schema_name_field = epJSON_schema_it_val.find( "name" );
 
 		auto key = legacy_idd.find("extension");
@@ -457,247 +562,217 @@ namespace EnergyPlus {
 
 		auto const & obj = epJSON_it;
 		auto const & obj_val = obj.value();
-		auto const & legacy_idd_alphas_fields = legacy_idd_alphas[ "fields" ];
-		// int idfObjCount = obj_val[ "idfOrder"];
-		for ( size_t i = 0; i < legacy_idd_alphas_fields.size(); ++i ) {
-			std::string const & field = legacy_idd_alphas_fields[ i ];
-			if ( field == "name" && schema_name_field != epJSON_schema_it_val.end() ) {
-				auto const & name_iter = schema_name_field.value();
-				if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
-					Alphas( i + 1 ) = obj.key();
-				} else {
-					Alphas( i + 1 ) = UtilityRoutines::MakeUPPERCase( obj.key() );
-					// Alphas( i + 1 ) = obj.key();
-				}
-				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = obj.key().empty();
-				if ( is_AlphaFieldNames ) {
-					AlphaFieldNames()( i + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
-				}
-				NumAlphas++;
-				continue;
-			}
-			auto it = obj_val.find( field );
-			if ( it != obj_val.end() ) {
-				if ( it.value().is_string() ) {
-					std::string val;
-					auto const & schema_field_obj = schema_obj_props[ field ];
-					auto const & find_default = schema_field_obj.find( "default" );
-					if ( it.value().get < std::string >().empty() &&
-						 find_default != schema_field_obj.end() ) {
-						auto const & default_val = find_default.value();
-						if ( default_val.is_string() ) {
-							val = default_val.get < std::string >();
-						} else {
-							dtoa( default_val.get < double >(), s );
-							val = s;
-						}
-						if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = true;
-					} else {
-						val = it.value().get < std::string >();
-						if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = val.empty();
-					}
-					if ( schema_field_obj.find("retaincase") != schema_field_obj.end() ) {
-						Alphas( i + 1 ) = val;
-					} else {
-						// Alphas( i + 1 ) = val;
-						Alphas( i + 1 ) = UtilityRoutines::MakeUPPERCase( val );
-					}
-				} else {
-					if ( it.value().is_number_integer() ) {
-						i64toa( it.value().get < int >(), s );
-					} else {
-						dtoa( it.value().get < double >(), s );
-					}
-					Alphas( i + 1 ) = s;
-					if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = false;
-				}
-				NumAlphas++;
-			} else {
-				Alphas( i + 1 ) = "";
-				if ( is_AlphaBlank ) AlphaBlank()( i + 1 ) = true;
-			}
-			if ( is_AlphaFieldNames ) {
-				AlphaFieldNames()( i + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
-			}
+
+		size_t idf_max_fields = 0;
+		auto found_idf_max_fields = obj_val.find( "idf_max_fields" );
+		if ( found_idf_max_fields != obj_val.end() ) {
+			idf_max_fields = *found_idf_max_fields;
 		}
 
-		auto const & legacy_idd_alphas_extension_iter = legacy_idd_alphas.find( "extensions" );
-		if ( legacy_idd_alphas_extension_iter != legacy_idd_alphas.end() ) {
+		size_t idf_max_extensible_fields = 0;
+		auto found_idf_max_extensible_fields = obj_val.find( "idf_max_extensible_fields" );
+		if ( found_idf_max_extensible_fields != obj_val.end() ) {
+			idf_max_extensible_fields = *found_idf_max_extensible_fields;
+		}
+
+		int alpha_index = 1;
+		int numeric_index = 1;
+
+		for ( size_t i = 0; i < legacy_idd_fields.size(); ++i ) {
+			std::string const & field = legacy_idd_fields[ i ];
+			auto const & field_info = legacy_idd_field_info.find( field );
+			if ( field_info == legacy_idd_field_info.end() ) {
+				ShowFatalError( "Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema." );
+			}
+			auto const & field_type = field_info.value().at( "field_type" ).get< std::string >();
+			bool within_idf_fields = ( i < idf_max_fields );
+			 if ( field == "name" && schema_name_field != epJSON_schema_it_val.end() ) {
+			 	auto const & name_iter = schema_name_field.value();
+			 	if ( name_iter.find( "retaincase" ) != name_iter.end() ) {
+			 		Alphas( alpha_index ) = obj.key();
+			 	} else {
+			 		Alphas( alpha_index ) = UtilityRoutines::MakeUPPERCase( obj.key() );
+			 	}
+			 	if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = obj.key().empty();
+			 	if ( is_AlphaFieldNames ) {
+			 		AlphaFieldNames()( alpha_index ) = ( DataGlobals::isEpJSON ) ? field : field_info.value().at( "field_name" ).get< std::string >();
+			 	}
+			 	NumAlphas++;
+				alpha_index++;
+			 	continue;
+			 }
+
+			auto const & schema_field_obj = schema_obj_props[ field ];
+			auto it = obj_val.find( field );
+			if ( it != obj_val.end() ) {
+				auto const & field_value = it.value();
+				if ( field_type == "a" ) {
+					// process alpha value
+					if ( field_value.is_string() ) {
+						auto const value = getObjectItemValue( field_value.get < std::string >(), schema_field_obj );
+
+						Alphas( alpha_index ) = value.first;
+						if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = value.second;
+
+					} else {
+						if ( field_value.is_number_integer() ) {
+							i64toa( field_value.get< std::int64_t >(), s );
+						} else {
+							dtoa( field_value.get < double >(), s );
+						}
+						Alphas( alpha_index ) = s;
+						if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = false;
+					}
+				}
+				else if ( field_type == "n" ) {
+					// process numeric value
+					if ( field_value.is_number() ) {
+						if ( field_value.is_number_integer() ) {
+							Numbers( numeric_index ) = field_value.get< std::int64_t >();
+						} else {
+							Numbers( numeric_index ) = field_value.get< double >();
+						}
+						if ( is_NumBlank ) NumBlank()( numeric_index ) = false;
+					} else {
+						bool is_empty = field_value.get < std::string >().empty();
+						if ( is_empty ) {
+							findDefault( Numbers( numeric_index ), schema_field_obj );
+						} else {
+							Numbers( numeric_index ) = -99999; // autosize and autocalculate
+						}
+						if ( is_NumBlank ) NumBlank()( numeric_index ) = is_empty;
+					}
+				}
+			} else {
+				if ( field_type == "a" ) {
+					if ( ! ( within_idf_fields && findDefault( Alphas( alpha_index ), schema_field_obj ) ) ) {
+						Alphas( alpha_index ) = "";
+					}
+					if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = true;
+				}
+				else if ( field_type == "n" ) {
+					if ( within_idf_fields ) {
+						findDefault( Numbers( numeric_index ), schema_field_obj );
+					} else {
+						Numbers( numeric_index ) = 0;
+					}
+					if ( is_NumBlank ) NumBlank()( numeric_index ) = true;
+				}
+			}
+			if ( field_type == "a" ) {
+				if ( within_idf_fields ) NumAlphas++;
+				if ( is_AlphaFieldNames ) {
+					AlphaFieldNames()( alpha_index ) = ( DataGlobals::isEpJSON ) ? field : field_info.value().at( "field_name" ).get< std::string >();
+				}
+				alpha_index++;
+			}
+			else if ( field_type == "n" ) {
+				if ( within_idf_fields ) NumNumbers++;
+				if ( is_NumericFieldNames ) {
+					NumericFieldNames()( numeric_index ) = ( DataGlobals::isEpJSON ) ? field : field_info.value().at( "field_name" ).get< std::string >();
+				}
+				numeric_index++;
+			}
+
+		}
+
+		size_t extensible_count = 0;
+		 auto const & legacy_idd_extensibles_iter = legacy_idd.find( "extensibles" );
+		 if ( legacy_idd_extensibles_iter != legacy_idd.end() ) {
 			auto const epJSON_extensions_array_itr = obj.value().find( extension_key );
 			if ( epJSON_extensions_array_itr != obj.value().end() ) {
-				auto const & legacy_idd_alphas_extensions = legacy_idd_alphas_extension_iter.value();
+				auto const & legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
 				auto const & epJSON_extensions_array = epJSON_extensions_array_itr.value();
 				auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-				int alphas_index = static_cast <int> ( legacy_idd_alphas_fields.size() );
 
 				for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
 					auto const & epJSON_extension_obj = it.value();
 
-					for ( size_t i = 0; i < legacy_idd_alphas_extensions.size(); i++ ) {
-						std::string const & field_name = legacy_idd_alphas_extensions[ i ];
+					for ( size_t i = 0; i < legacy_idd_extensibles.size(); i++, extensible_count++ ) {
+						std::string const & field_name = legacy_idd_extensibles[ i ];
 						auto const & epJSON_obj_field_iter = epJSON_extension_obj.find( field_name );
+						auto const & schema_field = schema_extension_fields[ field_name ];
+
+						auto const & field_info = legacy_idd_field_info.find( field_name );
+						if ( field_info == legacy_idd_field_info.end() ) {
+							ShowFatalError( "Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema." );
+						}
+						auto const & field_type = field_info.value().at( "field_type" ).get< std::string >();
+						bool within_idf_extensible_fields = ( extensible_count < idf_max_extensible_fields );
 
 						if ( epJSON_obj_field_iter != epJSON_extension_obj.end() ) {
-							auto const & epJSON_field_val = epJSON_obj_field_iter.value();
-							if ( epJSON_field_val.is_string() ) {
-								auto const & schema_field = schema_extension_fields[ field_name ];
-								std::string val = epJSON_field_val;
-								auto const & tmp_find_default_iter = schema_field.find( "default" );
-								if ( val.empty() and tmp_find_default_iter != schema_field.end() ) {
-									auto const & field_default_val = tmp_find_default_iter.value();
-									if ( field_default_val.is_string() ) {
-										val = field_default_val.get < std::string >();
+							auto const & field_value = epJSON_obj_field_iter.value();
+
+							if ( field_type == "a" ) {
+								if ( field_value.is_string() ) {
+									auto const value = getObjectItemValue( field_value.get < std::string >(), schema_field );
+
+									Alphas( alpha_index ) = value.first;
+									if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = value.second;
+								} else {
+									if ( field_value.is_number_integer() ) {
+										i64toa( field_value.get< std::int64_t >(), s );
 									} else {
-										if ( field_default_val.is_number_integer() ) {
-											i64toa( field_default_val.get < int >(), s );
-										} else {
-											dtoa( field_default_val.get < double >(), s );
-										}
-										val = s;
+										dtoa( field_value.get< double >(), s );
 									}
-									if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
-								} else {
-									if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = val.empty();
+									Alphas( alpha_index ) = s;
+									if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = false;
 								}
-								if ( schema_field.find("retaincase") != schema_field.end() ) {
-									Alphas( alphas_index + 1 ) = val;
-								} else {
-									// Alphas( alphas_index + 1 ) = val;
-									Alphas( alphas_index + 1 ) = UtilityRoutines::MakeUPPERCase( val );
-								}
-							} else {
-								if ( epJSON_field_val.is_number_integer() ) {
-									i64toa( epJSON_field_val.get < int >(), s );
-								} else {
-									dtoa( epJSON_field_val.get < double >(), s );
-								}
-								Alphas( alphas_index + 1 ) = s;
-								if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = false;
 							}
-							NumAlphas++;
-						} else {
-							Alphas( alphas_index + 1 ) = "";
-							if ( is_AlphaBlank ) AlphaBlank()( alphas_index + 1 ) = true;
-						}
-						if ( is_AlphaFieldNames ) {
-							AlphaFieldNames()( alphas_index + 1 ) = ( DataGlobals::isEpJSON ) ? field_name : legacy_idd_field_names[ field_name ].get< std::string >();
-						}
-						alphas_index++;
-					}
-				}
-			}
-		}
-
-		auto const & legacy_idd_numerics_fields = legacy_idd_numerics[ "fields" ];
-		for ( size_t i = 0; i < legacy_idd_numerics_fields.size(); ++i ) {
-			std::string const & field = legacy_idd_numerics_fields[ i ];
-			auto it = obj.value().find( field );
-			if ( it != obj.value().end() ) {
-				if ( !it.value().is_string() ) {
-					Numbers( i + 1 ) = it.value().get < double >();
-					if ( is_NumBlank ) NumBlank()( i + 1 ) = false;
-				} else {
-					if ( it.value().get < std::string >().empty() ) {
-						auto const & schema_obj = schema_obj_props[ field ];
-						auto const & schema_default_iter = schema_obj.find( "default" );
-						if ( schema_default_iter != schema_obj.end() ) {
-							auto const & schema_default_val = schema_default_iter.value();
-							if ( schema_default_val.is_string() ) Numbers( i + 1 ) = -99999;
-							else Numbers( i + 1 ) = schema_default_val.get < double >();
-						} else {
-							Numbers( i + 1 ) = 0;
-						}
-					} else {
-						Numbers( i + 1 ) = -99999; // autosize and autocalculate
-					}
-					if ( is_NumBlank ) NumBlank()( i + 1 ) = it.value().get < std::string >().empty();
-				}
-				NumNumbers++;
-			} else {
-				Numbers( i + 1 ) = 0;
-				if ( is_NumBlank )
-					NumBlank()( i + 1 ) = true;
-			}
-			if ( is_NumericFieldNames ) {
-				NumericFieldNames()( i + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
-			}
-		}
-
-		auto const legacy_idd_numerics_extension_iter = legacy_idd_numerics.find( "extensions" );
-		auto const epJSON_extensions_iter = obj.value().find( extension_key );
-		if ( legacy_idd_numerics_extension_iter != legacy_idd_numerics.end() && epJSON_extensions_iter != obj.value().end() ) {
-			auto const & legacy_idd_numerics_extensions = legacy_idd_numerics_extension_iter.value();
-			auto const & schema_extension_fields = schema_obj_props[ extension_key ][ "items" ][ "properties" ];
-			// auto const & epJSON_extensions_array = obj.value()[ extension_key ];
-			auto const & epJSON_extensions_array = epJSON_extensions_iter.value();
-			int numerics_index = static_cast <int> ( legacy_idd_numerics_fields.size() );
-
-			for ( auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it ) {
-				auto const & epJSON_extension_obj = it.value();
-
-				for ( size_t i = 0; i < legacy_idd_numerics_extensions.size(); i++ ) {
-					std::string const & field = legacy_idd_numerics_extensions[ i ];
-					auto const & epJSON_extension_field_iter = epJSON_extension_obj.find( field );
-
-					if ( epJSON_extension_field_iter != epJSON_extension_obj.end() ) {
-						auto const & val = epJSON_extension_field_iter.value();
-						if ( !val.is_string() ) {
-							if ( val.is_number_integer() ) {
-								Numbers( numerics_index + 1 ) = val.get < int >();
-							} else {
-								Numbers( numerics_index + 1 ) = val.get < double >();
-							}
-							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = false;
-						} else {
-							if ( val.get < std::string >().empty() ) {
-								auto const & schema_obj = schema_extension_fields[ field ];
-								auto const & default_iter = schema_obj.find( "default" );
-								if ( default_iter != schema_obj.end() ) {
-									auto const & default_val = default_iter.value();
-									if ( default_val.is_string() ) {
-										Numbers( numerics_index + 1 ) = -99999;
-									} else if ( default_val.is_number_integer() ) {
-										Numbers( numerics_index + 1 ) = default_val.get < int >();
+							else if ( field_type == "n" ) {
+								if ( field_value.is_number() ) {
+									if ( field_value.is_number_integer() ) {
+										Numbers( numeric_index ) = field_value.get< std::int64_t >();
 									} else {
-										Numbers( numerics_index + 1 ) = default_val.get < double >();
+										Numbers( numeric_index ) = field_value.get < double >();
 									}
+									if ( is_NumBlank ) NumBlank()( numeric_index ) = false;
 								} else {
-									Numbers( numerics_index + 1 ) = 0;
-								}
-							} else { // autosize and autocalculate
-								Numbers( numerics_index + 1 ) = -99999;
-							}
-							if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = val.get < std::string >().empty();
-						}
-						NumNumbers++;
-					} else {
-						auto const & schema_field = schema_extension_fields[ field ];
-						auto const & schema_field_default_iter = schema_field.find( "default" );
-						if ( schema_field_default_iter != schema_field.end() ) {
-							auto const & schema_field_default_val = schema_field_default_iter.value();
-							if ( schema_field_default_val.is_number_integer() ) {
-								Numbers( numerics_index + 1 ) = schema_field_default_val.get < int >();
-							} else if ( schema_field_default_val.is_number_float() ) {
-								Numbers( numerics_index + 1 ) = schema_field_default_val.get < double >();
-							} else {
-								if ( it.value().get < std::string >().empty() ) {
-									Numbers( numerics_index + 1 ) = 0;
-								} else {
-									Numbers( numerics_index + 1 ) = -99999; // autosize and autocalculate
+									bool is_empty = field_value.get< std::string >().empty();
+									if ( is_empty ) {
+										findDefault( Numbers( numeric_index ), schema_field );
+									} else {
+										Numbers( numeric_index ) = -99999; // autosize and autocalculate
+									}
+									if ( is_NumBlank ) NumBlank()( numeric_index ) = is_empty;
 								}
 							}
 						} else {
-							Numbers( numerics_index + 1 ) = 0;
+
+							if ( field_type == "a" ) {
+								if ( ! ( within_idf_extensible_fields && findDefault( Alphas( alpha_index ), schema_field ) ) ) {
+									Alphas( alpha_index ) = "";
+								}
+								if ( is_AlphaBlank ) AlphaBlank()( alpha_index ) = true;
+							}
+							else if ( field_type == "n" ) {
+								if ( within_idf_extensible_fields ) {
+									findDefault( Numbers( numeric_index ), schema_field );
+								} else {
+									Numbers( numeric_index ) = 0;
+								}
+								if ( is_NumBlank ) NumBlank()( numeric_index ) = true;
+							}
 						}
-						if ( is_NumBlank ) NumBlank()( numerics_index + 1 ) = true;
+
+						if ( field_type == "a" ) {
+							if ( within_idf_extensible_fields ) NumAlphas++;
+							if ( is_AlphaFieldNames ) {
+								AlphaFieldNames()( alpha_index ) = ( DataGlobals::isEpJSON ) ? field_name : field_info.value().at( "field_name" ).get< std::string >();
+							}
+							alpha_index++;
+						}
+						else if ( field_type == "n" ) {
+							if ( within_idf_extensible_fields ) NumNumbers++;
+							if ( is_NumericFieldNames ) {
+								NumericFieldNames()( numeric_index ) = ( DataGlobals::isEpJSON ) ? field_name : field_info.value().at( "field_name" ).get< std::string >();
+							}
+							numeric_index++;
+						}
 					}
-					if ( is_NumericFieldNames ) {
-						NumericFieldNames()( numerics_index + 1 ) = ( DataGlobals::isEpJSON ) ? field : legacy_idd_field_names[ field ].get< std::string >();
-					}
-					numerics_index++;
 				}
 			}
-		}
+		 }
 
 		Status = 1;
 	}
@@ -712,7 +787,7 @@ namespace EnergyPlus {
 
 		// Only applicable if the incoming file was idf
 		int idfOrderNumber = Number;
-		if ( DataGlobals::isEpJSON ) return idfOrderNumber;
+		if ( DataGlobals::isEpJSON || ! DataGlobals::preserveIDFOrder ) return idfOrderNumber;
 
 		json * obj;
 		auto obj_iter = epJSON.find( Object );
@@ -731,7 +806,7 @@ namespace EnergyPlus {
 
 		// get list of saved object numbers from idf processing
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
-			int objNum = it.value()[ "idfOrder" ];
+			int objNum = it.value()[ "idf_order" ];
 			idfObjNums.emplace_back( objNum );
 		}
 
@@ -759,7 +834,7 @@ namespace EnergyPlus {
 
 		// Only applicable if the incoming file was idf
 		int jSONOrderNumber = Number;
-		if ( DataGlobals::isEpJSON ) return jSONOrderNumber;
+		if ( DataGlobals::isEpJSON || ! DataGlobals::preserveIDFOrder ) return jSONOrderNumber;
 
 		json * obj;
 		auto obj_iter = epJSON.find( Object );
@@ -778,7 +853,7 @@ namespace EnergyPlus {
 
 		// get list of saved object numbers from idf processing
 		for ( auto it = obj->begin(); it != obj->end(); ++it ) {
-			int objNum = it.value()[ "idfOrder" ];
+			int objNum = it.value()[ "idf_order" ];
 			idfObjNums.emplace_back( objNum );
 		}
 
@@ -1324,9 +1399,9 @@ namespace EnergyPlus {
 			auto const & epJSON_object = epJSON_objects.value();
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
-				if ( !fields.at( "key_value" ).empty() ) {
-					addRecordToOutputVariableStructure( fields.at( "key_value" ),
-																		fields.at( "variable_name" ) );
+				auto it = fields.find( "key_value" );
+				if ( it != fields.end() && !it.value().empty() ) {
+					addRecordToOutputVariableStructure( it.value(), fields.at( "variable_name" ) );
 				} else {
 					addRecordToOutputVariableStructure( "*", fields.at( "variable_name" ) );
 				}
@@ -1344,13 +1419,11 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					if ( !obj.key().empty() ) {
-						addRecordToOutputVariableStructure( extensions.at( "key_name" ),
-																			extensions.at(
-																			"output_variable_or_meter_name" ) );
+					auto it = extensions.find( "key_name" );
+					if ( it != extensions.end() && !obj.key().empty() ) {
+						addRecordToOutputVariableStructure( it.value(), extensions.at( "output_variable_or_meter_name" ) );
 					} else {
-						addRecordToOutputVariableStructure( "*", extensions.at(
-						"output_variable_or_meter_name" ) );
+						addRecordToOutputVariableStructure( "*", extensions.at( "output_variable_or_meter_name" ) );
 					}
 				}
 			}
@@ -1367,13 +1440,11 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					if ( !obj.key().empty() ) {
-						addRecordToOutputVariableStructure( extensions.at( "key_name" ),
-																			extensions.at(
-																			"output_variable_or_meter_name" ) );
+					auto it = extensions.find( "key_name" );
+					if ( it != extensions.end() && !obj.key().empty() ) {
+						addRecordToOutputVariableStructure( it.value(), extensions.at( "output_variable_or_meter_name" ) );
 					} else {
-						addRecordToOutputVariableStructure( "*", extensions.at(
-						"output_variable_or_meter_name" ) );
+						addRecordToOutputVariableStructure( "*", extensions.at( "output_variable_or_meter_name" ) );
 					}
 				}
 			}
@@ -1384,13 +1455,11 @@ namespace EnergyPlus {
 			auto const & epJSON_object = epJSON_objects.value();
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
-				if ( !fields.at( "output_variable_or_output_meter_index_key_name" ).empty() ) {
-					addRecordToOutputVariableStructure(
-					fields.at( "output_variable_or_output_meter_index_key_name" ),
-					fields.at( "output_variable_or_output_meter_name" ) );
+				auto it = fields.find( "output_variable_or_output_meter_index_key_name" );
+				if ( it != fields.end() && !it.value().empty() ) {
+					addRecordToOutputVariableStructure( it.value(), fields.at( "output_variable_or_output_meter_name" ) );
 				} else {
-					addRecordToOutputVariableStructure( "*", fields.at(
-					"output_variable_or_output_meter_name" ) );
+					addRecordToOutputVariableStructure( "*", fields.at( "output_variable_or_output_meter_name" ) );
 				}
 			}
 		}
@@ -1427,8 +1496,7 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					addRecordToOutputVariableStructure( "*",
-																		extensions.at( "variable_or_meter_name" ) );
+					addRecordToOutputVariableStructure( "*", extensions.at( "variable_or_meter_name" ) );
 				}
 			}
 		}
@@ -1444,8 +1512,7 @@ namespace EnergyPlus {
 			for ( auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj ) {
 				json const & fields = obj.value();
 				for ( auto const & extensions : fields[ extension_key ] ) {
-					addRecordToOutputVariableStructure( "*", extensions.at(
-					"variable_or_meter_or_ems_variable_or_field_name" ) );
+					addRecordToOutputVariableStructure( "*", extensions.at( "variable_or_meter_or_ems_variable_or_field_name" ) );
 				}
 			}
 		}

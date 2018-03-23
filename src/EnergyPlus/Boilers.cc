@@ -104,7 +104,7 @@ namespace Boilers {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataPlant::PlantLoop;
 	using DataPlant::TypeOf_Boiler_Simple;
-	using DataPlant::ScanPlantLoopsForObject;
+	using PlantUtilities::ScanPlantLoopsForObject;
 	using DataBranchAirLoopPlant::ControlType_SeriesActive;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
@@ -138,7 +138,8 @@ namespace Boilers {
 	Real64 BoilerMassFlowRate( 0.0 ); // kg/s - Boiler mass flow rate
 	Real64 BoilerOutletTemp( 0.0 ); // W - Boiler outlet temperature
 	Real64 BoilerPLR( 0.0 ); // Boiler operating part-load ratio
-
+	bool GetBoilerInputFlag( true );
+	bool BoilerOneTimeFlag( true );
 	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
@@ -167,6 +168,8 @@ namespace Boilers {
 		CheckEquipName.deallocate();
 		Boiler.deallocate();
 		BoilerReport.deallocate();
+		GetBoilerInputFlag = true;
+		BoilerOneTimeFlag = true;
 	}
 
 	void
@@ -194,15 +197,14 @@ namespace Boilers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subrountine controls the boiler component simulation
 
-		static bool GetInput( true ); // if TRUE read user input
 		int BoilerNum; // boiler counter/identifier
 
 		//FLOW
 
 		//Get Input
-		if ( GetInput ) {
+		if ( GetBoilerInputFlag ) {
 			GetBoilerInput();
-			GetInput = false;
+			GetBoilerInputFlag = false;
 		}
 
 		// Find the correct Equipment
@@ -560,7 +562,6 @@ namespace Boilers {
 		static std::string const RoutineName( "InitBoiler" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true ); // one time flag
 		static Array1D_bool MyEnvrnFlag; // environment flag
 		static Array1D_bool MyFlag;
 		Real64 rho;
@@ -568,12 +569,12 @@ namespace Boilers {
 		bool errFlag;
 
 		// Do the one time initializations
-		if ( MyOneTimeFlag ) {
+		if ( BoilerOneTimeFlag ) {
 			MyFlag.allocate( NumBoilers );
 			MyEnvrnFlag.allocate( NumBoilers );
 			MyFlag = true;
 			MyEnvrnFlag = true;
-			MyOneTimeFlag = false;
+			BoilerOneTimeFlag = false;
 		}
 
 		// Init more variables

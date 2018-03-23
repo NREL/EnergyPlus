@@ -927,7 +927,7 @@ namespace HVACControllers {
 		using DataGlobals::WarmupFlag;
 		using DataHVACGlobals::DoSetPointTest;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForNodeNum;
+		using PlantUtilities::ScanPlantLoopsForNodeNum;
 		using RootFinder::SetupRootFinder;
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::CheckIfNodeSetPointManagedByEMS;
