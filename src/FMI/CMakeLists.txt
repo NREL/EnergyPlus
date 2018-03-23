@@ -5,7 +5,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../EnergyPlus/public )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../EnergyPlus )
 
-configure_file( Test/config.hpp.in config.hpp )
+configure_file( Test/config.hpp.in test-config.hpp )
 
 set(src
   EPFMI.hpp
