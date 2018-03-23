@@ -85,12 +85,8 @@ extern "C" {
 #include <GeneralRoutines.hh>
 #include <NodeInputManager.hh>
 #include <OutputReports.hh>
-<<<<<<< HEAD
-#include <PlantManager.hh>
-#include <ResultsSchema.hh>
-=======
 #include <Plant/PlantManager.hh>
->>>>>>> develop
+#include <ResultsSchema.hh>
 #include <SimulationManager.hh>
 #include <SolarShading.hh>
 #include <SQLiteProcedures.hh>
