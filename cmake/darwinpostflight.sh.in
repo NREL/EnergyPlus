@@ -5,6 +5,7 @@ ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/GrndTempCalc/BasementGHT.i
 ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PostProcess/convertESOMTRpgm/convertESOMTR" /usr/bin/
 ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/EnergyPlus" /usr/bin/
 ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/Energy+.idd" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/Energy+.schema.epJSON" /usr/bin/
 ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/EPMacro" /usr/bin/
 ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/ExpandObjects" /usr/bin/
 ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PostProcess/HVAC-Diagram" /usr/bin/
@@ -21,10 +22,10 @@ mv "$2@CPACK_PACKAGING_INSTALL_PREFIX@/energyplus.1" /usr/local/share/man/man1/
 chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@"
 chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/Contents/MacOS/"
 chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/"
-if [ -e "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/" ]; then 
+if [ -e "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/" ]; then
   chmod +x "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/Contents/MacOS/IDFVersionUpdater"
 fi
-if [ -e "$2@CPACK_PACKAGING_INSTALL_PREFIX@/Uninstall EnergyPlus.app" ]; then  
+if [ -e "$2@CPACK_PACKAGING_INSTALL_PREFIX@/Uninstall EnergyPlus.app" ]; then
   chmod +x "$2@CPACK_PACKAGING_INSTALL_PREFIX@/Uninstall EnergyPlus.app/Contents/MacOS/applet"
 fi
 if [ -e "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/EP-Launch-Lite.app" ]; then

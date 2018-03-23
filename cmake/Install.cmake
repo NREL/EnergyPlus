@@ -32,6 +32,7 @@ install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
+install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" DESTINATION ./ )
 
 # Some docs are generated on the fly here, create a dir for the 'built' files
 set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
