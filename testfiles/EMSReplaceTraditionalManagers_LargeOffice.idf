@@ -215,7 +215,7 @@
     9.69,                    !- Annual Average Outdoor Air Temperature {C}
     28.10;                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
-! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -245,7 +245,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=23.8°C
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2Â°C MWB=23.8Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name

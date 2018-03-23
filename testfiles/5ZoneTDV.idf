@@ -15,8 +15,8 @@
 !
 ! Location:                Los Angeles
 !
-! Design Days:             LOS_ANGELES_CA_USA Heating 99%, MaxDB=   7.40캜
-!                          LOS_ANGELES_CA_USA Cooling (DB=>MWB) 1%, MaxDB=  27.00캜 MWB=  17.60캜
+! Design Days:             LOS_ANGELES_CA_USA Heating 99%, MaxDB=   7.40째C
+!                          LOS_ANGELES_CA_USA Cooling (DB=>MWB) 1%, MaxDB=  27.00째C MWB=  17.60째C
 !
 ! Run Period (Weather File): Annual
 !
@@ -189,7 +189,7 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-! LOS_ANGELES_CA_USA Heating 99%, MaxDB=   7.40캜
+! LOS_ANGELES_CA_USA Heating 99%, MaxDB=   7.40째C
 
   SizingPeriod:DesignDay,
     LOS_ANGELES_CA_USA Heating 99% Conditions,  !- Name
@@ -219,7 +219,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! LOS_ANGELES_CA_USA Cooling (DB=>MWB) 1%, MaxDB=  27.00캜 MWB=  17.60캜
+! LOS_ANGELES_CA_USA Cooling (DB=>MWB) 1%, MaxDB=  27.00째C MWB=  17.60째C
 
   SizingPeriod:DesignDay,
     LOS_ANGELES_CA_USA Cooling 1% Conditions DB=>MWB,  !- Name

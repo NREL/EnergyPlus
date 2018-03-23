@@ -169,15 +169,18 @@ TEST_F( EnergyPlusFixture, PVWattsGenerator_GetInputsFailure )
 		";",
 		"Output:Variable,*,Generator Produced DC Electric Power,timestep;"
 	});
-	ASSERT_TRUE(process_idf(idfTxt));
+	EXPECT_FALSE( process_idf( idfTxt, false ) );
 	ASSERT_THROW( GetOrCreatePVWattsGenerator("PVWattsArray1"), std::runtime_error );
 	std::string const error_string = delimited_string({
+		"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_geometry_type] - \"asdf\" - Failed to match against any enum values.",
+		"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_type] - \"FixedRoofMount\" - Failed to match against any enum values.",
+		"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][module_type] - \"Primo\" - Failed to match against any enum values.",
 		"   ** Severe  ** PVWatts: Invalid Module Type: PRIMO",
 		"   ** Severe  ** PVWatts: Invalid Array Type: FIXEDROOFMOUNT",
 		"   ** Severe  ** PVWatts: Invalid Geometry Type: ASDF",
 		"   **  Fatal  ** Errors found in getting PVWatts input",
 		"   ...Summary of Errors that led to program termination:",
-		"   ..... Reference severe error count=3",
+		"   ..... Reference severe error count=6",
 		"   ..... Last severe error=PVWatts: Invalid Geometry Type: ASDF"
 	});
 	EXPECT_TRUE( compare_err_stream( error_string, true ) );

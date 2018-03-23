@@ -14,8 +14,8 @@
 !
 ! Location:                Miami, FL             !  Data Source=ASHRAE 2009 Annual Design Conditions
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/16, USA_FL_Miami.Intl.AP.722020_TMY3
 !
@@ -204,7 +204,7 @@
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -234,7 +234,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name

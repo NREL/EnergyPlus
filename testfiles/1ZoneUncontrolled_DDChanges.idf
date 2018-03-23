@@ -14,8 +14,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             Denver Centennial Golden_CO_USA Annual Heating 99%, MaxDB=-16°C
-!                          Denver Centennial Golden_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6°C MWB=15.5°C
+! Design Days:             Denver Centennial Golden_CO_USA Annual Heating 99%, MaxDB=-16Â°C
+!                          Denver Centennial Golden_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6Â°C MWB=15.5Â°C
 !                          Then, these design days with changes for relative humidity (schedule) and
 !                          range changes.  Also the two design days are duplicated for the solar model:
 !                          Zhang Huang aka IWEC2.  Then, the ability to add a Sky Temperature modifier is added.

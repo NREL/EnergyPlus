@@ -655,7 +655,7 @@ namespace UnitHeater {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -861,7 +861,7 @@ namespace UnitHeater {
 		using SteamCoils::GetCoilSteamInletNode;
 		using SteamCoils::GetCoilSteamOutletNode;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using Psychrometrics::CPHW;
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;

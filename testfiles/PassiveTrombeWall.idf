@@ -45,7 +45,7 @@
     -7.00,                   !- Time Zone {hr}
     1712.00;                 !- Elevation {m}
 
- ! CEDAR_CITY_UT_USA Annual Heating 99%, MaxDB=-12.8°C
+ ! CEDAR_CITY_UT_USA Annual Heating 99%, MaxDB=-12.8Â°C
 
   SizingPeriod:DesignDay,
     CEDAR_CITY Ann Htg 99% Condns DB,  !- Name
@@ -75,7 +75,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CEDAR_CITY_UT_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.9°C MWB=14.8°C
+ ! CEDAR_CITY_UT_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.9Â°C MWB=14.8Â°C
 
   SizingPeriod:DesignDay,
     CEDAR_CITY Ann Clg 1% Condns DB=>MWB,  !- Name

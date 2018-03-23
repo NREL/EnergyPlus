@@ -43,7 +43,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+ ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
@@ -73,7 +73,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5Â°C MWB=23Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name

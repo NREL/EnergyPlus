@@ -187,7 +187,7 @@ TEST_F( EnergyPlusFixture, CheckActuatorInit ) {
 
 		"EnergyManagementSystem:ProgramCallingManager,",
 		"Dual Setpoint Test Manager,  !- Name",
-		"EndSystemTimestepBeforeHVACReporting,  !- EnergyPlus Model Calling Point",
+		"EndOfSystemTimestepBeforeHVACReporting,  !- EnergyPlus Model Calling Point",
 		"DualSetpointTestControl;  !- Program Name 1",
 
 		"EnergyManagementSystem:Program,",

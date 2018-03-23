@@ -57,7 +57,7 @@
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <GlobalNames.hh>
-#include <PlantLocation.hh>
+#include <Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -172,6 +172,9 @@ public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
 
 	Real64
 	getPrimAirDesignVolFlow();
+
+	int
+	getTermUnitSizingIndex();
 
  private: // Methods
 

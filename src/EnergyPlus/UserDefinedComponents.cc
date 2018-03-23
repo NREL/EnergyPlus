@@ -1333,7 +1333,7 @@ namespace UserDefinedComponents {
 			// locate the connections to the plant loops
 			for ( ConnectionNum = 1; ConnectionNum <= UserPlantComp( CompNum ).NumPlantConnections; ++ConnectionNum ) {
 				errFlag = false;
-				ScanPlantLoopsForObject( UserPlantComp( CompNum ).Name, TypeOf_PlantComponentUserDefined, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopSideNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).BranchNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).CompNum, _, _, _, UserPlantComp( CompNum ).Loop( ConnectionNum ).InletNodeNum );
+				PlantUtilities::ScanPlantLoopsForObject( UserPlantComp( CompNum ).Name, TypeOf_PlantComponentUserDefined, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).LoopSideNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).BranchNum, UserPlantComp( CompNum ).Loop( ConnectionNum ).CompNum, _, _, _, UserPlantComp( CompNum ).Loop( ConnectionNum ).InletNodeNum );
 				if ( errFlag ) {
 					ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
 				}
@@ -1419,7 +1419,7 @@ namespace UserDefinedComponents {
 		if ( MyFlag( CompNum ) ) {
 			if ( UserCoil( CompNum ).PlantIsConnected ) {
 				errFlag = false;
-				ScanPlantLoopsForObject( UserCoil( CompNum ).Name, TypeOf_CoilUserDefined, UserCoil( CompNum ).Loop.LoopNum, UserCoil( CompNum ).Loop.LoopSideNum, UserCoil( CompNum ).Loop.BranchNum, UserCoil( CompNum ).Loop.CompNum );
+				PlantUtilities::ScanPlantLoopsForObject( UserCoil( CompNum ).Name, TypeOf_CoilUserDefined, UserCoil( CompNum ).Loop.LoopNum, UserCoil( CompNum ).Loop.LoopSideNum, UserCoil( CompNum ).Loop.BranchNum, UserCoil( CompNum ).Loop.CompNum );
 				if ( errFlag ) {
 					ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
 				}
@@ -1510,7 +1510,7 @@ namespace UserDefinedComponents {
 			if ( UserZoneAirHVAC( CompNum ).NumPlantConnections > 0 ) {
 				for ( Loop = 1; Loop <= UserZoneAirHVAC( CompNum ).NumPlantConnections; ++Loop ) {
 					errFlag = false;
-					ScanPlantLoopsForObject( UserZoneAirHVAC( CompNum ).Name, TypeOf_ZoneHVACAirUserDefined, UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopSideNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).BranchNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).CompNum, _, _, _, UserZoneAirHVAC( CompNum ).Loop( Loop ).InletNodeNum );
+					PlantUtilities::ScanPlantLoopsForObject( UserZoneAirHVAC( CompNum ).Name, TypeOf_ZoneHVACAirUserDefined, UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).LoopSideNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).BranchNum, UserZoneAirHVAC( CompNum ).Loop( Loop ).CompNum, _, _, _, UserZoneAirHVAC( CompNum ).Loop( Loop ).InletNodeNum );
 					if ( errFlag ) {
 						ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
 					}
@@ -1610,7 +1610,7 @@ namespace UserDefinedComponents {
 			if ( UserAirTerminal( CompNum ).NumPlantConnections > 0 ) {
 				for ( Loop = 1; Loop <= UserAirTerminal( CompNum ).NumPlantConnections; ++Loop ) {
 					errFlag = false;
-					ScanPlantLoopsForObject( UserAirTerminal( CompNum ).Name, TypeOf_AirTerminalUserDefined, UserAirTerminal( CompNum ).Loop( Loop ).LoopNum, UserAirTerminal( CompNum ).Loop( Loop ).LoopSideNum, UserAirTerminal( CompNum ).Loop( Loop ).BranchNum, UserAirTerminal( CompNum ).Loop( Loop ).CompNum, _, _, _, UserAirTerminal( CompNum ).Loop( Loop ).InletNodeNum );
+					PlantUtilities::ScanPlantLoopsForObject( UserAirTerminal( CompNum ).Name, TypeOf_AirTerminalUserDefined, UserAirTerminal( CompNum ).Loop( Loop ).LoopNum, UserAirTerminal( CompNum ).Loop( Loop ).LoopSideNum, UserAirTerminal( CompNum ).Loop( Loop ).BranchNum, UserAirTerminal( CompNum ).Loop( Loop ).CompNum, _, _, _, UserAirTerminal( CompNum ).Loop( Loop ).InletNodeNum );
 					if ( errFlag ) {
 						ShowFatalError( "InitPlantUserComponent: Program terminated due to previous condition(s)." );
 					}

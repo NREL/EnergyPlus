@@ -13,7 +13,7 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3Â°C
 !                          CHICAGO_IL_USA Annual Heating Wind 99% Design Conditions WS=>MCDB, WS=11.8m/s
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
@@ -148,7 +148,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name

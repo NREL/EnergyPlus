@@ -301,7 +301,7 @@
 
   Site:GroundTemperature:BuildingSurface,5.79,3.71,3.25,3.88,7.01,10.37,13.46,15.61,16.11,14.89,12.22,8.95;
 
- ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+ ! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99.6% Condns DB,  !- Name
@@ -333,7 +333,7 @@
 
  ! CHICAGO Annual Cooling Design Conditions Wind Speed=5.3m/s Wind Dir=230
  ! Hottest Month=JUL
- ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=23.8°C
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2Â°C MWB=23.8Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -9928,11 +9928,11 @@
 !Detailed Compressor: Bitzer OSNA7461-K,  Cooling capacity 55 kW
 !  Power input 39 kW , COP/EER 1.4
 !  Operating mode ECO , Mass flow LP 150 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) -19.25 °C, Mass flow ECO 193 kg/h
-!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 °C
-!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m³/h, Oil cooler outlet 48.7 °C
+!  Liquid temp. (sc) -19.25 Â°C, Mass flow ECO 193 kg/h
+!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 Â°C
+!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 mÂ°/h, Oil cooler outlet 48.7 Â°C
 !  Oil cooler load 29.8 kW , Necces. driving motor 75.0 kW
-!  DG w/o cooling 292 °C
+!  DG w/o cooling 292 Â°C
 !Detailed Compressor: Bitzer OSNA7461-K,   !cooling capacity = 79 KW, power input 73 kW at Tevap = -33C Tcond = 45C
 
   Refrigeration:Compressor,
@@ -9969,11 +9969,11 @@
 !Detailed Compressor: Bitzer OSKA8561-K,  Cooling capacity 295 kW
 !  Power input 90.2 kW , COP/EER 3.27
 !  Operating mode ECO , Mass flow LP 876 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) 12.32 °C, Mass flow ECO 124.8 kg/h
-!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 °C
-!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m³/h, Oil cooler outlet 41.9 °C
+!  Liquid temp. (sc) 12.32 Â°C, Mass flow ECO 124.8 kg/h
+!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 Â°C
+!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 mÂ°/h, Oil cooler outlet 41.9 Â°C
 !  Oil cooler load 55.4 kW , Necces. driving motor 110.0 kW
-!  DG w/o cooling 153.9 °C
+!  DG w/o cooling 153.9 Â°C
 
   Refrigeration:Compressor,
     MedTemp001Bitzer_OSKA8561_K,  !- Name
@@ -10331,14 +10331,14 @@
 
 ! For Dock compressors:Compressor model OSKA8591_K
 ! Input Values: Refrigerant R717 [NH3], Reference temperature Dew point temp.
-!               Evaporating SST 0°C, Condensing SDT 45°C, Operating mode Standard
-!               Liquid subcooling 0K, Discharge gas temp. 80°C
+!               Evaporating SST 0Â°C, Condensing SDT 45Â°C, Operating mode Standard
+!               Liquid subcooling 0K, Discharge gas temp. 80Â°C
 !               Suct. gas superheat 5K, Useful superheat 100%, Speed 2900 /min, Capacity Control 100%
 ! Output:       Cooling capacity 476 kW, Power input 127.6 kW, Condensing capacity 532 kW
 !               COP/EER 3.73, Mass flow LP 1616 kg/h, Mass flow HP 1616 kg/h
-!               Operating mode Standard, Liquid temp. 45.0 °C
-!               Oil volume flow 3.23 m³/h, Oil cooler outlet 33.7 °C, Oil cooler load 71.6 kW
-!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 °C
+!               Operating mode Standard, Liquid temp. 45.0 Â°C
+!               Oil volume flow 3.23 mÂ°/h, Oil cooler outlet 33.7 Â°C, Oil cooler load 71.6 kW
+!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 Â°C
 !Detailed Compressor: Bitzer OSKA8591_K,   !nominal cooling capacity = 476 KW, !nominal power input 127.6 kW
 
   Refrigeration:Compressor,
@@ -10804,11 +10804,11 @@
 !Detailed Compressor: Bitzer OSKA8561-K,  Cooling capacity 295 kW
 !  Power input 90.2 kW , COP/EER 3.27
 !  Operating mode ECO , Mass flow LP 876 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) 12.32 °C, Mass flow ECO 124.8 kg/h
-!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 °C
-!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 m³/h, Oil cooler outlet 41.9 °C
+!  Liquid temp. (sc) 12.32 Â°C, Mass flow ECO 124.8 kg/h
+!  sub cooler load 37.7 kW , sat. ECO Temp. 12.32 Â°C
+!  ECO pressure 6.67 bar(a), Oil volume flow 3.02 mÂ°/h, Oil cooler outlet 41.9 Â°C
 !  Oil cooler load 55.4 kW , Necces. driving motor 110.0 kW
-!  DG w/o cooling 153.9 °C
+!  DG w/o cooling 153.9 Â°C
 ! Capacity Curve for Bitzer OSKA8561-K,   !nominal cooling capacity = 295 KW at -4C/45C conditions
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -10852,11 +10852,11 @@
 !Detailed Compressor: Bitzer OSNA7461-K,  Cooling capacity 55 kW
 !  Power input 39 kW , COP/EER 1.4
 !  Operating mode ECO , Mass flow LP 150 kg/h, Mass flow HP 1001 kg/h
-!  Liquid temp. (sc) -19.25 °C, Mass flow ECO 193 kg/h
-!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 °C
-!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 m³/h, Oil cooler outlet 48.7 °C
+!  Liquid temp. (sc) -19.25 Â°C, Mass flow ECO 193 kg/h
+!  sub cooler load 12.5 kW , sat. ECO Temp. -19.25 Â°C
+!  ECO pressure 1.97 bar(a), Oil volume flow 1.97 mÂ°/h, Oil cooler outlet 48.7 Â°C
 !  Oil cooler load 29.8 kW , Necces. driving motor 75.0 kW
-!  DG w/o cooling 292 °C
+!  DG w/o cooling 292 Â°C
 ! Capacity Curve for Bitzer OSNA7461-K,   !nominal cooling capacity = 295 KW at -4C/45C conditions
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
@@ -10899,14 +10899,14 @@
 
 ! For Dock compressors:Compressor model OSKA8591_K
 ! Input Values: Refrigerant R717 [NH3], Reference temperature Dew point temp.
-!               Evaporating SST 0°C, Condensing SDT 45°C, Operating mode Standard
-!               Liquid subcooling 0K, Discharge gas temp. 80°C
+!               Evaporating SST 0Â°C, Condensing SDT 45Â°C, Operating mode Standard
+!               Liquid subcooling 0K, Discharge gas temp. 80Â°C
 !               Suct. gas superheat 5K, Useful superheat 100%, Speed 2900 /min, Capacity Control 100%
 ! Output:       Cooling capacity 476 kW, Power input 127.6 kW, Condensing capacity 532 kW
 !               COP/EER 3.73, Mass flow LP 1616 kg/h, Mass flow HP 1616 kg/h
-!               Operating mode Standard, Liquid temp. 45.0 °C
-!               Oil volume flow 3.23 m³/h, Oil cooler outlet 33.7 °C, Oil cooler load 71.6 kW
-!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 °C
+!               Operating mode Standard, Liquid temp. 45.0 Â°C
+!               Oil volume flow 3.23 mÂ°/h, Oil cooler outlet 33.7 Â°C, Oil cooler load 71.6 kW
+!               Necces. driving motor 160.0 kW, DG w/o cooling 138.6 Â°C
 ! Capacity Curve for Bitzer OSKA8591-K,   !nominal cooling capacity = 476 KW
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 

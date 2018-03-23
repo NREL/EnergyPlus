@@ -66,7 +66,8 @@
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/PlantManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
@@ -1141,11 +1142,11 @@ TEST_F( EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest ) {
 	EXPECT_EQ( LowTempRadiantSystem::HydronicSystem, RadSysTypes( RadSysNum ).SystemType );
 
 	ErrorsFound = false;
-	ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).HWLoopNum, HydrRadSys( RadSysNum ).HWLoopSide, HydrRadSys( RadSysNum ).HWBranchNum, HydrRadSys( RadSysNum ).HWCompNum, _, _, _, HydrRadSys( RadSysNum ).HotWaterInNode, _, ErrorsFound );
+	PlantUtilities::ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).HWLoopNum, HydrRadSys( RadSysNum ).HWLoopSide, HydrRadSys( RadSysNum ).HWBranchNum, HydrRadSys( RadSysNum ).HWCompNum, _, _, _, HydrRadSys( RadSysNum ).HotWaterInNode, _, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
 
 	ErrorsFound = false;
-	ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).CWLoopNum, HydrRadSys( RadSysNum ).CWLoopSide, HydrRadSys( RadSysNum ).CWBranchNum, HydrRadSys( RadSysNum ).CWCompNum, _, _, _, HydrRadSys( RadSysNum ).ColdWaterInNode, _, ErrorsFound );
+	PlantUtilities::ScanPlantLoopsForObject( HydrRadSys( RadSysNum ).Name, TypeOf_LowTempRadiant_VarFlow, HydrRadSys( RadSysNum ).CWLoopNum, HydrRadSys( RadSysNum ).CWLoopSide, HydrRadSys( RadSysNum ).CWBranchNum, HydrRadSys( RadSysNum ).CWCompNum, _, _, _, HydrRadSys( RadSysNum ).ColdWaterInNode, _, ErrorsFound );
 	EXPECT_FALSE( ErrorsFound );
 
 	DataSizing::CurZoneEqNum = 1;

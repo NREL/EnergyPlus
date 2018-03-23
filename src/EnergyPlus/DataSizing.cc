@@ -344,12 +344,6 @@ namespace DataSizing {
 	Array1D< Real64 > DBySys; // Population Diversity by system
 	Array1D< std::string > PeakPsOccurrenceDateTimeStringBySys; // string describing when Ps peak occurs
 	Array1D< std::string > PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
-	//Array1D< Real64 > PzSumBySysCool; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
-	//Array1D< Real64 > PzSumBySysHeat; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
-	//Array1D< Real64 > PsBySysCool; // saved value of PeakPeople which is Ps used in 62.1 tabular report
-	//Array1D< Real64 > PsBySysHeat; // saved value of PeakPeople which is Ps used in 62.1 tabular report
-	//Array1D< Real64 > DBySysCool; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
-	//Array1D< Real64 > DBySysHeat; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
 	Array1D< Real64 > VouBySys; // uncorrected system outdoor air requirement, for std 62.1 VRP
 	Array1D< Real64 > VpsClgBySys; // System primary airflow Vps, for cooling for std 62.1 VRP
 	Array1D< Real64 > VpsHtgBySys; // system primary airflow Vps, for heating for std 62.1 VRP
@@ -546,6 +540,66 @@ namespace DataSizing {
 		EvzMinBySysCool.deallocate();
 		FaByZoneCool.deallocate();
 		SensCoolCapTemp.deallocate();
+	}
+
+	Real64
+	TermUnitSizingData::applyTermUnitSizingCoolFlow(
+		Real64 const & coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+		Real64 const & coolFlowNoOA // Cooling flow rate without MinOA limit applied
+	)
+	{
+		// Apply DesignSpecification:AirTerminal:Sizing to cooling flow (could be vol flow or mass flow)
+		Real64 coolFlowRatio = 1.0;
+		if ( this->SpecDesCoolSATRatio > 0.0 ) {
+			coolFlowRatio = this->SpecDesSensCoolingFrac / this->SpecDesCoolSATRatio;
+		} else {
+			coolFlowRatio = this->SpecDesSensCoolingFrac;
+		}
+		Real64 adjustedFlow = coolFlowNoOA * coolFlowRatio + ( coolFlowWithOA - coolFlowNoOA ) * this->SpecMinOAFrac;
+		return adjustedFlow;
+	}
+
+	Real64
+	TermUnitSizingData::applyTermUnitSizingHeatFlow(
+		Real64 const & heatFlowWithOA, // Heating flow rate with MinOA limit applied
+		Real64 const & heatFlowNoOA // Heating flow rate without MinOA limit applied
+	)
+	{
+		// Apply DesignSpecification:AirTerminal:Sizing to heating flow (could be vol flow or mass flow)
+		Real64 heatFlowRatio = 1.0;
+		if ( this->SpecDesHeatSATRatio > 0.0 ) {
+			heatFlowRatio = this->SpecDesSensHeatingFrac / this->SpecDesHeatSATRatio;
+		} else {
+			heatFlowRatio = this->SpecDesSensHeatingFrac;
+		}
+		Real64 adjustedFlow = heatFlowNoOA * heatFlowRatio + ( heatFlowWithOA - heatFlowNoOA ) * this->SpecMinOAFrac;
+		return adjustedFlow;
+	}
+
+	void
+	ZoneSizingData::scaleZoneCooling(
+		Real64 const ratio // Scaling ratio
+	)
+	{
+		// Apply scaling ratio to TermUnitFinalZoneSizing cooling flow and load
+		this->DesCoolVolFlow = this->DesCoolVolFlow * ratio;
+		this->DesCoolMassFlow = this->DesCoolMassFlow * ratio;
+		this->DesCoolLoad = this->DesCoolLoad * ratio;
+		this->CoolFlowSeq = this->CoolFlowSeq * ratio;
+		this->CoolLoadSeq = this->CoolLoadSeq * ratio;
+	}
+
+	void
+	ZoneSizingData::scaleZoneHeating(
+		Real64 const ratio // Scaling ratio
+	)
+	{
+		// Apply scaling ratio to TermUnitFinalZoneSizing heating flow and load
+		this->DesHeatVolFlow = this->DesHeatVolFlow * ratio;
+		this->DesHeatMassFlow = this->DesHeatMassFlow * ratio;
+		this->DesHeatLoad = this->DesHeatLoad * ratio;
+		this->HeatFlowSeq = this->HeatFlowSeq * ratio;
+		this->HeatLoadSeq = this->HeatLoadSeq * ratio;
 	}
 
 } // DataSizing

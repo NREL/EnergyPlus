@@ -29,8 +29,8 @@
 !
 ! Location:                Phoenix, AZ USA
 !
-! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=3.7캜
-!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+! Design Days:             PHOENIX_AZ_USA Annual Heating 99.6%, MaxDB=3.7째C
+!                          PHOENIX_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_FL_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3
 !
@@ -174,10 +174,10 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Phoenix Sky Harbor Intl Ap_AZ_USA Extreme Annual Wind Speeds, 1%=8.2m/s, 2.5%=7.1m/s, 5%=5.8m/s
- ! Phoenix Sky Harbor Intl Ap_AZ_USA Extreme Annual Temperatures, Max Drybulb=1.3캜 Min Drybulb=45.8캜
+ ! Phoenix Sky Harbor Intl Ap_AZ_USA Extreme Annual Temperatures, Max Drybulb=1.3째C Min Drybulb=45.8째C
  ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating Design Conditions Wind Speed=1.7m/s Wind Dir=100
  ! Coldest Month=DEC
- ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating 99.6%, MaxDB=3.7캜
+ ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Heating 99.6%, MaxDB=3.7째C
 
   SizingPeriod:DesignDay,
     Phoenix Sky Harbor Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -209,7 +209,7 @@
 
  ! Phoenix Sky Harbor Intl Ap Annual Cooling Design Conditions Wind Speed=4.1m/s Wind Dir=260
  ! Hottest Month=JUL
- ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4캜 MWB=21.1캜
+ ! Phoenix Sky Harbor Intl Ap_AZ_USA Annual Cooling (DB=>MWB) .4%, MaxDB=43.4째C MWB=21.1째C
 
   SizingPeriod:DesignDay,
     Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name

@@ -30,8 +30,8 @@
 !
 ! Location:                Chicago, IL USA
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -16.6캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.6캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -16.6째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.6째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_IL_Chicago-OHare.Intl.AP_725300_TMY3
 !
@@ -185,8 +185,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.4m/s, 5%=8.6m/s
- ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Temperatures, Max Drybulb=-23.7캜 Min Drybulb=35.9캜
- ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99%, MaxDB=-16.6캜
+ ! Chicago Ohare Intl Ap_IL_USA Extreme Annual Temperatures, Max Drybulb=-23.7째C Min Drybulb=35.9째C
+ ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99%, MaxDB=-16.6째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -216,7 +216,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6캜 MWB=23캜
+ ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6째C MWB=23째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name

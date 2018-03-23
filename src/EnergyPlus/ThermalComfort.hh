@@ -165,6 +165,8 @@ namespace ThermalComfort {
 	extern Real64 TotalAnyZoneNotMetCoolingOccupied;
 	extern Real64 TotalAnyZoneNotMetOccupied;
 	extern Array1D< Real64 > ZoneOccHrs;
+	extern bool useEpwData;
+	extern Array1D< Real64 > DailyAveOutTemp;
 
 	extern Real64 runningAverageASH;
 

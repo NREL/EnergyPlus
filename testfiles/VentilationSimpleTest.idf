@@ -71,7 +71,7 @@
     -10.00,                  !- Time Zone {hr}
     11.00;                   !- Elevation {m}
 
- ! HILO_HI_USA Heating 99%, MaxDB=  17.10°C
+ ! HILO_HI_USA Heating 99%, MaxDB=  17.10Â°C
 
   SizingPeriod:DesignDay,
     HILO_HI_USA Heating 99% Conditions,  !- Name
@@ -101,7 +101,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! HILO_HI_USA Cooling (DB=>MWB) 1%, MaxDB=  29.10°C MWB=  23.10°C
+ ! HILO_HI_USA Cooling (DB=>MWB) 1%, MaxDB=  29.10Â°C MWB=  23.10Â°C
 
   SizingPeriod:DesignDay,
     HILO_HI_USA Cooling 1% Conditions DB=>MWB,  !- Name

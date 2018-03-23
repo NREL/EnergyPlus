@@ -44,8 +44,8 @@
 !
 ! Location:                Golden, CO
 !
-! Design Days:             DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16캜
-!                          DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=15.5캜
+! Design Days:             DENVER_STAPLETON_CO_USA Annual Heating 99%, MaxDB=-16째C
+!                          DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=15.5째C
 !
 ! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
 !
@@ -137,11 +137,11 @@
  !  Data Source=ASHRAE 2009 Annual Design Conditions
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Denver Centennial  Golden   N_CO_USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.5m/s, 5%=8.4m/s
- ! Denver Centennial  Golden   N_CO_USA Extreme Annual Temperatures, Max Drybulb=-22.9캜 Min Drybulb=36.1캜
+ ! Denver Centennial  Golden   N_CO_USA Extreme Annual Temperatures, Max Drybulb=-22.9째C Min Drybulb=36.1째C
  ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=JUL
- ! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=15.5캜
- ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32캜 MWB=15.5캜
+ ! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=15.5째C
+ ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32째C MWB=15.5째C
 
   SizingPeriod:DesignDay,
     Denver Centennial  Golden   N Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -173,7 +173,7 @@
 
  ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
  ! Coldest Month=DEC
- ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5캜
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5째C
 
   SizingPeriod:DesignDay,
     Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name

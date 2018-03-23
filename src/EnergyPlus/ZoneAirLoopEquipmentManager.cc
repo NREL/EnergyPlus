@@ -220,18 +220,12 @@ namespace ZoneAirLoopEquipmentManager {
 		}
 		DataSizing::CurTermUnitSizingNum = AirDistUnit( AirDistUnitNum ).TermUnitSizingNum;
 		InitZoneAirLoopEquipment( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
-		// After the zone number is assigned, check zone air system type.
-		if ( AirDistUnit( AirDistUnitNum ).ZoneNum != 0 && FirstHVACIteration && DataHeatBalance::Zone( AirDistUnit( AirDistUnitNum ).ZoneNum ).HasAdjustedReturnTempByITE ) {
-			for ( int AirDistCompNum = 1; AirDistCompNum <= AirDistUnit( AirDistUnitNum ).NumComponents; ++AirDistCompNum ) {
-				if ( AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompNum ) != SingleDuctVAVReheat && AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompNum ) != SingleDuctVAVNoReheat ) {
-					ShowSevereError( "The FlowControlWithApproachTemperatures only applies to ITE zones with single duct VAV terminal unit." );
-					ShowContinueError( "The return air temperature of the ITE will not be overwritten." );
-					ShowFatalError( "Preceding condition causes termination." );
-				}
-			}
-		}
+		InitZoneAirLoopEquipmentTimeStep( AirDistUnitNum );
 
 		SimZoneAirLoopEquipment( AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum );
+
+		// Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been matched to zone euqip config nodes
+		InitZoneAirLoopEquipment( AirDistUnitNum, ControlledZoneNum, ActualZoneNum );
 
 		//  CALL RecordZoneAirLoopEquipment
 
@@ -518,18 +512,36 @@ namespace ZoneAirLoopEquipmentManager {
 			}}
 
 			// Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
+			{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisADU.TermUnitSizingNum ) );
+			thisTermUnitSizingData.ADUName = thisADU.Name;
 			if ( thisADU.AirTerminalSizingSpecIndex > 0 ) {
 				{ auto const & thisAirTermSizingSpec( DataSizing::AirTerminalSizingSpec( thisADU.AirTerminalSizingSpecIndex ) );
-				{ auto & thisTermUnitSizingData( DataSizing::TermUnitSizing( thisADU.TermUnitSizingNum ) );
 				thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
 				thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
 				thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;
 				thisTermUnitSizingData.SpecDesSensHeatingFrac = thisAirTermSizingSpec.DesSensHeatingFrac;
 				thisTermUnitSizingData.SpecMinOAFrac = thisAirTermSizingSpec.MinOAFrac;
 			}}}}
-			EachOnceFlag( AirDistUnitNum ) = false;
-		}
 
+			if ( AirDistUnit( AirDistUnitNum ).ZoneNum != 0 && DataHeatBalance::Zone( AirDistUnit( AirDistUnitNum ).ZoneNum ).HasAdjustedReturnTempByITE ) {
+				for ( int AirDistCompNum = 1; AirDistCompNum <= AirDistUnit( AirDistUnitNum ).NumComponents; ++AirDistCompNum ) {
+					if ( AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompNum ) != SingleDuctVAVReheat && AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompNum ) != SingleDuctVAVNoReheat ) {
+						ShowSevereError( "The FlowControlWithApproachTemperatures only works with ITE zones with single duct VAV terminal unit." );
+						ShowContinueError( "The return air temperature of the ITE will not be overwritten." );
+						ShowFatalError( "Preceding condition causes termination." );
+					}
+				}
+			}
+			EachOnceFlag( AirDistUnitNum ) = false;
+
+		}
+	}
+
+	void
+	InitZoneAirLoopEquipmentTimeStep(
+		int const AirDistUnitNum
+	)
+	{
 		// every time step
 		AirDistUnit( AirDistUnitNum ).MassFlowRateDnStrLk = 0.0;
 		AirDistUnit( AirDistUnitNum ).MassFlowRateUpStrLk = 0.0;

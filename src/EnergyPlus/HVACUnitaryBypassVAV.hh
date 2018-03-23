@@ -388,8 +388,12 @@ namespace HVACUnitaryBypassVAV {
 
 	// Object Data
 	extern Array1D< CBVAVData > CBVAV;
+	extern bool GetInputFlag; // Flag set to make sure you get input once
 
 	// Functions
+
+	void
+	clear_state();
 
 	void
 	SimUnitaryBypassVAV(

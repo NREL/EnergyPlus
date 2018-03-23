@@ -12,8 +12,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=8캜
-!                          CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.1캜 MWB=25.3캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=8째C
+!                          CHICAGO_IL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.1째C MWB=25.3째C
 !
 ! Run Period (Weather File): full annual, CHICAGO_IL_USA TMY2-94846
 !
@@ -219,7 +219,7 @@
     1st Sunday in April,     !- Start Date
     Last Sunday in October;  !- End Date
 
- ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6캜 MWB=25.3캜
+ ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.6째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name

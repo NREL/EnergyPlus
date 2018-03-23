@@ -18,8 +18,8 @@
 !
 ! Location:                Miami, FL
 !
-! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8캜
-!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.1캜 MWB=25.3캜
+! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8째C
+!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.1째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, MIAMI_FL_USA TMY2-12839
 !
@@ -220,10 +220,10 @@
 
 ! Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
 ! MIAMI_FL_USA Extreme Annual Wind Speeds, 1%=9.4m/s, 2.5%=8.6m/s, 5%=8m/s
-! MIAMI_FL_USA Extreme Annual Temperatures, Max Drybulb=34.7캜 Min Drybulb=4.4캜
+! MIAMI_FL_USA Extreme Annual Temperatures, Max Drybulb=34.7째C Min Drybulb=4.4째C
 ! MIAMI_FL_USA Annual Heating Design Conditions Wind Speed=4.4m/s Wind Dir=340
 ! Coldest Month=January
-! MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8캜
+! MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8째C
 
   SizingPeriod:DesignDay,
     MIAMI Ann Htg 99.6% Condns DB,  !- Name
@@ -255,7 +255,7 @@
 
 ! MIAMI Annual Cooling Design Conditions Wind Speed=4.7m/s Wind Dir=140
 ! Hottest Month=July
-! MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.1캜 MWB=25.3캜
+! MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.1째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     MIAMI Ann Clg .4% Condns DB=>MWB,  !- Name

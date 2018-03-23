@@ -10,7 +10,7 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3Â°C
 !                          CHICAGO_IL_USA Annual Heating Wind 99% Design Conditions WS=>MCDB, WS=11.8m/s
 !
 ! Run Period (Weather File): none
@@ -149,7 +149,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
- ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+ ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name

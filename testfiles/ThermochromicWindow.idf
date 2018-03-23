@@ -226,7 +226,7 @@
     19.48,                   !- Annual Average Outdoor Air Temperature {C}
     25.60;                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
-! LAS_VEGAS_NV_USA Annual Heating 99.6%, MaxDB=-1.7°C
+! LAS_VEGAS_NV_USA Annual Heating 99.6%, MaxDB=-1.7Â°C
 
   SizingPeriod:DesignDay,
     LAS_VEGAS Ann Htg 99.6% Condns DB,  !- Name
@@ -256,7 +256,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! LAS_VEGAS_NV_USA Annual Cooling (DB=>MWB) .4%, MaxDB=42.4°C MWB=19.4°C
+! LAS_VEGAS_NV_USA Annual Cooling (DB=>MWB) .4%, MaxDB=42.4Â°C MWB=19.4Â°C
 
   SizingPeriod:DesignDay,
     LAS_VEGAS Ann Clg .4% Condns DB=>MWB,  !- Name

@@ -13,8 +13,8 @@
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7.
 !
@@ -940,7 +940,7 @@
 
  ! Miami Intl Ap FL USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=January
- ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7캜
+ ! Miami Intl Ap FL USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -972,7 +972,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=July
- ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+ ! Miami Intl Ap FL USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -2555,7 +2555,7 @@
 
   Output:Variable,*,Heating Coil Electric Energy,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Houlry;
+  Output:Variable,*,Fan Electric Power,Hourly;
 
   Output:Variable,*,Fan Runtime Fraction,Hourly;
 

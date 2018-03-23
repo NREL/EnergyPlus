@@ -497,7 +497,7 @@ namespace HVACSingleDuctInduc {
 		using DataZoneEquipment::CheckZoneEquipmentList;
 		using DataDefineEquip::AirDistUnit;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -697,7 +697,7 @@ namespace HVACSingleDuctInduc {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using DataPlant::PlantLoop;
-		using DataPlant::MyPlantSizingIndex;
+		using PlantUtilities::MyPlantSizingIndex;
 		using General::RoundSigDigits;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -803,7 +803,7 @@ namespace HVACSingleDuctInduc {
 								// the design heating coil load is the zone load minus whatever the central system does. Note that
 								// DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak > 0.0 ) {
-									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesHeatLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak );
+									DesCoilLoad = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).NonAirSysDesHeatLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtHeatPeak );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesHeatCoilInTempTU );
 								}
@@ -875,7 +875,7 @@ namespace HVACSingleDuctInduc {
 								// the design cooling coil load is the zone load minus whatever the central system does. Note that
 								// DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
 								if ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak > 0.0 ) {
-									DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU );
+									DesCoilLoad = TermUnitFinalZoneSizing( CurTermUnitSizingNum ).NonAirSysDesCoolLoad - CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).ZoneTempAtCoolPeak - TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU );
 								} else {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( TermUnitFinalZoneSizing( CurTermUnitSizingNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
 								}

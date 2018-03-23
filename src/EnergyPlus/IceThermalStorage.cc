@@ -1188,7 +1188,7 @@ namespace IceThermalStorage {
 
 		// Using/Aliasing
 		using DataGlobals::BeginEnvrnFlag;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_TS_IceDetailed;
 		using DataPlant::CommonPipe_TwoWay;
@@ -1297,7 +1297,7 @@ namespace IceThermalStorage {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataPlant::TypeOf_TS_IceSimple;
 		using DataPlant::PlantLoop;
-		using DataPlant::ScanPlantLoopsForObject;
+		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::CommonPipe_TwoWay;
 		using DataPlant::SupplySide;
 		using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;

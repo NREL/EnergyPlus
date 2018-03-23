@@ -35851,7 +35851,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    LAHA-032E-TAD_R-507_LOW_qcurv,  !- Name
+    LAHA-032E-TAD_R-507_LOW_qcurv 2,  !- Name
     2.904e+004,              !- Coefficient1 Constant
     789.7,                   !- Coefficient2 x
     4.693,                   !- Coefficient3 x**2
@@ -35871,7 +35871,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    LAHA-032E-TAD_R-507_LOW_pwrcurv,  !- Name
+    LAHA-032E-TAD_R-507_LOW_pwrcurv 2,  !- Name
     1563.,                   !- Coefficient1 Constant
     -162.4,                  !- Coefficient2 x
     -5.432,                  !- Coefficient3 x**2
@@ -35891,8 +35891,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-60HZ_R-507_LOW_LAHA-032E-TAD,  !- Name
-    LAHA-032E-TAD_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    LAHA-032E-TAD_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    LAHA-032E-TAD_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    LAHA-032E-TAD_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54415,7 +54415,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KANA-006E-TAC_R-507_LOW_qcurv,  !- Name
+    KANA-006E-TAC_R-507_LOW_qcurv 2,  !- Name
     3418.,                   !- Coefficient1 Constant
     84.04,                   !- Coefficient2 x
     -0.02942,                !- Coefficient3 x**2
@@ -54435,7 +54435,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KANA-006E-TAC_R-507_LOW_pwrcurv,  !- Name
+    KANA-006E-TAC_R-507_LOW_pwrcurv 2,  !- Name
     70.72,                   !- Coefficient1 Constant
     -34.90,                  !- Coefficient2 x
     -1.230,                  !- Coefficient3 x**2
@@ -54455,8 +54455,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_KANA-006E-TAC,  !- Name
-    KANA-006E-TAC_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    KANA-006E-TAC_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    KANA-006E-TAC_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    KANA-006E-TAC_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54568,7 +54568,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KAJA-011E-TAD_R-507_LOW_qcurv,  !- Name
+    KAJA-011E-TAD_R-507_LOW_qcurv 2,  !- Name
     6677.,                   !- Coefficient1 Constant
     220.1,                   !- Coefficient2 x
     2.275,                   !- Coefficient3 x**2
@@ -54588,7 +54588,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KAJA-011E-TAD_R-507_LOW_pwrcurv,  !- Name
+    KAJA-011E-TAD_R-507_LOW_pwrcurv 2,  !- Name
     528.5,                   !- Coefficient1 Constant
     -13.05,                  !- Coefficient2 x
     -0.4910,                 !- Coefficient3 x**2
@@ -54608,8 +54608,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_KAJA-011E-TAD,  !- Name
-    KAJA-011E-TAD_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    KAJA-011E-TAD_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    KAJA-011E-TAD_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    KAJA-011E-TAD_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54619,7 +54619,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KALA-016E-TAC_R-507_LOW_qcurv,  !- Name
+    KALA-016E-TAC_R-507_LOW_qcurv 2,  !- Name
     9029.,                   !- Coefficient1 Constant
     294.2,                   !- Coefficient2 x
     2.861,                   !- Coefficient3 x**2
@@ -54639,7 +54639,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KALA-016E-TAC_R-507_LOW_pwrcurv,  !- Name
+    KALA-016E-TAC_R-507_LOW_pwrcurv 2,  !- Name
     -403.0,                  !- Coefficient1 Constant
     -26.78,                  !- Coefficient2 x
     -0.5516,                 !- Coefficient3 x**2
@@ -54659,8 +54659,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_KALA-016E-TAC,  !- Name
-    KALA-016E-TAC_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    KALA-016E-TAC_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    KALA-016E-TAC_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    KALA-016E-TAC_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54670,7 +54670,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KALB-015E-CAV_R-507_LOW_qcurv,  !- Name
+    KALB-015E-CAV_R-507_LOW_qcurv 2,  !- Name
     1.045e+004,              !- Coefficient1 Constant
     354.6,                   !- Coefficient2 x
     4.175,                   !- Coefficient3 x**2
@@ -54690,7 +54690,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    KALB-015E-CAV_R-507_LOW_pwrcurv,  !- Name
+    KALB-015E-CAV_R-507_LOW_pwrcurv 2,  !- Name
     550.8,                   !- Coefficient1 Constant
     -32.67,                  !- Coefficient2 x
     -0.8056,                 !- Coefficient3 x**2
@@ -54710,8 +54710,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_KALB-015E-CAV,  !- Name
-    KALB-015E-CAV_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    KALB-015E-CAV_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    KALB-015E-CAV_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    KALB-015E-CAV_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54721,7 +54721,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    EADA-020E-TAC_R-507_LOW_qcurv,  !- Name
+    EADA-020E-TAC_R-507_LOW_qcurv 2,  !- Name
     1.214e+004,              !- Coefficient1 Constant
     447.7,                   !- Coefficient2 x
     5.157,                   !- Coefficient3 x**2
@@ -54741,7 +54741,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    EADA-020E-TAC_R-507_LOW_pwrcurv,  !- Name
+    EADA-020E-TAC_R-507_LOW_pwrcurv 2,  !- Name
     152.9,                   !- Coefficient1 Constant
     -53.72,                  !- Coefficient2 x
     -1.578,                  !- Coefficient3 x**2
@@ -54761,8 +54761,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_EADA-020E-TAC,  !- Name
-    EADA-020E-TAC_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    EADA-020E-TAC_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    EADA-020E-TAC_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    EADA-020E-TAC_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54772,7 +54772,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    EAVA-021E-TAC_R-507_LOW_qcurv,  !- Name
+    EAVA-021E-TAC_R-507_LOW_qcurv 2,  !- Name
     1.525e+004,              !- Coefficient1 Constant
     484.2,                   !- Coefficient2 x
     4.822,                   !- Coefficient3 x**2
@@ -54792,7 +54792,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    EAVA-021E-TAC_R-507_LOW_pwrcurv,  !- Name
+    EAVA-021E-TAC_R-507_LOW_pwrcurv 2,  !- Name
     564.4,                   !- Coefficient1 Constant
     -63.28,                  !- Coefficient2 x
     -1.972,                  !- Coefficient3 x**2
@@ -54812,8 +54812,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_EAVA-021E-TAC,  !- Name
-    EAVA-021E-TAC_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    EAVA-021E-TAC_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    EAVA-021E-TAC_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    EAVA-021E-TAC_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54823,7 +54823,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    EAVB-021E-CAV_R-507_LOW_qcurv,  !- Name
+    EAVB-021E-CAV_R-507_LOW_qcurv 2,  !- Name
     1.515e+004,              !- Coefficient1 Constant
     533.6,                   !- Coefficient2 x
     6.756,                   !- Coefficient3 x**2
@@ -54843,7 +54843,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    EAVB-021E-CAV_R-507_LOW_pwrcurv,  !- Name
+    EAVB-021E-CAV_R-507_LOW_pwrcurv 2,  !- Name
     1554.,                   !- Coefficient1 Constant
     -5.931,                  !- Coefficient2 x
     -0.7952,                 !- Coefficient3 x**2
@@ -54863,8 +54863,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_EAVB-021E-CAV,  !- Name
-    EAVB-021E-CAV_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    EAVB-021E-CAV_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    EAVB-021E-CAV_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    EAVB-021E-CAV_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54925,7 +54925,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    NRD1-032E-TFC_R-507_LOW_qcurv,  !- Name
+    NRD1-032E-TFC_R-507_LOW_qcurv 2,  !- Name
     2.942e+004,              !- Coefficient1 Constant
     1112.,                   !- Coefficient2 x
     14.90,                   !- Coefficient3 x**2
@@ -54945,7 +54945,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    NRD1-032E-TFC_R-507_LOW_pwrcurv,  !- Name
+    NRD1-032E-TFC_R-507_LOW_pwrcurv 2,  !- Name
     2445.,                   !- Coefficient1 Constant
     85.47,                   !- Coefficient2 x
     0.1657,                  !- Coefficient3 x**2
@@ -54965,8 +54965,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_NRD1-032E-TFC,  !- Name
-    NRD1-032E-TFC_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    NRD1-032E-TFC_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    NRD1-032E-TFC_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    NRD1-032E-TFC_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
@@ -54976,7 +54976,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    LALA-032E-TAC_R-507_LOW_qcurv,  !- Name
+    LALA-032E-TAC_R-507_LOW_qcurv 2,  !- Name
     2.163e+004,              !- Coefficient1 Constant
     814.6,                   !- Coefficient2 x
     8.837,                   !- Coefficient3 x**2
@@ -54996,7 +54996,7 @@
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
 
   Curve:Bicubic,
-    LALA-032E-TAC_R-507_LOW_pwrcurv,  !- Name
+    LALA-032E-TAC_R-507_LOW_pwrcurv 2,  !- Name
     2767.,                   !- Coefficient1 Constant
     -23.63,                  !- Coefficient2 x
     -1.262,                  !- Coefficient3 x**2
@@ -55016,8 +55016,8 @@
 
   Refrigeration:Compressor,
     Copeland-COPELAMETIC-50HZ_R-507_LOW_LALA-032E-TAC,  !- Name
-    LALA-032E-TAC_R-507_LOW_pwrcurv,  !- Refrigeration Compressor Power Curve Name
-    LALA-032E-TAC_R-507_LOW_qcurv,  !- Refrigeration Compressor Capacity Curve Name
+    LALA-032E-TAC_R-507_LOW_pwrcurv 2,  !- Refrigeration Compressor Power Curve Name
+    LALA-032E-TAC_R-507_LOW_qcurv 2,  !- Refrigeration Compressor Capacity Curve Name
     ,                        !- Rated Superheat {deltaC}
     18.3,                    !- Rated Return Gas Temperature {C}
     ,                        !- Rated Liquid Temperature {C}
