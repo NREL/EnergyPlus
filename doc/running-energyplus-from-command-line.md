@@ -11,6 +11,8 @@ This will give the following display of options:
     Usage: energyplus [options] [input-file]
     Options:
       -a, --annual                 Force annual simulation
+      -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent on
+                                   input file type
       -d, --output-directory ARG   Output directory path (default: current directory)
       -D, --design-day             Force design-day-only simulation
       -h, --help                   Display help information

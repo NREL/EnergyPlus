@@ -259,10 +259,10 @@ namespace EnergyPlus {
 		if ( ! DataGlobals::isEpJSON ) {
 			bool success = true;
 			epJSON = idf_parser->decode( input_file, schema, success );
-			bool hasErrors = processErrors();
-			if ( !success || hasErrors ) {
-				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
-			}
+//			bool hasErrors = processErrors();
+//			if ( !success || hasErrors ) {
+//				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+//			}
 			if ( DataGlobals::outputEpJSONConversion ) {
 				input_file = epJSON.dump( 4 );
 				std::string convertedIDF( DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON" );
@@ -288,11 +288,9 @@ namespace EnergyPlus {
 
 		bool is_valid = validation->validate( epJSON );
 		bool hasErrors = processErrors();
-		if (hasErrors) {
-			checkVersionMatch();
-		}
 
 		if ( !is_valid || hasErrors ) {
+            checkVersionMatch();
 			ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
 		}
 

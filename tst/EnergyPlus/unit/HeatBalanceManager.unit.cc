@@ -149,7 +149,12 @@ namespace EnergyPlus {
 			"    101325.0000;             !- Pressure {Pa}",
 		} );
 
-		ASSERT_TRUE( process_idf( idf_objects ) );
+		ASSERT_FALSE( process_idf( idf_objects, false ) ); // expect errors
+		std::string const error_string = delimited_string( {
+			"   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+
 
 		bool ErrorsFound( false );
 
@@ -186,7 +191,11 @@ namespace EnergyPlus {
 			}
 		);
 
-		ASSERT_TRUE( process_idf( idf_objects ) );
+		ASSERT_FALSE( process_idf( idf_objects, false ) ); // expect errors
+		std::string const error_string = delimited_string( {
+			"   ** Severe  ** Duplicate name found. name: \"Gap_1_Layer\". Overwriting existing object.",
+		} );
+		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
 		bool ErrorsFound( false );
 

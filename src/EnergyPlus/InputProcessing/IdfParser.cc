@@ -245,7 +245,7 @@ json IdfParser::parse_idf( std::string const & idf, size_t & index, bool & succe
 						if ( obj_name == "RunPeriod" ) {
 							name = obj_name + " " + s;
 						} else {
-							warnings_.emplace_back( "Duplicate name found. name: \"" + name + "\". Overwriting existing object." );
+							errors_.emplace_back( "Duplicate name found. name: \"" + name + "\". Overwriting existing object." );
 						}
 					}
 				} else {

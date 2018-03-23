@@ -5402,7 +5402,7 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const degChar( "Â°" );
+		static std::string const degChar( "°" );
 
 		// LineTypes for reading the stat file
 		int const StatisticsLine( 1 );
@@ -5523,9 +5523,9 @@ namespace OutputReportTabular {
 						coolingDesignlinepassed = true;
 						lineType = coolingConditionsLine;
 					}
-				} else if ( has( lineIn, "(standard) heating degree-days (18.3Â°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) heating degree-days (18.3°C baseline)" ) ) {
 					lineType = stdHDDLine;
-				} else if ( has( lineIn, "(standard) cooling degree-days (10Â°C baseline)" ) ) {
+				} else if ( has( lineIn, "(standard) cooling degree-days (10°C baseline)" ) ) {
 					lineType = stdCDDLine;
 
 				} else if ( has( lineIn, "Maximum Dry Bulb" ) ) {
@@ -5536,15 +5536,15 @@ namespace OutputReportTabular {
 					lineType = maxDewPointLine;
 				} else if ( has( lineIn, "Minimum Dew Point" ) ) {
 					lineType = minDewPointLine;
-				} else if ( has( lineIn, "(wthr file) heating degree-days (18Â°C baseline)" ) || has( lineIn, "heating degree-days (18Â°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) heating degree-days (18°C baseline)" ) || has( lineIn, "heating degree-days (18°C baseline)" ) ) {
 					lineType = wthHDDLine;
-				} else if ( has( lineIn, "(wthr file) cooling degree-days (10Â°C baseline)" ) || has( lineIn, "cooling degree-days (10Â°C baseline)" ) ) {
+				} else if ( has( lineIn, "(wthr file) cooling degree-days (10°C baseline)" ) || has( lineIn, "cooling degree-days (10°C baseline)" ) ) {
 					lineType = wthCDDLine;
 				}
 				// these not part of big if/else because sequential
 				if ( lineType == KoppenDes1Line && isKoppen ) lineType = KoppenDes2Line;
 				if ( lineType == KoppenLine && isKoppen ) lineType = KoppenDes1Line;
-				if ( has( lineIn, "(KÃ¶ppen classification)" ) ) lineType = KoppenLine;
+				if ( has( lineIn, "(Köppen classification)" ) ) lineType = KoppenLine;
 				if ( lineType == AshStdDes2Line ) lineType = AshStdDes3Line;
 				if ( lineType == AshStdDes1Line ) lineType = AshStdDes2Line;
 				if ( lineType == AshStdLine ) lineType = AshStdDes1Line;
@@ -5555,7 +5555,7 @@ namespace OutputReportTabular {
 					PreDefTableEntry( pdchWthrVal, "Reference", lineIn.substr( 15 ) );
 				} else if ( SELECT_CASE_var == LocationLine ) { // Location -- SAN_FRANCISCO CA USA
 					PreDefTableEntry( pdchWthrVal, "Site:Location", lineIn.substr( 11 ) );
-				} else if ( SELECT_CASE_var == LatLongLine ) { //      {N 37Â° 37'} {W 122Â° 22'} {GMT -8.0 Hours}
+				} else if ( SELECT_CASE_var == LatLongLine ) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
 					// find the {}
 					sposlt = index( lineIn, '{' );
 					eposlt = index( lineIn, '}' );
@@ -5719,11 +5719,11 @@ namespace OutputReportTabular {
 							}
 						}
 					}
-				} else if ( SELECT_CASE_var == stdHDDLine ) { //  - 1745 annual (standard) heating degree-days (10Â°C baseline)
+				} else if ( SELECT_CASE_var == stdHDDLine ) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
 					storeASHRAEHDD = lineIn.substr( 2, 4 );
-				} else if ( SELECT_CASE_var == stdCDDLine ) { //  -  464 annual (standard) cooling degree-days (18.3Â°C baseline)
+				} else if ( SELECT_CASE_var == stdCDDLine ) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
 					storeASHRAECDD = lineIn.substr( 2, 4 );
-				} else if ( SELECT_CASE_var == maxDryBulbLine ) { //   - Maximum Dry Bulb temperature of  35.6Â°C on Jul  9
+				} else if ( SELECT_CASE_var == maxDryBulbLine ) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5746,7 +5746,7 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == minDryBulbLine ) { //   - Minimum Dry Bulb temperature of -22.8Â°C on Jan  7
+				} else if ( SELECT_CASE_var == minDryBulbLine ) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5769,7 +5769,7 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == maxDewPointLine ) { //   - Maximum Dew Point temperature of  25.6Â°C on Aug  4
+				} else if ( SELECT_CASE_var == maxDewPointLine ) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5792,7 +5792,7 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Maximum Dew Point Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == minDewPointLine ) { //   - Minimum Dew Point temperature of -28.9Â°C on Dec 31
+				} else if ( SELECT_CASE_var == minDewPointLine ) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
 					sposlt = index( lineIn, "of" );
 					eposlt = index( lineIn, 'C' );
 					sposlt += 2;
@@ -5815,84 +5815,84 @@ namespace OutputReportTabular {
 					} else {
 						PreDefTableEntry( pdchWthrVal, "Minimum Dew Point Occurs on", "not found" );
 					}
-				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10Â°C baseline)
+				} else if ( SELECT_CASE_var == wthHDDLine ) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
 					if ( storeASHRAEHDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65Â°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAEHDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3Â°C)", storeASHRAEHDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65Â°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3Â°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65Â°(C)";
+						curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18Â°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Heating Degree Days", lineIn.substr( 2, 4 ) );
 					}
 					PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
 				}
-				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18Â°C baseline)
+				else if ( SELECT_CASE_var == wthCDDLine ) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
 					if ( storeASHRAECDD != "" ) {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50Â°(C)";
+							curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
 							LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 							PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( storeASHRAECDD ) ), 1 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10Â°C)", storeASHRAECDD );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD );
 						}
 					} else {
 						if ( unitsStyle == unitsStyleInchPound ) {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50Â°F)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found" );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10Â°C)", "not found" );
+							PreDefTableEntry( pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found" );
 						}
 					}
 					if ( unitsStyle == unitsStyleInchPound ) {
-						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50Â°(C)";
+						curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
 						LookupSItoIP( curNameWithSIUnits, indexUnitConv, curNameAndUnits );
 						PreDefTableEntry( pdchWthrVal, curNameAndUnits, RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", RealToStr( ConvertIPdelta( indexUnitConv, StrToReal( lineIn.substr( 2, 4 ) ) ), 1 ) );
 					} else {
-						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10Â°C)", lineIn.substr( 2, 4 ) );
+						PreDefTableEntry( pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr( 2, 4 ) );
 						PreDefTableEntry( pdchLeedGenData, "Cooling Degree Days", lineIn.substr( 2, 4 ) );
 					}
-				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (KÃ¶ppen classification)
+				} else if ( SELECT_CASE_var == KoppenLine ) { // - Climate type "BSk" (Köppen classification)
 					if ( ! has( lineIn, "not shown" ) ) {
 						isKoppen = true;
 						if ( lineIn[ 18 ] == '"' ) { // two character classification
-							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr( 16, 2 ) );
+							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 2 ) );
 						} else {
-							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Classification", lineIn.substr( 16, 3 ) );
+							PreDefTableEntry( pdchWthrVal, "Köppen Classification", lineIn.substr( 16, 3 ) );
 						}
 					} else {
 						isKoppen = false;
-						PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr( 2 ) );
+						PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
 					}
-				} else if ( SELECT_CASE_var == KoppenDes1Line ) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25Â°)
+				} else if ( SELECT_CASE_var == KoppenDes1Line ) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
 					if ( isKoppen ) {
-						PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Description", lineIn.substr( 2 ) );
+						PreDefTableEntry( pdchWthrVal, "Köppen Description", lineIn.substr( 2 ) );
 					}
 				} else if ( SELECT_CASE_var == KoppenDes2Line ) { // - Unbearably humid periods in summer, but passive cooling is possible
 					if ( isKoppen ) {
 						if ( len( lineIn ) > 3 ) { // avoid blank lines
 							if ( lineIn.substr( 2, 2 ) != "**" ) { // avoid line with warning
-								PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", lineIn.substr( 2 ) );
+								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", lineIn.substr( 2 ) );
 							} else {
-								PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", "" );
+								PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", "" );
 							}
 						} else {
-							PreDefTableEntry( pdchWthrVal, "KÃ¶ppen Recommendation", "" );
+							PreDefTableEntry( pdchWthrVal, "Köppen Recommendation", "" );
 						}
 					}
 				} else if ( ( SELECT_CASE_var == AshStdLine ) || ( SELECT_CASE_var == AshStdDes1Line ) || ( SELECT_CASE_var == AshStdDes2Line ) || ( SELECT_CASE_var == AshStdDes3Line ) ) {
@@ -11751,7 +11751,7 @@ namespace OutputReportTabular {
 					ComputeTableBodyUsingMovingAvg( ZoneCoolCompLoadTables(iZone).cells, ZoneCoolCompLoadTables( iZone ).cellUsed, coolDesSelected, timeCoolMax, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
 					CollectPeakZoneConditions( ZoneCoolCompLoadTables( iZone ), coolDesSelected, timeCoolMax, iZone, true );
 					//send latent load info to coil summary report
-					coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( iZone ,  ZoneCoolCompLoadTables(iZone).cells( cLatent, rGrdTot ) );  
+					coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak( iZone ,  ZoneCoolCompLoadTables(iZone).cells( cLatent, rGrdTot ) );
 
 					heatDesSelected = CalcFinalZoneSizing( iZone ).HeatDDNum;
 					ZoneHeatCompLoadTables( iZone ).desDayNum = heatDesSelected;
@@ -14796,7 +14796,7 @@ Label900: ;
 		UnitConvSize = 115;
 		UnitConv.allocate( UnitConvSize );
 		UnitConv( 1 ).siName = "%";
-		UnitConv( 2 ).siName = "Â°C";
+		UnitConv( 2 ).siName = "°C";
 		UnitConv( 3 ).siName = "0=OFF 1=ON";
 		UnitConv( 4 ).siName = "0-NO  1-YES";
 		UnitConv( 5 ).siName = "1-YES 0-NO";

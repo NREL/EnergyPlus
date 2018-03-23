@@ -17,11 +17,12 @@
     friendly’ graphical interface . . . EnergyPlus reads input and writes output as text files.</p>
 <p>Utilities and tools for creating, editing, and running input files that come with EnergyPlus include IDF Editor and
     EP-Launch. Many graphical user interfaces for EnergyPlus are available or under development. For the latest tools,
-    please see <a href="https://energyplus.net/interfaces">this EnergyPlus website for third party interfaces</a>.</p>
-<p>A number of third-party tools are available to create EnergyPlus input files (IDF). For the latest tools, please see
-    <a href="https://energyplus.net/input-files">this EnergyPlus website for third party IDF creation tools</a>. Some of
-    these may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older files to
-    current EnergyPlus version (you may need to use the Multiple Version Conversions set – see below.</p>
+    please see
+    <a href="https://www.buildingenergysoftwaretools.com/?capabilities=Whole-building+Energy+Simulation&keywords=EnergyPlus">
+        this website for third party interfaces</a>.
+    Some of these may produce out of date IDF files; you can then use the IDFVersionUpdater program to convert older
+    files to current EnergyPlus version (you may need to use the Multiple Version Conversions set – see below.
+</p>
 <h2><a id="Whats_going_on_in_V86_18"></a>What’s going on in V8.9?</h2>
 <p>Will there be any considerable difference between version 8.8 and 8.9?</p>
 <ul>
@@ -94,34 +95,42 @@
         <a href="https://github.com/NREL/EnergyPlus/pull/5893">#5893</a> : JSON input format and InputProcessor refactor
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6227">#6227</a> : Improving Building Energy Simulation in an Urban Context
+        <a href="https://github.com/NREL/EnergyPlus/pull/6227">#6227</a> : Improving Building Energy Simulation in an
+        Urban Context
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6245">#6245</a> : Improved Airflow Calculations for BSDF window types
+        <a href="https://github.com/NREL/EnergyPlus/pull/6245">#6245</a> : Improved Airflow Calculations for BSDF window
+        types
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6248">#6248</a> : Add air terminal unit sizing option, allow air loops with no return path, and partially allow multiple air loops serving the same zone
+        <a href="https://github.com/NREL/EnergyPlus/pull/6248">#6248</a> : Add air terminal unit sizing option, allow
+        air loops with no return path, and partially allow multiple air loops serving the same zone
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6291">#6291</a> : IDF Editor - add new Duplicate Object and Change function and support new units
+        <a href="https://github.com/NREL/EnergyPlus/pull/6291">#6291</a> : IDF Editor - add new Duplicate Object and
+        Change function and support new units
     </li>
     <li>
         <a href="https://github.com/NREL/EnergyPlus/pull/6385">#6385</a> : On/Off Thermostat
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6387">#6387</a> : Additional Source Term in the Surface Heat Balance Calculation
+        <a href="https://github.com/NREL/EnergyPlus/pull/6387">#6387</a> : Additional Source Term in the Surface Heat
+        Balance Calculation
     </li>
     <li>
         <a href="https://github.com/NREL/EnergyPlus/pull/6388">#6388</a> : Automatic Import of Shading from a CSV File
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6390">#6390</a> : Add New Options to Disable Self-Shading Effect
+        <a href="https://github.com/NREL/EnergyPlus/pull/6390">#6390</a> : Add New Options to Disable Self-Shading
+        Effect
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6393">#6393</a> : ASHRAE 90.1 SZVAV control for Packaged Terminal Units
+        <a href="https://github.com/NREL/EnergyPlus/pull/6393">#6393</a> : ASHRAE 90.1 SZVAV control for Packaged
+        Terminal Units
     </li>
     <li>
-        <a href="https://github.com/NREL/EnergyPlus/pull/6411">#6411</a> : Single Duct Constant Volume Air Terminal No Reheat New Object
+        <a href="https://github.com/NREL/EnergyPlus/pull/6411">#6411</a> : Single Duct Constant Volume Air Terminal No
+        Reheat New Object
     </li>
     <li>
         <a href="https://github.com/NREL/EnergyPlus/pull/6432">#6432</a> : Hybrid Air Conditioner
@@ -135,13 +144,11 @@
     <li>
         <a href="https://github.com/NREL/EnergyPlus/pull/6456">#6456</a> : Add annual reporting option
     </li>
- </ul>
+</ul>
 <h3><a id="Platforms_90"></a>Platforms</h3>
 <ul>
-    <li>Windows 7, 8 &amp; 8</li>
-    <li>Linux (Ubuntu 14.04 and compatible) 64 bit versions; (32-bit and RHEL-compatible versions may be available via
-        Helpdesk)
-    </li>
+    <li>Windows 7, 8 &amp; 10</li>
+    <li>Linux (Ubuntu 14.04 and compatible) 64 bit versions</li>
     <li>Mac OSX 10.9 64 bit versions</li>
     <li>EnergyPlus V8.9 has been tested on all of these platforms</li>
     <li><em>EnergyPlus does intensive computations, and based on configuration, can write massive amounts of data to
@@ -157,7 +164,7 @@
 <h2><a id="Known_problems_104"></a>Known problems</h2>
 <p>While every effort has been made to clean up all the “defects” that have occurred during our testing, quite a few
     known (and even more unknown) probably remain. Specifics on the remaining known problems can be found on the GitHub
-    repository <a href="github.com/NREL/EnergyPlus/issues">issues page</a>. If you are interested in what has been
+    repository <a href="https://github.com/NREL/EnergyPlus/issues">issues page</a>. If you are interested in what has been
     addressed, the issues resolved in this release are installed similarly in the <a href="changelog.html">changelog</a>.
 </p>
 <h2><a id="Thanks_108"></a>Thanks</h2>

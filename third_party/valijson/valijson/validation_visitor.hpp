@@ -231,7 +231,7 @@ public:
         if (numValidated == 0) {
             if (results) {
                 results->pushError(context,
-                        "Failed to match against any enum values.");
+                        "\"" + target.asString() + "\" - " + "Failed to match against any enum values.");
             }
 
             return false;
@@ -371,7 +371,7 @@ public:
         if (constraint.getExclusiveMaximum()) {
             if (target.asDouble() >= maximum) {
                 if (results) {
-                    results->pushError(context, "Expected number less than " +
+                    results->pushError(context, "\"" + target.asString() + "\" - " + "Expected number less than " +
                             std::to_string(maximum));
                 }
 
@@ -381,7 +381,7 @@ public:
         } else if (target.asDouble() > maximum) {
             if (results) {
                 results->pushError(context,
-                        "Expected number less than or equal to " +
+                        "\"" + target.asString() + "\" - " + "Expected number less than or equal to " +
                         std::to_string(maximum));
             }
 
@@ -495,7 +495,7 @@ public:
             if (target.asDouble() <= minimum) {
                 if (results) {
                     results->pushError(context,
-                        "Expected number greater than " +
+						"\"" + target.asString() + "\" - " + "Expected number greater than " +
                         std::to_string(minimum));
                 }
 
@@ -504,7 +504,7 @@ public:
         } else if (target.asDouble() < minimum) {
             if (results) {
                 results->pushError(context,
-                        "Expected number greater than or equal to " +
+                        "\"" + target.asString() + "\" - " + "Expected number greater than or equal to " +
                         std::to_string(minimum));
             }
 

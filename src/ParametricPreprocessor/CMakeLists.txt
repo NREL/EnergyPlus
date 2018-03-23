@@ -38,9 +38,9 @@ set_target_properties(ParametricPreprocessor PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-install( TARGETS ParametricPreprocessor DESTINATION PreProcess )
+install( TARGETS ParametricPreprocessor DESTINATION PreProcess/ParametricPreprocessor )
 if(NOT ${STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-  install_target_prereqs( ParametricPreprocessor PreProcess )
+  install_target_prereqs( ParametricPreprocessor PreProcess/ParametricPreprocessor )
 endif()
 

@@ -206,6 +206,7 @@ IF EXIST eplusout.delightdfdmp  DEL eplusout.delightdfdmp
 IF EXIST eplusscreen.csv  DEL eplusscreen.csv
 IF EXIST in.imf         DEL in.imf
 IF EXIST in.idf         DEL in.idf
+IF EXIST in.epJSON      DEL in.epJSON
 IF EXIST in.stat        DEL in.stat
 IF EXIST out.idf        DEL out.idf
 IF EXIST eplusout.inp   DEL eplusout.inp
@@ -314,7 +315,7 @@ IF EXIST SLABSurfaceTemps.TXT COPY "%epout%.expidf"+SLABSurfaceTemps.TXT "%epout
 IF EXIST SLABSurfaceTemps.TXT DEL SLABSurfaceTemps.TXT
 
 :  4. Execute EnergyPlus
-"%program_path%EnergyPlus"
+"%program_path%EnergyPlus" -c
 if %pausing%==Y pause
 
 :  5. Copy Post Processing Program command file(s) to working directory
@@ -398,6 +399,7 @@ IF EXIST "%epout%-PROC.csv" DEL "%epout%-PROC.csv"
 IF EXIST "%epout%.edd" DEL "%epout%.edd"
 IF EXIST "%epout%DFS.csv" DEL "%epout%DFS.csv"
 : IF EXIST "%epout%*.mat" DEL "%epout%*.mat"
+IF EXIST "%epout%.epJSONout" DEL "%epout%.epJSONout"
 
 IF EXIST eplusout.eso MOVE eplusout.eso "%epout%.eso"
 IF EXIST eplusout.rdd MOVE eplusout.rdd "%epout%.rdd"
@@ -444,6 +446,7 @@ IF EXIST readvars.audit MOVE readvars.audit "%epout%.rvaudit"
 IF EXIST eplusout.sql MOVE eplusout.sql "%epout%.sql"
 IF EXIST eplusout.edd MOVE eplusout.edd "%epout%.edd"
 IF EXIST eplusout.dfs MOVE eplusout.dfs "%epout%DFS.csv"
+IF EXIST in.epJSON MOVE in.epJSON "%epout%.epJSONout"
 
 : Determine whether FMUImport or FMUExport -- Added for FMI
 IF NOT EXIST tmp-fmus GOTO :CSVproc
