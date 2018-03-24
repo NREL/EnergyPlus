@@ -53,182 +53,126 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace ZoneEquipmentManager {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	//MODULE VARIABLE DECLARATIONS:
-	extern Array1D< Real64 > AvgData; // scratch array for storing averaged data
-	extern Array1D_int DefaultSimOrder;
-	extern int NumOfTimeStepInDay; // number of zone time steps in a day
-	extern bool GetZoneEquipmentInputFlag;
-	extern bool SizeZoneEquipmentOneTimeFlag;
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D<Real64> AvgData; // scratch array for storing averaged data
+    extern Array1D_int DefaultSimOrder;
+    extern int NumOfTimeStepInDay; // number of zone time steps in a day
+    extern bool GetZoneEquipmentInputFlag;
+    extern bool SizeZoneEquipmentOneTimeFlag;
 
+    // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
-	//SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
+    // Types
 
-	// Types
+    struct SimulationOrder
+    {
+        // Members
+        std::string EquipType;
+        int EquipType_Num;
+        std::string EquipName;
+        int EquipPtr;
+        int CoolingPriority;
+        int HeatingPriority;
 
-	struct SimulationOrder
-	{
-		// Members
-		std::string EquipType;
-		int EquipType_Num;
-		std::string EquipName;
-		int EquipPtr;
-		int CoolingPriority;
-		int HeatingPriority;
+        // Default Constructor
+        SimulationOrder() : EquipType_Num(0), EquipPtr(0), CoolingPriority(0), HeatingPriority(0)
+        {
+        }
+    };
 
-		// Default Constructor
-		SimulationOrder() :
-			EquipType_Num( 0 ),
-			EquipPtr( 0 ),
-			CoolingPriority( 0 ),
-			HeatingPriority( 0 )
-		{}
+    // Object Data
+    extern Array1D<SimulationOrder> PrioritySimOrder;
 
-	};
+    // Functions
+    void clear_state();
 
-	// Object Data
-	extern Array1D< SimulationOrder > PrioritySimOrder;
+    void ManageZoneEquipment(bool const FirstHVACIteration, bool &SimZone, bool &SimAir);
 
-	// Functions
-	void
-	clear_state();
+    void GetZoneEquipment();
 
-	void
-	ManageZoneEquipment(
-		bool const FirstHVACIteration,
-		bool & SimZone,
-		bool & SimAir
-	);
+    void InitZoneEquipment(bool const FirstHVACIteration); // unused 1208
 
-	void
-	GetZoneEquipment();
+    void SizeZoneEquipment();
 
-	void
-	InitZoneEquipment( bool const FirstHVACIteration ); // unused 1208
+    void SetUpZoneSizingArrays();
 
-	void
-	SizeZoneEquipment();
+    void RezeroZoneSizingArrays();
 
-	void
-	SetUpZoneSizingArrays();
+    void UpdateZoneSizing(int const CallIndicator);
 
-	void
-	RezeroZoneSizingArrays();
+    void SimZoneEquipment(bool const FirstHVACIteration, bool &SimAir);
 
-	void
-	UpdateZoneSizing( int const CallIndicator );
+    void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum);
 
-	void
-	SimZoneEquipment(
-		bool const FirstHVACIteration,
-		bool & SimAir
-	);
+    void InitSystemOutputRequired(int const ZoneNum, bool const FirstHVACIteration);
 
-	void
-	SetZoneEquipSimOrder(
-		int const ControlledZoneNum,
-		int const ActualZoneNum
-	);
+    void DistributeSystemOutputRequired(int const ActualZoneNum, bool const FirstHVACIteration);
 
-	void
-	InitSystemOutputRequired(
-		int const ZoneNum,
-		bool const FirstHVACIteration
-	);
+    void UpdateSystemOutputRequired(int const ZoneNum,
+                                    Real64 const SysOutputProvided,         // sensible output provided by zone equipment (W)
+                                    Real64 const LatOutputProvided,         // latent output provided by zone equipment (kg/s)
+                                    Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
+    );
 
-	void
-	DistributeSystemOutputRequired(
-		int const ActualZoneNum,
-		bool const FirstHVACIteration
-	);
+    void CalcZoneMassBalance();
 
-	void
-	UpdateSystemOutputRequired(
-		int const ZoneNum,
-		Real64 const SysOutputProvided, // sensible output provided by zone equipment (W)
-		Real64 const LatOutputProvided, // latent output provided by zone equipment (kg/s)
-		Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
-	);
+    void CalcZoneReturnFlows(int const ZoneNum,
+                             Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate
+                             Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
+    );
 
-	void
-	CalcZoneMassBalance();
+    void CalcAirFlowSimple(int const SysTimestepLoop = 0,              // System time step index
+                           bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
+    );
 
-	void
-	CalcZoneReturnFlows(
-		int const ZoneNum,
-		Real64 & ExpTotalReturnMassFlow, // Expected total return air mass flow rate
-		Real64 & FinalTotalReturnMassFlow // Final total return air mass flow rate
-	);
+    void GetStandAloneERVNodes(int const OutdoorNum); // Zone Air Balance Outdoor index
 
-	void
-	CalcAirFlowSimple(
-		int const SysTimestepLoop = 0, // System time step index
-		bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
-	);
+    void CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
 
-	void
-	GetStandAloneERVNodes(int const OutdoorNum); // Zone Air Balance Outdoor index
+    void CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum);
 
-	void
-	CalcZoneMixingFlowRateOfReceivingZone(
-		int const ZoneNum,
-		Real64 & ZoneMixingAirMassFlowRate
-	);
+    void CalcZoneLeavingConditions(bool const FirstHVACIteration);
 
-	void
-	CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum);
+    void UpdateZoneEquipment(bool &SimAir);
 
-	void
-	CalcZoneLeavingConditions(
-		bool const FirstHVACIteration
-	);
+    void ReportZoneEquipment();
 
-	void
-	UpdateZoneEquipment( bool & SimAir );
+    void CalcDOASSupCondsForSizing(Real64 OutDB,        // outside air temperature [C]
+                                   Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
+                                   int DOASControl,     // dedicated outside air control strategy
+                                   Real64 DOASLowTemp,  // DOAS low setpoint [C]
+                                   Real64 DOASHighTemp, // DOAS high setpoint [C]
+                                   Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+                                   Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+                                   Real64 &DOASSupTemp, // DOAS supply temperature [C]
+                                   Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
+    );
 
-	void
-	ReportZoneEquipment();
+    void AutoCalcDOASControlStrategy();
 
-	void
-	CalcDOASSupCondsForSizing(
-		Real64 OutDB, // outside air temperature [C]
-		Real64 OutHR, // outside humidity ratio [kg Water / kg Dry Air]
-		int DOASControl, // dedicated outside air control strategy
-		Real64 DOASLowTemp, // DOAS low setpoint [C]
-		Real64 DOASHighTemp, // DOAS high setpoint [C]
-		Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
-		Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
-		Real64 & DOASSupTemp, // DOAS supply temperature [C]
-		Real64 & DOASSupHR // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
-	);
+    void ReportZoneSizingDOASInputs(std::string const &ZoneName,         // the name of the zone
+                                    std::string const &DOASCtrlStrategy, // DOAS control strategy
+                                    Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
+                                    Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
+    );
 
-	void
-	AutoCalcDOASControlStrategy();
+} // namespace ZoneEquipmentManager
 
-	void
-	ReportZoneSizingDOASInputs(
-		std::string const & ZoneName, // the name of the zone
-		std::string const & DOASCtrlStrategy, // DOAS control strategy
-		Real64 const DOASLowTemp, // DOAS design low setpoint temperature [C]
-		Real64 const DOASHighTemp // DOAS design high setpoint temperature [C]
-	);
-
-} // ZoneEquipmentManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

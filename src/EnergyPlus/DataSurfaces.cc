@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
-#include <DataSurfaces.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -387,7 +386,8 @@ namespace DataSurfaces {
 	Array1D< Real64 > DGZone; // Factor for ground diffuse solar radiation into a zone
 	Array1D< Real64 > DBZone; // Factor for diffuse radiation in a zone from
 	// beam reflecting from inside surfaces
-	Array1D< Real64 > DBZoneSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
+    Array1D<Real64>
+        DBZoneSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
 	Array1D< Real64 > CBZone; // Factor for beam solar absorbed by interior shades
 	Array1D< Real64 > AISurf; // Time step value of factor for beam
 	// absorbed on inside of opaque surface
@@ -462,7 +462,8 @@ namespace DataSurfaces {
 	// if present
 	Array1D< Real64 > WinSysSolAbsorptance; // Effective solar absorptance of window + shading device,
 	// if present
-	Array2D< Real64 > SUNCOSHR( 24, 3, 0.0 ); // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
+    Array2D<Real64> SUNCOSHR(
+        24, 3, 0.0); // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
 	Array2D< Real64 > ReflFacBmToDiffSolObs;
 	Array2D< Real64 > ReflFacBmToDiffSolGnd;
 	Array2D< Real64 > ReflFacBmToBmSolObs;
@@ -509,12 +510,8 @@ namespace DataSurfaces {
 	// Class Methods
 
 		// Constructor
-		Surface2D::
-		Surface2D( ShapeCat const shapeCat, int const axis, Vertices const & v, Vector2D const & vl, Vector2D const & vu ) :
-			axis( axis ),
-			vertices( v ),
-			vl( vl ),
-			vu( vu )
+    Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu)
+        : axis(axis), vertices(v), vl(vl), vu(vu)
 		{
 			size_type const n( vertices.size() );
 			assert( n >= 3 );
@@ -541,7 +538,8 @@ namespace DataSurfaces {
 			} else if ( ( shapeCat == ShapeCat::Nonconvex ) || ( n >= nVerticesBig ) ) { // Set up slabs
 				assert( n >= 4u );
 				slabYs.reserve( n );
-				for ( size_type i = 0; i < n; ++i ) slabYs.push_back( vertices[ i ].y );
+            for (size_type i = 0; i < n; ++i)
+                slabYs.push_back(vertices[i].y);
 				std::sort( slabYs.begin(), slabYs.end() ); // Sort the vertex y coordinates
 				auto const iClip( std::unique( slabYs.begin(), slabYs.end() ) ); // Remove duplicate y-coordinate elements
 				slabYs.erase( iClip, slabYs.end() );
@@ -559,8 +557,7 @@ namespace DataSurfaces {
 					for ( size_type i = 0; i < n; ++i ) { // Find edges crossing slab
 						Vector2D const & v( vertices[ i ] );
 						Vector2D const & w( vertices[ ( i + 1 ) % n ] );
-						if (
-						 ( ( v.y <= yl ) && ( yu <= w.y ) ) || // Crosses upward
+                    if (((v.y <= yl) && (yu <= w.y)) || // Crosses upward
 						 ( ( yu <= v.y ) && ( w.y <= yl ) ) ) // Crosses downward
 						{
 							Edge const & e( edges[ i ] );
@@ -579,9 +576,9 @@ namespace DataSurfaces {
 					std::sort( crossEdges.begin(), crossEdges.end(),
 					 []( CrossEdge const & e1, CrossEdge const & e2 ) -> bool // Lambda to sort by x_mid
 						{
-							return std::get< 0 >( e1 ) + std::get< 1 >( e1 ) < std::get< 0 >( e2 ) + std::get< 1 >( e2 ); // Sort edges by x_mid: x_bot or x_top could have repeats with shared vertex
-						}
-					);
+                              return std::get<0>(e1) + std::get<1>(e1) <
+                                     std::get<0>(e2) + std::get<1>(e2); // Sort edges by x_mid: x_bot or x_top could have repeats with shared vertex
+                          });
 #ifndef NDEBUG // Check x_bot and x_top are also sorted
 					Real64 xb( std::get< 0 >( crossEdges[ 0 ] ) );
 					Real64 xt( std::get< 1 >( crossEdges[ 0 ] ) );
@@ -610,9 +607,7 @@ namespace DataSurfaces {
 		}
 
 		// Set Precomputed Parameters
-		void
-		SurfaceData::
-		set_computed_geometry()
+    void SurfaceData::set_computed_geometry()
 		{
 			if ( Vertex.size() >= 3 ) { // Skip no-vertex "surfaces"
 				shapeCat = computed_shapeCat();
@@ -621,9 +616,7 @@ namespace DataSurfaces {
 			}
 		}
 
-		void
-		SurfaceData::
-		SetOutBulbTempAt()
+    void SurfaceData::SetOutBulbTempAt()
 		{
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Noel Keen (LBL)/Linda Lawrie
@@ -658,9 +651,7 @@ namespace DataSurfaces {
 			}
 		}
 
-		void
-		SurfaceData::
-		SetWindSpeedAt( Real64 const fac )
+    void SurfaceData::SetWindSpeedAt(Real64 const fac)
 		{
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         Linda Lawrie
@@ -689,9 +680,7 @@ namespace DataSurfaces {
 			}
 		}
 
-		void
-		SurfaceData::
-		SetWindDirAt( Real64 const fac )
+    void SurfaceData::SetWindDirAt(Real64 const fac)
 		{
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         X Luo
@@ -903,9 +892,7 @@ namespace DataSurfaces {
 		}
 
 		// Computed Shape Category
-		ShapeCat
-		SurfaceData::
-		computed_shapeCat() const
+    ShapeCat SurfaceData::computed_shapeCat() const
 		{
 			if ( Shape == SurfaceShape::Triangle ) {
 				return ShapeCat::Triangular;
@@ -931,9 +918,7 @@ namespace DataSurfaces {
 		}
 
 		// Computed Plane
-		SurfaceData::Plane
-		SurfaceData::
-		computed_plane() const
+    SurfaceData::Plane SurfaceData::computed_plane() const
 		{
 			Vertices::size_type const n( Vertex.size() );
 			assert( n >= 3 );
@@ -952,9 +937,7 @@ namespace DataSurfaces {
 		}
 
 		// Computed axis-projected 2D surface
-		Surface2D
-		SurfaceData::
-		computed_surface2d() const
+    Surface2D SurfaceData::computed_surface2d() const
 		{
 			// Project along axis of min surface range for 2D intersection use
 			Vertices::size_type const n( Vertex.size() );
@@ -1015,8 +998,7 @@ namespace DataSurfaces {
 
 	// Clears the global data in DataSurfaces.
 	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
+    void clear_state()
 	{
 		TotSurfaces = 0;
 		TotWindows = 0;
@@ -1128,16 +1110,14 @@ namespace DataSurfaces {
 		SurroundingSurfsProperty.deallocate();
 	}
 
-	void
-	SetSurfaceOutBulbTempAt()
+    void SetSurfaceOutBulbTempAt()
 	{
 		for ( auto & surface : Surface ) {
 			surface.SetOutBulbTempAt();
 		}
 	}
 
-	void
-	CheckSurfaceOutBulbTempAt()
+    void CheckSurfaceOutBulbTempAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::SetOutBulbTempAt_error;
@@ -1149,8 +1129,7 @@ namespace DataSurfaces {
 		}
 	}
 
-	void
-	SetSurfaceWindSpeedAt()
+    void SetSurfaceWindSpeedAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::SiteWindBLHeight;
@@ -1163,8 +1142,7 @@ namespace DataSurfaces {
 		}
 	}
 
-	void
-	SetSurfaceWindDirAt()
+    void SetSurfaceWindDirAt()
 	{
 		// Using/Aliasing
 		using DataEnvironment::WindDir;
@@ -1173,8 +1151,7 @@ namespace DataSurfaces {
 		}
 	}
 
-	std::string
-	cSurfaceClass( int const ClassNo )
+    std::string cSurfaceClass(int const ClassNo)
 	{
 
 		// FUNCTION INFORMATION:
@@ -1213,7 +1190,8 @@ namespace DataSurfaces {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		{ auto const SELECT_CASE_var( ClassNo );
+        {
+            auto const SELECT_CASE_var(ClassNo);
 		if ( SELECT_CASE_var == SurfaceClass_Wall ) {
 			ClassName = "Wall";
 
@@ -1252,11 +1230,10 @@ namespace DataSurfaces {
 
 		} else {
 			ClassName = "Invalid/Unknown";
-
-		}}
+            }
+        }
 
 		return ClassName;
-
 	}
 
 	Real64 SurfaceWindowCalc::AbsorptanceFromInteriorFrontSide() const {
@@ -1285,4 +1262,4 @@ namespace DataSurfaces {
 
 } // DataSurfaces
 
-} // EnergyPlus
+} // namespace EnergyPlus

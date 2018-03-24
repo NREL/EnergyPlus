@@ -57,9 +57,9 @@
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataBSDFWindow.hh>
 #include <DataVectorTypes.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -178,12 +178,9 @@ namespace SolarShading {
 		int MiscIndex; // Used for other pertinent information to be stored
 
 		// Default Constructor
-		SurfaceErrorTracking() :
-			SurfIndex1( 0 ),
-			SurfIndex2( 0 ),
-			MiscIndex( 0 )
-		{}
-
+        SurfaceErrorTracking() : SurfIndex1(0), SurfIndex2(0), MiscIndex(0)
+        {
+        }
 	};
 
 	// Object Data
@@ -192,95 +189,63 @@ namespace SolarShading {
 	extern Array1D< SurfaceErrorTracking > TrackBaseSubSurround;
 
 	// Functions
-	void
-	clear_state();
+    void clear_state();
 
-	void
-	InitSolarCalculations();
+    void InitSolarCalculations();
 
-	void
-	GetShadowingInput();
+    void GetShadowingInput();
 
-	void
-	AllocateModuleArrays();
+    void AllocateModuleArrays();
 
-	void
-	AnisoSkyViewFactors();
+    void AnisoSkyViewFactors();
 
-	void
-	CHKBKS(
-		int const NBS, // Surface Number of the potential back surface
+    void CHKBKS(int const NBS, // Surface Number of the potential back surface
 		int const NRS // Surface Number of the potential shadow receiving surface
 	);
 
-	void
-	CHKGSS(
-		int const NRS, // Surface number of the potential shadow receiving surface
+    void CHKGSS(int const NRS,     // Surface number of the potential shadow receiving surface
 		int const NSS, // Surface number of the potential shadow casting surface
 		Real64 const ZMIN, // Lowest point of the receiving surface
 		bool & CannotShade // TRUE if shadow casting surface cannot shade receiving surface.
 	);
 
-	void
-	CHKSBS(
-		int const HTS, // Heat transfer surface number of the general receiving surf
+    void CHKSBS(int const HTS,   // Heat transfer surface number of the general receiving surf
 		int const GRSNR, // Surface number of general receiving surface
 		int const SBSNR // Surface number of subsurface
 	);
 
-	bool
-	polygon_contains_point(
-		int const nsides, // number of sides (vertices)
+    bool polygon_contains_point(int const nsides,           // number of sides (vertices)
 		Array1A< Vector > polygon_3d, // points of polygon
 		Vector const & point_3d, // point to be tested
 		bool const ignorex,
 		bool const ignorey,
-		bool const ignorez
-	);
+                                bool const ignorez);
 
-	void
-	ComputeIntSolarAbsorpFactors();
+    void ComputeIntSolarAbsorpFactors();
 
-	void
-	CLIP(
-		int const NVT,
-		Array1< Real64 > & XVT,
-		Array1< Real64 > & YVT,
-		Array1< Real64 > & ZVT
-	);
+    void CLIP(int const NVT, Array1<Real64> &XVT, Array1<Real64> &YVT, Array1<Real64> &ZVT);
 
-	void
-	CTRANS(
-		int const NS, // Surface number whose vertex coordinates are being transformed
+    void CTRANS(int const NS,        // Surface number whose vertex coordinates are being transformed
 		int const NGRS, // Base surface number for surface NS
 		int & NVT, // Number of vertices for surface NS
 		Array1< Real64 > & XVT, // XYZ coordinates of vertices of NS in plane of NGRS
 		Array1< Real64 > & YVT,
-		Array1< Real64 > & ZVT
-	);
+                Array1<Real64> &ZVT);
 
-	void
-	HTRANS(
-		int const I, // Mode selector: 0 - Compute H.C. of sides
+    void HTRANS(int const I,          // Mode selector: 0 - Compute H.C. of sides
 		int const NS, // Figure Number
 		int const NumVertices // Number of vertices
 	);
 
-	void
-	HTRANS0(
-		int const NS, // Figure Number
+    void HTRANS0(int const NS,         // Figure Number
 		int const NumVertices // Number of vertices
 	);
 
-	void
-	HTRANS1(
-		int const NS, // Figure Number
+    void HTRANS1(int const NS,         // Figure Number
 		int const NumVertices // Number of vertices
 	);
 
-	void
-	INCLOS(
-		int const N1, // Figure number of figure 1
+    void INCLOS(int const N1,            // Figure number of figure 1
 		int const N1NumVert, // Number of vertices of figure 1
 		int const N2, // Figure number of figure 2
 		int const N2NumVert, // Number of vertices of figure 2
@@ -288,86 +253,61 @@ namespace SolarShading {
 		int & NIN // Number of vertices of figure 1 within figure 2
 	);
 
-	void
-	INTCPT(
-		int const NV1, // Number of vertices of figure NS1
+    void INTCPT(int const NV1, // Number of vertices of figure NS1
 		int const NV2, // Number of vertices of figure NS2
 		int & NV3, // Number of vertices of figure NS3
 		int const NS1, // Number of the figure being overlapped
 		int const NS2 // Number of the figure doing overlapping
 	);
 
-	void
-	CLIPPOLY(
-		int const NS1, // Figure number of figure 1 (The subject polygon)
+    void CLIPPOLY(int const NS1, // Figure number of figure 1 (The subject polygon)
 		int const NS2, // Figure number of figure 2 (The clipping polygon)
 		int const NV1, // Number of vertices of figure 1
 		int const NV2, // Number of vertices of figure 2
 		int & NV3 // Number of vertices of figure 3
 	);
 
-	void
-	MULTOL(
-		int const NNN, // argument
+    void MULTOL(int const NNN,   // argument
 		int const LOC0, // Location in the homogeneous coordinate array
 		int const NRFIGS // Number of figures overlapped
 	);
 
-	void
-	ORDER(
-		int const NV3, // Number of vertices of figure NS3
+    void ORDER(int const NV3, // Number of vertices of figure NS3
 		int const NS3 // Location to place results of overlap
 	);
 
-	void
-	DeterminePolygonOverlap(
-		int const NS1, // Number of the figure being overlapped
+    void DeterminePolygonOverlap(int const NS1, // Number of the figure being overlapped
 		int const NS2, // Number of the figure doing overlapping
 		int const NS3 // Location to place results of overlap
 	);
 
-	void
-	CalcPerSolarBeam(
-		Real64 const AvgEqOfTime, // Average value of Equation of Time for period
+    void CalcPerSolarBeam(Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
 		Real64 const AvgSinSolarDeclin, // Average value of Sine of Solar Declination for period
 		Real64 const AvgCosSolarDeclin // Average value of Cosine of Solar Declination for period
 	);
 
-	void
-	FigureSunCosines(
-		int const iHour,
+    void FigureSunCosines(int const iHour,
 		int const iTimeStep,
 		Real64 const EqOfTime, // value of Equation of Time for period
 		Real64 const SinSolarDeclin, // value of Sine of Solar Declination for period
 		Real64 const CosSolarDeclin // value of Cosine of Solar Declination for period
 	);
 
-	void
-	FigureSolarBeamAtTimestep(
-		int const iHour,
-		int const iTimeStep
-	);
+    void FigureSolarBeamAtTimestep(int const iHour, int const iTimeStep);
 
-	void
-	DetermineShadowingCombinations();
+    void DetermineShadowingCombinations();
 
-	void
-	SHADOW(
-		int const iHour, // Hour index
+    void SHADOW(int const iHour, // Hour index
 		int const TS // Time Step
 	);
 
-	void
-	SHDBKS(
-		int const NGRS, // Number of the general receiving surface
+    void SHDBKS(int const NGRS, // Number of the general receiving surface
 		int const CurSurf,
 		int const NBKS, // Number of back surfaces
 		int const HTS // Heat transfer surface number of the general receiving surf
 	);
 
-	void
-	SHDGSS(
-		int const NGRS,
+    void SHDGSS(int const NGRS,
 		int const iHour, // Hour Counter
 		int const TS, // TimeStep
 		int const CurSurf, // Current Surface
@@ -375,17 +315,14 @@ namespace SolarShading {
 		int const HTS // Heat transfer surface number of the general receiving surf
 	);
 
-	void
-	CalcInteriorSolarOverlaps(
-		int const iHour, // Hour Index
+    void CalcInteriorSolarOverlaps(int const iHour, // Hour Index
 		int const NBKS, // Number of back surfaces associated with this GRSNR (in general, only
 		int const HTSS, // Surface number of the subsurface (exterior window)
 		int const GRSNR, // General receiving surface number (base surface of the exterior window)
 		int const TS // Time step Index
 	);
 
-	void
-	CalcInteriorSolarDistribution();
+    void CalcInteriorSolarDistribution();
 
 	void
 	CalcAborbedOnExteriorOpaqueSurfaces();
@@ -402,26 +339,18 @@ namespace SolarShading {
 		int const ConstNum // Construction number
 	);
 
-	int
-	SurfaceScheduledSolarInc(
-		int const SurfNum, // Surface number
+    int SurfaceScheduledSolarInc(int const SurfNum, // Surface number
 		int const ConstNum // Construction number
 	);
 
-	void
-	PerformSolarCalculations();
+    void PerformSolarCalculations();
 
-	void
-	SHDRVL(
-		int const HTSS, // Heat transfer surface number of the subsurface
+    void SHDRVL(int const HTSS,  // Heat transfer surface number of the subsurface
 		int const SBSNR, // Subsurface number
 		int const Hour,
-		int const TS
-	);
+                int const TS);
 
-	void
-	SHDSBS(
-		int const iHour, // Hour Index
+    void SHDSBS(int const iHour, // Hour Index
 		int const CurSurf,
 		int const NBKS, // Number of back surfaces
 		int const NSBS, // Number of subsurfaces
@@ -429,74 +358,55 @@ namespace SolarShading {
 		int const TS // Time step Index
 	);
 
-	void
-	SUN3(
-		int const JulianDayOfYear, // Julian Day Of Year
+    void SUN3(int const JulianDayOfYear,      // Julian Day Of Year
 		Real64 & SineOfSolarDeclination, // Sine of Solar Declination
 		Real64 & EquationOfTime // Equation of Time (Degrees)
 	);
 
-	void
-	SUN4(
-		Real64 const CurrentTime, // Time to use in shadowing calculations
+    void SUN4(Real64 const CurrentTime,    // Time to use in shadowing calculations
 		Real64 const EqOfTime, // Equation of time for current day
 		Real64 const SinSolarDeclin, // Sine of the Solar declination (current day)
 		Real64 const CosSolarDeclin // Cosine of the Solar declination (current day)
 	);
 
-	void
-	WindowShadingManager();
+    void WindowShadingManager();
 
-	void
-	WindowGapAirflowControl();
+    void WindowGapAirflowControl();
 
-	void
-	SkyDifSolarShading();
+    void SkyDifSolarShading();
 
-	void
-	CalcWindowProfileAngles();
+    void CalcWindowProfileAngles();
 
-	void
-	CalcFrameDividerShadow(
-		int const SurfNum, // Surface number
+    void CalcFrameDividerShadow(int const SurfNum,  // Surface number
 		int const FrDivNum, // Frame/divider number
 		int const HourNum // Hour number
 	);
 
-	void
-	CalcBeamSolarOnWinRevealSurface();
+    void CalcBeamSolarOnWinRevealSurface();
 
-	void
-	ReportSurfaceShading();
+    void ReportSurfaceShading();
 
-	void
-	ReportSurfaceErrors();
+    void ReportSurfaceErrors();
 
-	void
-	ComputeWinShadeAbsorpFactors();
+    void ComputeWinShadeAbsorpFactors();
 
-	void
-	CalcWinTransDifSolInitialDistribution();
+    void CalcWinTransDifSolInitialDistribution();
 
-	void
-	CalcInteriorWinTransDifSolInitialDistribution(
+    void CalcInteriorWinTransDifSolInitialDistribution(
 		int const ZoneNum, // Zone index number
 		int const IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
 		Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
 	);
 
-	void
-	CalcComplexWindowOverlap(
-		BSDFGeomDescr & Geom, // State Geometry
+    void CalcComplexWindowOverlap(BSDFGeomDescr &Geom,               // State Geometry
 		BSDFWindowGeomDescr const & Window, // Window Geometry
 		int const ISurf // Surface number of the complex fenestration
 	);
 
-	void
-	TimestepInitComplexFenestration();
+    void TimestepInitComplexFenestration();
 
-} // SolarShading
+} // namespace SolarShading
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

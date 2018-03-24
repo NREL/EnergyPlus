@@ -49,9 +49,9 @@
 #define UtilityRoutines_hh_INCLUDED
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -60,748 +60,488 @@
 
 namespace EnergyPlus {
 
-void
-AbortEnergyPlus();
+void AbortEnergyPlus();
 
-void
-CloseMiscOpenFiles();
+void CloseMiscOpenFiles();
 
-void
-CloseOutOpenFiles();
+void CloseOutOpenFiles();
 
-void
-EndEnergyPlus();
+void EndEnergyPlus();
 
-int
-GetNewUnitNumber();
+int GetNewUnitNumber();
 
-int
-FindUnitNumber( std::string const & FileName ); // File name to be searched.
+int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
-void
-ConvertCaseToUpper(
-	std::string const & InputString, // Input string
-	std::string & OutputString // Output string (in UpperCase)
+void ConvertCaseToUpper(std::string const &InputString, // Input string
+                        std::string &OutputString       // Output string (in UpperCase)
 );
 
-void
-ConvertCaseToLower(
-	std::string const & InputString, // Input string
-	std::string & OutputString // Output string (in LowerCase)
+void ConvertCaseToLower(std::string const &InputString, // Input string
+                        std::string &OutputString       // Output string (in LowerCase)
 );
 
-std::string::size_type
-FindNonSpace( std::string const & String ); // String to be scanned
+std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
-template< typename T >
-inline
-T
-pow2( T const & x )
+template <typename T> inline T pow2(T const &x)
 {
-	return x * x;
+    return x * x;
 }
 
-template< typename T >
-inline
-T
-pow3( T const & x )
+template <typename T> inline T pow3(T const &x)
 {
-	return x * x * x;
+    return x * x * x;
 }
 
-template< typename T >
-inline
-T
-pow4( T const & x )
+template <typename T> inline T pow4(T const &x)
 {
-	T y( x * x );
-	return y * y;
+    T y(x * x);
+    return y * y;
 }
 
-template< typename T >
-inline
-T
-pow5( T const & x )
+template <typename T> inline T pow5(T const &x)
 {
-	T y( x * x );
-	y *= y;
-	return y * x;
+    T y(x * x);
+    y *= y;
+    return y * x;
 }
 
-template< typename T >
-inline
-T
-pow6( T const & x )
+template <typename T> inline T pow6(T const &x)
 {
-	T y( x * x );
-	y *= y;
-	return y * y;
+    T y(x * x);
+    y *= y;
+    return y * y;
 }
 
-template< typename T >
-inline
-T
-pow7( T const & x )
+template <typename T> inline T pow7(T const &x)
 {
-	T y( x * x );
-	y *= y;
-	y *= y;
-	return y * x;
+    T y(x * x);
+    y *= y;
+    y *= y;
+    return y * x;
 }
 
-bool
-env_var_on( std::string const & env_var_str );
+bool env_var_on(std::string const &env_var_str);
 
-void
-ShowFatalError(
-	std::string const & ErrorMessage,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
+void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowContinueError(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowMessage(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+
+void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+                                   int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
+                                   Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
+                                   Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
+                                   Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                   std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
+                                   std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
+                                   std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void
-ShowSevereError(
-	std::string const & ErrorMessage,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
+void ShowRecurringWarningErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
+                                    Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
+                                    Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
+                                    Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                    std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
+                                    std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
+                                    std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void
-ShowSevereMessage(
-	std::string const & ErrorMessage,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
+void ShowRecurringContinueErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+                                     int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
+                                     Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
+                                     Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
+                                     Optional<Real64 const> ReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                     std::string const &ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
+                                     std::string const &ReportMinUnits = "", // optional char string (<=15 length) of units for min value
+                                     std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void
-ShowContinueError(
-	std::string const & Message,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
+void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
+                                int &ErrorMsgIndex,                          // Recurring message index, if zero, next available index is assigned
+                                Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
+                                Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
+                                Optional<Real64 const> ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
+                                std::string const &ErrorReportMaxUnits = "", // Units for "max" reporting
+                                std::string const &ErrorReportMinUnits = "", // Units for "min" reporting
+                                std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
 
-void
-ShowContinueErrorTimeStamp(
-	std::string const & Message,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
-);
+void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
 
-void
-ShowMessage(
-	std::string const & Message,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
-);
+void SummarizeErrors();
 
-void
-ShowWarningError(
-	std::string const & ErrorMessage,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
-);
-
-void
-ShowWarningMessage(
-	std::string const & ErrorMessage,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
-);
-
-void
-ShowRecurringSevereErrorAtEnd(
-	std::string const & Message, // Message automatically written to "error file" at end of simulation
-	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
-	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
-	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
-	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	std::string const & ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
-	std::string const & ReportMinUnits = "", // optional char string (<=15 length) of units for min value
-	std::string const & ReportSumUnits = "" // optional char string (<=15 length) of units for sum value
-);
-
-void
-ShowRecurringWarningErrorAtEnd(
-	std::string const & Message, // Message automatically written to "error file" at end of simulation
-	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
-	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
-	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
-	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	std::string const & ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
-	std::string const & ReportMinUnits = "", // optional char string (<=15 length) of units for min value
-	std::string const & ReportSumUnits = "" // optional char string (<=15 length) of units for sum value
-);
-
-void
-ShowRecurringContinueErrorAtEnd(
-	std::string const & Message, // Message automatically written to "error file" at end of simulation
-	int & MsgIndex, // Recurring message index, if zero, next available index is assigned
-	Optional< Real64 const > ReportMaxOf = _, // Track and report the max of the values passed to this argument
-	Optional< Real64 const > ReportMinOf = _, // Track and report the min of the values passed to this argument
-	Optional< Real64 const > ReportSumOf = _, // Track and report the sum of the values passed to this argument
-	std::string const & ReportMaxUnits = "", // optional char string (<=15 length) of units for max value
-	std::string const & ReportMinUnits = "", // optional char string (<=15 length) of units for min value
-	std::string const & ReportSumUnits = "" // optional char string (<=15 length) of units for sum value
-);
-
-void
-StoreRecurringErrorMessage(
-	std::string const & ErrorMessage, // Message automatically written to "error file" at end of simulation
-	int & ErrorMsgIndex, // Recurring message index, if zero, next available index is assigned
-	Optional< Real64 const > ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
-	Optional< Real64 const > ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
-	Optional< Real64 const > ErrorReportSumOf = _, // Track and report the sum of the values passed to this argument
-	std::string const & ErrorReportMaxUnits = "", // Units for "max" reporting
-	std::string const & ErrorReportMinUnits = "", // Units for "min" reporting
-	std::string const & ErrorReportSumUnits = "" // Units for "sum" reporting
-);
-
-void
-ShowErrorMessage(
-	std::string const & ErrorMessage,
-	Optional_int OutUnit1 = _,
-	Optional_int OutUnit2 = _
-);
-
-void
-SummarizeErrors();
-
-void
-ShowRecurringErrors();
+void ShowRecurringErrors();
 
 namespace UtilityRoutines {
-	extern bool outputErrorHeader;
+    extern bool outputErrorHeader;
 
-	template < class T >
-	struct is_shared_ptr : std::false_type {};
-	template < class T >
-	struct is_shared_ptr < std::shared_ptr < T > > : std::true_type {};
+    template <class T> struct is_shared_ptr : std::false_type
+    {
+    };
+    template <class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
+    {
+    };
 
-	Real64
-	ProcessNumber(
-		std::string const & String,
-		bool & ErrorFlag
-	);
+    Real64 ProcessNumber(std::string const &String, bool &ErrorFlag);
 
-	int
-	FindItemInList(
-		std::string const & String,
-		Array1_string const & ListOfItems,
-		int const NumItems
-	);
+    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int const NumItems);
 
+    inline int FindItemInList(std::string const &String, Array1_string const &ListOfItems)
+    {
+        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+    }
 
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		Array1_string const & ListOfItems
-	) {
-		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
-	}
+    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
 
-	int
-	FindItemInList(
-		std::string const & String,
-		Array1S_string const ListOfItems,
-		int const NumItems
-	);
+    inline int FindItemInList(std::string const &String, Array1S_string const ListOfItems)
+    {
+        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+    }
 
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		Array1S_string const ListOfItems
-	) {
-		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename A> inline int FindItemInList(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    {
+        for (int Count = 1; Count <= NumItems; ++Count) {
+            if (String == ListOfItems(Count)) return Count;
+        }
+        return 0; // Not found
+    }
 
-	template < typename A >
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		MArray1< A, std::string > const & ListOfItems,
-		int const NumItems
-	) {
-		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( String == ListOfItems( Count ) ) return Count;
-		}
-		return 0; // Not found
-	}
+    template <typename A> inline int FindItemInList(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    {
+        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+    }
 
-	template < typename A >
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		MArray1< A, std::string > const & ListOfItems
-	) {
-		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs and operator[i] and elements need Name
+    inline int FindItemInList(std::string const &String, Container const &ListOfItems, int const NumItems)
+    {
+        for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
+            if (String == ListOfItems[i].Name) return int(i + 1); // 1-based return index
+        }
+        return 0; // Not found
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs and operator[i] and elements need Name
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		Container const & ListOfItems,
-		int const NumItems
-	) {
-		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-			if ( String == ListOfItems[ i ].Name ) return int( i + 1 ); // 1-based return index
-		}
-		return 0; // Not found
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs isize() and operator[i] and elements need Name
+    inline int FindItemInList(std::string const &String, Container const &ListOfItems)
+    {
+        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs isize() and operator[i] and elements need Name
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		Container const & ListOfItems
-	) {
-		return UtilityRoutines::FindItemInList( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs operator[i] and value_type
+    inline int FindItemInList(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
+    {
+        for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
+            if (String == ListOfItems[i].*name_p) return int(i + 1); // 1-based return index
+        }
+        return 0; // Not found
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs operator[i] and value_type
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		Container const & ListOfItems,
-		std::string Container::value_type::*name_p,
-		int const NumItems
-	) {
-		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-			if ( String == ListOfItems[ i ].*name_p ) return int( i + 1 ); // 1-based return index
-		}
-		return 0; // Not found
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs isize() and operator[i] and value_type
+    inline int FindItemInList(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p)
+    {
+        return UtilityRoutines::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs isize() and operator[i] and value_type
-	inline
-	int
-	FindItemInList(
-		std::string const & String,
-		Container const & ListOfItems,
-		std::string Container::value_type::*name_p
-	) {
-		return UtilityRoutines::FindItemInList( String, ListOfItems, name_p, ListOfItems.isize() );
-	}
+    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
 
-	int
-	FindItemInSortedList(
-		std::string const & String,
-		Array1S_string const ListOfItems,
-		int const NumItems
-	);
+    inline int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems)
+    {
+        return FindItemInSortedList(String, ListOfItems, ListOfItems.isize());
+    }
 
-	inline
-	int
-	FindItemInSortedList(
-		std::string const & String,
-		Array1S_string const ListOfItems
-	) {
-		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename A> inline int FindItemInSortedList(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    {
+        int Probe(0);
+        int LBnd(0);
+        int UBnd(NumItems + 1);
+        bool Found(false);
+        while ((!Found) || (Probe != 0)) {
+            Probe = (UBnd - LBnd) / 2;
+            if (Probe == 0) break;
+            Probe += LBnd;
+            if (equali(String, ListOfItems(Probe))) {
+                Found = true;
+                break;
+            } else if (lessthani(String, ListOfItems(Probe))) {
+                UBnd = Probe;
+            } else {
+                LBnd = Probe;
+            }
+        }
+        return Probe;
+    }
 
-	template < typename A >
-	inline
-	int
-	FindItemInSortedList(
-		std::string const & String,
-		MArray1< A, std::string > const & ListOfItems,
-		int const NumItems
-	) {
-		int Probe( 0 );
-		int LBnd( 0 );
-		int UBnd( NumItems + 1 );
-		bool Found( false );
-		while ( ( !Found ) || ( Probe != 0 ) ) {
-			Probe = ( UBnd - LBnd ) / 2;
-			if ( Probe == 0 ) break;
-			Probe += LBnd;
-			if ( equali( String, ListOfItems( Probe ) ) ) {
-				Found = true;
-				break;
-			} else if ( lessthani( String, ListOfItems( Probe ) ) ) {
-				UBnd = Probe;
-			} else {
-				LBnd = Probe;
-			}
-		}
-		return Probe;
-	}
+    template <typename A> inline int FindItemInSortedList(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    {
+        return FindItemInSortedList(String, ListOfItems, ListOfItems.isize());
+    }
 
-	template < typename A >
-	inline
-	int
-	FindItemInSortedList(
-		std::string const & String,
-		MArray1< A, std::string > const & ListOfItems
-	) {
-		return FindItemInSortedList( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str, std::false_type)
+    {
+        using valueType = typename std::iterator_traits<InputIterator>::value_type;
+        // static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named"
+        // );
 
-	template < typename InputIterator >
-	inline
-	int
-	FindItem(
-		InputIterator first,
-		InputIterator last,
-		std::string const & str,
-		std::false_type
-	) {
-		using valueType = typename std::iterator_traits < InputIterator >::value_type;
-		//static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+        auto const it = std::find_if(first, last, [&str](const valueType &s) { return s.name == str; });
+        if (it != last) return it - first + 1; // 1-based return index
 
-		auto const it = std::find_if( first, last, [ &str ]( const valueType & s ) { return s.name == str; } );
-		if ( it != last ) return it - first + 1; // 1-based return index
+        auto const it2 = std::find_if(first, last, [&str](const valueType &s) { return equali(s.name, str); });
+        if (it2 != last) return it2 - first + 1; // 1-based return index
 
-		auto const it2 = std::find_if( first, last,
-									   [ &str ]( const valueType & s ) { return equali( s.name, str ); } );
-		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+        return 0; // Not found
+    }
 
-		return 0; // Not found
-	}
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str, std::true_type)
+    {
+        using valueType = typename std::iterator_traits<InputIterator>::value_type;
+        // static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class
+        // Named" );
 
-	template < typename InputIterator >
-	inline
-	int
-	FindItem(
-		InputIterator first,
-		InputIterator last,
-		std::string const & str,
-		std::true_type
-	) {
-		using valueType = typename std::iterator_traits < InputIterator >::value_type;
-		//static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named" );
+        auto const it = std::find_if(first, last, [&str](const valueType &s) { return s->name == str; });
+        if (it != last) return it - first + 1; // 1-based return index
 
-		auto const it = std::find_if( first, last, [ &str ]( const valueType & s ) { return s->name == str; } );
-		if ( it != last ) return it - first + 1; // 1-based return index
+        auto const it2 = std::find_if(first, last, [&str](const valueType &s) { return equali(s->name, str); });
+        if (it2 != last) return it2 - first + 1; // 1-based return index
 
-		auto const it2 = std::find_if( first, last,
-									   [ &str ]( const valueType & s ) { return equali( s->name, str ); } );
-		if ( it2 != last ) return it2 - first + 1; // 1-based return index
+        return 0; // Not found
+    }
 
-		return 0; // Not found
-	}
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str)
+    {
+        return FindItem(first, last, str, is_shared_ptr<typename std::iterator_traits<InputIterator>::value_type>{});
+    }
 
-	template < typename InputIterator >
-	inline
-	int
-	FindItem(
-		InputIterator first,
-		InputIterator last,
-		std::string const & str
-	) {
-		return FindItem( first, last, str,
-						 is_shared_ptr < typename std::iterator_traits < InputIterator >::value_type >{ } );
-	}
+    int FindItem(std::string const &String, Array1D_string const &ListOfItems, int const NumItems);
 
-	int
-	FindItem(
-		std::string const & String,
-		Array1D_string const & ListOfItems,
-		int const NumItems
-	);
+    inline int FindItem(std::string const &String, Array1D_string const &ListOfItems)
+    {
+        return FindItem(String, ListOfItems, ListOfItems.isize());
+    }
 
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		Array1D_string const & ListOfItems
-	) {
-		return FindItem( String, ListOfItems, ListOfItems.isize() );
-	}
+    int FindItem(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
 
-	int
-	FindItem(
-		std::string const & String,
-		Array1S_string const ListOfItems,
-		int const NumItems
-	);
+    inline int FindItem(std::string const &String, Array1S_string const ListOfItems)
+    {
+        return FindItem(String, ListOfItems, ListOfItems.isize());
+    }
 
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		Array1S_string const ListOfItems
-	) {
-		return FindItem( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename A> inline int FindItem(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    {
+        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
+        if (item_number != 0) return item_number;
+        for (int Count = 1; Count <= NumItems; ++Count) {
+            if (equali(String, ListOfItems(Count))) return Count;
+        }
+        return 0; // Not found
+    }
 
-	template < typename A >
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		MArray1< A, std::string > const & ListOfItems,
-		int const NumItems
-	) {
-		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, NumItems ) );
-		if ( item_number != 0 ) return item_number;
-		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( equali( String, ListOfItems( Count ) ) ) return Count;
-		}
-		return 0; // Not found
-	}
+    template <typename A> inline int FindItem(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    {
+        return FindItem(String, ListOfItems, ListOfItems.isize());
+    }
 
-	template < typename A >
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		MArray1< A, std::string > const & ListOfItems
-	) {
-		return FindItem( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs size() and operator[i] and elements need Name
+    inline int FindItem(std::string const &String, Container const &ListOfItems, int const NumItems)
+    {
+        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
+        if (item_number != 0) return item_number;
+        for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
+            if (equali(String, ListOfItems[i].Name)) return i + 1; // 1-based return index
+        }
+        return 0; // Not found
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs size() and operator[i] and elements need Name
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		Container const & ListOfItems,
-		int const NumItems
-	) {
-		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, NumItems ) );
-		if ( item_number != 0 ) return item_number;
-		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-			if ( equali( String, ListOfItems[ i ].Name ) ) return i + 1; // 1-based return index
-		}
-		return 0; // Not found
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs size() and operator[i] and elements need Name
+    inline int FindItem(std::string const &String, Container const &ListOfItems)
+    {
+        return FindItem(String, ListOfItems, ListOfItems.isize());
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs size() and operator[i] and elements need Name
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		Container const & ListOfItems
-	) {
-		return FindItem( String, ListOfItems, ListOfItems.isize() );
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs size() and operator[i] and value_type
+    inline int FindItem(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
+    {
+        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, name_p, NumItems));
+        if (item_number != 0) return item_number;
+        for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
+            if (equali(String, ListOfItems[i].*name_p)) return i + 1; // 1-based return index
+        }
+        return 0; // Not found
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs size() and operator[i] and value_type
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		Container const & ListOfItems,
-		std::string Container::value_type::*name_p,
-		int const NumItems
-	) {
-		int const item_number( UtilityRoutines::FindItemInList( String, ListOfItems, name_p, NumItems ) );
-		if ( item_number != 0 ) return item_number;
-		for ( typename Container::size_type i = 0, e = NumItems; i < e; ++i ) {
-			if ( equali( String, ListOfItems[ i ].*name_p ) ) return i + 1; // 1-based return index
-		}
-		return 0; // Not found
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs size() and operator[i] and value_type
+    inline int FindItem(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p)
+    {
+        return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
+    }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs size() and operator[i] and value_type
-	inline
-	int
-	FindItem(
-		std::string const & String,
-		Container const & ListOfItems,
-		std::string Container::value_type::*name_p
-	) {
-		return FindItem( String, ListOfItems, name_p, ListOfItems.isize() );
-	}
+    std::string MakeUPPERCase(std::string const &InputString); // Input String
 
-	std::string
-	MakeUPPERCase( std::string const & InputString ); // Input String
+    inline bool SameString(std::string const &s, std::string const &t)
+    {
+        // case insensitive comparison
+        return equali(s, t);
+    }
 
-	inline
-	bool
-	SameString( std::string const & s, std::string const & t ) {
-		// case insensitive comparison
-		return equali( s, t );
-	}
+    typedef char const *c_cstring;
 
-	typedef char const * c_cstring;
+    inline bool SameString(std::string const &s, c_cstring const &t)
+    {
+        // case insensitive comparison
+        return equali(s, t);
+    }
 
-	inline
-	bool
-	SameString( std::string const & s, c_cstring const & t ) {
-		// case insensitive comparison
-		return equali( s, t );
-	}
+    inline bool SameString(c_cstring const &s, std::string const &t)
+    {
+        // case insensitive comparison
+        return equali(s, t);
+    }
 
-	inline
-	bool
-	SameString( c_cstring const & s, std::string const & t ) {
-		// case insensitive comparison
-		return equali( s, t );
-	}
+    inline bool SameString(c_cstring const &s, c_cstring const &t)
+    {
+        // case insensitive comparison
+        return equali(s, t);
+    }
 
-	inline
-	bool
-	SameString( c_cstring const & s, c_cstring const & t ) {
-		// case insensitive comparison
-		return equali( s, t );
-	}
+    template <typename InputIterator>
+    inline void VerifyName(
+        InputIterator first, InputIterator last, std::string const &NameToVerify, bool &ErrorFound, bool &IsBlank, std::string const &StringToDisplay)
+    {
+        IsBlank = false;
+        ErrorFound = false;
+        if (NameToVerify.empty()) {
+            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ErrorFound = true;
+            IsBlank = true;
+            return;
+        }
+        int Found = FindItem(first, last, NameToVerify);
+        if (Found != 0) {
+            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+            ErrorFound = true;
+        }
+    }
 
-	template < typename InputIterator >
-	inline
-	void
-	VerifyName(
-		InputIterator first,
-		InputIterator last,
-		std::string const & NameToVerify,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	) {
-		IsBlank = false;
-		ErrorFound = false;
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-			return;
-		}
-		int Found = FindItem( first, last, NameToVerify );
-		if ( Found != 0 ) {
-			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-			ErrorFound = true;
-		}
-	}
+    void VerifyName(std::string const &NameToVerify,
+                    Array1D_string const &NamesList,
+                    int const NumOfNames,
+                    bool &ErrorFound,
+                    bool &IsBlank,
+                    std::string const &StringToDisplay);
 
-	void
-	VerifyName(
-		std::string const & NameToVerify,
-		Array1D_string const & NamesList,
-		int const NumOfNames,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	);
+    void VerifyName(std::string const &NameToVerify,
+                    Array1S_string const NamesList,
+                    int const NumOfNames,
+                    bool &ErrorFound,
+                    bool &IsBlank,
+                    std::string const &StringToDisplay);
 
-	void
-	VerifyName(
-		std::string const & NameToVerify,
-		Array1S_string const NamesList,
-		int const NumOfNames,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	);
+    template <typename A>
+    inline void VerifyName(std::string const &NameToVerify,
+                           MArray1<A, std::string> const &NamesList,
+                           int const NumOfNames,
+                           bool &ErrorFound,
+                           bool &IsBlank,
+                           std::string const &StringToDisplay)
+    { // Overload for member arrays: Implemented here to avoid copy to Array_string to forward to other VerifyName
+        ErrorFound = false;
+        if (NumOfNames > 0) {
+            int const Found = FindItem(NameToVerify, NamesList,
+                                       NumOfNames); // Calls FindItem overload that accepts member arrays
+            if (Found != 0) {
+                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ErrorFound = true;
+            }
+        }
 
-	template < typename A >
-	inline
-	void
-	VerifyName(
-		std::string const & NameToVerify,
-		MArray1< A, std::string > const & NamesList,
-		int const NumOfNames,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	) { // Overload for member arrays: Implemented here to avoid copy to Array_string to forward to other VerifyName
-		ErrorFound = false;
-		if ( NumOfNames > 0 ) {
-			int const Found = FindItem( NameToVerify, NamesList,
-										NumOfNames ); // Calls FindItem overload that accepts member arrays
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
+        if (NameToVerify.empty()) {
+            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ErrorFound = true;
+            IsBlank = true;
+        } else {
+            IsBlank = false;
+        }
+    }
 
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-		} else {
-			IsBlank = false;
-		}
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs size() and operator[i] and elements need Name
+    inline void VerifyName(std::string const &NameToVerify,
+                           Container const &NamesList,
+                           int const NumOfNames,
+                           bool &ErrorFound,
+                           bool &IsBlank,
+                           std::string const &StringToDisplay)
+    {
+        ErrorFound = false;
+        if (NumOfNames > 0) {
+            int const Found = FindItem(NameToVerify, NamesList,
+                                       NumOfNames); // Calls FindItem overload that accepts member arrays
+            if (Found != 0) {
+                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ErrorFound = true;
+            }
+        }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs size() and operator[i] and elements need Name
-	inline
-	void
-	VerifyName(
-		std::string const & NameToVerify,
-		Container const & NamesList,
-		int const NumOfNames,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	) {
-		ErrorFound = false;
-		if ( NumOfNames > 0 ) {
-			int const Found = FindItem( NameToVerify, NamesList,
-										NumOfNames ); // Calls FindItem overload that accepts member arrays
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
+        if (NameToVerify.empty()) {
+            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ErrorFound = true;
+            IsBlank = true;
+        } else {
+            IsBlank = false;
+        }
+    }
 
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-		} else {
-			IsBlank = false;
-		}
-	}
+    template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
+    // Container needs size() and operator[i] and value_type
+    inline void VerifyName(std::string const &NameToVerify,
+                           Container const &NamesList,
+                           std::string Container::value_type::*name_p,
+                           int const NumOfNames,
+                           bool &ErrorFound,
+                           bool &IsBlank,
+                           std::string const &StringToDisplay)
+    {
+        ErrorFound = false;
+        if (NumOfNames > 0) {
+            int const Found = FindItem(NameToVerify, NamesList, name_p, NumOfNames);
+            if (Found != 0) {
+                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ErrorFound = true;
+            }
+        }
 
-	template < typename Container, class = typename std::enable_if < !std::is_same < typename Container::value_type, std::string >::value >::type >
-	// Container needs size() and operator[i] and value_type
-	inline
-	void
-	VerifyName(
-		std::string const & NameToVerify,
-		Container const & NamesList,
-		std::string Container::value_type::*name_p,
-		int const NumOfNames,
-		bool & ErrorFound,
-		bool & IsBlank,
-		std::string const & StringToDisplay
-	) {
-		ErrorFound = false;
-		if ( NumOfNames > 0 ) {
-			int const Found = FindItem( NameToVerify, NamesList, name_p, NumOfNames );
-			if ( Found != 0 ) {
-				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
-				ErrorFound = true;
-			}
-		}
+        if (NameToVerify.empty()) {
+            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ErrorFound = true;
+            IsBlank = true;
+        } else {
+            IsBlank = false;
+        }
+    }
 
-		if ( NameToVerify.empty() ) {
-			ShowSevereError( StringToDisplay + ", cannot be blank" );
-			ErrorFound = true;
-			IsBlank = true;
-		} else {
-			IsBlank = false;
-		}
-	}
+    bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
 
-	bool
-	IsNameEmpty(
-		std::string & NameToVerify,
-		std::string const & StringToDisplay,
-		bool & ErrorFound
-	);
+    std::string IPTrimSigDigits(int const IntegerValue);
+} // namespace UtilityRoutines
 
-	std::string
-	IPTrimSigDigits( int const IntegerValue );
-}
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif
