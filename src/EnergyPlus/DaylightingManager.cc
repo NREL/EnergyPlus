@@ -6571,7 +6571,7 @@ namespace DaylightingManager {
                     // If switchable glazing, set switching factor to 1: fully switched.
                     if (SurfaceWindow(IWin).ShadingFlag == SwitchableGlazing) {
                         //						tmpSWFactor0 = SurfaceWindow( IWin ).SwitchingFactor; // save original
-                        //switching  factor
+                        // switching  factor
                         ////Unused Set but never used
                         SurfaceWindow(IWin).SwitchingFactor = 1.0;
                         SurfaceWindow(IWin).VisTransSelected = TVIS2;

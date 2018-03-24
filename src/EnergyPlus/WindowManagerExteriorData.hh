@@ -48,138 +48,136 @@
 #ifndef WindowManagerExteriorData_hh_INCLUDED
 #define WindowManagerExteriorData_hh_INCLUDED
 
+#include <map>
 #include <memory>
 #include <vector>
-#include <map>
 
 #include <Vectors.hh>
 
 namespace EnergyPlus {
-	namespace DataHeatBalance {
-		struct MaterialProperties;
-	}
-
+namespace DataHeatBalance {
+    struct MaterialProperties;
 }
+
+} // namespace EnergyPlus
 
 namespace FenestrationCommon {
 
-	enum class WavelengthRange;
-	class CSeries;
+enum class WavelengthRange;
+class CSeries;
 
-}
+} // namespace FenestrationCommon
 
 namespace SpectralAveraging {
 
-	class CSpectralSampleData;
-
+class CSpectralSampleData;
 }
 
 namespace SingleLayerOptics {
 
-	class CBSDFLayer;
-	class CScatteringLayer;
-	enum class BSDFHemisphere;
+class CBSDFLayer;
+class CScatteringLayer;
+enum class BSDFHemisphere;
 
-}
+} // namespace SingleLayerOptics
 
 namespace MultiLayerOptics {
 
-	class CMultiPaneBSDF;
-	class CMultiLayerScattered;
+class CMultiPaneBSDF;
+class CMultiLayerScattered;
 
-}
+} // namespace MultiLayerOptics
 
 namespace EnergyPlus {
 
-	namespace WindowManager {
+namespace WindowManager {
 
-		// using IGU_BSDFLayers = std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > >;
-		using IGU_Layers = std::vector< std::shared_ptr< SingleLayerOptics::CScatteringLayer > >;
-		// Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers 
-		// in between. So we will just use map to store layers so that we get optimized search.
-		// using LayersBSDF_Map = std::map< int, std::shared_ptr< IGU_BSDFLayers > >;
-		using Layers_Map = std::map< int, std::shared_ptr< IGU_Layers > >;
+    // using IGU_BSDFLayers = std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > >;
+    using IGU_Layers = std::vector<std::shared_ptr<SingleLayerOptics::CScatteringLayer>>;
+    // Construction numbers in EnergyPlus are not stored in orders and it can contain wall numbers
+    // in between. So we will just use map to store layers so that we get optimized search.
+    // using LayersBSDF_Map = std::map< int, std::shared_ptr< IGU_BSDFLayers > >;
+    using Layers_Map = std::map<int, std::shared_ptr<IGU_Layers>>;
 
-		// Test if surface is hit by beam defined with vector
-		bool isSurfaceHit( const int t_SurfNum, const DataVectorTypes::Vector& t_Ray );
+    // Test if surface is hit by beam defined with vector
+    bool isSurfaceHit(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray);
 
-		// Converts world coordinates (E+) into local surface coordinates that suites better for 
-		// WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
-		std::pair< Real64, Real64 > getWCECoordinates( const int t_SurfNum,
-		                                               const DataVectorTypes::Vector& t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction );
+    // Converts world coordinates (E+) into local surface coordinates that suites better for
+    // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
+    std::pair<Real64, Real64>
+    getWCECoordinates(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
-		// Returns Theta and Phi coordinates of surface BSDF for current Sun position
-		std::pair< Real64, Real64 > getSunWCEAngles( const int t_SurfNum,
-		                                             const SingleLayerOptics::BSDFHemisphere t_Direction );
+    // Returns Theta and Phi coordinates of surface BSDF for current Sun position
+    std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const SingleLayerOptics::BSDFHemisphere t_Direction);
 
-		///////////////////////////////////////////////////////////////////////////////
-		//   CWCESpecturmProperties
-		///////////////////////////////////////////////////////////////////////////////
-		class CWCESpecturmProperties {
-		public:
-			static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample(
-				int const t_SampleDataPtr );
-			static std::shared_ptr< SpectralAveraging::CSpectralSampleData > getSpectralSample(
-				DataHeatBalance::MaterialProperties const& t_MaterialProperties );
-			static std::shared_ptr< FenestrationCommon::CSeries > getDefaultSolarRadiationSpectrum();
-			static std::shared_ptr< FenestrationCommon::CSeries > getDefaultVisiblePhotopicResponse();
-		};
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWCESpecturmProperties
+    ///////////////////////////////////////////////////////////////////////////////
+    class CWCESpecturmProperties
+    {
+    public:
+        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
+        static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
+        getSpectralSample(DataHeatBalance::MaterialProperties const &t_MaterialProperties);
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum();
+        static std::shared_ptr<FenestrationCommon::CSeries> getDefaultVisiblePhotopicResponse();
+    };
 
-		// ///////////////////////////////////////////////////////////////////////////////
-		// //   CWindowConstructionsBSDF
-		// ///////////////////////////////////////////////////////////////////////////////
-		// // Singleton to keep window constructions in BSDF format.
-		// class CWindowConstructionsBSDF {
-		// public:
-		// 	static CWindowConstructionsBSDF& instance();
-		// 
-		// 	void pushBSDFLayer( FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum,
-		// 	                    std::shared_ptr< SingleLayerOptics::CBSDFLayer > const& t_Layer );
-		// 
-		// 	std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > getEquivalentLayer(
-		// 		FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum );
-		// 
-		// private:
-		// 	CWindowConstructionsBSDF();
-		// 	std::vector< Real64 > getCommonWavelengths(
-		// 		FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum ) const;
-		// 	std::shared_ptr< IGU_BSDFLayers > getLayers( FenestrationCommon::WavelengthRange const t_Range,
-		// 	                                             int const t_ConstrNum ) const;
-		// 
-		// 	// Need separate layer properties for Solar and Visible range
-		// 	std::map< FenestrationCommon::WavelengthRange, std::shared_ptr< LayersBSDF_Map > > m_Layers;
-		// 	std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > > m_Equivalent;
-		// 
-		// };
+    // ///////////////////////////////////////////////////////////////////////////////
+    // //   CWindowConstructionsBSDF
+    // ///////////////////////////////////////////////////////////////////////////////
+    // // Singleton to keep window constructions in BSDF format.
+    // class CWindowConstructionsBSDF {
+    // public:
+    // 	static CWindowConstructionsBSDF& instance();
+    //
+    // 	void pushBSDFLayer( FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum,
+    // 	                    std::shared_ptr< SingleLayerOptics::CBSDFLayer > const& t_Layer );
+    //
+    // 	std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > getEquivalentLayer(
+    // 		FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum );
+    //
+    // private:
+    // 	CWindowConstructionsBSDF();
+    // 	std::vector< Real64 > getCommonWavelengths(
+    // 		FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum ) const;
+    // 	std::shared_ptr< IGU_BSDFLayers > getLayers( FenestrationCommon::WavelengthRange const t_Range,
+    // 	                                             int const t_ConstrNum ) const;
+    //
+    // 	// Need separate layer properties for Solar and Visible range
+    // 	std::map< FenestrationCommon::WavelengthRange, std::shared_ptr< LayersBSDF_Map > > m_Layers;
+    // 	std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiLayerOptics::CMultiPaneBSDF > > m_Equivalent;
+    //
+    // };
 
-		///////////////////////////////////////////////////////////////////////////////
-		//   CWindowConstructionsSimplified
-		///////////////////////////////////////////////////////////////////////////////
-		// Singleton to keep window constructions in simplified (scattering) format.
-		class CWindowConstructionsSimplified {
-		public:
-			static CWindowConstructionsSimplified& instance();
+    ///////////////////////////////////////////////////////////////////////////////
+    //   CWindowConstructionsSimplified
+    ///////////////////////////////////////////////////////////////////////////////
+    // Singleton to keep window constructions in simplified (scattering) format.
+    class CWindowConstructionsSimplified
+    {
+    public:
+        static CWindowConstructionsSimplified &instance();
 
-			void pushLayer( FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum,
-			                std::shared_ptr< SingleLayerOptics::CScatteringLayer > const& t_Layer );
+        void pushLayer(FenestrationCommon::WavelengthRange const t_Range,
+                       int const t_ConstrNum,
+                       std::shared_ptr<SingleLayerOptics::CScatteringLayer> const &t_Layer);
 
-			std::shared_ptr< MultiLayerOptics::CMultiLayerScattered > getEquivalentLayer(
-				FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum );
+        std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> getEquivalentLayer(FenestrationCommon::WavelengthRange const t_Range,
+                                                                                   int const t_ConstrNum);
 
-		private:
-			CWindowConstructionsSimplified();
+    private:
+        CWindowConstructionsSimplified();
 
-			std::shared_ptr< IGU_Layers > getLayers( FenestrationCommon::WavelengthRange const t_Range,
-			                                         int const t_ConstrNum ) const;
+        std::shared_ptr<IGU_Layers> getLayers(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
 
-			// Need separate layer properties for Solar and Visible range
-			std::map< FenestrationCommon::WavelengthRange, std::shared_ptr< Layers_Map > > m_Layers;
-			std::map< std::pair< FenestrationCommon::WavelengthRange, int >, std::shared_ptr< MultiLayerOptics::CMultiLayerScattered > > m_Equivalent;
+        // Need separate layer properties for Solar and Visible range
+        std::map<FenestrationCommon::WavelengthRange, std::shared_ptr<Layers_Map>> m_Layers;
+        std::map<std::pair<FenestrationCommon::WavelengthRange, int>, std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>> m_Equivalent;
+    };
 
-		};
+} // namespace WindowManager
 
-	}
-
-}
+} // namespace EnergyPlus
 
 #endif

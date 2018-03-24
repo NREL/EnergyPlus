@@ -48,62 +48,71 @@
 #ifndef WindowModel_H
 #define WindowModel_H
 
-#include <memory>
 #include <map>
+#include <memory>
 
 namespace EnergyPlus {
 
-	template < typename T >
-	class EnumParser {
-		std::map< std::string, T > m_Map;
-	public:
-		EnumParser() {
-		};
+template <typename T> class EnumParser
+{
+    std::map<std::string, T> m_Map;
 
-		T StringToEnum( const std::string& value ) {
-			auto iValue = m_Map.find( value );
-			if ( iValue == m_Map.end() )
-				throw std::runtime_error( "Incorrect enumerator assigned." );
-			return iValue->second;
-		}
-	};
+public:
+    EnumParser(){};
 
-	namespace WindowManager {
+    T StringToEnum(const std::string &value)
+    {
+        auto iValue = m_Map.find(value);
+        if (iValue == m_Map.end()) throw std::runtime_error("Incorrect enumerator assigned.");
+        return iValue->second;
+    }
+};
 
-		enum class WindowsModel { BuiltIn, External };
+namespace WindowManager {
 
-		// Class that reads IDF object and decides if interior or exterior window models
-		// will be used.
-		class CWindowModel {
-		public:
-			CWindowModel();
+    enum class WindowsModel
+    {
+        BuiltIn,
+        External
+    };
 
-			static std::unique_ptr< CWindowModel > WindowModelFactory( std::string const & objectName );
+    // Class that reads IDF object and decides if interior or exterior window models
+    // will be used.
+    class CWindowModel
+    {
+    public:
+        CWindowModel();
 
-			WindowsModel getWindowsModel() const;
-			bool isExternalLibraryModel() const;
+        static std::unique_ptr<CWindowModel> WindowModelFactory(std::string const &objectName);
 
-		private:
-			WindowsModel m_Model;
+        WindowsModel getWindowsModel() const;
+        bool isExternalLibraryModel() const;
 
-		};
+    private:
+        WindowsModel m_Model;
+    };
 
-		enum class WindowsOpticalModel { Simplified, BSDF };
+    enum class WindowsOpticalModel
+    {
+        Simplified,
+        BSDF
+    };
 
-		class CWindowOpticalModel {
-		public:
-			CWindowOpticalModel();
+    class CWindowOpticalModel
+    {
+    public:
+        CWindowOpticalModel();
 
-			static std::unique_ptr< CWindowOpticalModel > WindowOpticalModelFactory();
+        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory();
 
-			WindowsOpticalModel getWindowsOpticalModel() const;
-			bool isSimplifiedModel() const;
+        WindowsOpticalModel getWindowsOpticalModel() const;
+        bool isSimplifiedModel() const;
 
-		private:
-			WindowsOpticalModel m_Model;
-		};
-	}
+    private:
+        WindowsOpticalModel m_Model;
+    };
+} // namespace WindowManager
 
-}
+} // namespace EnergyPlus
 
 #endif
