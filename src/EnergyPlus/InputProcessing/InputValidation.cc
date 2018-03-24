@@ -51,53 +51,58 @@
 
 // EnergyPlus Headers
 #include <InputProcessing/InputValidation.hh>
-#include <valijson/validator.hpp>
+#include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
-#include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/utils/nlohmann_json_utils.hpp>
+#include <valijson/validator.hpp>
 
 using json = nlohmann::json;
 
-Validation::Validation( json const * parsed_schema ) {
-	schema = parsed_schema;
+Validation::Validation(json const *parsed_schema)
+{
+    schema = parsed_schema;
 }
 
-bool Validation::hasErrors() {
-	return !errors_.empty();
+bool Validation::hasErrors()
+{
+    return !errors_.empty();
 }
 
-std::vector < std::string > const & Validation::errors() {
-	return errors_;
+std::vector<std::string> const &Validation::errors()
+{
+    return errors_;
 }
 
-std::vector < std::string > const & Validation::warnings() {
-	return warnings_;
+std::vector<std::string> const &Validation::warnings()
+{
+    return warnings_;
 }
 
-bool Validation::validate( json const & parsed_input ) {
-	valijson::Schema validation_schema;
-	valijson::SchemaParser parser;
-	valijson::adapters::NlohmannJsonAdapter schema_doc( *schema );
-	parser.populateSchema(schema_doc, validation_schema);
+bool Validation::validate(json const &parsed_input)
+{
+    valijson::Schema validation_schema;
+    valijson::SchemaParser parser;
+    valijson::adapters::NlohmannJsonAdapter schema_doc(*schema);
+    parser.populateSchema(schema_doc, validation_schema);
 
-	valijson::Validator validator;
-	valijson::adapters::NlohmannJsonAdapter doc( parsed_input );
-	valijson::ValidationResults results;
+    valijson::Validator validator;
+    valijson::adapters::NlohmannJsonAdapter doc(parsed_input);
+    valijson::ValidationResults results;
     if (!validator.validate(validation_schema, doc, &results)) {
-		valijson::ValidationResults::Error error;
-	    size_t max_context = 0;
-		while (results.popError(error)) {
-			if ( error.context.size() >= max_context ) {
-				max_context = error.context.size();
-				std::string context;
-				for (auto it = error.context.begin(); it != error.context.end(); it++)
-					context += *it;
+        valijson::ValidationResults::Error error;
+        size_t max_context = 0;
+        while (results.popError(error)) {
+            if (error.context.size() >= max_context) {
+                max_context = error.context.size();
+                std::string context;
+                for (auto it = error.context.begin(); it != error.context.end(); it++)
+                    context += *it;
 
-				errors_.emplace_back( context + " - " + error.description );
-			}
-		}
-		return false;
+                errors_.emplace_back(context + " - " + error.description);
+            }
+        }
+        return false;
     }
-	return true;
+    return true;
 }

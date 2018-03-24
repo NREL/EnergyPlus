@@ -51,111 +51,80 @@
 #include <Plant/LoopSide.hh>
 
 namespace EnergyPlus {
-	namespace DataPlant {
+namespace DataPlant {
 
-		struct PlantLoopData {
-			// Members
-			std::string Name; // Name of the component list
-			std::string FluidName; // Name of the fluid specified for this loop
-			int FluidType; // Type of fluid in the loop
-			int FluidIndex; // Index for Fluid in FluidProperties
-			int MFErrIndex; // for recurring mass flow errors
-			int MFErrIndex1; // for recurring mass flow errors
-			int MFErrIndex2; // for recurring mass flow errors
-			// (see CheckPlantMixerSplitterConsistency)
-			// Loop Operating Setpoints and Limits
-			int TempSetPointNodeNum; // Node Number for Loop Temp SP associated with SP manager
-			int MaxBranch; // Max branches in the loop
-			Real64 MinTemp; // Minimum temperature allowed in the loop
-			Real64 MaxTemp; // Maximum temperature allowed in the loop
-			int MinTempErrIndex; // for recurring too cold errors
-			int MaxTempErrIndex; // for recurring too hot errors
-			Real64 MinVolFlowRate; // Minimum flow rate allowed in the loop
-			Real64 MaxVolFlowRate; // Maximum flow rate allowed in the loop
-			bool MaxVolFlowRateWasAutoSized; // true if previous was set to autosized in the input
-			Real64 MinMassFlowRate; // Minimum flow rate allowed in the loop
-			Real64 MaxMassFlowRate; // Maximum flow rate allowed in the loop
-			Real64 Volume; // Volume of the fluid in the loop
-			bool VolumeWasAutoSized; //true if Volume was set to autocalculate
-			Real64 CirculationTime; // Loop circulation time [minutes] used to autocalculate loop volume, default is 2 minutes
-			Real64 Mass; // Mass of the fluid in the loop
-			bool EMSCtrl;
-			Real64 EMSValue;
-			// Loop Inlet and Outlet Nodes
-			Array1D <HalfLoopData> LoopSide; // Half loop data (Demand side or Supply Side)
-			std::string OperationScheme; // Operation scheme name for the loop
-			int NumOpSchemes; // Number of items in list identified by "OpScheme"
-			Array1D <OperationData> OpScheme; // Operation scheme data
-			int LoadDistribution; // Load distribution scheme 1 for optimal, 2 for overloading
-			int PlantSizNum; // index to corresponding plant sizing data array
-			int LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
-			// 2 DualSetPointwithDeadBand
-			int CommonPipeType;
-			std::string EconomizerHtExchanger; // DSU review, should move these out of here
-			std::string EconPlantSideSensedNodeName; // DSU review, should move these out of here
-			std::string EconCondSideSensedNodeName; // DSU review, should move these out of here
-			int EconPlantSideSensedNodeNum; // DSU review, should move these out of here
-			int EconCondSideSensedNodeNum; // DSU review, should move these out of here
-			int EconPlacement; // DSU review, should move these out of here
-			int EconBranch; // DSU review, should move these out of here
-			int EconComp; // DSU review, should move these out of here
-			Real64 EconControlTempDiff; // DSU review, should move these out of here
-			bool LoopHasConnectionComp;
-			int TypeOfLoop;
-			int PressureSimType;
-			bool HasPressureComponents;
-			Real64 PressureDrop;
-			bool UsePressureForPumpCalcs;
-			Real64 PressureEffectiveK;
-			PlantLoopSolver::PlantLoopSolverClass loopSolver;
+    struct PlantLoopData
+    {
+        // Members
+        std::string Name;      // Name of the component list
+        std::string FluidName; // Name of the fluid specified for this loop
+        int FluidType;         // Type of fluid in the loop
+        int FluidIndex;        // Index for Fluid in FluidProperties
+        int MFErrIndex;        // for recurring mass flow errors
+        int MFErrIndex1;       // for recurring mass flow errors
+        int MFErrIndex2;       // for recurring mass flow errors
+        // (see CheckPlantMixerSplitterConsistency)
+        // Loop Operating Setpoints and Limits
+        int TempSetPointNodeNum;         // Node Number for Loop Temp SP associated with SP manager
+        int MaxBranch;                   // Max branches in the loop
+        Real64 MinTemp;                  // Minimum temperature allowed in the loop
+        Real64 MaxTemp;                  // Maximum temperature allowed in the loop
+        int MinTempErrIndex;             // for recurring too cold errors
+        int MaxTempErrIndex;             // for recurring too hot errors
+        Real64 MinVolFlowRate;           // Minimum flow rate allowed in the loop
+        Real64 MaxVolFlowRate;           // Maximum flow rate allowed in the loop
+        bool MaxVolFlowRateWasAutoSized; // true if previous was set to autosized in the input
+        Real64 MinMassFlowRate;          // Minimum flow rate allowed in the loop
+        Real64 MaxMassFlowRate;          // Maximum flow rate allowed in the loop
+        Real64 Volume;                   // Volume of the fluid in the loop
+        bool VolumeWasAutoSized;         // true if Volume was set to autocalculate
+        Real64 CirculationTime;          // Loop circulation time [minutes] used to autocalculate loop volume, default is 2 minutes
+        Real64 Mass;                     // Mass of the fluid in the loop
+        bool EMSCtrl;
+        Real64 EMSValue;
+        // Loop Inlet and Outlet Nodes
+        Array1D<HalfLoopData> LoopSide;  // Half loop data (Demand side or Supply Side)
+        std::string OperationScheme;     // Operation scheme name for the loop
+        int NumOpSchemes;                // Number of items in list identified by "OpScheme"
+        Array1D<OperationData> OpScheme; // Operation scheme data
+        int LoadDistribution;            // Load distribution scheme 1 for optimal, 2 for overloading
+        int PlantSizNum;                 // index to corresponding plant sizing data array
+        int LoopDemandCalcScheme;        // Load distribution scheme 1 SingleSetPoint,
+        // 2 DualSetPointwithDeadBand
+        int CommonPipeType;
+        std::string EconomizerHtExchanger;       // DSU review, should move these out of here
+        std::string EconPlantSideSensedNodeName; // DSU review, should move these out of here
+        std::string EconCondSideSensedNodeName;  // DSU review, should move these out of here
+        int EconPlantSideSensedNodeNum;          // DSU review, should move these out of here
+        int EconCondSideSensedNodeNum;           // DSU review, should move these out of here
+        int EconPlacement;                       // DSU review, should move these out of here
+        int EconBranch;                          // DSU review, should move these out of here
+        int EconComp;                            // DSU review, should move these out of here
+        Real64 EconControlTempDiff;              // DSU review, should move these out of here
+        bool LoopHasConnectionComp;
+        int TypeOfLoop;
+        int PressureSimType;
+        bool HasPressureComponents;
+        Real64 PressureDrop;
+        bool UsePressureForPumpCalcs;
+        Real64 PressureEffectiveK;
+        PlantLoopSolver::PlantLoopSolverClass loopSolver;
 
-			// Default Constructor
-			PlantLoopData() :
-					FluidType(0),
-					FluidIndex(1), // default to water
-					MFErrIndex(0),
-					MFErrIndex1(0),
-					MFErrIndex2(0),
-					TempSetPointNodeNum(0),
-					MaxBranch(0),
-					MinTemp(0.0),
-					MaxTemp(0.0),
-					MinTempErrIndex(0),
-					MaxTempErrIndex(0),
-					MinVolFlowRate(0.0),
-					MaxVolFlowRate(0.0),
-					MaxVolFlowRateWasAutoSized(false),
-					MinMassFlowRate(0.0),
-					MaxMassFlowRate(0.0),
-					Volume(0.0),
-					VolumeWasAutoSized(false), //true if Volume was set to autocalculate
-					CirculationTime(2.0),
-					Mass(0.0),
-					EMSCtrl(false),
-					EMSValue(0.0),
-					NumOpSchemes(0),
-					LoadDistribution(0),
-					PlantSizNum(0),
-					LoopDemandCalcScheme(0),
-					CommonPipeType(0),
-					EconPlantSideSensedNodeNum(0),
-					EconCondSideSensedNodeNum(0),
-					EconPlacement(0),
-					EconBranch(0),
-					EconComp(0),
-					EconControlTempDiff(0.0),
-					LoopHasConnectionComp(false),
-					TypeOfLoop(0),
-					PressureSimType(1),
-					HasPressureComponents(false),
-					PressureDrop(0.0),
-					UsePressureForPumpCalcs(false),
-					PressureEffectiveK(0.0) {
-				this->loopSolver = PlantLoopSolver::PlantLoopSolverClass();
-			}
-
-		};
-	}
-}
+        // Default Constructor
+        PlantLoopData()
+            : FluidType(0), FluidIndex(1), // default to water
+              MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), TempSetPointNodeNum(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
+              MaxTempErrIndex(0), MinVolFlowRate(0.0), MaxVolFlowRate(0.0), MaxVolFlowRateWasAutoSized(false), MinMassFlowRate(0.0),
+              MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), // true if Volume was set to autocalculate
+              CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0), NumOpSchemes(0), LoadDistribution(0), PlantSizNum(0),
+              LoopDemandCalcScheme(0), CommonPipeType(0), EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0),
+              EconBranch(0), EconComp(0), EconControlTempDiff(0.0), LoopHasConnectionComp(false), TypeOfLoop(0), PressureSimType(1),
+              HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0)
+        {
+            this->loopSolver = PlantLoopSolver::PlantLoopSolverClass();
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif
