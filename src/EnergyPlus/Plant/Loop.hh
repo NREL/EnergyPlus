@@ -49,6 +49,7 @@
 #define PlantTopologyLoop_hh_INCLUDED
 
 #include <Plant/LoopSide.hh>
+#include <Plant/PlantLoopSolver.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
