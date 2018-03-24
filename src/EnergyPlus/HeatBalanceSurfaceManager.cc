@@ -4717,10 +4717,11 @@ namespace HeatBalanceSurfaceManager {
                                                QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum);
             QdotRadHVACInRep(SurfNum) = QdotRadHVACInRepPerArea(SurfNum) * Surface(SurfNum).Area;
             // Tuned Replaced by one line form below for speed
-            //			QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum
+            //			QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf(
+            //SurfNum
             //)
             //+  QElecBaseboardSurf( SurfNum ); 			QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) *
-            //surfaceArea;
+            // surfaceArea;
             QdotRadHVACInRep(SurfNum) =
                 (QdotRadHVACInRepPerArea(SurfNum) = QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                                                     QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum)) *
