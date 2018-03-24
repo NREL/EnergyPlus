@@ -5865,7 +5865,9 @@ namespace SurfaceGeometry {
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
             Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, ExtVentedCavity(Item).SurfPtrs));
-            //			AvgAzimuth = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Azimuth * Surface( ExtVentedCavity( Item ).SurfPtrs ).Area )
+            //			AvgAzimuth = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Azimuth * Surface( ExtVentedCavity( Item ).SurfPtrs
+            //).Area
+            //)
             ///  sum(  Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             AvgAzimuth = sum_product_sub(Surface, &SurfaceData::Azimuth, &SurfaceData::Area, ExtVentedCavity(Item).SurfPtrs) /
                          surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
@@ -5895,7 +5897,7 @@ namespace SurfaceGeometry {
 
             // find area weighted centroid.
             //			ExtVentedCavity( Item ).Centroid.z = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Centroid.z * Surface(
-            //ExtVentedCavity(  Item
+            // ExtVentedCavity(  Item
             //).SurfPtrs ).Area ) / sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             ExtVentedCavity(Item).Centroid.z =
                 sum_product_sub(Surface, &SurfaceData::Centroid, &Vector::z, Surface, &SurfaceData::Area, ExtVentedCavity(Item).SurfPtrs) /

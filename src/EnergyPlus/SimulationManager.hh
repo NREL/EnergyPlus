@@ -54,23 +54,23 @@
 namespace EnergyPlus {
 namespace SimulationManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern bool RunPeriodsInInput;
-	extern bool RunControlInInput;
+    // MODULE VARIABLE DECLARATIONS:
+    extern bool RunPeriodsInInput;
+    extern bool RunControlInInput;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
+    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
-	// Functions
+    // Functions
     void clear_state();
 
     void ManageSimulation();
@@ -81,17 +81,13 @@ namespace SimulationManager {
 
     void CheckForRequestedReporting();
 
-	void
-	OpenStreamFile( const std::string & fileName, int & unitNumber, std::ostream *& out_stream );
+    void OpenStreamFile(const std::string &fileName, int &unitNumber, std::ostream *&out_stream);
 
-	void
-	OpenOutputFiles();
+    void OpenOutputFiles();
 
-	void
-	OpenOutputJsonFiles();
+    void OpenOutputJsonFiles();
 
-	void
-	CloseOutputFiles();
+    void CloseOutputFiles();
 
     void SetupSimulation(bool &ErrorsFound);
 
@@ -105,16 +101,16 @@ namespace SimulationManager {
 
     void PostIPProcessing();
 
-//	void
-//	CheckCachedIPErrors();
+    //	void
+    //	CheckCachedIPErrors();
 
 } // namespace SimulationManager
 
 // EXTERNAL SUBROUTINES:
 
 void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use simulation
-	bool & ResimHB, // Flag to resimulate the heat balance simulation (including HVAC)
-	bool & ResimHVAC // Flag to resimulate the HVAC simulation
+                bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
+                bool &ResimHVAC // Flag to resimulate the HVAC simulation
 );
 
 } // namespace EnergyPlus
