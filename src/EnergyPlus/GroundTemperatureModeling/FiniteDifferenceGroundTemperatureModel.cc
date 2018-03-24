@@ -55,13 +55,13 @@
 
 // EnergyPlus Headers
 #include <DataEnvironment.hh>
-#include <General.hh>
 #include <DataGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataReportingFlags.hh>
+#include <General.hh>
 #include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
-#include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
@@ -79,11 +79,7 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Finite difference model factory
-	std::shared_ptr< FiniteDiffGroundTempsModel >
-	FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(
-		int objectType,
-		std::string objectName
-		)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(int objectType, std::string objectName)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -150,8 +146,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::initAndSim()
+void FiniteDiffGroundTempsModel::initAndSim()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -171,8 +166,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::getWeatherData()
+void FiniteDiffGroundTempsModel::getWeatherData()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -188,8 +182,8 @@ namespace EnergyPlus {
 		using General::JulianDay;
 		using WeatherManager::GetNextEnvironment;
 		using WeatherManager::ManageWeather;
-		using WeatherManager::ResetEnvironmentCounter;
 		using WeatherManager::RPReadAllWeatherData;
+    using WeatherManager::ResetEnvironmentCounter;
 		using namespace DataEnvironment;
 		using namespace DataGlobals;
 		using namespace DataReportingFlags;
@@ -380,8 +374,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::developMesh()
+void FiniteDiffGroundTempsModel::developMesh()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -437,7 +430,8 @@ namespace EnergyPlus {
 				if ( numCenterCell <= ( centerLayerNumCells / 2 ) ) {
 					thisCell.thickness = surfaceLayerCellThickness * std::pow( centerLayerExpansionCoeff, numCenterCell );
 				} else {
-					thisCell.thickness = cellArray( ( surfaceLayerNumCells + ( centerLayerNumCells / 2 ) ) - ( numCenterCell - ( centerLayerNumCells / 2 ) ) ).thickness;
+                thisCell.thickness =
+                    cellArray((surfaceLayerNumCells + (centerLayerNumCells / 2)) - (numCenterCell - (centerLayerNumCells / 2))).thickness;
 				}
 			} else if ( i > ( centerLayerNumCells + surfaceLayerNumCells ) ) {
 				// Constant thickness mesh here
@@ -461,14 +455,12 @@ namespace EnergyPlus {
 			thisCell.props.density = baseDensity;
 			thisCell.props.specificHeat = baseSpecificHeat;
 			thisCell.props.diffusivity = baseConductivity / ( baseDensity * baseSpecificHeat );
-
 		}
 	}
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::performSimulation()
+void FiniteDiffGroundTempsModel::performSimulation()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -523,20 +515,17 @@ namespace EnergyPlus {
 
 					// Shift temperatures for next timestep
 					updateTimeStepTemperatures();
-
 			}
 
 			// Check final temperature convergence
 			convergedFinal = checkFinalTemperatureConvergence();
-
 
 		} while ( !convergedFinal );
 	}
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
+void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -588,8 +577,8 @@ namespace EnergyPlus {
 		++denominator;
 
 		// Conduction to lower cell
-		resistance = ( thisCell.thickness / 2.0 ) / ( thisCell.props.conductivity * thisCell.conductionArea )
-						+ ( cellBelow_thisCell.thickness / 2.0 )/( cellBelow_thisCell.props.conductivity * cellBelow_thisCell.conductionArea );
+    resistance = (thisCell.thickness / 2.0) / (thisCell.props.conductivity * thisCell.conductionArea) +
+                 (cellBelow_thisCell.thickness / 2.0) / (cellBelow_thisCell.props.conductivity * cellBelow_thisCell.conductionArea);
 		numerator += ( thisCell.beta / resistance ) * cellBelow_thisCell.temperature;
 		denominator += ( thisCell.beta / resistance );
 
@@ -644,7 +633,10 @@ namespace EnergyPlus {
 		psychrometricConstant = 0.665e-3 * pressure;
 
 		// Evapotranspiration constant, [mm/hr]
-		evapotransFluidLoss_mmhr = ( evapotransCoeff * slope_S * ( netIncidentRadiation_MJhr - G_hr ) + psychrometricConstant * ( CN / currAirTempK ) * cwd.windSpeed * ( vaporPressureSaturated_kPa - vaporPressureActual_kPa ) ) / ( slope_S + psychrometricConstant * ( 1 + Cd * cwd.windSpeed ) );
+    evapotransFluidLoss_mmhr =
+        (evapotransCoeff * slope_S * (netIncidentRadiation_MJhr - G_hr) +
+         psychrometricConstant * (CN / currAirTempK) * cwd.windSpeed * (vaporPressureSaturated_kPa - vaporPressureActual_kPa)) /
+        (slope_S + psychrometricConstant * (1 + Cd * cwd.windSpeed));
 
 		// Convert units, [m/hr]
 		evapotransFluidLoss_mhr = evapotransFluidLoss_mmhr / 1000.0;
@@ -677,10 +669,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature(
-		int const cell
-	)
+void FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature(int const cell)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -705,15 +694,15 @@ namespace EnergyPlus {
 		++denominator;
 
 		// Conduction resistance between this cell and above cell
-		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) )
-					+ ( ( cellAbove_thisCell.thickness / 2.0 ) / ( cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity ) );
+    resistance = ((thisCell.thickness / 2.0) / (thisCell.conductionArea * thisCell.props.conductivity)) +
+                 ((cellAbove_thisCell.thickness / 2.0) / (cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity));
 
 		numerator += ( thisCell.beta / resistance ) * cellAbove_thisCell.temperature;
 		denominator += thisCell.beta / resistance;
 
 		// Conduction resitance between this cell and below cell
-		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) )
-					+ ( ( cellBelow_thisCell.thickness / 2.0 ) / ( cellBelow_thisCell.conductionArea * cellBelow_thisCell.props.conductivity ) );
+    resistance = ((thisCell.thickness / 2.0) / (thisCell.conductionArea * thisCell.props.conductivity)) +
+                 ((cellBelow_thisCell.thickness / 2.0) / (cellBelow_thisCell.conductionArea * cellBelow_thisCell.props.conductivity));
 
 		numerator += ( thisCell.beta / resistance ) * cellBelow_thisCell.temperature;
 		denominator += thisCell.beta / resistance;
@@ -724,8 +713,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::updateBottomCellTemperature()
+void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -756,8 +744,8 @@ namespace EnergyPlus {
 		++denominator;
 
 		// Conduction resistance between this cell and above cell
-		resistance = ( ( thisCell.thickness / 2.0 ) / ( thisCell.conductionArea * thisCell.props.conductivity ) )
-					+ ( ( cellAbove_thisCell.thickness / 2.0 ) / ( cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity ) );
+    resistance = ((thisCell.thickness / 2.0) / (thisCell.conductionArea * thisCell.props.conductivity)) +
+                 ((cellAbove_thisCell.thickness / 2.0) / (cellAbove_thisCell.conductionArea * cellAbove_thisCell.props.conductivity));
 
 		numerator += ( thisCell.beta / resistance ) * cellAbove_thisCell.temperature;
 		denominator += thisCell.beta / resistance;
@@ -772,8 +760,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	bool
-	FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
+bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -807,8 +794,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	bool
-	FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
+bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -835,8 +821,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::initDomain()
+void FiniteDiffGroundTempsModel::initDomain()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -860,7 +845,8 @@ namespace EnergyPlus {
 		tempModel->objectName = "KAModelForFDModel";
 		tempModel->objectType = objectType_KusudaGroundTemp;
 		tempModel->aveGroundTemp = annualAveAirTemp;
-		tempModel->aveGroundTempAmplitude = ( maxDailyAirTemp - minDailyAirTemp ) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
+    tempModel->aveGroundTempAmplitude =
+        (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
 		tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * SecsInDay;
 		tempModel->groundThermalDiffisivity = baseConductivity / ( baseDensity * baseSpecificHeat );
 
@@ -880,7 +866,6 @@ namespace EnergyPlus {
 
 			// Set cell volume
 			thisCell.volume = thisCell.thickness * thisCell.conductionArea;
-
 		}
 
 		// Initialize freezing calculation variables
@@ -894,8 +879,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::updateIterationTemperatures()
+void FiniteDiffGroundTempsModel::updateIterationTemperatures()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -913,8 +897,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
+void FiniteDiffGroundTempsModel::updateTimeStepTemperatures()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -938,8 +921,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
+void FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -957,28 +939,19 @@ namespace EnergyPlus {
 			evaluateSoilRhoCp( cell );
 
 			thisCell.beta = ( timeStepInSeconds / ( thisCell.props.rhoCp * thisCell.volume ) );
-
 		}
 	}
 
 	//******************************************************************************
 
-	Real64
-	FiniteDiffGroundTempsModel::interpolate(
-		Real64 const x,
-		Real64 const x_hi,
-		Real64 const x_low,
-		Real64 const y_hi,
-		Real64 const y_low
-	)
+Real64 FiniteDiffGroundTempsModel::interpolate(Real64 const x, Real64 const x_hi, Real64 const x_low, Real64 const y_hi, Real64 const y_low)
 	{
 		return ( x - x_low ) / ( x_hi - x_low ) * ( y_hi - y_low ) + y_low;
 	}
 
 	//******************************************************************************
 
-	Real64
-	FiniteDiffGroundTempsModel::getGroundTemp()
+Real64 FiniteDiffGroundTempsModel::getGroundTemp()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1098,11 +1071,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	Real64
-	FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(
-		Real64 const _depth,
-		Real64 const seconds
-	)
+Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 const _depth, Real64 const seconds)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -1131,11 +1100,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	Real64
-	FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(
-		Real64 const _depth,
-		int const month
-	)
+Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(Real64 const _depth, int const month)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Matt Mitchell
@@ -1164,11 +1129,7 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-	void
-	FiniteDiffGroundTempsModel::evaluateSoilRhoCp(
-		Optional< int const > cell,
-		Optional_bool_const InitOnly
-	)
+void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Optional_bool_const InitOnly)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Edwin Lee
@@ -1254,4 +1215,4 @@ namespace EnergyPlus {
 
 	//******************************************************************************
 
-}	// EnergyPlus
+} // namespace EnergyPlus

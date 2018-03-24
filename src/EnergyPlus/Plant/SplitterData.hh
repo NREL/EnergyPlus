@@ -49,35 +49,30 @@
 #define PlantTopologySplitterData_hh_INCLUDED
 
 namespace EnergyPlus {
-	namespace DataPlant {
+namespace DataPlant {
 
-		struct SplitterData {
-			// Members
-			bool Exists; // True if there is a splitter (only 1 allowed per loop)
-			std::string Name; // Name of the splitter
-			int NodeNumIn; // Node number for the inlet to the splitter
-			int BranchNumIn; // Reference number for branch connected to splitter inlet
-			int LevelIn; // Branch Level of splitter inlet in the loop topology
-			int LevelOut; // Branch Level of splitter outlet in the loop topology
-			int CorrMixIndex; // Index of Mixer corresponding to this Splitter
-			std::string NodeNameIn; // Node name for the inlet to the splitter
-			int TotalOutletNodes; // Number of outlet nodes for the splitter
-			Array1D_int NodeNumOut; // Node number for the outlet to the splitter
-			Array1D_int BranchNumOut; // Reference number for branch connected to splitter outlet
-			Array1D_string NodeNameOut; // Node name for the outlet to the splitter
+    struct SplitterData
+    {
+        // Members
+        bool Exists;                // True if there is a splitter (only 1 allowed per loop)
+        std::string Name;           // Name of the splitter
+        int NodeNumIn;              // Node number for the inlet to the splitter
+        int BranchNumIn;            // Reference number for branch connected to splitter inlet
+        int LevelIn;                // Branch Level of splitter inlet in the loop topology
+        int LevelOut;               // Branch Level of splitter outlet in the loop topology
+        int CorrMixIndex;           // Index of Mixer corresponding to this Splitter
+        std::string NodeNameIn;     // Node name for the inlet to the splitter
+        int TotalOutletNodes;       // Number of outlet nodes for the splitter
+        Array1D_int NodeNumOut;     // Node number for the outlet to the splitter
+        Array1D_int BranchNumOut;   // Reference number for branch connected to splitter outlet
+        Array1D_string NodeNameOut; // Node name for the outlet to the splitter
 
-			// Default Constructor
-			SplitterData() :
-					Exists(false),
-					NodeNumIn(0),
-					BranchNumIn(0),
-					LevelIn(0),
-					LevelOut(0),
-					CorrMixIndex(0),
-					TotalOutletNodes(0) {}
-
-		};
-	}
-}
+        // Default Constructor
+        SplitterData() : Exists(false), NodeNumIn(0), BranchNumIn(0), LevelIn(0), LevelOut(0), CorrMixIndex(0), TotalOutletNodes(0)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

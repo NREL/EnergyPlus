@@ -59,8 +59,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -302,43 +302,14 @@ namespace WeatherManager {
 		int RawSimDays; // number of basic sim days.
 
 		// Default Constructor
-		EnvironmentData() :
-			KindOfEnvrn( 0 ),
-			DesignDayNum( 0 ),
-			RunPeriodDesignNum( 0 ),
-			SeedEnvrnNum( 0 ),
-			HVACSizingIterationNum( 0 ),
-			TotalDays( 0 ),
-			StartJDay( 0 ),
-			StartMonth( 0 ),
-			StartDay( 0 ),
-			StartYear( 0 ),
-			StartDate( 0 ),
-			EndMonth( 0 ),
-			EndDay( 0 ),
-			EndJDay( 0 ),
-			EndYear( 0 ),
-			EndDate( 0 ),
-			DayOfWeek( 0 ),
-			UseDST( false ),
-			UseHolidays( false ),
-			ApplyWeekendRule( false ),
-			UseRain( true ),
-			UseSnow( true ),
-			MonWeekDay( 12, 0 ),
-			SetWeekDays( false ),
-			NumSimYears( 1 ),
-			CurrentCycle( 0 ),
-			WP_Type1( 0 ),
-			CurrentYear( 0 ),
-			IsLeapYear( false ),
-			RollDayTypeOnRepeat( true ),
-			TreatYearsAsConsecutive( true ),
-			MatchYear( false ),
-			ActualWeather( false ),
-			RawSimDays( 0 )
-		{}
-
+        EnvironmentData()
+            : KindOfEnvrn(0), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0), HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
+              StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0), EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0),
+              UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false),
+              NumSimYears(1), CurrentCycle(0), WP_Type1(0), CurrentYear(0), IsLeapYear(false), RollDayTypeOnRepeat(true),
+              TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0)
+        {
+        }
 	};
 
 	struct DesignDayData
@@ -373,34 +344,13 @@ namespace WeatherManager {
 		bool DewPointNeedsSet; // true if the Dewpoint humidicating value needs to be set (after location determined)
 
 		// Default Constructor
-		DesignDayData() :
-			MaxDryBulb( 0.0 ),
-			DailyDBRange( 0.0 ),
-			HumIndValue( 0.0 ),
-			HumIndType( 0 ),
-			PressBarom( 0.0 ),
-			WindSpeed( 0.0 ),
-			WindDir( 0.0 ),
-			SkyClear( 0.0 ),
-			RainInd( 0 ),
-			SnowInd( 0 ),
-			DayOfMonth( 0 ),
-			Month( 0 ),
-			DayType( 0 ),
-			DSTIndicator( 0 ),
-			SolarModel( 0 ),
-			DBTempRangeType( 0 ),
-			TempRangeSchPtr( 0 ),
-			HumIndSchPtr( 0 ),
-			BeamSolarSchPtr( 0 ),
-			DiffuseSolarSchPtr( 0 ),
-			TauB( 0.0 ),
-			TauD( 0.0 ),
-			DailyWBRange( 0.0 ),
-			PressureEntered( false ),
+        DesignDayData()
+            : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(0), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0), SkyClear(0.0),
+              RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(0), DBTempRangeType(0), TempRangeSchPtr(0),
+              HumIndSchPtr(0), BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
 			DewPointNeedsSet( false )
-		{}
-
+        {
+        }
 	};
 
 	struct RunPeriodData
@@ -477,19 +427,11 @@ namespace WeatherManager {
 		Real64 EquationOfTime; // Value of the equation of time formula
 
 		// Default Constructor
-		DayWeatherVariables() :
-			DayOfYear( 0 ),
-			DayOfYear_Schedule( 0 ),
-			Year( 0 ),
-			Month( 0 ),
-			DayOfMonth( 0 ),
-			DayOfWeek( 0 ),
-			DaylightSavingIndex( 0 ),
-			HolidayIndex( 0 ),
-			SinSolarDeclinAngle( 0.0 ),
-			CosSolarDeclinAngle( 0.0 ),
-			EquationOfTime( 0.0 )
-		{}
+        DayWeatherVariables()
+            : DayOfYear(0), DayOfYear_Schedule(0), Year(0), Month(0), DayOfMonth(0), DayOfWeek(0), DaylightSavingIndex(0), HolidayIndex(0),
+              SinSolarDeclinAngle(0.0), CosSolarDeclinAngle(0.0), EquationOfTime(0.0)
+        {
+        }
 	};
 
 	struct SpecialDayData
@@ -509,20 +451,10 @@ namespace WeatherManager {
 		bool Used; // Set to true in a run period after use (NthDayOfMonth and LastDayOfMonth only)
 
 		// Default Constructor
-		SpecialDayData() :
-			DateType( 0 ),
-			Month( 0 ),
-			Day( 0 ),
-			WeekDay( 0 ),
-			CompDate( 0 ),
-			WthrFile( false ),
-			Duration( 0 ),
-			DayType( 0 ),
-			ActStMon( 0 ),
-			ActStDay( 0 ),
-			Used( false )
-		{}
-
+        SpecialDayData()
+            : DateType(0), Month(0), Day(0), WeekDay(0), CompDate(0), WthrFile(false), Duration(0), DayType(0), ActStMon(0), ActStDay(0), Used(false)
+        {
+        }
 	};
 
 	struct DataPeriodData
@@ -545,22 +477,11 @@ namespace WeatherManager {
 		bool HasYearData;
 
 		// Default Constructor
-		DataPeriodData() :
-			NumYearsData( 1 ),
-			WeekDay( 0 ),
-			StMon( 0 ),
-			StDay( 0 ),
-			StYear( 0 ),
-			EnMon( 0 ),
-			EnDay( 0 ),
-			EnYear( 0 ),
-			NumDays( 0 ),
-			MonWeekDay( 12, 0 ),
-			DataStJDay( 0 ),
-			DataEnJDay( 0 ),
-			HasYearData( false )
-		{}
-
+        DataPeriodData()
+            : NumYearsData(1), WeekDay(0), StMon(0), StDay(0), StYear(0), EnMon(0), EnDay(0), EnYear(0), NumDays(0), MonWeekDay(12, 0), DataStJDay(0),
+              DataEnJDay(0), HasYearData(false)
+        {
+        }
 	};
 
 	struct DaylightSavingPeriodData
@@ -576,17 +497,9 @@ namespace WeatherManager {
 		int EnWeekDay; // For DateTypes=NthDayOfMonth or LastDayOfMonth
 
 		// Default Constructor
-		DaylightSavingPeriodData() :
-			StDateType( 0 ),
-			StWeekDay( 0 ),
-			StMon( 0 ),
-			StDay( 0 ),
-			EnDateType( 0 ),
-			EnMon( 0 ),
-			EnDay( 0 ),
-			EnWeekDay( 0 )
-		{}
-
+        DaylightSavingPeriodData() : StDateType(0), StWeekDay(0), StMon(0), StDay(0), EnDateType(0), EnMon(0), EnDay(0), EnWeekDay(0)
+        {
+        }
 	};
 
 	struct MissingData // This Derived type carries the default missing data
@@ -612,25 +525,11 @@ namespace WeatherManager {
 		Real64 LiquidPrecip; // Rain/Liquid Precipitation (mm)
 
 		// Default Constructor
-		MissingData() :
-			DryBulb( 0.0 ),
-			DewPoint( 0.0 ),
-			RelHumid( 0 ),
-			StnPres( 0.0 ),
-			WindDir( 0 ),
-			WindSpd( 0.0 ),
-			TotSkyCvr( 0 ),
-			OpaqSkyCvr( 0 ),
-			Visibility( 0.0 ),
-			Ceiling( 0 ),
-			PrecipWater( 0 ),
-			AerOptDepth( 0.0 ),
-			SnowDepth( 0 ),
-			DaysLastSnow( 0 ),
-			Albedo( 0.0 ),
-			LiquidPrecip( 0.0 )
-		{}
-
+        MissingData()
+            : DryBulb(0.0), DewPoint(0.0), RelHumid(0), StnPres(0.0), WindDir(0), WindSpd(0.0), TotSkyCvr(0), OpaqSkyCvr(0), Visibility(0.0),
+              Ceiling(0), PrecipWater(0), AerOptDepth(0.0), SnowDepth(0), DaysLastSnow(0), Albedo(0.0), LiquidPrecip(0.0)
+        {
+        }
 	};
 
 	struct MissingDataCounts // This Derived type carries the counts of missing data
@@ -661,28 +560,11 @@ namespace WeatherManager {
 		int LiquidPrecip; // Liquid Precip Depth
 
 		// Default Constructor
-		MissingDataCounts() :
-			DryBulb( 0 ),
-			DewPoint( 0 ),
-			RelHumid( 0 ),
-			StnPres( 0 ),
-			WindDir( 0 ),
-			WindSpd( 0 ),
-			DirectRad( 0 ),
-			DiffuseRad( 0 ),
-			TotSkyCvr( 0 ),
-			OpaqSkyCvr( 0 ),
-			Visibility( 0 ),
-			Ceiling( 0 ),
-			PrecipWater( 0 ),
-			AerOptDepth( 0 ),
-			SnowDepth( 0 ),
-			DaysLastSnow( 0 ),
-			WeathCodes( 0 ),
-			Albedo( 0 ),
-			LiquidPrecip( 0 )
-		{}
-
+        MissingDataCounts()
+            : DryBulb(0), DewPoint(0), RelHumid(0), StnPres(0), WindDir(0), WindSpd(0), DirectRad(0), DiffuseRad(0), TotSkyCvr(0), OpaqSkyCvr(0),
+              Visibility(0), Ceiling(0), PrecipWater(0), AerOptDepth(0), SnowDepth(0), DaysLastSnow(0), WeathCodes(0), Albedo(0), LiquidPrecip(0)
+        {
+        }
 	};
 
 	struct RangeDataCounts // This Derived type carries the counts of out of range
@@ -702,17 +584,9 @@ namespace WeatherManager {
 		int DiffuseRad; // Diffuse Radiation (wh/m2)
 
 		// Default Constructor
-		RangeDataCounts() :
-			DryBulb( 0 ),
-			DewPoint( 0 ),
-			RelHumid( 0 ),
-			StnPres( 0 ),
-			WindDir( 0 ),
-			WindSpd( 0 ),
-			DirectRad( 0 ),
-			DiffuseRad( 0 )
-		{}
-
+        RangeDataCounts() : DryBulb(0), DewPoint(0), RelHumid(0), StnPres(0), WindDir(0), WindSpd(0), DirectRad(0), DiffuseRad(0)
+        {
+        }
 	};
 
 	struct TypicalExtremeData
@@ -733,16 +607,9 @@ namespace WeatherManager {
 		int EndJDay;
 
 		// Default Constructor
-		TypicalExtremeData() :
-			TotalDays( 0 ),
-			StartJDay( 0 ),
-			StartMonth( 0 ),
-			StartDay( 0 ),
-			EndMonth( 0 ),
-			EndDay( 0 ),
-			EndJDay( 0 )
-		{}
-
+        TypicalExtremeData() : TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), EndMonth(0), EndDay(0), EndJDay(0)
+        {
+        }
 	};
 
 	struct WeatherProperties
@@ -756,13 +623,9 @@ namespace WeatherManager {
 		bool UsedForEnvrn;
 
 		// Default Constructor
-		WeatherProperties() :
-			IsSchedule( true ),
-			CalculationType( 0 ),
-			SchedulePtr( 0 ),
-			UsedForEnvrn( false )
-		{}
-
+        WeatherProperties() : IsSchedule(true), CalculationType(0), SchedulePtr(0), UsedForEnvrn(false)
+        {
+        }
 	};
 
 	struct UnderwaterBoundary
@@ -772,15 +635,28 @@ namespace WeatherManager {
 	    int OSCMIndex;
 	    int WaterTempScheduleIndex;
 	    int VelocityScheduleIndex;
-	    UnderwaterBoundary() : Name( "" ), distanceFromLeadingEdge( 0.0 ), OSCMIndex( 0 ), WaterTempScheduleIndex( 0 ), VelocityScheduleIndex( 0 ) {}
+        UnderwaterBoundary() : Name(""), distanceFromLeadingEdge(0.0), OSCMIndex(0), WaterTempScheduleIndex(0), VelocityScheduleIndex(0)
+        {
+        }
 	};
 	extern std::vector< UnderwaterBoundary > underwaterBoundaries;
 
 	// Object Data
-	extern DayWeatherVariables TodayVariables; // Today's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination angle | Value of the equation of time formula
-	extern DayWeatherVariables TomorrowVariables; // Tomorrow's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination angle | Value of the equation of time formula
+    extern DayWeatherVariables TodayVariables; // Today's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year for
+                                               // weather data | Year of weather data | Month of weather data | Day of month for weather data | Day of
+                                               // week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday indicator (0=no
+                                               // holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar
+                                               // declination angle | Value of the equation of time formula
+    extern DayWeatherVariables TomorrowVariables; // Tomorrow's daily weather variables | Derived Type for Storing Weather "Header" Data | Day of year
+                                                  // for weather data | Year of weather data | Month of weather data | Day of month for weather data |
+                                                  // Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday
+                                                  // indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of
+                                                  // the solar declination angle | Value of the equation of time formula
 	extern Array1D< DayWeatherVariables > DesignDay; // Design day environments
-	extern MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) | Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) | Visibility (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) | Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
+    extern MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) | Wind
+                                // Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) | Visibility
+                                // (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) | Number of Days
+                                // since last snow | Albedo | Rain/Liquid Precipitation (mm)
 	extern MissingDataCounts Missed;
 	extern RangeDataCounts OutOfRange;
 	extern Array1D< DesignDayData > DesDayInput; // Design day Input Data
@@ -796,118 +672,75 @@ namespace WeatherManager {
 	extern Array1D< DataPeriodData > DataPeriods;
 
 	// Functions
-	void
-	clear_state();
+    void clear_state();
 
-	void
-	ManageWeather();
+    void ManageWeather();
 
-	void
-	ResetEnvironmentCounter();
+    void ResetEnvironmentCounter();
 
-	void
-	GetNextEnvironment(
-		bool & Available, // true if there is another environment, false if the end
+    void GetNextEnvironment(bool &Available,  // true if there is another environment, false if the end
 		bool & ErrorsFound // will be set to true if severe errors are found in inputs
 	);
 
-	void
-	AddDesignSetToEnvironmentStruct(
+    void AddDesignSetToEnvironmentStruct(
 		int const HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
 	);
 
-	bool
-	CheckIfAnyUnderwaterBoundaries();
+    bool CheckIfAnyUnderwaterBoundaries();
 
 	Real64
-	calculateWaterBoundaryConvectionCoefficient(
-		Real64 const curWaterTemp,
-		Real64 const curWaterVelocity,
-		Real64 const distanceFromLeadingEdge
-	);
+    calculateWaterBoundaryConvectionCoefficient(Real64 const curWaterTemp, Real64 const curWaterVelocity, Real64 const distanceFromLeadingEdge);
 		
-	void
-	UpdateUnderwaterBoundaries();
+    void UpdateUnderwaterBoundaries();
 
-	void
-	ReadVariableLocationOrientation();
+    void ReadVariableLocationOrientation();
 
-	void
-	UpdateLocationAndOrientation();
+    void UpdateLocationAndOrientation();
 	
-	void
-	SetupWeekDaysByMonth(
-		int const StMon,
-		int const StDay,
-		int const StWeekDay,
-		Array1A_int WeekDays
-	);
+    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1A_int WeekDays);
 
-	void
-	ResetWeekDaysByMonth(
-		Array1A_int WeekDays,
+    void ResetWeekDaysByMonth(Array1A_int WeekDays,
 		int const LeapYearAdd,
 		int const StartMonth,
 		int const StartMonthDay,
 		int const EndMonth,
 		int const EndMonthDay,
 		bool const Rollover,
-		Optional_bool_const MidSimReset = _
-	);
+                              Optional_bool_const MidSimReset = _);
 
-	void
-	SetDSTDateRanges(
-		Array1S_int MonWeekDay, // Weekday of each day 1 of month
+    void SetDSTDateRanges(Array1S_int MonWeekDay, // Weekday of each day 1 of month
 		Array1S_int DSTIndex, // DST Index for each julian day (1:366)
 		Optional_int DSTActStMon = _,
 		Optional_int DSTActStDay = _,
 		Optional_int DSTActEnMon = _,
-		Optional_int DSTActEnDay = _
-	);
+                          Optional_int DSTActEnDay = _);
 
-	void
-	SetSpecialDayDates( Array1S_int MonWeekDay ); // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1S_int MonWeekDay); // Weekday of each day 1 of month
 
-	void
-	InitializeWeather( bool & PrintEnvrnStamp ); // Set to true when the environment header should be printed
+    void InitializeWeather(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-	void
-	UpdateWeatherData();
+    void UpdateWeatherData();
 
-	void
-	SetCurrentWeather();
+    void SetCurrentWeather();
 
-	void
-	ReadWeatherForDay(
-		int const DayToRead, // =1 when starting out, otherwise signifies next day
+    void ReadWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
 		int const Environ, // Environment being simulated
 		bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
 	);
 
-	void
-	ReadEPlusWeatherForDay(
-		int const DayToRead, // =1 when starting out, otherwise signifies next day
+    void ReadEPlusWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
 		int const Environ, // Environment being simulated
 		bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
 	);
 
-	Real64
-	interpolateWindDirection(
-		Real64 const prevHrWindDir,
-		Real64 const curHrWindDir,
-		Real64 const curHrWeight
-	);
+    Real64 interpolateWindDirection(Real64 const prevHrWindDir, Real64 const curHrWindDir, Real64 const curHrWeight);
 
-	void
-	SetDayOfWeekInitialValues(
-		int const EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
+    void SetDayOfWeekInitialValues(int const EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
 		int & CurDayOfWeek, // Current Day of Week
 		bool & UseDayOfWeek // hmmm does not appear to be used anywhere.
 	);
 
-	void
-	InterpretWeatherDataLine(
-		std::string & Line,
+    void InterpretWeatherDataLine(std::string &Line,
 		bool & ErrorFound,
 		int & WYear,
 		int & WMonth,
@@ -944,19 +777,15 @@ namespace WeatherManager {
 		Real64 & RField27 // LiquidPrecip
 	);
 
-	void
-	SetUpDesignDay( int const EnvrnNum ); // Environment number passed into the routine
+    void SetUpDesignDay(int const EnvrnNum); // Environment number passed into the routine
 
 	//------------------------------------------------------------------------------
 
-	Real64
-	AirMass( Real64 const CosZen ); // COS( solar zenith), 0 - 1
+    Real64 AirMass(Real64 const CosZen); // COS( solar zenith), 0 - 1
 
 	//------------------------------------------------------------------------------
 
-	void
-	ASHRAETauModel(
-		Real64 const ETR, // extraterrestrial normal irradiance, W/m2
+    void ASHRAETauModel(Real64 const ETR,    // extraterrestrial normal irradiance, W/m2
 		Real64 const CosZen, // COS( solar zenith angle), 0 - 1
 		Real64 const TauB, // beam tau factor
 		Real64 const TauD, // dif tau factor
@@ -965,12 +794,9 @@ namespace WeatherManager {
 		Real64 & IGlbH // returned: global irradiance on horiz surface, W/m2
 	);
 
-	void
-	AllocateWeatherData();
+    void AllocateWeatherData();
 
-	void
-	CalculateDailySolarCoeffs(
-		int const DayOfYear, // Day of year (1 - 366)
+    void CalculateDailySolarCoeffs(int const DayOfYear,           // Day of year (1 - 366)
 		Real64 & A, // ASHRAE "A" - Apparent solar irradiation at air mass = 0 [W/M**2]
 		Real64 & B, // ASHRAE "B" - Atmospheric extinction coefficient
 		Real64 & C, // ASHRAE "C" - Diffuse radiation factor
@@ -980,126 +806,81 @@ namespace WeatherManager {
 		Real64 & CosineSolarDeclination // Cosine of Solar Declination
 	);
 
-	void
-	CalculateSunDirectionCosines(
-		Real64 const TimeValue, // Current Time of Day
+    void CalculateSunDirectionCosines(Real64 const TimeValue,    // Current Time of Day
 		Real64 const EqOfTime, // Equation of Time
 		Real64 const SinSolDeclin, // Sine of Solar Declination
 		Real64 const CosSolDeclin, // Cosine of Solar Declination
-		Array1A< Real64 > SUNCOS
-	);
+                                      Array1A<Real64> SUNCOS);
 
-	void
-	DetermineSunUpDown( Array1A< Real64 > SunDirectionCosines );
+    void DetermineSunUpDown(Array1A<Real64> SunDirectionCosines);
 
-	void
-	OpenWeatherFile( bool & ErrorsFound );
+    void OpenWeatherFile(bool &ErrorsFound);
 
-	void
-	OpenEPlusWeatherFile(
-		bool & ErrorsFound, // Will be set to true if errors found
+    void OpenEPlusWeatherFile(bool &ErrorsFound,       // Will be set to true if errors found
 		bool const ProcessHeader // Set to true when headers should be processed (rather than just read)
 	);
 
-	void
-	CloseWeatherFile();
+    void CloseWeatherFile();
 
-	void
-	ResolveLocationInformation( bool & ErrorsFound ); // Set to true if no location evident
+    void ResolveLocationInformation(bool &ErrorsFound); // Set to true if no location evident
 
-	void
-	CheckLocationValidity();
+    void CheckLocationValidity();
 
-	void
-	CheckWeatherFileValidity();
+    void CheckWeatherFileValidity();
 
-	void
-	ReportOutputFileHeaders();
+    void ReportOutputFileHeaders();
 
-	void
-	ReportWeatherAndTimeInformation( bool & PrintEnvrnStamp ); // Set to true when the environment header should be printed
+    void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-	void
-	ReadUserWeatherInput();
+    void ReadUserWeatherInput();
 
-	void
-	GetRunPeriodData(
-		int & TotRunPers, // Total number of Run Periods requested
-		bool & ErrorsFound
-	);
+    void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
+                          bool &ErrorsFound);
 
-	void
-	GetRunPeriodDesignData( bool & ErrorsFound );
+    void GetRunPeriodDesignData(bool &ErrorsFound);
 
-	void
-	GetSpecialDayPeriodData( bool & ErrorsFound ); // will be set to true if severe errors are found in inputs
+    void GetSpecialDayPeriodData(bool &ErrorsFound); // will be set to true if severe errors are found in inputs
 
-	void
-	CalcSpecialDayTypes();
+    void CalcSpecialDayTypes();
 
-	void
-	GetDSTData( bool & ErrorsFound ); // will be set to true if severe errors are found in inputs
+    void GetDSTData(bool &ErrorsFound); // will be set to true if severe errors are found in inputs
 
-	void
-	GetDesignDayData(
-		int & TotDesDays, // Total number of Design days to Setup
-		bool & ErrorsFound
-	);
+    void GetDesignDayData(int &TotDesDays, // Total number of Design days to Setup
+                          bool &ErrorsFound);
 
-	void
-	GetLocationInfo( bool & ErrorsFound );
+    void GetLocationInfo(bool &ErrorsFound);
 
-	void
-	GetWeatherProperties( bool & ErrorsFound );
+    void GetWeatherProperties(bool &ErrorsFound);
 
-	void
-	GetGroundTemps( bool & ErrorsFound );
+    void GetGroundTemps(bool &ErrorsFound);
 
-	void
-	GetGroundReflectances( bool & ErrorsFound );
+    void GetGroundReflectances(bool &ErrorsFound);
 
-	void
-	GetSnowGroundRefModifiers( bool & ErrorsFound );
+    void GetSnowGroundRefModifiers(bool &ErrorsFound);
 
-	void
-	GetWaterMainsTemperatures( bool & ErrorsFound );
+    void GetWaterMainsTemperatures(bool &ErrorsFound);
 
-	void
-	CalcWaterMainsTemp();
+    void CalcWaterMainsTemp();
 
-	void
-	GetWeatherStation( bool & ErrorsFound );
+    void GetWeatherStation(bool &ErrorsFound);
 
-	void
-	DayltgCurrentExtHorizIllum();
+    void DayltgCurrentExtHorizIllum();
 
-	void
-	DayltgLuminousEfficacy(
-		Real64 & DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
+    void DayltgLuminousEfficacy(Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
 		Real64 & DirLumEff // Luminous efficacy of beam solar radiation (lum/W)
 	);
 
-	Real64
-	GetSTM( Real64 const Longitude ); // Longitude from user input
+    Real64 GetSTM(Real64 const Longitude); // Longitude from user input
 
-	void
-	ProcessEPWHeader(
-		std::string const & HeaderString,
-		std::string & Line,
-		bool & ErrorsFound
-	);
+    void ProcessEPWHeader(std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
-	void
-	SkipEPlusWFHeader();
+    void SkipEPlusWFHeader();
 
-	void
-	ReportMissing_RangeData();
+    void ReportMissing_RangeData();
 
-	void
-	SetupInterpolationValues();
+    void SetupInterpolationValues();
 
-	void
-	SetupEnvironmentTypes();
+    void SetupEnvironmentTypes();
 
 	bool
 	isLeapYear( int const Year );
@@ -1107,17 +888,14 @@ namespace WeatherManager {
 	int
 	computeJulianDate( int const gyyyy, int const gmm, int const gdd );
 
-	void
-	JGDate(
-		int const jflag, // indicates direction of conversion,
+    void JGDate(int const jflag, // indicates direction of conversion,
 		int & jdate, // input/output julian date, typically a 7 or 8 digit integer
 		int & gyyyy, // input/output gregorian year, should be specified as 4 digits
 		int & gmm, // input/output gregorian month
 		int & gdd // input/output gregorian day
 	);
 
-	int
-	CalculateDayOfWeek( int const JulianDate ); // from JGDate calculation
+    int CalculateDayOfWeek(int const JulianDate); // from JGDate calculation
 
 	WeekDay
 	calculateDayOfWeek( int const year, int const month, int day );
@@ -1133,6 +911,6 @@ namespace WeatherManager {
 
 } // WeatherManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

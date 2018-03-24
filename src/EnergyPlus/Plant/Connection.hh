@@ -49,24 +49,22 @@
 #define PlantTopologyConnection_hh_INCLUDED
 
 namespace EnergyPlus {
-    namespace DataPlant {
+namespace DataPlant {
 
-        struct PlantConnection {
-            // Members
-            int LoopType; // 1 = Plant, 2 = Condenser
-            int LoopNum;
-            int BranchNum;
-            int CompNum;
+    struct PlantConnection
+    {
+        // Members
+        int LoopType; // 1 = Plant, 2 = Condenser
+        int LoopNum;
+        int BranchNum;
+        int CompNum;
 
-            // Default Constructor
-            PlantConnection() :
-                    LoopType(0),
-                    LoopNum(0),
-                    BranchNum(0),
-                    CompNum(0) {}
-
-        };
-    }
-}
+        // Default Constructor
+        PlantConnection() : LoopType(0), LoopNum(0), BranchNum(0), CompNum(0)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif
