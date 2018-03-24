@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2012 rel. 2 sp1 (http://www.altova.com) by Lieferanten Buchhaltung (Deutsches Zentrum für Luft- und Raumfahrt e. V.) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="fmi2Annotation.xsd"/>
+	<xs:include schemaLocation="fmi2AttributeGroups.xsd"/>
+	<xs:annotation>
+		<xs:documentation>
+Copyright(c) 2008-2011 MODELISAR consortium,
+             2012-2013 Modelica Association Project "FMI".
+             All rights reserved.
+This file is licensed by the copyright holders under the BSD 2-Clause License
+(http://www.opensource.org/licenses/bsd-license.html):
+----------------------------------------------------------------------------
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+- Neither the name of the copyright holders nor the names of its
+  contributors may be used to endorse or promote products derived
+  from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+----------------------------------------------------------------------------
+
+with the extension:
+
+You may distribute or publicly perform any modification only under the
+terms of this license.
+(Note, this means that if you distribute a modified file,
+the modified file must also be provided under this license).
+    </xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="fmi2ScalarVariable">
+		<xs:annotation>
+			<xs:documentation>Properties of a scalar variable</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="Real">
+					<xs:complexType>
+						<xs:attribute name="declaredType" type="xs:normalizedString">
+							<xs:annotation>
+								<xs:documentation>If present, name of type defined with TypeDefinitions / SimpleType providing defaults.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attributeGroup ref="fmi2RealAttributes"/>
+						<xs:attribute name="start" type="xs:double">
+							<xs:annotation>
+								<xs:documentation>Value before initialization, if initial=exact or approx.
+max >= start >= min required</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="derivative" type="xs:unsignedInt">
+							<xs:annotation>
+								<xs:documentation>If present, this variable is the derivative of variable with ScalarVariable index "derivative".</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="reinit" type="xs:boolean" use="optional" default="false">
+							<xs:annotation>
+								<xs:documentation>Only for ModelExchange and if variable is a continuous-time state:
+If true, state can be reinitialized at an event by the FMU
+If false, state will never be reinitialized at an event by the FMU</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Integer">
+					<xs:complexType>
+						<xs:attribute name="declaredType" type="xs:normalizedString">
+							<xs:annotation>
+								<xs:documentation>If present, name of type defined with TypeDefinitions / SimpleType providing defaults.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attributeGroup ref="fmi2IntegerAttributes"/>
+						<xs:attribute name="start" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>Value before initialization, if initial=exact or approx.
+max >= start >= min required</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Boolean">
+					<xs:complexType>
+						<xs:attribute name="declaredType" type="xs:normalizedString">
+							<xs:annotation>
+								<xs:documentation>If present, name of type defined with TypeDefinitions / SimpleType providing defaults.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="start" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>Value before initialization, if initial=exact or approx</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="String">
+					<xs:complexType>
+						<xs:attribute name="declaredType" type="xs:normalizedString">
+							<xs:annotation>
+								<xs:documentation>If present, name of type defined with TypeDefinitions / SimpleType providing defaults.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="start" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Value before initialization, if initial=exact or approx</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Enumeration">
+					<xs:complexType>
+						<xs:attribute name="declaredType" type="xs:normalizedString" use="required">
+							<xs:annotation>
+								<xs:documentation>Name of type defined with TypeDefinitions / SimpleType </xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="quantity" type="xs:normalizedString"/>
+						<xs:attribute name="min" type="xs:int"/>
+						<xs:attribute name="max" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>max >= min required</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="start" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>Value before initialization, if initial=exact or approx.
+max >= start >= min required</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="Annotations" type="fmi2Annotation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Additional data of the scalar variable, e.g., for the dialog menu or the graphical layout</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:normalizedString" use="required">
+			<xs:annotation>
+				<xs:documentation>Identifier of variable, e.g. "a.b.mod[3,4].'#123'.c". "name" must be unique with respect to all other elements of the ModelVariables list</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="valueReference" type="xs:unsignedInt" use="required">
+			<xs:annotation>
+				<xs:documentation>Identifier for variable value in FMI2 function calls (not necessarily unique with respect to all variables)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="description" type="xs:string"/>
+		<xs:attribute name="causality" default="local">
+			<xs:annotation>
+				<xs:documentation>parameter: independent parameter
+calculatedParameter: calculated parameter
+input/output: can be used in connections
+local: variable calculated from other variables
+independent: independent variable (usually time)</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:normalizedString">
+					<xs:enumeration value="parameter"/>
+					<xs:enumeration value="calculatedParameter"/>
+					<xs:enumeration value="input"/>
+					<xs:enumeration value="output"/>
+					<xs:enumeration value="local"/>
+					<xs:enumeration value="independent"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="variability" default="continuous">
+			<xs:annotation>
+				<xs:documentation>constant: value never changes
+fixed: value fixed after initialization
+tunable: value constant between external events
+discrete: value constant between internal events
+continuous: no restriction on value changes</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:normalizedString">
+					<xs:enumeration value="constant"/>
+					<xs:enumeration value="fixed"/>
+					<xs:enumeration value="tunable"/>
+					<xs:enumeration value="discrete"/>
+					<xs:enumeration value="continuous"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="initial">
+			<xs:annotation>
+				<xs:documentation>exact: initialized with start value
+approx: iteration variable that starts with start value
+calculated: calculated from other variables.
+If not provided, initial is deduced from causality and variability (details see specification)</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:normalizedString">
+					<xs:enumeration value="exact"/>
+					<xs:enumeration value="approx"/>
+					<xs:enumeration value="calculated"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="canHandleMultipleSetPerTimeInstant" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Only for ModelExchange and only for variables with variability = "input":
+If present with value = false, then only one fmi2SetXXX call is allowed at one super dense time instant. In other words, this input is not allowed to appear in an algebraic loop.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

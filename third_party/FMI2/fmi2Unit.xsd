@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2012 rel. 2 sp1 (http://www.altova.com) by Lieferanten Buchhaltung (Deutsches Zentrum für Luft- und Raumfahrt e. V.) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:annotation>
+		<xs:documentation>
+Copyright(c) 2008-2011 MODELISAR consortium,
+             2012-2013 Modelica Association Project "FMI".
+             All rights reserved.
+This file is licensed by the copyright holders under the BSD 2-Clause License
+(http://www.opensource.org/licenses/bsd-license.html):
+----------------------------------------------------------------------------
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+- Neither the name of the copyright holders nor the names of its
+  contributors may be used to endorse or promote products derived
+  from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+----------------------------------------------------------------------------
+
+with the extension:
+
+You may distribute or publicly perform any modification only under the
+terms of this license.
+(Note, this means that if you distribute a modified file,
+the modified file must also be provided under this license).
+    </xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="fmi2Unit">
+		<xs:annotation>
+			<xs:documentation>Unit definition (with respect to SI base units) and default display units</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="BaseUnit" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>BaseUnit_value = factor*Unit_value + offset</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="kg" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI base unit "kg"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="m" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI base unit "m"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="s" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI base unit "s"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="A" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI base unit "A"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="K" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI base unit "K"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="mol" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI base unit "mol"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="cd" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI base unit "cd"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="rad" type="xs:int" default="0">
+						<xs:annotation>
+							<xs:documentation>Exponent of SI derived unit "rad"</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="factor" type="xs:double" default="1"/>
+					<xs:attribute name="offset" type="xs:double" default="0"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="DisplayUnit">
+					<xs:annotation>
+						<xs:documentation>DisplayUnit_value = factor*Unit_value + offset</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:normalizedString" use="required">
+							<xs:annotation>
+								<xs:documentation>Name of DisplayUnit element, e.g. <Unit name="rad"/>, <DisplayUnit name="deg" factor="57.29..."/>. "name" must be unique with respect to all other "names" of the DisplayUnit definitions of the same Unit (different Unit elements may have the same DisplayUnit names).</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="factor" type="xs:double" default="1"/>
+						<xs:attribute name="offset" type="xs:double" default="0"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:normalizedString" use="required">
+			<xs:annotation>
+				<xs:documentation>Name of Unit element, e.g. "N.m", "Nm",  "%/s". "name" must be unique will respect to all other elements of the UnitDefinitions list. The variable values of fmi2SetXXX and fmi2GetXXX are with respect to this unit.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

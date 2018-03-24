@@ -32,7 +32,7 @@ const unsigned int outputValueReferences[] = {6, 7, 8, 9, 10, 11};
 
   result = setupExperiment(tStart, stopTimeDefined, nullptr);
 
-  fmiEventInfo eventInfo;
+  fmi2EventInfo eventInfo;
   double time = tStart;
 
   double outputs[] = {0.0, 0.0};

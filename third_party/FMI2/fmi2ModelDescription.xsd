@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 sp1 (http://www.altova.com) by Lieferanten Buchhaltung (Deutsches Zentrum für Luft- und Raumfahrt e. V.) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="fmi2ScalarVariable.xsd"/>
+	<xs:include schemaLocation="fmi2VariableDependency.xsd"/>
+	<xs:include schemaLocation="fmi2Unit.xsd"/>
+	<xs:include schemaLocation="fmi2Type.xsd"/>
+	<xs:annotation>
+		<xs:documentation>
+Copyright(c) 2008-2011, MODELISAR consortium. All rights reserved.
+This file is licensed by the copyright holders under the BSD License
+(http://www.opensource.org/licenses/bsd-license.html):
+----------------------------------------------------------------------------
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+- Neither the name of the copyright holders nor the names of its
+  contributors may be used to endorse or promote products derived
+  from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+----------------------------------------------------------------------------
+
+with the extension:
+
+You may distribute or publicly perform any modification only under the
+terms of this license.
+(Note, this means that if you distribute a modified file,
+the modified file must also be provided under this license).
+    </xs:documentation>
+	</xs:annotation>
+	<xs:element name="fmiModelDescription">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:sequence maxOccurs="2">
+					<xs:annotation>
+						<xs:documentation>At least one of the elements must be present</xs:documentation>
+					</xs:annotation>
+					<xs:element name="ModelExchange" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The FMU includes a model or the communication to a tool that provides a model. The environment provides the simulation engine for the model.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:annotation>
+								<xs:documentation>List of capability flags that an FMI2 Model Exchange interface can provide</xs:documentation>
+							</xs:annotation>
+							<xs:sequence>
+								<xs:element name="SourceFiles" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>List of source file names that are present in the "sources" directory of the FMU and need to be compiled in order to generate the binary of the FMU (only meaningful for source code FMUs).</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence maxOccurs="unbounded">
+											<xs:element name="File">
+												<xs:complexType>
+													<xs:attribute name="name" type="xs:normalizedString" use="required">
+														<xs:annotation>
+															<xs:documentation>Name of the file including the path relative to the sources directory, using the forward slash as separator (for example: name = "myFMU.c"; name = "modelExchange/solve.c") </xs:documentation>
+														</xs:annotation>
+													</xs:attribute>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="modelIdentifier" type="xs:normalizedString" use="required">
+								<xs:annotation>
+									<xs:documentation>Short class name according to C-syntax, e.g. "A_B_C". Used as prefix for FMI2 functions if the functions are provided in C source code or in static libraries, but not if the functions are provided by a DLL/SharedObject. modelIdentifier is also used as name of the static library or DLL/SharedObject.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+							<xs:attribute name="needsExecutionTool" type="xs:boolean" default="false">
+								<xs:annotation>
+									<xs:documentation>If true, a tool is needed to execute the model and the FMU just contains the communication to this tool.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+							<xs:attribute name="completedIntegratorStepNotNeeded" type="xs:boolean" default="false"/>
+							<xs:attribute name="canBeInstantiatedOnlyOncePerProcess" type="xs:boolean" default="false"/>
+							<xs:attribute name="canNotUseMemoryManagementFunctions" type="xs:boolean" default="false"/>
+							<xs:attribute name="canGetAndSetFMUstate" type="xs:boolean" default="false"/>
+							<xs:attribute name="canSerializeFMUstate" type="xs:boolean" default="false"/>
+							<xs:attribute name="providesDirectionalDerivative" type="xs:boolean" default="false"/>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="CoSimulation" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The FMU includes a model and the simulation engine, or the communication to a tool that provides this. The environment provides the master algorithm for the Co-Simulation coupling.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="SourceFiles" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>List of source file names that are present in the "sources" directory of the FMU and need to be compiled in order to generate the binary of the FMU (only meaningful for source code FMUs).</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence maxOccurs="unbounded">
+											<xs:element name="File">
+												<xs:complexType>
+													<xs:attribute name="name" type="xs:normalizedString" use="required">
+														<xs:annotation>
+															<xs:documentation>Name of the file including the path relative to the sources directory, using the forward slash as separator (for example: name = "myFMU.c"; name = "coSimulation/solve.c") </xs:documentation>
+														</xs:annotation>
+													</xs:attribute>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="modelIdentifier" type="xs:normalizedString" use="required">
+								<xs:annotation>
+									<xs:documentation>Short class name according to C-syntax, e.g. "A_B_C". Used as prefix for FMI2 functions if the functions are provided in C source code or in static libraries, but not if the functions are provided by a DLL/SharedObject. modelIdentifier is also used as name of the static library or DLL/SharedObject.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+							<xs:attribute name="needsExecutionTool" type="xs:boolean" default="false">
+								<xs:annotation>
+									<xs:documentation>If true, a tool is needed to execute the model and the FMU just contains the communication to this tool.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+							<xs:attribute name="canHandleVariableCommunicationStepSize" type="xs:boolean" default="false"/>
+							<xs:attribute name="canInterpolateInputs" type="xs:boolean" default="false"/>
+							<xs:attribute name="maxOutputDerivativeOrder" type="xs:unsignedInt" default="0"/>
+							<xs:attribute name="canRunAsynchronuously" type="xs:boolean" default="false"/>
+							<xs:attribute name="canBeInstantiatedOnlyOncePerProcess" type="xs:boolean" default="false"/>
+							<xs:attribute name="canNotUseMemoryManagementFunctions" type="xs:boolean" default="false"/>
+							<xs:attribute name="canGetAndSetFMUstate" type="xs:boolean" default="false"/>
+							<xs:attribute name="canSerializeFMUstate" type="xs:boolean" default="false"/>
+							<xs:attribute name="providesDirectionalDerivative" type="xs:boolean" default="false">
+								<xs:annotation>
+									<xs:documentation>Directional derivatives at communication points</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:element name="UnitDefinitions" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element name="Unit" type="fmi2Unit"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="TypeDefinitions" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element name="SimpleType" type="fmi2SimpleType"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="LogCategories" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Log categories available in FMU</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element name="Category">
+								<xs:complexType>
+									<xs:attribute name="name" type="xs:normalizedString" use="required">
+										<xs:annotation>
+											<xs:documentation>Name of Category element. "name" must be unique with respect to all other elements of the LogCategories list. Standardized names: "logEvents", "logSingularLinearSystems", "logNonlinearSystems", "logDynamicStateSelection", "logStatusWarning", "logStatusDiscard", "logStatusError", "logStatusFatal", "logStatusPending", "logAll"</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="description" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Description of the log category</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DefaultExperiment" minOccurs="0">
+					<xs:complexType>
+						<xs:attribute name="startTime" type="xs:double">
+							<xs:annotation>
+								<xs:documentation>Default start time of simulation</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="stopTime" type="xs:double">
+							<xs:annotation>
+								<xs:documentation>Default stop time of simulation</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="tolerance" type="xs:double">
+							<xs:annotation>
+								<xs:documentation>Default relative integration tolerance</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="stepSize" type="xs:double">
+							<xs:annotation>
+								<xs:documentation>ModelExchange: Default step size for fixed step integrators.
+CoSimulation: Preferred communicationStepSize.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="VendorAnnotations" type="fmi2Annotation" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Tool specific data (ignored by other tools)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="ModelVariables">
+					<xs:annotation>
+						<xs:documentation>Ordered list of all variables (first definition has index = 1).</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element name="ScalarVariable" type="fmi2ScalarVariable"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ModelStructure">
+					<xs:annotation>
+						<xs:documentation>Ordered lists of outputs, exposed state derivatives,
+and the initial unknowns. Optionally, the functional
+dependency of these variables can be defined.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Outputs" type="fmi2VariableDependency" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Ordered list of all outputs. Exactly all variables with causality="output" must be in this list. The dependency definition holds for Continuous-Time and for Event Mode (ModelExchange) and for Communication Points (CoSimulation).</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Derivatives" type="fmi2VariableDependency" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Ordered list of all exposed state derivatives (and therefore implicitely associated continuous-time states). Exactly all state derivatives of a ModelExchange FMU must be in this list. A CoSimulation FMU need not expose its state derivatives. If a model has dynamic state selection, introduce dummy state variables. The dependency definition holds for Continuous-Time and for Event Mode (ModelExchange) and for Communication Points (CoSimulation).</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="InitialUnknowns" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Ordered list of all exposed Unknowns in Initialization Mode. This list consists of all variables with (1) causality = "output" and (initial="approx" or calculated"), (2) causality = "calculatedParameter", and (3) all continuous-time states and all state derivatives (defined with element Derivatives from ModelStructure)with initial=("approx" or "calculated"). The resulting list is not allowed to have duplicates (e.g. if a state is also an output, it is included only once in the list). The Unknowns in this list must be ordered according to their ScalarVariable index (e.g. if for two variables A and B the  ScalarVariable index of A is less than the index of B, then A must appear before B in InitialUnknowns).</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="Unknown">
+											<xs:annotation>
+												<xs:documentation>Dependency of scalar Unknown from Knowns:
+    Unknown=f(Known_1, Known_2, ...).
+The Knowns are "inputs",
+"variables with initial=exact", and
+"independent variable".</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:attribute name="index" type="xs:unsignedInt" use="required">
+													<xs:annotation>
+														<xs:documentation>ScalarVariable index of Unknown</xs:documentation>
+													</xs:annotation>
+												</xs:attribute>
+												<xs:attribute name="dependencies">
+													<xs:annotation>
+														<xs:documentation>Defines the dependency of the Unknown (directly or indirectly via auxiliary variables) on the Knowns in the Initialization Mode. If not present, it must be assumed that the Unknown depends on all Knowns. If present as empty list, the Unknown depends on none of the Knowns. Otherwise the Unknown depends on the Knowns defined by the given ScalarVariable indices. The indices are ordered according to size, starting with the smallest index.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:list itemType="xs:unsignedInt"/>
+													</xs:simpleType>
+												</xs:attribute>
+												<xs:attribute name="dependenciesKind">
+													<xs:annotation>
+														<xs:documentation>If not present, it must be assumed that the Unknown depends on the Knowns without a particular structure. Otherwise, the corresponding Known v enters the equation as:
+= "dependent": no particular structure, f(v)
+= "constant"   : constant factor, c*v (only for Real variables)
+If "dependenciesKind" is present, "dependencies" must be present and must have the same number of list elements.</xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:list>
+															<xs:simpleType>
+																<xs:restriction base="xs:normalizedString">
+																	<xs:enumeration value="dependent"/>
+																	<xs:enumeration value="constant"/>
+																	<xs:enumeration value="fixed"/>
+																	<xs:enumeration value="tunable"/>
+																	<xs:enumeration value="discrete"/>
+																</xs:restriction>
+															</xs:simpleType>
+														</xs:list>
+													</xs:simpleType>
+												</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="fmiVersion" type="xs:normalizedString" use="required" fixed="2.0">
+				<xs:annotation>
+					<xs:documentation>Version of FMI (FMI 2.0 revision is defined as "2.0"; future minor revisions are denoted as 2.0.1, 2.0.2 etc).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="modelName" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Class name of FMU, e.g. "A.B.C" (several FMU instances are possible)</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="guid" type="xs:normalizedString" use="required">
+				<xs:annotation>
+					<xs:documentation>Fingerprint of xml-file content to verify that xml-file and C-functions are compatible to each other</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="description" type="xs:string"/>
+			<xs:attribute name="author" type="xs:string"/>
+			<xs:attribute name="version" type="xs:normalizedString">
+				<xs:annotation>
+					<xs:documentation>Version of FMU, e.g., "1.4.1"</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="copyright" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Information on intellectual property copyright for this FMU, such as “© MyCompany 2011“</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="license" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Information on intellectual property licensing for this FMU, such as “BSD license”, "Proprietary", or "Public Domain"</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="generationTool" type="xs:normalizedString"/>
+			<xs:attribute name="generationDateAndTime" type="xs:dateTime"/>
+			<xs:attribute name="variableNamingConvention" use="optional" default="flat">
+				<xs:simpleType>
+					<xs:restriction base="xs:normalizedString">
+						<xs:enumeration value="flat"/>
+						<xs:enumeration value="structured"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="numberOfEventIndicators" type="xs:unsignedInt"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -248,13 +248,13 @@ unsigned int getVariables(const unsigned int valueReferences[],
   return 0;
 }
 
-unsigned int getNextEventTime(fmiEventInfo *eventInfo,
+unsigned int getNextEventTime(fmi2EventInfo *eventInfo,
                               const char *log)
 {
   UNUSED(log);
 
   eventInfo->nextEventTime = EnergyPlus::DataGlobals::NextSimTime;
-  eventInfo->nextEventTimeDefined = fmiTrue;
+  eventInfo->nextEventTimeDefined = fmi2True;
 
   return 0;
 }

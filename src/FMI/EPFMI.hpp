@@ -1,14 +1,14 @@
 #include <cstddef>
-#include <fmiModelTypes.h>
+#include <fmi2FunctionTypes.h>
 
-typedef struct {
-  fmiBoolean newDiscreteStatesNeeded;
-  fmiBoolean terminateSimulation;
-  fmiBoolean nominalsOfContinuousStatesChanged;
-  fmiBoolean valuesOfContinuousStatesChanged;
-  fmiBoolean nextEventTimeDefined;
-  fmiReal nextEventTime; // next event if nextEventTimeDefined=fmi2True
-} fmiEventInfo;
+//typedef struct {
+//  fmi2Boolean newDiscreteStatesNeeded;
+//  fmi2Boolean terminateSimulation;
+//  fmi2Boolean nominalsOfContinuousStatesChanged;
+//  fmi2Boolean valuesOfContinuousStatesChanged;
+//  fmi2Boolean nextEventTimeDefined;
+//  fmi2Real nextEventTime; // next event if nextEventTimeDefined=fmi2True
+//} fmi2EventInfo;
 
 extern "C" {
 
@@ -44,7 +44,7 @@ unsigned int getVariables(const unsigned int valueReferences[],
                           size_t nVars2,
                           const char *log);
 
-unsigned int getNextEventTime(fmiEventInfo *eventInfo,
+unsigned int getNextEventTime(fmi2EventInfo *eventInfo,
                               const char *log);
 
 unsigned int terminate(const char *log);
