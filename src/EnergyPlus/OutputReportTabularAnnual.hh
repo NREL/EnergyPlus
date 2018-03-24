@@ -49,9 +49,9 @@
 #define OutputReportTabularAnnual_hh_INCLUDED
 
 // C++ Headers
+#include <ostream>
 #include <string>
 #include <vector>
-#include <ostream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -66,161 +66,116 @@
 #include <OutputReportData.hh>
 #include <ScheduleManager.hh>
 
-
 namespace EnergyPlus {
 
 namespace OutputReportTabularAnnual {
 
-	// these functions are not in the class and act as an interface between procedural code and object oriented
+    // these functions are not in the class and act as an interface between procedural code and object oriented
 
-	void
-	GetInputTabularAnnual();
+    void GetInputTabularAnnual();
 
-	void
-	checkAggregationOrderForAnnual();
+    void checkAggregationOrderForAnnual();
 
-	void
-	GatherAnnualResultsForTimeStep( int kindOfTypeStep );
+    void GatherAnnualResultsForTimeStep(int kindOfTypeStep);
 
-	void
-	ResetAnnualGathering();
+    void ResetAnnualGathering();
 
-	void
-	WriteAnnualTables();
+    void WriteAnnualTables();
 
-	void
-	AddAnnualTableOfContents( std::ostream & );
+    void AddAnnualTableOfContents(std::ostream &);
 
-	AnnualFieldSet::AggregationKind
-	stringToAggKind( std::string inString );
+    AnnualFieldSet::AggregationKind stringToAggKind(std::string inString);
 
-	void
-	clear_state(); // for unit tests
+    void clear_state(); // for unit tests
 
-class AnnualTable
-{
-public:
+    class AnnualTable
+    {
+    public:
+        // Default Constructor
+        AnnualTable() : m_name(""), m_filter(""), m_scheduleName(""), m_scheduleNum(0){};
 
-	// Default Constructor
-	AnnualTable() :
-		m_name(""),
-		m_filter( "" ),
-		m_scheduleName( "" ),
-		m_scheduleNum(0)
-	{};
+        // Member Constructor
+        AnnualTable(std::string name, std::string filter, std::string scheduleName)
+        {
+            m_name = name;
+            m_filter = filter;
+            m_scheduleName = scheduleName;
+            if (!m_scheduleName.empty()) {
+                m_scheduleNum = ScheduleManager::GetScheduleIndex(m_scheduleName); // index to the period schedule
+            } else {
+                m_scheduleNum = 0;
+            }
+        };
 
-	// Member Constructor
-	AnnualTable(
-		std::string name,
-		std::string filter,
-		std::string scheduleName )
-	{
-		m_name = name;
-		m_filter = filter;
-		m_scheduleName = scheduleName;
-		if ( !m_scheduleName.empty() ){
-			m_scheduleNum = ScheduleManager::GetScheduleIndex( m_scheduleName ); //index to the period schedule
-		} else {
-			m_scheduleNum = 0;
-		}
-	};
+        void addFieldSet(std::string, AnnualFieldSet::AggregationKind, int);
 
-	void
-	addFieldSet( std::string, AnnualFieldSet::AggregationKind, int );
+        void addFieldSet(std::string, std::string, AnnualFieldSet::AggregationKind, int);
 
-	void
-	addFieldSet( std::string, std::string, AnnualFieldSet::AggregationKind, int );
+        void setupGathering();
 
-	void
-	setupGathering();
+        bool invalidAggregationOrder();
 
-	bool
-	invalidAggregationOrder();
+        void gatherForTimestep(int kindOfTypeStep);
 
-	void
-	gatherForTimestep( int kindOfTypeStep );
+        void resetGathering();
 
-	void
-	resetGathering();
+        void writeTable(int unitsStyle);
 
-	void
-	writeTable( int unitsStyle );
+        void addTableOfContents(std::ostream &);
 
-	void
-	addTableOfContents( std::ostream & );
+        std::vector<std::string> inspectTable();
 
-	std::vector<std::string>
-	inspectTable();
+        std::vector<std::string> inspectTableFieldSets(int);
 
-	std::vector<std::string>
-	inspectTableFieldSets(int);
+        void clearTable();
 
-	void
-	clearTable();
+        // this could be private but was made public for unit testing only
+        void columnHeadersToTitleCase();
 
-	// this could be private but was made public for unit testing only
-	void
-	columnHeadersToTitleCase ();
+    private:
+        // Members
 
+        std::string m_name; // identifier
+        std::string m_filter;
+        std::string m_scheduleName;
+        int m_scheduleNum;
+        std::vector<std::string> m_objectNames;     // for each row of annual table
+        std::vector<AnnualFieldSet> m_annualFields; // for each column
 
-private:
-	// Members
+        Real64 getElapsedTime(int);
 
-	std::string m_name; // identifier
-	std::string m_filter;
-	std::string m_scheduleName;
-	int m_scheduleNum;
-	std::vector < std::string > m_objectNames; //for each row of annual table
-	std::vector < AnnualFieldSet > m_annualFields; // for each column
+        Real64 getSecondsInTimeStep(int);
 
-	Real64
-	getElapsedTime( int );
+        void computeBinColumns();
 
-	Real64
-	getSecondsInTimeStep( int );
+        std::vector<std::string> setupAggString();
 
-	void
-	computeBinColumns();
+        Real64 setEnergyUnitStringAndFactor(int const unitsStyle, std::string &unitString);
 
-	std::vector < std::string >
-	setupAggString();
+        int columnCountForAggregation(AnnualFieldSet::AggregationKind curAgg);
 
-	Real64
-	setEnergyUnitStringAndFactor( int const unitsStyle, std::string & unitString );
+        std::string trim(const std::string &str);
 
-	int
-	columnCountForAggregation( AnnualFieldSet::AggregationKind curAgg );
+        void fixUnitsPerSecond(std::string &unitString, Real64 &conversionFactor);
 
-	std::string
-	trim( const std::string& str );
+        bool allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::iterator fldStIt);
 
-	void
-	fixUnitsPerSecond( std::string & unitString, Real64 & conversionFactor );
+        void convertUnitForDeferredResults(std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
 
-	bool
-	allRowsSameSizeDefferedVectors( std::vector<AnnualFieldSet>::iterator fldStIt );
+        std::vector<Real64> calculateBins(int const numberOfBins,
+                                          std::vector<Real64> const valuesToBin,
+                                          std::vector<Real64> const corrElapsedTime,
+                                          Real64 const topOfBins,
+                                          Real64 const bottomOfBins,
+                                          Real64 &timeAboveTopBin,
+                                          Real64 &timeBelowBottomBin);
 
-	void
-	convertUnitForDeferredResults( std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle );
+    }; // class AnnualTable
 
-	std::vector<Real64>
-	calculateBins( int const numberOfBins,
-		               std::vector<Real64> const valuesToBin,
-					   std::vector<Real64> const corrElapsedTime,
-					   Real64 const topOfBins,
-					   Real64 const bottomOfBins,
-					   Real64 & timeAboveTopBin,
-					   Real64 & timeBelowBottomBin );
-
-
-}; // class AnnualTable
-
-extern std::vector<AnnualTable> annualTables;
+    extern std::vector<AnnualTable> annualTables;
 
 } // namespace OutputReportTabularAnnual
 
-} // EnergyPlus
-
-
+} // namespace EnergyPlus
 
 #endif

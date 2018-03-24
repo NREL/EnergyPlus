@@ -52,192 +52,146 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace EarthTube {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// DERIVED TYPE DEFINITIONS
+    // Data
+    // DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLES DECLARATIONS:
-	extern int TotEarthTube; // Total EarthTube Statements in input
-	// Parameters for Ventilation
-	extern int const NaturalEarthTube;
-	extern int const IntakeEarthTube;
-	extern int const ExhaustEarthTube;
+    // MODULE VARIABLES DECLARATIONS:
+    extern int TotEarthTube; // Total EarthTube Statements in input
+    // Parameters for Ventilation
+    extern int const NaturalEarthTube;
+    extern int const IntakeEarthTube;
+    extern int const ExhaustEarthTube;
 
-	//         Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
+    //         Subroutine Specifications for the Heat Balance Module
+    // Driver Routines
 
-	// Get Input routines for module
+    // Get Input routines for module
 
-	// Algorithms for the module
+    // Algorithms for the module
 
-	// Reporting routines for module
+    // Reporting routines for module
 
-	// Types
+    // Types
 
-	struct EarthTubeData
-	{
-		// Members
-		int ZonePtr;
-		int SchedPtr;
-		std::string SchedName;
-		Real64 DesignLevel;
-		Real64 MinTemperature;
-		Real64 MaxTemperature;
-		Real64 DelTemperature;
-		int FanType;
-		Real64 FanPressure;
-		Real64 FanEfficiency;
-		Real64 FanPower;
-		Real64 GroundTempz1z2t; // ground temp between z1 and z2 at time t
-		Real64 InsideAirTemp;
-		Real64 AirTemp;
-		Real64 HumRat; // Humidity ratio of air leaving EarthTube and entering zone
-		Real64 WetBulbTemp; // Humidity ratio of air leaving EarthTube and entering zone
-		Real64 r1; // Inner Pipe Radius (m)
-		Real64 r2; // Pipe Thickness (m)
-		Real64 r3; // Distance between Pipe Outer Surface and Undistubed Soil (m)
-		Real64 PipeLength; // Entire Pipe Length
-		Real64 PipeThermCond; // Pipe Thermal Conductivity
-		Real64 z; // Depth under the Ground Surface (m)
-		Real64 SoilThermDiff; // Soil Thermal Diffusivity
-		Real64 SoilThermCond; // Soil Thermal Conductivity
-		Real64 AverSoilSurTemp; // Average Soil Surface Temperature
-		Real64 ApmlSoilSurTemp; // Amplitude of Soil Surface Temperature
-		int SoilSurPhaseConst; // Phase constant of Soil Surface
-		Real64 ConstantTermCoef;
-		Real64 TemperatureTermCoef;
-		Real64 VelocityTermCoef;
-		Real64 VelocitySQTermCoef;
+    struct EarthTubeData
+    {
+        // Members
+        int ZonePtr;
+        int SchedPtr;
+        std::string SchedName;
+        Real64 DesignLevel;
+        Real64 MinTemperature;
+        Real64 MaxTemperature;
+        Real64 DelTemperature;
+        int FanType;
+        Real64 FanPressure;
+        Real64 FanEfficiency;
+        Real64 FanPower;
+        Real64 GroundTempz1z2t; // ground temp between z1 and z2 at time t
+        Real64 InsideAirTemp;
+        Real64 AirTemp;
+        Real64 HumRat;          // Humidity ratio of air leaving EarthTube and entering zone
+        Real64 WetBulbTemp;     // Humidity ratio of air leaving EarthTube and entering zone
+        Real64 r1;              // Inner Pipe Radius (m)
+        Real64 r2;              // Pipe Thickness (m)
+        Real64 r3;              // Distance between Pipe Outer Surface and Undistubed Soil (m)
+        Real64 PipeLength;      // Entire Pipe Length
+        Real64 PipeThermCond;   // Pipe Thermal Conductivity
+        Real64 z;               // Depth under the Ground Surface (m)
+        Real64 SoilThermDiff;   // Soil Thermal Diffusivity
+        Real64 SoilThermCond;   // Soil Thermal Conductivity
+        Real64 AverSoilSurTemp; // Average Soil Surface Temperature
+        Real64 ApmlSoilSurTemp; // Amplitude of Soil Surface Temperature
+        int SoilSurPhaseConst;  // Phase constant of Soil Surface
+        Real64 ConstantTermCoef;
+        Real64 TemperatureTermCoef;
+        Real64 VelocityTermCoef;
+        Real64 VelocitySQTermCoef;
 
-		// Default Constructor
-		EarthTubeData() :
-			ZonePtr( 0 ),
-			SchedPtr( 0 ),
-			DesignLevel( 0.0 ),
-			MinTemperature( 0.0 ),
-			MaxTemperature( 0.0 ),
-			DelTemperature( 0.0 ),
-			FanType( 0 ),
-			FanPressure( 0.0 ),
-			FanEfficiency( 0.0 ),
-			FanPower( 0.0 ),
-			GroundTempz1z2t( 0.0 ),
-			InsideAirTemp( 0.0 ),
-			AirTemp( 0.0 ),
-			HumRat( 0.0 ),
-			WetBulbTemp( 0.0 ),
-			r1( 0.0 ),
-			r2( 0.0 ),
-			r3( 0.0 ),
-			PipeLength( 0.0 ),
-			PipeThermCond( 0.0 ),
-			z( 0.0 ),
-			SoilThermDiff( 0.0 ),
-			SoilThermCond( 0.0 ),
-			ConstantTermCoef( 0.0 ),
-			TemperatureTermCoef( 0.0 ),
-			VelocityTermCoef( 0.0 ),
-			VelocitySQTermCoef( 0.0 )
-		{}
+        // Default Constructor
+        EarthTubeData()
+            : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), MinTemperature(0.0), MaxTemperature(0.0), DelTemperature(0.0), FanType(0), FanPressure(0.0),
+              FanEfficiency(0.0), FanPower(0.0), GroundTempz1z2t(0.0), InsideAirTemp(0.0), AirTemp(0.0), HumRat(0.0), WetBulbTemp(0.0), r1(0.0),
+              r2(0.0), r3(0.0), PipeLength(0.0), PipeThermCond(0.0), z(0.0), SoilThermDiff(0.0), SoilThermCond(0.0), ConstantTermCoef(0.0),
+              TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0)
+        {
+        }
+    };
 
-	};
+    struct EarthTubeZoneReportVars
+    {
+        // Members
+        Real64 EarthTubeHeatLoss;          // [J] Heat loss or cooling to zone from air delivered by earth tube
+        Real64 EarthTubeHeatLossRate;      // [W] Heat loss or cooling rate to zone from air delivered by earth tube
+        Real64 EarthTubeHeatGain;          // [J] Heat Gain to zone from air delivered by earth tube
+        Real64 EarthTubeHeatGainRate;      // [W] Heat Gain rate to zone from air delivered by earth tube
+        Real64 EarthTubeOATreatmentPower;  // [W] rate of heat transfer to/from air.  positive is heating OA to higher temp
+        Real64 EarthTubeVolume;            // Volume of Air {m3} due to EarthTube
+        Real64 EarthTubeVolFlowRate;       // Volume flow rate of air (m3/s) due to EarthTube
+        Real64 EarthTubeVolFlowRateStd;    // Volume flow rate of air (m3/s) due to EarthTube at standard air conditions
+        Real64 EarthTubeMass;              // Mass of Air {kg} due to EarthTube
+        Real64 EarthTubeMassFlowRate;      // Mass flow rate of air (kg/s) due to EarthTube
+        Real64 EarthTubeWaterMassFlowRate; // Mass flow rate of water vapor (kg/s) due to EarthTube
+        Real64 EarthTubeFanElec;           // [J] Fan Electricity consumed by EarthTube
+        Real64 EarthTubeFanElecPower;      // [W] Fan Electric power for EarthTube
+        Real64 EarthTubeAirTemp;           // Air Temp {C} of EarthTube, air leaving tube and entering zone
+        Real64 EarthTubeWetBulbTemp;       // Wet Bulb Temperature {C} of EarthTube, air leaving tube and entering zone
+        Real64 EarthTubeHumRat;            // Humidity Ratio {kg/kg} of EarthTube, air leaving tube and entering zone
 
-	struct EarthTubeZoneReportVars
-	{
-		// Members
-		Real64 EarthTubeHeatLoss; // [J] Heat loss or cooling to zone from air delivered by earth tube
-		Real64 EarthTubeHeatLossRate; // [W] Heat loss or cooling rate to zone from air delivered by earth tube
-		Real64 EarthTubeHeatGain; // [J] Heat Gain to zone from air delivered by earth tube
-		Real64 EarthTubeHeatGainRate; // [W] Heat Gain rate to zone from air delivered by earth tube
-		Real64 EarthTubeOATreatmentPower; // [W] rate of heat transfer to/from air.  positive is heating OA to higher temp
-		Real64 EarthTubeVolume; // Volume of Air {m3} due to EarthTube
-		Real64 EarthTubeVolFlowRate; // Volume flow rate of air (m3/s) due to EarthTube
-		Real64 EarthTubeVolFlowRateStd; // Volume flow rate of air (m3/s) due to EarthTube at standard air conditions
-		Real64 EarthTubeMass; // Mass of Air {kg} due to EarthTube
-		Real64 EarthTubeMassFlowRate; // Mass flow rate of air (kg/s) due to EarthTube
-		Real64 EarthTubeWaterMassFlowRate; // Mass flow rate of water vapor (kg/s) due to EarthTube
-		Real64 EarthTubeFanElec; // [J] Fan Electricity consumed by EarthTube
-		Real64 EarthTubeFanElecPower; // [W] Fan Electric power for EarthTube
-		Real64 EarthTubeAirTemp; // Air Temp {C} of EarthTube, air leaving tube and entering zone
-		Real64 EarthTubeWetBulbTemp; // Wet Bulb Temperature {C} of EarthTube, air leaving tube and entering zone
-		Real64 EarthTubeHumRat; // Humidity Ratio {kg/kg} of EarthTube, air leaving tube and entering zone
+        // Default Constructor
+        EarthTubeZoneReportVars()
+            : EarthTubeHeatLoss(0.0), EarthTubeHeatLossRate(0.0), EarthTubeHeatGain(0.0), EarthTubeHeatGainRate(0.0), EarthTubeOATreatmentPower(0.0),
+              EarthTubeVolume(0.0), EarthTubeVolFlowRate(0.0), EarthTubeVolFlowRateStd(0.0), EarthTubeMass(0.0), EarthTubeMassFlowRate(0.0),
+              EarthTubeWaterMassFlowRate(0.0), EarthTubeFanElec(0.0), EarthTubeFanElecPower(0.0), EarthTubeAirTemp(0.0), EarthTubeWetBulbTemp(0.0),
+              EarthTubeHumRat(0.0)
+        {
+        }
+    };
 
-		// Default Constructor
-		EarthTubeZoneReportVars() :
-			EarthTubeHeatLoss( 0.0 ),
-			EarthTubeHeatLossRate( 0.0 ),
-			EarthTubeHeatGain( 0.0 ),
-			EarthTubeHeatGainRate( 0.0 ),
-			EarthTubeOATreatmentPower( 0.0 ),
-			EarthTubeVolume( 0.0 ),
-			EarthTubeVolFlowRate( 0.0 ),
-			EarthTubeVolFlowRateStd( 0.0 ),
-			EarthTubeMass( 0.0 ),
-			EarthTubeMassFlowRate( 0.0 ),
-			EarthTubeWaterMassFlowRate( 0.0 ),
-			EarthTubeFanElec( 0.0 ),
-			EarthTubeFanElecPower( 0.0 ),
-			EarthTubeAirTemp( 0.0 ),
-			EarthTubeWetBulbTemp( 0.0 ),
-			EarthTubeHumRat( 0.0 )
-		{}
+    // Object Data
+    extern Array1D<EarthTubeData> EarthTubeSys;
+    extern Array1D<EarthTubeZoneReportVars> ZnRptET;
 
-	};
+    // Functions
+    void clear_state();
 
-	// Object Data
-	extern Array1D< EarthTubeData > EarthTubeSys;
-	extern Array1D< EarthTubeZoneReportVars > ZnRptET;
+    void ManageEarthTube();
 
-	// Functions
-	void
-	clear_state();
+    void GetEarthTube(bool &ErrorsFound); // If errors found in input
 
-	void
-	ManageEarthTube();
+    void CheckEarthTubesInZones(std::string const ZoneName,  // name of zone for error reporting
+                                std::string const FieldName, // name of earth tube in input
+                                bool &ErrorsFound            // Found a problem
+    );
 
-	void
-	GetEarthTube( bool & ErrorsFound ); // If errors found in input
-	
-	void
-	CheckEarthTubesInZones
-		( std::string const ZoneName, // name of zone for error reporting
-	 	  std::string const FieldName, // name of earth tube in input
-		  bool & ErrorsFound // Found a problem
-		);
-	
-	void
-	CheckEarthTubesInZones
-		( std::string const ZoneName, // name of zone for error reporting
-	 	  std::string const FieldName, // name of earth tube in input
-		  bool & ErrorsFound // Found a problem
-		);
-	
-	void
-	CalcEarthTube();
+    void CheckEarthTubesInZones(std::string const ZoneName,  // name of zone for error reporting
+                                std::string const FieldName, // name of earth tube in input
+                                bool &ErrorsFound            // Found a problem
+    );
 
-	void
-	CalcEarthTubeHumRat(
-			int const Loop, // EarthTube number (index)
-			int const NZ // Zone number (index)
-	);
-	
-	void
-	ReportEarthTube();
+    void CalcEarthTube();
 
-	//        End of Module Subroutines for EarthTube
+    void CalcEarthTubeHumRat(int const Loop, // EarthTube number (index)
+                             int const NZ    // Zone number (index)
+    );
 
-	//*****************************************************************************************
+    void ReportEarthTube();
 
-} // EarthTube
+    //        End of Module Subroutines for EarthTube
 
-} // EnergyPlus
+    //*****************************************************************************************
+
+} // namespace EarthTube
+
+} // namespace EnergyPlus
 
 #endif
