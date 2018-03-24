@@ -47,324 +47,371 @@
 
 #ifndef HybridEvapCoolingModel_hh_INCLUDED
 #define HybridEvapCoolingModel_hh_INCLUDED
-#include <iostream>  
+#include <iostream>
 
-#include <string>
 #include <list>
 #include <map>
+#include <string>
 #include <vector>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
-
-#define MINIMUM_LOAD_TO_ACTIVATE 0.5 // (kw) sets a minimum load to avoid the system fluttering on and off. 
+#define MINIMUM_LOAD_TO_ACTIVATE 0.5 // (kw) sets a minimum load to avoid the system fluttering on and off.
 #define IMPLAUSIBLE_POWER 10000000
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-	namespace HybridEvapCoolingModel {
+namespace HybridEvapCoolingModel {
 
-		enum class SYSTEMOUTPUTS { VENTILATION_AIR_V, SUPPLY_MASS_FLOW, SYSTEM_FUEL_USE, SUPPLY_AIR_TEMP, MIXED_AIR_TEMP, SUPPLY_AIR_HR, MIXED_AIR_HR, OSUPPLY_FAN_POWER, OSECOND_FUEL_USE, OTHIRD_FUEL_USE, OWATER_USE, OEXTERNAL_STATIC_PRESSURE};
+    enum class SYSTEMOUTPUTS
+    {
+        VENTILATION_AIR_V,
+        SUPPLY_MASS_FLOW,
+        SYSTEM_FUEL_USE,
+        SUPPLY_AIR_TEMP,
+        MIXED_AIR_TEMP,
+        SUPPLY_AIR_HR,
+        MIXED_AIR_HR,
+        OSUPPLY_FAN_POWER,
+        OSECOND_FUEL_USE,
+        OTHIRD_FUEL_USE,
+        OWATER_USE,
+        OEXTERNAL_STATIC_PRESSURE
+    };
 
-		class CModeSolutionSpace
-		{
-		public:
-			std::vector<Real64> PointX;
-			std::vector<Real64> PointY;
-			std::vector<Real64> PointMeta;
-			void AddItem(Real64 X, Real64 Y, Real64 M)
-			{
-				PointX.push_back(X);
-				PointY.push_back(Y);
-				PointMeta.push_back(M);
-			}
-		};	 
+    class CModeSolutionSpace
+    {
+    public:
+        std::vector<Real64> PointX;
+        std::vector<Real64> PointY;
+        std::vector<Real64> PointMeta;
+        void AddItem(Real64 X, Real64 Y, Real64 M)
+        {
+            PointX.push_back(X);
+            PointY.push_back(Y);
+            PointMeta.push_back(M);
+        }
+    };
 
-		class CMode
-		{
-		public:
-			CMode();
-			
-			//finish init above
-			int ModeID;
-			CModeSolutionSpace sol;
-			std::string ModeName;
-			int Tsa_curve_pointer;
-			int HRsa_curve_pointer;
-			int Psa_curve_pointer;
-			int SFPsa_curve_pointer;
-			int ESPsa_curve_pointer;
-			int SFUsa_curve_pointer;
-			int TFUsa_curve_pointer;
-			int WUsa_curve_pointer;
+    class CMode
+    {
+    public:
+        CMode();
 
-			Real64 Max_Msa;
-			Real64 Min_Msa;
-			Real64 Min_OAF;
-			Real64 Max_OAF;
-			Real64 Minimum_Outdoor_Air_Temperature;
-			Real64 Maximum_Outdoor_Air_Temperature;
-			Real64 Minimum_Outdoor_Air_Humidity_Ratio;
-			Real64 Maximum_Outdoor_Air_Humidity_Ratio;
-			Real64 Minimum_Outdoor_Air_Relative_Humidity;
-			Real64 Maximum_Outdoor_Air_Relative_Humidity;
-			Real64 Minimum_Return_Air_Temperature;
-			Real64 Maximum_Return_Air_Temperature;
-			Real64 Minimum_Return_Air_Humidity_Ratio;
-			Real64 Maximum_Return_Air_Humidity_Ratio;
-			Real64 Minimum_Return_Air_Relative_Humidity;
-			Real64 Maximum_Return_Air_Relative_Humidity;
-			Real64 NormalizationReference;
-			Real64 Correction;
-			int MODE_BLOCK_OFFSET_Alpha;
-			int BLOCK_HEADER_OFFSET_Alpha;
-			int MODE1_BLOCK_OFFSET_Number;
-			int MODE_BLOCK_OFFSET_Number;
-			int BLOCK_HEADER_OFFSET_Number;
-			bool ValidPointer(int curve_pointer);
-			bool ValidateArrays(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, std::string cCurrentModuleObject);
-			bool ParseMode(int ModeCounter, std::vector<CMode>* OperatingModes, Real64 correction, Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
-			void InitializeCurve( int curveType, int CurveID);
-			Real64 CalculateCurveVal( Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
-			bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
-			bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
-			bool InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max);
-			bool InitializeOutdoorAirHumidityRatioConstraints(Real64 min, Real64 max);
-			bool InitializeOutdoorAirRelativeHumidityConstraints(Real64 min, Real64 max);
-			bool InitializeReturnAirTemperatureConstraints(Real64 min, Real64 max);
-			bool InitializeReturnAirHumidityRatioConstraints(Real64 min, Real64 max);
-			bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max); 
-			bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
-			bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
-			bool CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject); 
-		private:
-		
-		};
-		
-		class CSetting
-		{
-		public:
-			CSetting() :Runtime_Fraction(0), Mode(0), Outdoor_Air_Fraction(0), Unscaled_Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0), Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0),
-				SupplyAirTemperature(0), Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), 
-				TotalZone(0), SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0), ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0){}
-			Real64 Runtime_Fraction;															  
-			Real64 Mode;																		  
-			Real64 Outdoor_Air_Fraction;														  
-			Real64 Unscaled_Supply_Air_Mass_Flow_Rate;													  
-			Real64 ScaledSupply_Air_Mass_Flow_Rate;
-			Real64 Supply_Air_Ventilation_Volume;
-			Real64 ScaledSupply_Air_Ventilation_Volume;
-			Real64 Supply_Air_Mass_Flow_Rate_Ratio;
-			Real64 SupplyAirTemperature;
-			Real64 Mixed_Air_Temperature;
-			Real64 SupplyAirW;
-			Real64 Mixed_Air_W;
-			Real64 TotalSystem;
-			Real64 SensibleSystem;
-			Real64 LatentSystem;
-			Real64 TotalZone;	// kW
-			Real64 SensibleZone;	 // kW
-			Real64 LatentZone;	// kW
-			Real64 ElectricalPower;
-			Real64 SupplyFanElectricPower;	   
-			Real64 SecondaryFuelConsumptionRate;	
-			Real64 ThirdFuelConsumptionRate;	
-			Real64 WaterConsumptionRate;	   
-			Real64 ExternalStaticPressure;	  
+        // finish init above
+        int ModeID;
+        CModeSolutionSpace sol;
+        std::string ModeName;
+        int Tsa_curve_pointer;
+        int HRsa_curve_pointer;
+        int Psa_curve_pointer;
+        int SFPsa_curve_pointer;
+        int ESPsa_curve_pointer;
+        int SFUsa_curve_pointer;
+        int TFUsa_curve_pointer;
+        int WUsa_curve_pointer;
 
-			CMode oMode;
-		};
+        Real64 Max_Msa;
+        Real64 Min_Msa;
+        Real64 Min_OAF;
+        Real64 Max_OAF;
+        Real64 Minimum_Outdoor_Air_Temperature;
+        Real64 Maximum_Outdoor_Air_Temperature;
+        Real64 Minimum_Outdoor_Air_Humidity_Ratio;
+        Real64 Maximum_Outdoor_Air_Humidity_Ratio;
+        Real64 Minimum_Outdoor_Air_Relative_Humidity;
+        Real64 Maximum_Outdoor_Air_Relative_Humidity;
+        Real64 Minimum_Return_Air_Temperature;
+        Real64 Maximum_Return_Air_Temperature;
+        Real64 Minimum_Return_Air_Humidity_Ratio;
+        Real64 Maximum_Return_Air_Humidity_Ratio;
+        Real64 Minimum_Return_Air_Relative_Humidity;
+        Real64 Maximum_Return_Air_Relative_Humidity;
+        Real64 NormalizationReference;
+        Real64 Correction;
+        int MODE_BLOCK_OFFSET_Alpha;
+        int BLOCK_HEADER_OFFSET_Alpha;
+        int MODE1_BLOCK_OFFSET_Number;
+        int MODE_BLOCK_OFFSET_Number;
+        int BLOCK_HEADER_OFFSET_Number;
+        bool ValidPointer(int curve_pointer);
+        bool ValidateArrays(Array1D_string Alphas,
+                            Array1D_string cAlphaFields,
+                            Array1D<Real64> Numbers,
+                            Array1D_string cNumericFields,
+                            std::string cCurrentModuleObject);
+        bool ParseMode(int ModeCounter,
+                       std::vector<CMode> *OperatingModes,
+                       Real64 correction,
+                       Array1D_string Alphas,
+                       Array1D_string cAlphaFields,
+                       Array1D<Real64> Numbers,
+                       Array1D_string cNumericFields,
+                       Array1D<bool> lAlphaBlanks,
+                       std::string cCurrentModuleObject);
+        void InitializeCurve(int curveType, int CurveID);
+        Real64 CalculateCurveVal(Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
+        bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
+        bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
+        bool InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max);
+        bool InitializeOutdoorAirHumidityRatioConstraints(Real64 min, Real64 max);
+        bool InitializeOutdoorAirRelativeHumidityConstraints(Real64 min, Real64 max);
+        bool InitializeReturnAirTemperatureConstraints(Real64 min, Real64 max);
+        bool InitializeReturnAirHumidityRatioConstraints(Real64 min, Real64 max);
+        bool InitializeReturnAirRelativeHumidityConstraints(Real64 min, Real64 max);
+        bool GenerateSolutionSpace(Real64 ResolutionMsa, Real64 ResolutionOSA);
+        bool MeetsOAEnvConstraints(Real64 Tosa, Real64 Wosa, Real64 RHos);
+        bool CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject);
 
-		class CStepInputs
-		{
-			public:
-			CStepInputs() : Tosa(0), Tra(0), RHosa(0), RHra(0), RequestedCoolingLoad(0), RequestedHeatingLoad(0), ZoneMoistureLoad(0), ZoneDehumidificationLoad(0), MinimumOA(0) {}
-			Real64 Tosa; 
-			Real64 Tra;
-			Real64 RHosa;
-			Real64 RHra; 
-			Real64 RequestedCoolingLoad;
-			Real64 RequestedHeatingLoad; 
-			Real64 ZoneMoistureLoad; 
-			Real64 ZoneDehumidificationLoad;
-			Real64 MinimumOA ;
-		};
+    private:
+    };
 
-		class Model                   // begin declaration of the class
-		{
-		public:                    // begin public section
-			Model();
-	
-			// Default Constructor
-			std::string Name; // user identifier
-			std::string Schedule; // Availability Schedule Name
-			bool Initialized; // initialization flag ensures the system object is initialized only once.
-			int ZoneNum; //stores the current zone associated with the system, this is currently not used but is expected to be used in the next set of functionality additions. 
-			int SchedPtr; // Pointer to the correct schedule
-	
-			Real64 SystemMaximumSupplyAirFlowRate; //taken from IDF N1, the system max supply flow rate in m3/s.
-			Real64 ScalingFactor;  //taken from IDF N3, linear scaling factor.
-			Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the actual scaling factor used to multiply the 
-			
-			int UnitOn; //feels like it should be a bool but its an output and I couldn't get it to work as a bool 
-			Real64 UnitTotalCoolingRate;       // unit output to zone, total cooling rate [W]
-			Real64 UnitTotalCoolingEnergy;	   // unit output to zone, total cooling energy [J]
-			Real64 UnitSensibleCoolingRate;    // unit sensible cooling rate [W]
-			Real64 UnitSensibleCoolingEnergy;  // unit sensible cooling energy [J]
-			Real64 UnitLatentCoolingRate;      // unit latent cooling rate [W]
-			Real64 UnitLatentCoolingEnergy;    // unit latent cooling energy [J]
-			Real64 SystemTotalCoolingRate;	   // system output to zone, total cooling rate [W]
-			Real64 SystemTotalCoolingEnergy;   // system output to zone, total cooling energy [J]
-			Real64 SystemSensibleCoolingRate;  // system sensible cooling rate [W]
-			Real64 SystemSensibleCoolingEnergy;// system sensible cooling energy [J]
-			Real64 SystemLatentCoolingRate;	   // system latent cooling rate [W]
-			Real64 SystemLatentCoolingEnergy;  // system latent cooling energy [J]
-			Real64 UnitTotalHeatingRate;       // unit output to zone, total heating rate [W]
-			Real64 UnitTotalHeatingEnergy;     // unit output to zone, total heating energy [J]
-			Real64 UnitSensibleHeatingRate;	   // unit sensible heating rate [W]
-			Real64 UnitSensibleHeatingEnergy;  // unit sensible heating energy [J]
-			Real64 UnitLatentHeatingRate;	   // unit latent heating rate [W]
-			Real64 UnitLatentHeatingEnergy;	   // unit latent heating energy [J]
-			Real64 SystemTotalHeatingRate;     // system output to zone, total heating rate [W]
-			Real64 SystemTotalHeatingEnergy;   // system output to zone, total heating energy [J] 
-			Real64 SystemSensibleHeatingRate;  // system sensible heating rate [W]
-			Real64 SystemSensibleHeatingEnergy;// system sensible heating energy [J]
-			Real64 SystemLatentHeatingRate;	   // system latent heating rate [W]
-			Real64 SystemLatentHeatingEnergy;  // system latent heating energy [J]
-			Real64 SupplyFanElectricPower;	   //
-			Real64 SupplyFanElectricEnergy;    //
-			Real64 SecondaryFuelConsumptionRate;//
-			Real64 SecondaryFuelConsumption;   //
-			Real64 ThirdFuelConsumptionRate;   //
-			Real64 ThirdFuelConsumption;	   //
-			Real64 WaterConsumptionRate;	   //
-			Real64 WaterConsumption;		   //
-			Real64 QSensZoneOut;			//W
-			Real64 QLatentZoneOut;			// W
-			Real64 QLatentZoneOutMass;			// kg/s
-			Real64 ExternalStaticPressure;	   //
-			Real64 RequestedHumdificationMass;
-			Real64 RequestedHumdificationLoad;
-			Real64 RequestedHumdificationEnergy;
-			Real64 RequestedDeHumdificationMass;
-			Real64 RequestedDeHumdificationLoad;
-			Real64 RequestedDeHumdificationEnergy;
-			Real64 RequestedLoadToHeatingSetpoint;
-			Real64 RequestedLoadToCoolingSetpoint;
-			int TsaMin_schedule_pointer;
-			int TsaMax_schedule_pointer;
-			int RHsaMin_schedule_pointer;
-			int RHsaMax_schedule_pointer;
-			int PrimaryMode;
-			Real64 PrimaryModeRuntimeFraction;
-			Real64 averageOSAF;
-			int ErrorCode;
-			bool StandBy;
-			int InletNode;
-			int OutletNode;
-			int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
-			int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan
-			Real64 FinalElectricalPower; // Output fuel use in W
-			Real64 FinalElectricalEnergy; // Output fuel energy use in J
-			Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 InletTemp;
-			Real64 InletWetBulbTemp;
-			Real64 InletHumRat;
-			Real64 InletEnthalpy;
-			Real64 InletPressure;
-			Real64 InletRH;
-			Real64 OutletVolumetricFlowRate;
-			Real64 OutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 OutletTemp;
-			Real64 OutletWetBulbTemp;
-			Real64 OutletHumRat;
-			Real64 OutletEnthalpy;
-			Real64 OutletPressure;
-			Real64 OutletRH;
-			Real64 SecInletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 SecInletTemp;
-			Real64 SecInletWetBulbTemp;
-			Real64 SecInletHumRat;
-			Real64 SecInletEnthalpy;
-			Real64 SecInletPressure;
-			Real64 SecInletRH;
-			Real64 SecOutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
-			Real64 SecOutletTemp;
-			Real64 SecOutletWetBulbTemp;
-			Real64 SecOutletHumRat;
-			Real64 SecOutletEnthalpy;
-			Real64 SecOutletPressure;
-			Real64 SecOutletRH;
-			Real64 Wsa;
-			Real64 SupplyVentilationAir;
-			Real64 SupplyVentilationVolume;
-			Real64 ModelNormalizationReference;
-		
-			bool OutdoorAir;
-			Real64 MinOA_Msa;
-			int OARequirementsPtr; // Index to DesignSpecification:OutdoorAir object
-			
-			Real64 Tsa;
-			int ModeCounter;
-			bool CoolingRequested;
-			bool HeatingRequested;
-			bool VentilationRequested;
-			bool DehumidificationRequested;
-			bool HumidificationRequested;
-			//non-initializer
-			std::vector<int> Tsa_curve_pointer;
-			std::vector<int>  HRsa_curve_pointer;
-			std::vector<int>  Psa_curve_pointer;
-			std::vector<CMode>  OperatingModes;
-			std::vector<CSetting> CurrentOperatingSettings;
+    class CSetting
+    {
+    public:
+        CSetting()
+            : Runtime_Fraction(0), Mode(0), Outdoor_Air_Fraction(0), Unscaled_Supply_Air_Mass_Flow_Rate(0), ScaledSupply_Air_Mass_Flow_Rate(0),
+              Supply_Air_Ventilation_Volume(0), ScaledSupply_Air_Ventilation_Volume(0), Supply_Air_Mass_Flow_Rate_Ratio(0), SupplyAirTemperature(0),
+              Mixed_Air_Temperature(0), SupplyAirW(0), Mixed_Air_W(0), TotalSystem(0), SensibleSystem(0), LatentSystem(0), TotalZone(0),
+              SensibleZone(0), LatentZone(0), ElectricalPower(IMPLAUSIBLE_POWER), SupplyFanElectricPower(0), SecondaryFuelConsumptionRate(0),
+              ThirdFuelConsumptionRate(0), WaterConsumptionRate(0), ExternalStaticPressure(0)
+        {
+        }
+        Real64 Runtime_Fraction;
+        Real64 Mode;
+        Real64 Outdoor_Air_Fraction;
+        Real64 Unscaled_Supply_Air_Mass_Flow_Rate;
+        Real64 ScaledSupply_Air_Mass_Flow_Rate;
+        Real64 Supply_Air_Ventilation_Volume;
+        Real64 ScaledSupply_Air_Ventilation_Volume;
+        Real64 Supply_Air_Mass_Flow_Rate_Ratio;
+        Real64 SupplyAirTemperature;
+        Real64 Mixed_Air_Temperature;
+        Real64 SupplyAirW;
+        Real64 Mixed_Air_W;
+        Real64 TotalSystem;
+        Real64 SensibleSystem;
+        Real64 LatentSystem;
+        Real64 TotalZone;    // kW
+        Real64 SensibleZone; // kW
+        Real64 LatentZone;   // kW
+        Real64 ElectricalPower;
+        Real64 SupplyFanElectricPower;
+        Real64 SecondaryFuelConsumptionRate;
+        Real64 ThirdFuelConsumptionRate;
+        Real64 WaterConsumptionRate;
+        Real64 ExternalStaticPressure;
 
-			CSetting OptimalSetting;
-			CSetting oStandBy;
+        CMode oMode;
+    };
 
-			std::vector<CSetting> Settings;
-			//methods
-			int CurrentPrimaryMode();
-			Real64 CurrentPrimaryRuntimeFraction();
-			Real64 CalculatePartRuntimeFraction(Real64 MinOA_Msa, Real64 Mvent, Real64 RequestedCoolingLoad, Real64 RequestedHeatingLoad, Real64 SensibleRoomORZone, Real64 RequestedDehumidificationLoad, Real64 RequestedMoistureLoad, Real64 LatentRoomORZone);
-			bool ParseMode(Array1D_string Alphas, Array1D_string cAlphaFields, Array1D< Real64 > Numbers, Array1D_string cNumericFields, Array1D<bool>  lAlphaBlanks, std::string cCurrentModuleObject);
-			void doStep(Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
-			void Initialize(int ZoneNumber);
-			void InitializeModelParams();
-			void ResetOutputs();
-			bool MeetsSupplyAirTOC(Real64 Tosa);
-			bool MeetsSupplyAirRHOC(Real64 Wosa);
-			Real64 CheckVal_T(Real64 T);
-			Real64 CheckVal_W(Real64 W, Real64 T, Real64 P); // pascals
-			bool SetStandByMode(CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra );
-			Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
-			int SetOperatingSetting(CStepInputs StepIns);
-			void DetermineCoolingVentilationOrHumidificationNeeds(CStepInputs& StepIns);
-		
-		private:                   // begin private section
-			
-			//number of times in a day it failed resulting in a warning. 
-			std::vector<int> SAT_OC_MetinMode_v;
-			std::vector<int> SAHR_OC_MetinMode_v;
-			bool WarnOnceFlag;
-			Real64 ResolutionMsa;
-			Real64 ResolutionOSA;
-			int count_EnvironmentConditionsNotMet;
-			int count_EnvironmentConditionsMetOnce;
-			int count_SAHR_OC_MetOnce;
-			int count_SAT_OC_MetOnce;
-			int count_DidWeMeetLoad;
-			int count_DidWeNotMeetLoad;
-		
-			bool optimal_EnvCondMet;
-			bool RunningPeakCapacity_EnvCondMet;
-		
-			std::vector<Real64> PolygonXs;
-			std::vector<Real64> PolygonYs;
-		};
-	}
-}
+    class CStepInputs
+    {
+    public:
+        CStepInputs()
+            : Tosa(0), Tra(0), RHosa(0), RHra(0), RequestedCoolingLoad(0), RequestedHeatingLoad(0), ZoneMoistureLoad(0), ZoneDehumidificationLoad(0),
+              MinimumOA(0)
+        {
+        }
+        Real64 Tosa;
+        Real64 Tra;
+        Real64 RHosa;
+        Real64 RHra;
+        Real64 RequestedCoolingLoad;
+        Real64 RequestedHeatingLoad;
+        Real64 ZoneMoistureLoad;
+        Real64 ZoneDehumidificationLoad;
+        Real64 MinimumOA;
+    };
+
+    class Model // begin declaration of the class
+    {
+    public: // begin public section
+        Model();
+
+        // Default Constructor
+        std::string Name;     // user identifier
+        std::string Schedule; // Availability Schedule Name
+        bool Initialized;     // initialization flag ensures the system object is initialized only once.
+        int ZoneNum;  // stores the current zone associated with the system, this is currently not used but is expected to be used in the next set of
+                      // functionality additions.
+        int SchedPtr; // Pointer to the correct schedule
+
+        Real64 SystemMaximumSupplyAirFlowRate;           // taken from IDF N1, the system max supply flow rate in m3/s.
+        Real64 ScalingFactor;                            // taken from IDF N3, linear scaling factor.
+        Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the actual scaling factor used to multiply the
+
+        int UnitOn;                          // feels like it should be a bool but its an output and I couldn't get it to work as a bool
+        Real64 UnitTotalCoolingRate;         // unit output to zone, total cooling rate [W]
+        Real64 UnitTotalCoolingEnergy;       // unit output to zone, total cooling energy [J]
+        Real64 UnitSensibleCoolingRate;      // unit sensible cooling rate [W]
+        Real64 UnitSensibleCoolingEnergy;    // unit sensible cooling energy [J]
+        Real64 UnitLatentCoolingRate;        // unit latent cooling rate [W]
+        Real64 UnitLatentCoolingEnergy;      // unit latent cooling energy [J]
+        Real64 SystemTotalCoolingRate;       // system output to zone, total cooling rate [W]
+        Real64 SystemTotalCoolingEnergy;     // system output to zone, total cooling energy [J]
+        Real64 SystemSensibleCoolingRate;    // system sensible cooling rate [W]
+        Real64 SystemSensibleCoolingEnergy;  // system sensible cooling energy [J]
+        Real64 SystemLatentCoolingRate;      // system latent cooling rate [W]
+        Real64 SystemLatentCoolingEnergy;    // system latent cooling energy [J]
+        Real64 UnitTotalHeatingRate;         // unit output to zone, total heating rate [W]
+        Real64 UnitTotalHeatingEnergy;       // unit output to zone, total heating energy [J]
+        Real64 UnitSensibleHeatingRate;      // unit sensible heating rate [W]
+        Real64 UnitSensibleHeatingEnergy;    // unit sensible heating energy [J]
+        Real64 UnitLatentHeatingRate;        // unit latent heating rate [W]
+        Real64 UnitLatentHeatingEnergy;      // unit latent heating energy [J]
+        Real64 SystemTotalHeatingRate;       // system output to zone, total heating rate [W]
+        Real64 SystemTotalHeatingEnergy;     // system output to zone, total heating energy [J]
+        Real64 SystemSensibleHeatingRate;    // system sensible heating rate [W]
+        Real64 SystemSensibleHeatingEnergy;  // system sensible heating energy [J]
+        Real64 SystemLatentHeatingRate;      // system latent heating rate [W]
+        Real64 SystemLatentHeatingEnergy;    // system latent heating energy [J]
+        Real64 SupplyFanElectricPower;       //
+        Real64 SupplyFanElectricEnergy;      //
+        Real64 SecondaryFuelConsumptionRate; //
+        Real64 SecondaryFuelConsumption;     //
+        Real64 ThirdFuelConsumptionRate;     //
+        Real64 ThirdFuelConsumption;         //
+        Real64 WaterConsumptionRate;         //
+        Real64 WaterConsumption;             //
+        Real64 QSensZoneOut;                 // W
+        Real64 QLatentZoneOut;               // W
+        Real64 QLatentZoneOutMass;           // kg/s
+        Real64 ExternalStaticPressure;       //
+        Real64 RequestedHumdificationMass;
+        Real64 RequestedHumdificationLoad;
+        Real64 RequestedHumdificationEnergy;
+        Real64 RequestedDeHumdificationMass;
+        Real64 RequestedDeHumdificationLoad;
+        Real64 RequestedDeHumdificationEnergy;
+        Real64 RequestedLoadToHeatingSetpoint;
+        Real64 RequestedLoadToCoolingSetpoint;
+        int TsaMin_schedule_pointer;
+        int TsaMax_schedule_pointer;
+        int RHsaMin_schedule_pointer;
+        int RHsaMax_schedule_pointer;
+        int PrimaryMode;
+        Real64 PrimaryModeRuntimeFraction;
+        Real64 averageOSAF;
+        int ErrorCode;
+        bool StandBy;
+        int InletNode;
+        int OutletNode;
+        int SecondaryInletNode;       // This is usually OA node feeding into the purge/secondary side
+        int SecondaryOutletNode;      // This outlet node of the secondary side and ilet to the secondary fan
+        Real64 FinalElectricalPower;  // Output fuel use in W
+        Real64 FinalElectricalEnergy; // Output fuel energy use in J
+        Real64 InletMassFlowRate;     // Inlet is primary process air node at inlet to cooler
+        Real64 InletTemp;
+        Real64 InletWetBulbTemp;
+        Real64 InletHumRat;
+        Real64 InletEnthalpy;
+        Real64 InletPressure;
+        Real64 InletRH;
+        Real64 OutletVolumetricFlowRate;
+        Real64 OutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+        Real64 OutletTemp;
+        Real64 OutletWetBulbTemp;
+        Real64 OutletHumRat;
+        Real64 OutletEnthalpy;
+        Real64 OutletPressure;
+        Real64 OutletRH;
+        Real64 SecInletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+        Real64 SecInletTemp;
+        Real64 SecInletWetBulbTemp;
+        Real64 SecInletHumRat;
+        Real64 SecInletEnthalpy;
+        Real64 SecInletPressure;
+        Real64 SecInletRH;
+        Real64 SecOutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+        Real64 SecOutletTemp;
+        Real64 SecOutletWetBulbTemp;
+        Real64 SecOutletHumRat;
+        Real64 SecOutletEnthalpy;
+        Real64 SecOutletPressure;
+        Real64 SecOutletRH;
+        Real64 Wsa;
+        Real64 SupplyVentilationAir;
+        Real64 SupplyVentilationVolume;
+        Real64 ModelNormalizationReference;
+
+        bool OutdoorAir;
+        Real64 MinOA_Msa;
+        int OARequirementsPtr; // Index to DesignSpecification:OutdoorAir object
+
+        Real64 Tsa;
+        int ModeCounter;
+        bool CoolingRequested;
+        bool HeatingRequested;
+        bool VentilationRequested;
+        bool DehumidificationRequested;
+        bool HumidificationRequested;
+        // non-initializer
+        std::vector<int> Tsa_curve_pointer;
+        std::vector<int> HRsa_curve_pointer;
+        std::vector<int> Psa_curve_pointer;
+        std::vector<CMode> OperatingModes;
+        std::vector<CSetting> CurrentOperatingSettings;
+
+        CSetting OptimalSetting;
+        CSetting oStandBy;
+
+        std::vector<CSetting> Settings;
+        // methods
+        int CurrentPrimaryMode();
+        Real64 CurrentPrimaryRuntimeFraction();
+        Real64 CalculatePartRuntimeFraction(Real64 MinOA_Msa,
+                                            Real64 Mvent,
+                                            Real64 RequestedCoolingLoad,
+                                            Real64 RequestedHeatingLoad,
+                                            Real64 SensibleRoomORZone,
+                                            Real64 RequestedDehumidificationLoad,
+                                            Real64 RequestedMoistureLoad,
+                                            Real64 LatentRoomORZone);
+        bool ParseMode(Array1D_string Alphas,
+                       Array1D_string cAlphaFields,
+                       Array1D<Real64> Numbers,
+                       Array1D_string cNumericFields,
+                       Array1D<bool> lAlphaBlanks,
+                       std::string cCurrentModuleObject);
+        void
+        doStep(Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);
+        void Initialize(int ZoneNumber);
+        void InitializeModelParams();
+        void ResetOutputs();
+        bool MeetsSupplyAirTOC(Real64 Tosa);
+        bool MeetsSupplyAirRHOC(Real64 Wosa);
+        Real64 CheckVal_T(Real64 T);
+        Real64 CheckVal_W(Real64 W, Real64 T, Real64 P); // pascals
+        bool SetStandByMode(CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra);
+        Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
+        int SetOperatingSetting(CStepInputs StepIns);
+        void DetermineCoolingVentilationOrHumidificationNeeds(CStepInputs &StepIns);
+
+    private: // begin private section
+        // number of times in a day it failed resulting in a warning.
+        std::vector<int> SAT_OC_MetinMode_v;
+        std::vector<int> SAHR_OC_MetinMode_v;
+        bool WarnOnceFlag;
+        Real64 ResolutionMsa;
+        Real64 ResolutionOSA;
+        int count_EnvironmentConditionsNotMet;
+        int count_EnvironmentConditionsMetOnce;
+        int count_SAHR_OC_MetOnce;
+        int count_SAT_OC_MetOnce;
+        int count_DidWeMeetLoad;
+        int count_DidWeNotMeetLoad;
+
+        bool optimal_EnvCondMet;
+        bool RunningPeakCapacity_EnvCondMet;
+
+        std::vector<Real64> PolygonXs;
+        std::vector<Real64> PolygonYs;
+    };
+} // namespace HybridEvapCoolingModel
+} // namespace EnergyPlus
 
 #endif

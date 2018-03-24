@@ -63,104 +63,93 @@ namespace EnergyPlus {
 
 namespace DataTimings {
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
-	extern int const MaxTimingStringLength; // string length for timing string array
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const MaxTimingStringLength; // string length for timing string array
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumTimingElements;
-	extern int MaxTimingElements;
-	extern Real64 dailyWeatherTime;
-	extern Real64 dailyExteriorEnergyUseTime;
-	extern Real64 dailyHeatBalanceTime;
-	extern Real64 hbdailyInit;
-	extern Real64 hbdailyOutSurf;
-	extern Real64 hbdailyInSurf;
-	extern Real64 hbdailyHVAC;
-	extern Real64 hbdailyRep;
-	extern Real64 clockrate;
-	extern bool lprocessingInputTiming;
-	extern bool lmanageSimulationTiming;
-	extern bool lcloseoutReportingTiming;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumTimingElements;
+    extern int MaxTimingElements;
+    extern Real64 dailyWeatherTime;
+    extern Real64 dailyExteriorEnergyUseTime;
+    extern Real64 dailyHeatBalanceTime;
+    extern Real64 hbdailyInit;
+    extern Real64 hbdailyOutSurf;
+    extern Real64 hbdailyInSurf;
+    extern Real64 hbdailyHVAC;
+    extern Real64 hbdailyRep;
+    extern Real64 clockrate;
+    extern bool lprocessingInputTiming;
+    extern bool lmanageSimulationTiming;
+    extern bool lcloseoutReportingTiming;
 
-	// Following for calls to routines
+    // Following for calls to routines
 #ifdef EP_Count_Calls
-	extern int NumShadow_Calls;
-	extern int NumShadowAtTS_Calls;
-	extern int NumClipPoly_Calls;
-	extern int NumInitSolar_Calls;
-	extern int NumAnisoSky_Calls;
-	extern int NumDetPolyOverlap_Calls;
-	extern int NumCalcPerSolBeam_Calls;
-	extern int NumDetShadowCombs_Calls;
-	extern int NumIntSolarDist_Calls;
-	extern int NumIntRadExchange_Calls;
-	extern int NumIntRadExchangeZ_Calls;
-	extern int NumIntRadExchangeMain_Calls;
-	extern int NumIntRadExchangeOSurf_Calls;
-	extern int NumIntRadExchangeISurf_Calls;
-	extern int NumMaxInsideSurfIterations;
-	extern int NumCalcScriptF_Calls;
+    extern int NumShadow_Calls;
+    extern int NumShadowAtTS_Calls;
+    extern int NumClipPoly_Calls;
+    extern int NumInitSolar_Calls;
+    extern int NumAnisoSky_Calls;
+    extern int NumDetPolyOverlap_Calls;
+    extern int NumCalcPerSolBeam_Calls;
+    extern int NumDetShadowCombs_Calls;
+    extern int NumIntSolarDist_Calls;
+    extern int NumIntRadExchange_Calls;
+    extern int NumIntRadExchangeZ_Calls;
+    extern int NumIntRadExchangeMain_Calls;
+    extern int NumIntRadExchangeOSurf_Calls;
+    extern int NumIntRadExchangeISurf_Calls;
+    extern int NumMaxInsideSurfIterations;
+    extern int NumCalcScriptF_Calls;
 #endif
 
-	// Types
+    // Types
 
-	struct timings
-	{
-		// Members
-		std::string Element;
-		Real64 rstartTime;
-		Real64 currentTimeSum;
-		int calls;
+    struct timings
+    {
+        // Members
+        std::string Element;
+        Real64 rstartTime;
+        Real64 currentTimeSum;
+        int calls;
 
-		// Default Constructor
-		timings() :
-			rstartTime( 0.0 ),
-			currentTimeSum( 0.0 ),
-			calls( 0 )
-		{}
+        // Default Constructor
+        timings() : rstartTime(0.0), currentTimeSum(0.0), calls(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<timings> Timing;
 
-	// Object Data
-	extern Array1D< timings > Timing;
+    // Functions
 
-	// Functions
+    void epStartTime(std::string const &ctimingElementstring);
 
-	void
-	epStartTime( std::string const & ctimingElementstring );
+    void epStopTime(std::string const &ctimingElementstring,
+                    Optional_bool_const printit = _, // true if it should be printed here.
+                    Optional_string_const wprint = _ // only needed (and assumed, if printit is true)
+    );
 
-	void
-	epStopTime(
-		std::string const & ctimingElementstring,
-		Optional_bool_const printit = _, // true if it should be printed here.
-		Optional_string_const wprint = _ // only needed (and assumed, if printit is true)
-	);
+    void epSummaryTimes(Real64 &TimeUsed_CPUTime);
 
-	void
-	epSummaryTimes( Real64 & TimeUsed_CPUTime );
+    Real64 epGetTimeUsed(std::string const &ctimingElementstring);
 
-	Real64
-	epGetTimeUsed( std::string const & ctimingElementstring );
+    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring);
 
-	Real64
-	epGetTimeUsedperCall( std::string const & ctimingElementstring );
+    Real64 eptime();
 
-	Real64
-	eptime();
+    Real64 epElapsedTime();
 
-	Real64
-	epElapsedTime();
-
-} // DataTimings
+} // namespace DataTimings
 
 } // EnergyPlus
 

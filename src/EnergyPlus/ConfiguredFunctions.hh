@@ -52,10 +52,10 @@
 
 namespace EnergyPlus {
 
-	std::string configured_source_directory();
+std::string configured_source_directory();
 
-	std::string configured_build_directory();
+std::string configured_build_directory();
 
-}
+} // namespace EnergyPlus
 
 #endif // CONFIGURED_FUNCTIONS_HH
