@@ -4542,9 +4542,9 @@ namespace HVACUnitarySystem {
 
                     // **** How to get this info ****
                     //						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetWtoAHPCoilCapacity(
-                    //CoolingCoilType,  CoolingCoilName,  errFlag ); 						if ( errFlag ) {
+                    // CoolingCoilType,  CoolingCoilName,  errFlag ); 						if ( errFlag ) {
                     //							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem(
-                    //UnitarySysNum
+                    // UnitarySysNum
                     //).Name
                     //); 							ErrorsFound = true;
                     //							errFlag = false;

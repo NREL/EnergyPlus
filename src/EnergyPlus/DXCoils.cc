@@ -6345,8 +6345,8 @@ namespace DXCoils {
                 //						DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
                 //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
                 //						SizingMethod = HeatingAirflowSizing;
-                ////						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e., DX
-                ///cooling  and  heating coils)
+                ////						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e.,
+                /// DX  cooling  and  heating coils)
                 //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
                 //						SizingMethod = HeatingAirflowSizing;
                 //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
@@ -6365,7 +6365,7 @@ namespace DXCoils {
                 // RoutineName
                 //); 					DataFlowUsedForSizing = TempSize;
                 //					DataIsDXCoil = false; // don't need this and next 2, they are just overwritten below. Delete
-                //on  next  pass so testing will show problems if any. 					DataEMSOverrideON = false;
+                // on  next  pass so testing will show problems if any. 					DataEMSOverrideON = false;
                 //					DataEMSOverride = 0.0;
                 //					DataBypassFrac = 0.0;
                 //				}

@@ -542,7 +542,7 @@ namespace TranspiredCollector {
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
             Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, UTSC(Item).SurfPtrs));
             //			AvgAzimuth = sum( Surface( UTSC( Item ).SurfPtrs ).Azimuth * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface(
-            //UTSC(  Item
+            // UTSC(  Item
             //).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             AvgAzimuth = sum_product_sub(Surface, &SurfaceData::Azimuth, &SurfaceData::Area, UTSC(Item).SurfPtrs) /
                          surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
@@ -929,13 +929,13 @@ namespace TranspiredCollector {
         Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs));
         if (!IsRain) {
             //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            //Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
+            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
         } else { // when raining we use wet bulb not drybulb
             //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            //Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
+            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             Tamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         }
