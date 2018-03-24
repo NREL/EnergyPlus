@@ -52,11 +52,11 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/StandardRatings.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
@@ -66,167 +66,171 @@ using namespace EnergyPlus::DXCoils;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest ) {
-		// Test that the standard ratings calculation with negative curve value
+TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
+{
+    // Test that the standard ratings calculation with negative curve value
 
-		using CurveManager::Quadratic;
-		using CurveManager::Cubic;
-		using CurveManager::NumCurves;
-		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using DXCoils::DXCoil;
-		using StandardRatings::SingleSpeedDXHeatingCoilStandardRatings;
+    using CurveManager::Cubic;
+    using CurveManager::NumCurves;
+    using CurveManager::Quadratic;
+    using DXCoils::DXCoil;
+    using Psychrometrics::PsyRhoAirFnPbTdbW;
+    using StandardRatings::SingleSpeedDXHeatingCoilStandardRatings;
 
+    // Set up heating coil and curves.
+    int DXCoilNum;
+    NumDXCoils = 1;
+    DXCoilNum = 1;
+    DXCoil.allocate(NumDXCoils);
+    DXCoilNumericFields.allocate(1);
+    DXCoilOutletTemp.allocate(NumDXCoils);
+    DXCoilOutletHumRat.allocate(NumDXCoils);
+    DXCoilFanOpMode.allocate(NumDXCoils);
+    DXCoilPartLoadRatio.allocate(NumDXCoils);
+    DXCoilTotalHeating.allocate(NumDXCoils);
+    DXCoilHeatInletAirDBTemp.allocate(NumDXCoils);
+    DXCoilHeatInletAirWBTemp.allocate(NumDXCoils);
+    DXCoilData &Coil = DXCoil(DXCoilNum);
 
-		// Set up heating coil and curves.
-		int DXCoilNum;
-		NumDXCoils = 1;
-		DXCoilNum = 1;
-		DXCoil.allocate( NumDXCoils );
-		DXCoilNumericFields.allocate( 1 );
-		DXCoilOutletTemp.allocate( NumDXCoils );
-		DXCoilOutletHumRat.allocate( NumDXCoils );
-		DXCoilFanOpMode.allocate( NumDXCoils );
-		DXCoilPartLoadRatio.allocate( NumDXCoils );
-		DXCoilTotalHeating.allocate( NumDXCoils );
-		DXCoilHeatInletAirDBTemp.allocate( NumDXCoils );
-		DXCoilHeatInletAirWBTemp.allocate( NumDXCoils );
-		DXCoilData & Coil = DXCoil( DXCoilNum );
+    Coil.Name = "DX Single Speed Heating Coil";
+    Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
+    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    Coil.RatedSHR(1) = 1.0;
+    Coil.RatedTotCap(1) = 1600.0;
+    Coil.RatedCOP(1) = 4.0;
+    Coil.RatedEIR(1) = 1 / Coil.RatedCOP(1);
+    Coil.RatedAirVolFlowRate(1) = 0.50;
+    Coil.RatedAirMassFlowRate(1) =
+        Coil.RatedAirVolFlowRate(1) * PsyRhoAirFnPbTdbW(EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil");
+    Coil.FanPowerPerEvapAirFlowRate(1) = 773.3;
+    Coil.MinOATCompressor = -10.0;
+    Coil.CrankcaseHeaterCapacity = 0.0;
+    Coil.MaxOATDefrost = 0.0;
+    Coil.DefrostStrategy = Resistive;
+    Coil.DefrostControl = 0; // timed defrost control type
+    Coil.DefrostTime = 0.058333;
+    Coil.DefrostCapacity = 1000;
+    Coil.PLRImpact = false;
+    Coil.FuelType = FuelTypeElectricity;
+    Coil.RegionNum = 4;
+    Coil.OATempCompressorOn = -5.0;
+    Coil.OATempCompressorOnOffBlank = "true";
+    NumCurves = 5;
+    PerfCurve.allocate(NumCurves);
+    PerfomanceCurveData *pCurve;
 
-		Coil.Name = "DX Single Speed Heating Coil";
-		Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-		Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-		Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
-		Coil.RatedSHR( 1 ) = 1.0;
-		Coil.RatedTotCap( 1 ) = 1600.0;
-		Coil.RatedCOP( 1 ) = 4.0;
-		Coil.RatedEIR( 1 ) = 1 / Coil.RatedCOP( 1 );
-		Coil.RatedAirVolFlowRate( 1 ) = 0.50;
-		Coil.RatedAirMassFlowRate( 1 ) = Coil.RatedAirVolFlowRate( 1 ) * PsyRhoAirFnPbTdbW( EnergyPlus::DataEnvironment::StdBaroPress, 21.11, 0.00881, "InitDXCoil" );
-		Coil.FanPowerPerEvapAirFlowRate( 1 ) = 773.3;
-		Coil.MinOATCompressor = -10.0;
-		Coil.CrankcaseHeaterCapacity = 0.0;
-		Coil.MaxOATDefrost = 0.0;
-		Coil.DefrostStrategy = Resistive;
-		Coil.DefrostControl = 0; // timed defrost control type
-		Coil.DefrostTime = 0.058333;
-		Coil.DefrostCapacity = 1000;
-		Coil.PLRImpact = false;
-		Coil.FuelType = FuelTypeElectricity;
-		Coil.RegionNum = 4;
-		Coil.OATempCompressorOn = -5.0;
-		Coil.OATempCompressorOnOffBlank = "true";
-		NumCurves = 5;
-		PerfCurve.allocate( NumCurves );
-		PerfomanceCurveData * pCurve;
+    int const nCapfT = 1;
+    pCurve = &PerfCurve(nCapfT);
+    pCurve->CurveType = Cubic;
+    pCurve->Name = "PTHPHeatingCAPFT";
+    pCurve->Coeff1 = 0.876825;
+    pCurve->Coeff2 = -0.002955;
+    pCurve->Coeff3 = 5.8e-005;
+    pCurve->Coeff4 = 0.025335;
+    pCurve->Var1Min = -5;
+    pCurve->Var1Max = 25;
 
-		int const nCapfT = 1;
-		pCurve = &PerfCurve( nCapfT );
-		pCurve->CurveType = Cubic;
-		pCurve->Name = "PTHPHeatingCAPFT";
-		pCurve->Coeff1 = 0.876825;
-		pCurve->Coeff2 = -0.002955;
-		pCurve->Coeff3 = 5.8e-005;
-		pCurve->Coeff4 = 0.025335;
-		pCurve->Var1Min = -5;
-		pCurve->Var1Max = 25;
+    Coil.CCapFTemp(1) = nCapfT;
+    Coil.TotCapTempModFacCurveType(1) = pCurve->CurveType;
 
-		Coil.CCapFTemp( 1 ) = nCapfT;
-		Coil.TotCapTempModFacCurveType( 1 ) = pCurve->CurveType;
+    int const nCapfFF = 2;
+    pCurve = &PerfCurve(nCapfFF);
+    pCurve->CurveType = Quadratic;
+    pCurve->Name = "HPHeatCapfFF";
+    pCurve->Coeff1 = 1;
+    pCurve->Coeff2 = 0;
+    pCurve->Coeff3 = 0;
+    pCurve->Var1Min = 0;
+    pCurve->Var1Max = 2;
+    pCurve->CurveMin = 0;
+    pCurve->CurveMax = 2;
+    Coil.CCapFFlow(1) = nCapfFF;
 
-		int const nCapfFF = 2;
-		pCurve = &PerfCurve( nCapfFF );
-		pCurve->CurveType = Quadratic;
-		pCurve->Name = "HPHeatCapfFF";
-		pCurve->Coeff1 = 1;
-		pCurve->Coeff2 = 0;
-		pCurve->Coeff3 = 0;
-		pCurve->Var1Min = 0;
-		pCurve->Var1Max = 2;
-		pCurve->CurveMin = 0;
-		pCurve->CurveMax = 2;
-		Coil.CCapFFlow( 1 ) = nCapfFF;
+    int const nEIRfT = 3;
+    pCurve = &PerfCurve(nEIRfT);
+    pCurve->CurveType = Cubic;
+    pCurve->Name = "PTHPHeatingEIRFT";
+    pCurve->Coeff1 = 0.704658;
+    pCurve->Coeff2 = 0.008767;
+    pCurve->Coeff3 = 0.000625;
+    pCurve->Coeff4 = -0.009037;
+    pCurve->Var1Min = -5;
+    pCurve->Var1Max = 25;
+    Coil.EIRFTemp(1) = nEIRfT;
+    Coil.EIRTempModFacCurveType(1) = pCurve->CurveType;
 
-		int const nEIRfT = 3;
-		pCurve = &PerfCurve( nEIRfT );
-		pCurve->CurveType = Cubic;
-		pCurve->Name = "PTHPHeatingEIRFT";
-		pCurve->Coeff1 = 0.704658;
-		pCurve->Coeff2 = 0.008767;
-		pCurve->Coeff3 = 0.000625;
-		pCurve->Coeff4 = -0.009037;
-		pCurve->Var1Min = -5;
-		pCurve->Var1Max = 25;
-		Coil.EIRFTemp( 1 ) = nEIRfT;
-		Coil.EIRTempModFacCurveType( 1 ) = pCurve->CurveType;
+    int const nEIRfFF = 4;
+    pCurve = &PerfCurve(nEIRfFF);
+    pCurve->CurveType = Quadratic;
+    pCurve->Name = "HPHeatEIRfFF";
+    pCurve->Coeff1 = 1;
+    pCurve->Coeff2 = 0;
+    pCurve->Coeff3 = 0;
+    pCurve->Var1Min = 0;
+    pCurve->Var1Max = 2;
+    pCurve->CurveMin = 0;
+    pCurve->CurveMax = 2;
+    Coil.EIRFFlow(1) = nEIRfFF;
 
-		int const nEIRfFF = 4;
-		pCurve = &PerfCurve( nEIRfFF );
-		pCurve->CurveType = Quadratic;
-		pCurve->Name = "HPHeatEIRfFF";
-		pCurve->Coeff1 = 1;
-		pCurve->Coeff2 = 0;
-		pCurve->Coeff3 = 0;
-		pCurve->Var1Min = 0;
-		pCurve->Var1Max = 2;
-		pCurve->CurveMin = 0;
-		pCurve->CurveMax = 2;
-		Coil.EIRFFlow( 1 ) = nEIRfFF;
+    int const nPLFfPLR = 5;
+    pCurve = &PerfCurve(nPLFfPLR);
+    pCurve->CurveType = Quadratic;
+    pCurve->Name = "HPHeatPLFfPLR";
+    pCurve->Coeff1 = 1;
+    pCurve->Coeff2 = 0;
+    pCurve->Coeff3 = 0;
+    pCurve->Var1Min = 0;
+    pCurve->Var1Max = 1;
+    pCurve->CurveMin = 0.7;
+    pCurve->CurveMax = 1;
+    Coil.PLFFPLR(1) = nPLFfPLR;
 
-		int const nPLFfPLR = 5;
-		pCurve = &PerfCurve( nPLFfPLR );
-		pCurve->CurveType = Quadratic;
-		pCurve->Name = "HPHeatPLFfPLR";
-		pCurve->Coeff1 = 1;
-		pCurve->Coeff2 = 0;
-		pCurve->Coeff3 = 0;
-		pCurve->Var1Min = 0;
-		pCurve->Var1Max = 1;
-		pCurve->CurveMin = 0.7;
-		pCurve->CurveMax = 1;
-		Coil.PLFFPLR( 1 ) = nPLFfPLR;
+    for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
+        PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
+        if (rCurve.CurveType == Cubic) {
+            rCurve.ObjectType = CurveType_Cubic;
+        } else if (rCurve.CurveType == Quadratic) {
+            rCurve.ObjectType = CurveType_Quadratic;
+        }
+        rCurve.InterpolationType = EvaluateCurveToLimits;
+    }
+    Real64 NetHeatingCapRatedHighTemp;
+    Real64 NetHeatingCapRatedLowTemp;
+    Real64 HSPF;
 
-		for ( int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum ) {
-			PerfomanceCurveData & rCurve = PerfCurve( CurveNum );
-			if ( rCurve.CurveType == Cubic ) {
-				rCurve.ObjectType = CurveType_Cubic;
-			} else if ( rCurve.CurveType == Quadratic ) {
-				rCurve.ObjectType = CurveType_Quadratic;
-			}
-			rCurve.InterpolationType = EvaluateCurveToLimits;
-		}
-		Real64 NetHeatingCapRatedHighTemp;
-		Real64 NetHeatingCapRatedLowTemp;
-		Real64 HSPF;
+    SingleSpeedDXHeatingCoilStandardRatings(Coil.RatedTotCap(1), Coil.RatedCOP(1), Coil.CCapFFlow(1), Coil.CCapFTemp(1), Coil.EIRFFlow(1),
+                                            Coil.EIRFTemp(1), Coil.RatedAirVolFlowRate(1), Coil.FanPowerPerEvapAirFlowRate(1),
+                                            NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF, Coil.RegionNum, Coil.MinOATCompressor,
+                                            Coil.OATempCompressorOn, Coil.OATempCompressorOnOffBlank, Coil.DefrostControl);
 
-		SingleSpeedDXHeatingCoilStandardRatings( Coil.RatedTotCap( 1 ), Coil.RatedCOP( 1 ), Coil.CCapFFlow( 1 ), Coil.CCapFTemp( 1 ), Coil.EIRFFlow( 1 ), Coil.EIRFTemp( 1 ), Coil.RatedAirVolFlowRate( 1 ), Coil.FanPowerPerEvapAirFlowRate( 1 ), 
-			NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF, Coil.RegionNum, Coil.MinOATCompressor, Coil.OATempCompressorOn, Coil.OATempCompressorOnOffBlank, Coil.DefrostControl );
+    // evaluate capacity curves
+    Real64 TotCapTempModFacRated = CurveValue(Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
+    Real64 TotCapFlowModFac = CurveValue(Coil.CCapFFlow(1), 1.0);
+    Real64 NetHeatingCapRated =
+        Coil.RatedTotCap(1) * TotCapTempModFacRated * TotCapFlowModFac + Coil.RatedAirVolFlowRate(1) * Coil.FanPowerPerEvapAirFlowRate(1);
+    // check curve values and heating capacity
+    EXPECT_GT(TotCapTempModFacRated, 0.0);
+    EXPECT_DOUBLE_EQ(TotCapFlowModFac, 1.0);
+    EXPECT_DOUBLE_EQ(NetHeatingCapRatedHighTemp, NetHeatingCapRated);
+    // evaluate capacity curves
+    Real64 CapTempModFacH2Test = CurveValue(Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test);
+    EXPECT_GT(CapTempModFacH2Test, 0.0);
+    Real64 CapTempModFacH3Test = CurveValue(Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test);
+    // if CapTempModFacH3Test curves value is less than zero, NetHeatingCapRatedLowTemp is set to zero
+    EXPECT_LT(CapTempModFacH3Test, 0.0);
 
-		// evaluate capacity curves
-		Real64 TotCapTempModFacRated = CurveValue( Coil.CCapFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated );
-		Real64 TotCapFlowModFac = CurveValue( Coil.CCapFFlow( 1 ), 1.0 );
-		Real64 NetHeatingCapRated = Coil.RatedTotCap( 1 ) * TotCapTempModFacRated * TotCapFlowModFac + Coil.RatedAirVolFlowRate( 1 ) * Coil.FanPowerPerEvapAirFlowRate( 1 );
-		// check curve values and heating capacity
-		EXPECT_GT( TotCapTempModFacRated, 0.0 );
-		EXPECT_DOUBLE_EQ( TotCapFlowModFac, 1.0 );
-		EXPECT_DOUBLE_EQ( NetHeatingCapRatedHighTemp, NetHeatingCapRated );
-		// evaluate capacity curves
-		Real64 CapTempModFacH2Test = CurveValue( Coil.CCapFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test );
-		EXPECT_GT( CapTempModFacH2Test, 0.0 );
-		Real64 CapTempModFacH3Test = CurveValue( Coil.CCapFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test );
-		// if CapTempModFacH3Test curves value is less than zero, NetHeatingCapRatedLowTemp is set to zero
-		EXPECT_LT( CapTempModFacH3Test, 0.0 );
-
-		// check heating capacity at low temperature
-		EXPECT_DOUBLE_EQ( NetHeatingCapRatedLowTemp, 0.0 );
-		// evaluate EIR curves
-		Real64 EIRTempModFacRated = CurveValue( Coil.EIRFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated );
-		Real64 EIRTempModFacH2Test = CurveValue( Coil.EIRFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test );
-		Real64 EIRTempModFacH3Test = CurveValue( Coil.EIRFTemp( 1 ), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test );
-		// check EIR curve value
-		EXPECT_LT( EIRTempModFacRated, 0.0 );
-		EXPECT_GT( EIRTempModFacH2Test, 0.0 );
-		EXPECT_GT( EIRTempModFacH3Test, 0.0 );
-		// if one of the CAP or EIR curves value is less than zero, then HSPF is set to zero
-		EXPECT_DOUBLE_EQ( HSPF, 0.0 ); 
-	}
+    // check heating capacity at low temperature
+    EXPECT_DOUBLE_EQ(NetHeatingCapRatedLowTemp, 0.0);
+    // evaluate EIR curves
+    Real64 EIRTempModFacRated = CurveValue(Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
+    Real64 EIRTempModFacH2Test = CurveValue(Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH2Test);
+    Real64 EIRTempModFacH3Test = CurveValue(Coil.EIRFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempH3Test);
+    // check EIR curve value
+    EXPECT_LT(EIRTempModFacRated, 0.0);
+    EXPECT_GT(EIRTempModFacH2Test, 0.0);
+    EXPECT_GT(EIRTempModFacH3Test, 0.0);
+    // if one of the CAP or EIR curves value is less than zero, then HSPF is set to zero
+    EXPECT_DOUBLE_EQ(HSPF, 0.0);
 }
+} // namespace EnergyPlus

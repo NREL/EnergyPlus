@@ -52,115 +52,109 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataVectorTypes.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/TARCOGParams.hh>
+#include <EnergyPlus/TarcogShading.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::TarcogShading;
 using namespace EnergyPlus::TARCOGParams;
 
-TEST( WindowRoutines, EffectiveOpennessVenetianBlind_0_deg )
+TEST(WindowRoutines, EffectiveOpennessVenetianBlind_0_deg)
 {
-	EnergyPlus::ShowMessage( "Begin Test: Effective openness, venetian blind 0 deg slat." );
-	{
-		int const nlayer = 1;
-		Real64 const width = 1;
-		Real64 const height = 1;
-		Array1A_int LayerType( nlayer );
+    EnergyPlus::ShowMessage("Begin Test: Effective openness, venetian blind 0 deg slat.");
+    {
+        int const nlayer = 1;
+        Real64 const width = 1;
+        Real64 const height = 1;
+        Array1A_int LayerType(nlayer);
 
-		Array1D< Real64 > Atop_eff( nlayer, 0.0 );
-		Array1D< Real64 > Abot_eff( nlayer, 0.0 );
-		Array1D< Real64 > Al_eff( nlayer, 0.0 );
-		Array1D< Real64 > Ar_eff( nlayer, 0.0 );
-		Array1D< Real64 > Ah_eff( nlayer, 0.0 );
+        Array1D<Real64> Atop_eff(nlayer, 0.0);
+        Array1D<Real64> Abot_eff(nlayer, 0.0);
+        Array1D<Real64> Al_eff(nlayer, 0.0);
+        Array1D<Real64> Ar_eff(nlayer, 0.0);
+        Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-		Array1D< Real64 > const Atop( nlayer, 0.1 );
-		Array1D< Real64 > const Abot( nlayer, 0.1 );
-		Array1D< Real64 > const Al( nlayer, 0 );
-		Array1D< Real64 > const Ar( nlayer, 0 );
-		Array1D< Real64 > const Ah( nlayer, 0.2 );
-		LayerType( 1 ) = VENETBLIND;
-		Array1D< Real64 > const SlatAngle( nlayer, 0 );
+        Array1D<Real64> const Atop(nlayer, 0.1);
+        Array1D<Real64> const Abot(nlayer, 0.1);
+        Array1D<Real64> const Al(nlayer, 0);
+        Array1D<Real64> const Ar(nlayer, 0);
+        Array1D<Real64> const Ah(nlayer, 0.2);
+        LayerType(1) = VENETBLIND;
+        Array1D<Real64> const SlatAngle(nlayer, 0);
 
-		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff,
-			                            Ar_eff, Ah_eff, LayerType, SlatAngle );
+        updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
-		EXPECT_NEAR( Al_eff( 1 ), 0, 1e-6 );
-		EXPECT_NEAR( Ar_eff( 1 ), 0, 1e-6 );
-		EXPECT_NEAR( Atop_eff( 1 ), 0.1, 1e-6 );
-		EXPECT_NEAR( Abot_eff( 1 ), 0.1, 1e-6 );
-		EXPECT_NEAR( Ah_eff( 1 ), 0.006818, 1e-6 );
-
-	}
+        EXPECT_NEAR(Al_eff(1), 0, 1e-6);
+        EXPECT_NEAR(Ar_eff(1), 0, 1e-6);
+        EXPECT_NEAR(Atop_eff(1), 0.1, 1e-6);
+        EXPECT_NEAR(Abot_eff(1), 0.1, 1e-6);
+        EXPECT_NEAR(Ah_eff(1), 0.006818, 1e-6);
+    }
 }
 
-TEST( WindowRoutines, EffectiveOpennessVenetianBlind_45_deg )
+TEST(WindowRoutines, EffectiveOpennessVenetianBlind_45_deg)
 {
-	EnergyPlus::ShowMessage( "Begin Test: Effective openness, venetian blind 45 deg slat." );
-	{
-		int const nlayer = 1;
-		Real64 const width = 1;
-		Real64 const height = 1;
-		Array1A_int LayerType( nlayer );
+    EnergyPlus::ShowMessage("Begin Test: Effective openness, venetian blind 45 deg slat.");
+    {
+        int const nlayer = 1;
+        Real64 const width = 1;
+        Real64 const height = 1;
+        Array1A_int LayerType(nlayer);
 
-		Array1D< Real64 > Atop_eff( nlayer, 0.0 );
-		Array1D< Real64 > Abot_eff( nlayer, 0.0 );
-		Array1D< Real64 > Al_eff( nlayer, 0.0 );
-		Array1D< Real64 > Ar_eff( nlayer, 0.0 );
-		Array1D< Real64 > Ah_eff( nlayer, 0.0 );
+        Array1D<Real64> Atop_eff(nlayer, 0.0);
+        Array1D<Real64> Abot_eff(nlayer, 0.0);
+        Array1D<Real64> Al_eff(nlayer, 0.0);
+        Array1D<Real64> Ar_eff(nlayer, 0.0);
+        Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-		Array1D< Real64 > const Atop( nlayer, 0.1 );
-		Array1D< Real64 > const Abot( nlayer, 0.1 );
-		Array1D< Real64 > const Al( nlayer, 0 );
-		Array1D< Real64 > const Ar( nlayer, 0 );
-		Array1D< Real64 > const Ah( nlayer, 0.2 );
-		LayerType( 1 ) = VENETBLIND;
-		Array1D< Real64 > const SlatAngle( nlayer, 45 );
+        Array1D<Real64> const Atop(nlayer, 0.1);
+        Array1D<Real64> const Abot(nlayer, 0.1);
+        Array1D<Real64> const Al(nlayer, 0);
+        Array1D<Real64> const Ar(nlayer, 0);
+        Array1D<Real64> const Ah(nlayer, 0.2);
+        LayerType(1) = VENETBLIND;
+        Array1D<Real64> const SlatAngle(nlayer, 45);
 
-		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff,
-			                            Ar_eff, Ah_eff, LayerType, SlatAngle );
+        updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
-		EXPECT_NEAR( Al_eff( 1 ), 0, 1e-6 );
-		EXPECT_NEAR( Ar_eff( 1 ), 0, 1e-6 );
-		EXPECT_NEAR( Atop_eff( 1 ), 0.1, 1e-6 );
-		EXPECT_NEAR( Abot_eff( 1 ), 0.1, 1e-6 );
-		EXPECT_NEAR( Ah_eff( 1 ), 0.007655, 1e-6 );
-
-	}
+        EXPECT_NEAR(Al_eff(1), 0, 1e-6);
+        EXPECT_NEAR(Ar_eff(1), 0, 1e-6);
+        EXPECT_NEAR(Atop_eff(1), 0.1, 1e-6);
+        EXPECT_NEAR(Abot_eff(1), 0.1, 1e-6);
+        EXPECT_NEAR(Ah_eff(1), 0.007655, 1e-6);
+    }
 }
 
-TEST( WindowRoutines, EffectiveOpennessOtherShades )
+TEST(WindowRoutines, EffectiveOpennessOtherShades)
 {
-	EnergyPlus::ShowMessage( "Begin Test: Effective openness, other shades." );
-	{
-		int const nlayer = 1;
-		Real64 const width = 1;
-		Real64 const height = 1;
-		Array1A_int LayerType( nlayer );
+    EnergyPlus::ShowMessage("Begin Test: Effective openness, other shades.");
+    {
+        int const nlayer = 1;
+        Real64 const width = 1;
+        Real64 const height = 1;
+        Array1A_int LayerType(nlayer);
 
-		Array1D< Real64 > Atop_eff( nlayer, 0.0 );
-		Array1D< Real64 > Abot_eff( nlayer, 0.0 );
-		Array1D< Real64 > Al_eff( nlayer, 0.0 );
-		Array1D< Real64 > Ar_eff( nlayer, 0.0 );
-		Array1D< Real64 > Ah_eff( nlayer, 0.0 );
+        Array1D<Real64> Atop_eff(nlayer, 0.0);
+        Array1D<Real64> Abot_eff(nlayer, 0.0);
+        Array1D<Real64> Al_eff(nlayer, 0.0);
+        Array1D<Real64> Ar_eff(nlayer, 0.0);
+        Array1D<Real64> Ah_eff(nlayer, 0.0);
 
-		Array1D< Real64 > const Atop( nlayer, 0.1 );
-		Array1D< Real64 > const Abot( nlayer, 0.1 );
-		Array1D< Real64 > const Al( nlayer, 0 );
-		Array1D< Real64 > const Ar( nlayer, 0 );
-		Array1D< Real64 > const Ah( nlayer, 0.2 );
-		LayerType( 1 ) = DIFFSHADE;
-		Array1A< Real64 > const SlatAngle( nlayer, 0 );
+        Array1D<Real64> const Atop(nlayer, 0.1);
+        Array1D<Real64> const Abot(nlayer, 0.1);
+        Array1D<Real64> const Al(nlayer, 0);
+        Array1D<Real64> const Ar(nlayer, 0);
+        Array1D<Real64> const Ah(nlayer, 0.2);
+        LayerType(1) = DIFFSHADE;
+        Array1A<Real64> const SlatAngle(nlayer, 0);
 
-		updateEffectiveMultipliers( nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff,
-			                            Ar_eff, Ah_eff, LayerType, SlatAngle );
+        updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
-		EXPECT_NEAR( Al_eff( 1 ), 0, 1e-6 );
-		EXPECT_NEAR( Ar_eff( 1 ), 0, 1e-6 );
-		EXPECT_NEAR( Atop_eff( 1 ), 0.05, 1e-6 );
-		EXPECT_NEAR( Abot_eff( 1 ), 0.05, 1e-6 );
-		EXPECT_NEAR( Ah_eff( 1 ), 0.008792, 1e-6 );
-
-	}
+        EXPECT_NEAR(Al_eff(1), 0, 1e-6);
+        EXPECT_NEAR(Ar_eff(1), 0, 1e-6);
+        EXPECT_NEAR(Atop_eff(1), 0.05, 1e-6);
+        EXPECT_NEAR(Abot_eff(1), 0.05, 1e-6);
+        EXPECT_NEAR(Ah_eff(1), 0.008792, 1e-6);
+    }
 }

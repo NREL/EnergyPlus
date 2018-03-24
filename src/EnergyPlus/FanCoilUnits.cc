@@ -3170,8 +3170,8 @@ namespace FanCoilUnits {
                         // air flow). For now SA temperature will limit output. The following would increase SA flow and/or water flow to meet load.
                         // Not sure that's required at this point.
                         //					// if temperature control reduced capacity so that zone load is not met, iterate on
-                        //air  and  water flow (an attempt to hold outlet temp constant) 					if ( ( QZnReq -
-                        //QUnitOut ) > 0.0 && Node( InletNode ).MassFlowRate < FanCoil(  FanCoilNum
+                        // air  and  water flow (an attempt to hold outlet temp constant) 					if ( ( QZnReq -
+                        // QUnitOut ) > 0.0 && Node( InletNode ).MassFlowRate < FanCoil(  FanCoilNum
                         //).MaxAirMassFlow ) {
                         //						//solve for the hot water and air flow rate that meets zone load
                         //						Par( 1 ) = double( FanCoilNum );
@@ -3196,20 +3196,21 @@ namespace FanCoilUnits {
                         // CalcFanCoilAirAndWaterInStepResidual, 0.0, 1.0, Par );
                         //							PLR = Par( 6 ) + ( PLR * ( 1.0 - Par( 6 ) ) );
                         //							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration,
-                        //QUnitOut,  PLR
+                        // QUnitOut,  PLR
                         //);
                         //						}
                         //						if ( SolFlag == -1 ) {
                         //							ShowWarningError( "Heating Coil control failed in fan coil unit " +
                         // FanCoil(  FanCoilNum ).Name ); 							ShowContinueError( "  Iteration limit
                         // exceeded in calculating heating coil output " );
-                        //							ShowRecurringWarningErrorAtEnd( "Heating coil Iteration limit exceeded in
-                        //fan  coil  unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                        //							ShowRecurringWarningErrorAtEnd( "Heating coil Iteration limit exceeded
+                        // in  fan  coil  unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
                         //						} else if ( SolFlag == -2 ) {
                         //							ShowWarningError( "Heating coil control failed in fan coil unit " +
                         // FanCoil(  FanCoilNum ).Name ); 							ShowContinueError( "  Bad starting
                         // values for electric heating coil control to  meet zone load at constant temperature." );
-                        //							ShowRecurringWarningErrorAtEnd( "Heating coil control failed in fan coil unit
+                        //							ShowRecurringWarningErrorAtEnd( "Heating coil control failed in fan
+                        // coil  unit
                         //"
                         //+  FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
                         //							Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate =
