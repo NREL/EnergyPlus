@@ -51,34 +51,30 @@
 #include <OutputProcessor.hh>
 
 namespace EnergyPlus {
-    namespace DataPlant {
+namespace DataPlant {
 
+    struct MeterData
+    {
+        // Members
+        std::string ReportVarName;
+        OutputProcessor::Unit ReportVarUnits;
+        int ResourceType;
+        std::string EndUse;
+        int EndUse_CompMode;
+        std::string Group;
+        int ReportVarIndex;
+        int ReportVarIndexType;
+        int ReportVarType;
+        Real64 CurMeterReading;
 
-        struct MeterData {
-            // Members
-            std::string ReportVarName;
-            OutputProcessor::Unit ReportVarUnits;
-            int ResourceType;
-            std::string EndUse;
-            int EndUse_CompMode;
-            std::string Group;
-            int ReportVarIndex;
-            int ReportVarIndexType;
-            int ReportVarType;
-            Real64 CurMeterReading;
-
-            // Default Constructor
-            MeterData() :
-                    ReportVarUnits(OutputProcessor::Unit::None),
-                    ResourceType(0),
-                    EndUse_CompMode(0),
-                    ReportVarIndex(0),
-                    ReportVarIndexType(0),
-                    ReportVarType(0),
-                    CurMeterReading(0.0) {}
-
-        };
-    }
-}
+        // Default Constructor
+        MeterData()
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(0), EndUse_CompMode(0), ReportVarIndex(0), ReportVarIndexType(0),
+              ReportVarType(0), CurMeterReading(0.0)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

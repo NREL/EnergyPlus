@@ -60,45 +60,33 @@
 
 namespace EnergyPlus {
 
-	// Derived class for Site:GroundTemperature:BuildingSurface
-	class SiteBuildingSurfaceGroundTemps : public BaseGroundTempsModel
-	{
-		public:
-			int timeOfSimInMonths;
-			Array1D< Real64 > buildingSurfaceGroundTemps;
+// Derived class for Site:GroundTemperature:BuildingSurface
+class SiteBuildingSurfaceGroundTemps : public BaseGroundTempsModel
+{
+public:
+    int timeOfSimInMonths;
+    Array1D<Real64> buildingSurfaceGroundTemps;
 
-		// Default Constructor
-		SiteBuildingSurfaceGroundTemps():
-			timeOfSimInMonths( 0 ),
-			buildingSurfaceGroundTemps( 12, 13.0 )
+    // Default Constructor
+    SiteBuildingSurfaceGroundTemps() : timeOfSimInMonths(0), buildingSurfaceGroundTemps(12, 13.0)
 
-			{}
+    {
+    }
 
-		static std::shared_ptr< SiteBuildingSurfaceGroundTemps > BuildingSurfaceGTMFactory( 
-			int objectType, 
-			std::string objectName
-		);
+    static std::shared_ptr<SiteBuildingSurfaceGroundTemps> BuildingSurfaceGTMFactory(int objectType, std::string objectName);
 
-		Real64
-		getGroundTemp();
+    Real64 getGroundTemp();
 
-		Real64
-		getGroundTempAtTimeInSeconds(
-			Real64 const depth,
-			Real64 const timeInSecondsOfSim
-		);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
 
-		Real64
-		getGroundTempAtTimeInMonths(
-			Real64 const depth,
-			int const monthOfSim
-		);
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
 
-		// Destructor
-		~SiteBuildingSurfaceGroundTemps(){}
+    // Destructor
+    ~SiteBuildingSurfaceGroundTemps()
+    {
+    }
+};
 
-	};
-
-}
+} // namespace EnergyPlus
 
 #endif

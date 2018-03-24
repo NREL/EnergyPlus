@@ -52,137 +52,106 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DirectAirManager {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	//Type declarations in DirectAir module
+    // Type declarations in DirectAir module
 
-	//MODULE VARIABLE DECLARATIONS:
-	extern int NumDirectAir;
-	extern Array1D_bool CheckEquipName;
-	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumDirectAir;
+    extern Array1D_bool CheckEquipName;
+    // SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
-	// Types
+    // Types
 
-	struct DirectAirProps
-	{
-		// Members
-		// Input Data
-		std::string cObjectName;
-		std::string EquipID;
-		std::string Schedule;
-		int ZoneSupplyAirNode;
-		int SchedPtr;
-		Real64 MaxAirVolFlowRate; // Max Specified Volume Flow Rate of Sys [m3/sec]
-		Real64 AirMassFlowRateMax; // Max mass flow [kg/sec]
-		Real64 InitMaxAvailMassFlow; // The Initial max mass Flow to set the Control Flow Fraction
-		Real64 AirMassFlowFraction;
-		int ZoneEquipAirInletNode;
-		int AirTerminalSizingSpecIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
-		int TermUnitSizingNum; // index to TermUnitSizing and TermUnitFinalZoneSizing for this terminal unit
-		// Simulation Data
-		Real64 SensOutputProvided;
-		bool EMSOverrideAirFlow; // if true, EMS is calling to override flow rate
-		Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
-		//Reporting Variables
-		Real64 HeatRate;
-		Real64 CoolRate;
-		Real64 HeatEnergy;
-		Real64 CoolEnergy;
-		// pointers
-		int ZoneEqNum;
-		int ZoneNum;
+    struct DirectAirProps
+    {
+        // Members
+        // Input Data
+        std::string cObjectName;
+        std::string EquipID;
+        std::string Schedule;
+        int ZoneSupplyAirNode;
+        int SchedPtr;
+        Real64 MaxAirVolFlowRate;    // Max Specified Volume Flow Rate of Sys [m3/sec]
+        Real64 AirMassFlowRateMax;   // Max mass flow [kg/sec]
+        Real64 InitMaxAvailMassFlow; // The Initial max mass Flow to set the Control Flow Fraction
+        Real64 AirMassFlowFraction;
+        int ZoneEquipAirInletNode;
+        int AirTerminalSizingSpecIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
+        int TermUnitSizingNum;          // index to TermUnitSizing and TermUnitFinalZoneSizing for this terminal unit
+        // Simulation Data
+        Real64 SensOutputProvided;
+        bool EMSOverrideAirFlow;     // if true, EMS is calling to override flow rate
+        Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
+        // Reporting Variables
+        Real64 HeatRate;
+        Real64 CoolRate;
+        Real64 HeatEnergy;
+        Real64 CoolEnergy;
+        // pointers
+        int ZoneEqNum;
+        int ZoneNum;
 
-		bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
-		int OARequirementsPtr; // - Index to DesignSpecification:OutdoorAir object
-		int CtrlZoneInNodeIndex; // which controlled zone inlet node number corresponds with this unit
-		int AirLoopNum; // air loop index 
-		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
+        bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
+        int OARequirementsPtr;      // - Index to DesignSpecification:OutdoorAir object
+        int CtrlZoneInNodeIndex;    // which controlled zone inlet node number corresponds with this unit
+        int AirLoopNum;             // air loop index
+        int OAPerPersonMode;        // mode for how per person rates are determined, DCV or design.
 
-		// Default Constructor
-		DirectAirProps() :
-			ZoneSupplyAirNode( 0 ),
-			SchedPtr( 0 ),
-			MaxAirVolFlowRate( 0.0 ),
-			AirMassFlowRateMax( 0.0 ),
-			InitMaxAvailMassFlow( 0.0 ),
-			AirMassFlowFraction( 0.0 ),
-			ZoneEquipAirInletNode( 0 ),
-			AirTerminalSizingSpecIndex( 0 ),
-			SensOutputProvided( 0.0 ),
-			EMSOverrideAirFlow( false ),
-			EMSMassFlowRateValue( 0.0 ),
-			HeatRate( 0.0 ),
-			CoolRate( 0.0 ),
-			HeatEnergy( 0.0 ),
-			CoolEnergy( 0.0 ),
-			ZoneEqNum( 0 ),
-			ZoneNum( 0 ),
-			NoOAFlowInputFromUser( true ), 
-			OARequirementsPtr( 0 ), 
-			CtrlZoneInNodeIndex( 0 ),
-			AirLoopNum( 0 ), 
-			OAPerPersonMode( 0 )
-		{}
+        // Default Constructor
+        DirectAirProps()
+            : ZoneSupplyAirNode(0), SchedPtr(0), MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), InitMaxAvailMassFlow(0.0), AirMassFlowFraction(0.0),
+              ZoneEquipAirInletNode(0), AirTerminalSizingSpecIndex(0), SensOutputProvided(0.0), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
+              HeatRate(0.0), CoolRate(0.0), HeatEnergy(0.0), CoolEnergy(0.0), ZoneEqNum(0), ZoneNum(0), NoOAFlowInputFromUser(true),
+              OARequirementsPtr(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OAPerPersonMode(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<DirectAirProps> DirectAir;
 
-	// Object Data
-	extern Array1D< DirectAirProps > DirectAir;
+    // Functions
 
-	// Functions
+    void clear_state();
 
-	void
-	clear_state();
+    void SimDirectAir(std::string const &EquipName,
+                      int const ControlledZoneNum,
+                      bool const FirstHVACIteration,
+                      Real64 &SensOutputProvided,
+                      Real64 &LatOutputProvided, // Latent output provided (kg/s), dehumidification = negative
+                      int &CompIndex);
 
-	void
-	SimDirectAir(
-		std::string const & EquipName,
-		int const ControlledZoneNum,
-		bool const FirstHVACIteration,
-		Real64 & SensOutputProvided,
-		Real64 & LatOutputProvided, // Latent output provided (kg/s), dehumidification = negative
-		int & CompIndex
-	);
+    void GetDirectAirInput();
 
-	void
-	GetDirectAirInput();
+    // Beginning Initialization Section of the Module
+    //******************************************************************************
 
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
+    void InitDirectAir(int const DirectAirNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
-	void
-	InitDirectAir(
-		int const DirectAirNum,
-		int const ControlledZoneNum,
-		bool const FirstHVACIteration
-	);
+    void SizeDirectAir(int const DirectAirNum);
 
-	void
-	SizeDirectAir( int const DirectAirNum );
+    // End Initialization Section of the Module
+    //******************************************************************************
 
-	// End Initialization Section of the Module
-	//******************************************************************************
+    void CalcDirectAir(int const DirectAirNum,
+                       int const ControlledZoneNum,
+                       Real64 &SensOutputProvided,
+                       Real64 &LatOutputProvided // Latent output provided, kg/s, dehumidification = negative
+    );
 
-	void
-	CalcDirectAir(
-		int const DirectAirNum,
-		int const ControlledZoneNum,
-		Real64 & SensOutputProvided,
-		Real64 & LatOutputProvided // Latent output provided, kg/s, dehumidification = negative
-	);
+} // namespace DirectAirManager
 
-} // DirectAirManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

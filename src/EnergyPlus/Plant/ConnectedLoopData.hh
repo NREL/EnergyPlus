@@ -49,25 +49,22 @@
 #define PlantTopologyConnectedLoopData_hh_INCLUDED
 
 namespace EnergyPlus {
-	namespace DataPlant {
+namespace DataPlant {
 
-		struct ConnectedLoopData // DSU
-		{
-			// Members
-			int LoopNum; // plant loop index pointer, for the other loop
-			int LoopSideNum; // plant loop side number, for the other loop
-			int ConnectorTypeOf_Num; // plant equipment type doing the connecting
-			bool LoopDemandsOnRemote; // true if this loop puts demand on connected loop
+    struct ConnectedLoopData // DSU
+    {
+        // Members
+        int LoopNum;              // plant loop index pointer, for the other loop
+        int LoopSideNum;          // plant loop side number, for the other loop
+        int ConnectorTypeOf_Num;  // plant equipment type doing the connecting
+        bool LoopDemandsOnRemote; // true if this loop puts demand on connected loop
 
-			// Default Constructor
-			ConnectedLoopData() :
-					LoopNum(0),
-					LoopSideNum(0),
-					ConnectorTypeOf_Num(0),
-					LoopDemandsOnRemote(false) {}
-
-		};
-	}
-}
+        // Default Constructor
+        ConnectedLoopData() : LoopNum(0), LoopSideNum(0), ConnectorTypeOf_Num(0), LoopDemandsOnRemote(false)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif
