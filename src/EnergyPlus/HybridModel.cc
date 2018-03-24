@@ -49,13 +49,13 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <HybridModel.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataRoomAirModel.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
+#include <HybridModel.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
@@ -64,167 +64,166 @@ namespace EnergyPlus {
 
 namespace HybridModel {
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL
-	//       DATE WRITTEN   Oct 2015
+    // MODULE INFORMATION:
+    //       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL
+    //       DATE WRITTEN   Oct 2015
 
-	// PURPOSE OF THIS MODULE:
-	// This module manages hybrid model.
+    // PURPOSE OF THIS MODULE:
+    // This module manages hybrid model.
 
-	// METHODOLOGY EMPLOYED:
-	//  The model uses measured zone air temperature to calculate internal thermal mass or infiltration air flow rate.
+    // METHODOLOGY EMPLOYED:
+    //  The model uses measured zone air temperature to calculate internal thermal mass or infiltration air flow rate.
 
-	// USE STATEMENTS:
+    // USE STATEMENTS:
 
-	// Using/Aliasing
-	using namespace DataGlobals;
-	using namespace DataHeatBalance;
-	using namespace DataPrecisionGlobals;
-	using namespace DataRoomAirModel;
-	using DataGlobals::ScheduleAlwaysOn;
-	using General::CheckCreatedZoneItemName;
+    // Using/Aliasing
+    using namespace DataGlobals;
+    using namespace DataHeatBalance;
+    using namespace DataPrecisionGlobals;
+    using namespace DataRoomAirModel;
+    using DataGlobals::ScheduleAlwaysOn;
+    using General::CheckCreatedZoneItemName;
 
-	bool FlagHybridModel( false ); // True if hybrid model is activated
-	int NumOfHybridModelZones( 0 ); // Number of hybrid model zones in the model
-	std::string CurrentModuleObject; // to assist in getting input
+    bool FlagHybridModel(false);     // True if hybrid model is activated
+    int NumOfHybridModelZones(0);    // Number of hybrid model zones in the model
+    std::string CurrentModuleObject; // to assist in getting input
 
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-	// Object Data
-	Array1D< HybridModelProperties > HybridModelZone;
+    // Object Data
+    Array1D<HybridModelProperties> HybridModelZone;
 
-	// Functions
+    // Functions
 
-	void
-	GetHybridModelZone()
-	{
+    void GetHybridModelZone()
+    {
 
-		using ScheduleManager::GetScheduleIndex;
+        using ScheduleManager::GetScheduleIndex;
 
-		bool ErrorsFound( false ); // If errors detected in input
-		Array1D_bool lAlphaFieldBlanks( 10, false );
-		Array1D_bool lNumericFieldBlanks( 10, false );
-		int NumAlphas; // Number of Alphas for each GetobjectItem call
-		int NumNumbers; // Number of Numbers for each GetobjectItem call
-		int IOStatus;
-		int ZonePtr; // Pointer to the zone
-		int ZoneListPtr; // Pointer to the zone list
-		std::string CurrentModuleObject; // to assist in getting input
-		Array1D_string cAlphaArgs( 10 ); // Alpha input items for object
-		Array1D_string cAlphaFieldNames( 10 );
-		Array1D_string cNumericFieldNames( 10 );
-		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
-		int HybridModelStartMonth( 0 ); // Hybrid model start month
-		int HybridModelStartDate( 0 ); // Hybrid model start date of month
-		int HybridModelEndMonth( 0 ); // Hybrid model end month
-		int HybridModelEndDate( 0 ); // Hybrid model end date of month
-		int HMStartDay( 0 );
-		int HMEndDay( 0 );
+        bool ErrorsFound(false); // If errors detected in input
+        Array1D_bool lAlphaFieldBlanks(10, false);
+        Array1D_bool lNumericFieldBlanks(10, false);
+        int NumAlphas;  // Number of Alphas for each GetobjectItem call
+        int NumNumbers; // Number of Numbers for each GetobjectItem call
+        int IOStatus;
+        int ZonePtr;                     // Pointer to the zone
+        int ZoneListPtr;                 // Pointer to the zone list
+        std::string CurrentModuleObject; // to assist in getting input
+        Array1D_string cAlphaArgs(10);   // Alpha input items for object
+        Array1D_string cAlphaFieldNames(10);
+        Array1D_string cNumericFieldNames(10);
+        Array1D<Real64> rNumericArgs(10); // Numeric input items for object
+        int HybridModelStartMonth(0);     // Hybrid model start month
+        int HybridModelStartDate(0);      // Hybrid model start date of month
+        int HybridModelEndMonth(0);       // Hybrid model end month
+        int HybridModelEndDate(0);        // Hybrid model end date of month
+        int HMStartDay(0);
+        int HMEndDay(0);
 
-		// Read hybrid model input
-		CurrentModuleObject = "HybridModel:Zone";
-		NumOfHybridModelZones = inputProcessor->getNumObjectsFound( CurrentModuleObject );
-		HybridModelZone.allocate( NumOfZones );
+        // Read hybrid model input
+        CurrentModuleObject = "HybridModel:Zone";
+        NumOfHybridModelZones = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        HybridModelZone.allocate(NumOfZones);
 
-		if ( NumOfHybridModelZones > 0 ) {
+        if (NumOfHybridModelZones > 0) {
 
-			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
+            for (int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum) {
 
-				inputProcessor->getObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
+                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 
-				ZoneListPtr = 0;
-				ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
-				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ZoneList );
-				if ( ZonePtr > 0 ) {
-					HybridModelZone( ZonePtr ).Name = cAlphaArgs( 1 );
-					HybridModelZone( ZonePtr ).InternalThermalMassCalc = UtilityRoutines::SameString( cAlphaArgs( 3 ), "Yes" );
-					HybridModelZone( ZonePtr ).InfiltrationCalc = UtilityRoutines::SameString( cAlphaArgs( 4 ), "Yes" );
+                ZoneListPtr = 0;
+                ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                if (ZonePtr == 0 && NumOfZoneLists > 0) ZoneListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+                if (ZonePtr > 0) {
+                    HybridModelZone(ZonePtr).Name = cAlphaArgs(1);
+                    HybridModelZone(ZonePtr).InternalThermalMassCalc = UtilityRoutines::SameString(cAlphaArgs(3), "Yes");
+                    HybridModelZone(ZonePtr).InfiltrationCalc = UtilityRoutines::SameString(cAlphaArgs(4), "Yes");
 
-					// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
-					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc && HybridModelZone( ZonePtr ).InfiltrationCalc ){
-						HybridModelZone( ZonePtr ).InfiltrationCalc = false;
-						ShowWarningError( CurrentModuleObject + "=\"" + HybridModelZone( ZonePtr ).Name + "\" invalid " + cAlphaFieldNames( 3 ) + " and " + cAlphaFieldNames( 4 ) + "." );
-						ShowContinueError( "Field " + cAlphaFieldNames( 3 ) + " and " + cAlphaFieldNames( 4 ) + "\" cannot be both set to YES." );
-						ShowContinueError( "Field " + cAlphaFieldNames( 4 ) + "\" is changed to NO for the hybrid modeling simulations." );
-					}
+                    // Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
+                    if (HybridModelZone(ZonePtr).InternalThermalMassCalc && HybridModelZone(ZonePtr).InfiltrationCalc) {
+                        HybridModelZone(ZonePtr).InfiltrationCalc = false;
+                        ShowWarningError(CurrentModuleObject + "=\"" + HybridModelZone(ZonePtr).Name + "\" invalid " + cAlphaFieldNames(3) + " and " +
+                                         cAlphaFieldNames(4) + ".");
+                        ShowContinueError("Field " + cAlphaFieldNames(3) + " and " + cAlphaFieldNames(4) + "\" cannot be both set to YES.");
+                        ShowContinueError("Field " + cAlphaFieldNames(4) + "\" is changed to NO for the hybrid modeling simulations.");
+                    }
 
-					// Flags showing Hybrid Modeling settings
-					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc || HybridModelZone( ZonePtr ).InfiltrationCalc ){
-						FlagHybridModel = true;
-					}
+                    // Flags showing Hybrid Modeling settings
+                    if (HybridModelZone(ZonePtr).InternalThermalMassCalc || HybridModelZone(ZonePtr).InfiltrationCalc) {
+                        FlagHybridModel = true;
+                    }
 
-					if ( FlagHybridModel ){
-						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex( cAlphaArgs( 5 ) );
-						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartMonth = rNumericArgs( 1 );
-						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate = rNumericArgs( 2 );
-						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth = rNumericArgs( 3 );
-						HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndDate = rNumericArgs( 4 );
+                    if (FlagHybridModel) {
+                        HybridModelZone(ZonePtr).ZoneMeasuredTemperatureSchedulePtr = GetScheduleIndex(cAlphaArgs(5));
+                        HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartMonth = rNumericArgs(1);
+                        HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartDate = rNumericArgs(2);
+                        HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndMonth = rNumericArgs(3);
+                        HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndDate = rNumericArgs(4);
 
-						// prepare start and end date for Hybrid Modeling
-						{
-							int HMDayArr[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+                        // prepare start and end date for Hybrid Modeling
+                        {
+                            int HMDayArr[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-							HybridModelStartMonth = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartMonth;
-							HybridModelStartDate = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureStartDate;
-							HybridModelEndMonth = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndMonth;
-							HybridModelEndDate = HybridModelZone( ZonePtr ).ZoneMeasuredTemperatureEndDate;
+                            HybridModelStartMonth = HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartMonth;
+                            HybridModelStartDate = HybridModelZone(ZonePtr).ZoneMeasuredTemperatureStartDate;
+                            HybridModelEndMonth = HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndMonth;
+                            HybridModelEndDate = HybridModelZone(ZonePtr).ZoneMeasuredTemperatureEndDate;
 
-							if ( HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12 ){
-								HMStartDay = HMDayArr[ HybridModelStartMonth - 1 ];
-							}
-							else {
-								HMStartDay = 0;
-							}
+                            if (HybridModelStartMonth >= 1 && HybridModelStartMonth <= 12) {
+                                HMStartDay = HMDayArr[HybridModelStartMonth - 1];
+                            } else {
+                                HMStartDay = 0;
+                            }
 
-							if ( HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12 ){
-								HMEndDay = HMDayArr[ HybridModelEndMonth - 1 ];
-							}
-							else {
-								HMEndDay = 0;
-							}
+                            if (HybridModelEndMonth >= 1 && HybridModelEndMonth <= 12) {
+                                HMEndDay = HMDayArr[HybridModelEndMonth - 1];
+                            } else {
+                                HMEndDay = 0;
+                            }
 
-							HybridModelZone( ZonePtr ).HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
-							HybridModelZone( ZonePtr ).HybridEndDayOfYear = HMEndDay + HybridModelEndDate;
-						}
-					}
-				} else {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
-					ErrorsFound = true;
-				}
-			}
+                            HybridModelZone(ZonePtr).HybridStartDayOfYear = HMStartDay + HybridModelStartDate;
+                            HybridModelZone(ZonePtr).HybridEndDayOfYear = HMEndDay + HybridModelEndDate;
+                        }
+                    }
+                } else {
+                    ShowSevereError(CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
+                                    "\" not found.");
+                    ErrorsFound = true;
+                }
+            }
 
-			//ZoneAirMassFlowConservation should not be activated during the Hybrid Modeling infiltration calculations
-			if ( HybridModelZone( ZonePtr ).InfiltrationCalc && ZoneAirMassFlow.EnforceZoneMassBalance ){
-				ZoneAirMassFlow.EnforceZoneMassBalance = false;
-				ShowWarningError( "ZoneAirMassFlowConservation is deactivated when Hybrid Modeling is performed." );
-			}
+            // ZoneAirMassFlowConservation should not be activated during the Hybrid Modeling infiltration calculations
+            if (HybridModelZone(ZonePtr).InfiltrationCalc && ZoneAirMassFlow.EnforceZoneMassBalance) {
+                ZoneAirMassFlow.EnforceZoneMassBalance = false;
+                ShowWarningError("ZoneAirMassFlowConservation is deactivated when Hybrid Modeling is performed.");
+            }
 
-			//RoomAirModelType should be Mixing if Hybrid Modeling is performed for the zone
-			if( FlagHybridModel ){
-				for ( ZonePtr = 1; ZonePtr <= NumOfZones; ZonePtr++ ) {
-					if( ( HybridModelZone( ZonePtr ).InternalThermalMassCalc || HybridModelZone( ZonePtr ).InfiltrationCalc ) && ( AirModel( ZonePtr ).AirModelType != RoomAirModel_Mixing ) ){
-						AirModel( ZonePtr ).AirModelType = RoomAirModel_Mixing;
-						ShowWarningError( "Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone." );
-					}
-				}
-			}
+            // RoomAirModelType should be Mixing if Hybrid Modeling is performed for the zone
+            if (FlagHybridModel) {
+                for (ZonePtr = 1; ZonePtr <= NumOfZones; ZonePtr++) {
+                    if ((HybridModelZone(ZonePtr).InternalThermalMassCalc || HybridModelZone(ZonePtr).InfiltrationCalc) &&
+                        (AirModel(ZonePtr).AirModelType != RoomAirModel_Mixing)) {
+                        AirModel(ZonePtr).AirModelType = RoomAirModel_Mixing;
+                        ShowWarningError("Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone.");
+                    }
+                }
+            }
 
-			if ( ErrorsFound ) {
-				ShowFatalError( "Errors getting Hybrid Model input data. Preceding condition(s) cause termination." );
-			}
-		}
-	}
+            if (ErrorsFound) {
+                ShowFatalError("Errors getting Hybrid Model input data. Preceding condition(s) cause termination.");
+            }
+        }
+    }
 
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
-	{
+    // Needed for unit tests, should not be normally called.
+    void clear_state()
+    {
 
-		FlagHybridModel = false;
-		NumOfHybridModelZones = 0;
+        FlagHybridModel = false;
+        NumOfHybridModelZones = 0;
+    }
 
-	}
+} // namespace HybridModel
 
-}
-
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -49,132 +49,98 @@
 #define PlantTopologyLoopSide_hh_INCLUDED
 
 #include <DataLoopNode.hh>
-#include <Plant/LoopSidePumpInformation.hh>
-#include <Plant/PlantConvergencePoint.hh>
 #include <Plant/Branch.hh>
 #include <Plant/ConnectedLoopData.hh>
+#include <Plant/LoopSidePumpInformation.hh>
 #include <Plant/MixerData.hh>
+#include <Plant/PlantConvergencePoint.hh>
 #include <Plant/SplitterData.hh>
 
 namespace EnergyPlus {
-	namespace DataPlant {
+namespace DataPlant {
 
-		struct HalfLoopData {
-			// Members
-			bool SimLoopSideNeeded; // Determine whether or not to re-simulate this plant LoopSide
-			bool SimZoneEquipNeeded; // Plant requests resimulate zone HVAC equipment
-			bool SimAirLoopsNeeded; // Plant requests resimulate air loop HVAC equipment
-			bool SimNonZoneEquipNeeded; // Plant requests resimulate non zone Equip
-			bool SimElectLoadCentrNeeded; // Plant requests resimulate generators
-			bool OncePerTimeStepOperations;
-			Real64 TimeElapsed; // store time for dynamic updates for last time
-			Real64 FlowRequest; // Flow request in the half loop
-			Real64 FlowRequestTemperature; // Average Flow request outlet Temp in the half loop
-			// It's necessary to hold the values here since AIR and GROUND SPs aren't associated with either a node or a SP manager
-			Real64 TempSetPoint; // Loop temperature setpoint
-			Real64 TempSetPointHi; // High Loop temperature setpoint
-			Real64 TempSetPointLo; // Low Loop temperature setpoint
-			Real64 TempInterfaceTankOutlet; // Used by interface manager in common pipe simulation
-			// This is the temperature at the loop outlet linterface
-			// with half-loop capacitance and pump heat accounted for.
-			Real64 LastTempInterfaceTankOutlet;
-			std::string BranchList; // Branch list name for the half loop
-			std::string ConnectList; // Connector list name for the half loop
-			int TotalBranches; // Total number of branches on the half loop
-			int NodeNumIn; // Node number for the inlet to this loop
-			std::string NodeNameIn; // Node name for the inlet to this loop
-			int NodeNumOut; // Node number for the outlet to this loop
-			std::string NodeNameOut; // Node name for the outlet to this loop
-			int NumSplitters; // Number of splitters in the half loop
-			int NumMixers; // Number of mixers in the half loop
-			bool SplitterExists; // Logical Flag indication splitter exists in the half loop
-			bool MixerExists; // Logical Flag indication mixer exists in the half loop
-			int TotalPumps; // total number of pumps on the half loop
-			bool BranchPumpsExist; // logical flag indication branch pumps exist on half loop
-			Array1D <LoopSidePumpInformation> Pumps;
-			Real64 TotalPumpHeat; // [W] total heat addition by the pumps to place in "tank"
-			bool BypassExists;
-			bool InletNodeSetPt;
-			bool OutletNodeSetPt;
-			bool EMSCtrl;
-			Real64 EMSValue;
-			bool FlowRestrictionFlag; // Max available flow at the outlet of the half loop
-			// is less than max available flow at inlet
-			int FlowLock; // DSU
-			int TotalConnected; // total number of other loops connected to this loop side
-			Array1D <ConnectedLoopData> Connected; // DSU Other loops connected to this Loop side
-			Array1D <BranchData> Branch; // Branch data
-			Array1D <SplitterData> Splitter; // Data for splitter on branch (if any)
-			Array1D <MixerData> Mixer; // Data for splitter on branch (if any)
-			bool HasPressureComponents;
-			bool HasParallelPressComps;
-			Real64 PressureDrop;
-			Real64 PressureEffectiveK;
-			int errCount_LoadWasntDist;
-			int errIndex_LoadWasntDist;
-			int errCount_LoadRemains;
-			int errIndex_LoadRemains;
-			Real64 LoopSideInlet_TankTemp;
-			Real64 LoopSideInlet_MdotCpDeltaT;
-			Real64 LoopSideInlet_McpDTdt;
-			Real64 LoopSideInlet_CapExcessStorageTime;
-			Real64 LoopSideInlet_CapExcessStorageTimeReport;
-			Real64 LoopSideInlet_TotalTime;
-			PlantConvergencePoint InletNode;
-			PlantConvergencePoint OutletNode;
+    struct HalfLoopData
+    {
+        // Members
+        bool SimLoopSideNeeded;       // Determine whether or not to re-simulate this plant LoopSide
+        bool SimZoneEquipNeeded;      // Plant requests resimulate zone HVAC equipment
+        bool SimAirLoopsNeeded;       // Plant requests resimulate air loop HVAC equipment
+        bool SimNonZoneEquipNeeded;   // Plant requests resimulate non zone Equip
+        bool SimElectLoadCentrNeeded; // Plant requests resimulate generators
+        bool OncePerTimeStepOperations;
+        Real64 TimeElapsed;            // store time for dynamic updates for last time
+        Real64 FlowRequest;            // Flow request in the half loop
+        Real64 FlowRequestTemperature; // Average Flow request outlet Temp in the half loop
+        // It's necessary to hold the values here since AIR and GROUND SPs aren't associated with either a node or a SP manager
+        Real64 TempSetPoint;            // Loop temperature setpoint
+        Real64 TempSetPointHi;          // High Loop temperature setpoint
+        Real64 TempSetPointLo;          // Low Loop temperature setpoint
+        Real64 TempInterfaceTankOutlet; // Used by interface manager in common pipe simulation
+        // This is the temperature at the loop outlet linterface
+        // with half-loop capacitance and pump heat accounted for.
+        Real64 LastTempInterfaceTankOutlet;
+        std::string BranchList;  // Branch list name for the half loop
+        std::string ConnectList; // Connector list name for the half loop
+        int TotalBranches;       // Total number of branches on the half loop
+        int NodeNumIn;           // Node number for the inlet to this loop
+        std::string NodeNameIn;  // Node name for the inlet to this loop
+        int NodeNumOut;          // Node number for the outlet to this loop
+        std::string NodeNameOut; // Node name for the outlet to this loop
+        int NumSplitters;        // Number of splitters in the half loop
+        int NumMixers;           // Number of mixers in the half loop
+        bool SplitterExists;     // Logical Flag indication splitter exists in the half loop
+        bool MixerExists;        // Logical Flag indication mixer exists in the half loop
+        int TotalPumps;          // total number of pumps on the half loop
+        bool BranchPumpsExist;   // logical flag indication branch pumps exist on half loop
+        Array1D<LoopSidePumpInformation> Pumps;
+        Real64 TotalPumpHeat; // [W] total heat addition by the pumps to place in "tank"
+        bool BypassExists;
+        bool InletNodeSetPt;
+        bool OutletNodeSetPt;
+        bool EMSCtrl;
+        Real64 EMSValue;
+        bool FlowRestrictionFlag; // Max available flow at the outlet of the half loop
+        // is less than max available flow at inlet
+        int FlowLock;                         // DSU
+        int TotalConnected;                   // total number of other loops connected to this loop side
+        Array1D<ConnectedLoopData> Connected; // DSU Other loops connected to this Loop side
+        Array1D<BranchData> Branch;           // Branch data
+        Array1D<SplitterData> Splitter;       // Data for splitter on branch (if any)
+        Array1D<MixerData> Mixer;             // Data for splitter on branch (if any)
+        bool HasPressureComponents;
+        bool HasParallelPressComps;
+        Real64 PressureDrop;
+        Real64 PressureEffectiveK;
+        int errCount_LoadWasntDist;
+        int errIndex_LoadWasntDist;
+        int errCount_LoadRemains;
+        int errIndex_LoadRemains;
+        Real64 LoopSideInlet_TankTemp;
+        Real64 LoopSideInlet_MdotCpDeltaT;
+        Real64 LoopSideInlet_McpDTdt;
+        Real64 LoopSideInlet_CapExcessStorageTime;
+        Real64 LoopSideInlet_CapExcessStorageTimeReport;
+        Real64 LoopSideInlet_TotalTime;
+        PlantConvergencePoint InletNode;
+        PlantConvergencePoint OutletNode;
 
-			// Default Constructor
-			HalfLoopData() :
-					SimLoopSideNeeded(true),
-					SimZoneEquipNeeded(true),
-					SimAirLoopsNeeded(true),
-					SimNonZoneEquipNeeded(true),
-					SimElectLoadCentrNeeded(true),
-					OncePerTimeStepOperations(true),
-					TimeElapsed(0.0),
-					FlowRequest(0.0),
-					FlowRequestTemperature(0.0),
-					TempSetPoint(DataLoopNode::SensedNodeFlagValue),
-					TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
-					TempSetPointLo(DataLoopNode::SensedNodeFlagValue),
-					TempInterfaceTankOutlet(0.0),
-					LastTempInterfaceTankOutlet(0.0),
-					TotalBranches(0),
-					NodeNumIn(0),
-					NodeNumOut(0),
-					NumSplitters(0),
-					NumMixers(0),
-					SplitterExists(false),
-					MixerExists(false),
-					TotalPumps(0),
-					BranchPumpsExist(false),
-					TotalPumpHeat(0.0),
-					BypassExists(false),
-					InletNodeSetPt(false),
-					OutletNodeSetPt(false),
-					EMSCtrl(false),
-					FlowRestrictionFlag(false),
-					FlowLock(0),
-					TotalConnected(0),
-					HasPressureComponents(false),
-					HasParallelPressComps(false),
-					PressureDrop(0.0),
-					PressureEffectiveK(0.0),
-					errCount_LoadWasntDist(0),
-					errIndex_LoadWasntDist(0),
-					errCount_LoadRemains(0),
-					errIndex_LoadRemains(0),
-					LoopSideInlet_TankTemp(0.0),
-					LoopSideInlet_MdotCpDeltaT(0.0),
-					LoopSideInlet_McpDTdt(0.0),
-					LoopSideInlet_CapExcessStorageTime(0.0),
-					LoopSideInlet_CapExcessStorageTimeReport(0.0),
-					LoopSideInlet_TotalTime(0.0),
-					InletNode(0.0, 0.0),
-					OutletNode(0.0, 0.0) {}
-
-		};
-	}
-}
+        // Default Constructor
+        HalfLoopData()
+            : SimLoopSideNeeded(true), SimZoneEquipNeeded(true), SimAirLoopsNeeded(true), SimNonZoneEquipNeeded(true), SimElectLoadCentrNeeded(true),
+              OncePerTimeStepOperations(true), TimeElapsed(0.0), FlowRequest(0.0), FlowRequestTemperature(0.0),
+              TempSetPoint(DataLoopNode::SensedNodeFlagValue), TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
+              TempSetPointLo(DataLoopNode::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
+              NodeNumIn(0), NodeNumOut(0), NumSplitters(0), NumMixers(0), SplitterExists(false), MixerExists(false), TotalPumps(0),
+              BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false), OutletNodeSetPt(false), EMSCtrl(false),
+              FlowRestrictionFlag(false), FlowLock(0), TotalConnected(0), HasPressureComponents(false), HasParallelPressComps(false),
+              PressureDrop(0.0), PressureEffectiveK(0.0), errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0),
+              errIndex_LoadRemains(0), LoopSideInlet_TankTemp(0.0), LoopSideInlet_MdotCpDeltaT(0.0), LoopSideInlet_McpDTdt(0.0),
+              LoopSideInlet_CapExcessStorageTime(0.0), LoopSideInlet_CapExcessStorageTimeReport(0.0), LoopSideInlet_TotalTime(0.0),
+              InletNode(0.0, 0.0), OutletNode(0.0, 0.0)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

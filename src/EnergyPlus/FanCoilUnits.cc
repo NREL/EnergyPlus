@@ -53,13 +53,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <FanCoilUnits.hh>
 #include <BranchNodeConnections.hh>
 #include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
-#include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
@@ -67,13 +66,14 @@
 #include <DataSizing.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <FanCoilUnits.hh>
 #include <Fans.hh>
-#include <HVACFan.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <HeatingCoils.hh>
+#include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
+#include <HeatingCoils.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <MixedAir.hh>
 #include <NodeInputManager.hh>
@@ -123,30 +123,30 @@ namespace FanCoilUnits {
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using namespace DataSizing;
-	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::BeginDayFlag;
-	using DataGlobals::SecInHour;
-	using DataGlobals::SysSizingCalc;
-	using DataGlobals::DisplayExtraWarnings;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::OutRelHum;
 	using DataEnvironment::StdBaroPress;
 	using DataEnvironment::StdRhoAir;
-	using DataHVACGlobals::SmallMassFlow;
-	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::SmallAirVolFlow;
-	using DataHVACGlobals::SingleCoolingSetPoint;
-	using DataHVACGlobals::SingleHeatingSetPoint;
-	using DataHVACGlobals::SingleHeatCoolSetPoint;
-	using DataHVACGlobals::DualSetPointWithDeadBand;
-	using DataHVACGlobals::cFanTypes;
-	using DataHVACGlobals::ContFanCycCoil;
+    using DataGlobals::BeginDayFlag;
+    using DataGlobals::BeginEnvrnFlag;
+    using DataGlobals::DisplayExtraWarnings;
+    using DataGlobals::SecInHour;
+    using DataGlobals::SysSizingCalc;
+    using DataHVACGlobals::ATMixerExists;
 	using DataHVACGlobals::ATMixer_InletSide;
 	using DataHVACGlobals::ATMixer_SupplySide;
-	using DataHVACGlobals::cATMixerTypes;
-	using DataHVACGlobals::ATMixerExists;
-	using DataHVACGlobals::CycFanCycCoil;
 	using DataHVACGlobals::ContFanCycCoil;
+    using DataHVACGlobals::ContFanCycCoil;
+    using DataHVACGlobals::CycFanCycCoil;
+    using DataHVACGlobals::DualSetPointWithDeadBand;
+    using DataHVACGlobals::SingleCoolingSetPoint;
+    using DataHVACGlobals::SingleHeatCoolSetPoint;
+    using DataHVACGlobals::SingleHeatingSetPoint;
+    using DataHVACGlobals::SmallAirVolFlow;
+    using DataHVACGlobals::SmallLoad;
+    using DataHVACGlobals::SmallMassFlow;
+    using DataHVACGlobals::cATMixerTypes;
+    using DataHVACGlobals::cFanTypes;
 	using namespace ScheduleManager;
 
 	// Data
@@ -182,7 +182,7 @@ namespace FanCoilUnits {
 	namespace {
 		bool InitFanCoilUnitsOneTimeFlag( true );
 		bool InitFanCoilUnitsCheckInZoneEquipmentListFlag( false ); // True after the Zone Equipment List has been checked for items
-	}
+    }                                                             // namespace
 
 	int NumFanCoils( 0 );
 	int Num4PipeFanCoils( 0 );
@@ -204,8 +204,7 @@ namespace FanCoilUnits {
 
 	// Functions
 
-	void
-	clear_state()
+    void clear_state()
 	{
 		NumFanCoils = 0;
 		Num4PipeFanCoils = 0;
@@ -221,16 +220,13 @@ namespace FanCoilUnits {
 		InitFanCoilUnitsCheckInZoneEquipmentListFlag = false;
 	}
 
-	void
-	SimFanCoilUnit(
-		std::string const & CompName, // name of the fan coil unit
+    void SimFanCoilUnit(std::string const &CompName,   // name of the fan coil unit
 		int const ZoneNum, // number of zone being served
 		int const ControlledZoneNum, // index into ZoneEquipConfig array; may not be equal to ZoneNum
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet, // Sensible power supplied (W)
 		Real64 & LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
-		int & CompIndex
-	)
+                        int &CompIndex)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -266,11 +262,13 @@ namespace FanCoilUnits {
 		} else {
 			FanCoilNum = CompIndex;
 			if ( FanCoilNum > NumFanCoils || FanCoilNum < 1 ) {
-				ShowFatalError( "SimFanCoil:  Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Number of Units=" + TrimSigDigits( NumFanCoils ) + ", Entered Unit name=" + CompName );
+                ShowFatalError("SimFanCoil:  Invalid CompIndex passed=" + TrimSigDigits(FanCoilNum) +
+                               ", Number of Units=" + TrimSigDigits(NumFanCoils) + ", Entered Unit name=" + CompName);
 			}
 			if ( CheckEquipName( FanCoilNum ) ) {
 				if ( CompName != FanCoil( FanCoilNum ).Name ) {
-					ShowFatalError( "SimFanCoil: Invalid CompIndex passed=" + TrimSigDigits( FanCoilNum ) + ", Unit name=" + CompName + ", stored Unit Name for that index=" + FanCoil( FanCoilNum ).Name );
+                    ShowFatalError("SimFanCoil: Invalid CompIndex passed=" + TrimSigDigits(FanCoilNum) + ", Unit name=" + CompName +
+                                   ", stored Unit Name for that index=" + FanCoil(FanCoilNum).Name);
 				}
 				CheckEquipName( FanCoilNum ) = false;
 			}
@@ -282,23 +280,22 @@ namespace FanCoilUnits {
 		InitFanCoilUnits( FanCoilNum, ZoneNum );
 
 		// Select the correct unit type
-		{ auto const SELECT_CASE_var( FanCoil( FanCoilNum ).UnitType_Num );
+        {
+            auto const SELECT_CASE_var(FanCoil(FanCoilNum).UnitType_Num);
 
 		if ( SELECT_CASE_var == FanCoilUnit_4Pipe ) {
 
 			Sim4PipeFanCoil( FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided );
-
-		}}
+            }
+        }
 
 		// Report the result of the simulation
 		ReportFanCoilUnit( FanCoilNum );
 
 		ZoneEqFanCoil = false;
-
 	}
 
-	void
-	GetFanCoilUnits()
+    void GetFanCoilUnits()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -317,30 +314,30 @@ namespace FanCoilUnits {
 		// Uses "Get" routines to read in data.
 
 		// Using/Aliasing
-		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::TestCompSet;
 		using BranchNodeConnections::SetUpCompSets;
+        using BranchNodeConnections::TestCompSet;
 		using Fans::GetFanDesignVolumeFlowRate;
 		using Fans::GetFanType;
 		using General::TrimSigDigits;
+        using NodeInputManager::GetOnlySingleNode;
 		using namespace DataIPShortCuts;
 		using WaterCoils::GetCoilWaterInletNode;
 		auto & GetHXCoilWaterInletNode( HVACHXAssistedCoolingCoil::GetCoilWaterInletNode );
 		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
-		using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
+        using DataGlobals::NumOfZones;
+        using DataGlobals::ScheduleAlwaysOn;
 		using DataHVACGlobals::FanType_SimpleConstVolume;
-		using DataHVACGlobals::FanType_SimpleVAV;
 		using DataHVACGlobals::FanType_SimpleOnOff;
-		using DataPlant::TypeOf_CoilWaterSimpleHeating;
-		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+        using DataHVACGlobals::FanType_SimpleVAV;
 		using DataPlant::TypeOf_CoilWaterCooling;
+        using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+        using DataSizing::ZoneHVACSizing;
+        using DataZoneEquipment::ZoneEquipConfig;
+        using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
 		using MixedAir::GetOAMixerIndex;
 		using MixedAir::GetOAMixerNodeNumbers;
-		using DataZoneEquipment::ZoneEquipConfig;
-		using DataGlobals::NumOfZones;
-		using DataGlobals::ScheduleAlwaysOn;
 		using SingleDuct::GetATMixer;
-		using DataSizing::ZoneHVACSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -398,7 +395,8 @@ namespace FanCoilUnits {
 		// loop over 4 pipe fan coil units; get and load the input data
 		for ( FanCoilIndex = 1; FanCoilIndex <= Num4PipeFanCoils; ++FanCoilIndex ) {
 
-			inputProcessor->getObjectItem( CurrentModuleObject, FanCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+            inputProcessor->getObjectItem(CurrentModuleObject, FanCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
+                                          lAlphaBlanks, cAlphaFields, cNumericFields);
 
 			FanCoilNum = FanCoilIndex;
 
@@ -422,7 +420,10 @@ namespace FanCoilUnits {
 				}
 			}
 
-			if ( UtilityRoutines::SameString( Alphas( 3 ), "ConstantFanVariableFlow" ) || UtilityRoutines::SameString( Alphas( 3 ), "CyclingFan" ) || UtilityRoutines::SameString( Alphas( 3 ), "VariableFanVariableFlow" ) || UtilityRoutines::SameString( Alphas( 3 ), "VariableFanConstantFlow" ) || UtilityRoutines::SameString( Alphas( 3 ), "MultiSpeedFan" ) || UtilityRoutines::SameString( Alphas( 3 ), "ASHRAE90VariableFan" ) ) {
+            if (UtilityRoutines::SameString(Alphas(3), "ConstantFanVariableFlow") || UtilityRoutines::SameString(Alphas(3), "CyclingFan") ||
+                UtilityRoutines::SameString(Alphas(3), "VariableFanVariableFlow") ||
+                UtilityRoutines::SameString(Alphas(3), "VariableFanConstantFlow") || UtilityRoutines::SameString(Alphas(3), "MultiSpeedFan") ||
+                UtilityRoutines::SameString(Alphas(3), "ASHRAE90VariableFan")) {
 				FanCoil( FanCoilNum ).CapCtrlMeth = Alphas( 3 );
 				if ( UtilityRoutines::SameString( Alphas( 3 ), "ConstantFanVariableFlow" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_ConsFanVarFlow;
 				if ( UtilityRoutines::SameString( Alphas( 3 ), "CyclingFan" ) ) FanCoil( FanCoilNum ).CapCtrlMeth_Num = CCM_CycFan;
@@ -455,7 +456,8 @@ namespace FanCoilUnits {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"," );
 				ShowContinueError( "... " + cNumericFields( 2 ) + " is greater than the medium speed supply air flow ratio." );
 				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio = " + TrimSigDigits( FanCoil( FanCoilNum ).LowSpeedRatio, 5 ) + ' ' );
-				ShowContinueError( "... Fan Coit Unit medium speed supply air flow ratio = " + TrimSigDigits( FanCoil( FanCoilNum ).MedSpeedRatio, 5 ) + ' ' );
+                ShowContinueError("... Fan Coit Unit medium speed supply air flow ratio = " + TrimSigDigits(FanCoil(FanCoilNum).MedSpeedRatio, 5) +
+                                  ' ');
 				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio and medium speed supply air flow ratio set to default values" );
 				FanCoil( FanCoilNum ).LowSpeedRatio = 1.0 / 3.0;
 				FanCoil( FanCoilNum ).MedSpeedRatio = 2.0 / 3.0;
@@ -463,9 +465,11 @@ namespace FanCoilUnits {
 
 			FanCoil( FanCoilNum ).OutAirVolFlow = Numbers( 4 );
 
-			FanCoil( FanCoilNum ).AirInNode = GetOnlySingleNode( Alphas( 5 ), ErrorsFound, FanCoil( FanCoilNum ).UnitType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent ); // air input node
+            FanCoil(FanCoilNum).AirInNode = GetOnlySingleNode(Alphas(5), ErrorsFound, FanCoil(FanCoilNum).UnitType, Alphas(1), NodeType_Air,
+                                                              NodeConnectionType_Inlet, 1, ObjectIsParent); // air input node
 
-			FanCoil( FanCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 6 ), ErrorsFound, FanCoil( FanCoilNum ).UnitType, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent ); // air outlet node
+            FanCoil(FanCoilNum).AirOutNode = GetOnlySingleNode(Alphas(6), ErrorsFound, FanCoil(FanCoilNum).UnitType, Alphas(1), NodeType_Air,
+                                                               NodeConnectionType_Outlet, 1, ObjectIsParent); // air outlet node
 
 			FanCoil( FanCoilNum ).OAMixType = Alphas( 7 );
 			FanCoil( FanCoilNum ).OAMixName = Alphas( 8 );
@@ -501,7 +505,9 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).MinHotWaterVolFlow = Numbers( 9 );
 			FanCoil( FanCoilNum ).HotControlOffset = Numbers( 10 );
 
-			if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:Water" ) || UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:Water:DetailedGeometry" ) || UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
+            if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water") ||
+                UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry") ||
+                UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
 				FanCoil( FanCoilNum ).CCoilType = Alphas( 11 );
 				if ( UtilityRoutines::SameString( Alphas( 11 ), "Coil:Cooling:Water" ) ) {
 					FanCoil( FanCoilNum ).CCoilType_Num = CCoil_Water;
@@ -515,7 +521,8 @@ namespace FanCoilUnits {
 				}
 				if ( UtilityRoutines::SameString( Alphas( 11 ), "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 					FanCoil( FanCoilNum ).CCoilType_Num = CCoil_HXAssist;
-					GetHXCoilTypeAndName( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound, FanCoil( FanCoilNum ).CCoilPlantType, FanCoil( FanCoilNum ).CCoilPlantName );
+                    GetHXCoilTypeAndName(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound,
+                                         FanCoil(FanCoilNum).CCoilPlantType, FanCoil(FanCoilNum).CCoilPlantName);
 					if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 						FanCoil( FanCoilNum ).CCoilPlantTypeOfNum = TypeOf_CoilWaterCooling;
 					} else if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
@@ -536,9 +543,11 @@ namespace FanCoilUnits {
 				} else {
 					if ( FanCoil( FanCoilNum ).CCoilType_Num != CCoil_HXAssist ) {
 						// mine the cold water node from the coil object
-						FanCoil( FanCoilNum ).ColdControlNode = GetCoilWaterInletNode( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, IsNotOK );
+                        FanCoil(FanCoilNum).ColdControlNode =
+                            GetCoilWaterInletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
 					} else {
-						FanCoil( FanCoilNum ).ColdControlNode = GetHXCoilWaterInletNode( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, IsNotOK );
+                        FanCoil(FanCoilNum).ColdControlNode =
+                            GetHXCoilWaterInletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
 					}
 					// Other error checks should trap before it gets to this point in the code, but including just in case.
 					if ( IsNotOK ) {
@@ -576,7 +585,8 @@ namespace FanCoilUnits {
 					ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"." );
 					ErrorsFound = true;
 				} else {
-					FanCoil( FanCoilNum ).DesignHeatingCapacity = GetHeatingCoilCapacity( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, errFlag );
+                    FanCoil(FanCoilNum).DesignHeatingCapacity =
+                        GetHeatingCoilCapacity(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, errFlag);
 					if ( errFlag ) {
 						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + FanCoil( FanCoilNum ).Name );
 						ErrorsFound = true;
@@ -613,12 +623,16 @@ namespace FanCoilUnits {
 			} else {
 				if ( ! UtilityRoutines::SameString( FanCoil( FanCoilNum ).FanType, "Fan:SystemModel" ) ) {
 					GetFanType( FanCoil( FanCoilNum ).FanName, FanCoil( FanCoilNum ).FanType_Num, errFlag, CurrentModuleObject, FanCoil( FanCoilNum ).Name );
-					{ auto const SELECT_CASE_var( FanCoil( FanCoilNum ).FanType_Num );
-					if ( ( SELECT_CASE_var == FanType_SimpleConstVolume ) || ( SELECT_CASE_var == FanType_SimpleVAV ) || ( SELECT_CASE_var == FanType_SimpleOnOff ) ) {
+                    {
+                        auto const SELECT_CASE_var(FanCoil(FanCoilNum).FanType_Num);
+                        if ((SELECT_CASE_var == FanType_SimpleConstVolume) || (SELECT_CASE_var == FanType_SimpleVAV) ||
+                            (SELECT_CASE_var == FanType_SimpleOnOff)) {
 						// Get fan air volume flow rate
-						FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( FanCoil( FanCoilNum ).FanType, FanCoil( FanCoilNum ).FanName, IsNotOK );
+                            FanCoil(FanCoilNum).FanAirVolFlow =
+                                GetFanDesignVolumeFlowRate(FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName, IsNotOK);
 						// Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
-						if ( FanCoil( FanCoilNum ).MaxAirVolFlow > FanCoil( FanCoilNum ).FanAirVolFlow && FanCoil( FanCoilNum ).FanAirVolFlow != AutoSize ) {
+                            if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow &&
+                                FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {
 							ShowWarningError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "... " + cNumericFields( 1 ) + " is greater than the maximum fan flow rate." );
 							ShowContinueError( "... Fan Coil Unit flow = " + TrimSigDigits( FanCoil( FanCoilNum ).MaxAirVolFlow, 5 ) + " m3/s." );
@@ -629,9 +643,15 @@ namespace FanCoilUnits {
 						}
 
 						// Check that the fan type match with the capacity control method selected
-						if ( ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_ConsFanVarFlow && ( FanCoil( FanCoilNum ).FanType_Num == FanType_SimpleVAV ) ) || ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan && FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleOnOff ) || ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanVarFlow && FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleVAV ) || ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanConsFlow && FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleVAV ) ) {
+                            if ((FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_ConsFanVarFlow &&
+                                 (FanCoil(FanCoilNum).FanType_Num == FanType_SimpleVAV)) ||
+                                (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_CycFan && FanCoil(FanCoilNum).FanType_Num != FanType_SimpleOnOff) ||
+                                (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_VarFanVarFlow && FanCoil(FanCoilNum).FanType_Num != FanType_SimpleVAV) ||
+                                (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_VarFanConsFlow && FanCoil(FanCoilNum).FanType_Num != FanType_SimpleVAV)) {
 							ShowSevereError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
-							ShowContinueError( "...the fan type of the object : " + FanCoil( FanCoilNum ).FanName + " does not match with the capacity control method selected : " + FanCoil( FanCoilNum ).CapCtrlMeth + " please see I/O reference" );
+                                ShowContinueError("...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
+                                                  " does not match with the capacity control method selected : " + FanCoil(FanCoilNum).CapCtrlMeth +
+                                                  " please see I/O reference");
 							ShowContinueError( "...for ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid." );
 							ShowContinueError( "...for CyclingFan a Fan:OnOff is valid." );
 							ShowContinueError( "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid." );
@@ -642,7 +662,8 @@ namespace FanCoilUnits {
 						ShowSevereError( CurrentModuleObject + " = \"" + Alphas( 1 ) + "\"" );
 						ShowContinueError( "Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume." );
 						ErrorsFound = true;
-					}}
+                        }
+                    }
 				} else if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).FanType, "Fan:SystemModel" ) ) {
 					FanCoil( FanCoilNum ).FanType_Num   = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( FanCoil( FanCoilNum ).FanName ) ); // call constructor
@@ -660,14 +681,17 @@ namespace FanCoilUnits {
 					}
 
 					// check that for VariableFanVariableFlow or VariableFanConstantFlow that the fan speed control is continuous
-					if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanVarFlow || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanConsFlow || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_ASHRAE ) { // then expect continuous speed control fan
+                    if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_VarFanVarFlow || FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_VarFanConsFlow ||
+                        FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_ASHRAE) { // then expect continuous speed control fan
 						if ( HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->speedControl != HVACFan::FanSystem::SpeedControlMethod::Continuous ) {
 							ShowSevereError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
-							ShowContinueError( "...the fan type of the object : " + FanCoil( FanCoilNum ).FanName + " does not match with the capacity control method selected : " + FanCoil( FanCoilNum ).CapCtrlMeth + " please see I/O reference" );
-							ShowContinueError( "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control." );
+                            ShowContinueError("...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
+                                              " does not match with the capacity control method selected : " + FanCoil(FanCoilNum).CapCtrlMeth +
+                                              " please see I/O reference");
+                            ShowContinueError(
+                                "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
 							ErrorsFound = true;
 						}
-
 					}
 				}
 			}
@@ -677,7 +701,8 @@ namespace FanCoilUnits {
 				if ( FanCoil( FanCoilNum ).LowSpeedRatio > 0.5 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"," );
 					ShowContinueError( "... " + cNumericFields( 2 ) + " is greater than the 50% of the supply air flow ratio." );
-					ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio = " + TrimSigDigits( FanCoil( FanCoilNum ).LowSpeedRatio, 5 ) + ' ' );
+                    ShowContinueError("... Fan Coil Unit low speed supply air flow ratio = " + TrimSigDigits(FanCoil(FanCoilNum).LowSpeedRatio, 5) +
+                                      ' ');
 				} else if( FanCoil( FanCoilNum ).LowSpeedRatio == 0.0 ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + FanCoil( FanCoilNum ).Name + "\"," );
 					ShowContinueError( "... " + cNumericFields( 2 ) + " is equal to 0." );
@@ -696,7 +721,8 @@ namespace FanCoilUnits {
 			}
 
 			//check for inlet side air mixer
-			GetATMixer( FanCoil( FanCoilNum ).Name, ATMixerName, ATMixerNum, ATMixerType, ATMixerPriNode, ATMixerSecNode, ATMixerOutNode, FanCoil( FanCoilNum ).AirOutNode );
+            GetATMixer(FanCoil(FanCoilNum).Name, ATMixerName, ATMixerNum, ATMixerType, ATMixerPriNode, ATMixerSecNode, ATMixerOutNode,
+                       FanCoil(FanCoilNum).AirOutNode);
 			if ( ATMixerType == ATMixer_InletSide ) {
 				// save the air terminal mixer data in the fan coil data array
 				FanCoil( FanCoilNum ).ATMixerExists = true;
@@ -708,11 +734,13 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
 				// check that fan coil doesn' have local outside air
 				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit has local as well as central outdoor air specified" );
+                    ShowSevereError(CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
+                                    "\". Fan coil unit has local as well as central outdoor air specified");
 				}
 				// check that the air teminal mixer out node is the fan coil inlet node
 				if ( FanCoil( FanCoilNum ).AirInNode != ATMixerOutNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name." );
+                    ShowSevereError(CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
+                                    "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name.");
 					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
 					ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
 					ErrorsFound = true;
@@ -729,12 +757,16 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
 				// check that fan coil doesn' have local outside air
 				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit has local as well as central outdoor air specified" );
+                    ShowSevereError(CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
+                                    "\". Fan coil unit has local as well as central outdoor air specified");
 				}
 				// check that the air teminal mixer secondary air inlet node is the fan coil outlet node
 				if ( FanCoil( FanCoilNum ).AirOutNode != ATMixerSecNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name." );
-					ShowContinueError( "..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
+                    ShowSevereError(
+                        CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
+                        "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name.");
+                    ShowContinueError(
+                        "..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:SupplySideMixer object.");
 					ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
@@ -751,7 +783,8 @@ namespace FanCoilUnits {
 					}
 				}
 				if ( ZoneExNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air inlet node name must be the same as a zone exhaust node name." );
+                    ShowSevereError(CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
+                                    "\". Fan coil unit air inlet node name must be the same as a zone exhaust node name.");
 					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
 					ErrorsFound = true;
@@ -768,7 +801,8 @@ namespace FanCoilUnits {
 					}
 				}
 				if ( ZoneInNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air outlet node name must be the same as a zone inlet node name." );
+                    ShowSevereError(CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
+                                    "\". Fan coil unit air outlet node name must be the same as a zone inlet node name.");
 					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
 
@@ -778,7 +812,8 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth == "MULTISPEEDFAN" ) {
 				if ( !lAlphaBlanks( 17 ) ) {
 					FanCoil( FanCoilNum ).FanOpModeSchedPtr = GetScheduleIndex( Alphas( 17 ) );
-					if ( FanCoil( FanCoilNum ).FanType_Num != FanType_SimpleOnOff &&  FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+                    if (FanCoil(FanCoilNum).FanType_Num != FanType_SimpleOnOff &&
+                        FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
 						ShowSevereError( CurrentModuleObject + " = " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "For " + cAlphaFields( 17 ) + " = " + Alphas( 17 ) );
 						ShowContinueError( "Illegal " + cAlphaFields( 9 ) + " = " + Alphas( 9 ) );
@@ -792,7 +827,8 @@ namespace FanCoilUnits {
 						}
 					}
 				} else {
-					if ( FanCoil( FanCoilNum ).FanType_Num == FanType_SimpleOnOff || FanCoil( FanCoilNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+                    if (FanCoil(FanCoilNum).FanType_Num == FanType_SimpleOnOff ||
+                        FanCoil(FanCoilNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
 						FanCoil( FanCoilNum ).FanOpMode = CycFanCycCoil;
 					}
 				}
@@ -831,19 +867,24 @@ namespace FanCoilUnits {
 
 			// Set up component set for supply fan
 			if ( FanCoil( FanCoilNum ).OutsideAirNode > 0 ) {
-				SetUpCompSets( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).FanType, FanCoil( FanCoilNum ).FanName, NodeID( FanCoil( FanCoilNum ).MixedAirNode ), "UNDEFINED" );
+                SetUpCompSets(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName,
+                              NodeID(FanCoil(FanCoilNum).MixedAirNode), "UNDEFINED");
 			} else {
-				SetUpCompSets( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).FanType, FanCoil( FanCoilNum ).FanName, NodeID( FanCoil( FanCoilNum ).AirInNode ), "UNDEFINED" );
+                SetUpCompSets(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, FanCoil(FanCoilNum).FanType, FanCoil(FanCoilNum).FanName,
+                              NodeID(FanCoil(FanCoilNum).AirInNode), "UNDEFINED");
 			}
 			// Set up component set for cooling coil
-			SetUpCompSets( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, "UNDEFINED", "UNDEFINED" );
+            SetUpCompSets(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName,
+                          "UNDEFINED", "UNDEFINED");
 
 			// Set up component set for heating coil
-			SetUpCompSets( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, "UNDEFINED", NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
+            SetUpCompSets(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName,
+                          "UNDEFINED", NodeID(FanCoil(FanCoilNum).AirOutNode));
 
 			// Set up component set for OA mixer - use OA node and Mixed air node
 			if ( FanCoil( FanCoilNum ).OutsideAirNode > 0 ) {
-				SetUpCompSets( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).OAMixType, FanCoil( FanCoilNum ).OAMixName, NodeID( FanCoil( FanCoilNum ).OutsideAirNode ), NodeID( FanCoil( FanCoilNum ).MixedAirNode ) );
+                SetUpCompSets(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, FanCoil(FanCoilNum).OAMixType, FanCoil(FanCoilNum).OAMixName,
+                              NodeID(FanCoil(FanCoilNum).OutsideAirNode), NodeID(FanCoil(FanCoilNum).MixedAirNode));
 			}
 		}
 
@@ -861,42 +902,62 @@ namespace FanCoilUnits {
 		for ( FanCoilNum = 1; FanCoilNum <= NumFanCoils; ++FanCoilNum ) {
 			// Setup Report variables for the Fan Coils
 			// CurrentModuleObject='ZoneHVAC:FourPipeFanCoil'
-			SetupOutputVariable( "Fan Coil Heating Rate", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).HeatPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Heating Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).HeatEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Total Cooling Rate", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).TotCoolPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Total Cooling Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).TotCoolEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Sensible Cooling Rate", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).SensCoolPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Sensible Cooling Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).SensCoolEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Fan Electric Power", OutputProcessor::Unit::W, FanCoil( FanCoilNum ).ElecPower, "System", "Average", FanCoil( FanCoilNum ).Name );
-			SetupOutputVariable( "Fan Coil Fan Electric Energy", OutputProcessor::Unit::J, FanCoil( FanCoilNum ).ElecEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
+            SetupOutputVariable("Fan Coil Heating Rate", OutputProcessor::Unit::W, FanCoil(FanCoilNum).HeatPower, "System", "Average",
+                                FanCoil(FanCoilNum).Name);
+            SetupOutputVariable("Fan Coil Heating Energy", OutputProcessor::Unit::J, FanCoil(FanCoilNum).HeatEnergy, "System", "Sum",
+                                FanCoil(FanCoilNum).Name);
+            SetupOutputVariable("Fan Coil Total Cooling Rate", OutputProcessor::Unit::W, FanCoil(FanCoilNum).TotCoolPower, "System", "Average",
+                                FanCoil(FanCoilNum).Name);
+            SetupOutputVariable("Fan Coil Total Cooling Energy", OutputProcessor::Unit::J, FanCoil(FanCoilNum).TotCoolEnergy, "System", "Sum",
+                                FanCoil(FanCoilNum).Name);
+            SetupOutputVariable("Fan Coil Sensible Cooling Rate", OutputProcessor::Unit::W, FanCoil(FanCoilNum).SensCoolPower, "System", "Average",
+                                FanCoil(FanCoilNum).Name);
+            SetupOutputVariable("Fan Coil Sensible Cooling Energy", OutputProcessor::Unit::J, FanCoil(FanCoilNum).SensCoolEnergy, "System", "Sum",
+                                FanCoil(FanCoilNum).Name);
+            SetupOutputVariable("Fan Coil Fan Electric Power", OutputProcessor::Unit::W, FanCoil(FanCoilNum).ElecPower, "System", "Average",
+                                FanCoil(FanCoilNum).Name);
+            SetupOutputVariable("Fan Coil Fan Electric Energy", OutputProcessor::Unit::J, FanCoil(FanCoilNum).ElecEnergy, "System", "Sum",
+                                FanCoil(FanCoilNum).Name);
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_MultiSpeedFan ) {
-				SetupOutputVariable( "Fan Coil Runtime Fraction", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
-				SetupOutputVariable( "Fan Coil Fan Speed Level", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).SpeedFanSel, "System", "Average", FanCoil( FanCoilNum ).Name );
+                SetupOutputVariable("Fan Coil Runtime Fraction", OutputProcessor::Unit::None, FanCoil(FanCoilNum).PLR, "System", "Average",
+                                    FanCoil(FanCoilNum).Name);
+                SetupOutputVariable("Fan Coil Fan Speed Level", OutputProcessor::Unit::None, FanCoil(FanCoilNum).SpeedFanSel, "System", "Average",
+                                    FanCoil(FanCoilNum).Name);
 				if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_MultiSpeedFan ) {
-					SetupOutputVariable( "Fan Coil Speed Ratio", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).SpeedRatio, "System", "Average", FanCoil( FanCoilNum ).Name );
-					SetupOutputVariable( "Fan Coil Part Load Ratio", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
+                    SetupOutputVariable("Fan Coil Speed Ratio", OutputProcessor::Unit::None, FanCoil(FanCoilNum).SpeedRatio, "System", "Average",
+                                        FanCoil(FanCoilNum).Name);
+                    SetupOutputVariable("Fan Coil Part Load Ratio", OutputProcessor::Unit::None, FanCoil(FanCoilNum).PLR, "System", "Average",
+                                        FanCoil(FanCoilNum).Name);
 				}
 			}
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanVarFlow || FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_VarFanConsFlow ) {
-				SetupOutputVariable( "Fan Coil Part Load Ratio", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).PLR, "System", "Average", FanCoil( FanCoilNum ).Name );
+                SetupOutputVariable("Fan Coil Part Load Ratio", OutputProcessor::Unit::None, FanCoil(FanCoilNum).PLR, "System", "Average",
+                                    FanCoil(FanCoilNum).Name);
 			}
-			SetupOutputVariable( "Fan Coil Availability Status", OutputProcessor::Unit::None, FanCoil( FanCoilNum ).AvailStatus, "System", "Average", FanCoil( FanCoilNum ).Name );
+            SetupOutputVariable("Fan Coil Availability Status", OutputProcessor::Unit::None, FanCoil(FanCoilNum).AvailStatus, "System", "Average",
+                                FanCoil(FanCoilNum).Name);
 		}
 
 		for ( FanCoilNum = 1; FanCoilNum <= NumFanCoils; ++FanCoilNum ) {
 			if ( FanCoil( FanCoilNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).CCoilName , FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel , FanCoil( FanCoilNum ).FanIndex );
-				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).HCoilName , FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::objectVectorOOFanSystemModel , FanCoil( FanCoilNum ).FanIndex );
+                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).CCoilName, FanCoil(FanCoilNum).CCoilType,
+                                                             FanCoil(FanCoilNum).FanName, DataAirSystems::objectVectorOOFanSystemModel,
+                                                             FanCoil(FanCoilNum).FanIndex);
+                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).HCoilName, FanCoil(FanCoilNum).HCoilType,
+                                                             FanCoil(FanCoilNum).FanName, DataAirSystems::objectVectorOOFanSystemModel,
+                                                             FanCoil(FanCoilNum).FanIndex);
 			} else {
-				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).CCoilName , FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::structArrayLegacyFanModels , FanCoil( FanCoilNum ).FanIndex );
-				coilSelectionReportObj->setCoilSupplyFanInfo( FanCoil( FanCoilNum ).HCoilName , FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).FanName, DataAirSystems::structArrayLegacyFanModels , FanCoil( FanCoilNum ).FanIndex );
+                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).CCoilName, FanCoil(FanCoilNum).CCoilType,
+                                                             FanCoil(FanCoilNum).FanName, DataAirSystems::structArrayLegacyFanModels,
+                                                             FanCoil(FanCoilNum).FanIndex);
+                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).HCoilName, FanCoil(FanCoilNum).HCoilType,
+                                                             FanCoil(FanCoilNum).FanName, DataAirSystems::structArrayLegacyFanModels,
+                                                             FanCoil(FanCoilNum).FanIndex);
 			}
 		}
 	}
 
-	void
-	InitFanCoilUnits(
-		int const FanCoilNum, // number of the current fan coil unit being simulated
+    void InitFanCoilUnits(int const FanCoilNum, // number of the current fan coil unit being simulated
 		int const ZoneNum // number of zone being served
 	)
 	{
@@ -914,17 +975,17 @@ namespace FanCoilUnits {
 		// Uses the status flags to trigger initializations.
 
 		// Using/Aliasing
-		using Psychrometrics::PsyRhoAirFnPbTdbW;
-		using DataZoneEquipment::ZoneEquipInputsFilled;
-		using DataZoneEquipment::CheckZoneEquipmentList;
-		using DataZoneEquipment::FanCoil4Pipe_Num;
+        using DataHVACGlobals::ZoneComp;
 		using DataPlant::PlantLoop;
-		using PlantUtilities::ScanPlantLoopsForObject;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+        using DataZoneEquipment::CheckZoneEquipmentList;
+        using DataZoneEquipment::FanCoil4Pipe_Num;
+        using DataZoneEquipment::ZoneEquipInputsFilled;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
-		using DataHVACGlobals::ZoneComp;
+        using PlantUtilities::ScanPlantLoopsForObject;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitFanCoilUnits" );
@@ -957,7 +1018,6 @@ namespace FanCoilUnits {
 			MyPlantScanFlag = true;
 			MyZoneEqFlag = true;
 			InitFanCoilUnitsOneTimeFlag = false;
-
 		}
 
 		if ( allocated( ZoneComp ) ) {
@@ -972,14 +1032,20 @@ namespace FanCoilUnits {
 		if ( MyPlantScanFlag( FanCoilNum ) && allocated( PlantLoop ) ) {
 			errFlag = false;
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-				ScanPlantLoopsForObject( FanCoil( FanCoilNum ).HCoilName, FanCoil( FanCoilNum ).HCoilPlantTypeOfNum, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum, _, _, _, _, _, errFlag );
+                ScanPlantLoopsForObject(FanCoil(FanCoilNum).HCoilName, FanCoil(FanCoilNum).HCoilPlantTypeOfNum, FanCoil(FanCoilNum).HWLoopNum,
+                                        FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum, _, _, _, _, _,
+                                        errFlag);
 
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + FanCoil( FanCoilNum ).Name + "\", type=" + FanCoil( FanCoilNum ).UnitType );
 					ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );
 				}
 
-				FanCoil( FanCoilNum ).HotPlantOutletNode = PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).LoopSide( FanCoil( FanCoilNum ).HWLoopSide ).Branch( FanCoil( FanCoilNum ).HWBranchNum ).Comp( FanCoil( FanCoilNum ).HWCompNum ).NodeNumOut;
+                FanCoil(FanCoilNum).HotPlantOutletNode = PlantLoop(FanCoil(FanCoilNum).HWLoopNum)
+                                                             .LoopSide(FanCoil(FanCoilNum).HWLoopSide)
+                                                             .Branch(FanCoil(FanCoilNum).HWBranchNum)
+                                                             .Comp(FanCoil(FanCoilNum).HWCompNum)
+                                                             .NodeNumOut;
 
 			} else if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Electric ) {
 				// do nothing, valid type
@@ -987,13 +1053,20 @@ namespace FanCoilUnits {
 				ShowFatalError( "InitFanCoilUnits: FanCoil=" + FanCoil( FanCoilNum ).Name + ", invalid heating coil type. Program terminated." );
 			}
 
-			if ( ( FanCoil( FanCoilNum ).CCoilPlantTypeOfNum == TypeOf_CoilWaterCooling ) || ( FanCoil( FanCoilNum ).CCoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
-				ScanPlantLoopsForObject( FanCoil( FanCoilNum ).CCoilPlantName, FanCoil( FanCoilNum ).CCoilPlantTypeOfNum, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum, _, _, _, _, _, errFlag );
+            if ((FanCoil(FanCoilNum).CCoilPlantTypeOfNum == TypeOf_CoilWaterCooling) ||
+                (FanCoil(FanCoilNum).CCoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling)) {
+                ScanPlantLoopsForObject(FanCoil(FanCoilNum).CCoilPlantName, FanCoil(FanCoilNum).CCoilPlantTypeOfNum, FanCoil(FanCoilNum).CWLoopNum,
+                                        FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum, _, _, _, _, _,
+                                        errFlag);
 				if ( errFlag ) {
 					ShowContinueError( "Reference Unit=\"" + FanCoil( FanCoilNum ).Name + "\", type=" + FanCoil( FanCoilNum ).UnitType );
 					ShowFatalError( "InitFanCoilUnits: Program terminated for previous conditions." );
 				}
-				FanCoil( FanCoilNum ).ColdPlantOutletNode = PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).LoopSide( FanCoil( FanCoilNum ).CWLoopSide ).Branch( FanCoil( FanCoilNum ).CWBranchNum ).Comp( FanCoil( FanCoilNum ).CWCompNum ).NodeNumOut;
+                FanCoil(FanCoilNum).ColdPlantOutletNode = PlantLoop(FanCoil(FanCoilNum).CWLoopNum)
+                                                              .LoopSide(FanCoil(FanCoilNum).CWLoopSide)
+                                                              .Branch(FanCoil(FanCoilNum).CWBranchNum)
+                                                              .Comp(FanCoil(FanCoilNum).CWCompNum)
+                                                              .NodeNumOut;
 			} else {
 				ShowFatalError( "InitFanCoilUnits: FanCoil=" + FanCoil( FanCoilNum ).Name + ", invalid cooling coil type. Program terminated." );
 			}
@@ -1005,7 +1078,8 @@ namespace FanCoilUnits {
 			InitFanCoilUnitsCheckInZoneEquipmentListFlag = true;
 			for ( Loop = 1; Loop <= NumFanCoils; ++Loop ) {
 				if ( CheckZoneEquipmentList( FanCoil( Loop ).UnitType, FanCoil( Loop ).Name ) ) continue;
-				ShowSevereError( "InitFanCoil: FanCoil Unit=[" + FanCoil( Loop ).UnitType + ',' + FanCoil( Loop ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+                ShowSevereError("InitFanCoil: FanCoil Unit=[" + FanCoil(Loop).UnitType + ',' + FanCoil(Loop).Name +
+                                "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
 			}
 		}
 
@@ -1029,21 +1103,27 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).OutAirMassFlow = RhoAir * FanCoil( FanCoilNum ).OutAirVolFlow;
 
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-				rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineName );
+                rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
+                                       PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidIndex, RoutineName);
 				FanCoil( FanCoilNum ).MaxHotWaterFlow = rho * FanCoil( FanCoilNum ).MaxHotWaterVolFlow;
 				FanCoil( FanCoilNum ).MinHotWaterFlow = rho * FanCoil( FanCoilNum ).MinHotWaterVolFlow;
 			}
 
-			rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, DataGlobals::CWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineName );
+            rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidName, DataGlobals::CWInitConvTemp,
+                                   PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidIndex, RoutineName);
 			FanCoil( FanCoilNum ).MaxColdWaterFlow = rho * FanCoil( FanCoilNum ).MaxColdWaterVolFlow;
 			FanCoil( FanCoilNum ).MinColdWaterFlow = rho * FanCoil( FanCoilNum ).MinColdWaterVolFlow;
 
 			// set the node max and min mass flow rates
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-				InitComponentNodes( FanCoil( FanCoilNum ).MinHotWaterFlow, FanCoil( FanCoilNum ).MaxHotWaterFlow, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                InitComponentNodes(FanCoil(FanCoilNum).MinHotWaterFlow, FanCoil(FanCoilNum).MaxHotWaterFlow, FanCoil(FanCoilNum).HotControlNode,
+                                   FanCoil(FanCoilNum).HotPlantOutletNode, FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide,
+                                   FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 			}
 
-			InitComponentNodes( FanCoil( FanCoilNum ).MinColdWaterFlow, FanCoil( FanCoilNum ).MaxColdWaterFlow, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+            InitComponentNodes(FanCoil(FanCoilNum).MinColdWaterFlow, FanCoil(FanCoilNum).MaxColdWaterFlow, FanCoil(FanCoilNum).ColdControlNode,
+                               FanCoil(FanCoilNum).ColdPlantOutletNode, FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide,
+                               FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum);
 			//  Node(HotConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxHotWaterFlow
 			//  Node(HotConNode)%MassFlowRateMin = FanCoil(FanCoilNum)%MinHotWaterFlow
 			//  Node(ColdConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxColdWaterFlow
@@ -1077,7 +1157,8 @@ namespace FanCoilUnits {
 			}
 		}
 		// Set the inlet node mass flow rate
-		if ( ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn ) && ! DataHVACGlobals::ZoneCompTurnFansOff ) {
+        if ((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn) &&
+            !DataHVACGlobals::ZoneCompTurnFansOff) {
 			Node( InletNode ).MassFlowRate = FanCoil( FanCoilNum ).MaxAirMassFlow;
 			Node( InletNode ).MassFlowRateMaxAvail = Node( InletNode ).MassFlowRate;
 			Node( InletNode ).MassFlowRateMinAvail = Node( InletNode ).MassFlowRate;
@@ -1104,11 +1185,9 @@ namespace FanCoilUnits {
 				Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
 			}
 		}
-
 	}
 
-	void
-	SizeFanCoilUnit( int const FanCoilNum )
+    void SizeFanCoilUnit(int const FanCoilNum)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1127,34 +1206,34 @@ namespace FanCoilUnits {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using Psychrometrics::PsyCpAirFnWTdb;
-		using Psychrometrics::PsyHFnTdbW;
-		using Fans::GetFanDesignVolumeFlowRate;
-		using General::TrimSigDigits;
-		using WaterCoils::SetCoilDesFlow;
-		using WaterCoils::GetCoilWaterInletNode;
-		using WaterCoils::GetCoilWaterOutletNode;
-		using WaterCoils::GetWaterCoilIndex;
-		using WaterCoils::WaterCoil;
-		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-		using HVACHXAssistedCoolingCoil::GetHXCoilType;
-		using DataPlant::PlantLoop;
-		using PlantUtilities::MyPlantSizingIndex;
-		using FluidProperties::GetDensityGlycol;
-		using FluidProperties::GetSpecificHeatGlycol;
-		using ReportSizingManager::ReportSizingOutput;
-		using ReportSizingManager::RequestSizing;
-		using General::RoundSigDigits;
-		using DataHVACGlobals::SystemAirflowSizing;
 		using DataHVACGlobals::CoolingAirflowSizing;
-		using DataHVACGlobals::HeatingAirflowSizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
+        using DataHVACGlobals::HeatingAirflowSizing;
 		using DataHVACGlobals::HeatingCapacitySizing;
+        using DataHVACGlobals::MaxSATempHeatingSizing;
+        using DataHVACGlobals::MinSATempCoolingSizing;
+        using DataHVACGlobals::SystemAirflowSizing;
 		using DataHVACGlobals::ZoneCoolingLoadSizing;
 		using DataHVACGlobals::ZoneHeatingLoadSizing;
-		using DataHVACGlobals::MinSATempCoolingSizing;
-		using DataHVACGlobals::MaxSATempHeatingSizing;
 		using DataHeatBalance::Zone;
+        using DataPlant::PlantLoop;
+        using Fans::GetFanDesignVolumeFlowRate;
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
+        using General::RoundSigDigits;
+        using General::TrimSigDigits;
+        using HVACHXAssistedCoolingCoil::GetHXCoilType;
+        using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
+        using PlantUtilities::MyPlantSizingIndex;
+        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyHFnTdbW;
+        using ReportSizingManager::ReportSizingOutput;
+        using ReportSizingManager::RequestSizing;
+        using WaterCoils::GetCoilWaterInletNode;
+        using WaterCoils::GetCoilWaterOutletNode;
+        using WaterCoils::GetWaterCoilIndex;
+        using WaterCoils::SetCoilDesFlow;
+        using WaterCoils::WaterCoil;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeFanCoilUnit: " ); // include trailing blank space
@@ -1188,10 +1267,13 @@ namespace FanCoilUnits {
 		std::string SizingString;  // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 1; // IDD numeric field number where input field description is found
-		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+        int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
+                          // HeatingCapacitySizing, etc.)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
-		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
-		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+        int SAFMethod(0); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+                          // FractionOfAutosizedHeatingAirflow ...)
+        int CapSizingMethod(0);    // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
+                                   // FractionOfAutosizedHeatingCapacity )
 		bool SizingDesRunThisZone; // test for zone sizing
 		bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
 		Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
@@ -1367,7 +1449,8 @@ namespace FanCoilUnits {
 				if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
 					if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 						Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
-						FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
+                        FanCoil(FanCoilNum).FanAirVolFlow =
+                            GetFanDesignVolumeFlowRate(cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
 					} else {
 						HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( _,_,_,_ );
 						FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->designAirVolFlowRate;
@@ -1391,9 +1474,12 @@ namespace FanCoilUnits {
 						MaxAirVolFlowUser = FanCoil( FanCoilNum ).MaxAirVolFlow;
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowDes - MaxAirVolFlowUser ) / MaxAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Maximum Flow Rate of " + RoundSigDigits( MaxAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Maximum Flow Rate of " + RoundSigDigits( MaxAirVolFlowDes, 5 ) + " [m3/s]" );
+                                ShowMessage("SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
+                                            FanCoil(FanCoilNum).Name);
+                                ShowContinueError("User-Specified Supply Air Maximum Flow Rate of " + RoundSigDigits(MaxAirVolFlowUser, 5) +
+                                                  " [m3/s]");
+                                ShowContinueError("differs from Design Size Supply Air Maximum Flow Rate of " + RoundSigDigits(MaxAirVolFlowDes, 5) +
+                                                  " [m3/s]");
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1404,7 +1490,8 @@ namespace FanCoilUnits {
 		} else if ( FanCoil( FanCoilNum ).FanAirVolFlow == AutoSize ) {
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
-				FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
+                FanCoil(FanCoilNum).FanAirVolFlow =
+                    GetFanDesignVolumeFlowRate(cFanTypes(FanCoil(FanCoilNum).FanType_Num), FanCoil(FanCoilNum).FanName, ErrorsFound);
 			} else {
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( _,_,_,_ );
 				FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->designAirVolFlowRate;
@@ -1421,7 +1508,6 @@ namespace FanCoilUnits {
 			}
 		}
 
-
 		IsAutoSize = false;
 		if ( FanCoil( FanCoilNum ).OutAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
@@ -1430,7 +1516,8 @@ namespace FanCoilUnits {
 		if ( CurZoneEqNum > 0 ) {
 			if ( ! IsAutoSize && ! ZoneSizingRunDone ) {
 				if ( FanCoil( FanCoilNum ).OutAirVolFlow > 0.0 ) {
-					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", FanCoil( FanCoilNum ).OutAirVolFlow );
+                    ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
+                                       FanCoil(FanCoilNum).OutAirVolFlow);
 				}
 			} else {
 				CheckZoneSizing( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name );
@@ -1440,16 +1527,21 @@ namespace FanCoilUnits {
 				}
 				if ( IsAutoSize ) {
 					FanCoil( FanCoilNum ).OutAirVolFlow = OutAirVolFlowDes;
-					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes );
+                    ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
+                                       OutAirVolFlowDes);
 				} else {
 					if ( FanCoil( FanCoilNum ).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0 ) {
 						OutAirVolFlowUser = FanCoil( FanCoilNum ).OutAirVolFlow;
-						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
+                        ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
+                                           OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser);
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
-								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
+                                ShowMessage("SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
+                                            FanCoil(FanCoilNum).Name);
+                                ShowContinueError("User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowUser, 5) +
+                                                  " [m3/s]");
+                                ShowContinueError("differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits(OutAirVolFlowDes, 5) +
+                                                  " [m3/s]");
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1469,13 +1561,15 @@ namespace FanCoilUnits {
 			if ( CurZoneEqNum > 0 ) {
 				if ( !IsAutoSize && !ZoneSizingRunDone ) {
 					if ( FanCoil( FanCoilNum ).MaxHotWaterVolFlow > 0.0 ) {
-						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "User-Specified Maximum Hot Water Flow [m3/s]", FanCoil( FanCoilNum ).MaxHotWaterVolFlow );
+                        ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "User-Specified Maximum Hot Water Flow [m3/s]",
+                                           FanCoil(FanCoilNum).MaxHotWaterVolFlow);
 					}
 				} else {
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
 					if ( IsAutoSize ) {
-						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
+                        PltSizHeatNum = MyPlantSizingIndex("Coil:Heating:Water", FanCoil(FanCoilNum).HCoilName, CoilWaterInletNode,
+                                                           CoilWaterOutletNode, ErrorsFound);
 						CoilNum = GetWaterCoilIndex( "COIL:HEATING:WATER", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
 						if ( WaterCoil( CoilNum ).UseDesignWaterDeltaTemp ) {
 							WaterCoilSizDeltaT = WaterCoil( CoilNum ).DesignWaterDeltaTemp;
@@ -1495,7 +1589,8 @@ namespace FanCoilUnits {
 						if ( DoWaterCoilSizing ) {
 							SizingMethod = HeatingCapacitySizing;
 							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow > 0.0 ) {
-								FinalZoneSizing( CurZoneEqNum ).DesHeatOAFlowFrac = min( FanCoil( FanCoilNum ).OutAirVolFlow / FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow, 1.0 );
+                                FinalZoneSizing(CurZoneEqNum).DesHeatOAFlowFrac =
+                                    min(FanCoil(FanCoilNum).OutAirVolFlow / FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow, 1.0);
 							} else {
 								FinalZoneSizing( CurZoneEqNum ).DesHeatOAFlowFrac = 0.0;
 							}
@@ -1503,7 +1598,8 @@ namespace FanCoilUnits {
 								zoneHVACIndex = FanCoil( FanCoilNum ).HVACSizingIndex;
 								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-								if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+                                if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
+                                    CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
 									if ( CapSizingMethod == HeatingDesignCapacity ) {
 										if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
 											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
@@ -1549,8 +1645,10 @@ namespace FanCoilUnits {
 							}
 							FanCoil( FanCoilNum ).DesHeatingLoad = DesCoilLoad;
 							if ( DesCoilLoad >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
-								Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
+                                rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
+                                                       PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidIndex, RoutineNameNoSpace);
+                                Cp = GetSpecificHeatGlycol(PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
+                                                           PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidIndex, RoutineNameNoSpace);
 
 								MaxHotWaterVolFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 							} else {
@@ -1562,16 +1660,21 @@ namespace FanCoilUnits {
 
 				if ( IsAutoSize ) {
 					FanCoil( FanCoilNum ).MaxHotWaterVolFlow = MaxHotWaterVolFlowDes;
-					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowDes );
+                    ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Hot Water Flow [m3/s]",
+                                       MaxHotWaterVolFlowDes);
 				} else { // Hard size with sizing data
 					if ( FanCoil( FanCoilNum ).MaxHotWaterVolFlow > 0.0 && MaxHotWaterVolFlowDes > 0.0 ) {
 						MaxHotWaterVolFlowDes = FanCoil( FanCoilNum ).MaxHotWaterVolFlow;
-						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowUser );
+                        ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Hot Water Flow [m3/s]",
+                                           MaxHotWaterVolFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowUser);
 						if ( DisplayExtraWarnings ) {
 							if ( (std::abs (MaxHotWaterVolFlowDes - MaxHotWaterVolFlowUser ) / MaxHotWaterVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil( FanCoilNum ).Name );
-								ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxHotWaterVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxHotWaterVolFlowDes, 5 ) + " [m3/s]" );
+                                ShowMessage("SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
+                                            FanCoil(FanCoilNum).Name);
+                                ShowContinueError("User-Specified Maximum Hot Water Flow of " + RoundSigDigits(MaxHotWaterVolFlowUser, 5) +
+                                                  " [m3/s]");
+                                ShowContinueError("differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits(MaxHotWaterVolFlowDes, 5) +
+                                                  " [m3/s]");
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1600,7 +1703,8 @@ namespace FanCoilUnits {
 		if ( CurZoneEqNum > 0 ) {
 			if ( !IsAutoSize && !ZoneSizingRunDone ) {
 				if ( FanCoil( FanCoilNum ).MaxColdWaterVolFlow > 0.0 ) {
-					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", FanCoil( FanCoilNum ).MaxColdWaterVolFlow );
+                    ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "User-Specified Maximum Cold Water Flow [m3/s]",
+                                       FanCoil(FanCoilNum).MaxColdWaterVolFlow);
 				}
 			} else {
 				if ( UtilityRoutines::SameString( FanCoil( FanCoilNum ).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
@@ -1634,7 +1738,8 @@ namespace FanCoilUnits {
 					if ( DoWaterCoilSizing ) {
 						SizingMethod = CoolingCapacitySizing;
 						if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow > 0.0 ) {
-							FinalZoneSizing( CurZoneEqNum ).DesCoolOAFlowFrac = min( FanCoil( FanCoilNum ).OutAirVolFlow / FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow, 1.0 );
+                            FinalZoneSizing(CurZoneEqNum).DesCoolOAFlowFrac =
+                                min(FanCoil(FanCoilNum).OutAirVolFlow / FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow, 1.0);
 						} else {
 							FinalZoneSizing( CurZoneEqNum ).DesCoolOAFlowFrac = 0.0;
 						}
@@ -1642,7 +1747,8 @@ namespace FanCoilUnits {
 							zoneHVACIndex = FanCoil( FanCoilNum ).HVACSizingIndex;
 							CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
 							ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-							if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+                            if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
+                                CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
 								if ( CapSizingMethod == CoolingDesignCapacity ) {
 									if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
 										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
@@ -1690,8 +1796,10 @@ namespace FanCoilUnits {
 						}
 						FanCoil(FanCoilNum).DesCoolingLoad = DesCoilLoad;
 						if ( DesCoilLoad >= SmallLoad ) {
-							rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, 5., PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineNameNoSpace );
-							Cp = GetSpecificHeatGlycol(PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidName, 5., PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidIndex, RoutineNameNoSpace );
+                            rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidName, 5.,
+                                                   PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidIndex, RoutineNameNoSpace);
+                            Cp = GetSpecificHeatGlycol(PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidName, 5.,
+                                                       PlantLoop(FanCoil(FanCoilNum).CWLoopNum).FluidIndex, RoutineNameNoSpace);
 							MaxColdWaterVolFlowDes = DesCoilLoad / ( WaterCoilSizDeltaT * Cp * rho );
 						} else {
 							MaxColdWaterVolFlowDes = 0.0;
@@ -1700,16 +1808,21 @@ namespace FanCoilUnits {
 				}
 				if ( IsAutoSize ) {
 					FanCoil( FanCoilNum ).MaxColdWaterVolFlow = MaxColdWaterVolFlowDes;
-					ReportSizingOutput (FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowDes );
+                    ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Cold Water Flow [m3/s]",
+                                       MaxColdWaterVolFlowDes);
 				} else { // Hard size with sizing data
 					if ( FanCoil( FanCoilNum ).MaxColdWaterVolFlow > 0.0 && MaxColdWaterVolFlowDes > 0.0 ) {
 						MaxColdWaterVolFlowUser = FanCoil( FanCoilNum ).MaxColdWaterVolFlow;
-						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowUser );
+                        ReportSizingOutput(FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name, "Design Size Maximum Cold Water Flow [m3/s]",
+                                           MaxColdWaterVolFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowUser);
 						if (DisplayExtraWarnings) {
 							if ( ( std::abs( MaxColdWaterVolFlowDes - MaxColdWaterVolFlowUser ) / MaxColdWaterVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil( FanCoilNum ).UnitType + ' ' + FanCoil ( FanCoilNum ).Name );
-								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxColdWaterVolFlowUser, 5 ) + "[m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxColdWaterVolFlowDes, 5 ) + "[m3/s]" );
+                                ShowMessage("SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
+                                            FanCoil(FanCoilNum).Name);
+                                ShowContinueError("User-Specified Maximum Cold Water Flow of " + RoundSigDigits(MaxColdWaterVolFlowUser, 5) +
+                                                  "[m3/s]");
+                                ShowContinueError("differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits(MaxColdWaterVolFlowDes, 5) +
+                                                  "[m3/s]");
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
@@ -1760,7 +1873,8 @@ namespace FanCoilUnits {
 
 				if ( SizingDesRunThisZone ) {
 
-					FanCoil( FanCoilNum ).DesZoneCoolingLoad = -1.0 * ( FanCoil( FanCoilNum ).DesCoolingLoad / FinalZoneSizing( CurZoneEqNum ).CoolSizingFactor );
+                    FanCoil(FanCoilNum).DesZoneCoolingLoad =
+                        -1.0 * (FanCoil(FanCoilNum).DesCoolingLoad / FinalZoneSizing(CurZoneEqNum).CoolSizingFactor);
 					FanCoil( FanCoilNum ).DesZoneHeatingLoad = FanCoil( FanCoilNum ).DesHeatingLoad / FinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 					FanCoil( FanCoilNum ).DSOAPtr = FinalZoneSizing( CurZoneEqNum ).ZoneDesignSpecOAIndex;
 
@@ -1768,7 +1882,6 @@ namespace FanCoilUnits {
 
 					FanCoil( FanCoilNum ).DesZoneCoolingLoad = -1.0 * FanCoil( FanCoilNum ).DesCoolingLoad;
 					FanCoil( FanCoilNum ).DesZoneHeatingLoad = FanCoil( FanCoilNum ).DesHeatingLoad;
-
 				}
 			}
 
@@ -1805,12 +1918,9 @@ namespace FanCoilUnits {
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
-
 	}
 
-	void
-	Sim4PipeFanCoil(
-		int & FanCoilNum, // number of the current fan coil unit being simulated
+    void Sim4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
 		int const ZoneNum, // number of zone being served
 		int const ControlledZoneNum, // index into ZoneEqupConfig
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -1836,19 +1946,20 @@ namespace FanCoilUnits {
 
 		// REFERENCES:
 		// SZVAV sysetm control:
-		// ASHRAE 90.1 2010 Section 6.4.3.10 - Single Zone Variable-Air-volume Controls (described in Trane newsletter entitled Understanding Single-Zone VAV Systems)
-		// Trane Engineers Newsletter - https://www.trane.com/content/dam/Trane/Commercial/global/products-systems/education-training/engineers-newsletters/airside-design/admapn047en_0413.pdf
+        // ASHRAE 90.1 2010 Section 6.4.3.10 - Single Zone Variable-Air-volume Controls (described in Trane newsletter entitled Understanding
+        // Single-Zone VAV Systems) Trane Engineers Newsletter -
+        // https://www.trane.com/content/dam/Trane/Commercial/global/products-systems/education-training/engineers-newsletters/airside-design/admapn047en_0413.pdf
 		//
 
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
-		using Psychrometrics::PsyHFnTdbW;
-		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataHeatBalFanSys::TempControlType;
+        using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
+        using General::SolveRoot;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
-		using General::SolveRoot;
-		using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
+        using Psychrometrics::PsyHFnTdbW;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using namespace DataPlant;
 		using namespace DataLoopNode;
 		// Locals
@@ -1941,7 +2052,8 @@ namespace FanCoilUnits {
 		HotFlowLocked = false;
 
 		// select capacity control method
-		{ auto const SELECT_CASE_var( FanCoil( FanCoilNum ).CapCtrlMeth_Num );
+        {
+            auto const SELECT_CASE_var(FanCoil(FanCoilNum).CapCtrlMeth_Num);
 
 		// constant fan variable flow
 		if ( SELECT_CASE_var == CCM_ConsFanVarFlow ) {
@@ -1951,13 +2063,17 @@ namespace FanCoilUnits {
 
 			// set water coil flow rate to 0 to calculate coil off capacity (only valid while flow is unlocked)
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                     FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                     FanCoil(FanCoilNum).CWCompNum);
 			if ( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).LoopSide( FanCoil( FanCoilNum ).CWLoopSide ).FlowLock == FlowLocked ) {
 				ColdFlowLocked = true; // check for flow lock
 			}
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				mdot = 0.0;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                         FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                         FanCoil(FanCoilNum).HWCompNum);
 				if ( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).LoopSide( FanCoil( FanCoilNum ).HWLoopSide ).FlowLock == FlowLocked ) {
 					HotFlowLocked = true; // save locked flow
 				}
@@ -1989,7 +2105,9 @@ namespace FanCoilUnits {
 				}
 				// get full load result
 				mdot = MaxWaterFlow;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                         FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                         FanCoil(FanCoilNum).CWCompNum);
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxC );
 				if ( ! ColdFlowLocked ) {
 					FanCoil( FanCoilNum ).QUnitOutMaxC = QUnitOutMaxC;
@@ -2011,7 +2129,8 @@ namespace FanCoilUnits {
 						// tighten limits on water flow rate to see if this allows convergence
 						CoolingLoad = true;
 						HeatingLoad = false;
-						TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+                            TightenWaterFlowLimits(FanCoilNum, CoolingLoad, HeatingLoad, FanCoil(FanCoilNum).ColdControlNode, ControlledZoneNum,
+                                                   FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow);
 						SolveRoot( 0.001, MaxIterCycl, SolFlag, CWFlow, CalcFanCoilCWLoadResidual, MinWaterFlow, MaxWaterFlow, Par );
 						if ( SolFlag == -1 ) {
 							++FanCoil( FanCoilNum ).ConvgErrCountC;
@@ -2020,12 +2139,15 @@ namespace FanCoilUnits {
 								ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
 								Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = CWFlow;
 								Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
-								ShowContinueErrorTimeStamp( "Load Request = " + TrimSigDigits( QZnReq ) + ", Final Capacity = " + TrimSigDigits( QUnitOut ) );
-								ShowContinueErrorTimeStamp( "Min water flow used during iterations = " + TrimSigDigits( MinWaterFlow ) + ", Max water flow used during iterations = " + TrimSigDigits( MaxWaterFlow ) );
+                                    ShowContinueErrorTimeStamp("Load Request = " + TrimSigDigits(QZnReq) +
+                                                               ", Final Capacity = " + TrimSigDigits(QUnitOut));
+                                    ShowContinueErrorTimeStamp("Min water flow used during iterations = " + TrimSigDigits(MinWaterFlow) +
+                                                               ", Max water flow used during iterations = " + TrimSigDigits(MaxWaterFlow));
 								ShowContinueErrorTimeStamp( "Water flow rate on last iteration = " + TrimSigDigits( CWFlow ) );
 								ShowContinueErrorTimeStamp( "..Water flow rate set to last iteration value " );
 							} else {
-								ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name,
+                                    ShowRecurringWarningErrorAtEnd("Cold water flow Iteration limit exceeded in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
 									FanCoil( FanCoilNum ).MaxIterIndexC );
 							}
 						} else if( SolFlag == -2 ) {
@@ -2056,31 +2178,38 @@ namespace FanCoilUnits {
 				}
 				if ( ! ColdFlowLocked ) {
 					mdot = CWFlow; // not flowlocked - set flow to CWFlow
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum,
-						FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                             FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                             FanCoil(FanCoilNum).CWCompNum);
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
-				}
-				else {
+                    } else {
 					// flow lock on
 					if ( MdotLockC > CWFlow ) { // if mdot > CWFlow, bypass extra flow
-						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with CWFlow; rest will be bypassed
-						Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
+                            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration,
+                                             QUnitOut); // get QUnitOut with CWFlow; rest will be bypassed
+                            Node(FanCoil(FanCoilNum).ColdControlNode).MassFlowRate =
+                                MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).MassFlowRate = MdotLockC;
 						// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
 						CWFlowBypass = MdotLockC - CWFlow;
 						// change water outlet temperature and enthalpy
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Temp = ( CWFlowBypass * Node( FanCoil( FanCoilNum ).ColdControlNode ).Temp +
-							CWFlow * Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Temp ) / MdotLockC;
-						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy = ( CWFlowBypass * Node( FanCoil( FanCoilNum ).ColdControlNode ).Enthalpy +
-							CWFlow * Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).Enthalpy ) / MdotLockC;
+                                                                                  CWFlow * Node(FanCoil(FanCoilNum).ColdPlantOutletNode).Temp) /
+                                                                                 MdotLockC;
+                            Node(FanCoil(FanCoilNum).ColdPlantOutletNode).Enthalpy =
+                                (CWFlowBypass * Node(FanCoil(FanCoilNum).ColdControlNode).Enthalpy +
+                                 CWFlow * Node(FanCoil(FanCoilNum).ColdPlantOutletNode).Enthalpy) /
+                                MdotLockC;
 					} else {
 						// if MdotLockC <= CWFlow use MdotLockC as is
-						Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
+                            Node(FanCoil(FanCoilNum).ColdControlNode).MassFlowRate =
+                                MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
 						Node( FanCoil( FanCoilNum ).ColdPlantOutletNode ).MassFlowRate = MdotLockC;
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
 					}
 				}
-				QUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+                    QUnitOut = AirMassFlow *
+                               (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 			// if heating
 			} else if ( UnitOn && QCoilHeatSP > SmallLoad && TempControlType( ZoneNum ) != SingleCoolingSetPoint ) {
 				// get full load result
@@ -2096,7 +2225,9 @@ namespace FanCoilUnits {
 						MinWaterFlow = Node( ControlNode ).MassFlowRateMinAvail;
 					}
 					mdot = MaxWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                             FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                             FanCoil(FanCoilNum).HWCompNum);
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxH );
 					if ( ! HotFlowLocked ) {
 						FanCoil( FanCoilNum ).QUnitOutMaxH = QUnitOutMaxH;
@@ -2123,7 +2254,8 @@ namespace FanCoilUnits {
 							// tighten limits on water flow rate to see if this allows convergence
 							CoolingLoad = false;
 							HeatingLoad = true;
-							TightenWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).HotControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow );
+                                TightenWaterFlowLimits(FanCoilNum, CoolingLoad, HeatingLoad, FanCoil(FanCoilNum).HotControlNode, ControlledZoneNum,
+                                                       FirstHVACIteration, QZnReq, MinWaterFlow, MaxWaterFlow);
 							SolveRoot( 0.001, MaxIterCycl, SolFlag, HWFlow, CalcFanCoilHWLoadResidual, MinWaterFlow, MaxWaterFlow, Par );
 							if ( SolFlag == -1 ) {
 								++FanCoil( FanCoilNum ).ConvgErrCountH;
@@ -2132,12 +2264,15 @@ namespace FanCoilUnits {
 									ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
 									Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = HWFlow;
 									Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
-									ShowContinueErrorTimeStamp( "Load Request = " + TrimSigDigits( QZnReq ) + ", Final Capacity = " + TrimSigDigits( QUnitOut ) );
-									ShowContinueErrorTimeStamp( "Min water flow used during iterations = " + TrimSigDigits( MinWaterFlow ) + ", Max water flow used during iterations = " + TrimSigDigits( MaxWaterFlow ) );
+                                        ShowContinueErrorTimeStamp("Load Request = " + TrimSigDigits(QZnReq) +
+                                                                   ", Final Capacity = " + TrimSigDigits(QUnitOut));
+                                        ShowContinueErrorTimeStamp("Min water flow used during iterations = " + TrimSigDigits(MinWaterFlow) +
+                                                                   ", Max water flow used during iterations = " + TrimSigDigits(MaxWaterFlow));
 									ShowContinueErrorTimeStamp( "Water flow rate on last iteration = " + TrimSigDigits( HWFlow ) );
 									ShowContinueErrorTimeStamp( "..Water flow rate set to last iteration value " );
 								} else {
-									ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name,
+                                        ShowRecurringWarningErrorAtEnd("Hot water flow Iteration limit exceeded in fan coil unit " +
+                                                                           FanCoil(FanCoilNum).Name,
 										FanCoil( FanCoilNum ).MaxIterIndexH );
 								}
 							} else if ( SolFlag == -2 ) {
@@ -2181,31 +2316,39 @@ namespace FanCoilUnits {
 				if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 					if ( !HotFlowLocked ) {
 						mdot = HWFlow; // not flowlocked - set flow to HWFlow
-						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum,
-							FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                 FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                                 FanCoil(FanCoilNum).HWCompNum);
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut
 					} else {
 						// flow lock on
 						if ( MdotLockH > HWFlow ) { // if mdot > HWFlow, bypass extra flow
-							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut ); // get QUnitOut with HWFlow; rest will be bypassed
-							Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
+                                Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration,
+                                                 QUnitOut); // get QUnitOut with HWFlow; rest will be bypassed
+                                Node(FanCoil(FanCoilNum).HotControlNode).MassFlowRate =
+                                    MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).MassFlowRate = MdotLockH;
 							// Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
 							HWFlowBypass = MdotLockH - HWFlow;
 							// change outlet water temperature and enthalpy
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Temp = ( HWFlowBypass * Node( FanCoil( FanCoilNum ).HotControlNode ).Temp +
-								HWFlow * Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Temp ) / MdotLockH;
-							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Enthalpy = ( HWFlowBypass * Node( FanCoil( FanCoilNum ).HotControlNode ).Enthalpy +
-								HWFlow * Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).Enthalpy ) / MdotLockH;
+                                                                                     HWFlow * Node(FanCoil(FanCoilNum).HotPlantOutletNode).Temp) /
+                                                                                    MdotLockH;
+                                Node(FanCoil(FanCoilNum).HotPlantOutletNode).Enthalpy =
+                                    (HWFlowBypass * Node(FanCoil(FanCoilNum).HotControlNode).Enthalpy +
+                                     HWFlow * Node(FanCoil(FanCoilNum).HotPlantOutletNode).Enthalpy) /
+                                    MdotLockH;
 						} else {
 							// if MdotLockH <= HWFlow use MdotLockH as is
-							Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
+                                Node(FanCoil(FanCoilNum).HotControlNode).MassFlowRate =
+                                    MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
 							Node( FanCoil( FanCoilNum ).HotPlantOutletNode ).MassFlowRate = MdotLockH;
 							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
 						}
 					}
 				}
-				QUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+                    QUnitOut = AirMassFlow *
+                               (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 			} else {
 				// no action
 				QUnitOut = QUnitOutNoHC;
@@ -2236,13 +2379,17 @@ namespace FanCoilUnits {
 
 			// zero the hot & cold water flows
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                     FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                     FanCoil(FanCoilNum).CWCompNum);
 			if( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).LoopSide( FanCoil( FanCoilNum ).CWLoopSide ).FlowLock == FlowLocked ) {
 				ColdFlowLocked = true; // check for flow lock
 			}
 			if( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				mdot = 0.0;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                         FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                         FanCoil(FanCoilNum).HWCompNum);
 				if( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).LoopSide( FanCoil( FanCoilNum ).HWLoopSide ).FlowLock == FlowLocked ) {
 					HotFlowLocked = true; // save locked flow
 				}
@@ -2289,7 +2436,9 @@ namespace FanCoilUnits {
 			if ( UnitOn && QCoilCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
 				// cooling coil action, maximum cold water flow
 				mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                         FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                         FanCoil(FanCoilNum).CWCompNum);
 
 				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP;
 				ControlOffset = FanCoil( FanCoilNum ).ColdControlOffset;
@@ -2311,7 +2460,8 @@ namespace FanCoilUnits {
 						// tighten limits on water flow rate to see if this allows convergence
 						CoolingLoad = true;
 						HeatingLoad = false;
-						TightenAirAndWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).ColdControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, PLRMin, PLRMax );
+                            TightenAirAndWaterFlowLimits(FanCoilNum, CoolingLoad, HeatingLoad, FanCoil(FanCoilNum).ColdControlNode, ControlledZoneNum,
+                                                         FirstHVACIteration, QZnReq, PLRMin, PLRMax);
 						SolveRoot( 0.001, MaxIterCycl, SolFlag, PLR, CalcFanCoilPLRResidual, PLRMin, PLRMax, Par );
 						if ( SolFlag == -1 ) {
 							++FanCoil( FanCoilNum ).ConvgErrCountC;
@@ -2320,12 +2470,16 @@ namespace FanCoilUnits {
 								ShowContinueError( "  Iteration limit exceeded in calculating FCU part-load ratio " );
 								Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
 								Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
-								ShowContinueErrorTimeStamp( "Load Request = " + TrimSigDigits( QZnReq ) + ", Final Capacity = " + TrimSigDigits( QUnitOut ) );
-								ShowContinueErrorTimeStamp( "Min part-load used during iterations = " + TrimSigDigits( PLRMin ) + ", Max part-load used during iterations = " + TrimSigDigits( PLRMax ) );
+                                    ShowContinueErrorTimeStamp("Load Request = " + TrimSigDigits(QZnReq) +
+                                                               ", Final Capacity = " + TrimSigDigits(QUnitOut));
+                                    ShowContinueErrorTimeStamp("Min part-load used during iterations = " + TrimSigDigits(PLRMin) +
+                                                               ", Max part-load used during iterations = " + TrimSigDigits(PLRMax));
 								ShowContinueErrorTimeStamp( "Part-load ratio on last iteration = " + TrimSigDigits( PLR ) );
 								ShowContinueErrorTimeStamp( "..Part-load ratio set to last iteration value " );
 							} else {
-								ShowRecurringWarningErrorAtEnd( "Part-load ratio cooling iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                                    ShowRecurringWarningErrorAtEnd("Part-load ratio cooling iteration limit exceeded in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).MaxIterIndexC);
 							}
 						} else if( SolFlag == -2 ) {
 							++FanCoil( FanCoilNum ).LimitErrCountC;
@@ -2334,7 +2488,9 @@ namespace FanCoilUnits {
 								ShowContinueError( "  Bad part-load ratio limits" );
 								ShowContinueErrorTimeStamp( "..Part-load ratio set to " + TrimSigDigits( PLRMin ) );
 							} else{
-								ShowRecurringWarningErrorAtEnd( "Part-load ratio cooling control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).BadMassFlowLimIndexC );
+                                    ShowRecurringWarningErrorAtEnd("Part-load ratio cooling control failed in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).BadMassFlowLimIndexC);
 							}
 						}
 					} else if ( SolFlag == -2 ) {
@@ -2344,15 +2500,20 @@ namespace FanCoilUnits {
 							ShowContinueError( "  Bad part-load ratio limits" );
 							ShowContinueErrorTimeStamp( "..Part-load ratio set to 0" );
 						} else{
-							ShowRecurringWarningErrorAtEnd( "Part-load ratio control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).BadMassFlowLimIndexC );
+                                ShowRecurringWarningErrorAtEnd("Part-load ratio control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).BadMassFlowLimIndexC);
 						}
 					}
 					mdot = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                             FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                             FanCoil(FanCoilNum).CWCompNum);
 					} else {
 					PLR = 1.0;
 					mdot = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                             FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                             FanCoil(FanCoilNum).CWCompNum);
 				}
 
 				// at the end calculate output
@@ -2363,7 +2524,9 @@ namespace FanCoilUnits {
 
 				if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 					mdot = FanCoil( FanCoilNum ).MaxHotWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                             FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                             FanCoil(FanCoilNum).HWCompNum);
 				}
 
 				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP;
@@ -2387,7 +2550,8 @@ namespace FanCoilUnits {
 							// tighten limits on water flow rate to see if this allows convergence
 							CoolingLoad = false;
 							HeatingLoad = true;
-							TightenAirAndWaterFlowLimits( FanCoilNum, CoolingLoad, HeatingLoad, FanCoil( FanCoilNum ).HotControlNode, ControlledZoneNum, FirstHVACIteration, QZnReq, PLRMin, PLRMax );
+                                TightenAirAndWaterFlowLimits(FanCoilNum, CoolingLoad, HeatingLoad, FanCoil(FanCoilNum).HotControlNode,
+                                                             ControlledZoneNum, FirstHVACIteration, QZnReq, PLRMin, PLRMax);
 							SolveRoot( 0.001, MaxIterCycl, SolFlag, PLR, CalcFanCoilPLRResidual, PLRMin, PLRMax, Par );
 							if ( SolFlag == -1 ) {
 								++FanCoil( FanCoilNum ).ConvgErrCountH;
@@ -2396,12 +2560,16 @@ namespace FanCoilUnits {
 									ShowContinueError( "  Iteration limit exceeded in calculating FCU part-load ratio " );
 									Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate = PLR * FanCoil( FanCoilNum ).MaxHotWaterFlow;
 									Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
-									ShowContinueErrorTimeStamp( "Load Request = " + TrimSigDigits( QZnReq ) + ", Final Capacity = " + TrimSigDigits( QUnitOut ) );
-									ShowContinueErrorTimeStamp( "Min part-load ratio used during iterations = " + TrimSigDigits( PLRMin ) + ", Max part-load used during iterations = " + TrimSigDigits( PLRMax ) );
+                                        ShowContinueErrorTimeStamp("Load Request = " + TrimSigDigits(QZnReq) +
+                                                                   ", Final Capacity = " + TrimSigDigits(QUnitOut));
+                                        ShowContinueErrorTimeStamp("Min part-load ratio used during iterations = " + TrimSigDigits(PLRMin) +
+                                                                   ", Max part-load used during iterations = " + TrimSigDigits(PLRMax));
 									ShowContinueErrorTimeStamp( "Part-load ratio on last iteration = " + TrimSigDigits( PLR ) );
 									ShowContinueErrorTimeStamp( "..Part-load ratio set to last iteration value " );
 								} else {
-									ShowRecurringWarningErrorAtEnd( "Part-load ratio heating iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                        ShowRecurringWarningErrorAtEnd("Part-load ratio heating iteration limit exceeded in fan coil unit " +
+                                                                           FanCoil(FanCoilNum).Name,
+                                                                       FanCoil(FanCoilNum).MaxIterIndexH);
 								}
 							} else if ( SolFlag == -2 ) {
 								++FanCoil( FanCoilNum ).LimitErrCountH;
@@ -2410,7 +2578,9 @@ namespace FanCoilUnits {
 									ShowContinueError( "  Bad hot part-load ratio limits" );
 									ShowContinueErrorTimeStamp( "..Part-load ratio set to " + TrimSigDigits( PLRMin ) );
 								} else {
-									ShowRecurringWarningErrorAtEnd( "Part-load ratio heating control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).BadMassFlowLimIndexH );
+                                        ShowRecurringWarningErrorAtEnd("Part-load ratio heating control failed in fan coil unit " +
+                                                                           FanCoil(FanCoilNum).Name,
+                                                                       FanCoil(FanCoilNum).BadMassFlowLimIndexH);
 								}
 							}
 						} else if( SolFlag == -2 ) {
@@ -2420,12 +2590,15 @@ namespace FanCoilUnits {
 								ShowContinueError( "  Bad part-load ratio limits" );
 								ShowContinueErrorTimeStamp( "..Part-load ratio set to 0" );
 							} else {
-								ShowRecurringWarningErrorAtEnd( "Part-load ratio heating control failed in fan coil unit " + FanCoil( FanCoilNum ).Name,
+                                    ShowRecurringWarningErrorAtEnd("Part-load ratio heating control failed in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
 									FanCoil( FanCoilNum ).BadMassFlowLimIndexH );
 							}
 						}
 						HWFlow = PLR * FanCoil( FanCoilNum ).MaxHotWaterFlow;
-						SetComponentFlowRate( HWFlow, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                            SetComponentFlowRate(HWFlow, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                 FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                                 FanCoil(FanCoilNum).HWCompNum);
 
 					} else {
 						Par( 1 ) = double( FanCoilNum );
@@ -2434,13 +2607,14 @@ namespace FanCoilUnits {
 						Par( 3 ) = ControlledZoneNum;
 						Par( 4 ) = QZnReq;
 						SolveRoot( 0.001, MaxIterCycl, SolFlag, PLR, CalcFanCoilLoadResidual, 0.0, 1.0, Par );
-
 					}
 				} else {
 					PLR = 1.0;
 					if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 						mdot = PLR * FanCoil( FanCoilNum ).MaxHotWaterFlow;
-						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                 FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                                 FanCoil(FanCoilNum).HWCompNum);
 					}
 				}
 
@@ -2481,32 +2655,42 @@ namespace FanCoilUnits {
 
 			//  zero the hot & cold water flows
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                     FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                     FanCoil(FanCoilNum).CWCompNum);
 			OAMassFlow = 0.0;
 
 			// determine minimum outdoor air flow rate
 			if ( FanCoil( FanCoilNum ).DSOAPtr > 0 && FanCoil( FanCoilNum ).OutsideAirNode > 0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( FanCoil( FanCoilNum ).DSOAPtr, ZoneNum, true, true );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( FanCoil( FanCoilNum ).OutsideAirNode ).Press, Node( FanCoil( FanCoilNum ).OutsideAirNode ).Temp, Node( FanCoil( FanCoilNum ).OutsideAirNode ).HumRat );
+                    RhoAir = PsyRhoAirFnPbTdbW(Node(FanCoil(FanCoilNum).OutsideAirNode).Press, Node(FanCoil(FanCoilNum).OutsideAirNode).Temp,
+                                               Node(FanCoil(FanCoilNum).OutsideAirNode).HumRat);
 				OAMassFlow = OAVolumeFlowRate * RhoAir;
 			}
 
-			MinSAMassFlowRate = min( max( OAMassFlow, FanCoil( FanCoilNum ).MaxAirMassFlow * FanCoil( FanCoilNum ).LowSpeedRatio ), FanCoil( FanCoilNum ).MaxAirMassFlow );
+                MinSAMassFlowRate =
+                    min(max(OAMassFlow, FanCoil(FanCoilNum).MaxAirMassFlow * FanCoil(FanCoilNum).LowSpeedRatio), FanCoil(FanCoilNum).MaxAirMassFlow);
 			MaxSAMassFlowRate = FanCoil( FanCoilNum ).MaxAirMassFlow;
 			Node( InletNode ).MassFlowRate = MinSAMassFlowRate;
 
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				mdot = 0.0;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                         FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                         FanCoil(FanCoilNum).HWCompNum);
 			}
 
-			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
+                Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC,
+                                 0.0); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
 			// Operating mode = cooling
-			if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
+                if (UnitOn && ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP < (-1.0 * SmallLoad) &&
+                    TempControlType(ZoneNum) != SingleHeatingSetPoint) {
 				// cooling coil action, maximum cold water flow
 				mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                         FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                         FanCoil(FanCoilNum).CWCompNum);
 
 				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP;
 				ControlOffset = FanCoil( FanCoilNum ).ColdControlOffset;
@@ -2515,8 +2699,8 @@ namespace FanCoilUnits {
 				Node( InletNode ).MassFlowRate = MaxSAMassFlowRate;
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
 
-				// zone load is less than reduced capacity (e.g., 50% capacity) so operate at low speed fan and modulate coil water flow rate to meet load
-				// operate at low speed fan and modulate coil water flow rate to meet load
+                    // zone load is less than reduced capacity (e.g., 50% capacity) so operate at low speed fan and modulate coil water flow rate to
+                    // meet load operate at low speed fan and modulate coil water flow rate to meet load
 				if ( QUnitOutMax < 0.0 && ( QZnReq > ( FanCoil( FanCoilNum ).DesZoneCoolingLoad * FanCoil( FanCoilNum ).LowSpeedRatio ) ) ) {
 
 					Node( InletNode ).MassFlowRate = MinSAMassFlowRate;
@@ -2528,16 +2712,21 @@ namespace FanCoilUnits {
 					Par( 3 ) = ControlledZoneNum;
 					Par( 4 ) = QZnReq;
 					Par( 5 ) = double( FanCoil( FanCoilNum ).ColdControlNode );
-					SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil( FanCoilNum ).MaxColdWaterFlow, Par );
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                        SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil(FanCoilNum).MaxColdWaterFlow,
+                                  Par);
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                             FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                             FanCoil(FanCoilNum).CWCompNum);
 					if ( SolFlag == -1 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-						ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                            ShowRecurringWarningErrorAtEnd("Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexH);
 					} else if ( SolFlag == -2 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Bad cold water mass flow limits" );
-						ShowRecurringWarningErrorAtEnd( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                            ShowRecurringWarningErrorAtEnd("Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexC);
 					}
 
 				// operate at variable air flow and modulate coil water flow rate to meet load
@@ -2552,19 +2741,23 @@ namespace FanCoilUnits {
 					Par( 3 ) = ControlledZoneNum;
 					Par( 4 ) = FanCoil( FanCoilNum ).DesZoneCoolingLoad * FanCoil( FanCoilNum ).LowSpeedRatio; // QZnReq
 					Par( 5 ) = double( FanCoil( FanCoilNum ).ColdControlNode );
-					SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil( FanCoilNum ).MaxColdWaterFlow, Par );
+                        SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil(FanCoilNum).MaxColdWaterFlow,
+                                  Par);
 					if ( SolFlag == -1 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-						ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                            ShowRecurringWarningErrorAtEnd("Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexC);
 					} else if ( SolFlag == -2 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Bad cold water mass flow limits" );
-						ShowRecurringWarningErrorAtEnd( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                            ShowRecurringWarningErrorAtEnd("Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexC);
 					}
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
 
-					// if cooling load is greater than low fan speed unit output, modulate air and water flow rate so that each  (i.e., mdot and air flow) are above last iteration result
+                        // if cooling load is greater than low fan speed unit output, modulate air and water flow rate so that each  (i.e., mdot and
+                        // air flow) are above last iteration result
 					if ( QZnReq < QUnitOut ) {
 						//solve for the cold water and air flow rate that meets zone load
 						Par( 1 ) = double( FanCoilNum );
@@ -2576,21 +2769,30 @@ namespace FanCoilUnits {
 						Par( 6 ) = mdot;
 						SolveRoot( ControlOffset, MaxIterCycl, SolFlag, PLR, CalcFanCoilAirAndWaterFlowResidual, 0.0, 1.0, Par );
 						Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate = mdot + ( PLR * ( FanCoil( FanCoilNum ).MaxColdWaterFlow - mdot ) );
-						SetComponentFlowRate( Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                            SetComponentFlowRate(Node(FanCoil(FanCoilNum).ColdControlNode).MassFlowRate, FanCoil(FanCoilNum).ColdControlNode,
+                                                 FanCoil(FanCoilNum).ColdPlantOutletNode, FanCoil(FanCoilNum).CWLoopNum,
+                                                 FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum);
 						if ( SolFlag == -1 ) {
 							ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-							ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                                ShowRecurringWarningErrorAtEnd("Cold water flow Iteration limit exceeded in fan coil unit " +
+                                                                   FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexC);
 						} else if ( SolFlag == -2 ) {
 							ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Bad cold water mass flow limits" );
-							ShowRecurringWarningErrorAtEnd( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                                ShowRecurringWarningErrorAtEnd("Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexC);
 							Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = MinSAMassFlowRate;
-							SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                                SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                                     FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                                     FanCoil(FanCoilNum).CWCompNum);
 							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
 						}
 					} else {
-						SetComponentFlowRate( Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                            SetComponentFlowRate(Node(FanCoil(FanCoilNum).ColdControlNode).MassFlowRate, FanCoil(FanCoilNum).ColdControlNode,
+                                                 FanCoil(FanCoilNum).ColdPlantOutletNode, FanCoil(FanCoilNum).CWLoopNum,
+                                                 FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum);
 					}
 
 				// operate at variable coil water flow rate to meet load
@@ -2603,22 +2805,29 @@ namespace FanCoilUnits {
 					Par( 3 ) = ControlledZoneNum;
 					Par( 4 ) = QZnReq;
 					Par( 5 ) = double( FanCoil( FanCoilNum ).ColdControlNode );
-					SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil( FanCoilNum ).MaxColdWaterFlow, Par );
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                        SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil(FanCoilNum).MaxColdWaterFlow,
+                                  Par);
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                             FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                             FanCoil(FanCoilNum).CWCompNum);
 					if ( SolFlag == -1 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-						ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                            ShowRecurringWarningErrorAtEnd("Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexH);
 					} else if ( SolFlag == -2 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Bad cold water mass flow limits" );
-						ShowRecurringWarningErrorAtEnd( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                            ShowRecurringWarningErrorAtEnd("Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexC);
 					}
 
 				} else { // else run at full capacity
 					PLR = 1.0;
 					mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                             FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                             FanCoil(FanCoilNum).CWCompNum);
 				}
 
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
@@ -2634,27 +2843,35 @@ namespace FanCoilUnits {
 					Par( 4 ) = FanCoil( FanCoilNum ).MinSATempCooling;
 					Par( 5 ) = QZnReq;
 					Par( 6 ) = double( FanCoil( FanCoilNum ).ColdControlNode );
-					SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowTempResidual, 0.0, FanCoil( FanCoilNum ).MaxColdWaterFlow, Par );
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                        SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowTempResidual, 0.0,
+                                  FanCoil(FanCoilNum).MaxColdWaterFlow, Par);
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                             FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                             FanCoil(FanCoilNum).CWCompNum);
 					if ( SolFlag == -1 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-						ShowRecurringWarningErrorAtEnd( "Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                            ShowRecurringWarningErrorAtEnd("Cold water flow Iteration limit exceeded in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexH);
 					} else if ( SolFlag == -2 ) {
 						ShowWarningError( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Bad cold water mass flow limits" );
-						ShowRecurringWarningErrorAtEnd( "Cold Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                            ShowRecurringWarningErrorAtEnd("Cold Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexC);
 					}
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
 				}
 
 			// Operating mode = heating
-			} else if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP > SmallLoad && TempControlType( ZoneNum ) != SingleCoolingSetPoint ) {
+                } else if (UnitOn && ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP > SmallLoad &&
+                           TempControlType(ZoneNum) != SingleCoolingSetPoint) {
 
 				// heating coil action, maximun hot water flow
 				if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 					mdot = FanCoil( FanCoilNum ).MaxHotWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                             FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                             FanCoil(FanCoilNum).HWCompNum);
 				}
 
 				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP;
@@ -2664,8 +2881,8 @@ namespace FanCoilUnits {
 				Node( InletNode ).MassFlowRate = MaxSAMassFlowRate;
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
 
-				// zone load is less than reduced capacity (e.g., 50% capacity) so operate at low speed fan and modulate coil water flow rate to meet load
-				// operate at low speed fan and modulate coil water flow rate or elec heater PLR to meet load
+                    // zone load is less than reduced capacity (e.g., 50% capacity) so operate at low speed fan and modulate coil water flow rate to
+                    // meet load operate at low speed fan and modulate coil water flow rate or elec heater PLR to meet load
 				if ( QUnitOutMax > 0.0 && ( QZnReq < ( FanCoil( FanCoilNum ).DesZoneHeatingLoad * FanCoil( FanCoilNum ).LowSpeedRatio ) ) ) {
 
 					Node( InletNode ).MassFlowRate = MinSAMassFlowRate;
@@ -2679,20 +2896,28 @@ namespace FanCoilUnits {
 						Par( 4 ) = QZnReq;
 						Par( 5 ) = double( FanCoil( FanCoilNum ).HotControlNode );
 						if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-							SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil( FanCoilNum ).MaxHotWaterFlow, Par );
-							SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                                SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0,
+                                          FanCoil(FanCoilNum).MaxHotWaterFlow, Par);
+                                SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                     FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                                     FanCoil(FanCoilNum).HWCompNum);
 							if ( SolFlag == -1 ) {
 								ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 								ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-								ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                    ShowRecurringWarningErrorAtEnd("Hot water flow Iteration limit exceeded in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).MaxIterIndexH);
 							} else if ( SolFlag == -2 ) {
 								ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 								ShowContinueError( "  Bad hot water mass flow limits" );
-								ShowRecurringWarningErrorAtEnd( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                    ShowRecurringWarningErrorAtEnd("Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).MaxIterIndexH);
 								Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = MinSAMassFlowRate;
 								if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 									mdot = 0.0;
-									SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                             FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide,
+                                                             FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 								}
 							}
 							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
@@ -2704,11 +2929,15 @@ namespace FanCoilUnits {
 							if( SolFlag == -1 ) {
 								ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 								ShowContinueError( "  Iteration limit exceeded in calculating heating coil part load ratio." );
-								ShowRecurringWarningErrorAtEnd( "Electric heating coil iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                    ShowRecurringWarningErrorAtEnd("Electric heating coil iteration limit exceeded in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).MaxIterIndexH);
 							} else if( SolFlag == -2 ) {
 								ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 								ShowContinueError( "  Bad starting values for electric heating coil control at minimum air flow." );
-								ShowRecurringWarningErrorAtEnd( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                    ShowRecurringWarningErrorAtEnd("Electric heating coil control failed in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).MaxIterIndexH);
 							}
 							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
 						}
@@ -2716,10 +2945,13 @@ namespace FanCoilUnits {
 					} else { // unit coils are off
 						if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 							mdot = 0.0;
-							SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                                SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                     FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                                     FanCoil(FanCoilNum).HWCompNum);
 						}
 						PLR = 0.0;
-						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, PLR ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
+                            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC,
+                                             PLR); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 					}
 
 				// zone load is greater than reduced zone load and less than design zone load, modulate air flow rate to meet load
@@ -2735,16 +2967,19 @@ namespace FanCoilUnits {
 					Par( 4 ) = FanCoil( FanCoilNum ).DesZoneHeatingLoad * FanCoil( FanCoilNum ).LowSpeedRatio; // QZnReq
 					Par( 5 ) = double( FanCoil( FanCoilNum ).HotControlNode );
 					if( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-						SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil( FanCoilNum ).MaxHotWaterFlow, Par );
+                            SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0,
+                                      FanCoil(FanCoilNum).MaxHotWaterFlow, Par);
 						Low_mdot = mdot;
 						if ( SolFlag == -1 ) {
 							ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-							ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						} else if ( SolFlag == -2 ) {
 							ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Bad hot water mass flow limits" );
-							ShowRecurringWarningErrorAtEnd( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						}
 
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
@@ -2757,15 +2992,18 @@ namespace FanCoilUnits {
 						Par( 3 ) = ControlledZoneNum;
 						Par( 4 ) = FanCoil( FanCoilNum ).DesZoneHeatingLoad; // QZnReq;
 						Par( 5 ) = double( FanCoil( FanCoilNum ).HotControlNode );
-						SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil( FanCoilNum ).MaxHotWaterFlow, Par );
+                            SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0,
+                                      FanCoil(FanCoilNum).MaxHotWaterFlow, Par);
 						if ( SolFlag == -1 ) {
 							ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-							ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						} else if ( SolFlag == -2 ) {
 							ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Bad hot water mass flow limits" );
-							ShowRecurringWarningErrorAtEnd( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						}
 
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
@@ -2783,26 +3021,34 @@ namespace FanCoilUnits {
 							if ( SolFlag == -1 ) {
 								ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 								ShowContinueError( "  Iteration limit exceeded in calculating air flow rate " );
-								ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                    ShowRecurringWarningErrorAtEnd("Hot water flow Iteration limit exceeded in fan coil unit " +
+                                                                       FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).MaxIterIndexH);
 							} else if ( SolFlag == -2 ) {
 								ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 								ShowContinueError( "  Bad air mass flow limits" );
-								ShowRecurringWarningErrorAtEnd( "Hot Water air flow control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                    ShowRecurringWarningErrorAtEnd("Hot Water air flow control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                                   FanCoil(FanCoilNum).MaxIterIndexH);
 							}
 
-							SetComponentFlowRate( Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                                SetComponentFlowRate(Node(FanCoil(FanCoilNum).HotControlNode).MassFlowRate, FanCoil(FanCoilNum).HotControlNode,
+                                                     FanCoil(FanCoilNum).HotPlantOutletNode, FanCoil(FanCoilNum).HWLoopNum,
+                                                     FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 
 						} else if ( QUnitOutMax > FanCoil( FanCoilNum ).DesZoneHeatingLoad  ) {
 							if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-								SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                         FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide,
+                                                         FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 							}
 
 						} else if ( QUnitOut < FanCoil( FanCoilNum ).DesZoneHeatingLoad * FanCoil( FanCoilNum ).LowSpeedRatio ) {
 							Node( InletNode ).MassFlowRate = MinSAMassFlowRate;
 							if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-								SetComponentFlowRate( Low_mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                                    SetComponentFlowRate(Low_mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                         FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide,
+                                                         FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 							}
-
 						}
 						PLR = 1.0;
 
@@ -2820,13 +3066,15 @@ namespace FanCoilUnits {
 						if( SolFlag == -1 ) {
 							ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating heating coil part load ratio." );
-							ShowRecurringWarningErrorAtEnd( "Electric heating coil iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Electric heating coil iteration limit exceeded in fan coil unit " +
+                                                                   FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						} else if( SolFlag == -2 ) {
 							ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Bad starting values for electric heating coil control at modulating air flow." );
-							ShowRecurringWarningErrorAtEnd( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Electric heating coil control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						}
-
 					}
 
 				} else if ( QUnitOutMax > 0.0 && ( QZnReq < QUnitOutMax ) ) {
@@ -2841,15 +3089,18 @@ namespace FanCoilUnits {
 					Par( 4 ) = QZnReq;
 					Par( 5 ) = double( FanCoil( FanCoilNum ).HotControlNode );
 					if( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-						SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0, FanCoil( FanCoilNum ).MaxHotWaterFlow, Par );
+                            SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowResidual, 0.0,
+                                      FanCoil(FanCoilNum).MaxHotWaterFlow, Par);
 						if ( SolFlag == -1 ) {
 							ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating water flow rate " );
-							ShowRecurringWarningErrorAtEnd( "Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Hot water flow Iteration limit exceeded in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						} else if ( SolFlag == -2 ) {
 							ShowWarningError( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Bad hot water mass flow limits" );
-							ShowRecurringWarningErrorAtEnd( "Hot Water control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Hot Water control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						}
 
 						PLR = 1.0;
@@ -2861,19 +3112,23 @@ namespace FanCoilUnits {
 						if( SolFlag == -1 ) {
 							ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Iteration limit exceeded in calculating heating coil part load ratio." );
-							ShowRecurringWarningErrorAtEnd( "Electric heating coil iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Electric heating coil iteration limit exceeded in fan coil unit " +
+                                                                   FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						} else if( SolFlag == -2 ) {
 							ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 							ShowContinueError( "  Bad starting values for electric heating coil control at maximum air flow." );
-							ShowRecurringWarningErrorAtEnd( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                                ShowRecurringWarningErrorAtEnd("Electric heating coil control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                               FanCoil(FanCoilNum).MaxIterIndexH);
 						}
-
 					}
 				} else {
 					PLR = 1.0;
 					if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 						mdot = FanCoil( FanCoilNum ).MaxHotWaterFlow;
-						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                 FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                                 FanCoil(FanCoilNum).HWCompNum);
 					}
 				}
 
@@ -2894,8 +3149,11 @@ namespace FanCoilUnits {
 					if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 						Par( 5 ) = QZnReq;
 						Par( 6 ) = double( FanCoil( FanCoilNum ).HotControlNode );
-						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-						SolveRoot( ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowTempResidual, 0.0, FanCoil( FanCoilNum ).MaxHotWaterFlow, Par );
+                            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                                 FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                                 FanCoil(FanCoilNum).HWCompNum);
+                            SolveRoot(ControlOffset, MaxIterCycl, SolFlag, mdot, CalcFanCoilWaterFlowTempResidual, 0.0,
+                                      FanCoil(FanCoilNum).MaxHotWaterFlow, Par);
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
 					} else {
 						Par( 5 ) = FanCoil( FanCoilNum ).MaxAirMassFlow;
@@ -2907,58 +3165,80 @@ namespace FanCoilUnits {
 					if( SolFlag == -1 ) {
 						ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Iteration limit exceeded in calculating heating coil part load ratio." );
-						ShowRecurringWarningErrorAtEnd( "Electric heating coil iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                            ShowRecurringWarningErrorAtEnd("Electric heating coil iteration limit exceeded in fan coil unit " +
+                                                               FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexH);
 					} else if( SolFlag == -2 ) {
 						ShowWarningError( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
 						ShowContinueError( "  Bad starting values for electric heating coil control at constant temperature." );
-						ShowRecurringWarningErrorAtEnd( "Electric heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexH );
+                            ShowRecurringWarningErrorAtEnd("Electric heating coil control failed in fan coil unit " + FanCoil(FanCoilNum).Name,
+                                                           FanCoil(FanCoilNum).MaxIterIndexH);
 					}
 					FCOutletTempOn = Node( OutletNode ).Temp;
 
-// How to iterate on multiple independent variables, air flow rate, SA temperature, water flow rate or elec heating coil PLR, zone load.
-// The following code has drawbacks. One is that it dependently adjusts both air flow and water flow or PLR. It could only adjust air flow to a point, but this won't work for elec heaters (i.e., elec heaters put out a Q regardless of air flow).
-// For now SA temperature will limit output. The following would increase SA flow and/or water flow to meet load. Not sure that's required at this point.
-//					// if temperature control reduced capacity so that zone load is not met, iterate on air and water flow (an attempt to hold outlet temp constant)
-//					if ( ( QZnReq - QUnitOut ) > 0.0 && Node( InletNode ).MassFlowRate < FanCoil( FanCoilNum ).MaxAirMassFlow ) {
+                        // How to iterate on multiple independent variables, air flow rate, SA temperature, water flow rate or elec heating coil PLR,
+                        // zone load. The following code has drawbacks. One is that it dependently adjusts both air flow and water flow or PLR. It
+                        // could only adjust air flow to a point, but this won't work for elec heaters (i.e., elec heaters put out a Q regardless of
+                        // air flow). For now SA temperature will limit output. The following would increase SA flow and/or water flow to meet load.
+                        // Not sure that's required at this point.
+                        //					// if temperature control reduced capacity so that zone load is not met, iterate on
+                        //air  and  water flow (an attempt to hold outlet temp constant) 					if ( ( QZnReq -
+                        //QUnitOut ) > 0.0 && Node( InletNode ).MassFlowRate < FanCoil(  FanCoilNum
+                        //).MaxAirMassFlow ) {
 //						//solve for the hot water and air flow rate that meets zone load
 //						Par( 1 ) = double( FanCoilNum );
-//						Par( 2 ) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-//						if( FirstHVACIteration ) Par( 2 ) = 1.0;
-//						Par( 3 ) = ControlledZoneNum;
+                        //						Par( 2 ) = 0.0; // FLAG, IF 1.0 then FirstHVACIteration equals TRUE, if 0.0
+                        // then  FirstHVACIteration equals false 						if( FirstHVACIteration ) Par( 2 )
+                        // = 1.0; 						Par( 3 ) = ControlledZoneNum;
 //						Par( 4 ) = min( QZnReq, QUnitOutMax );
 //						Par( 5 ) = double( FanCoil( FanCoilNum ).HotControlNode );
 //						Par( 7 ) = Node( InletNode ).MassFlowRate;
 //						if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 //							Par( 6 ) = mdot;
-//							SolveRoot( ControlOffset, MaxIterCycl, SolFlag, PLR, CalcFanCoilAirAndWaterInStepResidual, 0.0, 1.0, Par );
-//							SetComponentFlowRate( Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-//							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
-//						} else {
-//							Par( 6 ) = PLR;
-//							SolveRoot( ControlOffset, MaxIterCycl, SolFlag, PLR, CalcFanCoilAirAndWaterInStepResidual, 0.0, 1.0, Par );
+                        //							SolveRoot( ControlOffset, MaxIterCycl, SolFlag, PLR,
+                        // CalcFanCoilAirAndWaterInStepResidual, 0.0, 1.0, Par );
+                        //							SetComponentFlowRate( Node( FanCoil( FanCoilNum ).HotControlNode
+                        //).MassFlowRate,  FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum
+                        // ).HWLoopNum, FanCoil(  FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                        //							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration,
+                        // QUnitOut
+                        //); 						} else { 							Par( 6 ) =
+                        // PLR;
+                        //							SolveRoot( ControlOffset, MaxIterCycl, SolFlag, PLR,
+                        // CalcFanCoilAirAndWaterInStepResidual, 0.0, 1.0, Par );
 //							PLR = Par( 6 ) + ( PLR * ( 1.0 - Par( 6 ) ) );
-//							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
+                        //							Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration,
+                        //QUnitOut,  PLR
+                        //);
 //						}
 //						if ( SolFlag == -1 ) {
-//							ShowWarningError( "Heating Coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
-//							ShowContinueError( "  Iteration limit exceeded in calculating heating coil output " );
-//							ShowRecurringWarningErrorAtEnd( "Heating coil Iteration limit exceeded in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                        //							ShowWarningError( "Heating Coil control failed in fan coil unit " +
+                        // FanCoil(  FanCoilNum ).Name ); 							ShowContinueError( "  Iteration limit
+                        // exceeded in calculating heating coil output " );
+                        //							ShowRecurringWarningErrorAtEnd( "Heating coil Iteration limit exceeded in
+                        //fan  coil  unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
 //						} else if ( SolFlag == -2 ) {
-//							ShowWarningError( "Heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name );
-//							ShowContinueError( "  Bad starting values for electric heating coil control to meet zone load at constant temperature." );
-//							ShowRecurringWarningErrorAtEnd( "Heating coil control failed in fan coil unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
-//							Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = MinSAMassFlowRate;
+                        //							ShowWarningError( "Heating coil control failed in fan coil unit " +
+                        // FanCoil(  FanCoilNum ).Name ); 							ShowContinueError( "  Bad starting
+                        // values for electric heating coil control to  meet zone load at constant temperature." );
+                        //							ShowRecurringWarningErrorAtEnd( "Heating coil control failed in fan coil unit
+                        //"
+                        //+  FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                        //							Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate =
+                        // MinSAMassFlowRate;
 //							if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
-//								SetComponentFlowRate( Node( FanCoil( FanCoilNum ).HotControlNode ).MassFlowRate, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-//								Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
-//							} else {
-//								Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
+                        //								SetComponentFlowRate( Node( FanCoil( FanCoilNum
+                        //).HotControlNode
+                        //).MassFlowRate, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum
+                        //).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                        //								Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum,
+                        // FirstHVACIteration,  QUnitOut ); 							} else {
+                        //								Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum,
+                        // FirstHVACIteration,  QUnitOut, PLR );
 //							}
 //						}
 //						FCOutletTempOn = Node( OutletNode ).Temp;
 //					}
-
-
 				}
 
 			} else {
@@ -2998,18 +3278,26 @@ namespace FanCoilUnits {
 			//    Node(FanCoil(FanCoilNum)%ColdControlNode)%MassFlowRate = 0.0
 			//    Node(FanCoil(FanCoilNum)%HotControlNode)%MassFlowRate = 0.0
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                     FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                     FanCoil(FanCoilNum).CWCompNum);
 
 			if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 				mdot = 0.0;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                         FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                         FanCoil(FanCoilNum).HWCompNum);
 			}
-			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
+                Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC,
+                                 0.0); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
-			if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP < ( -1.0 * SmallLoad ) && TempControlType( ZoneNum ) != SingleHeatingSetPoint ) {
+                if (UnitOn && ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP < (-1.0 * SmallLoad) &&
+                    TempControlType(ZoneNum) != SingleHeatingSetPoint) {
 				// cooling coil action, maximum cold water flow
 				mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
-				SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                         FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                         FanCoil(FanCoilNum).CWCompNum);
 				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP;
 				ControlOffset = FanCoil( FanCoilNum ).ColdControlOffset;
 
@@ -3035,20 +3323,27 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the cooling convergence tolerance." );
+                            ShowWarningMessage("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                               "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load "
+                                               "within the cooling convergence tolerance.");
 						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
+                        ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                                           "\"  -- Exceeded max iterations error (sensible runtime) continues...",
+                                                       FanCoil(FanCoilNum).MaxIterIndexC);
 				}
 
 				// at the end calculate output with adjusted PLR
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
 
-			} else if ( UnitOn && ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP > SmallLoad && TempControlType( ZoneNum ) != SingleCoolingSetPoint ) {
+                } else if (UnitOn && ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP > SmallLoad &&
+                           TempControlType(ZoneNum) != SingleCoolingSetPoint) {
 				// heating coil action, maximun hot water flow
 				if ( FanCoil( FanCoilNum ).HCoilType_Num == HCoil_Water ) {
 					mdot = FanCoil( FanCoilNum ).MaxHotWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                             FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                             FanCoil(FanCoilNum).HWCompNum);
 				}
 				QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToHeatSP;
 				ControlOffset = FanCoil( FanCoilNum ).HotControlOffset;
@@ -3075,12 +3370,16 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the heating convergence tolerance." );
+                            ShowWarningMessage("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                               "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load "
+                                               "within the heating convergence tolerance.");
 						ShowContinueError( "...Requested zone load = " + TrimSigDigits( QZnReq, 3 ) + " [W]");
 						ShowContinueError( "...Fan coil capacity   = " + TrimSigDigits( QUnitOut, 3 ) + " [W]" );
 						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
+                        ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                                           "\"  -- Exceeded max iterations error (sensible runtime) continues...",
+                                                       FanCoil(FanCoilNum).MaxIterIndexH);
 				}
 
 				// at the end calculate output with adjusted PLR
@@ -3106,7 +3405,8 @@ namespace FanCoilUnits {
 			SpecHumOut = Node( OutletNode ).HumRat;
 			SpecHumIn = Node( InletNode ).HumRat;
 			LatentOutput = AirMassFlow * ( SpecHumOut - SpecHumIn ); // Latent rate (kg/s), dehumid = negative
-			QSensUnitOutNoATM = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+                QSensUnitOutNoATM = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
+                                                   PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 			QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 			// report variables
 			FanCoil( FanCoilNum ).HeatPower = max( 0.0, QSensUnitOutNoATM );
@@ -3128,7 +3428,8 @@ namespace FanCoilUnits {
 			SpecHumOut = Node( OutletNode ).HumRat;
 			SpecHumIn = Node( InletNode ).HumRat;
 			LatentOutput = AirMassFlow * ( SpecHumOut - SpecHumIn ); // Latent rate (kg/s), dehumid = negative
-			QSensUnitOutNoATM = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+                QSensUnitOutNoATM = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
+                                                   PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 			QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 			// report variables
 			FanCoil( FanCoilNum ).HeatPower = max( 0.0, QSensUnitOutNoATM );
@@ -3141,14 +3442,11 @@ namespace FanCoilUnits {
 			}
 			PowerMet = QUnitOut;
 			LatOutputProvided = LatentOutput;
-
-		}}
-
+            }
+        }
 	}
 
-	void
-	TightenWaterFlowLimits(
-		int const FanCoilNum, // Unit index in fan coil array
+    void TightenWaterFlowLimits(int const FanCoilNum,          // Unit index in fan coil array
 		bool const CoolingLoad, // true if zone requires cooling
 		bool const HeatingLoad, // true if zone requires heating
 		int const WaterControlNode, // water control node, either cold or hot water
@@ -3195,7 +3493,8 @@ namespace FanCoilUnits {
 					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
 					if ( ( CoolingLoad && QUnitOut < QZnReq ) || ( HeatingLoad && QUnitOut > QZnReq ) ) {
 						MaxWaterFlow = mdot;
-						// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.001% of flow before iterating
+                        // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.001% of flow before
+                        // iterating
 						mdot *= 0.1;
 						Node( WaterControlNode ).MassFlowRate = mdot;
 						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut );
@@ -3216,12 +3515,9 @@ namespace FanCoilUnits {
 		} else {
 			MinWaterFlow = mdot;
 		}
-
 	}
 
-	void
-	TightenAirAndWaterFlowLimits(
-		int const FanCoilNum, // Unit index in fan coil array
+    void TightenAirAndWaterFlowLimits(int const FanCoilNum,          // Unit index in fan coil array
 		bool const CoolingLoad, // true if zone requires cooling
 		bool const HeatingLoad, // true if zone requires heating
 		int const WaterControlNode, // water control node, either cold or hot water
@@ -3286,7 +3582,8 @@ namespace FanCoilUnits {
 					if ( ( CoolingLoad && QUnitOut < QZnReq ) || ( HeatingLoad && QUnitOut > QZnReq ) ) {
 						PLRMax = PLR;
 						PLR *= 0.1;
-						// RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.01% of flow before iterating
+                        // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.01% of flow before
+                        // iterating
 						if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode ) {
 							Node( WaterControlNode ).MassFlowRate = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
 						} else if ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) {
@@ -3309,12 +3606,9 @@ namespace FanCoilUnits {
 		} else {
 			PLRMin = PLR;
 		}
-
 	}
 
-	void
-	Calc4PipeFanCoil(
-		int const FanCoilNum, // Unit index in fan coil array
+    void Calc4PipeFanCoil(int const FanCoilNum,          // Unit index in fan coil array
 		int const ControlledZoneNum, // ZoneEquipConfig index
 		bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
 		Real64 & LoadMet, // load met by unit (watts)
@@ -3338,15 +3632,15 @@ namespace FanCoilUnits {
 		// na
 
 		// Using/Aliasing
+        using DataHVACGlobals::ZoneCompTurnFansOff;
+        using DataHVACGlobals::ZoneCompTurnFansOn;
+        using DataZoneEquipment::ZoneEquipConfig;
+        using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
+        using HeatingCoils::SimulateHeatingCoilComponents;
 		using MixedAir::SimOAMixer;
+        using Psychrometrics::PsyHFnTdbW;
 		using SingleDuct::SimATMixer;
 		using WaterCoils::SimulateWaterCoilComponents;
-		using HeatingCoils::SimulateHeatingCoilComponents;
-		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-		using Psychrometrics::PsyHFnTdbW;
-		using DataHVACGlobals::ZoneCompTurnFansOn;
-		using DataHVACGlobals::ZoneCompTurnFansOff;
-		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3385,7 +3679,8 @@ namespace FanCoilUnits {
 
 		// Assume the unit is able to vary the flow. A cycling unit is treated as
 		// if it were variable flow, with the flow being the averaqe flow over the time step
-		if ( ( GetCurrentScheduleValue( FanCoil( FanCoilNum ).SchedPtr ) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn ) && ! DataHVACGlobals::ZoneCompTurnFansOff  ) {
+        if ((GetCurrentScheduleValue(FanCoil(FanCoilNum).SchedPtr) > 0.0 || DataHVACGlobals::ZoneCompTurnFansOn) &&
+            !DataHVACGlobals::ZoneCompTurnFansOff) {
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow ) {
 				if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ASHRAE ) Node( InletNode ).MassFlowRate = PartLoad * Node( InletNode ).MassFlowRateMax;
 			} else {
@@ -3404,7 +3699,8 @@ namespace FanCoilUnits {
 			ATMixOutNode = FanCoil( FanCoilNum ).ATMixerOutNode;
 			if ( FanCoil( FanCoilNum ).ATMixerType == ATMixer_InletSide ) {
 				// set the primary air inlet mass flow rate
-				Node( FanCoil( FanCoilNum ).ATMixerPriNode ).MassFlowRate = min( Node( FanCoil( FanCoilNum ).ATMixerPriNode ).MassFlowRateMaxAvail, Node( InletNode ).MassFlowRate );
+                Node(FanCoil(FanCoilNum).ATMixerPriNode).MassFlowRate =
+                    min(Node(FanCoil(FanCoilNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(InletNode).MassFlowRate);
 				// now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
 				// the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
 				SimATMixer( FanCoil( FanCoilNum ).ATMixerName, FirstHVACIteration, FanCoil( FanCoilNum ).ATMixerIndex );
@@ -3413,14 +3709,19 @@ namespace FanCoilUnits {
 		} else {
 			// OutdoorAir:Mixer
 			if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_CycFan ) {
-				Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax * PartLoad * FanCoil( FanCoilNum ).SpeedFanRatSel, Node( InletNode ).MassFlowRate );
+                Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRate =
+                    min(OASchedValue * Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRateMax * PartLoad * FanCoil(FanCoilNum).SpeedFanRatSel,
+                        Node(InletNode).MassFlowRate);
 			} else if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_MultiSpeedFan ) {
-				Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax * PartLoad * FanFlowRatio, Node( InletNode ).MassFlowRate );
+                Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRate = min(
+                    OASchedValue * Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRateMax * PartLoad * FanFlowRatio, Node(InletNode).MassFlowRate);
 			} else {
 				if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ConsFanVarFlow && FanCoil( FanCoilNum ).CapCtrlMeth_Num != CCM_ASHRAE ) {
-					Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax * PartLoad, Node( InletNode ).MassFlowRate );
+                    Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRate =
+                        min(OASchedValue * Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRateMax * PartLoad, Node(InletNode).MassFlowRate);
 				} else {
-					Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate = min( OASchedValue * Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRateMax, Node( InletNode ).MassFlowRate );
+                    Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRate =
+                        min(OASchedValue * Node(FanCoil(FanCoilNum).OutsideAirNode).MassFlowRateMax, Node(InletNode).MassFlowRate);
 				}
 			}
 			Node( FanCoil( FanCoilNum ).AirReliefNode ).MassFlowRate = Node( FanCoil( FanCoilNum ).OutsideAirNode ).MassFlowRate;
@@ -3432,27 +3733,32 @@ namespace FanCoilUnits {
 			// cycling fan coil unit calculation
 			if ( FanCoil( FanCoilNum ).SpeedFanSel == 1 ) {
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+                    Fans::SimulateFanComponents(FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex,
+                                                FanCoil(FanCoilNum).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
 				} else {
-					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanCoil( FanCoilNum ).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(FanCoil(FanCoilNum).LowSpeedRatio, ZoneCompTurnFansOn,
+                                                                             ZoneCompTurnFansOff, _);
 				}
 			} else if ( FanCoil( FanCoilNum ).SpeedFanSel == 2 ) {
 
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanCoil( FanCoilNum ).MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+                    Fans::SimulateFanComponents(FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex,
+                                                FanCoil(FanCoilNum).MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
 				} else {
-					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanCoil( FanCoilNum ).MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff,_ );
+                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(FanCoil(FanCoilNum).MedSpeedRatio, ZoneCompTurnFansOn,
+                                                                             ZoneCompTurnFansOff, _);
 				}
 			} else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+                    Fans::SimulateFanComponents(FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex, 1.0,
+                                                ZoneCompTurnFansOn, ZoneCompTurnFansOff);
 				} else {
 					HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 				}
-
 			}
 			if ( FanCoil( FanCoilNum ).CCoilType_Num == CCoil_HXAssist ) {
-				SimHXAssistedCoolingCoil( FanCoil( FanCoilNum ).CCoilName, FirstHVACIteration, On, 0.0, FanCoil( FanCoilNum ).CCoilName_Index, ContFanCycCoil );
+                SimHXAssistedCoolingCoil(FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
 			} else {
 				SimulateWaterCoilComponents( FanCoil( FanCoilNum ).CCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).CCoilName_Index, _, 1, PLR );
 			}
@@ -3460,19 +3766,23 @@ namespace FanCoilUnits {
 				SimulateWaterCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).HCoilName_Index, _, 1, PLR );
 			} else {
 				if ( Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate > 0.0 ) ElecHeaterControl = 0.0;
-				SimulateHeatingCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).DesignHeatingCapacity * PartLoad * ElecHeaterControl, FanCoil( FanCoilNum ).HCoilName_Index, _, false, ContFanCycCoil, PartLoad );
+                SimulateHeatingCoilComponents(FanCoil(FanCoilNum).HCoilName, FirstHVACIteration,
+                                              FanCoil(FanCoilNum).DesignHeatingCapacity * PartLoad * ElecHeaterControl,
+                                              FanCoil(FanCoilNum).HCoilName_Index, _, false, ContFanCycCoil, PartLoad);
 			}
 
 		} else if ( FanCoil( FanCoilNum ).CapCtrlMeth_Num == CCM_MultiSpeedFan ) {
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+                Fans::SimulateFanComponents(FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex, FanFlowRatio,
+                                            ZoneCompTurnFansOn, ZoneCompTurnFansOff);
 			} else {
 				// FanFlowRatio needs to be accurate here for new fan model
 				Real64 ActFanFlowRatio = FanFlowRatio * PartLoad;
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 			}
 			if ( FanCoil( FanCoilNum ).CCoilType_Num == CCoil_HXAssist ) {
-				SimHXAssistedCoolingCoil( FanCoil( FanCoilNum ).CCoilName, FirstHVACIteration, On, 0.0, FanCoil( FanCoilNum ).CCoilName_Index, ContFanCycCoil );
+                SimHXAssistedCoolingCoil(FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
 			} else {
 				SimulateWaterCoilComponents( FanCoil( FanCoilNum ).CCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).CCoilName_Index, _, 1, PLR );
 			}
@@ -3480,19 +3790,22 @@ namespace FanCoilUnits {
 
 		} else { // capacity control method is VariableFanVariableFlow, VariableFanConstantFlow, or ASHRAE90.1
 
-			// calculate fan speed ratio for Fan:OnOff or Fan:SystemModel (not used for other fan types). Only used in fan:OnOff model if performance curves are present.
+            // calculate fan speed ratio for Fan:OnOff or Fan:SystemModel (not used for other fan types). Only used in fan:OnOff model if performance
+            // curves are present.
 			FanSpeedRatio = Node( InletNode ).MassFlowRate / ( FanCoil( FanCoilNum ).FanAirVolFlow * StdRhoAir );
 
 			// Constant fan and variable flow calculation AND variable fan
 
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				Fans::SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+                Fans::SimulateFanComponents(FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex, FanSpeedRatio,
+                                            ZoneCompTurnFansOn, ZoneCompTurnFansOff);
 			} else {
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 			}
 
 			if ( FanCoil( FanCoilNum ).CCoilType_Num == CCoil_HXAssist ) {
-				SimHXAssistedCoolingCoil( FanCoil( FanCoilNum ).CCoilName, FirstHVACIteration, On, 0.0, FanCoil( FanCoilNum ).CCoilName_Index, ContFanCycCoil );
+                SimHXAssistedCoolingCoil(FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
 			} else {
 				SimulateWaterCoilComponents( FanCoil( FanCoilNum ).CCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).CCoilName_Index );
 			}
@@ -3500,9 +3813,10 @@ namespace FanCoilUnits {
 				SimulateWaterCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).HCoilName_Index );
 			} else {
 				if ( Node( FanCoil( FanCoilNum ).ColdControlNode ).MassFlowRate > 0.0 ) ElecHeaterControl = 0.0;
-				SimulateHeatingCoilComponents( FanCoil( FanCoilNum ).HCoilName, FirstHVACIteration, FanCoil( FanCoilNum ).DesignHeatingCapacity * PartLoad * ElecHeaterControl, FanCoil( FanCoilNum ).HCoilName_Index, _, false, ContFanCycCoil, PartLoad );
+                SimulateHeatingCoilComponents(FanCoil(FanCoilNum).HCoilName, FirstHVACIteration,
+                                              FanCoil(FanCoilNum).DesignHeatingCapacity * PartLoad * ElecHeaterControl,
+                                              FanCoil(FanCoilNum).HCoilName_Index, _, false, ContFanCycCoil, PartLoad);
 			}
-
 		}
 
 		if ( FanCoil( FanCoilNum ).ATMixerExists ) {
@@ -3514,20 +3828,20 @@ namespace FanCoilUnits {
 
 		if ( FanCoil( FanCoilNum ).ATMixerExists ) {
 			if ( FanCoil( FanCoilNum ).ATMixerType == ATMixer_SupplySide ) {
-				LoadMet = Node( ATMixOutNode ).MassFlowRate * ( PsyHFnTdbW( Node( ATMixOutNode ).Temp, Node( ZoneNode ).HumRat ) - PsyHFnTdbW( Node( ZoneNode ).Temp, Node( ZoneNode ).HumRat ) );
+                LoadMet = Node(ATMixOutNode).MassFlowRate *
+                          (PsyHFnTdbW(Node(ATMixOutNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
 			} else {
 				// ATM Mixer on inlet side
-				LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( ZoneNode ).HumRat ) - PsyHFnTdbW( Node( ZoneNode ).Temp, Node( ZoneNode ).HumRat ) );
+                LoadMet =
+                    AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
 			}
 		} else {
-			LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
+            LoadMet =
+                AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 		}
-
 	}
 
-	void
-	SimMultiStage4PipeFanCoil(
-		int & FanCoilNum, // number of the current fan coil unit being simulated
+    void SimMultiStage4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 & PowerMet // Sensible power supplied (W)
@@ -3538,7 +3852,6 @@ namespace FanCoilUnits {
 		//       AUTHOR         Bereket Nigusse
 		//       DATE WRITTEN   July 2015
 		//       MODIFIED       na
-
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Manages multi-speed fancoil unit simulation;
@@ -3584,7 +3897,6 @@ namespace FanCoilUnits {
 		int InletNode; // unit air inlet node
 		bool UnitOn; // TRUE if unit is on
 
-
 		// initialize local variables
 		UnitOn = true;
 		SpeedRatio = 0.0;
@@ -3611,9 +3923,11 @@ namespace FanCoilUnits {
 		Node( InletNode ).MassFlowRateMinAvail = AirMassFlow;
 
 		mdot = 0.0;
-		SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode, FanCoil(FanCoilNum).HWLoopNum,
+                             FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 		mdot = 0.0;
-		SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+        SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode, FanCoil(FanCoilNum).CWLoopNum,
+                             FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum);
 		Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutNoHC );
 
 		QCoilCoolSP = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP;
@@ -3637,7 +3951,8 @@ namespace FanCoilUnits {
 
 		// Zone load calculation for constant fan systems, adopted from unitary system
 		if ( FanCoil( FanCoilNum ).FanOpMode == ContFanCycCoil ) {
-				{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) );
+            {
+                auto const SELECT_CASE_var(TempControlType(ZoneNum));
 				if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
 					CoolingLoad = false;
 					// No heating load and constant fan pushes zone below heating set point
@@ -3716,7 +4031,8 @@ namespace FanCoilUnits {
 						}
 					}
 				} else {
-				}}
+                }
+            }
 			// IF small loads to meet, just shut down unit
 			if ( std::abs( QZnReq ) < Small5WLoad ) {
 				QZnReq = 0.0;
@@ -3728,9 +4044,11 @@ namespace FanCoilUnits {
 		if ( UnitOn && QZnReq < ( -1.0 * Small5WLoad ) && CoolingLoad ) {
 
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode, FanCoil(FanCoilNum).HWLoopNum,
+                                 FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 			mdot = FanCoil( FanCoilNum ).MaxColdWaterFlow;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode, FanCoil(FanCoilNum).CWLoopNum,
+                                 FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum);
 			// select fan speed
 			FanCoil( FanCoilNum ).SpeedFanSel = 1;
 			FanCoil( FanCoilNum ).SpeedFanRatSel = FanCoil( FanCoilNum ).LowSpeedRatio;
@@ -3767,9 +4085,11 @@ namespace FanCoilUnits {
 		} else if ( UnitOn && QZnReq > Small5WLoad && HeatingLoad ) {
 
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode, FanCoil(FanCoilNum).CWLoopNum,
+                                 FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum);
 			mdot = FanCoil( FanCoilNum ).MaxHotWaterFlow;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode, FanCoil(FanCoilNum).HWLoopNum,
+                                 FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
 			// select fan speed
 			FanCoil( FanCoilNum ).SpeedFanSel = 1;
 			FanCoil( FanCoilNum ).SpeedFanRatSel = FanCoil( FanCoilNum ).LowSpeedRatio;
@@ -3829,8 +4149,10 @@ namespace FanCoilUnits {
 				FanFlowRatio = 0.0;
 			}
 			mdot = 0.0;
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-			SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode, FanCoil(FanCoilNum).HWLoopNum,
+                                 FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum, FanCoil(FanCoilNum).HWCompNum);
+            SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode, FanCoil(FanCoilNum).CWLoopNum,
+                                 FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum, FanCoil(FanCoilNum).CWCompNum);
 			Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PartLoadRatio );
 		}
 		// output variable
@@ -3838,12 +4160,9 @@ namespace FanCoilUnits {
 		FanCoil( FanCoilNum ).PLR = PartLoadRatio;
 		FanCoil( FanCoilNum ).SpeedRatio = SpeedRatio;
 		PowerMet = QUnitOut;
-
 	}
 
-	void
-	CalcMultiStage4PipeFanCoil(
-		int & FanCoilNum, // number of the current fan coil unit being simulated
+    void CalcMultiStage4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
 		int const ZoneNum, // number of zone being served
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		Real64 const QZnReq, // current zone cooling or heating load
@@ -3858,7 +4177,6 @@ namespace FanCoilUnits {
 		//       DATE WRITTEN   July 2015
 		//       MODIFIED       na
 
-
 		// PURPOSE OF THIS SUBROUTINE:
 		// Simulate a multi-stage fan 4 pipe fan coil unit; adjust its output to
 		// match the remaining zone load.
@@ -3872,8 +4190,8 @@ namespace FanCoilUnits {
 		// Using/Aliasing
 		using namespace DataZoneEnergyDemands;
 		using DataHeatBalFanSys::TempControlType;
-		using PlantUtilities::SetComponentFlowRate;
 		using General::TrimSigDigits;
+        using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3936,7 +4254,9 @@ namespace FanCoilUnits {
 				while ( std::abs( Error ) > ControlOffset && std::abs( AbsError ) > Small5WLoad && Iter < MaxIterCycl && PLR != 1.0 ) {
 					Node( InletNode ).MassFlowRateMinAvail = Node( InletNode ).MassFlowRate;
 					mdot = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).ColdControlNode, FanCoil(FanCoilNum).ColdPlantOutletNode,
+                                         FanCoil(FanCoilNum).CWLoopNum, FanCoil(FanCoilNum).CWLoopSide, FanCoil(FanCoilNum).CWBranchNum,
+                                         FanCoil(FanCoilNum).CWCompNum);
 					if ( FanCoil( FanCoilNum ).FanOpMode == ContFanCycCoil ) {
 						Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut );
 					} else {
@@ -3960,10 +4280,14 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter >( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the cooling convergence tolerance." );
+                        ShowWarningMessage("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                           "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within "
+                                           "the cooling convergence tolerance.");
 						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
+                    ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                                       "\"  -- Exceeded max iterations error (sensible runtime) continues...",
+                                                   FanCoil(FanCoilNum).MaxIterIndexC);
 				}
 
 			} else {
@@ -4055,7 +4379,9 @@ namespace FanCoilUnits {
 				while ( std::abs( Error ) > ControlOffset && std::abs( AbsError ) > Small5WLoad && Iter < MaxIterCycl && PLR != 1.0 ) {
 					mdot = PLR * FanCoil( FanCoilNum ).MaxHotWaterFlow;
 					Node( InletNode ).MassFlowRateMinAvail = Node( InletNode ).MassFlowRate;
-					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+                    SetComponentFlowRate(mdot, FanCoil(FanCoilNum).HotControlNode, FanCoil(FanCoilNum).HotPlantOutletNode,
+                                         FanCoil(FanCoilNum).HWLoopNum, FanCoil(FanCoilNum).HWLoopSide, FanCoil(FanCoilNum).HWBranchNum,
+                                         FanCoil(FanCoilNum).HWCompNum);
 					if ( FanCoil( FanCoilNum ).FanOpMode == ContFanCycCoil ) {
 						Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut );
 					} else {
@@ -4079,10 +4405,14 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter >( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the heating convergence tolerance." );
+                        ShowWarningMessage("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                           "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within "
+                                           "the heating convergence tolerance.");
 						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
+                    ShowRecurringWarningErrorAtEnd("ZoneHVAC:FourPipeFanCoil=\"" + FanCoil(FanCoilNum).Name +
+                                                       "\"  -- Exceeded max iterations error (sensible runtime) continues...",
+                                                   FanCoil(FanCoilNum).MaxIterIndexH);
 				}
 
 			} else {
@@ -4174,8 +4504,7 @@ namespace FanCoilUnits {
 		PowerMet = QUnitOut;
 	}
 
-	void
-	ReportFanCoilUnit( int const FanCoilNum ) // number of the current fan coil unit being simulated
+    void ReportFanCoilUnit(int const FanCoilNum) // number of the current fan coil unit being simulated
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4217,11 +4546,9 @@ namespace FanCoilUnits {
 		FanCoil( FanCoilNum ).SensCoolEnergy = FanCoil( FanCoilNum ).SensCoolPower * ReportingConstant;
 		FanCoil( FanCoilNum ).TotCoolEnergy = FanCoil( FanCoilNum ).TotCoolPower * ReportingConstant;
 		FanCoil( FanCoilNum ).ElecEnergy = FanCoil( FanCoilNum ).ElecPower * ReportingConstant;
-
 	}
 
-	int
-	GetFanCoilZoneInletAirNode( int const FanCoilNum )
+    int GetFanCoilZoneInletAirNode(int const FanCoilNum)
 	{
 
 		// FUNCTION INFORMATION:
@@ -4271,11 +4598,9 @@ namespace FanCoilUnits {
 		}
 
 		return GetFanCoilZoneInletAirNode;
-
 	}
 
-	int
-	GetFanCoilOutAirNode( int const FanCoilNum )
+    int GetFanCoilOutAirNode(int const FanCoilNum)
 	{
 
 		// FUNCTION INFORMATION:
@@ -4325,11 +4650,9 @@ namespace FanCoilUnits {
 		}
 
 		return GetFanCoilOutAirNode;
-
 	}
 
-	int
-	GetFanCoilReturnAirNode( int const FanCoilNum )
+    int GetFanCoilReturnAirNode(int const FanCoilNum)
 	{
 
 		// FUNCTION INFORMATION:
@@ -4383,11 +4706,9 @@ namespace FanCoilUnits {
 		}
 
 		return GetFanCoilReturnAirNode;
-
 	}
 
-	int
-	GetFanCoilMixedAirNode( int const FanCoilNum )
+    int GetFanCoilMixedAirNode(int const FanCoilNum)
 	{
 
 		// FUNCTION INFORMATION:
@@ -4441,11 +4762,9 @@ namespace FanCoilUnits {
 		}
 
 		return GetFanCoilMixedAirNode;
-
 	}
 
-	int
-	GetFanCoilInletAirNode( int const FanCoilNum )
+    int GetFanCoilInletAirNode(int const FanCoilNum)
 	{
 
 		// FUNCTION INFORMATION:
@@ -4495,14 +4814,9 @@ namespace FanCoilUnits {
 		}
 
 		return GetFanCoilInletAirNode;
-
 	}
 
-	void
-	GetFanCoilIndex(
-		std::string const & FanCoilName,
-		int & FanCoilIndex
-	)
+    void GetFanCoilIndex(std::string const &FanCoilName, int &FanCoilIndex)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4528,12 +4842,9 @@ namespace FanCoilUnits {
 			ShowSevereError( "GetFanCoilIndex: Fan Coil Unit not found=" + FanCoilName );
 		}
 		ErrorsFound = true;
-
 	}
 
-	Real64
-	CalcFanCoilLoadResidual(
-		Real64 const PartLoadRatio, // coil part load ratio
+    Real64 CalcFanCoilLoadResidual(Real64 const PartLoadRatio, // coil part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -4596,7 +4907,8 @@ namespace FanCoilUnits {
 		ControlledZoneNum = int( Par( 3 ) );
 		QZnReq = Par( 4 );
 
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PartLoadRatio ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+        Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,
+                         PartLoadRatio); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
@@ -4608,9 +4920,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-		CalcFanCoilPLRResidual(
-		Real64 const PLR, // part-load ratio of air and water mass flow rate
+    Real64 CalcFanCoilPLRResidual(Real64 const PLR,         // part-load ratio of air and water mass flow rate
 		Array1< Real64 > const & Par // Function parameters
 		)
 	{
@@ -4652,8 +4962,7 @@ namespace FanCoilUnits {
 		FanCoilNum = int( Par( 1 ) );
 		if ( Par( 2 ) == 1.0 ) {
 			FirstHVACIteration = true;
-		}
-		else {
+        } else {
 			FirstHVACIteration = false;
 		}
 		ControlledZoneNum = int( Par( 3 ) );
@@ -4662,10 +4971,12 @@ namespace FanCoilUnits {
 
 		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode ) {
 			Node( WaterControlNode ).MassFlowRate = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
-			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,
+                             PLR); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else if ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) {
 			Node( WaterControlNode ).MassFlowRate = PLR * FanCoil( FanCoilNum ).MaxHotWaterFlow;
-			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,
+                             PLR); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR ); // needs PLR=1 for electric heating coil
 		}
@@ -4680,9 +4991,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-		CalcFanCoilHWLoadResidual(
-		Real64 const HWFlow, // water mass flow rate [kg/s]
+    Real64 CalcFanCoilHWLoadResidual(Real64 const HWFlow,      // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 		)
 	{
@@ -4739,8 +5048,7 @@ namespace FanCoilUnits {
 		FanCoilNum = int( Par( 1 ) );
 		if ( Par( 2 ) == 1.0 ) {
 			FirstHVACIteration = true;
-		}
-		else {
+        } else {
 			FirstHVACIteration = false;
 		}
 		ControlledZoneNum = int( Par( 3 ) );
@@ -4752,17 +5060,14 @@ namespace FanCoilUnits {
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
 			Residuum = ( QUnitOut - QZnReq ) / 100.0;
-		}
-		else {
+        } else {
 			Residuum = ( QUnitOut - QZnReq ) / QZnReq;
 		}
 
 		return Residuum;
 	}
 
-	Real64
-		CalcFanCoilCWLoadResidual(
-		Real64 const CWFlow, // water mass flow rate [kg/s]
+    Real64 CalcFanCoilCWLoadResidual(Real64 const CWFlow,      // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 		)
 	{
@@ -4819,8 +5124,7 @@ namespace FanCoilUnits {
 		FanCoilNum = int( Par( 1 ) );
 		if ( Par( 2 ) == 1.0 ) {
 			FirstHVACIteration = true;
-		}
-		else {
+        } else {
 			FirstHVACIteration = false;
 		}
 		ControlledZoneNum = int( Par( 3 ) );
@@ -4832,16 +5136,13 @@ namespace FanCoilUnits {
 		// Calculate residual based on output magnitude
 		if ( std::abs( QZnReq ) <= 100.0 ) {
 			Residuum = ( QUnitOut - QZnReq ) / 100.0;
-		}
-		else {
+        } else {
 			Residuum = ( QUnitOut - QZnReq ) / QZnReq;
 		}
 
 		return Residuum;
 	}
-	Real64
-	CalcFanCoilWaterFlowTempResidual(
-		Real64 const WaterFlow, // water mass flow rate [kg/s]
+    Real64 CalcFanCoilWaterFlowTempResidual(Real64 const WaterFlow,   // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -4911,9 +5212,11 @@ namespace FanCoilUnits {
 		QZnReq = Par( 5 );
 		WaterControlNode = int( Par( 6 ) );
 
-		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode || ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) ) {
+        if (WaterControlNode == FanCoil(FanCoilNum).ColdControlNode ||
+            (WaterControlNode == FanCoil(FanCoilNum).HotControlNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil_Electric)) {
 			Node( WaterControlNode ).MassFlowRate = WaterFlow;
-			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,
+                             0.0); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=1 for electric heating coil
 		}
@@ -4925,9 +5228,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-	CalcFanCoilWaterFlowResidual(
-		Real64 const WaterFlow, // water mass flow rate [kg/s]
+    Real64 CalcFanCoilWaterFlowResidual(Real64 const WaterFlow,   // water mass flow rate [kg/s]
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -4994,9 +5295,11 @@ namespace FanCoilUnits {
 		QZnReq = Par( 4 );
 		WaterControlNode = int( Par( 5 ) );
 
-		if ( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode || ( WaterControlNode == FanCoil( FanCoilNum ).HotControlNode && FanCoil( FanCoilNum ).HCoilType_Num != HCoil_Electric ) ) {
+        if (WaterControlNode == FanCoil(FanCoilNum).ColdControlNode ||
+            (WaterControlNode == FanCoil(FanCoilNum).HotControlNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil_Electric)) {
 			Node( WaterControlNode ).MassFlowRate = WaterFlow;
-			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 0.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,
+                             0.0); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 		} else {
 			Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=1 for electric heating coil
 		}
@@ -5011,9 +5314,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-	CalcFanCoilAirAndWaterFlowResidual(
-		Real64 const PLR, // water and air part load ratio
+    Real64 CalcFanCoilAirAndWaterFlowResidual(Real64 const PLR,         // water and air part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -5082,7 +5383,8 @@ namespace FanCoilUnits {
 		MinWaterFlow = Par( 6 );
 
 		// set air flow rate
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = FanCoil( FanCoilNum ).MaxAirMassFlow * ( FanCoil( FanCoilNum ).LowSpeedRatio + ( PLR * ( 1.0 - FanCoil( FanCoilNum ).LowSpeedRatio ) ) );
+        Node(FanCoil(FanCoilNum).AirInNode).MassFlowRate =
+            FanCoil(FanCoilNum).MaxAirMassFlow * (FanCoil(FanCoilNum).LowSpeedRatio + (PLR * (1.0 - FanCoil(FanCoilNum).LowSpeedRatio)));
 		// set water flow rate
 		if( WaterControlNode == FanCoil( FanCoilNum ).ColdControlNode ) {
 			Node( WaterControlNode ).MassFlowRate = MinWaterFlow + ( PLR * ( FanCoil( FanCoilNum ).MaxColdWaterFlow - MinWaterFlow ) );
@@ -5092,7 +5394,8 @@ namespace FanCoilUnits {
 			// developer error
 			ShowFatalError( "Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " + FanCoil( FanCoilNum ).Name );
 		}
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+        Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,
+                         1.0); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
 		// Calculate residual based on output magnitude
 		if( std::abs( QZnReq ) <= 100.0 ) {
@@ -5104,9 +5407,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-	CalcFanCoilAirAndWaterInStepResidual(
-		Real64 const PLR, // water and air part load ratio
+    Real64 CalcFanCoilAirAndWaterInStepResidual(Real64 const PLR,         // water and air part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -5205,9 +5506,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-	CalcFanCoilBothFlowResidual(
-		Real64 const PLR, // water and air part load ratio
+    Real64 CalcFanCoilBothFlowResidual(Real64 const PLR,         // water and air part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -5279,10 +5578,12 @@ namespace FanCoilUnits {
 		WaterControlNode = Par( 7 );
 
 		// set air flow rate
-		Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate = FanCoil( FanCoilNum ).MaxAirMassFlow * ( FanCoil( FanCoilNum ).LowSpeedRatio + ( PLR * ( 1.0 - FanCoil( FanCoilNum ).LowSpeedRatio ) ) );
+        Node(FanCoil(FanCoilNum).AirInNode).MassFlowRate =
+            FanCoil(FanCoilNum).MaxAirMassFlow * (FanCoil(FanCoilNum).LowSpeedRatio + (PLR * (1.0 - FanCoil(FanCoilNum).LowSpeedRatio)));
 		// set water flow rate
 		Node( WaterControlNode ).MassFlowRate = MinWaterFlow + ( PLR * ( MaxWaterFlow - MinWaterFlow ) );
-		Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0 ); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
+        Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut,
+                         1.0); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
 		// Calculate residual based on output magnitude
 		if( std::abs( QZnReq ) <= 100.0 ) {
@@ -5294,9 +5595,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-	CalcFanCoilElecHeatResidual(
-		Real64 const PLR, // water and air part load ratio
+    Real64 CalcFanCoilElecHeatResidual(Real64 const PLR,         // water and air part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -5378,9 +5677,7 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-	Real64
-	CalcFanCoilElecHeatTempResidual(
-		Real64 const PLR, // water and air part load ratio
+    Real64 CalcFanCoilElecHeatTempResidual(Real64 const PLR,         // water and air part load ratio
 		Array1< Real64 > const & Par // Function parameters
 	)
 	{
@@ -5460,6 +5757,6 @@ namespace FanCoilUnits {
 		return Residuum;
 	}
 
-} // FanCoilUnits
+} // namespace FanCoilUnits
 
-} // EnergyPlus
+} // namespace EnergyPlus

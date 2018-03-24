@@ -52,297 +52,224 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobalConstants.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace ICEngineElectricGenerator {
 
-	// Using/Aliasing
-	using DataGlobalConstants::iGeneratorICEngine;
+    // Using/Aliasing
+    using DataGlobalConstants::iGeneratorICEngine;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	extern Real64 const ReferenceTemp; // Reference temperature by which lower heating
-	// value is reported.  This should be subtracted
-	// off of when calculated exhaust energies.
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern Real64 const ReferenceTemp; // Reference temperature by which lower heating
+    // value is reported.  This should be subtracted
+    // off of when calculated exhaust energies.
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
-	extern bool GetICEInput; // When TRUE, calls subroutine to read input file.
-	extern Array1D_bool CheckEquipName;
-	// SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
+    extern bool GetICEInput;          // When TRUE, calls subroutine to read input file.
+    extern Array1D_bool CheckEquipName;
+    // SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
 
-	// Types
+    // Types
 
-	struct ICEngineGeneratorSpecs
-	{
-		// Members
-		std::string Name; // user identifier
-		std::string TypeOf; // Type of Generator
-		int CompType_Num;
-		std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
-		Real64 RatedPowerOutput; // W - design nominal capacity of Generator
-		int ElectricCircuitNode; // Electric Circuit Node
-		Real64 MinPartLoadRat; // (IC ENGINE MIN) min allowed operating frac full load
-		Real64 MaxPartLoadRat; // (IC ENGINE MAX) max allowed operating frac full load
-		Real64 OptPartLoadRat; // (IC ENGINE BEST) optimal operating frac full load
-		Real64 ElecOutputFuelRat; // (RELDC) Ratio of Generator output to Fuel Energy Input
-		int ElecOutputFuelCurve; // Curve Index for generator output to Fuel Energy Input Coeff Poly Fit
-		Real64 RecJacHeattoFuelRat; // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-		int RecJacHeattoFuelCurve; // Curve Index for Ratio of Recoverable Jacket Heat to
-		// Fuel Energy Input Coeff Poly Fit
-		Real64 RecLubeHeattoFuelRat; // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-		int RecLubeHeattoFuelCurve; // Curve Index for Ratio of Recoverable Lube Oil Heat to
-		// Fuel Energy Input Coef Poly Fit
-		Real64 TotExhausttoFuelRat; // (REXDC) Total Exhaust heat Input to Fuel Energy Input
-		int TotExhausttoFuelCurve; // Curve Index for Total Exhaust heat Input to Fuel Energy Input
-		// Coeffs Poly Fit
-		Real64 ExhaustTemp; // (TEXDC) Exhaust Gas Temp to Fuel Energy Input
-		int ExhaustTempCurve; // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
-		int ErrExhaustTempIndex; // error index for temp curve
-		Real64 UA; // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-		Array1D< Real64 > UACoef; // Heat Exchanger UA Coeffs Poly Fit
-		Real64 MaxExhaustperPowerOutput; // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
-		Real64 DesignMinExitGasTemp; // Steam Saturation Temperature
-		Real64 FuelHeatingValue; // Heating Value of Fuel in kJ/kg
-		Real64 DesignHeatRecVolFlowRate; // m3/s, Design Water mass flow rate through heat recovery loop
-		Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
-		bool HeatRecActive; // True if Heat Rec Design Vol Flow Rate > 0
-		int HeatRecInletNodeNum; // Node number on the heat recovery inlet side of the condenser
-		int HeatRecOutletNodeNum; // Node number on the heat recovery outlet side of the condenser
-		Real64 HeatRecInletTemp; // Inlet Temperature of the heat recovery fluid
-		Real64 HeatRecOutletTemp; // Outlet Temperature of the heat recovery fluid
-		Real64 HeatRecMdotDesign; // reporting: Heat Recovery Loop Mass flow rate
-		Real64 HeatRecMdotActual;
-		Real64 QTotalHeatRecovered; // total heat recovered (W)
-		Real64 QJacketRecovered; // heat recovered from jacket (W)
-		Real64 QLubeOilRecovered; // heat recovered from lube (W)
-		Real64 QExhaustRecovered; // exhaust gas heat recovered (W)
-		Real64 FuelEnergyUseRate; // Fuel Energy used (W)
-		Real64 TotalHeatEnergyRec; // total heat recovered (J)
-		Real64 JacketEnergyRec; // heat recovered from jacket (J)
-		Real64 LubeOilEnergyRec; // heat recovered from lube (J)
-		Real64 ExhaustEnergyRec; // exhaust gas heat recovered (J)
-		Real64 FuelEnergy; // Fuel Energy used (J)
-		Real64 FuelMdot; // Fuel Amount used (Kg/s)
-		Real64 ExhaustStackTemp; // Exhaust Stack Temperature (C)
-		Real64 ElecPowerGenerated; // Electric Power Generated (W)
-		Real64 ElecEnergyGenerated; // Amount of Electric Energy Generated (J)
-		Real64 HeatRecMaxTemp; // Max Temp that can be produced in heat recovery
-		int HRLoopNum; // cooling water plant loop index number, for heat recovery
-		int HRLoopSideNum; // cooling water plant loop side index, for heat recovery
-		int HRBranchNum; // cooling water plant loop branch index, for heat recovery
-		int HRCompNum; // cooling water plant loop component index, for heat recovery
+    struct ICEngineGeneratorSpecs
+    {
+        // Members
+        std::string Name;   // user identifier
+        std::string TypeOf; // Type of Generator
+        int CompType_Num;
+        std::string FuelType;       // Type of Fuel - DIESEL, GASOLINE, GAS
+        Real64 RatedPowerOutput;    // W - design nominal capacity of Generator
+        int ElectricCircuitNode;    // Electric Circuit Node
+        Real64 MinPartLoadRat;      // (IC ENGINE MIN) min allowed operating frac full load
+        Real64 MaxPartLoadRat;      // (IC ENGINE MAX) max allowed operating frac full load
+        Real64 OptPartLoadRat;      // (IC ENGINE BEST) optimal operating frac full load
+        Real64 ElecOutputFuelRat;   // (RELDC) Ratio of Generator output to Fuel Energy Input
+        int ElecOutputFuelCurve;    // Curve Index for generator output to Fuel Energy Input Coeff Poly Fit
+        Real64 RecJacHeattoFuelRat; // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
+        int RecJacHeattoFuelCurve;  // Curve Index for Ratio of Recoverable Jacket Heat to
+        // Fuel Energy Input Coeff Poly Fit
+        Real64 RecLubeHeattoFuelRat; // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
+        int RecLubeHeattoFuelCurve;  // Curve Index for Ratio of Recoverable Lube Oil Heat to
+        // Fuel Energy Input Coef Poly Fit
+        Real64 TotExhausttoFuelRat; // (REXDC) Total Exhaust heat Input to Fuel Energy Input
+        int TotExhausttoFuelCurve;  // Curve Index for Total Exhaust heat Input to Fuel Energy Input
+        // Coeffs Poly Fit
+        Real64 ExhaustTemp;               // (TEXDC) Exhaust Gas Temp to Fuel Energy Input
+        int ExhaustTempCurve;             // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
+        int ErrExhaustTempIndex;          // error index for temp curve
+        Real64 UA;                        // (UACDC) exhaust gas Heat Exchanger UA to Capacity
+        Array1D<Real64> UACoef;           // Heat Exchanger UA Coeffs Poly Fit
+        Real64 MaxExhaustperPowerOutput;  // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
+        Real64 DesignMinExitGasTemp;      // Steam Saturation Temperature
+        Real64 FuelHeatingValue;          // Heating Value of Fuel in kJ/kg
+        Real64 DesignHeatRecVolFlowRate;  // m3/s, Design Water mass flow rate through heat recovery loop
+        Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
+        bool HeatRecActive;               // True if Heat Rec Design Vol Flow Rate > 0
+        int HeatRecInletNodeNum;          // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutletNodeNum;         // Node number on the heat recovery outlet side of the condenser
+        Real64 HeatRecInletTemp;          // Inlet Temperature of the heat recovery fluid
+        Real64 HeatRecOutletTemp;         // Outlet Temperature of the heat recovery fluid
+        Real64 HeatRecMdotDesign;         // reporting: Heat Recovery Loop Mass flow rate
+        Real64 HeatRecMdotActual;
+        Real64 QTotalHeatRecovered; // total heat recovered (W)
+        Real64 QJacketRecovered;    // heat recovered from jacket (W)
+        Real64 QLubeOilRecovered;   // heat recovered from lube (W)
+        Real64 QExhaustRecovered;   // exhaust gas heat recovered (W)
+        Real64 FuelEnergyUseRate;   // Fuel Energy used (W)
+        Real64 TotalHeatEnergyRec;  // total heat recovered (J)
+        Real64 JacketEnergyRec;     // heat recovered from jacket (J)
+        Real64 LubeOilEnergyRec;    // heat recovered from lube (J)
+        Real64 ExhaustEnergyRec;    // exhaust gas heat recovered (J)
+        Real64 FuelEnergy;          // Fuel Energy used (J)
+        Real64 FuelMdot;            // Fuel Amount used (Kg/s)
+        Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
+        Real64 ElecPowerGenerated;  // Electric Power Generated (W)
+        Real64 ElecEnergyGenerated; // Amount of Electric Energy Generated (J)
+        Real64 HeatRecMaxTemp;      // Max Temp that can be produced in heat recovery
+        int HRLoopNum;              // cooling water plant loop index number, for heat recovery
+        int HRLoopSideNum;          // cooling water plant loop side index, for heat recovery
+        int HRBranchNum;            // cooling water plant loop branch index, for heat recovery
+        int HRCompNum;              // cooling water plant loop component index, for heat recovery
 
-		// Default Constructor
-		ICEngineGeneratorSpecs() :
-			TypeOf( "Generator:InternalCombustionEngine" ),
-			CompType_Num( iGeneratorICEngine ),
-			RatedPowerOutput( 0.0 ),
-			ElectricCircuitNode( 0 ),
-			MinPartLoadRat( 0.0 ),
-			MaxPartLoadRat( 0.0 ),
-			OptPartLoadRat( 0.0 ),
-			ElecOutputFuelRat( 0.0 ),
-			ElecOutputFuelCurve( 0 ),
-			RecJacHeattoFuelRat( 0.0 ),
-			RecJacHeattoFuelCurve( 0 ),
-			RecLubeHeattoFuelRat( 0.0 ),
-			RecLubeHeattoFuelCurve( 0 ),
-			TotExhausttoFuelRat( 0.0 ),
-			TotExhausttoFuelCurve( 0 ),
-			ExhaustTemp( 0.0 ),
-			ExhaustTempCurve( 0 ),
-			ErrExhaustTempIndex( 0 ),
-			UA( 0.0 ),
-			UACoef( 2, 0.0 ),
-			MaxExhaustperPowerOutput( 0.0 ),
-			DesignMinExitGasTemp( 0.0 ),
-			FuelHeatingValue( 0.0 ),
-			DesignHeatRecVolFlowRate( 0.0 ),
-			DesignHeatRecMassFlowRate( 0.0 ),
-			HeatRecActive( false ),
-			HeatRecInletNodeNum( 0 ),
-			HeatRecOutletNodeNum( 0 ),
-			HeatRecInletTemp( 0.0 ),
-			HeatRecOutletTemp( 0.0 ),
-			HeatRecMdotDesign( 0.0 ),
-			HeatRecMdotActual( 0.0 ),
-			QTotalHeatRecovered( 0.0 ),
-			QJacketRecovered( 0.0 ),
-			QLubeOilRecovered( 0.0 ),
-			QExhaustRecovered( 0.0 ),
-			FuelEnergyUseRate( 0.0 ),
-			TotalHeatEnergyRec( 0.0 ),
-			JacketEnergyRec( 0.0 ),
-			LubeOilEnergyRec( 0.0 ),
-			ExhaustEnergyRec( 0.0 ),
-			FuelEnergy( 0.0 ),
-			FuelMdot( 0.0 ),
-			ExhaustStackTemp( 0.0 ),
-			ElecPowerGenerated( 0.0 ),
-			ElecEnergyGenerated( 0.0 ),
-			HeatRecMaxTemp( 0.0 ),
-			HRLoopNum( 0 ),
-			HRLoopSideNum( 0 ),
-			HRBranchNum( 0 ),
-			HRCompNum( 0 )
-		{}
+        // Default Constructor
+        ICEngineGeneratorSpecs()
+            : TypeOf("Generator:InternalCombustionEngine"), CompType_Num(iGeneratorICEngine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
+              MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), ElecOutputFuelRat(0.0), ElecOutputFuelCurve(0), RecJacHeattoFuelRat(0.0),
+              RecJacHeattoFuelCurve(0), RecLubeHeattoFuelRat(0.0), RecLubeHeattoFuelCurve(0), TotExhausttoFuelRat(0.0), TotExhausttoFuelCurve(0),
+              ExhaustTemp(0.0), ExhaustTempCurve(0), ErrExhaustTempIndex(0), UA(0.0), UACoef(2, 0.0), MaxExhaustperPowerOutput(0.0),
+              DesignMinExitGasTemp(0.0), FuelHeatingValue(0.0), DesignHeatRecVolFlowRate(0.0), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false),
+              HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdotDesign(0.0),
+              HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0),
+              FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0),
+              FuelMdot(0.0), ExhaustStackTemp(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0),
+              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0)
+        {
+        }
+    };
 
-	};
+    struct ReportVars
+    {
+        // Members
+        Real64 PowerGen;            // reporting: power (W)
+        Real64 EnergyGen;           // reporting: energy (J)
+        Real64 QJacketRecovered;    // reporting: Heat Recovered from Jacket (W)
+        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
+        Real64 QExhaustRecovered;   // reporting: exhaust gas heat recovered (W)
+        Real64 QTotalHeatRecovered; // reporting: Total Heat Recovered (W)
+        Real64 TotalHeatEnergyRec;  // reporting: total heat recovered (J)
+        Real64 JacketEnergyRec;     // reporting: heat recovered from jacket (J)
+        Real64 LubeOilEnergyRec;    // reporting: heat recovered from lube (J)
+        Real64 ExhaustEnergyRec;    // reporting: exhaust gas heat recovered (J)
+        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
+        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy used (W)
+        Real64 FuelMdot;            // reporting: Fuel used (Kg/s)
+        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
+        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
+        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
+        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
 
-	struct ReportVars
-	{
-		// Members
-		Real64 PowerGen; // reporting: power (W)
-		Real64 EnergyGen; // reporting: energy (J)
-		Real64 QJacketRecovered; // reporting: Heat Recovered from Jacket (W)
-		Real64 QLubeOilRecovered; // reporting: Heat Recovered from Lubricant (W)
-		Real64 QExhaustRecovered; // reporting: exhaust gas heat recovered (W)
-		Real64 QTotalHeatRecovered; // reporting: Total Heat Recovered (W)
-		Real64 TotalHeatEnergyRec; // reporting: total heat recovered (J)
-		Real64 JacketEnergyRec; // reporting: heat recovered from jacket (J)
-		Real64 LubeOilEnergyRec; // reporting: heat recovered from lube (J)
-		Real64 ExhaustEnergyRec; // reporting: exhaust gas heat recovered (J)
-		Real64 FuelEnergy; // reporting: Fuel Energy used (J)
-		Real64 FuelEnergyUseRate; // reporting: Fuel Energy used (W)
-		Real64 FuelMdot; // reporting: Fuel used (Kg/s)
-		Real64 ExhaustStackTemp; // reporting: Exhaust Stack Temperature (C)
-		Real64 HeatRecInletTemp; // reporting: Heat Recovery Loop Inlet Temperature (C)
-		Real64 HeatRecOutletTemp; // reporting: Heat Recovery Loop Outlet Temperature (C)
-		Real64 HeatRecMdot; // reporting: Heat Recovery Loop Mass flow rate (kg/s)
+        // Default Constructor
+        ReportVars()
+            : PowerGen(0.0), EnergyGen(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0),
+              TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelEnergyUseRate(0.0),
+              FuelMdot(0.0), ExhaustStackTemp(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0)
+        {
+        }
+    };
 
-		// Default Constructor
-		ReportVars() :
-			PowerGen( 0.0 ),
-			EnergyGen( 0.0 ),
-			QJacketRecovered( 0.0 ),
-			QLubeOilRecovered( 0.0 ),
-			QExhaustRecovered( 0.0 ),
-			QTotalHeatRecovered( 0.0 ),
-			TotalHeatEnergyRec( 0.0 ),
-			JacketEnergyRec( 0.0 ),
-			LubeOilEnergyRec( 0.0 ),
-			ExhaustEnergyRec( 0.0 ),
-			FuelEnergy( 0.0 ),
-			FuelEnergyUseRate( 0.0 ),
-			FuelMdot( 0.0 ),
-			ExhaustStackTemp( 0.0 ),
-			HeatRecInletTemp( 0.0 ),
-			HeatRecOutletTemp( 0.0 ),
-			HeatRecMdot( 0.0 )
-		{}
+    // Object Data
+    extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
+    extern Array1D<ReportVars> ICEngineGeneratorReport;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< ICEngineGeneratorSpecs > ICEngineGenerator; // dimension to number of machines
-	extern Array1D< ReportVars > ICEngineGeneratorReport;
+    void SimICEngineGenerator(int const GeneratorType,          // type of Generator
+                              std::string const &GeneratorName, // user specified name of Generator
+                              int &GeneratorIndex,
+                              bool const RunFlag,  // simulate Generator when TRUE
+                              Real64 const MyLoad, // demand on electric generator
+                              bool const FirstHVACIteration);
 
-	// Functions
+    void GetICEGeneratorResults(int const GeneratorType, // type of Generator
+                                int const GeneratorIndex,
+                                Real64 &GeneratorPower,  // electrical power
+                                Real64 &GeneratorEnergy, // electrical energy
+                                Real64 &ThermalPower,    // heat power
+                                Real64 &ThermalEnergy    // heat energy
+    );
 
-	void
-	SimICEngineGenerator(
-		int const GeneratorType, // type of Generator
-		std::string const & GeneratorName, // user specified name of Generator
-		int & GeneratorIndex,
-		bool const RunFlag, // simulate Generator when TRUE
-		Real64 const MyLoad, // demand on electric generator
-		bool const FirstHVACIteration
-	);
+    void SimICEPlantHeatRecovery(std::string const &CompType,
+                                 std::string const &CompName,
+                                 int const CompTypeNum,
+                                 int &CompNum,
+                                 bool const RunFlag,
+                                 bool &InitLoopEquip,
+                                 Real64 &MyLoad,
+                                 Real64 &MaxCap,
+                                 Real64 &MinCap,
+                                 Real64 &OptCap,
+                                 bool const FirstHVACIteration // TRUE if First iteration of simulation
+    );
 
-	void
-	GetICEGeneratorResults(
-		int const GeneratorType, // type of Generator
-		int const GeneratorIndex,
-		Real64 & GeneratorPower, // electrical power
-		Real64 & GeneratorEnergy, // electrical energy
-		Real64 & ThermalPower, // heat power
-		Real64 & ThermalEnergy // heat energy
-	);
+    // End IC ENGINE Generator Module Driver Subroutines
+    //******************************************************************************
 
-	void
-	SimICEPlantHeatRecovery(
-		std::string const & CompType,
-		std::string const & CompName,
-		int const CompTypeNum,
-		int & CompNum,
-		bool const RunFlag,
-		bool & InitLoopEquip,
-		Real64 & MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-	);
+    // Beginning of IC ENGINE Generator Module Get Input subroutines
+    //******************************************************************************
 
-	// End IC ENGINE Generator Module Driver Subroutines
-	//******************************************************************************
+    void GetICEngineGeneratorInput();
 
-	// Beginning of IC ENGINE Generator Module Get Input subroutines
-	//******************************************************************************
+    // End of Get Input subroutines for the IC ENGINE Generator Module
+    //******************************************************************************
 
-	void
-	GetICEngineGeneratorInput();
+    // Beginning of Generator model Subroutines
+    // *****************************************************************************
 
-	// End of Get Input subroutines for the IC ENGINE Generator Module
-	//******************************************************************************
+    void CalcICEngineGeneratorModel(int const GeneratorNum, // Generator number
+                                    bool const RunFlag,     // TRUE when Generator operating
+                                    Real64 const MyLoad,    // Generator demand
+                                    bool const FirstHVACIteration);
 
-	// Beginning of Generator model Subroutines
-	// *****************************************************************************
+    void CalcICEngineGenHeatRecovery(int const Num,                // HR Component number
+                                     Real64 const EnergyRecovered, // Amount of heat recovered
+                                     Real64 const HeatRecMdot,
+                                     Real64 &HRecRatio // Max Heat recovery ratio
+    );
 
-	void
-	CalcICEngineGeneratorModel(
-		int const GeneratorNum, // Generator number
-		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
-		bool const FirstHVACIteration
-	);
+    // End IC ENGINE Generator Module Model Subroutines
+    // *****************************************************************************
 
-	void
-	CalcICEngineGenHeatRecovery(
-		int const Num, // HR Component number
-		Real64 const EnergyRecovered, // Amount of heat recovered
-		Real64 const HeatRecMdot,
-		Real64 & HRecRatio // Max Heat recovery ratio
-	);
+    // Begin IC ENGINE Generator Module Utility Subroutines
+    // *****************************************************************************
 
-	// End IC ENGINE Generator Module Model Subroutines
-	// *****************************************************************************
+    void InitICEngineGenerators(int const GeneratorNum, // Generator number
+                                bool const RunFlag,     // TRUE when Generator operating
+                                Real64 const MyLoad,    // Generator demand
+                                bool const FirstHVACIteration);
 
-	// Begin IC ENGINE Generator Module Utility Subroutines
-	// *****************************************************************************
+    // End IC ENGINE Generator Module Utility Subroutines
+    // *****************************************************************************
 
-	void
-	InitICEngineGenerators(
-		int const GeneratorNum, // Generator number
-		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
-		bool const FirstHVACIteration
-	);
+    // Beginning of Record Keeping subroutines for the IC ENGINE Generator Module
+    // *****************************************************************************
 
-	// End IC ENGINE Generator Module Utility Subroutines
-	// *****************************************************************************
+    void UpdateICEngineGeneratorRecords(bool const RunFlag, // TRUE if Generator operating
+                                        int const Num       // Generator number
+    );
 
-	// Beginning of Record Keeping subroutines for the IC ENGINE Generator Module
-	// *****************************************************************************
+    // End of Record Keeping subroutines for the IC ENGINE Generator Module
+    // *****************************************************************************
 
-	void
-	UpdateICEngineGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
-		int const Num // Generator number
-	);
+} // namespace ICEngineElectricGenerator
 
-	// End of Record Keeping subroutines for the IC ENGINE Generator Module
-	// *****************************************************************************
-
-} // ICEngineElectricGenerator
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

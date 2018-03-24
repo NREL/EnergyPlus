@@ -54,157 +54,134 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace NodeInputManager {
 
-	// Using/Aliasing
-	using DataLoopNode::MarkedNodeData;
-	using DataLoopNode::NodeData;
+    // Using/Aliasing
+    using DataLoopNode::MarkedNodeData;
+    using DataLoopNode::NodeData;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
+    // Data
+    // MODULE PARAMETER DEFINITIONS
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern int NumOfNodeLists; // Total number of Node Lists in IDF
-	extern int NumOfUniqueNodeNames; // Number of Unique Node Names (current)
-	// The following is a module level flag because there are several possible "entries" into
-	// this module that may need to get the Node Inputs.
-	extern bool GetNodeInputFlag; // Flag to Get Node Input(s)
-	extern Array1D_int NodeRef; // Number of times a Node is "referenced"
-	extern std::string CurCheckContextName; // Used in Uniqueness checks
-	extern Array1D_string UniqueNodeNames; // used in uniqueness checks
-	extern int NumCheckNodes; // Num of Unique nodes in check
-	extern int MaxCheckNodes; // Current "max" unique nodes in check
-	extern bool NodeVarsSetup; // Setup indicator of node vars for reporting (also that all nodes have been entered)
-	extern Array1D_bool NodeWetBulbRepReq;
+    extern int NumOfNodeLists;       // Total number of Node Lists in IDF
+    extern int NumOfUniqueNodeNames; // Number of Unique Node Names (current)
+    // The following is a module level flag because there are several possible "entries" into
+    // this module that may need to get the Node Inputs.
+    extern bool GetNodeInputFlag;           // Flag to Get Node Input(s)
+    extern Array1D_int NodeRef;             // Number of times a Node is "referenced"
+    extern std::string CurCheckContextName; // Used in Uniqueness checks
+    extern Array1D_string UniqueNodeNames;  // used in uniqueness checks
+    extern int NumCheckNodes;               // Num of Unique nodes in check
+    extern int MaxCheckNodes;               // Current "max" unique nodes in check
+    extern bool NodeVarsSetup;              // Setup indicator of node vars for reporting (also that all nodes have been entered)
+    extern Array1D_bool NodeWetBulbRepReq;
 
-	// Types
+    // Types
 
-	struct NodeListDef // Derived Type for Node Lists
-	{
-		// Members
-		std::string Name; // Name of this Node List
-		int NumOfNodesInList; // Number of Nodes in this Node List
-		Array1D_string NodeNames; // List of Names in this Node List
-		Array1D_int NodeNumbers; // Number of each Node (ref NodeNames) in this Node List
+    struct NodeListDef // Derived Type for Node Lists
+    {
+        // Members
+        std::string Name;         // Name of this Node List
+        int NumOfNodesInList;     // Number of Nodes in this Node List
+        Array1D_string NodeNames; // List of Names in this Node List
+        Array1D_int NodeNumbers;  // Number of each Node (ref NodeNames) in this Node List
 
-		// Default Constructor
-		NodeListDef() :
-			NumOfNodesInList( 0 )
-		{}
+        // Default Constructor
+        NodeListDef() : NumOfNodesInList(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<NodeListDef> NodeLists; // Node Lists
 
-	// Object Data
-	extern Array1D< NodeListDef > NodeLists; // Node Lists
+    // Functions
 
-	// Functions
+    // Clears the global data in NodeInputManager.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-	// Clears the global data in NodeInputManager.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    void GetNodeNums(std::string const &Name,                      // Name for which to obtain information
+                     int &NumNodes,                                // Number of nodes accompanying this Name
+                     Array1S_int NodeNumbers,                      // Node Numbers accompanying this Name
+                     bool &ErrorsFound,                            // True when errors are found...
+                     int const NodeFluidType,                      // Fluidtype for checking/setting node FluidType
+                     std::string const &NodeObjectType,            // Node Object Type (i.e. "Chiller:Electric")
+                     std::string const &NodeObjectName,            // Node Object Name (i.e. "MyChiller")
+                     int const NodeConnectionType,                 // Node Connection Type (see DataLoopNode)
+                     int const NodeFluidStream,                    // Which Fluid Stream (1,2,3,...)
+                     bool const ObjectIsParent,                    // True/False
+                     Optional_bool_const IncrementFluidStream = _, // True/False
+                     Optional_string_const InputFieldName = _      // Input Field Name
+    );
 
-	void
-	GetNodeNums(
-		std::string const & Name, // Name for which to obtain information
-		int & NumNodes, // Number of nodes accompanying this Name
-		Array1S_int NodeNumbers, // Node Numbers accompanying this Name
-		bool & ErrorsFound, // True when errors are found...
-		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
-		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
-		std::string const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
-		int const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-		int const NodeFluidStream, // Which Fluid Stream (1,2,3,...)
-		bool const ObjectIsParent, // True/False
-		Optional_bool_const IncrementFluidStream = _, // True/False
-		Optional_string_const InputFieldName = _ // Input Field Name
-	);
+    void GetNodeList(std::string const &Name,                 // Node List Name for which information is obtained
+                     int &NumNodes,                           // Number of nodes accompanying this Name
+                     Array1S_int NodeNumbers,                 // NodeNumbers accompanying this Name
+                     bool &errFlag,                           // Set to true when requested Node List not found
+                     int const NodeFluidType,                 // Fluidtype for checking/setting node FluidType
+                     std::string const &NodeObjectType,       // Node Object Type (i.e. "Chiller:Electric")
+                     std::string const &NodeObjectName,       // Node Object Name (i.e. "MyChiller")
+                     int const NodeConnectionType,            // Node Connection Type (see DataLoopNode)
+                     int const NodeFluidStream,               // Which Fluid Stream (1,2,3,...)
+                     bool const ObjectIsParent,               // True/False
+                     Optional_string_const InputFieldName = _ // Input Field Name
+    );
 
-	void
-	GetNodeList(
-		std::string const & Name, // Node List Name for which information is obtained
-		int & NumNodes, // Number of nodes accompanying this Name
-		Array1S_int NodeNumbers, // NodeNumbers accompanying this Name
-		bool & errFlag, // Set to true when requested Node List not found
-		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
-		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
-		std::string const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
-		int const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-		int const NodeFluidStream, // Which Fluid Stream (1,2,3,...)
-		bool const ObjectIsParent, // True/False
-		Optional_string_const InputFieldName = _ // Input Field Name
-	);
+    void SetupNodeVarsForReporting();
 
-	void
-	SetupNodeVarsForReporting();
+    void GetNodeListsInput(bool &ErrorsFound);
 
-	void
-	GetNodeListsInput( bool & ErrorsFound );
+    int AssignNodeNumber(std::string const &Name, // Name for assignment
+                         int const NodeFluidType, // must be valid
+                         bool &ErrorsFound);
 
-	int
-	AssignNodeNumber(
-		std::string const & Name, // Name for assignment
-		int const NodeFluidType, // must be valid
-		bool & ErrorsFound
-	);
+    int GetOnlySingleNode(std::string const &NodeName,
+                          bool &errFlag,
+                          std::string const &NodeObjectType,       // Node Object Type (i.e. "Chiller:Electric")
+                          std::string const &NodeObjectName,       // Node Object Name (i.e. "MyChiller")
+                          int const NodeFluidType,                 // Fluidtype for checking/setting node FluidType
+                          int const NodeConnectionType,            // Node Connection Type (see DataLoopNode)
+                          int const NodeFluidStream,               // Which Fluid Stream (1,2,3,...)
+                          bool const ObjectIsParent,               // True/False
+                          Optional_string_const InputFieldName = _ // Input Field Name
+    );
 
-	int
-	GetOnlySingleNode(
-		std::string const & NodeName,
-		bool & errFlag,
-		std::string const & NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
-		std::string const & NodeObjectName, // Node Object Name (i.e. "MyChiller")
-		int const NodeFluidType, // Fluidtype for checking/setting node FluidType
-		int const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-		int const NodeFluidStream, // Which Fluid Stream (1,2,3,...)
-		bool const ObjectIsParent, // True/False
-		Optional_string_const InputFieldName = _ // Input Field Name
-	);
+    void InitUniqueNodeCheck(std::string const &ContextName);
 
-	void
-	InitUniqueNodeCheck( std::string const & ContextName );
+    void CheckUniqueNodes(std::string const &NodeTypes,
+                          std::string const &CheckType,
+                          bool &ErrorsFound,
+                          Optional_string_const CheckName = _,
+                          Optional_int_const CheckNumber = _,
+                          Optional_string_const ObjectName = _);
 
-	void
-	CheckUniqueNodes(
-		std::string const & NodeTypes,
-		std::string const & CheckType,
-		bool & ErrorsFound,
-		Optional_string_const CheckName = _,
-		Optional_int_const CheckNumber = _,
-		Optional_string_const ObjectName = _
-	);
+    void EndUniqueNodeCheck(std::string const &ContextName);
 
-	void
-	EndUniqueNodeCheck( std::string const & ContextName );
+    void CalcMoreNodeInfo();
 
-	void
-	CalcMoreNodeInfo();
+    void MarkNode(int const NodeNumber, // Node Number to be marked
+                  std::string const &ObjectType,
+                  std::string const &ObjectName,
+                  std::string const &FieldName);
 
-	void
-	MarkNode(
-		int const NodeNumber, // Node Number to be marked
-		std::string const & ObjectType,
-		std::string const & ObjectName,
-		std::string const & FieldName
-	);
+    void CheckMarkedNodes(bool &ErrorsFound);
 
-	void
-	CheckMarkedNodes( bool & ErrorsFound );
+} // namespace NodeInputManager
 
-} // NodeInputManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif
