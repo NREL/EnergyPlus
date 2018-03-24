@@ -1,8 +1,5 @@
 #include <cstddef>
 #include <fmiModelTypes.h>
-//#include <fmi1_types.h>
-//#include <fmi1_functions.h>
-//#include <jmi_types.h>
 
 typedef struct {
   fmiBoolean newDiscreteStatesNeeded;
@@ -12,6 +9,8 @@ typedef struct {
   fmiBoolean nextEventTimeDefined;
   fmiReal nextEventTime; // next event if nextEventTimeDefined=fmi2True
 } fmiEventInfo;
+
+extern "C" {
 
 unsigned int instantiate(const char *input,
                          const char *weather,
@@ -49,4 +48,7 @@ unsigned int getNextEventTime(fmiEventInfo *eventInfo,
                               const char *log);
 
 unsigned int terminate(const char *log);
+
+}
+
 
