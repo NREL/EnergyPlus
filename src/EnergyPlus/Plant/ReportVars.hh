@@ -51,41 +51,34 @@
 #include <Plant/LoopSideReportVars.hh>
 
 namespace EnergyPlus {
-    namespace DataPlant {
+namespace DataPlant {
 
-        struct ReportVars {
-            // Members
-            // Whole loop descriptions
-            Real64 CoolingDemand; // Plant Loop Cooling Demand, W
-            Real64 HeatingDemand; // Plant Loop Heating Demand[W]
-            Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
-            Real64 UnmetDemand; // Plant Loop Unmet Demand [W]
-            // Loop side data
-            Array1D <LoopSideReportVars> LoopSide;
-            Real64 BypassFrac; // Debug Variable
-            Real64 InletNodeFlowrate; // Debug Variable
-            Real64 InletNodeTemperature; // Debug Variable
-            Real64 OutletNodeFlowrate; // Debug Variable
-            Real64 OutletNodeTemperature; // Debug Variable
-            int LastLoopSideSimulated;
+    struct ReportVars
+    {
+        // Members
+        // Whole loop descriptions
+        Real64 CoolingDemand;       // Plant Loop Cooling Demand, W
+        Real64 HeatingDemand;       // Plant Loop Heating Demand[W]
+        Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
+        Real64 UnmetDemand;         // Plant Loop Unmet Demand [W]
+        // Loop side data
+        Array1D<LoopSideReportVars> LoopSide;
+        Real64 BypassFrac;            // Debug Variable
+        Real64 InletNodeFlowrate;     // Debug Variable
+        Real64 InletNodeTemperature;  // Debug Variable
+        Real64 OutletNodeFlowrate;    // Debug Variable
+        Real64 OutletNodeTemperature; // Debug Variable
+        int LastLoopSideSimulated;
 
-            // Default Constructor
-            ReportVars() :
-                    CoolingDemand(0.0),
-                    HeatingDemand(0.0),
-                    DemandNotDispatched(0.0),
-                    UnmetDemand(0.0),
-                    LoopSide(2),
-                    BypassFrac(0.0),
-                    InletNodeFlowrate(0.0),
-                    InletNodeTemperature(0.0),
-                    OutletNodeFlowrate(0.0),
-                    OutletNodeTemperature(0.0),
-                    LastLoopSideSimulated(0) {}
+        // Default Constructor
+        ReportVars()
+            : CoolingDemand(0.0), HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), LoopSide(2), BypassFrac(0.0),
+              InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
+        {
+        }
+    };
 
-        };
-
-    }
-}
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

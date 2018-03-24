@@ -80,8 +80,7 @@ using namespace OutputProcessor;
 using namespace SolarShading;
 using namespace ez;
 
-int
-ProcessArgs(int argc, const char * argv[])
+    int ProcessArgs(int argc, const char *argv[])
 {
 	typedef  std::string::size_type  size_type;
 
@@ -151,7 +150,10 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
 
-	opt.add("L", 0, 1, 0, "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: Dash (e.g., eplus-table.csv)", "-s", "--output-suffix");
+        opt.add("L", 0, 1, 0,
+                "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: "
+                "Dash (e.g., eplus-table.csv)",
+                "-s", "--output-suffix");
 
 	opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
@@ -181,8 +183,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-i")->getString(inputIddFileName);
 
-	if (!opt.isSet("-i") && !legacyMode)
-		inputIddFileName = exeDirectory + inputIddFileName;
+        if (!opt.isSet("-i") && !legacyMode) inputIddFileName = exeDirectory + inputIddFileName;
 
 	opt.get("-d")->getString(outDirPathName);
 
@@ -299,7 +300,6 @@ ProcessArgs(int argc, const char * argv[])
 
 	std::string suffixType;
 	opt.get("-s")->getString(suffixType);
-
 
 	std::string outputEpmdetFileName;
 	std::string outputEpmidfFileName;
@@ -429,8 +429,7 @@ ProcessArgs(int argc, const char * argv[])
 	outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
 	if (suffixType == "L" || suffixType == "l") {
 		outputSqliteErrFileName = outDirPathName + sqliteSuffix + ".err";
-	}
-	else {
+        } else {
 		outputSqliteErrFileName = outputFilePrefix + sqliteSuffix + ".err";
 	}
 	outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
@@ -455,7 +454,6 @@ ProcessArgs(int argc, const char * argv[])
 	// ExpandObjects files
 	outputExpidfFileName = outputFilePrefix + normalSuffix + ".expidf";
 	outputExperrFileName = outputFilePrefix + normalSuffix + ".experr";
-
 
 	// Handle bad options
 	if (!opt.gotExpected(badOptions)) {
@@ -503,15 +501,28 @@ ProcessArgs(int argc, const char * argv[])
 	bool FileExists;
 
 	// Check for IDD and IDF files
-	{ IOFlags flags; gio::inquire( EnergyPlusIniFileName, flags ); EPlusINI = flags.exists(); }
+        {
+            IOFlags flags;
+            gio::inquire(EnergyPlusIniFileName, flags);
+            EPlusINI = flags.exists();
+        }
 	if ( EPlusINI ) {
 		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
+            {
+                IOFlags flags;
+                flags.ACTION("read");
+                gio::open(LFN, EnergyPlusIniFileName, flags);
+                iostatus = flags.ios();
+            }
 		if ( iostatus != 0 ) {
 			DisplayString( "ERROR: Could not open file " + EnergyPlusIniFileName + " for input (read)." );
 			exit(EXIT_FAILURE);
 		}
-		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
+            {
+                IOFlags flags;
+                gio::inquire(LFN, flags);
+                CurrentWorkingFolder = flags.name();
+            }
 		// Relying on compiler to supply full path name here
 		TempIndx = index( CurrentWorkingFolder, pathChar, true );
 		if ( TempIndx == std::string::npos ) {
@@ -528,14 +539,22 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	// Check if specified files exist
-	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
+        {
+            IOFlags flags;
+            gio::inquire(inputIddFileName, flags);
+            FileExists = flags.exists();
+        }
 	if ( ! FileExists ) {
 		DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
 
-	{ IOFlags flags; gio::inquire( inputFileName, flags ); FileExists = flags.exists(); }
+        {
+            IOFlags flags;
+            gio::inquire(inputFileName, flags);
+            FileExists = flags.exists();
+        }
 	if ( ! FileExists ) {
 		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputFileName) + "." );
 		DisplayString(errorFollowUp);
@@ -543,7 +562,11 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	if (opt.isSet("-w") && !DDOnlySimulation) {
-		{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); FileExists = flags.exists(); }
+            {
+                IOFlags flags;
+                gio::inquire(inputWeatherFileName, flags);
+                FileExists = flags.exists();
+            }
 		if ( ! FileExists ) {
 			DisplayString("ERROR: Could not find weather file: " + getAbsolutePath(inputWeatherFileName) + "." );
 			DisplayString(errorFollowUp);
@@ -552,7 +575,12 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	OutputFileDebug = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, outputDbgFileName, flags ); iostatus = flags.ios(); }
+        {
+            IOFlags flags;
+            flags.ACTION("write");
+            gio::open(OutputFileDebug, outputDbgFileName, flags);
+            iostatus = flags.ios();
+        }
 	if ( iostatus != 0 ) {
 		DisplayString( "ERROR: Could not open output debug file: " + outputDbgFileName + "." );
 		exit(EXIT_FAILURE);
@@ -563,14 +591,17 @@ ProcessArgs(int argc, const char * argv[])
 	// Preprocessors (These will likely move to a new file)
 	if (runEPMacro) {
 		std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
-		{ IOFlags flags; gio::inquire( epMacroPath, flags ); FileExists = flags.exists(); }
+            {
+                IOFlags flags;
+                gio::inquire(epMacroPath, flags);
+                FileExists = flags.exists();
+            }
 		if (!FileExists) {
 			DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + "." );
 			exit(EXIT_FAILURE);
 		}
 		std::string epMacroCommand = "\"" + epMacroPath + "\"";
-		bool inputFileNamedIn =
-				(getAbsolutePath(inputFileName) == getAbsolutePath("in.imf"));
+            bool inputFileNamedIn = (getAbsolutePath(inputFileName) == getAbsolutePath("in.imf"));
 
 		if (!inputFileNamedIn) linkFile(inputFileName.c_str(), "in.imf");
 		DisplayString("Running EPMacro...");
@@ -583,35 +614,36 @@ ProcessArgs(int argc, const char * argv[])
 
 	if (runExpandObjects) {
 		std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
-		{ IOFlags flags; gio::inquire( expandObjectsPath, flags ); FileExists = flags.exists(); }
+            {
+                IOFlags flags;
+                gio::inquire(expandObjectsPath, flags);
+                FileExists = flags.exists();
+            }
 		if (!FileExists) {
 			DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + "." );
 			exit(EXIT_FAILURE);
 		}
 		std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
-		bool inputFileNamedIn =
-				(getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
+            bool inputFileNamedIn = (getAbsolutePath(inputFileName) == getAbsolutePath("in.idf"));
 
-		bool iddFileNamedEnergy =
-				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
+            bool iddFileNamedEnergy = (getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 
-		if (!inputFileNamedIn)
-			linkFile(inputFileName.c_str(), "in.idf");
-		if (!iddFileNamedEnergy)
-			linkFile(inputIddFileName,"Energy+.idd");
+            if (!inputFileNamedIn) linkFile(inputFileName.c_str(), "in.idf");
+            if (!iddFileNamedEnergy) linkFile(inputIddFileName, "Energy+.idd");
 		systemCall(expandObjectsCommand);
-		if (!inputFileNamedIn)
-			removeFile("in.idf");
-		if (!iddFileNamedEnergy)
-			removeFile("Energy+.idd");
+            if (!inputFileNamedIn) removeFile("in.idf");
+            if (!iddFileNamedEnergy) removeFile("Energy+.idd");
 		moveFile("expandedidf.err", outputExperrFileName);
-		{ IOFlags flags; gio::inquire( "expanded.idf", flags ); FileExists = flags.exists(); }
+            {
+                IOFlags flags;
+                gio::inquire("expanded.idf", flags);
+                FileExists = flags.exists();
+            }
 		if (FileExists) {
 			moveFile("expanded.idf", outputExpidfFileName);
 		    inputFileName = outputExpidfFileName;
 		}
 	}
-
 
 	return 0;
 }
@@ -622,9 +654,7 @@ ProcessArgs(int argc, const char * argv[])
 //     Rewinding is a big performance hit and should be avoided if possible
 //     Case-insensitive comparison is much faster than converting strings to upper or lower case
 //     Each strip and case conversion is a heap hit and should be avoided if possible
-void
-ReadINIFile(
-	int const UnitNumber, // Unit number of the opened INI file
+    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
 	std::string const & Heading, // Heading for the parameters ('[heading]')
 	std::string const & KindofParameter, // Kind of parameter to be found (String)
 	std::string & DataOut // Output from the retrieval
@@ -695,7 +725,11 @@ ReadINIFile(
 	NewHeading = false;
 
 	while ( ! EndofFile && ! Found ) {
-		{ IOFlags flags; gio::read( UnitNumber, Format_700, flags ) >> LINE; ReadStat = flags.ios(); }
+            {
+                IOFlags flags;
+                gio::read(UnitNumber, Format_700, flags) >> LINE;
+                ReadStat = flags.ios();
+            }
 		if ( ReadStat < GoodIOStatValue ) {
 			EndofFile = true;
 			break;
@@ -716,7 +750,11 @@ ReadINIFile(
 
 		//                                  Heading line found, now looking for Kind
 		while ( ! EndofFile && ! NewHeading ) {
-			{ IOFlags flags; gio::read( UnitNumber, Format_700, flags ) >> LINE; ReadStat = flags.ios(); }
+                {
+                    IOFlags flags;
+                    gio::read(UnitNumber, Format_700, flags) >> LINE;
+                    ReadStat = flags.ios();
+                }
 			if ( ReadStat < GoodIOStatValue ) {
 				EndofFile = true;
 				break;
@@ -750,9 +788,7 @@ ReadINIFile(
 			DataOut = stripped( LINE.substr( IEQ + 1 ) );
 			Found = true;
 			break;
-
 		}
-
 	}
 
 	if ( Param == "dir" ) {
@@ -764,11 +800,9 @@ ReadINIFile(
 			if ( DataOut[ IPOS - 1 ] != pathChar ) {
 				DataOut += pathChar;
 			}
-
 		}
 	}
-
 }
 
-} // CommandLineInterface namespace
-} // EnergyPlus namespace
+} // namespace CommandLineInterface
+} // namespace EnergyPlus

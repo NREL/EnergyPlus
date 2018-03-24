@@ -56,13 +56,13 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EconomicTariff.hh>
 #include <DataCostEstimate.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobalConstants.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
+#include <EconomicTariff.hh>
 #include <General.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -71,6 +71,7 @@
 #include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
+#include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -311,7 +312,7 @@ namespace EconomicTariff {
 		// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
 		bool Update_GetInput( true );
 		int addOperand_prevVarMe( 0 );
-	}
+    } // namespace
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -321,8 +322,7 @@ namespace EconomicTariff {
 
 	// Functions
 
-	void
-	UpdateUtilityBills()
+    void UpdateUtilityBills()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   September 2003
@@ -369,8 +369,7 @@ namespace EconomicTariff {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	void
-	GetInputEconomicsTariff( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsTariff(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -382,12 +381,11 @@ namespace EconomicTariff {
 		// It will be the right conversion factors based on the associated meter resource type
 		// meaning if "CCF" is picked, the conversion factor isn't the same whether it's a water meter or a fuel meter.
 
-
+        using DataGlobalConstants::AssignResourceTypeNum;
 		using DataGlobals::NumOfTimeStepInHour;
+        using OutputProcessor::EnergyMeters;
 		using OutputReportTabular::AddTOCEntry;
 		using OutputReportTabular::displayTariffReport;
-		using OutputProcessor::EnergyMeters;
-		using DataGlobalConstants::AssignResourceTypeNum;
 		using namespace DataIPShortCuts;
 		using General::RoundSigDigits;
 
@@ -416,7 +414,8 @@ namespace EconomicTariff {
 		numTariff = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		tariff.allocate( numTariff );
 		for ( iInObj = 1; iInObj <= numTariff; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				//  args are always turned to upper case but this is okay...
@@ -447,7 +446,8 @@ namespace EconomicTariff {
 			// if no meters found for that name
 			if ( KeyCount == 0 ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing meter" );
-				ShowContinueError( "Meter referenced is not present due to a lack of equipment that uses that energy source/meter:\"" + tariff( iInObj ).reportMeter + "\"." );
+                ShowContinueError("Meter referenced is not present due to a lack of equipment that uses that energy source/meter:\"" +
+                                  tariff(iInObj).reportMeter + "\".");
 				tariff( iInObj ).reportMeterIndx = 0;
 			} else {
 				NamesOfKeys.allocate( KeyCount );
@@ -489,10 +489,10 @@ namespace EconomicTariff {
 					tariff( iInObj ).kindElectricMtr = kindMeterElecNet;
 
 					// Handle the case where its a water meter
-				} else if  ( SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER"
-						|| SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER"
-						|| SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION"
-						|| SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE" ) {
+                } else if (SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER" ||
+                           SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER" ||
+                           SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION" ||
+                           SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE") {
 					tariff( iInObj ).kindWaterMtr = kindMeterWater;
 					// Or a Natural Gas meter
 				} else if (SELECT_CASE_var == "GAS" || SELECT_CASE_var == "NATURALGAS" || SELECT_CASE_var == "NATURAL GAS" )  {
@@ -707,35 +707,43 @@ namespace EconomicTariff {
 			//type of demand window
 			if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "QuarterHour" ) ) {
 				// check to make sure that the demand window and the TIMESTEP IN HOUR are consistant.
-				{ auto const SELECT_CASE_var( NumOfTimeStepInHour );
+                {
+                    auto const SELECT_CASE_var(NumOfTimeStepInHour);
 				if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 15 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHour;
 					tariff( iInObj ).demWinTime = 1.00;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
-					ShowContinueError( "Demand window of QuarterHour is not consistent with number of timesteps per hour [" + RoundSigDigits( NumOfTimeStepInHour ) + "]." );
+                        ShowContinueError("Demand window of QuarterHour is not consistent with number of timesteps per hour [" +
+                                          RoundSigDigits(NumOfTimeStepInHour) + "].");
 					ShowContinueError( "Demand window will be set to FullHour, and the simulation continues." );
 				} else if ( ( SELECT_CASE_var == 2 ) || ( SELECT_CASE_var == 6 ) || ( SELECT_CASE_var == 10 ) || ( SELECT_CASE_var == 30 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHalf;
 					tariff( iInObj ).demWinTime = 0.50;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
-					ShowContinueError( "Demand window of QuarterHour is not consistent with number of timesteps per hour [" + RoundSigDigits( NumOfTimeStepInHour ) + "]." );
+                        ShowContinueError("Demand window of QuarterHour is not consistent with number of timesteps per hour [" +
+                                          RoundSigDigits(NumOfTimeStepInHour) + "].");
 					ShowContinueError( "Demand window will be set to HalfHour, and the simulation continues." );
 				} else if ( ( SELECT_CASE_var == 4 ) || ( SELECT_CASE_var == 12 ) || ( SELECT_CASE_var == 20 ) || ( SELECT_CASE_var == 60 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowQuarter;
 					tariff( iInObj ).demWinTime = 0.25;
-				}}
+                    }
+                }
 			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "HalfHour" ) ) {
-				{ auto const SELECT_CASE_var( NumOfTimeStepInHour );
+                {
+                    auto const SELECT_CASE_var(NumOfTimeStepInHour);
 				if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 15 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHour;
 					tariff( iInObj ).demWinTime = 1.00;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
-					ShowContinueError( "Demand window of HalfHour is not consistent with number of timesteps per hour [" + RoundSigDigits( NumOfTimeStepInHour ) + "]." );
+                        ShowContinueError("Demand window of HalfHour is not consistent with number of timesteps per hour [" +
+                                          RoundSigDigits(NumOfTimeStepInHour) + "].");
 					ShowContinueError( "Demand window will be set to FullHour, and the simulation continues." );
-				} else if ( ( SELECT_CASE_var == 2 ) || ( SELECT_CASE_var == 4 ) || ( SELECT_CASE_var == 6 ) || ( SELECT_CASE_var == 10 ) || ( SELECT_CASE_var == 12 ) || ( SELECT_CASE_var == 20 ) || ( SELECT_CASE_var == 30 ) || ( SELECT_CASE_var == 60 ) ) {
+                    } else if ((SELECT_CASE_var == 2) || (SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 10) ||
+                               (SELECT_CASE_var == 12) || (SELECT_CASE_var == 20) || (SELECT_CASE_var == 30) || (SELECT_CASE_var == 60)) {
 					tariff( iInObj ).demandWindow = demandWindowHalf;
 					tariff( iInObj ).demWinTime = 0.50;
-				}}
+                    }
+                }
 			} else if ( UtilityRoutines::SameString( cAlphaArgs( 7 ), "FullHour" ) ) {
 				tariff( iInObj ).demandWindow = demandWindowHour;
 				tariff( iInObj ).demWinTime = 1.00;
@@ -747,7 +755,8 @@ namespace EconomicTariff {
 				tariff( iInObj ).demWinTime = 24.0 * 7.0;
 			} else {
 				// if not entered default to the same logic as quarter of an hour
-				{ auto const SELECT_CASE_var( NumOfTimeStepInHour );
+                {
+                    auto const SELECT_CASE_var(NumOfTimeStepInHour);
 				if ( ( SELECT_CASE_var == 1 ) || ( SELECT_CASE_var == 3 ) || ( SELECT_CASE_var == 5 ) || ( SELECT_CASE_var == 15 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowHour;
 					tariff( iInObj ).demWinTime = 1.00;
@@ -757,7 +766,8 @@ namespace EconomicTariff {
 				} else if ( ( SELECT_CASE_var == 4 ) || ( SELECT_CASE_var == 12 ) || ( SELECT_CASE_var == 20 ) || ( SELECT_CASE_var == 60 ) ) {
 					tariff( iInObj ).demandWindow = demandWindowQuarter;
 					tariff( iInObj ).demWinTime = 0.25;
-				}}
+                    }
+                }
 			}
 			//monthly charge
 			tariff( iInObj ).monthChgVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 8 ), isNotNumeric );
@@ -787,7 +797,8 @@ namespace EconomicTariff {
 				tariff( iInObj ).buyOrSell = buyFromUtility;
 			}
 			// check if meter is consistent with buy or sell option
-			if ( ( tariff( iInObj ).buyOrSell == sellToUtility ) && ( ! UtilityRoutines::SameString( tariff( iInObj ).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY" ) ) ) {
+            if ((tariff(iInObj).buyOrSell == sellToUtility) &&
+                (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
 				ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + "\" is not typically used with the sellToUtility option." );
 				ShowContinueError( "Usually the ElectricitySurplusSold:Facility meter is selected when the sellToUtility option is used." );
@@ -800,10 +811,13 @@ namespace EconomicTariff {
 			//also test the buy option for electricity
 			if ( tariff( iInObj ).buyOrSell == buyFromUtility ) {
 				if ( hasi( tariff( iInObj ).reportMeter, "Elec" ) ) { //test if electric meter
-					if ( ! ( UtilityRoutines::SameString( tariff( iInObj ).reportMeter, "Electricity:Facility" ) || UtilityRoutines::SameString( tariff( iInObj ).reportMeter, "ElectricityPurchased:Facility" ) ) ) {
+                    if (!(UtilityRoutines::SameString(tariff(iInObj).reportMeter, "Electricity:Facility") ||
+                          UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ElectricityPurchased:Facility"))) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
-						ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the buyFromUtility option." );
-						ShowContinueError( "Usually the Electricity:Facility meter or the ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
+                        ShowContinueError("The meter chosen \"" + tariff(iInObj).reportMeter +
+                                          " is not typically used with the buyFromUtility option.");
+                        ShowContinueError("Usually the Electricity:Facility meter or the ElectricityPurchased:Facility is selected when the "
+                                          "buyFromUtility option is used.");
 					}
 				}
 			}
@@ -828,8 +842,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	GetInputEconomicsQualify( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsQualify(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -852,7 +865,8 @@ namespace EconomicTariff {
 		numQualify = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		qualify.allocate( numQualify );
 		for ( iInObj = 1; iInObj <= numQualify; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -863,9 +877,11 @@ namespace EconomicTariff {
 			//index of the tariff name in the tariff array
 			qualify( iInObj ).tariffIndx = FindTariffIndex( cAlphaArgs( 2 ), cAlphaArgs( 1 ), ErrorsFound, CurrentModuleObject );
 			warnIfNativeVarname( cAlphaArgs( 1 ), qualify( iInObj ).tariffIndx, ErrorsFound, CurrentModuleObject );
-			qualify( iInObj ).namePt = AssignVariablePt( cAlphaArgs( 1 ), true, varIsAssigned, varNotYetDefined, kindQualify, iInObj, qualify( iInObj ).tariffIndx );
+            qualify(iInObj).namePt =
+                AssignVariablePt(cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindQualify, iInObj, qualify(iInObj).tariffIndx);
 			//index of the variable in the variable array
-			qualify( iInObj ).sourcePt = AssignVariablePt( cAlphaArgs( 3 ), true, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify( iInObj ).tariffIndx );
+            qualify(iInObj).sourcePt =
+                AssignVariablePt(cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify(iInObj).tariffIndx);
 			//indicator if maximum test otherwise minimum
 			if ( UtilityRoutines::SameString( cAlphaArgs( 4 ), "Minimum" ) ) {
 				qualify( iInObj ).isMaximum = false;
@@ -879,7 +895,8 @@ namespace EconomicTariff {
 			}
 			//value of the threshold
 			qualify( iInObj ).thresholdVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 5 ), isNotNumeric );
-			qualify( iInObj ).thresholdPt = AssignVariablePt( cAlphaArgs( 5 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify( iInObj ).tariffIndx );
+            qualify(iInObj).thresholdPt =
+                AssignVariablePt(cAlphaArgs(5), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, qualify(iInObj).tariffIndx);
 			//enumerated list of the kind of season
 			qualify( iInObj ).season = LookUpSeason( cAlphaArgs( 6 ), cAlphaArgs( 1 ) );
 			//indicator if consecutive months otherwise count
@@ -898,8 +915,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	GetInputEconomicsChargeSimple( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsChargeSimple(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -923,7 +939,8 @@ namespace EconomicTariff {
 		numChargeSimple = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		chargeSimple.allocate( numChargeSimple );
 		for ( iInObj = 1; iInObj <= numChargeSimple; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -934,9 +951,11 @@ namespace EconomicTariff {
 			//index of the tariff name in the tariff array
 			chargeSimple( iInObj ).tariffIndx = FindTariffIndex( cAlphaArgs( 2 ), cAlphaArgs( 1 ), ErrorsFound, CurrentModuleObject );
 			warnIfNativeVarname( cAlphaArgs( 1 ), chargeSimple( iInObj ).tariffIndx, ErrorsFound, CurrentModuleObject );
-			chargeSimple( iInObj ).namePt = AssignVariablePt( cAlphaArgs( 1 ), true, varIsAssigned, varNotYetDefined, kindChargeSimple, iInObj, chargeSimple( iInObj ).tariffIndx );
+            chargeSimple(iInObj).namePt =
+                AssignVariablePt(cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindChargeSimple, iInObj, chargeSimple(iInObj).tariffIndx);
 			//index of the variable in the variable array
-			chargeSimple( iInObj ).sourcePt = AssignVariablePt( cAlphaArgs( 3 ), true, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeSimple( iInObj ).tariffIndx );
+            chargeSimple(iInObj).sourcePt =
+                AssignVariablePt(cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeSimple(iInObj).tariffIndx);
 			//enumerated list of the kind of season
 			chargeSimple( iInObj ).season = LookUpSeason( cAlphaArgs( 4 ), cAlphaArgs( 1 ) );
 			//check to make sure a seasonal schedule is specified if the season is not annual
@@ -950,15 +969,16 @@ namespace EconomicTariff {
 				}
 			}
 			//index of the category in the variable array
-			chargeSimple( iInObj ).categoryPt = AssignVariablePt( cAlphaArgs( 5 ), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeSimple( iInObj ).tariffIndx );
+            chargeSimple(iInObj).categoryPt =
+                AssignVariablePt(cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeSimple(iInObj).tariffIndx);
 			//cost per unit value or variable
 			chargeSimple( iInObj ).costPerVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 6 ), isNotNumeric );
-			chargeSimple( iInObj ).costPerPt = AssignVariablePt( cAlphaArgs( 6 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeSimple( iInObj ).tariffIndx );
+            chargeSimple(iInObj).costPerPt =
+                AssignVariablePt(cAlphaArgs(6), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeSimple(iInObj).tariffIndx);
 		}
 	}
 
-	void
-	GetInputEconomicsChargeBlock( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsChargeBlock(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -986,7 +1006,8 @@ namespace EconomicTariff {
 		numChargeBlock = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		chargeBlock.allocate( numChargeBlock );
 		for ( iInObj = 1; iInObj <= numChargeBlock; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -997,9 +1018,11 @@ namespace EconomicTariff {
 			//index of the tariff name in the tariff array
 			chargeBlock( iInObj ).tariffIndx = FindTariffIndex( cAlphaArgs( 2 ), cAlphaArgs( 1 ), ErrorsFound, CurrentModuleObject );
 			warnIfNativeVarname( cAlphaArgs( 1 ), chargeBlock( iInObj ).tariffIndx, ErrorsFound, CurrentModuleObject );
-			chargeBlock( iInObj ).namePt = AssignVariablePt( cAlphaArgs( 1 ), true, varIsAssigned, varNotYetDefined, kindChargeBlock, iInObj, chargeBlock( iInObj ).tariffIndx );
+            chargeBlock(iInObj).namePt =
+                AssignVariablePt(cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindChargeBlock, iInObj, chargeBlock(iInObj).tariffIndx);
 			//index of the variable in the variable array
-			chargeBlock( iInObj ).sourcePt = AssignVariablePt( cAlphaArgs( 3 ), true, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock( iInObj ).tariffIndx );
+            chargeBlock(iInObj).sourcePt =
+                AssignVariablePt(cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
 			//enumerated list of the kind of season
 			chargeBlock( iInObj ).season = LookUpSeason( cAlphaArgs( 4 ), cAlphaArgs( 1 ) );
 			//check to make sure a seasonal schedule is specified if the season is not annual
@@ -1013,16 +1036,19 @@ namespace EconomicTariff {
 				}
 			}
 			//index of the category in the variable array
-			chargeBlock( iInObj ).categoryPt = AssignVariablePt( cAlphaArgs( 5 ), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeBlock( iInObj ).tariffIndx );
+            chargeBlock(iInObj).categoryPt =
+                AssignVariablePt(cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeBlock(iInObj).tariffIndx);
 			//index of the remaining into variable in the variable array
-			chargeBlock( iInObj ).remainingPt = AssignVariablePt( cAlphaArgs( 6 ), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeBlock( iInObj ).tariffIndx );
+            chargeBlock(iInObj).remainingPt =
+                AssignVariablePt(cAlphaArgs(6), true, varIsAssigned, varNotYetDefined, kindCategory, iInObj, chargeBlock(iInObj).tariffIndx);
 			//block size multiplier
 			if ( len( cAlphaArgs( 7 ) ) == 0 ) { //if blank
 				chargeBlock( iInObj ).blkSzMultVal = 1.0; //default is 1 if left blank
 				chargeBlock( iInObj ).blkSzMultPt = 0;
 			} else {
 				chargeBlock( iInObj ).blkSzMultVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 7 ), isNotNumeric );
-				chargeBlock( iInObj ).blkSzMultPt = AssignVariablePt( cAlphaArgs( 7 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock( iInObj ).tariffIndx );
+                chargeBlock(iInObj).blkSzMultPt =
+                    AssignVariablePt(cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
 			}
 			//number of blocks used
 			chargeBlock( iInObj ).numBlk = ( NumAlphas - 7 ) / 2;
@@ -1036,17 +1062,18 @@ namespace EconomicTariff {
 					//array of block size
 					chargeBlock( iInObj ).blkSzVal( jBlk ) = UtilityRoutines::ProcessNumber( cAlphaArgs( alphaOffset + 1 ), isNotNumeric );
 
-					chargeBlock( iInObj ).blkSzPt( jBlk ) = AssignVariablePt( cAlphaArgs( alphaOffset + 1 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock( iInObj ).tariffIndx );
+                    chargeBlock(iInObj).blkSzPt(jBlk) = AssignVariablePt(cAlphaArgs(alphaOffset + 1), isNotNumeric, varIsArgument, varNotYetDefined,
+                                                                         kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
 				}
 				//array of block cost
 				chargeBlock( iInObj ).blkCostVal( jBlk ) = UtilityRoutines::ProcessNumber( cAlphaArgs( alphaOffset + 2 ), isNotNumeric );
-				chargeBlock( iInObj ).blkCostPt( jBlk ) = AssignVariablePt( cAlphaArgs( alphaOffset + 2 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock( iInObj ).tariffIndx );
+                chargeBlock(iInObj).blkCostPt(jBlk) = AssignVariablePt(cAlphaArgs(alphaOffset + 2), isNotNumeric, varIsArgument, varNotYetDefined,
+                                                                       kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
 			}
 		}
 	}
 
-	void
-	GetInputEconomicsRatchet( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsRatchet(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -1070,7 +1097,8 @@ namespace EconomicTariff {
 		numRatchet = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		ratchet.allocate( numRatchet );
 		for ( iInObj = 1; iInObj <= numRatchet; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -1081,25 +1109,29 @@ namespace EconomicTariff {
 			//index of the tariff name in the tariff array
 			ratchet( iInObj ).tariffIndx = FindTariffIndex( cAlphaArgs( 2 ), cAlphaArgs( 1 ), ErrorsFound, CurrentModuleObject );
 			warnIfNativeVarname( cAlphaArgs( 1 ), ratchet( iInObj ).tariffIndx, ErrorsFound, CurrentModuleObject );
-			ratchet( iInObj ).namePt = AssignVariablePt( cAlphaArgs( 1 ), true, varIsAssigned, varNotYetDefined, kindRatchet, iInObj, ratchet( iInObj ).tariffIndx );
+            ratchet(iInObj).namePt =
+                AssignVariablePt(cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
 			//index of the variable in the variable array
-			ratchet( iInObj ).baselinePt = AssignVariablePt( cAlphaArgs( 3 ), true, varIsArgument, varNotYetDefined, kindRatchet, iInObj, ratchet( iInObj ).tariffIndx );
+            ratchet(iInObj).baselinePt =
+                AssignVariablePt(cAlphaArgs(3), true, varIsArgument, varNotYetDefined, kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
 			//index of the variable in the variable array
-			ratchet( iInObj ).adjustmentPt = AssignVariablePt( cAlphaArgs( 4 ), true, varIsArgument, varNotYetDefined, kindRatchet, iInObj, ratchet( iInObj ).tariffIndx );
+            ratchet(iInObj).adjustmentPt =
+                AssignVariablePt(cAlphaArgs(4), true, varIsArgument, varNotYetDefined, kindRatchet, iInObj, ratchet(iInObj).tariffIndx);
 			// seasons to and from
 			ratchet( iInObj ).seasonFrom = LookUpSeason( cAlphaArgs( 5 ), cAlphaArgs( 1 ) );
 			ratchet( iInObj ).seasonTo = LookUpSeason( cAlphaArgs( 6 ), cAlphaArgs( 1 ) );
 			//ratchet multiplier
 			ratchet( iInObj ).multiplierVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 7 ), isNotNumeric );
-			ratchet( iInObj ).multiplierPt = AssignVariablePt( cAlphaArgs( 7 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet( iInObj ).tariffIndx );
+            ratchet(iInObj).multiplierPt =
+                AssignVariablePt(cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet(iInObj).tariffIndx);
 			//ratchet offset
 			ratchet( iInObj ).offsetVal = UtilityRoutines::ProcessNumber( cAlphaArgs( 8 ), isNotNumeric );
-			ratchet( iInObj ).offsetPt = AssignVariablePt( cAlphaArgs( 8 ), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet( iInObj ).tariffIndx );
+            ratchet(iInObj).offsetPt =
+                AssignVariablePt(cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, ratchet(iInObj).tariffIndx);
 		}
 	}
 
-	void
-	GetInputEconomicsVariable( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsVariable(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -1126,7 +1158,8 @@ namespace EconomicTariff {
 		CurrentModuleObject = "UtilityCost:Variable";
 		numEconVarObj = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		for ( iInObj = 1; iInObj <= numEconVarObj; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -1165,8 +1198,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	GetInputEconomicsComputation( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsComputation(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -1200,7 +1232,8 @@ namespace EconomicTariff {
 			e.isUserDef = false;
 		}
 		for ( iInObj = 1; iInObj <= numComputation; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another economic object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( cAlphaArgs( jFld ), "UtilityCost:" ) ) {
@@ -1238,8 +1271,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	GetInputEconomicsCurrencyType( bool & ErrorsFound ) // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(bool &ErrorsFound) // true if errors found during getting input objects.
 	{
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   August 2008
@@ -1267,7 +1299,8 @@ namespace EconomicTariff {
 		if ( NumCurrencyType == 0 ) {
 			selectedMonetaryUnit = 1; //USD - U.S. Dollar
 		} else if ( NumCurrencyType == 1 ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			// Monetary Unit
 			for ( i = 1; i <= numMonetaryUnit; ++i ) {
 				if ( UtilityRoutines::SameString( cAlphaArgs( 1 ), monetaryUnit( i ).code ) ) {
@@ -1286,11 +1319,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	parseComputeLine(
-		std::string const & lineOfCompute,
-		int const fromTariff
-	)
+    void parseComputeLine(std::string const &lineOfCompute, int const fromTariff)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
@@ -1334,12 +1363,7 @@ namespace EconomicTariff {
 		steps( numSteps ) = 0; //at the end of the line show a zero to clear the stack
 	}
 
-	void
-	GetLastWord(
-		std::string const & lineOfText,
-		std::string::size_type & endOfScan,
-		std::string & aWord
-	)
+    void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
@@ -1412,8 +1436,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	initializeMonetaryUnit()
+    void initializeMonetaryUnit()
 	{
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   August 2008
@@ -1766,11 +1789,7 @@ namespace EconomicTariff {
 		monetaryUnit( 111 ).html = "Z$";
 	}
 
-	int
-	LookUpSeason(
-		std::string const & nameOfSeason,
-		std::string const & nameOfReferingObj
-	)
+    int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -1798,13 +1817,7 @@ namespace EconomicTariff {
 		return LookUpSeason;
 	}
 
-	int
-	FindTariffIndex(
-		std::string const & nameOfTariff,
-		std::string const & nameOfReferingObj,
-		bool & ErrorsFound,
-		std::string const & nameOfCurObj
-	)
+    int FindTariffIndex(std::string const &nameOfTariff, std::string const &nameOfReferingObj, bool &ErrorsFound, std::string const &nameOfCurObj)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -1834,13 +1847,7 @@ namespace EconomicTariff {
 		return FindTariffIndex;
 	}
 
-	void
-	warnIfNativeVarname(
-		std::string const & objName,
-		int const curTariffIndex,
-		bool & ErrorsFound,
-		std::string const & curobjName
-	)
+    void warnIfNativeVarname(std::string const &objName, int const curTariffIndex, bool &ErrorsFound, std::string const &curobjName)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   March 2007
@@ -1908,16 +1915,13 @@ namespace EconomicTariff {
 		}
 	}
 
-	int
-	AssignVariablePt(
-		std::string const & stringIn,
+    int AssignVariablePt(std::string const &stringIn,
 		bool const flagIfNotNumeric,
 		int const useOfVar,
 		int const varSpecific,
 		int const econObjKind,
 		int const objIndex,
-		int const tariffPt
-	)
+                         int const tariffPt)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -1978,8 +1982,7 @@ namespace EconomicTariff {
 		return AssignVariablePt;
 	}
 
-	void
-	incrementEconVar()
+    void incrementEconVar()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -2019,8 +2022,7 @@ namespace EconomicTariff {
 		//Autodesk Don't initialize varUnitType
 	}
 
-	void
-	incrementSteps()
+    void incrementSteps()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
@@ -2045,8 +2047,7 @@ namespace EconomicTariff {
 		steps( numSteps ) = 0;
 	}
 
-	std::string
-	RemoveSpaces( std::string const & StringIn )
+    std::string RemoveSpaces(std::string const &StringIn)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -2069,8 +2070,7 @@ namespace EconomicTariff {
 		return StringOut;
 	}
 
-	void
-	CreateCategoryNativeVariables()
+    void CreateCategoryNativeVariables()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -2100,18 +2100,26 @@ namespace EconomicTariff {
 			tariff( iTariff ).nativeTotalDemand = AssignVariablePt( "TotalDemand", true, varIsArgument, nativeTotalDemand, kindNative, 0, iTariff );
 			tariff( iTariff ).nativePeakEnergy = AssignVariablePt( "PeakEnergy", true, varIsArgument, nativePeakEnergy, kindNative, 0, iTariff );
 			tariff( iTariff ).nativePeakDemand = AssignVariablePt( "PeakDemand", true, varIsArgument, nativePeakDemand, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeShoulderEnergy = AssignVariablePt( "ShoulderEnergy", true, varIsArgument, nativeShoulderEnergy, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeShoulderDemand = AssignVariablePt( "ShoulderDemand", true, varIsArgument, nativeShoulderDemand, kindNative, 0, iTariff );
+            tariff(iTariff).nativeShoulderEnergy =
+                AssignVariablePt("ShoulderEnergy", true, varIsArgument, nativeShoulderEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativeShoulderDemand =
+                AssignVariablePt("ShoulderDemand", true, varIsArgument, nativeShoulderDemand, kindNative, 0, iTariff);
 			tariff( iTariff ).nativeOffPeakEnergy = AssignVariablePt( "OffPeakEnergy", true, varIsArgument, nativeOffPeakEnergy, kindNative, 0, iTariff );
 			tariff( iTariff ).nativeOffPeakDemand = AssignVariablePt( "OffPeakDemand", true, varIsArgument, nativeOffPeakDemand, kindNative, 0, iTariff );
 			tariff( iTariff ).nativeMidPeakEnergy = AssignVariablePt( "MidPeakEnergy", true, varIsArgument, nativeMidPeakEnergy, kindNative, 0, iTariff );
 			tariff( iTariff ).nativeMidPeakDemand = AssignVariablePt( "MidPeakDemand", true, varIsArgument, nativeMidPeakDemand, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakExceedsOffPeak = AssignVariablePt( "PeakExceedsOffPeak", true, varIsArgument, nativePeakExceedsOffPeak, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeOffPeakExceedsPeak = AssignVariablePt( "OffPeakExceedsPeak", true, varIsArgument, nativeOffPeakExceedsPeak, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakExceedsMidPeak = AssignVariablePt( "PeakExceedsMidPeak", true, varIsArgument, nativePeakExceedsMidPeak, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeMidPeakExceedsPeak = AssignVariablePt( "MidPeakExceedsPeak", true, varIsArgument, nativeMidPeakExceedsPeak, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakExceedsShoulder = AssignVariablePt( "PeakExceedsShoulder", true, varIsArgument, nativePeakExceedsShoulder, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeShoulderExceedsPeak = AssignVariablePt( "ShoulderExceedsPeak", true, varIsArgument, nativeShoulderExceedsPeak, kindNative, 0, iTariff );
+            tariff(iTariff).nativePeakExceedsOffPeak =
+                AssignVariablePt("PeakExceedsOffPeak", true, varIsArgument, nativePeakExceedsOffPeak, kindNative, 0, iTariff);
+            tariff(iTariff).nativeOffPeakExceedsPeak =
+                AssignVariablePt("OffPeakExceedsPeak", true, varIsArgument, nativeOffPeakExceedsPeak, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakExceedsMidPeak =
+                AssignVariablePt("PeakExceedsMidPeak", true, varIsArgument, nativePeakExceedsMidPeak, kindNative, 0, iTariff);
+            tariff(iTariff).nativeMidPeakExceedsPeak =
+                AssignVariablePt("MidPeakExceedsPeak", true, varIsArgument, nativeMidPeakExceedsPeak, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakExceedsShoulder =
+                AssignVariablePt("PeakExceedsShoulder", true, varIsArgument, nativePeakExceedsShoulder, kindNative, 0, iTariff);
+            tariff(iTariff).nativeShoulderExceedsPeak =
+                AssignVariablePt("ShoulderExceedsPeak", true, varIsArgument, nativeShoulderExceedsPeak, kindNative, 0, iTariff);
 			tariff( iTariff ).nativeIsWinter = AssignVariablePt( "IsWinter", true, varIsArgument, nativeIsWinter, kindNative, 0, iTariff );
 			tariff( iTariff ).nativeIsNotWinter = AssignVariablePt( "IsNotWinter", true, varIsArgument, nativeIsNotWinter, kindNative, 0, iTariff );
 			tariff( iTariff ).nativeIsSpring = AssignVariablePt( "IsSpring", true, varIsArgument, nativeIsSpring, kindNative, 0, iTariff );
@@ -2121,25 +2129,37 @@ namespace EconomicTariff {
 			tariff( iTariff ).nativeIsAutumn = AssignVariablePt( "IsAutumn", true, varIsArgument, nativeIsAutumn, kindNative, 0, iTariff );
 			tariff( iTariff ).nativeIsNotAutumn = AssignVariablePt( "IsNotAutumn", true, varIsArgument, nativeIsNotAutumn, kindNative, 0, iTariff );
 
-			tariff( iTariff ).nativePeakAndShoulderEnergy = AssignVariablePt( "PeakAndShoulderEnergy", true, varIsArgument, nativePeakAndShoulderEnergy, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakAndShoulderDemand = AssignVariablePt( "PeakAndShoulderDemand", true, varIsArgument, nativePeakAndShoulderDemand, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakAndMidPeakEnergy = AssignVariablePt( "PeakAndMidPeakEnergy", true, varIsArgument, nativePeakAndMidPeakEnergy, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakAndMidPeakDemand = AssignVariablePt( "PeakAndMidPeakDemand", true, varIsArgument, nativePeakAndMidPeakDemand, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeShoulderAndOffPeakEnergy = AssignVariablePt( "ShoulderAndOffPeakEnergy", true, varIsArgument, nativeShoulderAndOffPeakEnergy, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeShoulderAndOffPeakDemand = AssignVariablePt( "ShoulderAndOffPeakDemand", true, varIsArgument, nativeShoulderAndOffPeakDemand, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakAndOffPeakEnergy = AssignVariablePt( "PeakAndOffPeakEnergy", true, varIsArgument, nativePeakAndOffPeakEnergy, kindNative, 0, iTariff );
-			tariff( iTariff ).nativePeakAndOffPeakDemand = AssignVariablePt( "PeakAndOffPeakDemand", true, varIsArgument, nativePeakAndOffPeakDemand, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeRealTimePriceCosts = AssignVariablePt( "RealTimePriceCosts", true, varIsArgument, nativeRealTimePriceCosts, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeAboveCustomerBaseCosts = AssignVariablePt( "AboveCustomerBaseCosts", true, varIsArgument, nativeAboveCustomerBaseCosts, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeBelowCustomerBaseCosts = AssignVariablePt( "BelowCustomerBaseCosts", true, varIsArgument, nativeBelowCustomerBaseCosts, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeAboveCustomerBaseEnergy = AssignVariablePt( "AboveCustomerBaseEnergy", true, varIsArgument, nativeAboveCustomerBaseEnergy, kindNative, 0, iTariff );
-			tariff( iTariff ).nativeBelowCustomerBaseEnergy = AssignVariablePt( "BelowCustomerBaseEnergy", true, varIsArgument, nativeBelowCustomerBaseEnergy, kindNative, 0, iTariff );
+            tariff(iTariff).nativePeakAndShoulderEnergy =
+                AssignVariablePt("PeakAndShoulderEnergy", true, varIsArgument, nativePeakAndShoulderEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakAndShoulderDemand =
+                AssignVariablePt("PeakAndShoulderDemand", true, varIsArgument, nativePeakAndShoulderDemand, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakAndMidPeakEnergy =
+                AssignVariablePt("PeakAndMidPeakEnergy", true, varIsArgument, nativePeakAndMidPeakEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakAndMidPeakDemand =
+                AssignVariablePt("PeakAndMidPeakDemand", true, varIsArgument, nativePeakAndMidPeakDemand, kindNative, 0, iTariff);
+            tariff(iTariff).nativeShoulderAndOffPeakEnergy =
+                AssignVariablePt("ShoulderAndOffPeakEnergy", true, varIsArgument, nativeShoulderAndOffPeakEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativeShoulderAndOffPeakDemand =
+                AssignVariablePt("ShoulderAndOffPeakDemand", true, varIsArgument, nativeShoulderAndOffPeakDemand, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakAndOffPeakEnergy =
+                AssignVariablePt("PeakAndOffPeakEnergy", true, varIsArgument, nativePeakAndOffPeakEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativePeakAndOffPeakDemand =
+                AssignVariablePt("PeakAndOffPeakDemand", true, varIsArgument, nativePeakAndOffPeakDemand, kindNative, 0, iTariff);
+            tariff(iTariff).nativeRealTimePriceCosts =
+                AssignVariablePt("RealTimePriceCosts", true, varIsArgument, nativeRealTimePriceCosts, kindNative, 0, iTariff);
+            tariff(iTariff).nativeAboveCustomerBaseCosts =
+                AssignVariablePt("AboveCustomerBaseCosts", true, varIsArgument, nativeAboveCustomerBaseCosts, kindNative, 0, iTariff);
+            tariff(iTariff).nativeBelowCustomerBaseCosts =
+                AssignVariablePt("BelowCustomerBaseCosts", true, varIsArgument, nativeBelowCustomerBaseCosts, kindNative, 0, iTariff);
+            tariff(iTariff).nativeAboveCustomerBaseEnergy =
+                AssignVariablePt("AboveCustomerBaseEnergy", true, varIsArgument, nativeAboveCustomerBaseEnergy, kindNative, 0, iTariff);
+            tariff(iTariff).nativeBelowCustomerBaseEnergy =
+                AssignVariablePt("BelowCustomerBaseEnergy", true, varIsArgument, nativeBelowCustomerBaseEnergy, kindNative, 0, iTariff);
 			tariff( iTariff ).lastNative = numEconVar;
 		}
 	}
 
-	int
-	lookupOperator( std::string const & opString )
+    int lookupOperator(std::string const &opString)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   May 2004
@@ -2264,8 +2284,7 @@ namespace EconomicTariff {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	void
-	CreateDefaultComputation()
+    void CreateDefaultComputation()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
@@ -2537,7 +2556,8 @@ namespace EconomicTariff {
 					}
 				}
 				if ( remainingVarFlag ) {
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
+                    ShowWarningError("CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: " +
+                                     tariff(iTariff).tariffName);
 					ShowContinueError( "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on." );
 					for ( iVar = 1; iVar <= numEconVar; ++iVar ) {
 						if ( econVar( iVar ).tariffIndx == iTariff ) {
@@ -2555,17 +2575,15 @@ namespace EconomicTariff {
 				if ( computation( iTariff ).firstStep >= computation( iTariff ).lastStep ) {
 					computation( iTariff ).firstStep = 0;
 					computation( iTariff ).lastStep = -1;
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
+                    ShowWarningError("CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto generated computation can be "
+                                     "interpreted in tariff: " +
+                                     tariff(iTariff).tariffName);
 				}
 			}
 		}
 	}
 
-	void
-	addOperand(
-		int const varMe,
-		int const varOperand
-	)
+    void addOperand(int const varMe, int const varOperand)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -2601,11 +2619,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	addChargesToOperand(
-		int const curTariff,
-		int const curPointer
-	)
+    void addChargesToOperand(int const curTariff, int const curPointer)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -2642,8 +2656,7 @@ namespace EconomicTariff {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	void
-	GatherForEconomics()
+    void GatherForEconomics()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   June 2004
@@ -2652,10 +2665,10 @@ namespace EconomicTariff {
 		//   holding the data that will be used by the tariff
 		//   calculation.
 
+        using DataEnvironment::Month;
 		using DataGlobals::SecInHour;
 		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataEnvironment::Month;
 
 		int iTariff;
 		Real64 curInstantValue;
@@ -2755,12 +2768,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	bool
-	isWithinRange(
-		int const testVal,
-		int const minThreshold,
-		int const maxThreshold
-	)
+    bool isWithinRange(int const testVal, int const minThreshold, int const maxThreshold)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -2789,8 +2797,7 @@ namespace EconomicTariff {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	void
-	ComputeTariff()
+    void ComputeTariff()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -2833,7 +2840,8 @@ namespace EconomicTariff {
 			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 				for ( jStep = computation( iTariff ).firstStep; jStep <= computation( iTariff ).lastStep; ++jStep ) {
 					curStep = steps( jStep );
-					{ auto const SELECT_CASE_var( curStep );
+                    {
+                        auto const SELECT_CASE_var(curStep);
 					if ( SELECT_CASE_var == 0 ) { //end of line - assign variable and clear stack
 						// if the stack still has two items on it then assign the values to the
 						// pointer otherwise if it follows a NOOP line it will only have one item
@@ -3159,7 +3167,8 @@ namespace EconomicTariff {
 						//and push zero
 						//a = 0
 						//CALL pushStack(a,noVar)
-					}}
+                        }
+                    }
 				}
 				checkMinimumMonthlyCharge( iTariff );
 			}
@@ -3168,11 +3177,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	pushStack(
-		Array1A< Real64 > const monthlyArray,
-		int const variablePointer
-	)
+    void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3209,7 +3214,8 @@ namespace EconomicTariff {
 		//if it has not overwrite the values for monthlyArray with the evaluated values
 		if ( variablePointer != 0 ) {
 			if ( ! econVar( variablePointer ).isEvaluated ) {
-				{ auto const SELECT_CASE_var( econVar( variablePointer ).kindOfObj );
+                {
+                    auto const SELECT_CASE_var(econVar(variablePointer).kindOfObj);
 				if ( SELECT_CASE_var == kindChargeSimple ) {
 					evaluateChargeSimple( variablePointer );
 				} else if ( SELECT_CASE_var == kindChargeBlock ) {
@@ -3223,11 +3229,15 @@ namespace EconomicTariff {
 					ShowContinueError( "   In tariff: " + tariff( econVar( variablePointer ).tariffIndx ).tariffName );
 					ShowContinueError( "   This may be the result of a mispelled variable name in the UtilityCost:Computation object." );
 					ShowContinueError( "   All zero values will be assumed for this variable." );
-				} else if ( ( SELECT_CASE_var == kindVariable ) || ( SELECT_CASE_var == kindCategory ) || ( SELECT_CASE_var == kindNative ) || ( SELECT_CASE_var == kindAssignCompute ) || ( SELECT_CASE_var == kindTariff ) || ( SELECT_CASE_var == kindComputation ) ) {
+                    } else if ((SELECT_CASE_var == kindVariable) || (SELECT_CASE_var == kindCategory) || (SELECT_CASE_var == kindNative) ||
+                               (SELECT_CASE_var == kindAssignCompute) || (SELECT_CASE_var == kindTariff) || (SELECT_CASE_var == kindComputation)) {
 					// do nothing
 				} else {
-					ShowWarningError( "UtilityCost Debugging issue. Invalid kind of variable used (pushStack). " + IntToStr( econVar( variablePointer ).kindOfObj ) + " in tariff: " + tariff( econVar( variablePointer ).tariffIndx ).tariffName );
-				}}
+                        ShowWarningError("UtilityCost Debugging issue. Invalid kind of variable used (pushStack). " +
+                                         IntToStr(econVar(variablePointer).kindOfObj) +
+                                         " in tariff: " + tariff(econVar(variablePointer).tariffIndx).tariffName);
+                    }
+                }
 				// if the serviceCharges are being evaluated add in the monthly charges
 				if ( econVar( variablePointer ).specific == catServiceCharges ) addMonthlyCharge( variablePointer );
 				//get the results of performing the evaulation - should have been
@@ -3239,11 +3249,7 @@ namespace EconomicTariff {
 		stack( topOfStack ).values = curMonthlyArray;
 	}
 
-	void
-	popStack(
-		Array1A< Real64 > monthlyArray,
-		int & variablePointer
-	)
+    void popStack(Array1A<Real64> monthlyArray, int &variablePointer)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3270,8 +3276,7 @@ namespace EconomicTariff {
 		--topOfStack;
 	}
 
-	void
-	evaluateChargeSimple( int const usingVariable )
+    void evaluateChargeSimple(int const usingVariable)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3306,7 +3311,8 @@ namespace EconomicTariff {
 			costPer = chargeSimple( indexInChg ).costPerVal;
 		}
 		// find proper season mask
-		{ auto const SELECT_CASE_var( chargeSimple( indexInChg ).season );
+        {
+            auto const SELECT_CASE_var(chargeSimple(indexInChg).season);
 		if ( SELECT_CASE_var == seasonSummer ) {
 			seasonMask = econVar( tariff( curTariff ).nativeIsSummer ).values;
 		} else if ( SELECT_CASE_var == seasonWinter ) {
@@ -3317,7 +3323,8 @@ namespace EconomicTariff {
 			seasonMask = econVar( tariff( curTariff ).nativeIsAutumn ).values;
 		} else if ( SELECT_CASE_var == seasonAnnual ) {
 			seasonMask = 1.0; //all months are 1
-		}}
+            }
+        }
 		// finally perform calculations
 		resultChg = sourceVals * costPer * seasonMask;
 		//store the cost in the name of the variable
@@ -3326,8 +3333,7 @@ namespace EconomicTariff {
 		econVar( usingVariable ).isEvaluated = true;
 	}
 
-	void
-	evaluateChargeBlock( int const usingVariable )
+    void evaluateChargeBlock(int const usingVariable)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3363,7 +3369,8 @@ namespace EconomicTariff {
 		// data from the chargeBlock
 		sourceVals = econVar( chargeBlock( indexInChg ).sourcePt ).values;
 		// find proper season mask
-		{ auto const SELECT_CASE_var( chargeBlock( indexInChg ).season );
+        {
+            auto const SELECT_CASE_var(chargeBlock(indexInChg).season);
 		if ( SELECT_CASE_var == seasonSummer ) {
 			seasonMask = econVar( tariff( curTariff ).nativeIsSummer ).values;
 		} else if ( SELECT_CASE_var == seasonWinter ) {
@@ -3374,7 +3381,8 @@ namespace EconomicTariff {
 			seasonMask = econVar( tariff( curTariff ).nativeIsAutumn ).values;
 		} else if ( SELECT_CASE_var == seasonAnnual ) {
 			seasonMask = 1.0; //all months are 1
-		}}
+            }
+        }
 		// get block size multiplier
 		if ( chargeBlock( indexInChg ).blkSzMultPt != 0 ) {
 			blkSzMult = econVar( chargeBlock( indexInChg ).blkSzMultPt ).values;
@@ -3437,8 +3445,7 @@ namespace EconomicTariff {
 		econVar( usingVariable ).isEvaluated = true;
 	}
 
-	void
-	evaluateRatchet( int const usingVariable )
+    void evaluateRatchet(int const usingVariable)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3489,7 +3496,8 @@ namespace EconomicTariff {
 			offsetVals = ratchet( indexInChg ).offsetVal;
 		}
 		// find proper season from mask
-		{ auto const SELECT_CASE_var( ratchet( indexInChg ).seasonFrom );
+        {
+            auto const SELECT_CASE_var(ratchet(indexInChg).seasonFrom);
 		if ( SELECT_CASE_var == seasonSummer ) {
 			seasonFromMask = econVar( tariff( curTariff ).nativeIsSummer ).values;
 			isMonthly = false;
@@ -3510,9 +3518,11 @@ namespace EconomicTariff {
 			isMonthly = true;
 		} else {
 			assert( false );
-		}}
+            }
+        }
 		// find proper season to mask
-		{ auto const SELECT_CASE_var( ratchet( indexInChg ).seasonTo );
+        {
+            auto const SELECT_CASE_var(ratchet(indexInChg).seasonTo);
 		if ( SELECT_CASE_var == seasonSummer ) {
 			seasonToMask = econVar( tariff( curTariff ).nativeIsSummer ).values;
 		} else if ( SELECT_CASE_var == seasonWinter ) {
@@ -3523,7 +3533,8 @@ namespace EconomicTariff {
 			seasonToMask = econVar( tariff( curTariff ).nativeIsAutumn ).values;
 		} else if ( SELECT_CASE_var == seasonAnnual ) {
 			seasonToMask = 1.0; //all months are 1
-		}}
+            }
+        }
 		// finally perform calculations
 		if ( isMonthly ) {
 			adjSeasonal = adjustmentVals;
@@ -3561,8 +3572,7 @@ namespace EconomicTariff {
 		econVar( usingVariable ).isEvaluated = true;
 	}
 
-	void
-	evaluateQualify( int const usingVariable )
+    void evaluateQualify(int const usingVariable)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3609,7 +3619,8 @@ namespace EconomicTariff {
 			thresholdVals = qualify( indexInQual ).thresholdVal;
 		}
 		// find proper season mask
-		{ auto const SELECT_CASE_var( qualify( indexInQual ).season );
+        {
+            auto const SELECT_CASE_var(qualify(indexInQual).season);
 		if ( SELECT_CASE_var == seasonSummer ) {
 			seasonMask = econVar( tariff( curTariff ).nativeIsSummer ).values;
 		} else if ( SELECT_CASE_var == seasonWinter ) {
@@ -3620,7 +3631,8 @@ namespace EconomicTariff {
 			seasonMask = econVar( tariff( curTariff ).nativeIsAutumn ).values;
 		} else if ( SELECT_CASE_var == seasonAnnual ) {
 			seasonMask = 1.0; //all months are 1
-		}}
+            }
+        }
 		//any months with no energy use are excluded from the qualification process
 		for ( iMonth = 1; iMonth <= MaxNumMonths; ++iMonth ) {
 			if ( econVar( tariff( curTariff ).nativeTotalEnergy ).values( iMonth ) == 0 ) {
@@ -3662,7 +3674,8 @@ namespace EconomicTariff {
 		cntConsecQualMonths = 0;
 		maxConsecQualMonths = 0;
 		for ( iMonth = 1; iMonth <= MaxNumMonths; ++iMonth ) {
-			{ auto const SELECT_CASE_var( monthsQualify( iMonth ) );
+            {
+                auto const SELECT_CASE_var(monthsQualify(iMonth));
 			if ( SELECT_CASE_var == 1 ) { //qualified
 				++cntAllQualMonths;
 				++cntConsecQualMonths;
@@ -3673,7 +3686,8 @@ namespace EconomicTariff {
 			} else if ( SELECT_CASE_var == 0 ) { //not qualified
 				//reset the counter on consecutive months
 				cntConsecQualMonths = 0;
-			}}
+                }
+            }
 		}
 		//if test is for consecutive months
 		if ( curIsConsecutive ) {
@@ -3703,8 +3717,7 @@ namespace EconomicTariff {
 		econVar( usingVariable ).isEvaluated = true;
 	}
 
-	void
-	addMonthlyCharge( int const usingVariable )
+    void addMonthlyCharge(int const usingVariable)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3734,8 +3747,7 @@ namespace EconomicTariff {
 		//END DO
 	}
 
-	void
-	checkMinimumMonthlyCharge( int const curTariff )
+    void checkMinimumMonthlyCharge(int const curTariff)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   August 2008
@@ -3764,8 +3776,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	setNativeVariables()
+    void setNativeVariables()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -3901,7 +3912,8 @@ namespace EconomicTariff {
 					econVar( tariff( iTariff ).nativeIsNotAutumn ).values( kMonth ) = 1.0;
 				}
 				//nativePeakAndShoulderEnergy
-				econVar( tariff( iTariff ).nativePeakAndShoulderEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodShoulder );
+                econVar(tariff(iTariff).nativePeakAndShoulderEnergy).values(kMonth) =
+                    tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodShoulder);
 				//nativePeakAndShoulderDemand
 				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) ) {
 					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
@@ -3909,7 +3921,8 @@ namespace EconomicTariff {
 					econVar( tariff( iTariff ).nativePeakAndShoulderDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
 				}
 				//nativePeakAndMidPeakEnergy
-				econVar( tariff( iTariff ).nativePeakAndMidPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodMidPeak );
+                econVar(tariff(iTariff).nativePeakAndMidPeakEnergy).values(kMonth) =
+                    tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodMidPeak);
 				//nativePeakAndMidPeakDemand
 				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodMidPeak ) ) {
 					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
@@ -3917,7 +3930,8 @@ namespace EconomicTariff {
 					econVar( tariff( iTariff ).nativePeakAndMidPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodMidPeak );
 				}
 				//nativeShoulderAndOffPeakEnergy
-				econVar( tariff( iTariff ).nativeShoulderAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodShoulder ) + tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
+                econVar(tariff(iTariff).nativeShoulderAndOffPeakEnergy).values(kMonth) =
+                    tariff(iTariff).gatherEnergy(kMonth, periodShoulder) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
 				//nativeShoulderAndOffPeakDemand
 				if ( tariff( iTariff ).gatherDemand( kMonth, periodShoulder ) > tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) ) {
 					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodShoulder );
@@ -3925,7 +3939,8 @@ namespace EconomicTariff {
 					econVar( tariff( iTariff ).nativeShoulderAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodOffPeak );
 				}
 				//nativePeakAndOffPeakEnergy
-				econVar( tariff( iTariff ).nativePeakAndOffPeakEnergy ).values( kMonth ) = tariff( iTariff ).gatherEnergy( kMonth, periodPeak ) + tariff( iTariff ).gatherEnergy( kMonth, periodOffPeak );
+                econVar(tariff(iTariff).nativePeakAndOffPeakEnergy).values(kMonth) =
+                    tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
 				//nativePeakAndOffPeakDemand
 				if ( tariff( iTariff ).gatherDemand( kMonth, periodPeak ) > tariff( iTariff ).gatherDemand( kMonth, periodOffPeak ) ) {
 					econVar( tariff( iTariff ).nativePeakAndOffPeakDemand ).values( kMonth ) = tariff( iTariff ).gatherDemand( kMonth, periodPeak );
@@ -3946,8 +3961,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	LEEDtariffReporting()
+    void LEEDtariffReporting()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   October 2012
@@ -4092,28 +4106,27 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	WriteTabularTariffReports()
+    void WriteTabularTariffReports()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
 		//    MODIFIED       January 2010, Kyle Benne
 		//                   Added SQLite output
 
+        using OutputReportTabular::ConvertIP;
+        using OutputReportTabular::DetermineBuildingFloorArea;
+        using OutputReportTabular::LookupSItoIP;
+        using OutputReportTabular::RealToStr;
 		using OutputReportTabular::WriteReportHeaders;
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
-		using OutputReportTabular::RealToStr;
 		using OutputReportTabular::WriteTextLine;
-		using OutputReportTabular::buildingGrossFloorArea;
 		using OutputReportTabular::buildingConditionedFloorArea;
-		using OutputReportTabular::DetermineBuildingFloorArea;
-		using OutputReportTabular::LookupSItoIP;
-		using OutputReportTabular::ConvertIP;
+        using OutputReportTabular::buildingGrossFloorArea;
+        using OutputReportTabular::displayEconomicResultSummary;
+        using OutputReportTabular::displayTariffReport;
 		using OutputReportTabular::unitsStyle;
 		using OutputReportTabular::unitsStyleInchPound;
-		using OutputReportTabular::displayTariffReport;
-		using OutputReportTabular::displayEconomicResultSummary;
 
 		// all arrays are in the format: (row, column)
 		Array1D_string columnHead;
@@ -4156,7 +4169,8 @@ namespace EconomicTariff {
 		if ( numTariff > 0 ) {
 			if ( displayEconomicResultSummary ) {
 				DisplayString( "Writing Tariff Reports" );
-				for ( auto & e : econVar ) e.isReported = false;
+                for (auto &e : econVar)
+                    e.isReported = false;
 				//CALL selectTariff moved to the end of computeTariff.
 				showWarningsBasedOnTotal();
 				//---------------------------------
@@ -4251,14 +4265,16 @@ namespace EconomicTariff {
 						tableBody( 2, iTariff ) = "No";
 					}
 					tableBody( 3, iTariff ) = tariff( iTariff ).reportMeter;
-					{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
+                    {
+                        auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
 					if ( SELECT_CASE_var == buyFromUtility ) {
 						tableBody( 4, iTariff ) = "Buy";
 					} else if ( SELECT_CASE_var == sellToUtility ) {
 						tableBody( 4, iTariff ) = "Sell";
 					} else if ( SELECT_CASE_var == netMetering ) {
 						tableBody( 4, iTariff ) = "Net";
-					}}
+                        }
+                    }
 					if ( tariff( iTariff ).groupName == "" ) {
 						tableBody( 5, iTariff ) = "(none)";
 					} else {
@@ -4270,7 +4286,8 @@ namespace EconomicTariff {
 				WriteSubtitle( "Tariff Summary" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility",
+                                                           "Tariff Summary");
 				}
 				if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 					ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
@@ -4325,7 +4342,8 @@ namespace EconomicTariff {
 					} else {
 						tableBody( 1, 6 ) = "automatic";
 					}
-					{ auto const SELECT_CASE_var( tariff( iTariff ).convChoice );
+                    {
+                        auto const SELECT_CASE_var(tariff(iTariff).convChoice);
 					if ( SELECT_CASE_var == conversionUSERDEF ) {
 						tableBody( 1, 7 ) = "User Defined";
 					} else if ( SELECT_CASE_var == conversionKWH ) {
@@ -4342,12 +4360,14 @@ namespace EconomicTariff {
 						tableBody( 1, 7 ) = "MCF";
 					} else if ( SELECT_CASE_var == conversionCCF ) {
 						tableBody( 1, 7 ) = "CCF";
-					}}
+                        }
+                    }
 					columnWidth = 14; //array assignment - same for all columns
 					WriteSubtitle( "General" );
 					WriteTable( tableBody, rowHead, columnHead, columnWidth );
 					if ( sqlite ) {
-						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName,
+                                                               "General");
 					}
 					if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 						ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
@@ -4357,7 +4377,8 @@ namespace EconomicTariff {
 					columnWidth.deallocate();
 					tableBody.deallocate();
 					//---- Categories
-					for ( auto & e : econVar ) e.activeNow = false;
+                    for (auto &e : econVar)
+                        e.activeNow = false;
 					econVar( tariff( iTariff ).ptEnergyCharges ).activeNow = true;
 					econVar( tariff( iTariff ).ptDemandCharges ).activeNow = true;
 					econVar( tariff( iTariff ).ptServiceCharges ).activeNow = true;
@@ -4369,7 +4390,8 @@ namespace EconomicTariff {
 					econVar( tariff( iTariff ).ptTotal ).activeNow = true;
 					ReportEconomicVariable( "Categories", false, true, tariff( iTariff ).tariffName );
 					//---- Charges
-					for ( auto & e : econVar ) e.activeNow = false;
+                    for (auto &e : econVar)
+                        e.activeNow = false;
 					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 						if ( econVar( kVar ).tariffIndx == iTariff ) {
 							if ( ( econVar( kVar ).kindOfObj == kindChargeSimple ) || ( econVar( kVar ).kindOfObj == kindChargeBlock ) ) {
@@ -4379,7 +4401,8 @@ namespace EconomicTariff {
 					}
 					ReportEconomicVariable( "Charges", true, true, tariff( iTariff ).tariffName );
 					//---- Sources for Charges
-					for ( auto & e : econVar ) e.activeNow = false;
+                    for (auto &e : econVar)
+                        e.activeNow = false;
 					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 						if ( econVar( kVar ).tariffIndx == iTariff ) {
 							indexInChg = econVar( kVar ).index;
@@ -4396,7 +4419,8 @@ namespace EconomicTariff {
 					}
 					ReportEconomicVariable( "Corresponding Sources for Charges", false, false, tariff( iTariff ).tariffName );
 					//---- Rachets
-					for ( auto & e : econVar ) e.activeNow = false;
+                    for (auto &e : econVar)
+                        e.activeNow = false;
 					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 						if ( econVar( kVar ).tariffIndx == iTariff ) {
 							if ( econVar( kVar ).kindOfObj == kindRatchet ) {
@@ -4406,7 +4430,8 @@ namespace EconomicTariff {
 					}
 					ReportEconomicVariable( "Ratchets", false, false, tariff( iTariff ).tariffName );
 					//---- Qualifies
-					for ( auto & e : econVar ) e.activeNow = false;
+                    for (auto &e : econVar)
+                        e.activeNow = false;
 					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 						if ( econVar( kVar ).tariffIndx == iTariff ) {
 							if ( econVar( kVar ).kindOfObj == kindQualify ) {
@@ -4416,13 +4441,15 @@ namespace EconomicTariff {
 					}
 					ReportEconomicVariable( "Qualifies", false, false, tariff( iTariff ).tariffName );
 					//---- Native Variables
-					for ( auto & e : econVar ) e.activeNow = false;
+                    for (auto &e : econVar)
+                        e.activeNow = false;
 					for ( kVar = tariff( iTariff ).firstNative; kVar <= tariff( iTariff ).lastNative; ++kVar ) {
 						econVar( kVar ).activeNow = true;
 					}
 					ReportEconomicVariable( "Native Variables", false, false, tariff( iTariff ).tariffName );
 					//---- Other Variables
-					for ( auto & e : econVar ) e.activeNow = false;
+                    for (auto &e : econVar)
+                        e.activeNow = false;
 					for ( kVar = 1; kVar <= numEconVar; ++kVar ) {
 						if ( econVar( kVar ).tariffIndx == iTariff ) {
 							if ( ! econVar( kVar ).isReported ) {
@@ -4440,7 +4467,8 @@ namespace EconomicTariff {
 					outString = "";
 					for ( lStep = computation( iTariff ).firstStep; lStep <= computation( iTariff ).lastStep; ++lStep ) {
 						curStep = steps( lStep );
-						{ auto const SELECT_CASE_var( curStep );
+                        {
+                            auto const SELECT_CASE_var(curStep);
 						if ( SELECT_CASE_var == 0 ) { //end of line
 							WriteTextLine( rstrip( outString ) );
 							outString = "";
@@ -4509,15 +4537,15 @@ namespace EconomicTariff {
 						} else if ( SELECT_CASE_var == opNOOP ) { //should clear the outString when done debugging
 							//outString = ''
 							outString = "FROM " + outString;
-						}}
+                            }
+                        }
 					}
 				}
 			}
 		}
 	}
 
-	void
-	showWarningsBasedOnTotal()
+    void showWarningsBasedOnTotal()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -4528,7 +4556,8 @@ namespace EconomicTariff {
 
 		if ( numTariff > 0 ) {
 			for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
-				{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
+                {
+                    auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
 				if ( SELECT_CASE_var == buyFromUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost < 0 ) {
 						ShowWarningError( "UtilityCost:Tariff: A negative annual total cost when buying electricity from a utility is unusual. " );
@@ -4539,17 +4568,13 @@ namespace EconomicTariff {
 						ShowWarningError( "UtilityCost:Tariff: A positive annual total cost when selling electricity to a utility is unusual. " );
 						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
-				}}
+                    }
+                }
 			}
 		}
 	}
 
-	void
-	getMaxAndSum(
-		int const varPointer,
-		Real64 & sumResult,
-		Real64 & maxResult
-	)
+    void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -4575,12 +4600,7 @@ namespace EconomicTariff {
 	}
 
 	void
-	ReportEconomicVariable(
-		std::string const & titleString,
-		bool const includeCategory,
-		bool const showCurrencySymbol,
-		std::string const & forString
-	)
+    ReportEconomicVariable(std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString)
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -4589,10 +4609,10 @@ namespace EconomicTariff {
 
 		//    Report all econVar that show as activeNow
 
+        using OutputReportTabular::RealToStr;
 		using OutputReportTabular::WriteReportHeaders;
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
-		using OutputReportTabular::RealToStr;
 
 		// all arrays are in the format: (row, column)
 		Array1D_string columnHead;
@@ -4678,7 +4698,8 @@ namespace EconomicTariff {
 					//first find category
 					curCategory = 0;
 					curIndex = econVar( iVar ).index;
-					{ auto const SELECT_CASE_var( econVar( iVar ).kindOfObj );
+                    {
+                        auto const SELECT_CASE_var(econVar(iVar).kindOfObj);
 					if ( SELECT_CASE_var == kindChargeSimple ) {
 						if ( ( curIndex >= 1 ) && ( curIndex <= numChargeSimple ) ) {
 							curCatPt = chargeSimple( curIndex ).categoryPt;
@@ -4687,11 +4708,13 @@ namespace EconomicTariff {
 						if ( ( curIndex >= 1 ) && ( curIndex <= numChargeBlock ) ) {
 							curCatPt = chargeBlock( curIndex ).categoryPt;
 						}
-					}}
+                        }
+                    }
 					if ( ( curCatPt >= 1 ) && ( curCatPt <= numEconVar ) ) {
 						curCategory = econVar( curCatPt ).specific;
 					}
-					{ auto const SELECT_CASE_var( curCategory );
+                    {
+                        auto const SELECT_CASE_var(curCategory);
 					if ( SELECT_CASE_var == catEnergyCharges ) {
 						tableBody( 15, nCntOfVar ) = "EnergyCharges";
 					} else if ( SELECT_CASE_var == catDemandCharges ) {
@@ -4712,7 +4735,8 @@ namespace EconomicTariff {
 						tableBody( 15, nCntOfVar ) = "Total";
 					} else {
 						tableBody( 15, nCntOfVar ) = "none";
-					}}
+                        }
+                    }
 				}
 				econVar( iVar ).isReported = true;
 			}
@@ -4730,11 +4754,9 @@ namespace EconomicTariff {
 		rowHead.deallocate();
 		columnWidth.deallocate();
 		tableBody.deallocate();
-
 	}
 
-	void
-	selectTariff()
+    void selectTariff()
 	{
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
 		//    DATE WRITTEN   July 2004
@@ -4843,7 +4865,8 @@ namespace EconomicTariff {
 				if ( tariff( iTariff ).isQualified ) {
 					if ( tariff( iTariff ).isSelected ) {
 						if ( groupIndex( iTariff ) == mGroup ) {
-							{ auto const SELECT_CASE_var( tariff( iTariff ).kindElectricMtr );
+                            {
+                                auto const SELECT_CASE_var(tariff(iTariff).kindElectricMtr);
 							if ( SELECT_CASE_var == kindMeterElecSimple ) {
 								lowestSimpleTariff = iTariff;
 							} else if ( SELECT_CASE_var == kindMeterElecProduced ) {
@@ -4855,7 +4878,8 @@ namespace EconomicTariff {
 								lowestSurplusSoldTariff = iTariff;
 							} else if ( SELECT_CASE_var == kindMeterElecNet ) {
 								lowestNetMeterTariff = iTariff;
-							}}
+                                }
+                            }
 						}
 					}
 				}
@@ -4879,7 +4903,8 @@ namespace EconomicTariff {
 			}
 			// if netmetering is used compare it to simple plus surplus
 			if ( ( ( lowestNetMeterTariff > 0 ) && ( lowestSurplusSoldTariff > 0 ) ) && ( lowestSimpleTariff > 0 ) ) {
-				if ( tariff( lowestNetMeterTariff ).totalAnnualCost < ( tariff( lowestSimpleTariff ).totalAnnualCost + tariff( lowestSurplusSoldTariff ).totalAnnualCost ) ) {
+                if (tariff(lowestNetMeterTariff).totalAnnualCost <
+                    (tariff(lowestSimpleTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
 					tariff( lowestSimpleTariff ).isSelected = false;
 					lowestSimpleTariff = 0;
 					tariff( lowestSurplusSoldTariff ).isSelected = false;
@@ -4891,7 +4916,8 @@ namespace EconomicTariff {
 			}
 			// if netmetering is used compare it to purchased plus surplus
 			if ( ( ( lowestNetMeterTariff > 0 ) && ( lowestSurplusSoldTariff > 0 ) ) && ( lowestPurchaseTariff > 0 ) ) {
-				if ( tariff( lowestNetMeterTariff ).totalAnnualCost < ( tariff( lowestPurchaseTariff ).totalAnnualCost + tariff( lowestSurplusSoldTariff ).totalAnnualCost ) ) {
+                if (tariff(lowestNetMeterTariff).totalAnnualCost <
+                    (tariff(lowestPurchaseTariff).totalAnnualCost + tariff(lowestSurplusSoldTariff).totalAnnualCost)) {
 					tariff( lowestPurchaseTariff ).isSelected = false;
 					lowestPurchaseTariff = 0;
 					tariff( lowestSurplusSoldTariff ).isSelected = false;
@@ -4926,11 +4952,7 @@ namespace EconomicTariff {
 		MinTariffIndex.deallocate();
 	}
 
-	void
-	GetMonthlyCostForResource(
-		int const inResourceNumber,
-		Array1A< Real64 > outMonthlyCosts
-	)
+    void GetMonthlyCostForResource(int const inResourceNumber, Array1A<Real64> outMonthlyCosts)
 	{
 		//       AUTHOR         Jason Glazer
 		//       DATE WRITTEN   May 2010
@@ -4957,8 +4979,7 @@ namespace EconomicTariff {
 		}
 	}
 
-	void
-	clear_state()
+    void clear_state()
 	{
 		numEconVar = 0;
 		sizeEconVar = 0;
@@ -4987,9 +5008,8 @@ namespace EconomicTariff {
 		stack.deallocate();
 		Update_GetInput = true;
 		addOperand_prevVarMe = 0;
-
 	}
 
-} // EconomicTariff
+} // namespace EconomicTariff
 
-} // EnergyPlus
+} // namespace EnergyPlus

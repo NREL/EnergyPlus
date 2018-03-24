@@ -53,116 +53,105 @@
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {
-	namespace DataPlant {
+namespace DataPlant {
 
-		struct EquipListPtrData {
-			// Members
-			int ListPtr; // points to List on OpScheme on plant loop:
-			// PlantLoop(LoopNum)%OpScheme(Optschemeptr)%List(ListPtr)...
-			int CompPtr; // points to this component on List on OpScheme on plant loop:
-			// PlantLoop(LoopNum)%OpScheme(Optschemeptr)%List(ListPtr)%Comp(compPtr)
+    struct EquipListPtrData
+    {
+        // Members
+        int ListPtr; // points to List on OpScheme on plant loop:
+        // PlantLoop(LoopNum)%OpScheme(Optschemeptr)%List(ListPtr)...
+        int CompPtr; // points to this component on List on OpScheme on plant loop:
+        // PlantLoop(LoopNum)%OpScheme(Optschemeptr)%List(ListPtr)%Comp(compPtr)
 
-			// Default Constructor
-			EquipListPtrData() :
-					ListPtr(0),
-					CompPtr(0) {}
+        // Default Constructor
+        EquipListPtrData() : ListPtr(0), CompPtr(0)
+        {
+        }
+    };
 
-		};
+    struct OpSchemePtrData
+    {
+        // Members
+        int OpSchemePtr; // DSU points to OpScheme on plant loop:
+        // PlantLoop(LoopNum)%OpScheme(Optschemeptr)...
+        int NumEquipLists;                   // DSU ALLOCATABLE to the schedule (for valid schedules)
+        Array1D<EquipListPtrData> EquipList; // DSU Component  list
 
-		struct OpSchemePtrData {
-			// Members
-			int OpSchemePtr; // DSU points to OpScheme on plant loop:
-			// PlantLoop(LoopNum)%OpScheme(Optschemeptr)...
-			int NumEquipLists; // DSU ALLOCATABLE to the schedule (for valid schedules)
-			Array1D <EquipListPtrData> EquipList; // DSU Component  list
+        // Default Constructor
+        OpSchemePtrData() : OpSchemePtr(0), NumEquipLists(0)
+        {
+        }
+    };
 
-			// Default Constructor
-			OpSchemePtrData() :
-					OpSchemePtr(0),
-					NumEquipLists(0) {}
+    struct EquipListCompData
+    {
+        // Members
+        std::string Name;   // The name of each item in the list
+        std::string TypeOf; // The name of each item in the list
+        int TypeOf_Num;
+        std::string CtrlType;                  // CoolingOp, HeatingOp, DualOp
+        int CtrlTypeNum;                       // CoolingOp, HeatingOp, DualOp
+        int LoopNumPtr;                        // pointer to the comp location in the data structure
+        int LoopSideNumPtr;                    // pointer to the comp location in the data structure
+        int BranchNumPtr;                      // pointer to the comp location in the data structure
+        int CompNumPtr;                        // pointer to the comp location in the data structure
+        Real64 SetPointFlowRate;               // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
+        std::string DemandNodeName;            // COMP SETPOINT CTRL ONLY--The name of each item in the list
+        int DemandNodeNum;                     // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
+        std::string SetPointNodeName;          // COMP SETPOINT CTRL ONLY--The name of each item in the list
+        int SetPointNodeNum;                   // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
+        Real64 EMSIntVarRemainingLoadValue;    // EMS internal variable remaining load, neg cooling [W]
+        Real64 EMSActuatorDispatchedLoadValue; // EMS actuator for dispatched load, neg= cooling [W]
 
-		};
+        // Default Constructor
+        EquipListCompData() : TypeOf_Num(0), SetPointFlowRate(0.0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
+        {
+        }
+    };
 
-		struct EquipListCompData {
-			// Members
-			std::string Name; // The name of each item in the list
-			std::string TypeOf; // The name of each item in the list
-			int TypeOf_Num;
-			std::string CtrlType; // CoolingOp, HeatingOp, DualOp
-			int CtrlTypeNum; // CoolingOp, HeatingOp, DualOp
-			int LoopNumPtr; // pointer to the comp location in the data structure
-			int LoopSideNumPtr; // pointer to the comp location in the data structure
-			int BranchNumPtr; // pointer to the comp location in the data structure
-			int CompNumPtr; // pointer to the comp location in the data structure
-			Real64 SetPointFlowRate; // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
-			std::string DemandNodeName; // COMP SETPOINT CTRL ONLY--The name of each item in the list
-			int DemandNodeNum; // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-			std::string SetPointNodeName; // COMP SETPOINT CTRL ONLY--The name of each item in the list
-			int SetPointNodeNum; // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
-			Real64 EMSIntVarRemainingLoadValue; // EMS internal variable remaining load, neg cooling [W]
-			Real64 EMSActuatorDispatchedLoadValue; // EMS actuator for dispatched load, neg= cooling [W]
+    struct EquipOpList // DSU
+    {
+        // Members
+        std::string Name;                // The name of each item in the list
+        Real64 RangeUpperLimit;          // for range based controls
+        Real64 RangeLowerLimit;          // for range based controls
+        int NumComps;                    // ALLOCATABLE to the schedule (for valid schedules)
+        Array1D<EquipListCompData> Comp; // Component type list
 
-			// Default Constructor
-			EquipListCompData() :
-					TypeOf_Num(0),
-					SetPointFlowRate(0.0),
-					EMSIntVarRemainingLoadValue(0.0),
-					EMSActuatorDispatchedLoadValue(0.0) {}
+        // Default Constructor
+        EquipOpList() : RangeUpperLimit(0.0), RangeLowerLimit(0.0), NumComps(0)
+        {
+        }
+    };
 
-		};
+    struct OperationData // DSU
+    {
+        // Members
+        std::string Name;               // The name of each item in the list
+        std::string TypeOf;             // The 'keyWord' identifying each item in the list
+        int OpSchemeType;               // Op scheme type (from keyword)
+        std::string Sched;              // The name of the schedule associated with the list
+        int SchedPtr;                   // ALLOCATABLE to the schedule (for valid schedules)
+        bool Available;                 // TRUE = designated component or operation scheme available
+        int NumEquipLists;              // number of equipment lists
+        int CurListPtr;                 // points to the current equipment list
+        Array1D<EquipOpList> EquipList; // Component type list
+        int EquipListNumForLastStage;   // points to the equipment list with the highest upper limit
+        std::string ReferenceNodeName;  // DELTA CTRL ONLY--for calculation of delta Temp
+        int ReferenceNodeNumber;        // DELTA CTRL ONLY--for calculation of delta Temp
+        int ErlSimProgramMngr;          // EMS:ProgramManager to always run when this model is called
+        int ErlInitProgramMngr;         // EMS:ProgramManager to run when this model is initialized and setup
+        Real64 EMSIntVarLoopDemandRate; // EMS internal variable for loop-level demand rate, neg cooling [W]
+        bool MyEnvrnFlag;
 
-		struct EquipOpList // DSU
-		{
-			// Members
-			std::string Name; // The name of each item in the list
-			Real64 RangeUpperLimit; // for range based controls
-			Real64 RangeLowerLimit; // for range based controls
-			int NumComps; // ALLOCATABLE to the schedule (for valid schedules)
-			Array1D <EquipListCompData> Comp; // Component type list
-
-			// Default Constructor
-			EquipOpList() :
-					RangeUpperLimit(0.0),
-					RangeLowerLimit(0.0),
-					NumComps(0) {}
-
-		};
-
-		struct OperationData // DSU
-		{
-			// Members
-			std::string Name; // The name of each item in the list
-			std::string TypeOf; // The 'keyWord' identifying each item in the list
-			int OpSchemeType; // Op scheme type (from keyword)
-			std::string Sched; // The name of the schedule associated with the list
-			int SchedPtr; // ALLOCATABLE to the schedule (for valid schedules)
-			bool Available; // TRUE = designated component or operation scheme available
-			int NumEquipLists; // number of equipment lists
-			int CurListPtr; // points to the current equipment list
-			Array1D <EquipOpList> EquipList; // Component type list
-			int EquipListNumForLastStage; // points to the equipment list with the highest upper limit
-			std::string ReferenceNodeName; // DELTA CTRL ONLY--for calculation of delta Temp
-			int ReferenceNodeNumber; // DELTA CTRL ONLY--for calculation of delta Temp
-			int ErlSimProgramMngr; // EMS:ProgramManager to always run when this model is called
-			int ErlInitProgramMngr; // EMS:ProgramManager to run when this model is initialized and setup
-			Real64 EMSIntVarLoopDemandRate; // EMS internal variable for loop-level demand rate, neg cooling [W]
-			bool MyEnvrnFlag;
-
-			// Default Constructor
-			OperationData() :
-					OpSchemeType(0),
-					SchedPtr(0),
-					Available(false),
-					NumEquipLists(0),
-					CurListPtr(0),
-					EquipListNumForLastStage(0),
-					ErlSimProgramMngr(0),
-					ErlInitProgramMngr(0),
-					EMSIntVarLoopDemandRate(0.0),
-					MyEnvrnFlag(true) {}
-
-		};
-	}
-}
+        // Default Constructor
+        OperationData()
+            : OpSchemeType(0), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0), ErlSimProgramMngr(0),
+              ErlInitProgramMngr(0), EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

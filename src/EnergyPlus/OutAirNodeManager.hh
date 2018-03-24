@@ -58,46 +58,39 @@ namespace EnergyPlus {
 
 namespace OutAirNodeManager {
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	//Type declarations in OutAirNodeManager module
+    // Type declarations in OutAirNodeManager module
 
-	//MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
-	extern int NumOutsideAirNodes; // Number of single outside air nodes
-	extern bool GetOutAirNodesInputFlag; // Flag set to make sure you get input once
+    extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
+    extern int NumOutsideAirNodes;         // Number of single outside air nodes
+    extern bool GetOutAirNodesInputFlag;   // Flag set to make sure you get input once
 
-	//SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
+    // SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
 
-	// Functions
+    // Functions
 
-	// Clears the global data in OutAirNodeManager.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    // Clears the global data in OutAirNodeManager.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-	void
-	SetOutAirNodes();
+    void SetOutAirNodes();
 
-	void
-	GetOutAirNodesInput();
+    void GetOutAirNodesInput();
 
-	void
-	InitOutAirNodes();
+    void InitOutAirNodes();
 
-	bool
-	CheckOutAirNodeNumber( int const NodeNumber ); // Number of node to check to see if in Outside Air list
+    bool CheckOutAirNodeNumber(int const NodeNumber); // Number of node to check to see if in Outside Air list
 
-	void
-	CheckAndAddAirNodeNumber(
-		int const NodeNumber, // Number of node to check to see if in Outside Air list
-		bool & Okay // True if found, false if not
-	);
+    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
+                                  bool &Okay            // True if found, false if not
+    );
 
-} // OutAirNodeManager
+} // namespace OutAirNodeManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

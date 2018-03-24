@@ -45,19 +45,19 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <string>
 #include "ConfiguredFunctions.hh"
+#include <string>
 
 namespace EnergyPlus {
 
-	std::string configured_source_directory()
-	{
-		return ("${CMAKE_SOURCE_DIR}");
-	}
-
-	std::string configured_build_directory()
-	{
-		return ("${CMAKE_BUILD_DIR}");
-	}
-
+std::string configured_source_directory()
+{
+    return ("${CMAKE_SOURCE_DIR}");
 }
+
+std::string configured_build_directory()
+{
+    return ("${CMAKE_BUILD_DIR}");
+}
+
+} // namespace EnergyPlus

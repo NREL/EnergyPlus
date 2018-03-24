@@ -49,155 +49,179 @@
 #define PVWatts_hh_INCLUDED
 
 // C++ Headers
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
 
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataSurfaces.hh>
+#include <EnergyPlus.hh>
 #include <PVWattsSSC.hh>
 
 namespace EnergyPlus {
 
 namespace PVWatts {
 
-	enum class ModuleType {
-		STANDARD,
-		PREMIUM,
-		THIN_FILM,
-	};
+    enum class ModuleType
+    {
+        STANDARD,
+        PREMIUM,
+        THIN_FILM,
+    };
 
-	enum class ArrayType {
-		FIXED_OPEN_RACK,
-		FIXED_ROOF_MOUNTED,
-		ONE_AXIS,
-		ONE_AXIS_BACKTRACKING,
-		TWO_AXIS,
-	};
+    enum class ArrayType
+    {
+        FIXED_OPEN_RACK,
+        FIXED_ROOF_MOUNTED,
+        ONE_AXIS,
+        ONE_AXIS_BACKTRACKING,
+        TWO_AXIS,
+    };
 
-	enum class GeometryType {
-		TILT_AZIMUTH,
-		SURFACE,
-	};
+    enum class GeometryType
+    {
+        TILT_AZIMUTH,
+        SURFACE,
+    };
 
-	struct DCPowerOutput {
-		Real64 poa; // Plane of array irradiance
-		Real64 tpoa; // Transmitted plane of array irradiance
-		Real64 pvt; // PV Cell temperature
-		Real64 dc; // DC power output
-	};
+    struct DCPowerOutput
+    {
+        Real64 poa;  // Plane of array irradiance
+        Real64 tpoa; // Transmitted plane of array irradiance
+        Real64 pvt;  // PV Cell temperature
+        Real64 dc;   // DC power output
+    };
 
-	struct IrradianceOutput {
-		Real64 solazi;
-		Real64 solzen;
-		Real64 solalt;
-		Real64 aoi;
-		Real64 stilt;
-		Real64 sazi;
-		Real64 rot;
-		Real64 btd;
-		Real64 ibeam;
-		Real64 iskydiff;
-		Real64 ignddiff;
-		int sunup;
-	};
+    struct IrradianceOutput
+    {
+        Real64 solazi;
+        Real64 solzen;
+        Real64 solalt;
+        Real64 aoi;
+        Real64 stilt;
+        Real64 sazi;
+        Real64 rot;
+        Real64 btd;
+        Real64 ibeam;
+        Real64 iskydiff;
+        Real64 ignddiff;
+        int sunup;
+    };
 
-	class PVWattsGenerator
-	{
-	private:
+    class PVWattsGenerator
+    {
+    private:
+        enum AlphaFields
+        {
+            NAME = 1,
+            VERSION = 2,
+            MODULE_TYPE = 3,
+            ARRAY_TYPE = 4,
+            GEOMETRY_TYPE = 5,
+            SURFACE_NAME = 6,
+        };
 
-		enum AlphaFields {
-			NAME = 1,
-			VERSION = 2,
-			MODULE_TYPE = 3,
-			ARRAY_TYPE = 4,
-			GEOMETRY_TYPE = 5,
-			SURFACE_NAME = 6,
-		};
+        enum NumFields
+        {
+            DC_SYSTEM_CAPACITY = 1,
+            SYSTEM_LOSSES = 2,
+            TILT_ANGLE = 3,
+            AZIMUTH_ANGLE = 4,
+            GROUND_COVERAGE_RATIO = 5,
+        };
 
-		enum NumFields {
-			DC_SYSTEM_CAPACITY = 1,
-			SYSTEM_LOSSES = 2,
-			TILT_ANGLE = 3,
-			AZIMUTH_ANGLE = 4,
-			GROUND_COVERAGE_RATIO = 5,
-		};
+        // User inputs
+        std::string m_name;
+        Real64 m_dcSystemCapacity;
+        ModuleType m_moduleType;
+        ArrayType m_arrayType;
+        Real64 m_systemLosses;
+        GeometryType m_geometryType;
+        Real64 m_tilt;
+        Real64 m_azimuth;
+        int m_surfaceNum;
+        Real64 m_groundCoverageRatio;
 
-		// User inputs
-		std::string m_name;
-		Real64 m_dcSystemCapacity;
-		ModuleType m_moduleType;
-		ArrayType m_arrayType;
-		Real64 m_systemLosses;
-		GeometryType m_geometryType;
-		Real64 m_tilt;
-		Real64 m_azimuth;
-		int m_surfaceNum;
-		Real64 m_groundCoverageRatio;
+        // Internal properties and data structures
+        Real64 m_gamma;
+        bool m_useARGlass;
+        int m_trackMode;
+        Real64 m_inoct;
+        int m_shadeMode1x;
+        std::unique_ptr<pvwatts_celltemp> m_tccalc;
 
-		// Internal properties and data structures
-		Real64 m_gamma;
-		bool m_useARGlass;
-		int m_trackMode;
-		Real64 m_inoct;
-		int m_shadeMode1x;
-		std::unique_ptr<pvwatts_celltemp> m_tccalc;
+        // State variables
+        Real64 m_TimeElapsed;                // total time elapsed, to keep track of system time steps
+        Real64 m_lastCellTemperature;        // last cell temperature
+        Real64 m_lastPlaneOfArrayIrradiance; // last cell plane of array irradiance
+        Real64 m_cellTemperature;
+        Real64 m_planeOfArrayIrradiance;
 
-		// State variables
-		Real64 m_TimeElapsed; // total time elapsed, to keep track of system time steps
-		Real64 m_lastCellTemperature; // last cell temperature
-		Real64 m_lastPlaneOfArrayIrradiance; // last cell plane of array irradiance
-		Real64 m_cellTemperature;
-		Real64 m_planeOfArrayIrradiance;
+        // Output variables
+        Real64 m_outputDCPower;
+        Real64 m_outputDCEnergy;
 
-		// Output variables
-		Real64 m_outputDCPower;
-		Real64 m_outputDCEnergy;
+    public:
+        static PVWattsGenerator createFromIdfObj(int objNum);
 
+        PVWattsGenerator(const std::string &name,
+                         const Real64 dcSystemCapacity,
+                         ModuleType moduleType,
+                         ArrayType arrayType,
+                         Real64 systemLosses = 0.14,
+                         GeometryType geometryType = GeometryType::TILT_AZIMUTH,
+                         Real64 tilt = 20.0,
+                         Real64 azimuth = 180.0,
+                         size_t surfaceNum = 0,
+                         Real64 groundCoverageRatio = 0.4);
 
-	public:
-		static PVWattsGenerator createFromIdfObj(int objNum);
+        void setupOutputVariables();
 
-		PVWattsGenerator(const std::string &name, const Real64 dcSystemCapacity, ModuleType moduleType, ArrayType arrayType, Real64 systemLosses=0.14, GeometryType geometryType=GeometryType::TILT_AZIMUTH, Real64 tilt=20.0, Real64 azimuth=180.0, size_t surfaceNum=0, Real64 groundCoverageRatio=0.4);
+        Real64 getDCSystemCapacity();
+        ModuleType getModuleType();
+        ArrayType getArrayType();
+        Real64 getSystemLosses();
+        GeometryType getGeometryType();
+        Real64 getTilt();
+        Real64 getAzimuth();
+        DataSurfaces::SurfaceData &getSurface();
+        Real64 getGroundCoverageRatio();
 
-		void setupOutputVariables();
+        Real64 getCellTempearture();
+        Real64 getPlaneOfArrayIrradiance();
+        void setCellTemperature(Real64 cellTemp);
+        void setPlaneOfArrayIrradiance(Real64 poa);
 
-		Real64 getDCSystemCapacity();
-		ModuleType getModuleType();
-		ArrayType getArrayType();
-		Real64 getSystemLosses();
-		GeometryType getGeometryType();
-		Real64 getTilt();
-		Real64 getAzimuth();
-		DataSurfaces::SurfaceData& getSurface();
-		Real64 getGroundCoverageRatio();
+        void calc();
 
-		Real64 getCellTempearture();
-		Real64 getPlaneOfArrayIrradiance();
-		void setCellTemperature(Real64 cellTemp);
-		void setPlaneOfArrayIrradiance(Real64 poa);
+        void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
-		void calc();
+        IrradianceOutput processIrradiance(int year,
+                                           int month,
+                                           int day,
+                                           int hour,
+                                           Real64 minute,
+                                           Real64 ts_hour,
+                                           Real64 lat,
+                                           Real64 lon,
+                                           Real64 tz,
+                                           Real64 dn,
+                                           Real64 df,
+                                           Real64 alb);
 
-		void getResults(Real64& GeneratorPower, Real64& GeneratorEnergy, Real64& ThermalPower, Real64& ThermalEnergy);
+        DCPowerOutput powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st);
+    };
 
-		IrradianceOutput processIrradiance(int year, int month, int day, int hour, Real64 minute, Real64 ts_hour, Real64 lat, Real64 lon, Real64 tz, Real64 dn, Real64 df, Real64 alb );
+    extern std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-		DCPowerOutput powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput& irr_st);
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName);
 
-	};
+    void clear_state();
 
-	extern std::map<int, PVWattsGenerator> PVWattsGenerators;
+} // namespace PVWatts
 
-	PVWattsGenerator& GetOrCreatePVWattsGenerator(std::string const & GeneratorName);
-
-	void clear_state();
-
-}
-
-}
+} // namespace EnergyPlus
 
 #endif

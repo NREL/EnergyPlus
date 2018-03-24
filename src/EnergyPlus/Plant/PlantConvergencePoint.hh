@@ -49,30 +49,28 @@
 #define PlantOperationPlantConvergencePoint_hh_INCLUDED
 
 namespace EnergyPlus {
-	namespace DataPlant {
+namespace DataPlant {
 
-		int const NumConvergenceHistoryTerms = 5;
+    int const NumConvergenceHistoryTerms = 5;
 
-		struct PlantConvergencePoint {
-			// Members
-			Array1D <Real64> MassFlowRateHistory;
-			Array1D <Real64> TemperatureHistory;
+    struct PlantConvergencePoint
+    {
+        // Members
+        Array1D<Real64> MassFlowRateHistory;
+        Array1D<Real64> TemperatureHistory;
 
-			// Default Constructor
-			PlantConvergencePoint() :
-					MassFlowRateHistory(NumConvergenceHistoryTerms),
-					TemperatureHistory(NumConvergenceHistoryTerms) {}
+        // Default Constructor
+        PlantConvergencePoint() : MassFlowRateHistory(NumConvergenceHistoryTerms), TemperatureHistory(NumConvergenceHistoryTerms)
+        {
+        }
 
-			// Scalar Constructor
-			PlantConvergencePoint(
-					Real64 const MassFlowRateValue,
-					Real64 const TemperatureValue
-			) :
-					MassFlowRateHistory(NumConvergenceHistoryTerms, MassFlowRateValue),
-					TemperatureHistory(NumConvergenceHistoryTerms, TemperatureValue) {}
-
-		};
-	}
-}
+        // Scalar Constructor
+        PlantConvergencePoint(Real64 const MassFlowRateValue, Real64 const TemperatureValue)
+            : MassFlowRateHistory(NumConvergenceHistoryTerms, MassFlowRateValue), TemperatureHistory(NumConvergenceHistoryTerms, TemperatureValue)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

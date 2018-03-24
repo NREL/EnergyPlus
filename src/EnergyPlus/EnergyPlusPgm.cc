@@ -177,9 +177,9 @@
 #endif
 
 // C++ Headers
-#include <iostream>
-#include <fstream>
 #include <exception>
+#include <fstream>
+#include <iostream>
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -187,45 +187,44 @@
 #endif
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlusPgm.hh>
 #include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
 #include <DataTimings.hh>
 #include <DisplayRoutines.hh>
+#include <EnergyPlusPgm.hh>
 #include <FileSystem.hh>
 #include <FluidProperties.hh>
-#include <InputProcessing/IdfParser.hh>
-#include <InputProcessing/InputValidation.hh>
 #include <InputProcessing/DataStorage.hh>
+#include <InputProcessing/IdfParser.hh>
 #include <InputProcessing/InputProcessor.hh>
+#include <InputProcessing/InputValidation.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
 #include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
-#include <DataIPShortCuts.hh>
 
 #ifdef _WIN32
- #include <stdlib.h>
  #include <direct.h>
+#include <stdlib.h>
 #else //Mac or Linux
  #include <unistd.h>
 #endif
 
-void
-EnergyPlusPgm( std::string const & filepath )
+void EnergyPlusPgm(std::string const &filepath)
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
@@ -254,16 +253,16 @@ EnergyPlusPgm( std::string const & filepath )
 	using namespace DataGlobals;
 	using namespace DataSystemVariables;
 	using namespace DataTimings;
-	using DataEnvironment::IgnoreSolarRadiation;
 	using DataEnvironment::IgnoreBeamRadiation;
 	using DataEnvironment::IgnoreDiffuseRadiation;
+    using DataEnvironment::IgnoreSolarRadiation;
 	// routine modules
 	using namespace FileSystem;
 	using namespace OutputProcessor;
 	using namespace SimulationManager;
-	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
+    using ScheduleManager::ReportOrphanSchedules;
 
 	// Disable C++ i/o synching with C methods for speed
 	std::ios_base::sync_with_stdio( false );
@@ -314,8 +313,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
-	if (DDOnlySimulation)
-		DDOnly = true;
+    if (DDOnlySimulation) DDOnly = true;
 
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
 	ReverseDD = env_var_on( cEnvValue ); // Yes or True
@@ -325,8 +323,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
-	if (AnnualSimulation)
-		FullAnnualRun = true;
+    if (AnnualSimulation) FullAnnualRun = true;
 
 	get_environment_variable( cDisplayAllWarnings, cEnvValue );
 	DisplayAllWarnings = env_var_on( cEnvValue ); // Yes or True
@@ -438,8 +435,7 @@ EnergyPlusPgm( std::string const & filepath )
 		if ( write_stat == 600 ) {
 			DisplayString( "ERROR: Could not open file " + outputErrFileName + " for output (write). Write permission denied in output directory." );
 			std::exit( EXIT_FAILURE );
-		}
-		else if ( write_stat != 0 ) {
+        } else if (write_stat != 0) {
 			DisplayString( "ERROR: Could not open file " + outputErrFileName + " for output (write)." );
 			std::exit( EXIT_FAILURE );
 		}
@@ -472,10 +468,18 @@ EnergyPlusPgm( std::string const & filepath )
 		if (runReadVars) {
 			std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 			bool FileExists;
-			{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+            {
+                IOFlags flags;
+                gio::inquire(readVarsPath, flags);
+                FileExists = flags.exists();
+            }
 			if (!FileExists) {
 				readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
-				{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+                {
+                    IOFlags flags;
+                    gio::inquire(readVarsPath, flags);
+                    FileExists = flags.exists();
+                }
 				if (!FileExists) {
 					DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
 					exit(EXIT_FAILURE);
@@ -492,10 +496,19 @@ EnergyPlusPgm( std::string const & filepath )
 
 			gio::Fmt readvarsFmt( "(A)" );
 
-			{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
+            {
+                IOFlags flags;
+                gio::inquire(RVIfile, flags);
+                rviFileExists = flags.exists();
+            }
 			if (!rviFileExists) {
 				fileUnitNumber = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
+                {
+                    IOFlags flags;
+                    flags.ACTION("write");
+                    gio::open(fileUnitNumber, RVIfile, flags);
+                    iostatus = flags.ios();
+                }
 				if ( iostatus != 0 ) {
 					ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
 				}
@@ -504,10 +517,19 @@ EnergyPlusPgm( std::string const & filepath )
 				gio::close( fileUnitNumber );
 			}
 
-			{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
+            {
+                IOFlags flags;
+                gio::inquire(MVIfile, flags);
+                mviFileExists = flags.exists();
+            }
 			if (!mviFileExists) {
 				fileUnitNumber = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
+                {
+                    IOFlags flags;
+                    flags.ACTION("write");
+                    gio::open(fileUnitNumber, MVIfile, flags);
+                    iostatus = flags.ios();
+                }
 				if ( iostatus != 0 ) {
 					ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
 				}
@@ -522,17 +544,14 @@ EnergyPlusPgm( std::string const & filepath )
 			systemCall(readVarsRviCommand);
 			systemCall(readVarsMviCommand);
 
-			if (!rviFileExists)
-				removeFile(RVIfile.c_str());
+            if (!rviFileExists) removeFile(RVIfile.c_str());
 
-			if (!mviFileExists)
-				removeFile(MVIfile.c_str());
+            if (!mviFileExists) removeFile(MVIfile.c_str());
 
 			moveFile("readvars.audit", outputRvauditFileName);
 		}
 
-	}
-	catch( const std::exception& e ) {
+    } catch (const std::exception &e) {
 		AbortEnergyPlus();
 	}
 
@@ -550,8 +569,7 @@ void StoreMessageCallback( void(*f)( std::string const & ) )
 	fMessagePtr = f;
 }
 
-void
-CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
+void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
 {
 
 	// SUBROUTINE INFORMATION:
@@ -603,5 +621,4 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	} else {
 		CurrentDateTimeString = " unknown date/time";
 	}
-
 }

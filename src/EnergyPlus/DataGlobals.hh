@@ -286,7 +286,8 @@ namespace DataGlobals {
 	extern bool RunOptCondEntTemp; // true if the ideal condenser entering set point optimization is running
 	extern bool CompLoadReportIsReq; // true if the extra sizing calcs are performed to create a "pulse" for the load component report
 	extern bool isPulseZoneSizing; // true during the set of zone sizing calcs that include the "pulse" for the load component report
-	extern int OutputFileZonePulse; // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
+    extern int
+        OutputFileZonePulse; // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
 	extern bool doLoadComponentPulseNow; // true for the time step that is the "pulse" for the load component report
 	extern bool ShowDecayCurvesInEIO; // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
@@ -298,11 +299,10 @@ namespace DataGlobals {
 
 	// Clears the global data in DataGlobals.
 	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    void clear_state();
 
-} // DataGlobals
+} // namespace DataGlobals
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -49,21 +49,21 @@
 #define PlantReportingLoopSideReportVars_hh_INCLUDED
 
 namespace EnergyPlus {
-    namespace DataPlant {
+namespace DataPlant {
 
-        struct LoopSideReportVars {
-            // Members
-            Real64 LoopSetPtDemandAtInlet;
-            Real64 ThisSideLoadAlterations;
+    struct LoopSideReportVars
+    {
+        // Members
+        Real64 LoopSetPtDemandAtInlet;
+        Real64 ThisSideLoadAlterations;
 
-            // Default Constructor
-            LoopSideReportVars() :
-                    LoopSetPtDemandAtInlet(0.0),
-                    ThisSideLoadAlterations(0.0) {}
+        // Default Constructor
+        LoopSideReportVars() : LoopSetPtDemandAtInlet(0.0), ThisSideLoadAlterations(0.0)
+        {
+        }
+    };
 
-        };
-
-    }
-}
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

@@ -51,25 +51,24 @@
 #include <Plant/ReportCompData.hh>
 
 namespace EnergyPlus {
-    namespace DataPlant {
+namespace DataPlant {
 
-        struct ReportBranchData {
-            // Members
-            std::string Name; // Name of the branch
-            int TotalComponents; // Total number of components on the branch
-            int NodeNumIn; // Branch inlet node number
-            int NodeNumOut; // Branch outlet node number
-            Array1D <ReportCompData> Comp; // Component type list
+    struct ReportBranchData
+    {
+        // Members
+        std::string Name;             // Name of the branch
+        int TotalComponents;          // Total number of components on the branch
+        int NodeNumIn;                // Branch inlet node number
+        int NodeNumOut;               // Branch outlet node number
+        Array1D<ReportCompData> Comp; // Component type list
 
-            // Default Constructor
-            ReportBranchData() :
-                    TotalComponents(0),
-                    NodeNumIn(0),
-                    NodeNumOut(0) {}
+        // Default Constructor
+        ReportBranchData() : TotalComponents(0), NodeNumIn(0), NodeNumOut(0)
+        {
+        }
+    };
 
-        };
-
-    }
-}
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

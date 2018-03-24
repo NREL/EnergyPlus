@@ -53,12 +53,12 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EconomicLifeCycleCost.hh>
 #include <DataCostEstimate.hh>
 #include <DataGlobalConstants.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DisplayRoutines.hh>
+#include <EconomicLifeCycleCost.hh>
 #include <EconomicTariff.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputReportTabular.hh>
@@ -212,7 +212,8 @@ namespace EconomicLifeCycleCost {
 	Array1D< Real64 > AfterTaxCashFlow;
 	Array1D< Real64 > AfterTaxPresentValue;
 
-	Array1D_string const MonthNames( 12, { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" } );
+    Array1D_string const
+        MonthNames(12, {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"});
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -244,13 +245,11 @@ namespace EconomicLifeCycleCost {
 		int ExpressAsCashFlows_baseMonths1900( 0 ); // number of months since 1900 for base period
 		int ExpressAsCashFlows_serviceMonths1900( 0 ); // number of months since 1900 for service period
 
-	}
-
+    } // namespace
 
 	// Functions
 
-	void
-	GetInputForLifeCycleCost()
+    void GetInputForLifeCycleCost()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -294,8 +293,7 @@ namespace EconomicLifeCycleCost {
 		}
 	}
 
-	void
-	ComputeLifeCycleCostAndReport()
+    void ComputeLifeCycleCostAndReport()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -345,8 +343,7 @@ namespace EconomicLifeCycleCost {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	void
-	GetInputLifeCycleCostParameters()
+    void GetInputLifeCycleCostParameters()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -396,11 +393,13 @@ namespace EconomicLifeCycleCost {
 			LCCparamPresent = false;
 		} else if ( NumObj == 1 ) {
 			LCCparamPresent = true;
-			inputProcessor->getObjectItem( CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, 1, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
-					ShowWarningError( "In " + CurrentModuleObject + " named " + AlphaArray( 1 ) + " a field was found containing LifeCycleCost: which may indicate a missing comma." );
+                    ShowWarningError("In " + CurrentModuleObject + " named " + AlphaArray(1) +
+                                     " a field was found containing LifeCycleCost: which may indicate a missing comma.");
 				}
 			}
 			// start to extract values from input array into appropriate fields
@@ -435,34 +434,41 @@ namespace EconomicLifeCycleCost {
 				inflationApproach = inflAppCurrentDollar;
 			} else {
 				inflationApproach = inflAppConstantDollar;
-				ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 3 ) + "=\"" + AlphaArray( 3 ) + "\". ConstantDollar will be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
+                                 "\". ConstantDollar will be used.");
 			}
 			// N1,  \field Real Discount Rate
 			//      \type real
 			realDiscountRate = NumArray( 1 );
 			if ( ( inflationApproach == inflAppConstantDollar ) && lNumericFieldBlanks( 1 ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid for field " + cNumericFieldNames( 1 ) + " to be blank when ConstantDollar analysis is be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(1) +
+                                 " to be blank when ConstantDollar analysis is be used.");
 			}
 			if ( ( realDiscountRate > 0.30 ) || ( realDiscountRate < -0.30 ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 1 ) + ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
+                                 ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
 			}
 			// N2,  \field Nominal Discount Rate
 			//      \type real
 			nominalDiscountRate = NumArray( 2 );
 			if ( ( inflationApproach == inflAppCurrentDollar ) && lNumericFieldBlanks( 2 ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid for field " + cNumericFieldNames( 2 ) + " to be blank when CurrentDollar analysis is be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(2) +
+                                 " to be blank when CurrentDollar analysis is be used.");
 			}
 			if ( ( nominalDiscountRate > 0.30 ) || ( nominalDiscountRate < -0.30 ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                                 ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
 			}
 			// N3,  \field Inflation
 			//      \type real
 			inflation = NumArray( 3 );
 			if ( ( inflationApproach == inflAppConstantDollar ) && ( ! lNumericFieldBlanks( 3 ) ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid for field " + cNumericFieldNames( 3 ) + " contain a value when ConstantDollar analysis is be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid for field " + cNumericFieldNames(3) +
+                                 " contain a value when ConstantDollar analysis is be used.");
 			}
 			if ( ( inflation > 0.30 ) || ( inflation < -0.30 ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                                 ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
 			}
 			// A4,  \field Base Date Month
 			//      \type choice
@@ -486,10 +492,12 @@ namespace EconomicLifeCycleCost {
 			//      \maximum 2100
 			baseDateYear = int( NumArray( 4 ) );
 			if ( baseDateYear > 2100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  Value greater than 2100 yet it is representing a year. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                                 ".  Value greater than 2100 yet it is representing a year. ");
 			}
 			if ( baseDateYear < 1900 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  Value less than 1900 yet it is representing a year. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                                 ".  Value less than 1900 yet it is representing a year. ");
 			}
 			// A5,  \field Service Date Month
 			//      \type choice
@@ -513,10 +521,12 @@ namespace EconomicLifeCycleCost {
 			//      \maximum 2100
 			serviceDateYear = int( NumArray( 5 ) );
 			if ( serviceDateYear > 2100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  Value greater than 2100 yet it is representing a year. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                                 ".  Value greater than 2100 yet it is representing a year. ");
 			}
 			if ( serviceDateYear < 1900 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  Value less than 1900 yet it is representing a year. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                                 ".  Value less than 1900 yet it is representing a year. ");
 			}
 			// N6,  \field Length of Study Period in Years
 			//      \type integer
@@ -524,10 +534,12 @@ namespace EconomicLifeCycleCost {
 			//      \maximum 100
 			lengthStudyYears = int( NumArray( 6 ) );
 			if ( lengthStudyYears > 100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 6 ) + ".  A value greater than 100 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                                 ".  A value greater than 100 is not reasonable for an economic evaluation. ");
 			}
 			if ( lengthStudyYears < 1 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 6 ) + ".  A value less than 1 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                                 ".  A value less than 1 is not reasonable for an economic evaluation. ");
 			}
 			lengthStudyTotalMonths = lengthStudyYears * 12;
 			// N7, \field Tax rate
@@ -535,7 +547,8 @@ namespace EconomicLifeCycleCost {
 			//      \minimum 0.0
 			taxRate = NumArray( 7 );
 			if ( taxRate < 0.0 && ( ! lNumericFieldBlanks( 7 ) ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 10 ) + ".  A value less than 0 is not reasonable for a tax rate. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(10) +
+                                 ".  A value less than 0 is not reasonable for a tax rate. ");
 			}
 			// A6;  \field Depreciation Method
 			//      \type choice
@@ -590,8 +603,7 @@ namespace EconomicLifeCycleCost {
 		}
 	}
 
-	void
-	GetInputLifeCycleCostRecurringCosts()
+    void GetInputLifeCycleCostRecurringCosts()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -639,11 +651,13 @@ namespace EconomicLifeCycleCost {
 		numRecurringCosts = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		RecurringCosts.allocate( numRecurringCosts );
 		for ( iInObj = 1; iInObj <= numRecurringCosts; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
-					ShowWarningError( "In " + CurrentModuleObject + " named " + AlphaArray( 1 ) + " a field was found containing LifeCycleCost: which may indicate a missing comma." );
+                    ShowWarningError("In " + CurrentModuleObject + " named " + AlphaArray(1) +
+                                     " a field was found containing LifeCycleCost: which may indicate a missing comma.");
 				}
 			}
 			// start to extract values from input array into appropriate fields
@@ -677,7 +691,8 @@ namespace EconomicLifeCycleCost {
 				RecurringCosts( iInObj ).category = costCatOtherOperational;
 			} else {
 				RecurringCosts( iInObj ).category = costCatMaintenance;
-				ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphaArray( 2 ) + "\". The category of Maintenance will be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
+                                 "\". The category of Maintenance will be used.");
 			}
 			//   N1,  \field Cost
 			//        \type real
@@ -693,7 +708,8 @@ namespace EconomicLifeCycleCost {
 				RecurringCosts( iInObj ).startOfCosts = startBasePeriod;
 			} else {
 				RecurringCosts( iInObj ).startOfCosts = startServicePeriod;
-				ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 3 ) + "=\"" + AlphaArray( 3 ) + "\". The start of the service period will be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
+                                 "\". The start of the service period will be used.");
 			}
 			//   N2,  \field Years from Start
 			//        \type integer
@@ -701,10 +717,14 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 100
 			RecurringCosts( iInObj ).yearsFromStart = int( NumArray( 2 ) );
 			if ( RecurringCosts( iInObj ).yearsFromStart > 100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. " );
+                ShowWarningError(
+                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
 			}
 			if ( RecurringCosts( iInObj ).yearsFromStart < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. " );
+                ShowWarningError(
+                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
 			}
 			//   N3,  \field Months from Start
 			//        \type integer
@@ -712,10 +732,14 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 1200
 			RecurringCosts( iInObj ).monthsFromStart = int( NumArray( 3 ) );
 			if ( RecurringCosts( iInObj ).monthsFromStart > 1200 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                                 ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
+                                 "economic evaluation. ");
 			}
 			if ( RecurringCosts( iInObj ).monthsFromStart < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. " );
+                ShowWarningError(
+                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                    ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
 			}
 			//   N4,  \field Repeat Period Years
 			//        \type integer
@@ -723,10 +747,14 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 100
 			RecurringCosts( iInObj ).repeatPeriodYears = int( NumArray( 4 ) );
 			if ( RecurringCosts( iInObj ).repeatPeriodYears > 100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  This value is the number of years between occurances of the cost so a value greater than 100 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                                 ".  This value is the number of years between occurances of the cost so a value greater than 100 is not reasonable "
+                                 "for an economic evaluation. ");
 			}
 			if ( RecurringCosts( iInObj ).repeatPeriodYears < 1 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  This value is the number of years between occurances of the cost so a value less than 1 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
+                                 ".  This value is the number of years between occurances of the cost so a value less than 1 is not reasonable for "
+                                 "an economic evaluation. ");
 			}
 			//   N5,  \field Repeat Period Months
 			//        \type integer
@@ -734,31 +762,38 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 1200
 			RecurringCosts( iInObj ).repeatPeriodMonths = int( NumArray( 5 ) );
 			if ( RecurringCosts( iInObj ).repeatPeriodMonths > 1200 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  This value is the number of months between occurances of the cost so a value greater than 1200 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                                 ".  This value is the number of months between occurances of the cost so a value greater than 1200 is not "
+                                 "reasonable for an economic evaluation. ");
 			}
 			if ( RecurringCosts( iInObj ).repeatPeriodMonths < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  This value is the number of months between occurances of the cost so a value less than 0 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
+                                 ".  This value is the number of months between occurances of the cost so a value less than 0 is not reasonable for "
+                                 "an economic evaluation. ");
 			}
 			if ( ( RecurringCosts( iInObj ).repeatPeriodMonths == 0 ) && ( RecurringCosts( iInObj ).repeatPeriodYears == 0 ) ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in fields " + cNumericFieldNames( 5 ) + " and " + cNumericFieldNames( 4 ) + ".  The repeat period must not be zero months and zero years. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in fields " + cNumericFieldNames(5) + " and " + cNumericFieldNames(4) +
+                                 ".  The repeat period must not be zero months and zero years. ");
 			}
 			//   N6;  \field Annual escalation rate
 			//        \type real
 			RecurringCosts( iInObj ).annualEscalationRate = int( NumArray( 6 ) );
 			if ( RecurringCosts( iInObj ).annualEscalationRate > 0.30 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 6 ) + ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                                 ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
 			}
 			if ( RecurringCosts( iInObj ).annualEscalationRate < -0.30 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 6 ) + ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(6) +
+                                 ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
 			}
 			// express the years and months fields in total months
 			RecurringCosts( iInObj ).totalMonthsFromStart = RecurringCosts( iInObj ).yearsFromStart * 12 + RecurringCosts( iInObj ).monthsFromStart;
-			RecurringCosts( iInObj ).totalRepeatPeriodMonths = RecurringCosts( iInObj ).repeatPeriodYears * 12 + RecurringCosts( iInObj ).repeatPeriodMonths;
+            RecurringCosts(iInObj).totalRepeatPeriodMonths =
+                RecurringCosts(iInObj).repeatPeriodYears * 12 + RecurringCosts(iInObj).repeatPeriodMonths;
 		}
 	}
 
-	void
-	GetInputLifeCycleCostNonrecurringCost()
+    void GetInputLifeCycleCostNonrecurringCost()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -812,11 +847,13 @@ namespace EconomicLifeCycleCost {
 			NonrecurringCost.allocate( numNonrecurringCost );
 		}
 		for ( iInObj = 1; iInObj <= numNonrecurringCost; ++iInObj ) {
-			inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
+                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 			//check to make sure none of the values are another life cycle cost object
 			for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 				if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
-					ShowWarningError( "In " + CurrentModuleObject + " named " + AlphaArray( 1 ) + " a field was found containing LifeCycleCost: which may indicate a missing comma." );
+                    ShowWarningError("In " + CurrentModuleObject + " named " + AlphaArray(1) +
+                                     " a field was found containing LifeCycleCost: which may indicate a missing comma.");
 				}
 			}
 			// start to extract values from input array into appropriate fields
@@ -838,7 +875,8 @@ namespace EconomicLifeCycleCost {
 				NonrecurringCost( iInObj ).category = costCatOtherCapital;
 			} else {
 				NonrecurringCost( iInObj ).category = costCatConstruction;
-				ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphaArray( 2 ) + "\". The category of Construction will be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
+                                 "\". The category of Construction will be used.");
 			}
 			// N1,  \field Cost
 			//      \type real
@@ -854,7 +892,8 @@ namespace EconomicLifeCycleCost {
 				NonrecurringCost( iInObj ).startOfCosts = startBasePeriod;
 			} else {
 				NonrecurringCost( iInObj ).startOfCosts = startServicePeriod;
-				ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 3 ) + "=\"" + AlphaArray( 3 ) + "\". The start of the service period will be used." );
+                ShowWarningError(CurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
+                                 "\". The start of the service period will be used.");
 			}
 			// N2,  \field Years from Start
 			//      \type integer
@@ -862,10 +901,14 @@ namespace EconomicLifeCycleCost {
 			//      \maximum 100
 			NonrecurringCost( iInObj ).yearsFromStart = int( NumArray( 2 ) );
 			if ( NonrecurringCost( iInObj ).yearsFromStart > 100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. " );
+                ShowWarningError(
+                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
 			}
 			if ( NonrecurringCost( iInObj ).yearsFromStart < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. " );
+                ShowWarningError(
+                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(2) +
+                    ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
 			}
 			//  N3;  \field Months from Start
 			//       \type integer
@@ -873,18 +916,21 @@ namespace EconomicLifeCycleCost {
 			//       \maximum 11
 			NonrecurringCost( iInObj ).monthsFromStart = int( NumArray( 3 ) );
 			if ( NonrecurringCost( iInObj ).monthsFromStart > 1200 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an economic evaluation. " );
+                ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                                 ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
+                                 "economic evaluation. ");
 			}
 			if ( NonrecurringCost( iInObj ).monthsFromStart < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. " );
+                ShowWarningError(
+                    CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
+                    ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
 			}
 			// express the years and months fields in total months
 			NonrecurringCost( iInObj ).totalMonthsFromStart = NonrecurringCost( iInObj ).yearsFromStart * 12 + NonrecurringCost( iInObj ).monthsFromStart;
 		}
 	}
 
-	void
-	GetInputLifeCycleCostUsePriceEscalation()
+    void GetInputLifeCycleCostUsePriceEscalation()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -936,11 +982,13 @@ namespace EconomicLifeCycleCost {
 		}
 		if ( numUsePriceEscalation > 0 ) {
 			for ( iInObj = 1; iInObj <= numUsePriceEscalation; ++iInObj ) {
-				inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
+                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 				//check to make sure none of the values are another life cycle cost object
 				for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 					if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
-						ShowWarningError( "In " + CurrentModuleObject + " named " + AlphaArray( 1 ) + " a field was found containing LifeCycleCost: which may indicate a missing comma." );
+                        ShowWarningError("In " + CurrentModuleObject + " named " + AlphaArray(1) +
+                                         " a field was found containing LifeCycleCost: which may indicate a missing comma.");
 					}
 				}
 				// start to extract values from input array into appropriate fields
@@ -973,10 +1021,12 @@ namespace EconomicLifeCycleCost {
 				//      \maximum 2100
 				UsePriceEscalation( iInObj ).escalationStartYear = int( NumArray( 1 ) );
 				if ( UsePriceEscalation( iInObj ).escalationStartYear > 2100 ) {
-					ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 1 ) + ".  Value greater than 2100 yet it is representing a year. " );
+                    ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
+                                     ".  Value greater than 2100 yet it is representing a year. ");
 				}
 				if ( UsePriceEscalation( iInObj ).escalationStartYear < 1900 ) {
-					ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 1 ) + ".  Value less than 1900 yet it is representing a year. " );
+                    ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(1) +
+                                     ".  Value less than 1900 yet it is representing a year. ");
 				}
 				// A3,  \field Escalation Start Month
 				//      \type choice
@@ -1023,8 +1073,7 @@ namespace EconomicLifeCycleCost {
 		}
 	}
 
-	void
-	GetInputLifeCycleCostUseAdjustment()
+    void GetInputLifeCycleCostUseAdjustment()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1078,11 +1127,13 @@ namespace EconomicLifeCycleCost {
 		}
 		if ( numUseAdjustment > 0 ) {
 			for ( iInObj = 1; iInObj <= numUseAdjustment; ++iInObj ) {
-				inputProcessor->getObjectItem( CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+                inputProcessor->getObjectItem(CurrentModuleObject, iInObj, AlphaArray, NumAlphas, NumArray, NumNums, IOStat, lNumericFieldBlanks,
+                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
 				//check to make sure none of the values are another life cycle cost object
 				for ( jFld = 1; jFld <= NumAlphas; ++jFld ) {
 					if ( hasi( AlphaArray( jFld ), "LifeCycleCost:" ) ) {
-						ShowWarningError( "In " + CurrentModuleObject + " named " + AlphaArray( 1 ) + " a field was found containing LifeCycleCost: which may indicate a missing comma." );
+                        ShowWarningError("In " + CurrentModuleObject + " named " + AlphaArray(1) +
+                                         " a field was found containing LifeCycleCost: which may indicate a missing comma.");
 					}
 				}
 				// start to extract values from input array into appropriate fields
@@ -1124,11 +1175,7 @@ namespace EconomicLifeCycleCost {
 		}
 	}
 
-	int
-	MonthToMonthNumber(
-		std::string const & inMonthString,
-		int const inDefaultMonth
-	)
+    int MonthToMonthNumber(std::string const &inMonthString, int const inDefaultMonth)
 	{
 
 		// FUNCTION INFORMATION:
@@ -1204,8 +1251,7 @@ namespace EconomicLifeCycleCost {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	void
-	ExpressAsCashFlows()
+    void ExpressAsCashFlows()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1344,7 +1390,8 @@ namespace EconomicLifeCycleCost {
 			if ( ( month >= 1 ) && ( month <= lengthStudyTotalMonths ) ) {
 				CashFlow( offset + jCost ).mnAmount( month ) = NonrecurringCost( jCost ).cost * monthlyInflationFactor( month );
 			} else {
-				ShowWarningError( "For life cycle costing a nonrecurring cost named " + NonrecurringCost( jCost ).name + " contains a cost which is not within the study period." );
+                ShowWarningError("For life cycle costing a nonrecurring cost named " + NonrecurringCost(jCost).name +
+                                 " contains a cost which is not within the study period.");
 			}
 		}
 		// Put recurring costs into cashflows
@@ -1369,7 +1416,8 @@ namespace EconomicLifeCycleCost {
 					}
 				}
 			} else {
-				ShowWarningError( "For life cycle costing the recurring cost named " + RecurringCosts( jCost ).name + " has the first year of the costs that is not within the study period." );
+                ShowWarningError("For life cycle costing the recurring cost named " + RecurringCosts(jCost).name +
+                                 " has the first year of the costs that is not within the study period.");
 			}
 		}
 		// Put resource costs into cashflows
@@ -1444,8 +1492,14 @@ namespace EconomicLifeCycleCost {
 		//create total categories
 		for ( jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth ) {
 			CashFlow( costCatTotEnergy ).mnAmount( jMonth ) = CashFlow( costCatEnergy ).mnAmount( jMonth );
-			CashFlow( costCatTotOper ).mnAmount( jMonth ) = CashFlow( costCatMaintenance ).mnAmount( jMonth ) + CashFlow( costCatRepair ).mnAmount( jMonth ) + CashFlow( costCatOperation ).mnAmount( jMonth ) + CashFlow( costCatReplacement ).mnAmount( jMonth ) + CashFlow( costCatMinorOverhaul ).mnAmount( jMonth ) + CashFlow( costCatMajorOverhaul ).mnAmount( jMonth ) + CashFlow( costCatOtherOperational ).mnAmount( jMonth ) + CashFlow( costCatWater ).mnAmount( jMonth ) + CashFlow( costCatEnergy ).mnAmount( jMonth );
-			CashFlow( costCatTotCaptl ).mnAmount( jMonth ) = CashFlow( costCatConstruction ).mnAmount( jMonth ) + CashFlow( costCatSalvage ).mnAmount( jMonth ) + CashFlow( costCatOtherCapital ).mnAmount( jMonth );
+            CashFlow(costCatTotOper).mnAmount(jMonth) = CashFlow(costCatMaintenance).mnAmount(jMonth) + CashFlow(costCatRepair).mnAmount(jMonth) +
+                                                        CashFlow(costCatOperation).mnAmount(jMonth) + CashFlow(costCatReplacement).mnAmount(jMonth) +
+                                                        CashFlow(costCatMinorOverhaul).mnAmount(jMonth) +
+                                                        CashFlow(costCatMajorOverhaul).mnAmount(jMonth) +
+                                                        CashFlow(costCatOtherOperational).mnAmount(jMonth) + CashFlow(costCatWater).mnAmount(jMonth) +
+                                                        CashFlow(costCatEnergy).mnAmount(jMonth);
+            CashFlow(costCatTotCaptl).mnAmount(jMonth) = CashFlow(costCatConstruction).mnAmount(jMonth) + CashFlow(costCatSalvage).mnAmount(jMonth) +
+                                                         CashFlow(costCatOtherCapital).mnAmount(jMonth);
 			CashFlow( costCatTotGrand ).mnAmount( jMonth ) = CashFlow( costCatTotOper ).mnAmount( jMonth ) + CashFlow( costCatTotCaptl ).mnAmount( jMonth );
 		}
 		//convert all monthly cashflows into yearly cashflows
@@ -1465,14 +1519,14 @@ namespace EconomicLifeCycleCost {
 		for ( int nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc ) {
 			int curResource = UsePriceEscalation( nUsePriceEsc ).resource - ResourceTypeInitialOffset;
 			if ( !resourceCostNotZero( curResource ) && DataGlobals::DoWeathSim ) {
-				ShowWarningError( "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation( nUsePriceEsc ).name + "\" has no energy cost. " );
+                ShowWarningError("The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation(nUsePriceEsc).name +
+                                 "\" has no energy cost. ");
 				ShowContinueError( "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff." );
 			}
 		}
 	}
 
-	void
-	ComputePresentValue()
+    void ComputePresentValue()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1516,7 +1570,8 @@ namespace EconomicLifeCycleCost {
 
 		// identify how each cashflow should be treated
 		for ( iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow ) {
-			{ auto const SELECT_CASE_var( CashFlow( iCashFlow ).SourceKind );
+            {
+                auto const SELECT_CASE_var(CashFlow(iCashFlow).SourceKind);
 			if ( SELECT_CASE_var == skResource ) {
 				//only for real fuels purchased such as electricity, natural gas, etc..
 				if ( ( CashFlow(iCashFlow).Resource >= iRT_Electricity ) && ( CashFlow(iCashFlow).Resource <= iRT_ElectricitySurplusSold ) ) {
@@ -1534,7 +1589,8 @@ namespace EconomicLifeCycleCost {
 				CashFlow( iCashFlow ).pvKind = pvkNotComputed;
 			} else {
 				CashFlow( iCashFlow ).pvKind = pvkNotComputed;
-			}}
+                }
+            }
 		}
 		// compute the Single Present Value factors based on the discount rate
 		SPV.allocate( lengthStudyYears );
@@ -1549,7 +1605,8 @@ namespace EconomicLifeCycleCost {
 		//compute single present values based on real discount rates
 		for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
 			// NIST 155 D.2.1.1 - Single Present Value (SPV) formula
-			{ auto const SELECT_CASE_var( discountConvension );
+            {
+                auto const SELECT_CASE_var(discountConvension);
 			if ( SELECT_CASE_var == disConvBeginOfYear ) {
 				effectiveYear = double( jYear ) - 1.0;
 			} else if ( SELECT_CASE_var == disConvMidYear ) {
@@ -1557,7 +1614,8 @@ namespace EconomicLifeCycleCost {
 			} else if ( SELECT_CASE_var == disConvEndOfYear ) {
 				effectiveYear = double( jYear );
 			} else {
-			}}
+                }
+            }
 			SPV( jYear ) = 1.0 / std::pow( 1.0 + curDiscountRate, effectiveYear );
 		}
 		//use SPV as default values for all energy types
@@ -1572,7 +1630,8 @@ namespace EconomicLifeCycleCost {
 			if ( ( curResource >= 1 ) && ( curResource < NumOfResourceTypes ) ) {
 				for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
 					//the following is based on UPV* formula from NIST 135 supplement but is for a single year
-					{ auto const SELECT_CASE_var( discountConvension );
+                    {
+                        auto const SELECT_CASE_var(discountConvension);
 					if ( SELECT_CASE_var == disConvBeginOfYear ) {
 						effectiveYear = double( jYear ) - 1.0;
 					} else if ( SELECT_CASE_var == disConvMidYear ) {
@@ -1580,13 +1639,16 @@ namespace EconomicLifeCycleCost {
 					} else if ( SELECT_CASE_var == disConvEndOfYear ) {
 						effectiveYear = double( jYear );
 					} else {
-					}}
-					energySPV( jYear, curResource ) = UsePriceEscalation( nUsePriceEsc ).Escalation( jYear ) / std::pow( 1.0 + curDiscountRate, effectiveYear );
+                        }
+                    }
+                    energySPV(jYear, curResource) =
+                        UsePriceEscalation(nUsePriceEsc).Escalation(jYear) / std::pow(1.0 + curDiscountRate, effectiveYear);
 				}
 			}
 		}
 		for ( iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow ) {
-			{ auto const SELECT_CASE_var( CashFlow( iCashFlow ).pvKind );
+            {
+                auto const SELECT_CASE_var(CashFlow(iCashFlow).pvKind);
 			if ( SELECT_CASE_var == pvkNonEnergy ) {
 				totalPV = 0.0;
 				for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
@@ -1606,7 +1668,8 @@ namespace EconomicLifeCycleCost {
 				}
 			} else if ( SELECT_CASE_var == pvkNotComputed ) {
 				// do nothing
-			}}
+                }
+            }
 		}
 		// sum by category
 		for ( int i = 1; i <= countOfCostCat; ++i ) {
@@ -1623,20 +1686,28 @@ namespace EconomicLifeCycleCost {
 		}
 		//create total categories
 		CashFlow( costCatTotEnergy ).presentValue = CashFlow( costCatEnergy ).presentValue;
-		CashFlow( costCatTotOper ).presentValue = CashFlow( costCatMaintenance ).presentValue + CashFlow( costCatRepair ).presentValue + CashFlow( costCatOperation ).presentValue + CashFlow( costCatReplacement ).presentValue + CashFlow( costCatMinorOverhaul ).presentValue + CashFlow( costCatMajorOverhaul ).presentValue + CashFlow( costCatOtherOperational ).presentValue + CashFlow( costCatWater ).presentValue + CashFlow( costCatEnergy ).presentValue;
-		CashFlow( costCatTotCaptl ).presentValue = CashFlow( costCatConstruction ).presentValue + CashFlow( costCatSalvage ).presentValue + CashFlow( costCatOtherCapital ).presentValue;
+        CashFlow(costCatTotOper).presentValue =
+            CashFlow(costCatMaintenance).presentValue + CashFlow(costCatRepair).presentValue + CashFlow(costCatOperation).presentValue +
+            CashFlow(costCatReplacement).presentValue + CashFlow(costCatMinorOverhaul).presentValue + CashFlow(costCatMajorOverhaul).presentValue +
+            CashFlow(costCatOtherOperational).presentValue + CashFlow(costCatWater).presentValue + CashFlow(costCatEnergy).presentValue;
+        CashFlow(costCatTotCaptl).presentValue =
+            CashFlow(costCatConstruction).presentValue + CashFlow(costCatSalvage).presentValue + CashFlow(costCatOtherCapital).presentValue;
 		CashFlow( costCatTotGrand ).presentValue = CashFlow( costCatTotOper ).presentValue + CashFlow( costCatTotCaptl ).presentValue;
 		for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
 			CashFlow( costCatTotEnergy ).yrPresVal( jYear ) = CashFlow( costCatEnergy ).yrPresVal( jYear );
-			CashFlow( costCatTotOper ).yrPresVal( jYear ) = CashFlow( costCatMaintenance ).yrPresVal( jYear ) + CashFlow( costCatRepair ).yrPresVal( jYear ) + CashFlow( costCatOperation ).yrPresVal( jYear ) + CashFlow( costCatReplacement ).yrPresVal( jYear ) + CashFlow( costCatMinorOverhaul ).yrPresVal( jYear ) + CashFlow( costCatMajorOverhaul ).yrPresVal( jYear ) + CashFlow( costCatOtherOperational ).yrPresVal( jYear ) + CashFlow( costCatWater ).yrPresVal( jYear ) + CashFlow( costCatEnergy ).yrPresVal( jYear );
-			CashFlow( costCatTotCaptl ).yrPresVal( jYear ) = CashFlow( costCatConstruction ).yrPresVal( jYear ) + CashFlow( costCatSalvage ).yrPresVal( jYear ) + CashFlow( costCatOtherCapital ).yrPresVal( jYear );
+            CashFlow(costCatTotOper).yrPresVal(jYear) = CashFlow(costCatMaintenance).yrPresVal(jYear) + CashFlow(costCatRepair).yrPresVal(jYear) +
+                                                        CashFlow(costCatOperation).yrPresVal(jYear) + CashFlow(costCatReplacement).yrPresVal(jYear) +
+                                                        CashFlow(costCatMinorOverhaul).yrPresVal(jYear) +
+                                                        CashFlow(costCatMajorOverhaul).yrPresVal(jYear) +
+                                                        CashFlow(costCatOtherOperational).yrPresVal(jYear) + CashFlow(costCatWater).yrPresVal(jYear) +
+                                                        CashFlow(costCatEnergy).yrPresVal(jYear);
+            CashFlow(costCatTotCaptl).yrPresVal(jYear) = CashFlow(costCatConstruction).yrPresVal(jYear) + CashFlow(costCatSalvage).yrPresVal(jYear) +
+                                                         CashFlow(costCatOtherCapital).yrPresVal(jYear);
 			CashFlow( costCatTotGrand ).yrPresVal( jYear ) = CashFlow( costCatTotOper ).yrPresVal( jYear ) + CashFlow( costCatTotCaptl ).yrPresVal( jYear );
 		}
-
 	}
 
-	void
-	ComputeTaxAndDepreciation()
+    void ComputeTaxAndDepreciation()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1691,7 +1762,8 @@ namespace EconomicLifeCycleCost {
 		// and should not be confused with the length of the study. For 27 years, 31 years, 39 years and 40 years
 		// the June value was used.
 		DepreciationPercent = 0.0; //default all values to zero
-		{ auto const SELECT_CASE_var( depreciationMethod );
+        {
+            auto const SELECT_CASE_var(depreciationMethod);
 		if ( SELECT_CASE_var == depMethMACRS3 ) { // IRS Publication 946 for 2009 Table A-1
 			DepreciationPercent( 1 ) = 33.33;
 			DepreciationPercent( 2 ) = 44.45;
@@ -1909,7 +1981,8 @@ namespace EconomicLifeCycleCost {
 			DepreciationPercent( 39 ) = 2.5;
 			DepreciationPercent( 40 ) = 2.5;
 			DepreciationPercent( 41 ) = 1.146;
-		}}
+            }
+        }
 		// convert construction costs (not salvage) into depreciation
 		DepreciatedCapital = 0.0; // set all years to zero
 		for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
@@ -1944,8 +2017,7 @@ namespace EconomicLifeCycleCost {
 	//======================================================================================================================
 	//======================================================================================================================
 
-	void
-	WriteTabularLifeCycleCostReport()
+    void WriteTabularLifeCycleCostReport()
 	{
 		// SUBROUTINE INFORMATION:
 		//    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1963,11 +2035,11 @@ namespace EconomicLifeCycleCost {
 		// na
 
 		// Using/Aliasing
+        using OutputReportTabular::IntToStr;
+        using OutputReportTabular::RealToStr;
 		using OutputReportTabular::WriteReportHeaders;
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
-		using OutputReportTabular::RealToStr;
-		using OutputReportTabular::IntToStr;
 		using OutputReportTabular::displayLifeCycleCostReport;
 
 		// Locals
@@ -2056,7 +2128,8 @@ namespace EconomicLifeCycleCost {
 			tableBody( 1, 8 ) = MonthNames( serviceDateMonth ) + ' ' + IntToStr( serviceDateYear );
 			tableBody( 1, 9 ) = IntToStr( lengthStudyYears );
 			tableBody( 1, 10 ) = RealToStr( taxRate, 4 );
-			{ auto const SELECT_CASE_var( depreciationMethod );
+            {
+                auto const SELECT_CASE_var(depreciationMethod);
 			if ( SELECT_CASE_var == depMethMACRS3 ) {
 				tableBody( 1, 11 ) = "ModifiedAcceleratedCostRecoverySystem-3year";
 			} else if ( SELECT_CASE_var == depMethMACRS5 ) {
@@ -2079,12 +2152,14 @@ namespace EconomicLifeCycleCost {
 				tableBody( 1, 11 ) = "StraightLine-40year";
 			} else if ( SELECT_CASE_var == depMethNone ) {
 				tableBody( 1, 11 ) = "None";
-			}}
+                }
+            }
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Life-Cycle Cost Parameters" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Life-Cycle Cost Parameters");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters" );
@@ -2110,7 +2185,8 @@ namespace EconomicLifeCycleCost {
 			for ( jObj = 1; jObj <= numUsePriceEscalation; ++jObj ) { //loop through objects not columns to add names
 				columnHead( jObj ) = UsePriceEscalation( jObj ).name;
 				tableBody( jObj, 1 ) = GetResourceTypeChar( UsePriceEscalation( jObj ).resource );
-				tableBody( jObj, 2 ) = MonthNames( UsePriceEscalation( jObj ).escalationStartMonth ) + ' ' + IntToStr( UsePriceEscalation( jObj ).escalationStartYear );
+                tableBody(jObj, 2) =
+                    MonthNames(UsePriceEscalation(jObj).escalationStartMonth) + ' ' + IntToStr(UsePriceEscalation(jObj).escalationStartYear);
 			}
 			for ( jObj = 1; jObj <= numUsePriceEscalation; ++jObj ) {
 				for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
@@ -2120,7 +2196,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Use Price Escalation" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Use Price Escalation");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation" );
@@ -2155,7 +2232,8 @@ namespace EconomicLifeCycleCost {
 				WriteSubtitle( "Use Adjustment" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment" );
+                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                           "Use Adjustment");
 				}
 				if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 					ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment" );
@@ -2179,12 +2257,14 @@ namespace EconomicLifeCycleCost {
 			for ( jObj = 1; jObj <= ( numRecurringCosts + numNonrecurringCost ); ++jObj ) {
 				curCashFlow = countOfCostCat + jObj;
 				columnHead( jObj ) = CashFlow( curCashFlow ).name;
-				{ auto const SELECT_CASE_var( CashFlow( curCashFlow ).SourceKind );
+                {
+                    auto const SELECT_CASE_var(CashFlow(curCashFlow).SourceKind);
 				if ( SELECT_CASE_var == skNonrecurring ) {
 					tableBody( jObj, 1 ) = "Nonrecurring";
 				} else if ( SELECT_CASE_var == skRecurring ) {
 					tableBody( jObj, 1 ) = "Recurring";
-				}}
+                    }
+                }
 				for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
 					tableBody( jObj, iYear + 1 ) = RealToStr( CashFlow( curCashFlow ).yrAmount( iYear ), 2 );
 				}
@@ -2192,7 +2272,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
@@ -2221,7 +2302,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Energy and Water Cost Cash Flows (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (Without Escalation)" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Energy and Water Cost Cash Flows (Without Escalation)");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (Without Escalation)" );
@@ -2251,7 +2333,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Capital Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Capital Cash Flow by Category (Without Escalation)");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)" );
@@ -2294,7 +2377,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Operating Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Operating Cash Flow by Category (Without Escalation)");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)" );
@@ -2341,7 +2425,8 @@ namespace EconomicLifeCycleCost {
 				WriteSubtitle( "DEBUG ONLY - Monthly Cash Flows" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows" );
+                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                           "DEBUG ONLY - Monthly Cash Flows");
 				}
 				if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 					ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows" );
@@ -2372,7 +2457,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Monthly Total Cash Flow (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Monthly Total Cash Flow (Without Escalation)");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)" );
@@ -2399,7 +2485,8 @@ namespace EconomicLifeCycleCost {
 			for ( jObj = 1; jObj <= ( numRecurringCosts + numNonrecurringCost + numResourcesUsed ); ++jObj ) {
 				offset = countOfCostCat;
 				rowHead( jObj ) = CashFlow( offset + jObj ).name;
-				{ auto const SELECT_CASE_var( CashFlow( offset + jObj ).Category );
+                {
+                    auto const SELECT_CASE_var(CashFlow(offset + jObj).Category);
 				if ( SELECT_CASE_var == costCatMaintenance ) {
 					tableBody( 1, jObj ) = "Maintenance";
 				} else if ( SELECT_CASE_var == costCatRepair ) {
@@ -2426,8 +2513,10 @@ namespace EconomicLifeCycleCost {
 					tableBody( 1, jObj ) = "Energy";
 				} else {
 					tableBody( 1, jObj ) = "-";
-				}}
-				{ auto const SELECT_CASE_var( CashFlow( offset + jObj ).SourceKind );
+                    }
+                }
+                {
+                    auto const SELECT_CASE_var(CashFlow(offset + jObj).SourceKind);
 				if ( SELECT_CASE_var == skNonrecurring ) {
 					tableBody( 2, jObj ) = "Nonrecurring";
 				} else if ( SELECT_CASE_var == skRecurring ) {
@@ -2438,10 +2527,10 @@ namespace EconomicLifeCycleCost {
 					} else {
 						tableBody( 2, jObj ) = "Energy Cost";
 					}
-				}
-				else {
+                    } else {
 					tableBody( 2, jObj ) = "-";
-				}}
+                    }
+                }
 				tableBody( 3, jObj ) = RealToStr( CashFlow( offset + jObj ).orginalCost, 2 );
 				tableBody( 4, jObj ) = RealToStr( CashFlow( offset + jObj ).presentValue, 2 );
 				totalPV += CashFlow( offset + jObj ).presentValue;
@@ -2455,7 +2544,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
@@ -2509,7 +2599,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Present Value by Category" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Present Value by Category");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category" );
@@ -2542,7 +2633,8 @@ namespace EconomicLifeCycleCost {
 			WriteSubtitle( "Present Value by Year" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			if ( sqlite ) {
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year" );
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                       "Present Value by Year");
 			}
 			if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 				ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year" );
@@ -2582,7 +2674,8 @@ namespace EconomicLifeCycleCost {
 				WriteSubtitle( "After Tax Estimate" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				if ( sqlite ) {
-					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate" );
+                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+                                                           "After Tax Estimate");
 				}
 				if ( ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled() ) {
 					ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate" );
@@ -2592,12 +2685,10 @@ namespace EconomicLifeCycleCost {
 				columnWidth.deallocate();
 				tableBody.deallocate();
 			}
-
 		}
 	}
 
-	void
-	clear_state()
+    void clear_state()
 	{
 		LCCparamPresent = false;
 		LCCname = "";
@@ -2645,10 +2736,8 @@ namespace EconomicLifeCycleCost {
 		UsePriceEscalation_curFld = 0;
 		ExpressAsCashFlows_baseMonths1900 = 0;
 		ExpressAsCashFlows_serviceMonths1900 = 0;
-
 	}
 
+} // namespace EconomicLifeCycleCost
 
-} // EconomicLifeCycleCost
-
-} // EnergyPlus
+} // namespace EnergyPlus

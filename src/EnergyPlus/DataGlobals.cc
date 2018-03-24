@@ -261,8 +261,7 @@ namespace DataGlobals {
 
 	// Clears the global data in DataGlobals.
 	// Needed for unit tests, should not be normally called.
-	void
-	clear_state()
+    void clear_state()
 	{
 		runReadVars = false;
 		DDOnlySimulation = false;
@@ -360,6 +359,6 @@ namespace DataGlobals {
 		delightin_stream = nullptr;
 	}
 
-} // DataGlobals
+} // namespace DataGlobals
 
-} // EnergyPlus
+} // namespace EnergyPlus
