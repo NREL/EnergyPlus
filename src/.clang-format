@@ -3,7 +3,7 @@
 
 IndentWidth: 4
 AccessModifierOffset: -4
-ColumnLimit: 140
+ColumnLimit: 150
 CommentPragmas: '^ IWYU pragma:'
 UseTab: Never
 SpacesInParentheses: false
@@ -20,6 +20,7 @@ AllowShortCaseLabelsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: true
 AllowShortBlocksOnASingleLine: false
 BinPackParameters: false
+Standard: Cpp11
 BraceWrapping:
   AfterClass: true
   AfterControlStatement: false
