@@ -1345,14 +1345,14 @@ namespace HybridEvapCoolingModel {
         //  			-> if so
         //  				-> check if this setting meets the conditioning load (only)
         //  					-> if so
-        //  						->check to see if this setting is better at meeting the dehumidification or humidification lad than
-        //  any previous setting this step.
+        //  						->check to see if this setting is better at meeting the dehumidification or humidification lad
+        //  than any previous setting this step.
         //  						-> if its not, ignore it.
         // 		  				-> if not
         // 		  					->check to see if any previous setting met the conditioning load
         // 		  						->if not:
-        // 		  							->see if this setting is better at meeting the conditioning load than any
-        // previous setting this calculation step.
+        // 		  							->see if this setting is better at meeting the conditioning load than
+        // any previous setting this calculation step.
         // 		  								-> if so save as current optimal
         // 		  								-> if its not, ignore it.
         // 		  						-> if so: then ignore it.
