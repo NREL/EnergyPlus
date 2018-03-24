@@ -48,9 +48,9 @@
 #ifndef DataStorage_hh_INCLUDED
 #define DataStorage_hh_INCLUDED
 
-#include <string>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <string>
 #include <unordered_map>
 
 #include <nlohmann/json.hpp>
@@ -58,98 +58,86 @@
 class DataStorage
 {
 public:
-	using json = nlohmann::json;
+    using json = nlohmann::json;
 
-	template< typename T >
-	T *
-	addObject( std::string const & name, json const & fields )
-	{
-		T * ptr = new T( name, fields );
-		storage[ T::objectTypeHash() ][ name ] = std::move( unique_void( ptr ) );
-		return ptr;
-	}
+    template <typename T> T *addObject(std::string const &name, json const &fields)
+    {
+        T *ptr = new T(name, fields);
+        storage[T::objectTypeHash()][name] = std::move(unique_void(ptr));
+        return ptr;
+    }
 
-	template< typename T >
-	T *
-	addObject( json const & fields )
-	{
-		static const std::string blankString;
-		T * ptr = new T( fields );
-		storage[ T::objectTypeHash() ][ blankString ] = std::move( unique_void( ptr ) );
-		return ptr;
-	}
+    template <typename T> T *addObject(json const &fields)
+    {
+        static const std::string blankString;
+        T *ptr = new T(fields);
+        storage[T::objectTypeHash()][blankString] = std::move(unique_void(ptr));
+        return ptr;
+    }
 
-	template< typename T >
-	std::vector< T * >
-	addObjects( json const & objs )
-	{
-		assert( objs.is_object() );
-		std::vector< T * > output;
-		output.reserve( objs.size() );
-		for ( auto it = objs.begin(); it != objs.end(); ++it ) {
-			T * ptr = new T( it.key(), it.value() );
-			output.emplace_back( ptr );
-			storage[ T::objectTypeHash() ][ it.key() ] = std::move( unique_void( ptr ) );
-		}
-		return output;
-	}
+    template <typename T> std::vector<T *> addObjects(json const &objs)
+    {
+        assert(objs.is_object());
+        std::vector<T *> output;
+        output.reserve(objs.size());
+        for (auto it = objs.begin(); it != objs.end(); ++it) {
+            T *ptr = new T(it.key(), it.value());
+            output.emplace_back(ptr);
+            storage[T::objectTypeHash()][it.key()] = std::move(unique_void(ptr));
+        }
+        return output;
+    }
 
-	template< typename T >
-	T *
-	objectFactory( std::string const & name )
-	{
-		auto const it = storage.find( T::objectTypeHash() );
-		if ( it == storage.end() ) return nullptr;
-		auto const it2 = it->second.find( name );
-		if ( it2 == it->second.end() ) return nullptr;
-		T * p = static_cast< T * >( it2->second.get() );
-		return p;
-	}
+    template <typename T> T *objectFactory(std::string const &name)
+    {
+        auto const it = storage.find(T::objectTypeHash());
+        if (it == storage.end()) return nullptr;
+        auto const it2 = it->second.find(name);
+        if (it2 == it->second.end()) return nullptr;
+        T *p = static_cast<T *>(it2->second.get());
+        return p;
+    }
 
-	template< typename T >
-	T *
-	objectFactory()
-	{
-		static const std::string blankString;
-		auto const it = storage.find( T::objectTypeHash() );
-		if ( it == storage.end() ) return nullptr;
-		auto const it2 = it->second.find( blankString );
-		if ( it2 == it->second.end() ) return nullptr;
-		T * p = static_cast< T * >( it2->second.get() );
-		return p;
-	}
+    template <typename T> T *objectFactory()
+    {
+        static const std::string blankString;
+        auto const it = storage.find(T::objectTypeHash());
+        if (it == storage.end()) return nullptr;
+        auto const it2 = it->second.find(blankString);
+        if (it2 == it->second.end()) return nullptr;
+        T *p = static_cast<T *>(it2->second.get());
+        return p;
+    }
 
-	// template< typename T >
-	// std::vector< T * >
-	// objectsFactory()
-	// {
-	// 	auto const it = storage.find( T::objectTypeHash() );
-	// 	if ( it == storage.end() ) return nullptr;
-	// 	std::vector< T * > output;
-	// 	output.reserve( it->second.size() );
-	// 	for ( auto const & obj : it->second ) {
-	// 		output.emplace_back( obj->second.get() );
-	// 	}
-	// 	return output;
-	// }
+    // template< typename T >
+    // std::vector< T * >
+    // objectsFactory()
+    // {
+    // 	auto const it = storage.find( T::objectTypeHash() );
+    // 	if ( it == storage.end() ) return nullptr;
+    // 	std::vector< T * > output;
+    // 	output.reserve( it->second.size() );
+    // 	for ( auto const & obj : it->second ) {
+    // 		output.emplace_back( obj->second.get() );
+    // 	}
+    // 	return output;
+    // }
 
 private:
-	// taken from https://stackoverflow.com/a/39288979/2358662
-	using deleter_t = std::function< void( void * ) >;
-	using unique_void_ptr = std::unique_ptr< void, deleter_t >;
+    // taken from https://stackoverflow.com/a/39288979/2358662
+    using deleter_t = std::function<void(void *)>;
+    using unique_void_ptr = std::unique_ptr<void, deleter_t>;
 
-	template< typename T >
-	auto unique_void( T * ptr ) -> unique_void_ptr
-	{
-		auto deleter = []( void * data ) -> void {
-			T * p = static_cast< T * >( data );
-			delete p;
-		};
-		return std::unique_ptr< void, deleter_t >( ptr, deleter );
-	}
+    template <typename T> auto unique_void(T *ptr) -> unique_void_ptr
+    {
+        auto deleter = [](void *data) -> void {
+            T *p = static_cast<T *>(data);
+            delete p;
+        };
+        return std::unique_ptr<void, deleter_t>(ptr, deleter);
+    }
 
-	std::unordered_map< std::size_t, std::unordered_map< std::string, unique_void_ptr > > storage;
-
+    std::unordered_map<std::size_t, std::unordered_map<std::string, unique_void_ptr>> storage;
 };
 
 #endif // DataStorage_hh_INCLUDED

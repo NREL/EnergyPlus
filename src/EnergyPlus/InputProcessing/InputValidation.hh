@@ -53,24 +53,25 @@
 
 #include <nlohmann/json.hpp>
 
-class Validation {
+class Validation
+{
 public:
-	using json = nlohmann::json;
+    using json = nlohmann::json;
 
-	explicit Validation( json const * parsed_schema );
+    explicit Validation(json const *parsed_schema);
 
-	bool validate( json const & parsed_input );
+    bool validate(json const &parsed_input);
 
-	bool hasErrors();
+    bool hasErrors();
 
-	std::vector< std::string > const & errors();
+    std::vector<std::string> const &errors();
 
-	std::vector< std::string > const & warnings();
+    std::vector<std::string> const &warnings();
 
 private:
-	json const * schema;
-	std::vector< std::string > errors_;
-	std::vector< std::string > warnings_;
+    json const *schema;
+    std::vector<std::string> errors_;
+    std::vector<std::string> warnings_;
 };
 
 #endif // InputValidation_hh_INCLUDED

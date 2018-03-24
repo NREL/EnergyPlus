@@ -49,28 +49,26 @@
 #define PlantOperationPlantAvailManager_hh_INCLUDED
 
 namespace EnergyPlus {
-    namespace DataPlant {
+namespace DataPlant {
 
-        struct PlantAvailMgrData {
-            // Members
-            int NumAvailManagers; // number of availability managers for this plant loop
-            int AvailStatus; // system availability status
-            int StartTime; // cycle on time (in SimTimeSteps)
-            int StopTime; // cycle off time (in SimTimeSteps)
-            Array1D_string AvailManagerName; // name of each availability manager
-            Array1D_int AvailManagerType; // type of availability manager
-            Array1D_int AvailManagerNum; // index of availability manager
+    struct PlantAvailMgrData
+    {
+        // Members
+        int NumAvailManagers;            // number of availability managers for this plant loop
+        int AvailStatus;                 // system availability status
+        int StartTime;                   // cycle on time (in SimTimeSteps)
+        int StopTime;                    // cycle off time (in SimTimeSteps)
+        Array1D_string AvailManagerName; // name of each availability manager
+        Array1D_int AvailManagerType;    // type of availability manager
+        Array1D_int AvailManagerNum;     // index of availability manager
 
-            // Default Constructor
-            PlantAvailMgrData() :
-                    NumAvailManagers(0),
-                    AvailStatus(0),
-                    StartTime(0),
-                    StopTime(0) {}
+        // Default Constructor
+        PlantAvailMgrData() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0)
+        {
+        }
+    };
 
-        };
-
-    }
-}
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

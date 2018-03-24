@@ -49,33 +49,29 @@
 #define PlantOperationLoopSidePumpInformation_hh_INCLUDED
 
 namespace EnergyPlus {
-	namespace DataPlant {
+namespace DataPlant {
 
-		struct LoopSidePumpInformation {
-			// Members
-			std::string PumpName;
-			int PumpTypeOf;
-			int BranchNum;
-			int CompNum;
-			int PumpOutletNode;
-			Real64 PumpFlowRate;
-			Real64 CurrentMinAvail;
-			Real64 CurrentMaxAvail;
-			Real64 PumpHeatToFluid;
+    struct LoopSidePumpInformation
+    {
+        // Members
+        std::string PumpName;
+        int PumpTypeOf;
+        int BranchNum;
+        int CompNum;
+        int PumpOutletNode;
+        Real64 PumpFlowRate;
+        Real64 CurrentMinAvail;
+        Real64 CurrentMaxAvail;
+        Real64 PumpHeatToFluid;
 
-			// Default Constructor
-			LoopSidePumpInformation() :
-					PumpTypeOf(0),
-					BranchNum(0),
-					CompNum(0),
-					PumpOutletNode(0),
-					PumpFlowRate(0.0),
-					CurrentMinAvail(0.0),
-					CurrentMaxAvail(0.0),
-					PumpHeatToFluid(0.0) {}
-
-		};
-	}
-}
+        // Default Constructor
+        LoopSidePumpInformation()
+            : PumpTypeOf(0), BranchNum(0), CompNum(0), PumpOutletNode(0), PumpFlowRate(0.0), CurrentMinAvail(0.0), CurrentMaxAvail(0.0),
+              PumpHeatToFluid(0.0)
+        {
+        }
+    };
+} // namespace DataPlant
+} // namespace EnergyPlus
 
 #endif

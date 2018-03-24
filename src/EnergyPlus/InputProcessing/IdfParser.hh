@@ -48,81 +48,89 @@
 #ifndef InputProcessing_IdfParser_hh_INCLUDED
 #define InputProcessing_IdfParser_hh_INCLUDED
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <unordered_map>
-#include <nlohmann/json.hpp>
 
 namespace EnergyPlus {
-	class InputProcessorFixture;
+class InputProcessorFixture;
 }
 
-class IdfParser {
+class IdfParser
+{
 public:
-	friend class EnergyPlus::InputProcessorFixture;
-	using json = nlohmann::json;
+    friend class EnergyPlus::InputProcessorFixture;
+    using json = nlohmann::json;
 
-	IdfParser() = default;
+    IdfParser() = default;
 
-	json decode( std::string const & idf, json const & schema );
+    json decode(std::string const &idf, json const &schema);
 
-	json decode( std::string const & idf, json const & schema, bool & success );
+    json decode(std::string const &idf, json const &schema, bool &success);
 
-	std::string encode( json const & root, json const & schema );
+    std::string encode(json const &root, json const &schema);
 
-	std::string normalizeObjectType( std::string const & objectType );
+    std::string normalizeObjectType(std::string const &objectType);
 
-	std::vector< std::string > const & errors();
+    std::vector<std::string> const &errors();
 
-	std::vector< std::string > const & warnings();
+    std::vector<std::string> const &warnings();
 
-	bool hasErrors();
+    bool hasErrors();
 
-	enum class Token : size_t {
-		NONE = 0, END = 1, EXCLAMATION = 2, COMMA = 3, SEMICOLON = 4, STRING = 5, NUMBER = 6
-	};
+    enum class Token : size_t
+    {
+        NONE = 0,
+        END = 1,
+        EXCLAMATION = 2,
+        COMMA = 3,
+        SEMICOLON = 4,
+        STRING = 5,
+        NUMBER = 6
+    };
 
 private:
-	size_t cur_line_num = 1;
-	size_t index_into_cur_line = 0;
-	size_t beginning_of_line_index = 0;
-	char s[ 129 ];
-	std::unordered_map< std::string, std::string > objectTypeMap;
-	std::vector< std::string > errors_;
-	std::vector< std::string > warnings_;
+    size_t cur_line_num = 1;
+    size_t index_into_cur_line = 0;
+    size_t beginning_of_line_index = 0;
+    char s[129];
+    std::unordered_map<std::string, std::string> objectTypeMap;
+    std::vector<std::string> errors_;
+    std::vector<std::string> warnings_;
 
-	void increment_both_index( size_t & index, size_t & line_index );
+    void increment_both_index(size_t &index, size_t &line_index);
 
-	void decrement_both_index( size_t & index, size_t & line_index );
+    void decrement_both_index(size_t &index, size_t &line_index);
 
-	json parse_idf( std::string const & idf, size_t & index, bool & success, json const & schema );
+    json parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema);
 
-	json parse_object( std::string const & idf, size_t & index, bool & success, json const & schema_loc,
-								json const & obj_loc, int idfObjectCount );
+    json parse_object(std::string const &idf, size_t &index, bool &success, json const &schema_loc, json const &obj_loc, int idfObjectCount);
 
-	json parse_value( std::string const & idf, size_t & index, bool & success, json const & field_loc );
+    json parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc);
 
-	json parse_number( std::string const & idf, size_t & index, bool & success );
+    json parse_number(std::string const &idf, size_t &index, bool &success);
 
-	std::string parse_string( std::string const & idf, size_t & index, bool & success );
+    std::string parse_string(std::string const &idf, size_t &index, bool &success);
 
-	void eat_whitespace( std::string const & idf, size_t & index );
+    void eat_whitespace(std::string const &idf, size_t &index);
 
-	void eat_comment( std::string const & idf, size_t & index );
+    void eat_comment(std::string const &idf, size_t &index);
 
-	Token look_ahead( std::string const & idf, size_t index );
+    Token look_ahead(std::string const &idf, size_t index);
 
-	Token next_token( std::string const & idf, size_t & index );
+    Token next_token(std::string const &idf, size_t &index);
 
-	std::string & rtrim( std::string & s );
+    std::string &rtrim(std::string &s);
 
-	inline std::string convertToUpper( std::string s ) {
-		size_t len = s.size();
-		for ( size_t i = 0 ; i < len ; ++i ) {
-			char c = s[ i ];
-			s[i] = ( 'a' <= c && c <= 'z' ) ? c ^ 0x20 : c; // ASCII only, which is fine
-		}
-		return s;
-	}
+    inline std::string convertToUpper(std::string s)
+    {
+        size_t len = s.size();
+        for (size_t i = 0; i < len; ++i) {
+            char c = s[i];
+            s[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only, which is fine
+        }
+        return s;
+    }
 };
 
 #endif // InputProcessing_IdfParser_hh_INCLUDED
