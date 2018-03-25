@@ -48,6 +48,7 @@
 #ifndef HYSTERESISPHASECHANGE_HH_INCLUDED
 #define HYSTERESISPHASECHANGE_HH_INCLUDED
 
+#include <string>
 #include <vector>
 
 #include <EnergyPlus.hh>

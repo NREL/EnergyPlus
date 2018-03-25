@@ -63,80 +63,79 @@
 #include <DualDuct.hh>
 
 #include <DataGlobals.hh>
-#include <ZoneAirLoopEquipmentManager.hh>
 #include <HeatBalanceManager.hh>
 #include <ScheduleManager.hh>
+#include <ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace DualDuct;
 
+TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
+{
 
-TEST_F( EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir ) {
+    // AUTHOR: L. Gu, FSEC
+    // DATE WRITTEN: Jul. 2016
+    // TEST: #5769
 
-	// AUTHOR: L. Gu, FSEC
-	// DATE WRITTEN: Jul. 2016
-	// TEST: #5769
+    Real64 SAMassFlow;
+    Real64 AirLoopOAFrac;
+    Real64 OAMassFlow;
 
-	Real64 SAMassFlow;
-	Real64 AirLoopOAFrac;
-	Real64 OAMassFlow;
+    int numOfDampers = 2;
 
-	int numOfDampers = 2;
+    DataHeatBalance::Zone.allocate(1);
+    DataSizing::OARequirements.allocate(1);
+    DataAirLoop::AirLoopControlInfo.allocate(1);
+    DataHeatBalance::ZoneIntGain.allocate(1);
 
-	DataHeatBalance::Zone.allocate( 1 );
-	DataSizing::OARequirements.allocate( 1 );
-	DataAirLoop::AirLoopControlInfo.allocate( 1 );
-	DataHeatBalance::ZoneIntGain.allocate( 1 );
+    DataHeatBalance::Zone(1).FloorArea = 10.0;
 
-	DataHeatBalance::Zone( 1 ).FloorArea = 10.0;
+    Damper.allocate(numOfDampers);
+    Damper(1).CtrlZoneNum = 1;
+    Damper(1).OARequirementsPtr = 1;
+    Damper(1).NoOAFlowInputFromUser = false;
+    Damper(1).ActualZoneNum = 1;
+    Damper(1).AirLoopNum = 1;
+    Damper(2).CtrlZoneNum = 1;
+    Damper(2).NoOAFlowInputFromUser = false;
+    Damper(2).OARequirementsPtr = 1;
+    Damper(2).ActualZoneNum = 1;
+    Damper(2).AirLoopNum = 1;
 
-	Damper.allocate( numOfDampers );
-	Damper( 1 ).CtrlZoneNum = 1;
-	Damper( 1 ).OARequirementsPtr = 1;
-	Damper( 1 ).NoOAFlowInputFromUser = false;
-	Damper( 1 ).ActualZoneNum = 1;
-	Damper( 1 ).AirLoopNum = 1;
-	Damper( 2 ).CtrlZoneNum = 1;
-	Damper( 2 ).NoOAFlowInputFromUser = false;
-	Damper( 2 ).OARequirementsPtr = 1;
-	Damper( 2 ).ActualZoneNum = 1;
-	Damper( 2 ).AirLoopNum = 1;
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-	DataZoneEquipment::ZoneEquipConfig.allocate( 1 );
-	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum.allocate( 1 );
-	DataZoneEquipment::ZoneEquipConfig( 1 ).InletNodeAirLoopNum( 1 ) = 1;
+    DataAirLoop::AirLoopFlow.allocate(1);
+    DataAirLoop::AirLoopFlow(1).OAFrac = 0.5;
+    DataAirLoop::AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
-	DataAirLoop::AirLoopFlow.allocate( 1 );
-	DataAirLoop::AirLoopFlow( 1 ).OAFrac = 0.5;
-	DataAirLoop::AirLoopControlInfo( 1 ).AirLoopDCVFlag = true;
+    DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
+    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
+    DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
+    DataEnvironment::StdRhoAir = 1.20;
+    DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
 
-	DataSizing::OARequirements( 1 ).Name = "CM DSOA WEST ZONE";
-	DataSizing::OARequirements( 1 ).OAFlowMethod = DataSizing::OAFlowSum;
-	DataSizing::OARequirements( 1 ).OAFlowPerPerson = 0.003149;
-	DataSizing::OARequirements( 1 ).OAFlowPerArea = 0.000407;
-	DataEnvironment::StdRhoAir = 1.20;
-	DataHeatBalance::ZoneIntGain( 1 ).NOFOCC = 0.1;
+    DualDuct::CalcOAMassFlow(1, SAMassFlow, AirLoopOAFrac);
+    EXPECT_NEAR(0.01052376, SAMassFlow, 0.00001);
+    EXPECT_NEAR(0.5, AirLoopOAFrac, 0.00001);
 
-	DualDuct::CalcOAMassFlow( 1, SAMassFlow, AirLoopOAFrac );
-	EXPECT_NEAR( 0.01052376, SAMassFlow, 0.00001 );
-	EXPECT_NEAR( 0.5, AirLoopOAFrac, 0.00001 );
+    DualDuct::CalcOAOnlyMassFlow(2, OAMassFlow);
+    EXPECT_NEAR(0.004884, OAMassFlow, 0.00001);
 
-	DualDuct::CalcOAOnlyMassFlow( 2, OAMassFlow );
-	EXPECT_NEAR( 0.004884, OAMassFlow, 0.00001 );
+    // Cleanup
+    DataHeatBalance::Zone.deallocate();
+    DataSizing::OARequirements.deallocate();
+    DataAirLoop::AirLoopControlInfo.deallocate();
+    DataHeatBalance::ZoneIntGain.deallocate();
 
-	// Cleanup
-	DataHeatBalance::Zone.deallocate( );
-	DataSizing::OARequirements.deallocate( );
-	DataAirLoop::AirLoopControlInfo.deallocate( );
-	DataHeatBalance::ZoneIntGain.deallocate( );
-
-	Damper.deallocate( );
-	DataZoneEquipment::ZoneEquipConfig.deallocate( );
-	DataAirLoop::AirLoopFlow.deallocate( );
-
+    Damper.deallocate();
+    DataZoneEquipment::ZoneEquipConfig.deallocate();
+    DataAirLoop::AirLoopFlow.deallocate();
 }
 
-//TEST_F( EnergyPlusFixture, AirTerminalDualDuct_GetInputTest ) {
+// TEST_F( EnergyPlusFixture, AirTerminalDualDuct_GetInputTest ) {
 //
 //		bool ErrorsFound( false );
 //
@@ -307,5 +306,3 @@ TEST_F( EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir ) {
 //			EXPECT_GT(0, DualDuct::Damper(i).ADUNum);
 //		}
 //}
-
-
