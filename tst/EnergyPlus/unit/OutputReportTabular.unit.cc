@@ -56,24 +56,24 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -91,7 +91,6 @@ using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::OutputProcessor;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
-
 
 TEST( OutputReportTabularTest, ConfirmSetUnitsStyleFromString )
 {
@@ -141,7 +140,6 @@ TEST( OutputReportTabularTest, RealToStr )
 	EXPECT_EQ( " 123456.7890", RealToStr( 123456.789, 4 ) );
 
 	EXPECT_EQ( "0.123457E+06", RealToStr( 123456.789, 5 ) );
-
 }
 
 TEST(OutputReportTabularTest, isNumber)
@@ -209,9 +207,7 @@ TEST(OutputReportTabularTest, unitsFromHeading)
 	unitString = "Fictional field {nonsense}";
 	EXPECT_EQ(0, unitsFromHeading(unitString));
 	EXPECT_EQ("Fictional field {nonsense}", unitString);
-
 }
-
 
 TEST(OutputReportTabularTest, ConfirmResourceWarning)
 {
@@ -221,11 +217,14 @@ TEST(OutputReportTabularTest, ConfirmResourceWarning)
 		ResourceWarningMessage("Electricity [kWh]"));
 	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Natural Gas [kWh]",
 		ResourceWarningMessage("Natural Gas [kWh]"));
-	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Additional Fuel [kWh]",
+    EXPECT_EQ(
+        "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Additional Fuel [kWh]",
 		ResourceWarningMessage("Additional Fuel [kWh]"));
-	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Cooling [kBtu]",
+    EXPECT_EQ(
+        "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Cooling [kBtu]",
 		ResourceWarningMessage("District Cooling [kBtu]"));
-	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Heating [kBtu]",
+    EXPECT_EQ(
+        "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Heating [kBtu]",
 		ResourceWarningMessage("District Heating [kBtu]"));
 	EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Water [GJ]",
 		ResourceWarningMessage("Water [GJ]"));
@@ -244,7 +243,6 @@ TEST(OutputReportTabularTest, ConfirmWaterConversion)
 	EXPECT_EQ(13.756, WaterConversionFunct(481.46, 35));
 	EXPECT_EQ(-2, WaterConversionFunct(-12, 6));
 	EXPECT_NE(15, WaterConversionFunct(135, 5));
-
 }
 
 TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
@@ -315,8 +313,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 	EXPECT_EQ( 1.0, curConversionFactor );
 	EXPECT_EQ( 0.0, curConversionOffset );
 
-	std::vector<std::string> units = {
-		"[ ]",
+    std::vector<std::string> units = {"[ ]",
 		"[%]",
 		"[]",
 		"[A]",
@@ -361,16 +358,13 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion )
 		"[W/m2-C]",
 		"[W/m2-K]",
 		"[W/W]",
-		"[W]"
-	};
+                                      "[W]"};
 
 	for ( auto u : units ) {
 		LookupSItoIP( u, indexUnitConv, curUnits );
 		EXPECT_NE( indexUnitConv, 0 );
 	}
-
 }
-
 
 TEST_F( EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH )
 {
@@ -396,9 +390,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH )
 	LookupJtokWH( varNameWithUnits, indexUnitConv, curUnits );
 	EXPECT_EQ( 94, indexUnitConv );
 	EXPECT_EQ( "Electricty [kWh/m2]", curUnits );
-
 }
-
 
 TEST( OutputReportTabularTest, GetColumnUsingTabs )
 {
@@ -472,7 +464,6 @@ TEST( OutputReportTabularTest, GetColumnUsingTabs )
 	EXPECT_EQ( "", GetColumnUsingTabs( inString, 5 ) );
 	EXPECT_EQ( "", GetColumnUsingTabs( inString, 6 ) );
 }
-
 }
 
 TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTest )
@@ -618,7 +609,6 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTe
 
 	// surfDelaySeq.allocate( TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, TotSurfaces );
 	// EXPECT_EQ( surfDelaySeq.size(), 3360u );
-
 }
 
 TEST( OutputReportTabularTest, ConfirmConvertToEscaped )
@@ -663,7 +653,6 @@ TEST( OutputReportTabularTest, ConvertUnicodeToUTF8 )
 	EXPECT_EQ( "", ConvertUnicodeToUTF8( std::stoul( "0x1FFFFF", nullptr, 16 ) ) );
 }
 
-
 TEST( OutputReportTabularTest, GetUnitSubStringTest )
 {
 	ShowMessage( "Begin Test: OutputReportTabularTest, GetUnitSubStringTest" );
@@ -677,7 +666,6 @@ TEST( OutputReportTabularTest, GetUnitSubStringTest )
 	EXPECT_EQ( "W", GetUnitSubString( "This is a column header with units [W] " ) );
 	EXPECT_EQ( "K/M", GetUnitSubString( "This is a column header with units [K/M] and trailing text." ) );
 }
-
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 {
@@ -1436,7 +1424,9 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 	// leaving a little wiggle room on these
 	EXPECT_NEAR( 10.0, ( DXCoils::DXCoil( 2 ).RatedTotCap( 1 ) / DXCoils::DXCoil( 1 ).RatedTotCap( 1 ) ), 0.00001 );
 	EXPECT_NEAR( 10.0, ( DXCoils::DXCoil( 2 ).RatedAirVolFlowRate( 1 ) / DXCoils::DXCoil( 1 ).RatedAirVolFlowRate( 1 ) ), 0.00001 );
-	EXPECT_NEAR( 10.0, ( DataZoneEnergyDemands::ZoneSysEnergyDemand( 2 ).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).TotalOutputRequired ), 0.00001 );
+    EXPECT_NEAR(
+        10.0, (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
+        0.00001);
 
 	DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 	DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
@@ -1497,7 +1487,6 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest )
 	EXPECT_NEAR( 10.0, ( DataHeatBalance::ZonePreDefRep( 2 ).SHGSAnEquipAdd / DataHeatBalance::ZonePreDefRep( 1 ).SHGSAnEquipAdd ), 0.00001 );
 	EXPECT_NEAR( 10.0, ( DataHeatBalance::ZonePreDefRep( 2 ).SHGSAnOtherRem / DataHeatBalance::ZonePreDefRep( 1 ).SHGSAnOtherRem ), 0.00001 );
 	EXPECT_NEAR( 10.0, ( DataHeatBalance::ZonePreDefRep( 2 ).clPeak / DataHeatBalance::ZonePreDefRep( 1 ).clPeak ), 0.00001 );
-
 }
 
 TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
@@ -2087,7 +2076,6 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		" ,                         !- Fraction of Autosized Heating Design Capacity",
 		" OnOff;                    !- Central Cooling Capacity Control Method",
 
-
 		"AirLoopHVAC,",
 		"  DOAS,                    !- Name",
 		"  ,                        !- Controller List Name",
@@ -2477,7 +2465,6 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 	UpdateTabularReports( OutputReportTabular::stepTypeHVAC );
 
 	EXPECT_NEAR( 1.86168, DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow, 0.0001 );
-
 }
 
 //TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
@@ -3066,7 +3053,6 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 		//" ,                         !- Fraction of Autosized Heating Design Capacity",
 		//" OnOff;                    !- Central Cooling Capacity Control Method",
 
-
 		//"AirLoopHVAC,",
 		//"  DOAS,                    !- Name",
 		//"  ,                        !- Controller List Name",
@@ -3447,7 +3433,8 @@ TEST_F( EnergyPlusFixture, AirloopHVAC_ZoneSumTest )
 
 	//ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
-	//EXPECT_EQ( 10.0, ( Zone( 2 ).Volume * Zone( 2 ).Multiplier * Zone( 2 ).ListMultiplier ) / ( Zone( 1 ).Volume * Zone( 1 ).Multiplier * Zone( 1 ).ListMultiplier ) );
+// EXPECT_EQ( 10.0, ( Zone( 2 ).Volume * Zone( 2 ).Multiplier * Zone( 2 ).ListMultiplier ) / ( Zone( 1 ).Volume * Zone( 1 ).Multiplier * Zone( 1
+// ).ListMultiplier ) );
 
 	//DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 	//DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
@@ -3476,9 +3463,12 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
+                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
+                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
+                        "Exterior Lights", "General");
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 0.25;
@@ -3506,7 +3496,6 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering )
 
 	GatherMonthlyResultsForTimestep( 1 );
 	EXPECT_EQ( extLitUse * 1, MonthlyColumns( 1 ).reslt( 12 ) );
-
 }
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
@@ -3514,9 +3503,12 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
+                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
+                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
+                        "Exterior Lights", "General");
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 1.0;
@@ -3560,7 +3552,6 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering )
 	UpdateDataandReport( 1 );
 	GatherBEPSResultsForTimestep( 1 );
 	EXPECT_EQ( extLitUse * 3, gatherEndUseBEPS( 1, endUseExteriorLights ) );
-
 }
 
 TEST_F( EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep )
@@ -3662,28 +3653,16 @@ TEST_F( EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep )
 	EXPECT_EQ( 39., gatherDemandEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
 	EXPECT_EQ( 42., gatherDemandIndEndUseSub( subEndUseNum, endUseNum, resourceNum ) );
 
-
 	meterNumEndUseSubBEPS.deallocate();
 	gatherDemandEndUseSub.deallocate();
 	gatherDemandIndEndUseSub.deallocate();
-
-
 }
-
-
 
 TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 {
-	std::string const idf_objects = delimited_string( {
-		"Version,8.3;",
-		"Output:Table:TimeBins,",
-		"System1, !- Key Value",
-		"Some Temperature Variable, !- Variable Name",
-		"0.00, !- Interval Start",
-		"0.20, !- Interval Size",
-		"5,                       !- Interval Count",
-		"Always1; !- Schedule Name"
-	} );
+    std::string const idf_objects = delimited_string(
+        {"Version,8.3;", "Output:Table:TimeBins,", "System1, !- Key Value", "Some Temperature Variable, !- Variable Name", "0.00, !- Interval Start",
+         "0.20, !- Interval Size", "5,                       !- Interval Count", "Always1; !- Schedule Name"});
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -3699,7 +3678,6 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 	EXPECT_EQ( OutputTableBinned( 1 ).intervalCount, 5 );
 	EXPECT_EQ( OutputTableBinned( 1 ).ScheduleName, "ALWAYS1" );
 }
-
 
 //TEST_F( EnergyPlusFixture, FinAndOverhangCount )
 //{
@@ -4839,7 +4817,6 @@ TEST_F( EnergyPlusFixture, OutputTableTimeBins_GetInput )
 	//EXPECT_EQ( "1", RetrievePreDefTableEntry( pdchSurfCntTot, "Fin" ) );
 	//EXPECT_EQ( "1", RetrievePreDefTableEntry( pdchSurfCntExt, "Fin" ) );
 
-
 //}
 
 //TEST_F( EnergyPlusFixture, TubularDaylightDiffuserCount )
@@ -5946,12 +5923,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularTest_PredefinedTableRowMatchingTes
 	PreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING", 2000., 2 );
 	EXPECT_EQ( "1000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting" ) );
 	EXPECT_EQ( "2000.00", RetrievePreDefTableEntry( pdchLeedPerfElEneUse, "EXTERIOR LIGHTING" ) );
-
 }
-
-
-
-
 
 TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 {
@@ -5969,8 +5941,8 @@ TEST( OutputReportTabularTest, GetUnitSubstring_Test )
 	EXPECT_EQ( "", GetUnitSubString( "[] String with empty unit string at beginning" ) );
 }
 
-
-TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
+TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
+{
 	EnergyPlus::sqlite->sqliteBegin();
 	EnergyPlus::sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
 
@@ -6050,7 +6022,8 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	EnergyPlus::sqlite->sqliteCommit();
 
 	EXPECT_EQ( 123ul, tabularData.size() );
-	// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value
+    // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
+    // columnId, value
 	EXPECT_EQ( "       12.30", tabularData[3][10] );
 	EXPECT_EQ( "       45.60", tabularData[4][10] );
 	// envelope - window-wall ratio subtable
@@ -6075,9 +6048,7 @@ TEST_F( SQLiteFixture, WriteVeriSumTableAreasTest ) {
 	EXPECT_EQ( "      500.00", tabularData[88][10] ); // above ground gross floor area
 	EXPECT_EQ( "      100.00", tabularData[98][10] ); // window glass area
 	EXPECT_EQ( "      114.72", tabularData[103][10] ); // window opening area
-
 }
-
 
 TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
 {
@@ -6099,9 +6070,12 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
 
 	Real64 extLitUse;
 
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity", "Exterior Lights", "General" );
-	SetupOutputVariable( "Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity", "Exterior Lights", "General" );
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite1", _, "Electricity",
+                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite2", _, "Electricity",
+                        "Exterior Lights", "General");
+    SetupOutputVariable("Exterior Lights Electric Energy", OutputProcessor::Unit::J, extLitUse, "Zone", "Sum", "Lite3", _, "Electricity",
+                        "Exterior Lights", "General");
 
 	DataGlobals::DoWeathSim = true;
 	DataGlobals::TimeStepZone = 0.25;
@@ -6111,9 +6085,7 @@ TEST_F( EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder )
 	InitializeTabularMonthly( );
 
 	EXPECT_TRUE(isInvalidAggregationOrder());
-
 }
-
 
 TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 {
@@ -6173,7 +6145,6 @@ TEST( OutputReportTabularTest, CollectPeakZoneConditions_test )
 	EXPECT_NEAR( compLoad.totCapPerArea, 600. / 12., 0.0001 );
 	EXPECT_NEAR( compLoad.airflowPerTotCap, 3.3 / 600., 0.0001 );
 	EXPECT_NEAR( compLoad.areaPerTotCap, 12. / 600., 0.0001 );
-
 }
 
 TEST( OutputReportTabularTest, ComputeEngineeringChecks_test )
@@ -6194,7 +6165,6 @@ TEST( OutputReportTabularTest, ComputeEngineeringChecks_test )
 	EXPECT_EQ( compLoad.totCapPerArea, 800./13. );
 	EXPECT_EQ( compLoad.airflowPerTotCap, 0.50/800. );
 	EXPECT_EQ( compLoad.areaPerTotCap, 13./800. );
-
 }
 
 TEST( OutputReportTabularTest, GetZoneComponentAreas_test )
@@ -6301,7 +6271,6 @@ TEST( OutputReportTabularTest, GetZoneComponentAreas_test )
 	EXPECT_EQ( 28., areas( 1 ).grndCntFloor );
 	EXPECT_EQ( 29., areas( 1 ).fenestration );
 	EXPECT_EQ( 29., areas( 1 ).door );
-
 }
 
 TEST( OutputReportTabularTest, CombineLoadCompResults_test )
@@ -6335,7 +6304,6 @@ TEST( OutputReportTabularTest, CombineLoadCompResults_test )
 	EXPECT_EQ( true, compLoadTotal.cellUsed( 3, 17 ) );
 	EXPECT_EQ( 17., compLoadTotal.outsideWebBulb );
 	EXPECT_EQ( 33., compLoadTotal.diffDesignPeak );
-
 }
 
 TEST( OutputReportTabularTest, AddTotalRowsForLoadSummary_test )
@@ -6370,7 +6338,6 @@ TEST( OutputReportTabularTest, AddTotalRowsForLoadSummary_test )
 
 	EXPECT_EQ( 13. / 5., compLoad.cells( cPerArea, rLights ) );
 	EXPECT_EQ( 24. / 5., compLoad.cells( cPerArea, rRefrig ) );
-
 }
 
 TEST( OutputReportTabularTest, LoadSummaryUnitConversion_test )
@@ -6411,9 +6378,7 @@ TEST( OutputReportTabularTest, LoadSummaryUnitConversion_test )
 	EXPECT_EQ( 0.7 * airFlowConversion, compLoad.mainFanAirFlow );
 	EXPECT_EQ( 0.2 * airFlowPerAreaConversion / powerConversion, compLoad.airflowPerTotCap );
 	EXPECT_EQ( 0.15 * powerConversion / areaConversion, compLoad.totCapPerArea );
-
 }
-
 
 TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
 {
@@ -6468,7 +6433,6 @@ TEST( OutputReportTabularTest, CreateListOfZonesForAirLoop_test )
 	EXPECT_EQ( 13, compLoad.zoneIndices( 3 ) );
 	EXPECT_EQ( 14, compLoad.zoneIndices( 4 ) );
 	EXPECT_EQ( 0, compLoad.zoneIndices( 5 ) );
-
 }
 
 TEST( OutputReportTabularTest, GetDelaySequencesTwice_test )
@@ -6533,16 +6497,19 @@ TEST( OutputReportTabularTest, GetDelaySequencesTwice_test )
 
 	netSurfRadSeq( coolDesSelected, 1, 1 ) = 0.05;
 
-	GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
+    GetDelaySequences(coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool,
+                      lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool);
 
 	EXPECT_EQ( 0.83, feneCondInstantSeq( coolDesSelected, 1, 1 )); // the first time the subtraction operation should have occurred
 
-	GetDelaySequences( coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool, lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool );
+    GetDelaySequences(coolDesSelected, true, iZone, peopleDelaySeqCool, equipDelaySeqCool, hvacLossDelaySeqCool, powerGenDelaySeqCool,
+                      lightDelaySeqCool, feneSolarDelaySeqCool, feneCondInstantSeq, surfDelaySeqCool);
 
-	EXPECT_EQ( 0.83, feneCondInstantSeq( coolDesSelected, 1, 1 )); // the second time the subtraction should not have happened since it is only adjusted once so the value should be the same.
-
+    EXPECT_EQ(0.83,
+              feneCondInstantSeq(
+                  coolDesSelected, 1,
+                  1)); // the second time the subtraction should not have happened since it is only adjusted once so the value should be the same.
 }
-
 
 TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay )
 {
@@ -6573,8 +6540,4 @@ TEST_F( SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLo
 	EXPECT_EQ( 460ul, tabularData.size() );
 	EXPECT_EQ( 76ul, strings.size() );
 	EXPECT_EQ( "AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
-
 }
-
-
-

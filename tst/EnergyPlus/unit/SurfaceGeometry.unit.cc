@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -64,7 +64,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::HeatBalanceManager;
 //using namespace ObjexxFCL;
-
 
 TEST_F( EnergyPlusFixture, BaseSurfaceRectangularTest )
 {
@@ -362,7 +361,6 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SurfaceShape )
 		"    0.95, 0.0, 0.05,         !- X,Y,Z ==> Vertex 2 {m}",
 		"    0.90, 0.0, 0.15;         !- X,Y,Z ==> Vertex 3 {m}",
 
-
 		" BuildingSurface:Detailed,",
 		"    Surface 10 - Polygonal,  !- Name",
 		"    Floor,                   !- Surface Type",
@@ -546,7 +544,6 @@ TEST_F( EnergyPlusFixture, DataSurfaces_SurfaceShape )
 //	Surface( 13 ).Name = "Surface 10 - Polygonal"
 	ProcessSurfaceVertices( 13, ErrorsFound );
 	EXPECT_EQ( SurfaceShape::Polygonal, Surface( 13 ).Shape );
-
 }
 
 TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
@@ -588,13 +585,15 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	SubSurface.Azimuth = 45.;
 	SubSurface.Tilt = 0.;
 	SubSurface.NewellSurfaceNormalVector.x = 0.;
-	SubSurface.NewellSurfaceNormalVector.y = 1.; // This doesn't match the tilt and azimuth, but want it to be different so tilt and azimuth tests are executed
+    SubSurface.NewellSurfaceNormalVector.y =
+        1.; // This doesn't match the tilt and azimuth, but want it to be different so tilt and azimuth tests are executed
 	SubSurface.NewellSurfaceNormalVector.z = 1.;
 	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
 	EXPECT_FALSE( surfaceError );
 	EXPECT_FALSE( has_err_output() );
 
-	//Case 4 - Base surface is not horizontal and subsurface is different by 45 degrees azimuth and tilt - should be warning error message but surfaceError=false
+    // Case 4 - Base surface is not horizontal and subsurface is different by 45 degrees azimuth and tilt - should be warning error message but
+    // surfaceError=false
 	surfaceError = false;
 	BaseSurface.Azimuth = 90.;
 	BaseSurface.Tilt = 90.;
@@ -610,7 +609,6 @@ TEST_F( EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm )
 	checkSubSurfAzTiltNorm( BaseSurface, SubSurface, surfaceError );
 	EXPECT_FALSE( surfaceError );
 	EXPECT_TRUE( has_err_output() );
-
 }
 
 TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
@@ -677,7 +675,6 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 		"    11;                      !- Elevation {m}",
 		" ",
 
-
 	} );
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
@@ -738,7 +735,6 @@ TEST_F( EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface )
 	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).x, 0. );
 	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).y, 0. );
 	EXPECT_EQ( SurfaceTmp( TotSurfaces ).Vertex( 4 ).z, 2.4 );
-
 }
 
 TEST_F( EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealisticZ )
@@ -772,7 +768,6 @@ TEST_F( EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealist
 	EXPECT_EQ( Surface( 1 ).Centroid.x, 667. );
 	EXPECT_EQ( Surface( 1 ).Centroid.y, 0. );
 	EXPECT_EQ( Surface( 1 ).Centroid.z, 10. );
-
 }
 
 TEST_F( EnergyPlusFixture, MakeEquivalentRectangle )
@@ -955,7 +950,6 @@ TEST_F( EnergyPlusFixture, MakeEquivalentRectangle )
 	// (3) parallelogram window
 	EXPECT_NEAR( 8.08, Surface( 4 ).Width, 0.01 );
 	EXPECT_NEAR( 1.13, Surface( 4 ).Height, 0.01 );
-
 }
 
 TEST( SurfaceGeometryUnitTests, distance )
@@ -998,9 +992,7 @@ TEST( SurfaceGeometryUnitTests, distance )
 	a.z = -4.;
 
 	EXPECT_NEAR( 26.7955, distance( a, b ), 0.0001 );
-
 }
-
 
 TEST( SurfaceGeometryUnitTests, isAlmostEqual3dPt )
 {
@@ -1159,7 +1151,6 @@ TEST( SurfaceGeometryUnitTests, isPointOnLineBetweenPoints )
 	t.z = -4.5;
 
 	EXPECT_TRUE( isPointOnLineBetweenPoints( a, b, t ) );
-
 }
 
 TEST( SurfaceGeometryUnitTests, findIndexOfVertex )
@@ -1203,7 +1194,6 @@ TEST( SurfaceGeometryUnitTests, findIndexOfVertex )
 	a.z = 3.03;
 
 	EXPECT_EQ( -1, findIndexOfVertex( a, list ) ); //not found
-
 }
 
 TEST( SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test )
@@ -1275,7 +1265,6 @@ TEST( SurfaceGeometryUnitTests, listOfFacesFacingAzimuth_test )
 	EXPECT_EQ( 8, results.at( 0 ) );
 	EXPECT_EQ( 9, results.at( 1 ) );
 }
-
 
 TEST( SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test )
 {
@@ -1401,9 +1390,7 @@ TEST( SurfaceGeometryUnitTests, areSurfaceHorizAndVert_test )
 	EXPECT_FALSE( isFloorHorizontal );
 	EXPECT_FALSE( isCeilingHorizontal );
 	EXPECT_FALSE( areWallsVertical );
-
 }
-
 
 TEST( SurfaceGeometryUnitTests, areWallHeightSame_test )
 {
@@ -1480,7 +1467,6 @@ TEST( SurfaceGeometryUnitTests, areWallHeightSame_test )
 
 	zonePoly.SurfaceFace( 3 ).FacePoints( 1 ).z = -0.4;
 	EXPECT_FALSE( areWallHeightSame( zonePoly ) );
-
 }
 
 TEST( SurfaceGeometryUnitTests, findPossibleOppositeFace_test )
@@ -1515,7 +1501,6 @@ TEST( SurfaceGeometryUnitTests, findPossibleOppositeFace_test )
 
 	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
 	zonePoly.SurfaceFace( 4 ).NSides = 4;
-
 
 	EXPECT_EQ( 3, findPossibleOppositeFace( zonePoly, 1 ) );
 	EXPECT_EQ( 1, findPossibleOppositeFace( zonePoly, 3 ) );
@@ -1552,7 +1537,6 @@ TEST( SurfaceGeometryUnitTests, findPossibleOppositeFace_test )
 
 	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 1 ) ); // not found
 	EXPECT_EQ( -1, findPossibleOppositeFace( zonePoly, 3 ) ); // not found
-
 }
 
 TEST( SurfaceGeometryUnitTests, areCornersEquidistant_test )
@@ -1609,7 +1593,6 @@ TEST( SurfaceGeometryUnitTests, areCornersEquidistant_test )
 
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 7.;
 	EXPECT_FALSE( areCornersEquidistant( zonePoly, 1, 2, dist ) );
-
 }
 
 TEST( SurfaceGeometryUnitTests, areOppositeWallsSame_test )
@@ -1677,7 +1660,6 @@ TEST( SurfaceGeometryUnitTests, areOppositeWallsSame_test )
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 0.;
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
 
-
 	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
 	zonePoly.SurfaceFace( 3 ).NSides = 4;
 	zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
@@ -1697,7 +1679,6 @@ TEST( SurfaceGeometryUnitTests, areOppositeWallsSame_test )
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).x = 0.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).y = 8.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 3.;
-
 
 	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
 	zonePoly.SurfaceFace( 4 ).NSides = 4;
@@ -1746,7 +1727,6 @@ TEST( SurfaceGeometryUnitTests, areOppositeWallsSame_test )
 
 	zonePoly.SurfaceFace( 4 ).FacePoints( 3 ).x = 11.; //move one corner out so distances are not all equal
 	EXPECT_FALSE( areOppositeWallsSame( zonePoly, area, dist ) ); // now neither wall matches
-
 }
 
 TEST( SurfaceGeometryUnitTests, areFloorAndCeilingSame_test )
@@ -1807,7 +1787,6 @@ TEST( SurfaceGeometryUnitTests, areFloorAndCeilingSame_test )
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).x = 7.; // move one corner
 
 	EXPECT_FALSE( areFloorAndCeilingSame( zonePoly ) );
-
 }
 
 TEST( SurfaceGeometryUnitTests, makeListOfUniqueVertices_test )
@@ -1858,7 +1837,6 @@ TEST( SurfaceGeometryUnitTests, makeListOfUniqueVertices_test )
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 0.;
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
 
-
 	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
 	zonePoly.SurfaceFace( 3 ).NSides = 4;
 	zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
@@ -1878,7 +1856,6 @@ TEST( SurfaceGeometryUnitTests, makeListOfUniqueVertices_test )
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).x = 0.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).y = 8.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 3.;
-
 
 	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
 	zonePoly.SurfaceFace( 4 ).NSides = 4;
@@ -1952,7 +1929,6 @@ TEST( SurfaceGeometryUnitTests, makeListOfUniqueVertices_test )
 	EXPECT_EQ( Vector( 0., 8., 0. ), uniqueVertices.at( 5 ) );
 	EXPECT_EQ( Vector( 10., 8., 3. ), uniqueVertices.at( 6 ) );
 	EXPECT_EQ( Vector( 10., 8., 0. ), uniqueVertices.at( 7 ) );
-
 }
 
 TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
@@ -2003,7 +1979,6 @@ TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 0.;
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
 
-
 	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
 	zonePoly.SurfaceFace( 3 ).NSides = 4;
 	zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
@@ -2023,7 +1998,6 @@ TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).x = 0.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).y = 8.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 3.;
-
 
 	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
 	zonePoly.SurfaceFace( 4 ).NSides = 4;
@@ -2102,9 +2076,7 @@ TEST( SurfaceGeometryUnitTests, numberOfEdgesNotTwoForEnclosedVolumeTest_test )
 
 	std::vector<EdgeOfSurf> e2 = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
 	EXPECT_EQ( size_t( 4 ), e2.size() );
-
 }
-
 
 TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test )
 {
@@ -2176,7 +2148,6 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).y = 0.;
 	zonePoly.SurfaceFace( 2 ).FacePoints( 4 ).z = 3.;
 
-
 	zonePoly.SurfaceFace( 3 ).SurfNum = 3;
 	zonePoly.SurfaceFace( 3 ).NSides = 4;
 	zonePoly.SurfaceFace( 3 ).FacePoints.allocate( 4 );
@@ -2196,7 +2167,6 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).x = 0.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).y = 8.;
 	zonePoly.SurfaceFace( 3 ).FacePoints( 4 ).z = 3.;
-
 
 	zonePoly.SurfaceFace( 4 ).SurfNum = 4;
 	zonePoly.SurfaceFace( 4 ).NSides = 4;
@@ -2266,11 +2236,11 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	std::vector<EdgeOfSurf> e1 = edgesNotTwoForEnclosedVolumeTest( zonePoly, uniqueVertices );
 	EXPECT_EQ( size_t( 6 ), e1.size() );
 
-	DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints( zonePoly, uniqueVertices ); // this is done after initial test since it is computationally intensive.
+    DataVectorTypes::Polyhedron updatedZonePoly = updateZonePolygonsForMissingColinearPoints(
+        zonePoly, uniqueVertices); // this is done after initial test since it is computationally intensive.
 
 	std::vector<EdgeOfSurf> e2 = edgesNotTwoForEnclosedVolumeTest( updatedZonePoly, uniqueVertices );
 	EXPECT_EQ( size_t( 0 ), e2.size() );
-
  }
 
  TEST( SurfaceGeometryUnitTests, insertVertexOnFace_test )
@@ -2402,7 +2372,6 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	 EXPECT_EQ( Vector( 4., 4., 4. ), faceOfPoly.FacePoints( 4 ) );
 
 	 faceOfPoly.FacePoints.deallocate();
-
  }
 
  TEST( SurfaceGeometryUnitTests, isEnclosedVolume_SimpleBox_test )
@@ -2468,7 +2437,6 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	 // leave gap
 	 zonePoly.SurfaceFace( 1 ).FacePoints( 3 ) = Vector( 9., 0., 0. );
 	 EXPECT_FALSE( isEnclosedVolume( zonePoly, edgeNot2 ) );
-
  }
 
  TEST( SurfaceGeometryUnitTests, isEnclosedVolume_BoxWithSplitSide_test )
@@ -2544,9 +2512,7 @@ TEST( SurfaceGeometryUnitTests, updateZonePolygonsForMissingColinearPoints_test 
 	 // leave gap
 	 zonePoly.SurfaceFace( 1 ).FacePoints( 3 ) = Vector( 9., 0., 0. );
 	 EXPECT_FALSE( isEnclosedVolume( zonePoly, edgeNot2 ) );
-
  }
-
 
 TEST_F( EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test )
 {
@@ -2618,8 +2584,6 @@ TEST_F( EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test )
 
 	 CalculateZoneVolume( enteredCeilingHeight );
 	 EXPECT_EQ( 240., Zone(1).Volume );
-
-
  }
 
 TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test )
@@ -2686,9 +2650,7 @@ TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test )
 
 	CalculateZoneVolume( enteredCeilingHeight );
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
-
 }
-
 
 TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test )
 {
@@ -2754,7 +2716,6 @@ TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test )
 
 	CalculateZoneVolume( enteredCeilingHeight );
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
-
 }
 
 TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test )
@@ -2815,7 +2776,6 @@ TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test )
 	Surface( 5 ).Vertex( 2 ) = Vector( 0., 0., 3. );
 	Surface( 5 ).Vertex( 3 ) = Vector( 10., 0., 3. );
 	Surface( 5 ).Vertex( 4 ) = Vector( 10., 8., 3. );
-
 
 	Zone( 1 ).CeilingArea = 80.;
 	Zone( 1 ).CeilingHeight = 3.;
@@ -2880,7 +2840,6 @@ TEST_F( EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test )
 	Surface( 4 ).Vertex( 2 ) = Vector( 10., 0., 0. );
 	Surface( 4 ).Vertex( 3 ) = Vector( 10., 8., 0. );
 	Surface( 4 ).Vertex( 4 ) = Vector( 10., 8., 3. );
-
 
 	CalculateZoneVolume( enteredCeilingHeight );
 	EXPECT_EQ( 240., Zone( 1 ).Volume );
@@ -2994,7 +2953,4 @@ TEST_F( EnergyPlusFixture, MakeRectangularVertices )
 	EXPECT_NEAR( 0., SurfaceTmp( surfNum ).Vertex( 4 ).x, 0.001 );
 	EXPECT_NEAR( -5., SurfaceTmp( surfNum ).Vertex( 4 ).y, 0.001 );
 	EXPECT_NEAR( 3., SurfaceTmp( surfNum ).Vertex( 4 ).z, 0.001 );
-
-
 }
-

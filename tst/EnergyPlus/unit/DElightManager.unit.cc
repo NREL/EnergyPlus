@@ -52,14 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DaylightingManager.hh>
 #include <DElightManagerF.hh>
 #include <DataDaylighting.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataSurfaces.hh>
+#include <DaylightingManager.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -74,7 +73,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DElightManagerF;
 using namespace EnergyPlus::DataDaylighting;
-
 
 TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Test )
 {
@@ -297,7 +295,6 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 		"ScheduleTypeLimits,",
 		"    Any Number;              !- Name",
 
-
 	} );
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
@@ -331,7 +328,6 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 	SurfaceGeometry::SetupZoneGeometry( foundErrors ); // this calls GetSurfaceData()
 	EXPECT_FALSE( foundErrors ); // expect no errors
 
-
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 	ScheduleManager::ProcessScheduleInput();
@@ -360,7 +356,4 @@ TEST_F( EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Te
 	EXPECT_EQ( "ZN001:WALL001", DElightComplexFene( 1 ).surfName );
 	EXPECT_EQ( "ZN001:WALL001:WIN001", DElightComplexFene( 1 ).wndwName );
 	EXPECT_EQ( 0. , DElightComplexFene( 1 ).feneRota );
-
 }
-
-

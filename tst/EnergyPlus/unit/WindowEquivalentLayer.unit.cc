@@ -57,19 +57,19 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
-#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
@@ -197,7 +197,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput )
 	InitEquivalentLayerWindowCalculations();
 	EQLNum = DataHeatBalance::Construct( ConstrNum ).EQLConsPtr;
 	EXPECT_EQ( CFS( EQLNum ).L( CFS( EQLNum ).VBLayerPtr ).CNTRL, WindowEquivalentLayer::lscVBNOBM );
-
 }
 
 TEST_F( EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar )

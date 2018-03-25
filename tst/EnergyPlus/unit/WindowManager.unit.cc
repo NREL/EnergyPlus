@@ -57,27 +57,27 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <WindowManager.hh>
 #include <ConvectionCoefficients.hh>
+#include <CurveManager.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataHeatBalance.hh>
+#include <DataIPShortCuts.hh>
 #include <DataSurfaces.hh>
 #include <ElectricPowerServiceManager.hh>
-#include <HeatBalanceManager.hh>
-#include <HeatBalanceIntRadExchange.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <Psychrometrics.hh>
-#include <SolarShading.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <DataIPShortCuts.hh>
-#include <CurveManager.hh>
+#include <HeatBalanceIntRadExchange.hh>
+#include <HeatBalanceManager.hh>
+#include <HeatBalanceSurfaceManager.hh>
+#include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SolarShading.hh>
+#include <WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -89,8 +89,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 	DataIPShortCuts::lAlphaFieldBlanks = true;
 
-	std::string const idf_objects = delimited_string({
-		"Version,8.4;",
+    std::string const idf_objects =
+        delimited_string({"Version,8.4;",
 		"Material,",
 		"  Concrete Block,          !- Name",
 		"  MediumRough,             !- Roughness",
@@ -183,9 +183,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 		"  1,                       !- Type",
 		"  1,                       !- Multiplier",
 		"  autocalculate,           !- Ceiling Height {m}",
-		"  autocalculate;           !- Volume {m3}"
-	});
-
+                          "  autocalculate;           !- Volume {m3}"});
 
 	ASSERT_TRUE(process_idf(idf_objects));
 
@@ -276,14 +274,18 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 		DataSurfaces::Surface( 1 ).Tilt = 180 - tiltSave;
 		DataSurfaces::Surface( 1 ).CosTilt = cos(DataSurfaces::Surface( winNum ).Tilt*DataGlobals::Pi/180);
 		DataSurfaces::Surface( 1 ).SinTilt = sin(DataSurfaces::Surface( winNum ).Tilt*DataGlobals::Pi/180);
-		ConvectionCoefficients::CalcISO15099WindowIntConvCoeff( winNum, outSurfTemp, T_out); // This subroutine sets the global HConvIn( 1 ) variable. We will use it to set the exterior natural convection.
+        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+            winNum, outSurfTemp,
+            T_out); // This subroutine sets the global HConvIn( 1 ) variable. We will use it to set the exterior natural convection.
 		h_exterior = h_exterior_f + DataHeatBalance::HConvIn( winNum ); // add natural convection
 
 		// revert tilt for interior natural convection calculations
 		DataSurfaces::Surface( 1 ).Tilt = tiltSave;
 		DataSurfaces::Surface( 1 ).CosTilt = cos(tiltSave*DataGlobals::Pi/180);
 		DataSurfaces::Surface( 1 ).SinTilt = sin(tiltSave*DataGlobals::Pi/180);
-		ConvectionCoefficients::CalcISO15099WindowIntConvCoeff( winNum, inSurfTemp, T_in); // This time it's actually being used as intended. HConvIn( 1 ) is referenced from the actual heat balance calculation.
+        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+            winNum, inSurfTemp,
+            T_in); // This time it's actually being used as intended. HConvIn( 1 ) is referenced from the actual heat balance calculation.
 
 		WindowManager::CalcWindowHeatBalance( winNum, h_exterior, inSurfTemp, outSurfTemp );
 
@@ -296,11 +298,9 @@ TEST_F(EnergyPlusFixture, WindowFrameTest )
 
 		outSurfTempPrev = outSurfTemp;
 		inSurfTempPrev = inSurfTemp;
-
 	}
 
 	EXPECT_GT(DataSurfaces::WinHeatLossRep( winNum ), DataSurfaces::WinHeatTransfer( winNum ));
-
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
@@ -324,7 +324,6 @@ TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
 	EXPECT_NEAR(tfp, 0.89455, 0.0001);
 	EXPECT_NEAR(rfp, 0.08323, 0.0001);
 	EXPECT_NEAR(rbp, 0.08323, 0.0001);
-
 }
 
 TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
@@ -332,8 +331,8 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	// GitHub issue 6037
 	bool ErrorsFound( false );
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.4;",
+    std::string const idf_objects =
+        delimited_string({"Version,8.4;",
 		"Material,",
 		"  Concrete Block,          !- Name",
 		"  MediumRough,             !- Roughness",
@@ -426,8 +425,7 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 		"  1,                       !- Type",
 		"  1,                       !- Multiplier",
 		"  autocalculate,           !- Ceiling Height {m}",
-		"  autocalculate;           !- Volume {m3}"
-	} );
+                          "  autocalculate;           !- Volume {m3}"});
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -580,7 +578,6 @@ TEST_F( EnergyPlusFixture, WindowManager_RefAirTempTest )
 	DataSurfaces::Surface( 1 ).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
 	WindowManager::CalcWindowHeatBalance( 2, DataHeatBalance::HConvIn( 2 ), inSurfTemp, outSurfTemp );
 	EXPECT_NEAR( 25.0, DataHeatBalance::TempEffBulkAir( 2 ), 0.0001 );
-
 }
 
 TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
@@ -658,7 +655,6 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 		"    -87.75,                  !- Longitude {deg}",
 		"    -6.00,                   !- Time Zone {hr}",
 		"    190.00;                  !- Elevation {m}",
-
 
 		"  SizingPeriod:DesignDay,",
 		"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
@@ -2387,13 +2383,17 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 	int NumAngles = 10 ; // Number of incident angles
 	Real64 sum;
 	// total transmittance
-	Array1D< Real64 > correctT ( NumAngles, { 0.529017128,0.472866571,0.370790548,0.248928459,0.138553744,0.061213244,0.020072976,0.00430128,0.00042861,0.0 } );
+    Array1D<Real64> correctT(
+        NumAngles, {0.529017128, 0.472866571, 0.370790548, 0.248928459, 0.138553744, 0.061213244, 0.020072976, 0.00430128, 0.00042861, 0.0});
 	// total reflectance
-	Array1D< Real64 > correctR ( NumAngles, { 0.097222311,0.194253146,0.36875691,0.57565985,0.762546964,0.89393376,0.964537901,0.99210584,0.99912202,1.00000000 } );
+    Array1D<Real64> correctR(
+        NumAngles, {0.097222311, 0.194253146, 0.36875691, 0.57565985, 0.762546964, 0.89393376, 0.964537901, 0.99210584, 0.99912202, 1.00000000});
 	// Layer 1 absortance
-	Array1D< Real64 > correctabs1 ( NumAngles, { 0.242079608,0.214464137,0.165811001,0.109778385,0.060620181,0.02682869,0.008920102,0.001979289,0.000219736,0.0 } );
+    Array1D<Real64> correctabs1(
+        NumAngles, {0.242079608, 0.214464137, 0.165811001, 0.109778385, 0.060620181, 0.02682869, 0.008920102, 0.001979289, 0.000219736, 0.0});
 	// Layer 2 absortance
-	Array1D< Real64 > correctabs2 ( NumAngles, { 0.131680954,0.118416146,0.094641541,0.065633305,0.03827911,0.018024306,0.006469021,0.001613591,0.000229628,0.0 } );
+    Array1D<Real64> correctabs2(
+        NumAngles, {0.131680954, 0.118416146, 0.094641541, 0.065633305, 0.03827911, 0.018024306, 0.006469021, 0.001613591, 0.000229628, 0.0});
 
 	for ( int i = 1; i <= NumAngles; i++ ) {
 		EXPECT_NEAR( correctT( i ), WindowManager::tsolPhi( i ), 0.0001 );
@@ -2406,7 +2406,6 @@ TEST_F( EnergyPlusFixture, SpectralAngularPropertyTest )
 
 	SurfaceGeometry::CosZoneRelNorth.deallocate( );
 	SurfaceGeometry::SinZoneRelNorth.deallocate( );
-
 }
 
 TEST_F( EnergyPlusFixture, WindowManager_SrdLWRTest )
@@ -2414,8 +2413,8 @@ TEST_F( EnergyPlusFixture, WindowManager_SrdLWRTest )
 	// GitHub issue 6037
 	bool ErrorsFound( false );
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.4;",
+    std::string const idf_objects =
+        delimited_string({"Version,8.4;",
 		"Material,",
 		"  Concrete Block,          !- Name",
 		"  MediumRough,             !- Roughness",
@@ -2529,8 +2528,7 @@ TEST_F( EnergyPlusFixture, WindowManager_SrdLWRTest )
 		"  1,                       !- Type",
 		"  1,                       !- Multiplier",
 		"  autocalculate,           !- Ceiling Height {m}",
-		"  autocalculate;           !- Volume {m3}"
-	} );
+                          "  autocalculate;           !- Volume {m3}"});
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 	ScheduleManager::ProcessScheduleInput();
@@ -2669,8 +2667,5 @@ TEST_F( EnergyPlusFixture, WindowManager_SrdLWRTest )
 
 	WindowManager::CalcWindowHeatBalance( 2, DataHeatBalance::HConvIn( 2 ), inSurfTemp, outSurfTemp );
 		// Test if LWR from surrounding surfaces correctly calculated
-	EXPECT_DOUBLE_EQ( StefanBoltzmann * 0.84 * 0.6 * ( pow_4( 25.0 + KelvinConv ) - pow_4( thetas( 1 ) ) ),
-		DataHeatBalSurface::QRadLWOutSrdSurfs( 2 ) );
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(2));
 }
-
-

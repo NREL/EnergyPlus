@@ -55,57 +55,55 @@
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, BBConvergeCheckTest )
-	{
+TEST_F(EnergyPlusFixture, BBConvergeCheckTest)
+{
 
-	int SimCompNum;
-	Real64 MaxFlow;
-	Real64 MinFlow;
-	bool FunctionResult;
+    int SimCompNum;
+    Real64 MaxFlow;
+    Real64 MinFlow;
+    bool FunctionResult;
 
-	// Test 1: Not a radiant/convective baseboard unit
-	SimCompNum = 1;
-	MaxFlow = 1.0;
-	MinFlow = 0.99999999;
-	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_FALSE( FunctionResult );
+    // Test 1: Not a radiant/convective baseboard unit
+    SimCompNum = 1;
+    MaxFlow = 1.0;
+    MinFlow = 0.99999999;
+    FunctionResult = BBConvergeCheck(SimCompNum, MaxFlow, MinFlow);
+    EXPECT_FALSE(FunctionResult);
 
-	// Test 2: Also not a radiant/convective baseboard unit
-	SimCompNum = 10;
-	MaxFlow = 1.0;
-	MinFlow = 0.99999999;
-	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_FALSE( FunctionResult );
+    // Test 2: Also not a radiant/convective baseboard unit
+    SimCompNum = 10;
+    MaxFlow = 1.0;
+    MinFlow = 0.99999999;
+    FunctionResult = BBConvergeCheck(SimCompNum, MaxFlow, MinFlow);
+    EXPECT_FALSE(FunctionResult);
 
-	// Test 3: One of the radiant/convective baseboard units but Max and Min too different
-	SimCompNum = 5;
-	MaxFlow = 1.0;
-	MinFlow = 0.9;
-	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_FALSE( FunctionResult );
+    // Test 3: One of the radiant/convective baseboard units but Max and Min too different
+    SimCompNum = 5;
+    MaxFlow = 1.0;
+    MinFlow = 0.9;
+    FunctionResult = BBConvergeCheck(SimCompNum, MaxFlow, MinFlow);
+    EXPECT_FALSE(FunctionResult);
 
-	// Test 4: One of the radiant/convective baseboard units and Max and Min almost the same
-	SimCompNum = 5;
-	MaxFlow = 1.0;
-	MinFlow = 0.9999999;
-	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_TRUE( FunctionResult );
+    // Test 4: One of the radiant/convective baseboard units and Max and Min almost the same
+    SimCompNum = 5;
+    MaxFlow = 1.0;
+    MinFlow = 0.9999999;
+    FunctionResult = BBConvergeCheck(SimCompNum, MaxFlow, MinFlow);
+    EXPECT_TRUE(FunctionResult);
 
-	// Test 5: The other radiant/convective baseboard units but Max and Min too different
-	SimCompNum = 6;
-	MaxFlow = 1.0;
-	MinFlow = 0.9;
-	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_FALSE( FunctionResult );
+    // Test 5: The other radiant/convective baseboard units but Max and Min too different
+    SimCompNum = 6;
+    MaxFlow = 1.0;
+    MinFlow = 0.9;
+    FunctionResult = BBConvergeCheck(SimCompNum, MaxFlow, MinFlow);
+    EXPECT_FALSE(FunctionResult);
 
-	// Test 6: The other radiant/convective baseboard units and Max and Min almost the same
-	SimCompNum = 6;
-	MaxFlow = 1.0;
-	MinFlow = 0.9999999;
-	FunctionResult = BBConvergeCheck( SimCompNum, MaxFlow, MinFlow );
-	EXPECT_TRUE( FunctionResult );
-
-	}
-
+    // Test 6: The other radiant/convective baseboard units and Max and Min almost the same
+    SimCompNum = 6;
+    MaxFlow = 1.0;
+    MinFlow = 0.9999999;
+    FunctionResult = BBConvergeCheck(SimCompNum, MaxFlow, MinFlow);
+    EXPECT_TRUE(FunctionResult);
 }
 
+} // namespace EnergyPlus

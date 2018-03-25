@@ -51,16 +51,15 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -146,10 +145,10 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest )
 	// Deallocate everything
 	VentSlab.deallocate();
 	Node.deallocate();
-
 }
 
-TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
+TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
+{
 
 	BeginEnvrnFlag = false;
 	bool ErrorsFound( false );        // function returns true on error
@@ -2279,7 +2278,6 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		"    1000000,                 !- Load Range 1 Upper Limit {W}",
 		"    cooling plant;           !- Range 1 Equipment List Name",
 
-
 		"  PlantEquipmentOperation:HeatingLoad,",
 		"    Purchased Heating Only,  !- Name",
 		"    0,                       !- Load Range 1 Lower Limit {W}",
@@ -2348,5 +2346,4 @@ TEST_F( EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest ) {
 		InitVentilatedSlab( Item, VentSlabZoneNum, FirstHVACIteration );
 		EXPECT_EQ( 324.38499999999999, VentSlab( 1 ).TotalSurfaceArea );
 		EXPECT_EQ( 139.21499999999997, VentSlab( 2 ).TotalSurfaceArea );
-
 }

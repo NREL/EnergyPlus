@@ -52,12 +52,12 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -81,7 +81,6 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::SimAirServingZones;
 using namespace EnergyPlus::ReturnAirPathManager;
 using namespace EnergyPlus::SimulationManager;
-
 
 TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 {
@@ -234,14 +233,18 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
-	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
+    EXPECT_DOUBLE_EQ(
+        (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
+        Node(ExchCond(ExchNum).SupOutletNode).Temp);
 
 	ExchCond( ExchNum ).ExchConfigNum = Rotary;
 	HXUnitOn = true;
 	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag );
 	UpdateHeatRecovery( ExchNum );
-	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
+    EXPECT_DOUBLE_EQ(
+        (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
+        Node(ExchCond(ExchNum).SupOutletNode).Temp);
 
 	ExchCond( ExchNum ).ControlToTemperatureSetPoint = true;
 	Node( ExchCond( ExchNum ).SupOutletNode ).TempSetPoint = 19.0;
@@ -269,12 +272,13 @@ TEST_F( EnergyPlusFixture, HeatRecovery_HRTest )
 	InitHeatRecovery( ExchNum, CompanionCoilNum, 0 );
 	CalcAirToAirGenericHeatExch( ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio );
 	UpdateHeatRecovery( ExchNum );
-	EXPECT_DOUBLE_EQ( ( ExchCond( ExchNum ).SupInTemp + ( ExchCond( ExchNum ).CoolEffectSensible75 * ( ExchCond( ExchNum ).SecInTemp - ExchCond( ExchNum ).SupInTemp ) ) ), Node( ExchCond( ExchNum ).SupOutletNode ).Temp );
-
+    EXPECT_DOUBLE_EQ(
+        (ExchCond(ExchNum).SupInTemp + (ExchCond(ExchNum).CoolEffectSensible75 * (ExchCond(ExchNum).SecInTemp - ExchCond(ExchNum).SupInTemp))),
+        Node(ExchCond(ExchNum).SupOutletNode).Temp);
 }
 
-
-TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
+TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
+{
 
 		std::string const idf_objects = delimited_string( {
 			" Version,8.4;",
@@ -481,14 +485,13 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest ) {
 		GetReturnAirPathInput();
 		GetAirPathData();
 		ASSERT_EQ( SimAirServingZones::HeatXchngr, PrimaryAirSystem( 1 ).Branch( 1 ).Comp( 4 ).CompType_Num );
-
 }
 
-TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
+TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
+{
 	Real64 Qhr_HeatingRateTot( 0.0 );
 	int InletNode( 0 ); // Heat Recovery primary air inlet node number
 	int OutletNode( 0 ); // Heat Recovery primary air outlet node number
-
 
 	std::string const idf_objects = delimited_string( {
 
@@ -548,7 +551,6 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
 		"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 		"    1.0;                     !- Sky Clearness",
-
 
 		"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3�C",
 		"SizingPeriod:DesignDay,",
@@ -3808,10 +3810,10 @@ TEST_F( EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest ) {
 	OutletNode = ExchCond( 1 ).SupOutletNode;
 	Qhr_HeatingRateTot = ExchCond( 1 ).SupInMassFlow * ( Node( OutletNode ).Enthalpy - Node( InletNode ).Enthalpy );
 	ASSERT_NEAR( Qhr_HeatingRateTot, ExchCond( 1 ).TotHeatingRate, 0.01 );
-
 }
 
-TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
+TEST_F(EnergyPlusFixture, SizeHeatRecovery)
+{
 
 	int ExchNum( 1 );
 	int BalDesDehumPerfDataIndex( 1 );
@@ -3868,7 +3870,8 @@ TEST_F( EnergyPlusFixture, SizeHeatRecovery ) {
 	EXPECT_EQ( FaceVelocity, BalDesDehumPerfData( BalDesDehumPerfDataIndex ).NomProcAirFaceVel ); // m/s
 }
 
-TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
+TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
+{
 
 	int ExchNum = 1;
 
@@ -3920,5 +3923,4 @@ TEST_F( EnergyPlusFixture, HeatRecovery_AirFlowSizing ) {
 	// verify the name and autosized supply air flow rate
 	EXPECT_EQ( ExchCond( ExchNum ).Name, "HEATRECOVERY HX IN ERV" );
 	EXPECT_EQ( ExchCond( ExchNum ).NomSupAirVolFlow, 1.0 );
-
 }

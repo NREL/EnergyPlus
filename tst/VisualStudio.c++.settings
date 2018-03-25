@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UserSettings>
+   <ApplicationIdentity version="14.0" />
+   <ToolsOptions>
+      <ToolsOptionsCategory name="TextEditor" RegisteredName="TextEditor">
+         <ToolsOptionsSubCategory name="C/C++" RegisteredName="C/C++" PackageName="Text Management Package">
+            <PropertyValue name="TabSize">4</PropertyValue>
+            <PropertyValue name="IndentStyle">2</PropertyValue>
+            <PropertyValue name="InsertTabs">false</PropertyValue>
+            <PropertyValue name="IndentSize">4</PropertyValue>
+            <PropertyValue name="BraceCompletion">true</PropertyValue>
+         </ToolsOptionsSubCategory>
+         <ToolsOptionsSubCategory name="C/C++ Specific" RegisteredName="C/C++ Specific" PackageName="Visual C++ Language Manager Package">
+            <PropertyValue name="SpaceAroundBinaryOperator">2</PropertyValue>
+            <PropertyValue name="SpaceAfterSemicolon">true</PropertyValue>
+            <PropertyValue name="PreserveInitListSpace">true</PropertyValue>
+            <PropertyValue name="SpaceBeforeFunctionParenthesis2">1</PropertyValue>
+            <PropertyValue name="NewlineFunctionBrace">2</PropertyValue>
+            <PropertyValue name="IndentBlockContents">true</PropertyValue>
+            <PropertyValue name="SpaceBeforeInitListBrace">false</PropertyValue>
+            <PropertyValue name="SpaceWithinCastParentheses">false</PropertyValue>
+            <PropertyValue name="NewlineInitListBrace">0</PropertyValue>
+            <PropertyValue name="IndentCaseContents">true</PropertyValue>
+            <PropertyValue name="RefactorScope">2</PropertyValue>
+            <PropertyValue name="SpaceAroundConditionalOperator">2</PropertyValue>
+            <PropertyValue name="SpaceWithinInitListBraces">false</PropertyValue>
+            <PropertyValue name="SpaceBeforeLambdaParenthesis">false</PropertyValue>
+            <PropertyValue name="NewlineScopeBrace">true</PropertyValue>
+            <PropertyValue name="NewlineEmptyFunctionCloseBrace">true</PropertyValue>
+            <PropertyValue name="PreserveBlock">2</PropertyValue>
+            <PropertyValue name="SpaceBeforeConstructorColon">true</PropertyValue>
+            <PropertyValue name="SpaceBeforeBlockBrace">true</PropertyValue>
+            <PropertyValue name="NewlineKeywordWhile">false</PropertyValue>
+            <PropertyValue name="NewlineLambdaBrace">0</PropertyValue>
+            <PropertyValue name="SpaceBeforeFunctionParenthesis">false</PropertyValue>
+            <PropertyValue name="NewlineNamespaceBrace">1</PropertyValue>
+            <PropertyValue name="NewlineControlBlockBrace">1</PropertyValue>
+            <PropertyValue name="IndentNamespaceContents">true</PropertyValue>
+            <PropertyValue name="SpaceBeforeComma">false</PropertyValue>
+            <PropertyValue name="IndentAccessSpecifiers">false</PropertyValue>
+            <PropertyValue name="SpaceAroundAssignmentOperator">2</PropertyValue>
+            <PropertyValue name="RemoveSpaceBeforeSemicolon">true</PropertyValue>
+            <PropertyValue name="SpaceBetweenEmptyLambdaBrackets">false</PropertyValue>
+            <PropertyValue name="SpaceBeforeControlBlockParenthesis">true</PropertyValue>
+            <PropertyValue name="SpaceBetweenEmptyFunctionParentheses">false</PropertyValue>
+            <PropertyValue name="PreserveParameterIndentation">false</PropertyValue>
+            <PropertyValue name="SpaceBeforeEmptyBracket">false</PropertyValue>
+            <PropertyValue name="SpaceWithinExpressionParentheses">false</PropertyValue>
+            <PropertyValue name="TrimSpaceUnaryOperator">true</PropertyValue>
+            <PropertyValue name="TrimSpaceAroundScope">true</PropertyValue>
+            <PropertyValue name="GroupBrackets">true</PropertyValue>
+            <PropertyValue name="SpaceBetweenEmptyBrackets">false</PropertyValue>
+            <PropertyValue name="SpaceWithinControlBlockParentheses">false</PropertyValue>
+            <PropertyValue name="NewlineTypeBrace">2</PropertyValue>
+            <PropertyValue name="SpaceAfterCastParenthesis">false</PropertyValue>
+            <PropertyValue name="PreserveCommentIndentation">false</PropertyValue>
+            <PropertyValue name="IndentPreprocessor">2</PropertyValue>
+            <PropertyValue name="IndentCaseBraces">false</PropertyValue>
+            <PropertyValue name="AlignParameters">true</PropertyValue>
+            <PropertyValue name="IndentBraces">false</PropertyValue>
+            <PropertyValue name="SpaceBeforeInheritanceColon">true</PropertyValue>
+            <PropertyValue name="NewlineKeywordCatch">false</PropertyValue>
+            <PropertyValue name="NewlineKeywordElse">false</PropertyValue>
+            <PropertyValue name="IndentCaseLabels">false</PropertyValue>
+            <PropertyValue name="AutoIndentOnTab">false</PropertyValue>
+            <PropertyValue name="SpaceWithinLambdaBrackets">false</PropertyValue>
+            <PropertyValue name="SpaceWithinBrackets">false</PropertyValue>
+            <PropertyValue name="SpaceAfterComma">true</PropertyValue>
+            <PropertyValue name="SpaceBetweenEmptyBraces">false</PropertyValue>
+            <PropertyValue name="IndentGotoLabels">1</PropertyValue>
+            <PropertyValue name="SpaceBeforeBracket">false</PropertyValue>
+            <PropertyValue name="SpaceWithinFunctionParentheses">false</PropertyValue>
+            <PropertyValue name="NewlineEmptyTypeCloseBrace">true</PropertyValue>
+            <PropertyValue name="IndentationReference">2</PropertyValue>
+         </ToolsOptionsSubCategory>
+      </ToolsOptionsCategory>
+   </ToolsOptions>
+</UserSettings>
+

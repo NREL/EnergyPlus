@@ -51,24 +51,24 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneControls.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -157,38 +157,35 @@ namespace EnergyPlus {
 
 		ControllerNum = 1;
 
-		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+    inputProcessor->getObjectItem(CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
+                                  cAlphaFields, cNumericFields);
 
-		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
+    ProcessOAControllerInputs(CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+                              cNumericFields, ErrorsFound);
 
 		EXPECT_FALSE( ErrorsFound );
 		EXPECT_EQ( 2, OAController( 1 ).OANode );
 		EXPECT_TRUE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 1 ).OANode ) );
 
 		ControllerNum = 2;
-		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+    inputProcessor->getObjectItem(CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
+                                  cAlphaFields, cNumericFields);
 
 		ErrorsFound = false;
-		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
+    ProcessOAControllerInputs(CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+                              cNumericFields, ErrorsFound);
 		EXPECT_FALSE( ErrorsFound );
 		EXPECT_EQ( 6, OAController( 2 ).OANode );
 		EXPECT_FALSE( OutAirNodeManager::CheckOutAirNodeNumber( OAController( 2 ).OANode ) );
-
 	}
 
 	TEST_F( EnergyPlusFixture, MixedAir_HXBypassOptionTest )
 	{
-		std::string const idf_objects = delimited_string( {
-			"Version,8.3;",
-			"  OutdoorAir:Node,",
-			"    Outside Air Inlet Node 1; !- Name",
-			"  Controller:OutdoorAir,",
-			"    OA Controller 1,         !- Name",
-			"    Relief Air Outlet Node 1, !- Relief Air Outlet Node Name",
-			"    VAV Sys 1 Inlet Node,    !- Return Air Node Name",
-			"    Mixed Air Node 1,        !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 1, !- Actuator Node Name",
-			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+    std::string const idf_objects = delimited_string(
+        {"Version,8.3;", "  OutdoorAir:Node,", "    Outside Air Inlet Node 1; !- Name", "  Controller:OutdoorAir,",
+         "    OA Controller 1,         !- Name", "    Relief Air Outlet Node 1, !- Relief Air Outlet Node Name",
+         "    VAV Sys 1 Inlet Node,    !- Return Air Node Name", "    Mixed Air Node 1,        !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 1, !- Actuator Node Name", "    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
 			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
 			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should open for this one, so OA flow should be > min OA
 			"    ModulateFlow,            !- Economizer Control Action Type",
@@ -198,47 +195,31 @@ namespace EnergyPlus {
 			"    ,                        !- Electronic Enthalpy Limit Curve Name",
 			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
 			"    NoLockout,               !- Lockout Type", // No lockout
-			"    ProportionalMinimum,     !- Minimum Limit Type",
-			"    ,                        !- Minimum Outdoor Air Schedule Name",
+         "    ProportionalMinimum,     !- Minimum Limit Type", "    ,                        !- Minimum Outdoor Air Schedule Name",
 			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Mechanical Ventilation Controller Name",
-			"    ,                        !- Time of Day Economizer Control Schedule Name",
-			"    No,                      !- High Humidity Control",
-			"    ,                        !- Humidistat Control Zone Name",
-			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+         "    ,                        !- Time of Day Economizer Control Schedule Name", "    No,                      !- High Humidity Control",
+         "    ,                        !- Humidistat Control Zone Name", "    ,                        !- High Humidity Outdoor Air Flow Ratio",
 			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
 			"    BypassWhenWithinEconomizerLimits;  !- Heat Recovery Bypass Control Type", // HX bypass should be true
 
-			"  OutdoorAir:Mixer,",
-			"    OA Mixer 1,                !- Name",
-			"    Mixed Air Node 1,          !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 1, !- Outdoor Air Stream Node Name",
-			"    Relief Air Outlet Node 1,  !- Relief Air Stream Node Name",
+         "  OutdoorAir:Mixer,", "    OA Mixer 1,                !- Name", "    Mixed Air Node 1,          !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 1, !- Outdoor Air Stream Node Name", "    Relief Air Outlet Node 1,  !- Relief Air Stream Node Name",
 			"    VAV Sys 1 Inlet Node;     !- Return Air Stream Node Name",
 
-			" AirLoopHVAC:ControllerList,",
-			"    OA Sys 1 controller,     !- Name",
-			"    Controller:OutdoorAir,   !- Controller 1 Object Type",
+         " AirLoopHVAC:ControllerList,", "    OA Sys 1 controller,     !- Name", "    Controller:OutdoorAir,   !- Controller 1 Object Type",
 			"    OA Controller 1;         !- Controller 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
-			"    OA Sys 1 Equipment list, !- Name",
-			"    OutdoorAir:Mixer,        !- Component 1 Object Type",
-			"    OA Mixer 1;                !- Component 1 Name",
+         " AirLoopHVAC:OutdoorAirSystem:EquipmentList,", "    OA Sys 1 Equipment list, !- Name",
+         "    OutdoorAir:Mixer,        !- Component 1 Object Type", "    OA Mixer 1;                !- Component 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem,",
-			"    OA Sys 1, !- Name",
-			"    OA Sys 1 controller,     !- Controller List Name",
+         " AirLoopHVAC:OutdoorAirSystem,", "    OA Sys 1, !- Name", "    OA Sys 1 controller,     !- Controller List Name",
 			"    OA Sys 1 Equipment list; !- Outdoor Air Equipment List Name",
 
-			"  Controller:OutdoorAir,",
-			"    OA Controller 2,         !- Name",
-			"    Relief Air Outlet Node 2, !- Relief Air Outlet Node Name",
-			"    VAV Sys 2 Inlet Node,    !- Return Air Node Name",
-			"    Mixed Air Node 2,        !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 2, !- Actuator Node Name",
-			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+         "  Controller:OutdoorAir,", "    OA Controller 2,         !- Name", "    Relief Air Outlet Node 2, !- Relief Air Outlet Node Name",
+         "    VAV Sys 2 Inlet Node,    !- Return Air Node Name", "    Mixed Air Node 2,        !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 2, !- Actuator Node Name", "    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
 			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
 			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should be locked out for this one, so OA flow should = min OA
 			"    ModulateFlow,            !- Economizer Control Action Type",
@@ -248,47 +229,31 @@ namespace EnergyPlus {
 			"    ,                        !- Electronic Enthalpy Limit Curve Name",
 			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
 			"    LockoutWithHeating,               !- Lockout Type", // Lockout with heating is on
-			"    ProportionalMinimum,     !- Minimum Limit Type",
-			"    ,                        !- Minimum Outdoor Air Schedule Name",
+         "    ProportionalMinimum,     !- Minimum Limit Type", "    ,                        !- Minimum Outdoor Air Schedule Name",
 			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Mechanical Ventilation Controller Name",
-			"    ,                        !- Time of Day Economizer Control Schedule Name",
-			"    No,                      !- High Humidity Control",
-			"    ,                        !- Humidistat Control Zone Name",
-			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+         "    ,                        !- Time of Day Economizer Control Schedule Name", "    No,                      !- High Humidity Control",
+         "    ,                        !- Humidistat Control Zone Name", "    ,                        !- High Humidity Outdoor Air Flow Ratio",
 			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
 			"    BypassWhenWithinEconomizerLimits;  !- Heat Recovery Bypass Control Type", // HX bypass should be false because economizer is locked out
 
-			"  OutdoorAir:Mixer,",
-			"    OA Mixer 2,                !- Name",
-			"    Mixed Air Node 2,          !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 2, !- Outdoor Air Stream Node Name",
-			"    Relief Air Outlet Node 2,  !- Relief Air Stream Node Name",
+         "  OutdoorAir:Mixer,", "    OA Mixer 2,                !- Name", "    Mixed Air Node 2,          !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 2, !- Outdoor Air Stream Node Name", "    Relief Air Outlet Node 2,  !- Relief Air Stream Node Name",
 			"    VAV Sys 2 Inlet Node;     !- Return Air Stream Node Name",
 
-			" AirLoopHVAC:ControllerList,",
-			"    OA Sys 2 controller,     !- Name",
-			"    Controller:OutdoorAir,   !- Controller 1 Object Type",
+         " AirLoopHVAC:ControllerList,", "    OA Sys 2 controller,     !- Name", "    Controller:OutdoorAir,   !- Controller 1 Object Type",
 			"    OA Controller 2;         !- Controller 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
-			"    OA Sys 2 Equipment list, !- Name",
-			"    OutdoorAir:Mixer,        !- Component 1 Object Type",
-			"    OA Mixer 2;                !- Component 1 Name",
+         " AirLoopHVAC:OutdoorAirSystem:EquipmentList,", "    OA Sys 2 Equipment list, !- Name",
+         "    OutdoorAir:Mixer,        !- Component 1 Object Type", "    OA Mixer 2;                !- Component 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem,",
-			"    OA Sys 2, !- Name",
-			"    OA Sys 2 controller,     !- Controller List Name",
+         " AirLoopHVAC:OutdoorAirSystem,", "    OA Sys 2, !- Name", "    OA Sys 2 controller,     !- Controller List Name",
 			"    OA Sys 2 Equipment list; !- Outdoor Air Equipment List Name",
 
-			"  Controller:OutdoorAir,",
-			"    OA Controller 3,         !- Name",
-			"    Relief Air Outlet Node 3, !- Relief Air Outlet Node Name",
-			"    VAV Sys 3 Inlet Node,    !- Return Air Node Name",
-			"    Mixed Air Node 3,        !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 3, !- Actuator Node Name",
-			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+         "  Controller:OutdoorAir,", "    OA Controller 3,         !- Name", "    Relief Air Outlet Node 3, !- Relief Air Outlet Node Name",
+         "    VAV Sys 3 Inlet Node,    !- Return Air Node Name", "    Mixed Air Node 3,        !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 3, !- Actuator Node Name", "    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
 			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
 			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should open for this one, so OA flow should be > min OA
 			"    ModulateFlow,            !- Economizer Control Action Type",
@@ -296,151 +261,101 @@ namespace EnergyPlus {
 			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
 			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
 			"    ,                        !- Electronic Enthalpy Limit Curve Name",
-			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
-			"    NoLockout,               !- Lockout Type",
-			"    ProportionalMinimum,     !- Minimum Limit Type",
-			"    ,                        !- Minimum Outdoor Air Schedule Name",
+         "    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}", "    NoLockout,               !- Lockout Type",
+         "    ProportionalMinimum,     !- Minimum Limit Type", "    ,                        !- Minimum Outdoor Air Schedule Name",
 			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Mechanical Ventilation Controller Name",
-			"    ,                        !- Time of Day Economizer Control Schedule Name",
-			"    No,                      !- High Humidity Control",
-			"    ,                        !- Humidistat Control Zone Name",
-			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+         "    ,                        !- Time of Day Economizer Control Schedule Name", "    No,                      !- High Humidity Control",
+         "    ,                        !- Humidistat Control Zone Name", "    ,                        !- High Humidity Outdoor Air Flow Ratio",
 			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
 			"    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type", // HX bypass should be true because economizer has opened up
 
-			"  OutdoorAir:Mixer,",
-			"    OA Mixer 3,                !- Name",
-			"    Mixed Air Node 3,          !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 3, !- Outdoor Air Stream Node Name",
-			"    Relief Air Outlet Node 3,  !- Relief Air Stream Node Name",
+         "  OutdoorAir:Mixer,", "    OA Mixer 3,                !- Name", "    Mixed Air Node 3,          !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 3, !- Outdoor Air Stream Node Name", "    Relief Air Outlet Node 3,  !- Relief Air Stream Node Name",
 			"    VAV Sys 3 Inlet Node;     !- Return Air Stream Node Name",
 
-			" AirLoopHVAC:ControllerList,",
-			"    OA Sys 3 controller,     !- Name",
-			"    Controller:OutdoorAir,   !- Controller 1 Object Type",
+         " AirLoopHVAC:ControllerList,", "    OA Sys 3 controller,     !- Name", "    Controller:OutdoorAir,   !- Controller 1 Object Type",
 			"    OA Controller 3;         !- Controller 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
-			"    OA Sys 3 Equipment list, !- Name",
-			"    OutdoorAir:Mixer,        !- Component 1 Object Type",
-			"    OA Mixer 3;                !- Component 1 Name",
+         " AirLoopHVAC:OutdoorAirSystem:EquipmentList,", "    OA Sys 3 Equipment list, !- Name",
+         "    OutdoorAir:Mixer,        !- Component 1 Object Type", "    OA Mixer 3;                !- Component 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem,",
-			"    OA Sys 3, !- Name",
-			"    OA Sys 3 controller,     !- Controller List Name",
+         " AirLoopHVAC:OutdoorAirSystem,", "    OA Sys 3, !- Name", "    OA Sys 3 controller,     !- Controller List Name",
 			"    OA Sys 3 Equipment list; !- Outdoor Air Equipment List Name",
 
-			"  Controller:OutdoorAir,",
-			"    OA Controller 4,         !- Name",
-			"    Relief Air Outlet Node 4, !- Relief Air Outlet Node Name",
-			"    VAV Sys 4 Inlet Node,    !- Return Air Node Name",
-			"    Mixed Air Node 4,        !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 4, !- Actuator Node Name",
-			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+         "  Controller:OutdoorAir,", "    OA Controller 4,         !- Name", "    Relief Air Outlet Node 4, !- Relief Air Outlet Node Name",
+         "    VAV Sys 4 Inlet Node,    !- Return Air Node Name", "    Mixed Air Node 4,        !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 4, !- Actuator Node Name", "    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
 			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
-			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should not open for this one - lowered the outdoor dry bulb temp for Case 4
+         "    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should not open for this one - lowered the outdoor dry bulb temp for
+                                                                    // Case 4
 			"    ModulateFlow,            !- Economizer Control Action Type",
 			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
 			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
 			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
 			"    ,                        !- Electronic Enthalpy Limit Curve Name",
-			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
-			"    NoLockout,               !- Lockout Type",
-			"    ProportionalMinimum,     !- Minimum Limit Type",
-			"    ,                        !- Minimum Outdoor Air Schedule Name",
+         "    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}", "    NoLockout,               !- Lockout Type",
+         "    ProportionalMinimum,     !- Minimum Limit Type", "    ,                        !- Minimum Outdoor Air Schedule Name",
 			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Mechanical Ventilation Controller Name",
-			"    ,                        !- Time of Day Economizer Control Schedule Name",
-			"    No,                      !- High Humidity Control",
-			"    ,                        !- Humidistat Control Zone Name",
-			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+         "    ,                        !- Time of Day Economizer Control Schedule Name", "    No,                      !- High Humidity Control",
+         "    ,                        !- Humidistat Control Zone Name", "    ,                        !- High Humidity Outdoor Air Flow Ratio",
 			"    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
 			"    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type", // HX bypass should be true because economizer has opened up
 
-			"  OutdoorAir:Mixer,",
-			"    OA Mixer 4,                !- Name",
-			"    Mixed Air Node 4,          !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 4, !- Outdoor Air Stream Node Name",
-			"    Relief Air Outlet Node 4,  !- Relief Air Stream Node Name",
+         "  OutdoorAir:Mixer,", "    OA Mixer 4,                !- Name", "    Mixed Air Node 4,          !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 4, !- Outdoor Air Stream Node Name", "    Relief Air Outlet Node 4,  !- Relief Air Stream Node Name",
 			"    VAV Sys 4 Inlet Node;     !- Return Air Stream Node Name",
 
-			" AirLoopHVAC:ControllerList,",
-			"    OA Sys 4 controller,     !- Name",
-			"    Controller:OutdoorAir,   !- Controller 1 Object Type",
+         " AirLoopHVAC:ControllerList,", "    OA Sys 4 controller,     !- Name", "    Controller:OutdoorAir,   !- Controller 1 Object Type",
 			"    OA Controller 4;         !- Controller 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
-			"    OA Sys 4 Equipment list, !- Name",
-			"    OutdoorAir:Mixer,        !- Component 1 Object Type",
-			"    OA Mixer 4;                !- Component 1 Name",
+         " AirLoopHVAC:OutdoorAirSystem:EquipmentList,", "    OA Sys 4 Equipment list, !- Name",
+         "    OutdoorAir:Mixer,        !- Component 1 Object Type", "    OA Mixer 4;                !- Component 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem,",
-			"    OA Sys 4, !- Name",
-			"    OA Sys 4 controller,     !- Controller List Name",
+         " AirLoopHVAC:OutdoorAirSystem,", "    OA Sys 4, !- Name", "    OA Sys 4 controller,     !- Controller List Name",
 			"    OA Sys 4 Equipment list; !- Outdoor Air Equipment List Name",
 
-			"  Controller:OutdoorAir,",
-			"    OA Controller 5,         !- Name",
-			"    Relief Air Outlet Node 5, !- Relief Air Outlet Node Name",
-			"    VAV Sys 5 Inlet Node,    !- Return Air Node Name",
-			"    Mixed Air Node 5,        !- Mixed Air Node Name",
-			"    Outside Air Inlet Node 5, !- Actuator Node Name",
-			"    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+         "  Controller:OutdoorAir,", "    OA Controller 5,         !- Name", "    Relief Air Outlet Node 5, !- Relief Air Outlet Node Name",
+         "    VAV Sys 5 Inlet Node,    !- Return Air Node Name", "    Mixed Air Node 5,        !- Mixed Air Node Name",
+         "    Outside Air Inlet Node 5, !- Actuator Node Name", "    0.2,                !- Minimum Outdoor Air Flow Rate {m3/s}",
 			"    1.0,                !- Maximum Outdoor Air Flow Rate {m3/s}",
-			"    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should not open for this one - lowered the outdoor dry bulb temp for Case 4
+         "    DifferentialDryBulb,     !- Economizer Control Type", // Economizer should not open for this one - lowered the outdoor dry bulb temp for
+                                                                    // Case 4
 			"    ModulateFlow,            !- Economizer Control Action Type",
 			"    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
 			"    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
 			"    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
 			"    ,                        !- Electronic Enthalpy Limit Curve Name",
-			"    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
-			"    NoLockout,               !- Lockout Type",
-			"    ProportionalMinimum,     !- Minimum Limit Type",
-			"    ,                        !- Minimum Outdoor Air Schedule Name",
+         "    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}", "    NoLockout,               !- Lockout Type",
+         "    ProportionalMinimum,     !- Minimum Limit Type", "    ,                        !- Minimum Outdoor Air Schedule Name",
 			"    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
 			"    ,                        !- Mechanical Ventilation Controller Name",
-			"    ,                        !- Time of Day Economizer Control Schedule Name",
-			"    No,                      !- High Humidity Control",
-			"    ,                        !- Humidistat Control Zone Name",
-			"    ,                        !- High Humidity Outdoor Air Flow Ratio",
+         "    ,                        !- Time of Day Economizer Control Schedule Name", "    No,                      !- High Humidity Control",
+         "    ,                        !- Humidistat Control Zone Name", "    ,                        !- High Humidity Outdoor Air Flow Ratio",
 			"    No,                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
 			"    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type", // HX bypass should be true because economizer has opened up
 
-			"  OutdoorAir:Mixer,",
-			"    OA Mixer 5,                !- Name",
-			"    Mixed Air Node 5,          !- Mixed Air Node Name",
-			"    OA Sys 5 HC Outlet Node,   !- Outdoor Air Stream Node Name",
-			"    Relief Air Outlet Node 5,  !- Relief Air Stream Node Name",
+         "  OutdoorAir:Mixer,", "    OA Mixer 5,                !- Name", "    Mixed Air Node 5,          !- Mixed Air Node Name",
+         "    OA Sys 5 HC Outlet Node,   !- Outdoor Air Stream Node Name", "    Relief Air Outlet Node 5,  !- Relief Air Stream Node Name",
 			"    VAV Sys 5 Inlet Node;     !- Return Air Stream Node Name",
 
-			" AirLoopHVAC:ControllerList,",
-			"    OA Sys 5 controller,     !- Name",
-			"    Controller:OutdoorAir,   !- Controller 1 Object Type",
+         " AirLoopHVAC:ControllerList,", "    OA Sys 5 controller,     !- Name", "    Controller:OutdoorAir,   !- Controller 1 Object Type",
 			"    OA Controller 5;         !- Controller 1 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
-			"    OA Sys 5 Equipment list, !- Name",
-			"    Coil:Heating:Electric,    !- Component 1 Object Type",
-			"    OA Sys 5 Heating Coil,    !- Component 1 Name",
-			"    OutdoorAir:Mixer,         !- Component 2 Object Type",
-			"    OA Mixer 5;               !- Component 2 Name",
+         " AirLoopHVAC:OutdoorAirSystem:EquipmentList,", "    OA Sys 5 Equipment list, !- Name",
+         "    Coil:Heating:Electric,    !- Component 1 Object Type", "    OA Sys 5 Heating Coil,    !- Component 1 Name",
+         "    OutdoorAir:Mixer,         !- Component 2 Object Type", "    OA Mixer 5;               !- Component 2 Name",
 
-			" AirLoopHVAC:OutdoorAirSystem,",
-			"    OA Sys 5, !- Name",
-			"    OA Sys 5 controller,      !- Controller List Name",
+         " AirLoopHVAC:OutdoorAirSystem,", "    OA Sys 5, !- Name", "    OA Sys 5 controller,      !- Controller List Name",
 			"    OA Sys 5 Equipment list;  !- Outdoor Air Equipment List Name",
 
-			" Coil:Heating:Electric,",
-			"    OA Sys 5 Heating Coil,    !- Name",
-			"    ,                         !- Availability Schedule Name",
-			"    1,                        !- Efficiency",
-			"    2500,                     !- Nominal Capacity{ W }",
-			"    Outside Air Inlet Node 5, !- Air Inlet Node Name",
-			"    OA Sys 5 HC Outlet Node,  !- Air Outlet Node Name",
+         " Coil:Heating:Electric,", "    OA Sys 5 Heating Coil,    !- Name", "    ,                         !- Availability Schedule Name",
+         "    1,                        !- Efficiency", "    2500,                     !- Nominal Capacity{ W }",
+         "    Outside Air Inlet Node 5, !- Air Inlet Node Name", "    OA Sys 5 HC Outlet Node,  !- Air Outlet Node Name",
 			"    OA Sys 5 HC Outlet Node;  !- Temperature Setpoint Node Name"
 
 		} );
@@ -516,7 +431,8 @@ namespace EnergyPlus {
 			Node( OAControllerNum * 4 - 3 ).TempSetPoint = OAController( OAControllerNum ).MixSetTemp; // Mixed air nodes
 			if ( OAControllerNum == 5 ) Node( 18 ).TempSetPoint = OAController( OAControllerNum ).MixSetTemp + 1.0; // Mixed air nodes
 			Node( OAControllerNum * 4 - 2 ).Temp = OAController( OAControllerNum ).OATemp; // OA inlet (actuated) air nodes, dry air
-			Node( OAControllerNum * 4 - 2 ).Enthalpy = Psychrometrics::PsyHFnTdbW( OAController( OAControllerNum ).InletTemp, 0.0 );; // OA inlet (actuated) air nodes, dry air
+        Node(OAControllerNum * 4 - 2).Enthalpy = Psychrometrics::PsyHFnTdbW(OAController(OAControllerNum).InletTemp, 0.0);
+        ; // OA inlet (actuated) air nodes, dry air
 		}
 
 		Real64 expectedOAflow( 0.0 );
@@ -532,8 +448,10 @@ namespace EnergyPlus {
 //		ManageOutsideAirSystem( "OA Sys 1", true, AirLoopNum, OAControllerNum );
 		OAController( OAControllerNum ).CalcOAController( AirLoopNum, true );
 
-		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
-		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
+    expectedMinOAflow =
+        0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
+    expectedOAflow = OAController(OAControllerNum).MixMassFlow * (OAController(OAControllerNum).MixSetTemp - OAController(OAControllerNum).RetTemp) /
+                     (OAController(OAControllerNum).InletTemp - OAController(OAControllerNum).RetTemp);
 		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
 		EXPECT_EQ( expectedMinOAflow, AirLoopFlow( AirLoopNum ).MinOutAir );
@@ -552,7 +470,8 @@ namespace EnergyPlus {
 
 		OAController( OAControllerNum ).CalcOAController( AirLoopNum, true );
 
-		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
+    expectedMinOAflow =
+        0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
 		expectedOAflow = expectedMinOAflow;
 		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
@@ -572,8 +491,10 @@ namespace EnergyPlus {
 		Node( OAControllerNum * 4 - 2 ).Temp = OAController( OAControllerNum ).OATemp; // OA inlet (actuated) air nodes, dry air
 		OAController( OAControllerNum ).CalcOAController( AirLoopNum, true );
 
-		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
-		expectedOAflow = OAController( OAControllerNum ).MixMassFlow * ( OAController( OAControllerNum ).MixSetTemp - OAController( OAControllerNum ).RetTemp ) / ( OAController( OAControllerNum ).InletTemp - OAController( OAControllerNum ).RetTemp );
+    expectedMinOAflow =
+        0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
+    expectedOAflow = OAController(OAControllerNum).MixMassFlow * (OAController(OAControllerNum).MixSetTemp - OAController(OAControllerNum).RetTemp) /
+                     (OAController(OAControllerNum).InletTemp - OAController(OAControllerNum).RetTemp);
 		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
 		EXPECT_EQ( expectedMinOAflow, AirLoopFlow( AirLoopNum ).MinOutAir );
@@ -592,7 +513,8 @@ namespace EnergyPlus {
 
 		OAController( OAControllerNum ).CalcOAController( AirLoopNum, true );
 
-		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
+    expectedMinOAflow =
+        0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
 		expectedOAflow = expectedMinOAflow;
 		EXPECT_NEAR( expectedOAflow, OAController( OAControllerNum ).OAMassFlow, 0.00001 );
 		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
@@ -614,7 +536,8 @@ namespace EnergyPlus {
 
 		OAController( OAControllerNum ).CalcOAController( AirLoopNum, true );
 
-		expectedMinOAflow = 0.2 * StdRhoAir * OAController( OAControllerNum ).MixMassFlow / AirLoopFlow( AirLoopNum ).DesSupply; // For Proportional minimum input
+    expectedMinOAflow =
+        0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
 		expectedOAflow = expectedMinOAflow;
 		EXPECT_GT( OAController( OAControllerNum ).OAMassFlow, expectedOAflow );
 		EXPECT_NEAR( OAController( OAControllerNum ).OAMassFlow / OAController( OAControllerNum ).MixMassFlow, AirLoopFlow( AirLoopNum ).OAFrac, 0.00001 );
@@ -681,7 +604,6 @@ namespace EnergyPlus {
 			"    CM DSOA West Zone, !- Design Specification Outdoor Air Object Name 1",
 			"    CM DSZAD West Zone; !- Design Specification Zone Air Distribution Object Name 1",
 		} );
-
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -896,7 +818,6 @@ namespace EnergyPlus {
 			"  1; !- Zone Air Distribution Effectiveness in Heating Mode{ dimensionless }",
 		} );
 
-
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopControlInfo.allocate( 1 );
@@ -921,7 +842,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAAreaRate( 1 ) );
 		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAFlowRate( 1 ) );
 		EXPECT_EQ( 0.00, VentilationMechanical( 1 ).ZoneOAACHRate( 1 ) );
-
 	}
 
 	TEST_F( EnergyPlusFixture, MixedAir_TestHXinOASystem )
@@ -1061,10 +981,10 @@ namespace EnergyPlus {
 		int mixedAirNode = OAController( OAControllerNum ).MixNode;
 		int mixerIntletNode = OAController( OAControllerNum ).InletNode;
 		EXPECT_EQ( Node( mixedAirNode ).Temp, Node( mixerIntletNode ).Temp );
-
 	}
 
-	TEST_F( EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest ) {
+TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
+{
 		std::string const idf_objects = delimited_string( {
 			"Version,8.4;",
 
@@ -1305,7 +1225,8 @@ namespace EnergyPlus {
 		Node( OAControllerNum * 4 ).Temp = OAController( OAControllerNum ).RetTemp; // Return air nodes
 		Node( OAControllerNum * 4 ).Enthalpy = Psychrometrics::PsyHFnTdbW( OAController( OAControllerNum ).RetTemp, 0.0 ); // Return air nodes, dry air
 		Node( OAControllerNum * 4 - 3 ).TempSetPoint = OAController( OAControllerNum ).MixSetTemp; // Mixed air nodes
-		Node( OAControllerNum * 4 - 2 ).Enthalpy = Psychrometrics::PsyHFnTdbW( OAController( OAControllerNum ).InletTemp, 0.0 );; // OA inlet (actuated) air nodes, dry air
+    Node(OAControllerNum * 4 - 2).Enthalpy = Psychrometrics::PsyHFnTdbW(OAController(OAControllerNum).InletTemp, 0.0);
+    ; // OA inlet (actuated) air nodes, dry air
 
 		OAController( 1 ).CoolCoilFreezeCheck = true;
 		Schedule( 1 ).CurrentValue = 1.0;
@@ -1313,10 +1234,10 @@ namespace EnergyPlus {
 		OAController( OAControllerNum ).CalcOAController( AirLoopNum, true );
 
 		EXPECT_NEAR( 0.2408617, OAController( 1 ).OAFractionRpt, 0.00001 );
-
 	}
 
-	TEST_F( EnergyPlusFixture, MixedAir_ControllerTypeTest ) {
+TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
+{
 
 		int OAControllerNum = 1;
 
@@ -1353,9 +1274,7 @@ namespace EnergyPlus {
 		Contaminant.GenericContamSimulation = false;
 		OAController.deallocate( );
 		Node.deallocate( );
-
 	}
-
 
 	TEST_F( EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest )
 	{
@@ -1453,20 +1372,22 @@ namespace EnergyPlus {
 		HumidityControlZone( 1 ).ActualZoneNum = 1;
 		NumHumidityControlZones = 1;
 
-		inputProcessor->getObjectItem( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+    inputProcessor->getObjectItem(CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
+                                  cAlphaFields, cNumericFields);
 
-		ProcessOAControllerInputs( CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
+    ProcessOAControllerInputs(CurrentModuleObject, ControllerNum, AlphArray, NumAlphas, NumArray, NumNums, lNumericBlanks, lAlphaBlanks, cAlphaFields,
+                              cNumericFields, ErrorsFound);
 		//compare_err_stream( "" ); // just for debugging
 
 		EXPECT_FALSE( ErrorsFound );
-		EXPECT_FALSE( OAController( ControllerNum ).ModifyDuringHighOAMoisture ); // missing input defaults "Control High Indoor Humidity Based on Outdoor Humidity Ratio" to false
+    EXPECT_FALSE(OAController(ControllerNum)
+                     .ModifyDuringHighOAMoisture); // missing input defaults "Control High Indoor Humidity Based on Outdoor Humidity Ratio" to false
 
 		std::string const error_string = delimited_string( {
 			"   ** Warning ** Controller:OutdoorAir \"OA CONTROLLER 1\", missing field value",
 			"   **   ~~~   ** ...Control High Indoor Humidity Based on Outdoor Humidity Ratio will default to Yes when High Humidity Control= \"Yes\"",
 		} );
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
-
 	}
 
 	TEST_F( EnergyPlusFixture, OAControllerMixedAirSPTest )
@@ -1505,7 +1426,6 @@ namespace EnergyPlus {
 			"    ;                        !- Mechanical Ventilation Controller Name",
 		} );
 
-
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
 		AirLoopFlow.allocate( 1 );
@@ -1520,7 +1440,8 @@ namespace EnergyPlus {
 		AirLoopFlow( 1 ).DesSupply = 1.7 * StdRhoAir;
 		AirLoopFlow( 1 ).ReqSupplyFrac = 1.0;
 		Node( OAController( 1 ).MixNode ).MassFlowRateMaxAvail = AirLoopFlow( 1 ).DesSupply; // set max avail or controller will shut down
-		Node( OAController( 1 ).RetNode ).MassFlowRate = AirLoopFlow( 1 ).DesSupply; // set return flow for mixing calculation (i.e., mix flow = return flow + exhaust flow [0])
+    Node(OAController(1).RetNode).MassFlowRate =
+        AirLoopFlow(1).DesSupply; // set return flow for mixing calculation (i.e., mix flow = return flow + exhaust flow [0])
 		NumOASystems = 1;
 		OutsideAirSys.allocate( 1 );
 		OutsideAirSys( 1 ).Name = "AIRLOOP OASYSTEM";
@@ -1558,7 +1479,6 @@ namespace EnergyPlus {
 		Node( 1 ).TempSetPoint = -5.0;
 		InitOAController( 1, true, 1 );
 		EXPECT_EQ( OAController( 1 ).MixSetTemp, -5.0 );
-
 	}
 
 	TEST_F( EnergyPlusFixture, MixedAir_MiscGetsPart1 )
@@ -1726,7 +1646,6 @@ namespace EnergyPlus {
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 			"    1.0;                     !- Sky Clearness",
-
 
 			"! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3�C",
 			"SizingPeriod:DesignDay,",
@@ -4968,7 +4887,6 @@ namespace EnergyPlus {
 
 		} );
 
-
 			ASSERT_TRUE( process_idf( idf_objects ) );
 			GetOAControllerInputs();
 
@@ -4983,7 +4901,6 @@ namespace EnergyPlus {
 			EXPECT_EQ( 4, GetOAMixerIndex( "SPACE4-1 OA Mixing Box" ) );
 			EXPECT_EQ( 5, GetOAMixerIndex( "SPACE5-1 OA Mixing Box" ) );
 			EXPECT_EQ( 6, GetOAMixerIndex( "DOAS OA Mixing Box" ) );
-
 	}
 
 	TEST_F( EnergyPlusFixture, MechVentController_IAQPTests )
@@ -4991,24 +4908,13 @@ namespace EnergyPlus {
 		Contaminant.CO2Simulation = true;
 		Contaminant.GenericContamSimulation = true;
 
-		std::string const idf_objects = delimited_string({
-			"Version,8.6;",
-			"  Controller:MechanicalVentilation,",
-			"    DCVObject, !- Name",
-			"    , !- Availability Schedule Name",
-			"    , !- Demand Controlled Ventilation",
-			"    IndoorAirQualityProcedure, !- System Outdoor Air Method",
-			"     , !- Zone Maximum Outdoor Air Fraction{ dimensionless }",
-			"    Zone 1, !- Zone 1 Name",
-			"    , !- Design Specification Outdoor Air Object Name 1",
-			"    , !- Design Specification Zone Air Distribution Object Name 1",
-			"    Zone 2, !- Zone 1 Name",
-			"    , !- Design Specification Outdoor Air Object Name 1",
-			"    ; !- Design Specification Zone Air Distribution Object Name 1",
-			"    Zone, Zone 1;",
-			"    Zone, Zone 2;"
-		} );
-
+    std::string const idf_objects = delimited_string(
+        {"Version,8.6;", "  Controller:MechanicalVentilation,", "    DCVObject, !- Name", "    , !- Availability Schedule Name",
+         "    , !- Demand Controlled Ventilation", "    IndoorAirQualityProcedure, !- System Outdoor Air Method",
+         "     , !- Zone Maximum Outdoor Air Fraction{ dimensionless }", "    Zone 1, !- Zone 1 Name",
+         "    , !- Design Specification Outdoor Air Object Name 1", "    , !- Design Specification Zone Air Distribution Object Name 1",
+         "    Zone 2, !- Zone 1 Name", "    , !- Design Specification Outdoor Air Object Name 1",
+         "    ; !- Design Specification Zone Air Distribution Object Name 1", "    Zone, Zone 1;", "    Zone, Zone 2;"});
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -5039,7 +4945,8 @@ namespace EnergyPlus {
 		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
 		EXPECT_EQ( 1.5, OAMassFlow );
 
-		// Case 3 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, controls to greater of total OutputRequiredToCO2SP and OutputRequiredToGCSP
+    // Case 3 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, controls to greater of total OutputRequiredToCO2SP and
+    // OutputRequiredToGCSP
 		OAMassFlow = 0.0;
 		VentilationMechanical( 1 ).SystemOAMethod = SOAM_IAQPCOM;
 		VentilationMechanical( 1 ).CalcMechVentController( SysMassFlow, OAMassFlow );
@@ -5065,8 +4972,7 @@ namespace EnergyPlus {
 		Contaminant.CO2Simulation = true;
 		Contaminant.CO2OutdoorSchedPtr = 1;
 
-		std::string const idf_objects = delimited_string({
-			"Version,8.6;",
+    std::string const idf_objects = delimited_string({"Version,8.6;",
 			"  Controller:MechanicalVentilation,",
 			"    DCVObject, !- Name",
 			"    , !- Availability Schedule Name",
@@ -5198,9 +5104,7 @@ namespace EnergyPlus {
 			"    5,                       !- Multiplier",
 			"    ,                        !- Ceiling Height {m}",
 			"    3600,                    !- Volume {m3}",
-			"    600;                     !- Floor Area {m2}"
-		} );
-
+                                                      "    600;                     !- Floor Area {m2}"});
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -5245,7 +5149,8 @@ namespace EnergyPlus {
 		// Zone 3 - flow/zone, 3.0 m3/s-zone, OA=3.0 m3/s
 		// Zone 4 - AirChanges/Hour, 5.0 ACH, volume 3600 m3, OA=5 m3/s (ACH/3600=air change/sec)
 		// Zone 5 - Sum, 0.2 m3/s/person, 20 persons [4], 2 m3/s-m2, area 100 [200], 5 m3/s-zone [5], 4 ACH, volume 7200 m3 [8], OA=4+200+5+8=217 m3/s
-		// Zone 6 - Maximum, 0.3 m3/s/person, 6 persons [1.8], 1 m3/s-m2, area 600 [600], 1 m3/s-zone [1], 0.1 ACH, volume 3600 m3 [0.1], OA=max(1.8+600+1+0.1=600 m3/s
+    // Zone 6 - Maximum, 0.3 m3/s/person, 6 persons [1.8], 1 m3/s-m2, area 600 [600], 1 m3/s-zone [1], 0.1 ACH, volume 3600 m3 [0.1],
+    // OA=max(1.8+600+1+0.1=600 m3/s
 
 		// Apply schedules and zone multipliers
 		// Zone 1 - schedule = 0.1, multiplier = 1.0, OA=1*0.1*1  =   0.1 m3/s
@@ -5255,7 +5160,6 @@ namespace EnergyPlus {
 		// Zone 5 - schedule = 0.5, multiplier = 1.0, OA=217*0.5*1= 108.5 m3/s
 		// Zone 6 - schedule = 0.6, multiplier = 5.0, OA=600*0.6*5=1800.0 m3/s
 		// Total for all zones = 1951.5 m3/s
-
 
 		// Case 1 - All zones as initially set up
 		OAMassFlow = 0.0;
@@ -5354,7 +5258,6 @@ namespace EnergyPlus {
 			"    CM DSOA West Zone, !- Design Specification Outdoor Air Object Name 1",
 			"    CM DSZAD West Zone; !- Design Specification Zone Air Distribution Object Name 1",
 		} );
-
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -5700,6 +5603,5 @@ namespace EnergyPlus {
 		SimOAController( CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum );
 		// OAControllerIndex is set during first time InitOAController run
 		EXPECT_EQ( CurrentOASystem.OAControllerIndex, 1 );
-
-	}
 }
+} // namespace EnergyPlus

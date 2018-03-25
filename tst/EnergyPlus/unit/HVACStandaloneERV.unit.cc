@@ -52,15 +52,14 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/HVACStandAloneERV.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACStandAloneERV;
@@ -73,154 +72,154 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::ScheduleManager;
 
-TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
+TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 {
-	ZoneEquipConfig.allocate( 1 );
-	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
-	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+    ZoneEquipConfig.allocate(1);
+    ZoneEquipConfig(1).ZoneName = "Zone 1";
+    ZoneEquipConfig(1).ActualZoneNum = 1;
 
-	Zone.allocate( 1 );
-	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
-	ZoneEqSizing.allocate( 1 );
-	CurZoneEqNum = 1;
+    Zone.allocate(1);
+    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    ZoneEqSizing.allocate(1);
+    CurZoneEqNum = 1;
 
-	TotPeople = 2; // Total number of people statements
-	People.allocate(TotPeople);
-	People( 1 ).ZonePtr = 1;
-	People( 1 ).NumberOfPeople = 100.0;
-	People( 1 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-	People( 2 ).ZonePtr = 1;
-	People( 2 ).NumberOfPeople = 200.0;
-	People( 2 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    TotPeople = 2; // Total number of people statements
+    People.allocate(TotPeople);
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 100.0;
+    People(1).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    People(2).ZonePtr = 1;
+    People(2).NumberOfPeople = 200.0;
+    People(2).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
-	StandAloneERV.allocate( 1 );
+    StandAloneERV.allocate(1);
 
-	// size on floor area
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 1.0;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 0.0;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 1000.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 1000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
+    // size on floor area
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
+    StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 1000.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(1000.0, StandAloneERV(1).SupplyAirVolFlow);
 
-	// size on occupancy
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 0.0;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 10.0;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 1000.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 3000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
+    // size on occupancy
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
+    StandAloneERV(1).AirVolFlowPerFloorArea = 0.0;
+    StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 1000.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(3000.0, StandAloneERV(1).SupplyAirVolFlow);
 
-	// size on floor area and occupancy
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 1.0;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 10.0;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 1000.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 4000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
+    // size on floor area and occupancy
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
+    StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 1000.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(4000.0, StandAloneERV(1).SupplyAirVolFlow);
 
-	// size on floor area and occupancy using zone multiplier
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
-	Zone( 1 ).Multiplier = 5.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 20000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
-
+    // size on floor area and occupancy using zone multiplier
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    Zone(1).Multiplier = 5.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(20000.0, StandAloneERV(1).SupplyAirVolFlow);
 }
 
-TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
+TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
+{
 
-	std::string const idf_objects = delimited_string( {
-		" Version,8.5;",
+    std::string const idf_objects = delimited_string({
+        " Version,8.5;",
 
-		"  Fan:OnOff,",
-			"    ERV Supply Fan,          !- Name",
-			"    FanAndCoilAvailSched,    !- Availability Schedule Name",
-			"    0.5,                     !- Fan Total Efficiency",
-			"    75.0,                    !- Pressure Rise {Pa}",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
-			"    0.9,                     !- Motor Efficiency",
-			"    1.0,                     !- Motor In Airstream Fraction",
-			"    HR Supply Outlet Node,   !- Air Inlet Node Name",
-			"    Supply Fan Outlet Node;  !- Air Outlet Node Name",
+        "  Fan:OnOff,",
+        "    ERV Supply Fan,          !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    autosize,                !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Supply Outlet Node,   !- Air Inlet Node Name",
+        "    Supply Fan Outlet Node;  !- Air Outlet Node Name",
 
-			"  Fan:OnOff,",
-			"    ERV Exhaust Fan,         !- Name",
-			"    FanAndCoilAvailSched,    !- Availability Schedule Name",
-			"    0.5,                     !- Fan Total Efficiency",
-			"    75.0,                    !- Pressure Rise {Pa}",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
-			"    0.9,                     !- Motor Efficiency",
-			"    1.0,                     !- Motor In Airstream Fraction",
-			"    HR Secondary Outlet Node,!- Air Inlet Node Name",
-			"    Exhaust Fan Outlet Node; !- Air Outlet Node Name",
+        "  Fan:OnOff,",
+        "    ERV Exhaust Fan,         !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    autosize,                !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Secondary Outlet Node,!- Air Inlet Node Name",
+        "    Exhaust Fan Outlet Node; !- Air Outlet Node Name",
 
-			"  Schedule:Compact,",
-			"    FanAndCoilAvailSched,    !- Name",
-			"    Fraction,                !- Schedule Type Limits Name",
-			"    Through: 12/31,          !- Field 1",
-			"    For: AllDays,            !- Field 2",
-			"    Until: 24:00,1.0;        !- Field 3",
-	} );
+        "  Schedule:Compact,",
+        "    FanAndCoilAvailSched,    !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+    });
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-	ProcessScheduleInput(); // read schedules
+    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput();  // read schedules
 
-	GetFanInput();
+    GetFanInput();
 
-	EnergyPlus::DataSizing::CurZoneEqNum = 1;
+    EnergyPlus::DataSizing::CurZoneEqNum = 1;
 
-	ZoneEquipConfig.allocate( 1 );
-	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
-	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+    ZoneEquipConfig.allocate(1);
+    ZoneEquipConfig(1).ZoneName = "Zone 1";
+    ZoneEquipConfig(1).ActualZoneNum = 1;
 
-	Zone.allocate( 1 );
-	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 100.0;
+    Zone.allocate(1);
+    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 100.0;
 
-	ZoneEqSizing.allocate( 1 );
-	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
-	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
+    ZoneEqSizing.allocate(1);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-	FinalZoneSizing.allocate( 1 );
-	FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.0;
-	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.0;
+    FinalZoneSizing.allocate(1);
+    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.0;
 
-	TotPeople = 2; // Total number of people objects
-	People.allocate( TotPeople );
-	People( 1 ).ZonePtr = 1;
-	People( 1 ).NumberOfPeople = 10.0;
-	People( 1 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
-	People( 2 ).ZonePtr = 1;
-	People( 2 ).NumberOfPeople = 20.0;
-	People( 2 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
+    TotPeople = 2; // Total number of people objects
+    People.allocate(TotPeople);
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 10.0;
+    People(1).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
+    People(2).ZonePtr = 1;
+    People(2).NumberOfPeople = 20.0;
+    People(2).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
 
-	StandAloneERV.allocate( 1 );
-	StandAloneERV( 1 ).SupplyAirVolFlow = DataSizing::AutoSize;
-	StandAloneERV( 1 ).ExhaustAirVolFlow = DataSizing::AutoSize;
-	StandAloneERV( 1 ).DesignSAFanVolFlowRate = DataSizing::AutoSize;
-	StandAloneERV( 1 ).DesignEAFanVolFlowRate = DataSizing::AutoSize;
-	StandAloneERV( 1 ).DesignHXVolFlowRate = DataSizing::AutoSize;
-	StandAloneERV( 1 ).SupplyAirFanName = Fan( 1 ).FanName;
-	StandAloneERV( 1 ).SupplyAirFanIndex = 1;
-	StandAloneERV( 1 ).ExhaustAirFanName = Fan( 2 ).FanName;
-	StandAloneERV( 1 ).ExhaustAirFanIndex = 2;
-	StandAloneERV( 1 ).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
-	StandAloneERV( 1 ).HeatExchangerName = "ERV Heat Exchanger";
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 0.01;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 0.0;
-	StandAloneERV( 1 ).HighRHOAFlowRatio = 1.2;
+    StandAloneERV.allocate(1);
+    StandAloneERV(1).SupplyAirVolFlow = DataSizing::AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = DataSizing::AutoSize;
+    StandAloneERV(1).DesignSAFanVolFlowRate = DataSizing::AutoSize;
+    StandAloneERV(1).DesignEAFanVolFlowRate = DataSizing::AutoSize;
+    StandAloneERV(1).DesignHXVolFlowRate = DataSizing::AutoSize;
+    StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    StandAloneERV(1).SupplyAirFanIndex = 1;
+    StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    StandAloneERV(1).ExhaustAirFanIndex = 2;
+    StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+    StandAloneERV(1).AirVolFlowPerFloorArea = 0.01;
+    StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
+    StandAloneERV(1).HighRHOAFlowRatio = 1.2;
 
-	SizeStandAloneERV( 1 );
+    SizeStandAloneERV(1);
 
-	EXPECT_EQ( 1.0, StandAloneERV( 1 ).SupplyAirVolFlow );
-	EXPECT_EQ( 1.0, StandAloneERV( 1 ).DesignHXVolFlowRate );
-	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignSAFanVolFlowRate );
-	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignEAFanVolFlowRate );
+    EXPECT_EQ(1.0, StandAloneERV(1).SupplyAirVolFlow);
+    EXPECT_EQ(1.0, StandAloneERV(1).DesignHXVolFlowRate);
+    EXPECT_EQ(1.2, StandAloneERV(1).DesignSAFanVolFlowRate);
+    EXPECT_EQ(1.2, StandAloneERV(1).DesignEAFanVolFlowRate);
 }

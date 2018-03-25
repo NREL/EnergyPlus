@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <DataDaylighting.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
@@ -64,7 +65,6 @@
 #include <InternalHeatGains.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DaylightingManager;
@@ -151,8 +151,6 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test )
 	EXPECT_EQ(1, ZoneDaylight(1).DaylRefPtNum(1));
 	EXPECT_EQ(1., ZoneDaylight(1).FracZoneDaylit(1));
 	EXPECT_EQ(500., ZoneDaylight(1).IllumSetPoint(1));
-
-
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_Test)
@@ -263,10 +261,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
 	EXPECT_EQ(3, ZoneDaylight(1).DaylRefPtNum(3));
 	EXPECT_EQ(0.25, ZoneDaylight(1).FracZoneDaylit(3));
 	EXPECT_EQ(450., ZoneDaylight(1).IllumSetPoint(3));
-
 }
-
-
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
 {
@@ -335,9 +330,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
 	EXPECT_EQ(3.048, DaylRefPt(3).x);
 	EXPECT_EQ(4.048, DaylRefPt(3).y);
 	EXPECT_EQ(0.9, DaylRefPt(3).z);
-
 }
-
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
 {
@@ -394,7 +387,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
 
 	//OutputControl:IlluminanceMap:Style
 	EXPECT_EQ(',', MapColSep);
-
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_doesDayLightingUseDElight_Test)
@@ -411,9 +403,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_doesDayLightingUseDElight_Test)
 	ZoneDaylight(2).DaylightMethod = DElightDaylighting;
 
 	EXPECT_TRUE(doesDayLightingUseDElight());
-
 }
-
 
 TEST_F( EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test )
 {
@@ -629,7 +619,6 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test )
 		"ScheduleTypeLimits,",
 		"    Any Number;              !- Name",
 
-
 	} );
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
@@ -663,7 +652,6 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test )
 	SurfaceGeometry::SetupZoneGeometry( foundErrors ); // this calls GetSurfaceData()
 	EXPECT_FALSE( foundErrors ); // expect no errors
 
-
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
 	ScheduleManager::ProcessScheduleInput();
@@ -688,7 +676,6 @@ TEST_F( EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test )
 	EXPECT_NEAR( 2.048, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 1, 1 ), 0.001);
 	EXPECT_NEAR( 3.048, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 2, 1 ), 0.001 );
 	EXPECT_NEAR( 0.9, ZoneDaylight( 1 ).DaylRefPtAbsCoord( 3, 1 ), 0.001 );
-
 
 	DataHeatBalance::Zone( 1 ).RelNorth = 45.;
 
@@ -728,7 +715,6 @@ TEST_F (EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 	ProfileAngle(1, CosDirSun, vert, ProfAng);
 	EXPECT_NEAR(2.06065, ProfAng, 0.00001);
 
-
 	CosDirSun(1) = 0.92318;
 	CosDirSun(2) = 0.36483;
 	CosDirSun(3) = 0.12094;
@@ -738,5 +724,4 @@ TEST_F (EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 
 	ProfileAngle(1, CosDirSun, vert, ProfAng);
 	EXPECT_NEAR(1.94715, ProfAng, 0.00001);
-
 }
