@@ -56,79 +56,77 @@
 
 namespace EnergyPlus {
 
-	TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource) {
+TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
+{
 
-		// Setup the Plant temperature source object from IDF
-		std::string const idf_objects = delimited_string({
-                     "PlantComponent:TemperatureSource,",
-                     " FluidSource,             !- Name",
-                     " FluidSource Inlet Node,  !- Inlet Node",
-                     " FluidSource Outlet Node, !- Outlet Node",
-                     " 0.001,                   !- Design Volume Flow Rate {m3/s}",
-                     " Constant,                !- Temperature Specification Type",
-                     " 8,                       !- Source Temperature {C}",
-                     " ;                        !- Source Temperature Schedule Name"
-		});
-		ASSERT_TRUE(process_idf(idf_objects));
+    // Setup the Plant temperature source object from IDF
+    std::string const idf_objects =
+        delimited_string({"PlantComponent:TemperatureSource,", " FluidSource,             !- Name", " FluidSource Inlet Node,  !- Inlet Node",
+                          " FluidSource Outlet Node, !- Outlet Node", " 0.001,                   !- Design Volume Flow Rate {m3/s}",
+                          " Constant,                !- Temperature Specification Type", " 8,                       !- Source Temperature {C}",
+                          " ;                        !- Source Temperature Schedule Name"});
+    ASSERT_TRUE(process_idf(idf_objects));
 
-		// Setup the plant itself manually
-		DataPlant::TotNumLoops = 1;
-		DataPlant::PlantLoop.allocate(1);
-		DataPlant::PlantLoop(1).LoopSide.allocate(2);
-		DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-		DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-		DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-		DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-		DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-		DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-		DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-		DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-		DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_WaterSource;
-		DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "FLUIDSOURCE";
-		DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+    // Setup the plant itself manually
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_WaterSource;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "FLUIDSOURCE";
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
-		// define some arguments that aren't used but listed as parameters
-		int dummyInteger = 0;
-		bool dummyRunFlag = true;
+    // define some arguments that aren't used but listed as parameters
+    int dummyInteger = 0;
+    bool dummyRunFlag = true;
 
-		// define the INOUT variables that are passed back
-		int compIndex = 0; // use this to call back into Sim multiple times
-		Real64 myLoad = 0.0;
-		Real64 maxLoad = 0.0, minLoad = 0.0, optLoad = 0.0;
-		Real64 sizingFactor = 0.0;
+    // define the INOUT variables that are passed back
+    int compIndex = 0; // use this to call back into Sim multiple times
+    Real64 myLoad = 0.0;
+    Real64 maxLoad = 0.0, minLoad = 0.0, optLoad = 0.0;
+    Real64 sizingFactor = 0.0;
 
-		// First call is for initialization only
-		bool firstHVACIteration = true;
-		bool initLoopEquip = true;
-		bool getSizingFactor = true;
-		DataGlobals::BeginEnvrnFlag = true;
-		DataPlant::PlantFirstSizesOkayToFinalize = true;
-		PlantComponentTemperatureSources::SimWaterSource("FLUIDSOURCE", dummyInteger, compIndex, dummyRunFlag, firstHVACIteration, initLoopEquip, myLoad, maxLoad, minLoad, optLoad, getSizingFactor, sizingFactor);
+    // First call is for initialization only
+    bool firstHVACIteration = true;
+    bool initLoopEquip = true;
+    bool getSizingFactor = true;
+    DataGlobals::BeginEnvrnFlag = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    PlantComponentTemperatureSources::SimWaterSource("FLUIDSOURCE", dummyInteger, compIndex, dummyRunFlag, firstHVACIteration, initLoopEquip, myLoad,
+                                                     maxLoad, minLoad, optLoad, getSizingFactor, sizingFactor);
 
-		// We can check that GetInput happened properly here
-		EXPECT_EQ(1u, PlantComponentTemperatureSources::WaterSource.size());
-		auto & waterSource1 = PlantComponentTemperatureSources::WaterSource(1);
-		EXPECT_EQ(PlantComponentTemperatureSources::TempSpecType_Constant, waterSource1.TempSpecType);
-		EXPECT_EQ(1, waterSource1.InletNodeNum);
-		EXPECT_EQ(2, waterSource1.OutletNodeNum);
+    // We can check that GetInput happened properly here
+    EXPECT_EQ(1u, PlantComponentTemperatureSources::WaterSource.size());
+    auto &waterSource1 = PlantComponentTemperatureSources::WaterSource(1);
+    EXPECT_EQ(PlantComponentTemperatureSources::TempSpecType_Constant, waterSource1.TempSpecType);
+    EXPECT_EQ(1, waterSource1.InletNodeNum);
+    EXPECT_EQ(2, waterSource1.OutletNodeNum);
 
-		// Second call is on firstHVAC, no load at the moment
-		firstHVACIteration = true;
-		initLoopEquip = false;
-		getSizingFactor = false;
-		PlantComponentTemperatureSources::SimWaterSource("FLUIDSOURCE", dummyInteger, compIndex, dummyRunFlag, firstHVACIteration, initLoopEquip, myLoad, maxLoad, minLoad, optLoad, getSizingFactor, sizingFactor);
-		EXPECT_NEAR(0.0, waterSource1.MassFlowRate, 0.00001);
+    // Second call is on firstHVAC, no load at the moment
+    firstHVACIteration = true;
+    initLoopEquip = false;
+    getSizingFactor = false;
+    PlantComponentTemperatureSources::SimWaterSource("FLUIDSOURCE", dummyInteger, compIndex, dummyRunFlag, firstHVACIteration, initLoopEquip, myLoad,
+                                                     maxLoad, minLoad, optLoad, getSizingFactor, sizingFactor);
+    EXPECT_NEAR(0.0, waterSource1.MassFlowRate, 0.00001);
 
-		// Third call is no longer firstHVAC, and we now have a load
-		firstHVACIteration = false;
-		myLoad = 1696.55;
-		PlantComponentTemperatureSources::SimWaterSource("FLUIDSOURCE", dummyInteger, compIndex, dummyRunFlag, firstHVACIteration, initLoopEquip, myLoad, maxLoad, minLoad, optLoad, getSizingFactor, sizingFactor);
-		EXPECT_NEAR(0.05, waterSource1.MassFlowRate, 0.001);
+    // Third call is no longer firstHVAC, and we now have a load
+    firstHVACIteration = false;
+    myLoad = 1696.55;
+    PlantComponentTemperatureSources::SimWaterSource("FLUIDSOURCE", dummyInteger, compIndex, dummyRunFlag, firstHVACIteration, initLoopEquip, myLoad,
+                                                     maxLoad, minLoad, optLoad, getSizingFactor, sizingFactor);
+    EXPECT_NEAR(0.05, waterSource1.MassFlowRate, 0.001);
 
-		// Do this for scheduled temperature
-		// NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-		// MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-		// ProcessScheduleInput(); // read schedules
-
-	}
+    // Do this for scheduled temperature
+    // NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    // MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    // ProcessScheduleInput(); // read schedules
 }
+} // namespace EnergyPlus

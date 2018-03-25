@@ -61,77 +61,76 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
 using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim )
+TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
 {
-	TotNumLoops = 3;
-	PlantLoop.allocate( TotNumLoops );
-	for ( int l = 1; l <= TotNumLoops; ++l ) {
-		auto & loop( PlantLoop( l ) );
-		loop.LoopSide.allocate( 2 );
-	}
+    TotNumLoops = 3;
+    PlantLoop.allocate(TotNumLoops);
+    for (int l = 1; l <= TotNumLoops; ++l) {
+        auto &loop(PlantLoop(l));
+        loop.LoopSide.allocate(2);
+    }
 
-	EXPECT_TRUE( PlantUtilities::AnyPlantLoopSidesNeedSim() ); // SimLoopSideNeeded is set to true in default ctor
-	PlantUtilities::SetAllPlantSimFlagsToValue( false ); // Set all SimLoopSideNeeded to false
-	EXPECT_FALSE( PlantUtilities::AnyPlantLoopSidesNeedSim() );
+    EXPECT_TRUE(PlantUtilities::AnyPlantLoopSidesNeedSim()); // SimLoopSideNeeded is set to true in default ctor
+    PlantUtilities::SetAllPlantSimFlagsToValue(false);       // Set all SimLoopSideNeeded to false
+    EXPECT_FALSE(PlantUtilities::AnyPlantLoopSidesNeedSim());
 }
 
-TEST_F( EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop )
+TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
 {
 
-	// not using the DataPlantTest base class because of how specific this one is and that one is very general
-	if ( PlantLoop.allocated() ) PlantLoop.deallocate();
-	TotNumLoops = 2;
-	PlantLoop.allocate( 2 );
-	PlantLoop( 1 ).LoopSide.allocate(2);
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide.allocate(2);
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.allocate( 1 );
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.allocate( 1 );
+    // not using the DataPlantTest base class because of how specific this one is and that one is very general
+    if (PlantLoop.allocated()) PlantLoop.deallocate();
+    TotNumLoops = 2;
+    PlantLoop.allocate(2);
+    PlantLoop(1).LoopSide.allocate(2);
+    PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    PlantLoop(2).LoopSide.allocate(2);
+    PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
-	// initialize all node numbers to zero
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumOut = 0;
+    // initialize all node numbers to zero
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
+    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 0;
+    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
+    PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 0;
 
-	// specify the node numbers of interest
-	int const nodeNumA = 1;
-	int const nodeNumB = 2;
+    // specify the node numbers of interest
+    int const nodeNumA = 1;
+    int const nodeNumB = 2;
 
-	// first test, expected pass
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_TRUE( PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
+    // first test, expected pass
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 2;
+    EXPECT_TRUE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(nodeNumA, nodeNumB));
 
-	// reset node numbers
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 0;
+    // reset node numbers
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 0;
 
-	// second test, expected false
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 1;
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp( 1 ).NodeNumIn = 2;
-	EXPECT_FALSE( PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop( nodeNumA, nodeNumB ) );
+    // second test, expected false
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    EXPECT_FALSE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(nodeNumA, nodeNumB));
 
-	TotNumLoops = 0;
-	PlantLoop( 1 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 1 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 1 ).LoopSide.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 1 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch( 1 ).Comp.deallocate();
-	PlantLoop( 2 ).LoopSide( 2 ).Branch.deallocate();
-	PlantLoop( 2 ).LoopSide.deallocate();
-	PlantLoop.deallocate();
-
+    TotNumLoops = 0;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp.deallocate();
+    PlantLoop(1).LoopSide(1).Branch.deallocate();
+    PlantLoop(1).LoopSide(2).Branch(1).Comp.deallocate();
+    PlantLoop(1).LoopSide(2).Branch.deallocate();
+    PlantLoop(1).LoopSide.deallocate();
+    PlantLoop(2).LoopSide(1).Branch(1).Comp.deallocate();
+    PlantLoop(2).LoopSide(1).Branch.deallocate();
+    PlantLoop(2).LoopSide(2).Branch(1).Comp.deallocate();
+    PlantLoop(2).LoopSide(2).Branch.deallocate();
+    PlantLoop(2).LoopSide.deallocate();
+    PlantLoop.deallocate();
 }

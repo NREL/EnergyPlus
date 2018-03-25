@@ -54,54 +54,54 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/HVACInterfaceManager.hh>
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
 
 namespace EnergyPlus {
-	TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test) {
-		using namespace DataPlant;
-		using namespace HVACInterfaceManager;
-		using namespace DataHVACGlobals;
-		Real64 TankOutletTemp;
-		TimeStepSys = 1;
-		TotNumLoops = 1;
-		PlantLoop.allocate(TotNumLoops);
-		for (int i = 1; i <= TotNumLoops; ++i) {
-			auto & loop(PlantLoop(i));
-			loop.LoopSide.allocate(2);
-		}
-		//Set Up PlantLoop Variables
-		PlantLoop(1).Mass = 50;
-		PlantLoop(1).FluidName = "Water";
-		PlantLoop(1).FluidIndex = 1;
-		PlantLoop(1).LoopSide(1).NodeNumOut = 1;
-		PlantLoop(1).LoopSide(1).NodeNumIn = 1;
-		PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 80;
-		PlantLoop(1).LoopSide(2).TotalPumpHeat = 500;
-		DataLoopNode::Node.allocate(TotNumLoops);
-		DataLoopNode::Node(1).Temp = 100;
-		DataLoopNode::Node(1).MassFlowRate = 10;
+TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
+{
+    using namespace DataPlant;
+    using namespace HVACInterfaceManager;
+    using namespace DataHVACGlobals;
+    Real64 TankOutletTemp;
+    TimeStepSys = 1;
+    TotNumLoops = 1;
+    PlantLoop.allocate(TotNumLoops);
+    for (int i = 1; i <= TotNumLoops; ++i) {
+        auto &loop(PlantLoop(i));
+        loop.LoopSide.allocate(2);
+    }
+    // Set Up PlantLoop Variables
+    PlantLoop(1).Mass = 50;
+    PlantLoop(1).FluidName = "Water";
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).LoopSide(1).NodeNumOut = 1;
+    PlantLoop(1).LoopSide(1).NodeNumIn = 1;
+    PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 80;
+    PlantLoop(1).LoopSide(2).TotalPumpHeat = 500;
+    DataLoopNode::Node.allocate(TotNumLoops);
+    DataLoopNode::Node(1).Temp = 100;
+    DataLoopNode::Node(1).MassFlowRate = 10;
 
-		//LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
-		//Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep
-		UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
-		EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
-		EXPECT_NEAR(2928.82, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, 0.001);
-		EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
-		EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);
+    // LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
+    // Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep
+    UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+    EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, 0.001);
+    EXPECT_NEAR(2928.82, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, 0.001);
+    EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
+    EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);
 
-		PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 120;		//random
+    PlantLoop(1).LoopSide(2).LastTempInterfaceTankOutlet = 120; // random
 
-																		//LoopSideInlet_MdotCpDeltaT should be > LoopSideInlet_McpDTdt
-																		//Therefore TotalTime will increase by 1 more timestep, but CapExcessStorageTime will NOT increase
-		UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
-		EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, .001);
-		EXPECT_NEAR(-588.264, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, .001);
-		EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
-		EXPECT_EQ(2, PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);
-
-	}
+    // LoopSideInlet_MdotCpDeltaT should be > LoopSideInlet_McpDTdt
+    // Therefore TotalTime will increase by 1 more timestep, but CapExcessStorageTime will NOT increase
+    UpdateHalfLoopInletTemp(1, 1, TankOutletTemp);
+    EXPECT_NEAR(-500, PlantLoop(1).LoopSide(2).LoopSideInlet_MdotCpDeltaT, .001);
+    EXPECT_NEAR(-588.264, PlantLoop(1).LoopSide(2).LoopSideInlet_McpDTdt, .001);
+    EXPECT_EQ(1, PlantLoop(1).LoopSide(2).LoopSideInlet_CapExcessStorageTime);
+    EXPECT_EQ(2, PlantLoop(1).LoopSide(2).LoopSideInlet_TotalTime);
 }
+} // namespace EnergyPlus

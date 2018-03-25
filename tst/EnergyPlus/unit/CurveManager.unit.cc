@@ -49,9 +49,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <CurveManager.hh>
 #include <DataGlobals.hh>
 #include <DataIPShortCuts.hh>
-#include <CurveManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "EnergyPlus/CurveManager.hh"
@@ -1748,7 +1748,8 @@ TEST_F(EnergyPlusFixture, Curves_QuadLinear) {
 	EXPECT_FALSE(has_err_output());
 }
 
-TEST_F( EnergyPlusFixture, Tables_TwoIndVar_Malformed ) {
+TEST_F(EnergyPlusFixture, Tables_TwoIndVar_Malformed)
+{
 
 	DataIPShortCuts::lAlphaFieldBlanks = true;
 	std::string const idf_objects = delimited_string( {
@@ -1920,25 +1921,16 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndVar_Malformed ) {
 	} );
 
 	EXPECT_TRUE( compare_err_stream( error_string, true ) );
-
 }
-TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY ) {
-	std::string const idf_objects = delimited_string( {
-		"Version,8.5;",
-		"Table:OneIndependentVariable,",
-		"TestTableMinMax,         !- Name",
-		"Linear,                  !- Curve Type",
-		"LinearInterpolationOfTable,  !- Interpolation Method",
-		",                        !- Minimum Value of X",
-		",                        !- Maximum Value of X",
-		",                        !- Minimum Table Output",
-		",                        !- Maximum Table Output",
-		"Dimensionless,           !- Input Unit Type for X",
-		"Dimensionless,           !- Output Unit Type",
-		",                        !- Normalization Reference",
-		"0,                       !- X Value #1",
-		"0,                       !- Output Value #1",
-		"1,                       !- X Value #2",
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY)
+{
+    std::string const idf_objects = delimited_string(
+        {"Version,8.5;", "Table:OneIndependentVariable,", "TestTableMinMax,         !- Name", "Linear,                  !- Curve Type",
+         "LinearInterpolationOfTable,  !- Interpolation Method", ",                        !- Minimum Value of X",
+         ",                        !- Maximum Value of X", ",                        !- Minimum Table Output",
+         ",                        !- Maximum Table Output", "Dimensionless,           !- Input Unit Type for X",
+         "Dimensionless,           !- Output Unit Type", ",                        !- Normalization Reference",
+         "0,                       !- X Value #1", "0,                       !- Output Value #1", "1,                       !- X Value #2",
 		"1;                       !- Output Value #2" } );
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		EXPECT_EQ( 0, CurveManager::NumCurves );
@@ -1960,10 +1952,10 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_UserDidNotEnterMinMaxXY
 		EXPECT_FALSE( has_err_output() );
 }
 
-TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEnteredMinMaxXY ) {
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEnteredMinMaxXY)
+{
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.5;",
+    std::string const idf_objects = delimited_string({"Version,8.5;",
 		"Table:OneIndependentVariable,",
 		"TestTableOverwrite,      !- Name",
 		"Linear,                  !- Curve Type",
@@ -2020,10 +2012,10 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_EvaluateToLimits_UserEn
 		EXPECT_FALSE( has_err_output() );
 }
 
-TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnterMinMaxXY ) {
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnterMinMaxXY)
+{
 
-	std::string const idf_objects = delimited_string( {
-		"Version,8.5;",
+    std::string const idf_objects = delimited_string({"Version,8.5;",
 		"Table:OneIndependentVariable,",
 		"TestTableOverwrite,      !- Name",
 		"Linear,                  !- Curve Type",
@@ -2083,7 +2075,8 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Lagrange_UserDidntEnter
 		EXPECT_FALSE( has_err_output() );
 }
 
-TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndUserEnteredMinMaxXY ) {
+TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAndUserEnteredMinMaxXY)
+{
 
 	std::string const idf_objects = delimited_string( {
 
@@ -2180,7 +2173,8 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		EXPECT_EQ( ( 40000.0 / 25000.0 ), CurveManager::PerfCurve( 1 ).CurveMax );
 		EXPECT_EQ( CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum( 1 ) );
 
-		EXPECT_GT( CurveManager::CurveValue( 1, 10.0, 15.0 ), ( 15000.0 / 25000.0 ) ); // both values too small, Minimum Value of X (12.8) and Y (18) are used, Min Table Output is not used
+    EXPECT_GT(CurveManager::CurveValue(1, 10.0, 15.0),
+              (15000.0 / 25000.0)); // both values too small, Minimum Value of X (12.8) and Y (18) are used, Min Table Output is not used
 		Real64 Coeff1 = CurveManager::PerfCurve( 1 ).Coeff1;
 		Real64 Coeff2 = CurveManager::PerfCurve( 1 ).Coeff2;
 		Real64 Coeff3 = CurveManager::PerfCurve( 1 ).Coeff3;
@@ -2194,14 +2188,19 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		EXPECT_LT( curveOut, CurveManager::CurveValue( 1, 10.0, 15.0 ) );  // result of using less than minimum X1 and X2 limits
 
 		// calculate new value using min X1 and min X2, this value should match curve output
-		Real64 curveOutActual = Coeff1 + ( Coeff2 * 12.77778 ) + ( Coeff3 * 12.77778 * 12.77778 ) + ( Coeff4 * 18.0 ) + ( Coeff5 * 18.0 * 18.0 ) + ( Coeff6 * 12.77778 * 18.0 );
+    Real64 curveOutActual =
+        Coeff1 + (Coeff2 * 12.77778) + (Coeff3 * 12.77778 * 12.77778) + (Coeff4 * 18.0) + (Coeff5 * 18.0 * 18.0) + (Coeff6 * 12.77778 * 18.0);
 		EXPECT_NEAR( 0.7662161, curveOutActual, 0.0000001 );  // result of using less than minimum X1 and X2 limits
 		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 10.0, 15.0 ), 0.000001 );  // result of using less than minimum X1 and X2 limits
-		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 12.0, 16.0 ), 0.000001 );  // result shouldn't change as long as inputs are below minimum X1 and X2 limits
-		curveOutActual = Coeff1 + ( Coeff2 * 23.88889 ) + ( Coeff3 * 23.88889 * 23.88889 ) + ( Coeff4 * 46.11111 ) + ( Coeff5 * 46.11111 * 46.11111 ) + ( Coeff6 * 23.88889 * 46.11111 );
-		EXPECT_LT( CurveManager::CurveValue( 1, 40.0, 50.0 ), ( 40000.0 / 25000.0 ) ); // both values too large, Maximum Value of X1 (23.8) and X2 (46.1) are used, Max Table Output is too high
+    EXPECT_NEAR(curveOutActual, CurveManager::CurveValue(1, 12.0, 16.0),
+                0.000001); // result shouldn't change as long as inputs are below minimum X1 and X2 limits
+    curveOutActual = Coeff1 + (Coeff2 * 23.88889) + (Coeff3 * 23.88889 * 23.88889) + (Coeff4 * 46.11111) + (Coeff5 * 46.11111 * 46.11111) +
+                     (Coeff6 * 23.88889 * 46.11111);
+    EXPECT_LT(CurveManager::CurveValue(1, 40.0, 50.0),
+              (40000.0 / 25000.0)); // both values too large, Maximum Value of X1 (23.8) and X2 (46.1) are used, Max Table Output is too high
 		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 40.0, 50.0 ), 0.000001 );  // result of using maximum X1 and X2 limits
-		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 1, 25.0, 47.0 ), 0.000001 );  // result shouldn't change as long as inputs are above maximum X and Y limits
+    EXPECT_NEAR(curveOutActual, CurveManager::CurveValue(1, 25.0, 47.0),
+                0.000001);                               // result shouldn't change as long as inputs are above maximum X and Y limits
 		EXPECT_NEAR( 0.91625045, curveOutActual, 0.00000001 );  // result is actually less than max ouput since a regression was performed
 
 		// artificially change CurveMin And CurveMax and repeat limit test
@@ -2233,13 +2232,18 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		EXPECT_FALSE( CurveManager::PerfCurve( 2 ).CurveMaxPresent ); // max won't be used since value is NOT present
 		EXPECT_EQ( CurveManager::CurveType_TableTwoIV, CurveManager::GetCurveObjectTypeNum( 2 ) );
 
-		EXPECT_GT( CurveManager::CurveValue( 2, 10.0, 15.0 ), ( 15000.0 / 25000.0 ) ); // both values too small, Minimum Value of X1 (12.8) and X2 (18) are used, Min Table Output is not present
+    EXPECT_GT(CurveManager::CurveValue(2, 10.0, 15.0),
+              (15000.0 / 25000.0)); // both values too small, Minimum Value of X1 (12.8) and X2 (18) are used, Min Table Output is not present
 		EXPECT_NEAR( 0.780966, CurveManager::CurveValue( 2, 10.0, 15.0 ), 0.0000001 );  // result of using minimum X1 and X2 limits
-		EXPECT_NEAR( 0.780966, CurveManager::CurveValue( 2, 12.0, 16.0 ), 0.0000001 );  // result shouldn't change as long as inputs are below minimum X1 and X2 limits
-		curveOutActual = Coeff1 + ( Coeff2 * 19.44448943 ) + ( Coeff3 * 19.44448943 * 19.44448943 ) + ( Coeff4 * 46.11111 ) + ( Coeff5 * 46.11111 * 46.11111 ) + ( Coeff6 * 19.44448943 * 46.11111 );
-		EXPECT_LT( CurveManager::CurveValue( 2, 40.0, 50.0 ), ( 23375.08713 / 25000.0 ) ); // both values too large, Maximum Value of X1 (23.8) and X2 (46.1) are used, Max Table Output is not present
+    EXPECT_NEAR(0.780966, CurveManager::CurveValue(2, 12.0, 16.0),
+                0.0000001); // result shouldn't change as long as inputs are below minimum X1 and X2 limits
+    curveOutActual = Coeff1 + (Coeff2 * 19.44448943) + (Coeff3 * 19.44448943 * 19.44448943) + (Coeff4 * 46.11111) + (Coeff5 * 46.11111 * 46.11111) +
+                     (Coeff6 * 19.44448943 * 46.11111);
+    EXPECT_LT(CurveManager::CurveValue(2, 40.0, 50.0),
+              (23375.08713 / 25000.0)); // both values too large, Maximum Value of X1 (23.8) and X2 (46.1) are used, Max Table Output is not present
 		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 2, 40.0, 50.0 ), 0.000001 );  // result of using maximum X1 and X2 limits
-		EXPECT_NEAR( curveOutActual, CurveManager::CurveValue( 2, 25.0, 47.0 ), 0.000001 );  // result shouldn't change as long as inputs are above maximum X1 and X2 limits
+    EXPECT_NEAR(curveOutActual, CurveManager::CurveValue(2, 25.0, 47.0),
+                0.000001); // result shouldn't change as long as inputs are above maximum X1 and X2 limits
 
 		// test capacity entered by user is same as calculated
 		EXPECT_NEAR( 19524.15032, ( CurveManager::CurveValue( 2, 12.77778, 36.0 ) * 25000.0 ), 0.1 ); // uses data from first entry in table
@@ -2257,11 +2261,13 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		CurveManager::PerfCurve( 2 ).CurveMin = 0.5; // 0.5 is same as entering 12500 for Minimum Table Output
 		CurveManager::PerfCurve( 2 ).CurveMax = 1.2; // 1.2 is same as entering 30000 for Maximum Table Output
 		// result is lower than before when using 0.8 as Minimum Table Output
-		EXPECT_LT( 0.5, CurveManager::CurveValue( 2, 10.0, 15.0 ) );  // new result is lower than 0.8 but not lower than 0.5 since output is limited by X1 X2 min/max
+    EXPECT_LT(
+        0.5, CurveManager::CurveValue(2, 10.0, 15.0)); // new result is lower than 0.8 but not lower than 0.5 since output is limited by X1 X2 min/max
 		EXPECT_GT( 0.8, CurveManager::CurveValue( 2, 10.0, 15.0 ) );
 		EXPECT_NEAR( 0.780966, CurveManager::CurveValue( 2, 10.0, 15.0 ), 0.000001 );
 		// result is higher than before when using 0.87 as Maximum Table Output
-		EXPECT_LT( 0.87, CurveManager::CurveValue( 2, 40.0, 50.0 ) );  // new result is higher than 0.87 but not higher than 1.2 since output is limited by X1 X2 min/max
+    EXPECT_LT(0.87, CurveManager::CurveValue(
+                        2, 40.0, 50.0)); // new result is higher than 0.87 but not higher than 1.2 since output is limited by X1 X2 min/max
 		EXPECT_GT( 1.2, CurveManager::CurveValue( 2, 40.0, 50.0 ) );
 		EXPECT_NEAR( 0.8799342, CurveManager::CurveValue( 2, 40.0, 50.0 ), 0.0000001 );
 
@@ -2283,8 +2289,10 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		Real64 minY = 16810.36004 / 25000.0;
 		Real64 maxY = 23375.08713 / 25000.0;
 
-		EXPECT_LT( CurveManager::CurveValue( 2, 40.0, 50.0 ), maxY );  // results show dangers of extrapolation, large X1 and X2 gives output lower than max Y table data
-		EXPECT_LT( CurveManager::CurveValue( 2, 40.0, 50.0 ), minY );  // results show dangers of extrapolation, large X1 and X2 gives output lower than min Y table data
+    EXPECT_LT(CurveManager::CurveValue(2, 40.0, 50.0),
+              maxY); // results show dangers of extrapolation, large X1 and X2 gives output lower than max Y table data
+    EXPECT_LT(CurveManager::CurveValue(2, 40.0, 50.0),
+              minY); // results show dangers of extrapolation, large X1 and X2 gives output lower than min Y table data
 		Coeff1 = CurveManager::PerfCurve( 2 ).Coeff1;
 		Coeff2 = CurveManager::PerfCurve( 2 ).Coeff2;
 		Coeff3 = CurveManager::PerfCurve( 2 ).Coeff3;
@@ -2294,13 +2302,12 @@ TEST_F( EnergyPlusFixture, Tables_TwoIndependentVariable_EvaluateToLimits_NotAnd
 		curveOutActual = Coeff1 + ( Coeff2 * 40.0 ) + ( Coeff3 * 40.0 * 40.0 ) + ( Coeff4 * 50.0 ) + ( Coeff5 * 50.0 * 50.0 ) + ( Coeff6 * 40.0 * 50.0 );
 		EXPECT_NEAR( ( curveOutActual * 25000.0 ), extrapolatedCapacity, 0.001 );  // result of extrapolation is value less than minimum table data
 		EXPECT_NEAR( 9358.378, ( curveOutActual * 25000.0 ), 0.001 );  // result of extrapolation is value less than minimum table data
-
 }
 
-TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMinMaxXY) {
+TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMinMaxXY)
+{
 
-    std::string const idf_objects = delimited_string({
-        "Version,8.5;",
+    std::string const idf_objects = delimited_string({"Version,8.5;",
         "Table:TwoIndependentVariables,",
         "TestTableMinMax,         !- Name",
         "QuadraticLinear,         !- Curve Type",
@@ -2389,10 +2396,11 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserDidNotEnterMi
     EXPECT_FALSE(has_err_output());
 }
 
-TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOutOfBoundsMinMaxXY) {
+TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOutOfBoundsMinMaxXY)
+{
 
-    std::string const idf_objects = delimited_string({
-        "Version,8.5;",
+    std::string const idf_objects =
+        delimited_string({"Version,8.5;",
         "Table:TwoIndependentVariables,",
         "TestTableMinMax,         !- Name",
         "QuadraticLinear,         !- Curve Type",
@@ -2563,7 +2571,8 @@ TEST_F(EnergyPlusFixture, Tables_TwoIndependentVariable_Linear_UserEntersInAndOu
     EXPECT_FALSE(has_err_output());
 }
 
-TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Linear_EvaluateCurveTypes ) {
+TEST_F(EnergyPlusFixture, Tables_OneIndependentVariable_Linear_EvaluateCurveTypes)
+{
 	std::string const idf_objects = delimited_string( {
 
 		"Table:OneIndependentVariable,",
@@ -2686,7 +2695,8 @@ TEST_F( EnergyPlusFixture, Tables_OneIndependentVariable_Linear_EvaluateCurveTyp
 		EXPECT_FALSE( has_err_output() );
 }
 
-TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
+TEST_F(EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest)
+{
 
 	int NumOfTables = 5;
 
@@ -2717,7 +2727,8 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 
 	std::string const error_string = delimited_string( {
 		"   ** Warning ** TableLookupObject: Table:OneIndependentVariable\"Table 1\"",
-		"   **   ~~~   ** ...Excess number of independent variables (2) passed to subroutine when only 1 is required. The excess arguments are ignored.",
+        "   **   ~~~   ** ...Excess number of independent variables (2) passed to subroutine when only 1 is required. The excess arguments are "
+        "ignored.",
 	} );
 
 	EXPECT_TRUE( compare_err_stream( error_string, true ) );
@@ -2750,7 +2761,8 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 
 	std::string const error_string1 = delimited_string( {
 		"   ** Warning ** TableLookupObject: Table:TwoIndependentVariables\"Table 2\"",
-		"   **   ~~~   ** ...Excess number of independent variables (3) passed to subroutine when 2 or less are required. The excess arguments are ignored.",
+        "   **   ~~~   ** ...Excess number of independent variables (3) passed to subroutine when 2 or less are required. The excess arguments are "
+        "ignored.",
 	} );
 
 	EXPECT_TRUE( compare_err_stream( error_string1, true ) );
@@ -2787,7 +2799,8 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 
 	std::string const error_string2 = delimited_string( {
 		"   ** Warning ** TableLookupObject: Table:MultiVariableLookup\"Table 3\"",
-		"   **   ~~~   ** ...Excess number of independent variables (4) passed to subroutine when 3 or less are required. The excess arguments are ignored.",
+        "   **   ~~~   ** ...Excess number of independent variables (4) passed to subroutine when 3 or less are required. The excess arguments are "
+        "ignored.",
 	} );
 
 	EXPECT_TRUE( compare_err_stream( error_string2, true ) );
@@ -2829,12 +2842,12 @@ TEST_F( EnergyPlusFixture, TableLookupObject_ExcessArguments_WarningTest ) {
 
 	std::string const error_string3 = delimited_string( {
 		"   ** Warning ** TableLookupObject: Table:MultiVariableLookup\"Table 4\"",
-		"   **   ~~~   ** ...Excess number of independent variables (5) passed to subroutine when 4 or less are required. The excess arguments are ignored.",
+        "   **   ~~~   ** ...Excess number of independent variables (5) passed to subroutine when 4 or less are required. The excess arguments are "
+        "ignored.",
 	} );
 
 	EXPECT_TRUE( compare_err_stream( error_string3, true ) );
 
 	PerfCurve.deallocate( );
 	TableLookup.deallocate( );
-
 }
