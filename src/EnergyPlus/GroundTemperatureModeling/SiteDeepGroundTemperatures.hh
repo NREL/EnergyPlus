@@ -60,45 +60,33 @@
 
 namespace EnergyPlus {
 
-	// Derived class for Site:GroundTemperature:Deep
-	class SiteDeepGroundTemps : public BaseGroundTempsModel
-	{
-		public:
-			int timeOfSimInMonths;
-			Array1D< Real64 > deepGroundTemps;
+// Derived class for Site:GroundTemperature:Deep
+class SiteDeepGroundTemps : public BaseGroundTempsModel
+{
+public:
+    int timeOfSimInMonths;
+    Array1D<Real64> deepGroundTemps;
 
-		// Default Constructor
-		SiteDeepGroundTemps():
-			timeOfSimInMonths( 0 ),
-			deepGroundTemps( 12, 13.0 )
+    // Default Constructor
+    SiteDeepGroundTemps() : timeOfSimInMonths(0), deepGroundTemps(12, 13.0)
 
-			{}
+    {
+    }
 
-		static std::shared_ptr< SiteDeepGroundTemps > DeepGTMFactory( 
-			int objectType, 
-			std::string objectName
-		);
+    static std::shared_ptr<SiteDeepGroundTemps> DeepGTMFactory(int objectType, std::string objectName);
 
-		Real64
-		getGroundTemp();
+    Real64 getGroundTemp();
 
-		Real64
-		getGroundTempAtTimeInSeconds(
-			Real64 const depth,
-			Real64 const timeInSecondsOfSim
-		);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
 
-		Real64
-		getGroundTempAtTimeInMonths(
-			Real64 const depth,
-			int const monthOfSim
-		);
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
 
-		// Destructor
-		~SiteDeepGroundTemps(){}
+    // Destructor
+    ~SiteDeepGroundTemps()
+    {
+    }
+};
 
-	};
-
-}
+} // namespace EnergyPlus
 
 #endif

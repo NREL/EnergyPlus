@@ -70,9 +70,9 @@
 #include <HeatBalanceManager.hh>
 #include <Plant/PlantManager.hh>
 #include <PlantPipingSystemsManager.hh>
+#include <SQLiteProcedures.hh>
 #include <SimulationManager.hh>
 #include <SizingAnalysisObjects.hh>
-#include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
@@ -81,37 +81,29 @@ namespace EnergyPlus {
 class HVACSizingSimulationManager
 {
 public:
+    std::vector<PlantCoinicidentAnalysis> plantCoincAnalyObjs;
+    bool plantCoinAnalyRequestsAnotherIteration;
 
-	std::vector< PlantCoinicidentAnalysis > plantCoincAnalyObjs;
-	bool plantCoinAnalyRequestsAnotherIteration;
+    SizingLoggerFramework sizingLogger;
 
-	SizingLoggerFramework sizingLogger;
+    void DetermineSizingAnalysesNeeded();
+    void SetupSizingAnalyses();
 
-	void DetermineSizingAnalysesNeeded();
-	void SetupSizingAnalyses();
+    void RedoKickOffAndResize();
+    void PostProcessLogs();
+    void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
 
-	void RedoKickOffAndResize();
-	void PostProcessLogs();
-	void ProcessCoincidentPlantSizeAdjustments(
-		int const HVACSizingIterCount
-	);
-
-	void UpdateSizingLogsZoneStep();
-	void UpdateSizingLogsSystemStep();
+    void UpdateSizingLogsZoneStep();
+    void UpdateSizingLogsSystemStep();
 
 private:
-
-	void CreateNewCoincidentPlantAnalysisObject(
-		std::string const & PlantLoopName,
-		int const PlantSizingIndex
-	);
-
+    void CreateNewCoincidentPlantAnalysisObject(std::string const &PlantLoopName, int const PlantSizingIndex);
 };
 
-extern std::unique_ptr< HVACSizingSimulationManager > hvacSizingSimulationManager;
+extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation( bool & ErrorsFound );
+void ManageHVACSizingSimulation(bool &ErrorsFound);
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

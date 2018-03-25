@@ -53,12 +53,14 @@ namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-${embedded_epJSON_schema}
+    ${embedded_epJSON_schema}
 
-	std::pair< std::uint8_t const *, std::size_t > embeddedEpJSONSchema() {
-		return std::make_pair( embeddedSchema.data(), embeddedSchema.size() );
-	}
+    std::pair<std::uint8_t const *, std::size_t>
+    embeddedEpJSONSchema()
+    {
+        return std::make_pair(embeddedSchema.data(), embeddedSchema.size());
+    }
 
-}
+} // namespace EmbeddedEpJSONSchema
 
-}
+} // namespace EnergyPlus
