@@ -6346,7 +6346,7 @@ namespace DXCoils {
                 //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
                 //						SizingMethod = HeatingAirflowSizing;
                 ////						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e.,
-                ///DX  cooling  and  heating coils)
+                /// DX  cooling  and  heating coils)
                 //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
                 //						SizingMethod = HeatingAirflowSizing;
                 //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {

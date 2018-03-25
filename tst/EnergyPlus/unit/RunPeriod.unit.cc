@@ -70,134 +70,130 @@ using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
 {
-	std::string const idf_objects = delimited_string({
-		"Version,",
-		"8.8;",
-		"SimulationControl, NO, NO, NO, YES, YES;",
-		"Timestep,4;",
-		"RunPeriod,",
-		"RP1,                     !- Name",
-		"2,                       !- Begin Month",
-		"29,                      !- Begin Day of Month",
-		"2016,                    !- Begin Year",
-		"3,                       !- End Month",
-		"3,                       !- End Day of Month",
-		",                        !- End Year",
-		"Monday,                  !- Day of Week for Start Day",
-		"Yes,                     !- Use Weather File Holidays and Special Days",
-		"Yes,                     !- Use Weather File Daylight Saving Period",
-		"No,                      !- Apply Weekend Holiday Rule",
-		"Yes,                     !- Use Weather File Rain Indicators",
-		"Yes;                     !- Use Weather File Snow Indicators",
-		"RunPeriod,",
-		"RP2,                     !- Name",
-		"2,                       !- Begin Month",
-		"29,                      !- Begin Day of Month",
-		",                        !- Begin Year",
-		"3,                       !- End Month",
-		"3,                       !- End Day of Month",
-		",                        !- End Year",
-		"Wednesday,               !- Day of Week for Start Day",
-		"Yes,                     !- Use Weather File Holidays and Special Days",
-		"Yes,                     !- Use Weather File Daylight Saving Period",
-		"No,                      !- Apply Weekend Holiday Rule",
-		"Yes,                     !- Use Weather File Rain Indicators",
-		"Yes;                     !- Use Weather File Snow Indicators",
-		"RunPeriod,",
-		"RP3,                     !- Name",
-		"1,                       !- Begin Month",
-		"1,                       !- Begin Day of Month",
-		",                        !- Begin Year",
-		"12,                      !- End Month",
-		"31,                      !- End Day of Month",
-		",                        !- End Year",
-		"Thursday,                !- Day of Week for Start Day",
-		"Yes,                     !- Use Weather File Holidays and Special Days",
-		"Yes,                     !- Use Weather File Daylight Saving Period",
-		"No,                      !- Apply Weekend Holiday Rule",
-		"Yes,                     !- Use Weather File Rain Indicators",
-		"Yes;                     !- Use Weather File Snow Indicators",
-		"RunPeriod,",
-		"RP4,                     !- Name",
-		"1,                       !- Begin Month",
-		"1,                       !- Begin Day of Month",
-		",                        !- Begin Year",
-		"12,                      !- End Month",
-		"31,                      !- End Day of Month",
-		",                        !- End Year",
-		",                        !- Day of Week for Start Day",
-		"Yes,                     !- Use Weather File Holidays and Special Days",
-		"Yes,                     !- Use Weather File Daylight Saving Period",
-		"No,                      !- Apply Weekend Holiday Rule",
-		"Yes,                     !- Use Weather File Rain Indicators",
-		"Yes;                     !- Use Weather File Snow Indicators",
-		"BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
+    std::string const idf_objects = delimited_string({
+        "Version,",
+        "8.8;",
+        "SimulationControl, NO, NO, NO, YES, YES;",
+        "Timestep,4;",
+        "RunPeriod,",
+        "RP1,                     !- Name",
+        "2,                       !- Begin Month",
+        "29,                      !- Begin Day of Month",
+        "2016,                    !- Begin Year",
+        "3,                       !- End Month",
+        "3,                       !- End Day of Month",
+        ",                        !- End Year",
+        "Monday,                  !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
+        "RunPeriod,",
+        "RP2,                     !- Name",
+        "2,                       !- Begin Month",
+        "29,                      !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "3,                       !- End Month",
+        "3,                       !- End Day of Month",
+        ",                        !- End Year",
+        "Wednesday,               !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
+        "RunPeriod,",
+        "RP3,                     !- Name",
+        "1,                       !- Begin Month",
+        "1,                       !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "12,                      !- End Month",
+        "31,                      !- End Day of Month",
+        ",                        !- End Year",
+        "Thursday,                !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
+        "RunPeriod,",
+        "RP4,                     !- Name",
+        "1,                       !- Begin Month",
+        "1,                       !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "12,                      !- End Month",
+        "31,                      !- End Day of Month",
+        ",                        !- End Year",
+        ",                        !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
+        "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
 
-	});
+    });
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
-	bool errors_in_input( false );
-	int totalrps( 4 );
-	WeatherManager::GetRunPeriodData( totalrps, errors_in_input );
-	EXPECT_FALSE( errors_in_input );
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool errors_in_input(false);
+    int totalrps(4);
+    WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
+    EXPECT_FALSE(errors_in_input);
 
-	EXPECT_EQ( WeatherManager::WeekDay::Monday, WeatherManager::RunPeriodInput[0].startWeekDay );
-	EXPECT_EQ( 2016, WeatherManager::RunPeriodInput[0].startYear );
-	EXPECT_EQ( 2016, WeatherManager::RunPeriodInput[0].startYear );
-	EXPECT_EQ( 2457448, WeatherManager::RunPeriodInput[0].startJulianDate );
-	EXPECT_EQ( 2457451, WeatherManager::RunPeriodInput[0].endJulianDate );
+    EXPECT_EQ(WeatherManager::WeekDay::Monday, WeatherManager::RunPeriodInput[0].startWeekDay);
+    EXPECT_EQ(2016, WeatherManager::RunPeriodInput[0].startYear);
+    EXPECT_EQ(2016, WeatherManager::RunPeriodInput[0].startYear);
+    EXPECT_EQ(2457448, WeatherManager::RunPeriodInput[0].startJulianDate);
+    EXPECT_EQ(2457451, WeatherManager::RunPeriodInput[0].endJulianDate);
 
-	EXPECT_EQ( WeatherManager::WeekDay::Wednesday, WeatherManager::RunPeriodInput[1].startWeekDay );
-	EXPECT_EQ( 2012, WeatherManager::RunPeriodInput[1].startYear );
-	EXPECT_EQ( 2012, WeatherManager::RunPeriodInput[1].startYear );
-	EXPECT_EQ( 2455987, WeatherManager::RunPeriodInput[1].startJulianDate );
-	EXPECT_EQ( 2455990, WeatherManager::RunPeriodInput[1].endJulianDate );
+    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, WeatherManager::RunPeriodInput[1].startWeekDay);
+    EXPECT_EQ(2012, WeatherManager::RunPeriodInput[1].startYear);
+    EXPECT_EQ(2012, WeatherManager::RunPeriodInput[1].startYear);
+    EXPECT_EQ(2455987, WeatherManager::RunPeriodInput[1].startJulianDate);
+    EXPECT_EQ(2455990, WeatherManager::RunPeriodInput[1].endJulianDate);
 
-	EXPECT_EQ( WeatherManager::WeekDay::Thursday, WeatherManager::RunPeriodInput[2].startWeekDay );
-	EXPECT_EQ( 2015, WeatherManager::RunPeriodInput[2].startYear );
-	EXPECT_EQ( 2015, WeatherManager::RunPeriodInput[2].startYear );
-	EXPECT_EQ( 2457024, WeatherManager::RunPeriodInput[2].startJulianDate );
-	EXPECT_EQ( 2457388, WeatherManager::RunPeriodInput[2].endJulianDate );
+    EXPECT_EQ(WeatherManager::WeekDay::Thursday, WeatherManager::RunPeriodInput[2].startWeekDay);
+    EXPECT_EQ(2015, WeatherManager::RunPeriodInput[2].startYear);
+    EXPECT_EQ(2015, WeatherManager::RunPeriodInput[2].startYear);
+    EXPECT_EQ(2457024, WeatherManager::RunPeriodInput[2].startJulianDate);
+    EXPECT_EQ(2457388, WeatherManager::RunPeriodInput[2].endJulianDate);
 
-	EXPECT_EQ( WeatherManager::WeekDay::Sunday, WeatherManager::RunPeriodInput[3].startWeekDay );
-	EXPECT_EQ( 2017, WeatherManager::RunPeriodInput[3].startYear );
-	EXPECT_EQ( 2017, WeatherManager::RunPeriodInput[3].startYear );
-	EXPECT_EQ( 2457755, WeatherManager::RunPeriodInput[3].startJulianDate );
-	EXPECT_EQ( 2458119, WeatherManager::RunPeriodInput[3].endJulianDate );
-
+    EXPECT_EQ(WeatherManager::WeekDay::Sunday, WeatherManager::RunPeriodInput[3].startWeekDay);
+    EXPECT_EQ(2017, WeatherManager::RunPeriodInput[3].startYear);
+    EXPECT_EQ(2017, WeatherManager::RunPeriodInput[3].startYear);
+    EXPECT_EQ(2457755, WeatherManager::RunPeriodInput[3].startJulianDate);
+    EXPECT_EQ(2458119, WeatherManager::RunPeriodInput[3].endJulianDate);
 }
 
-
-TEST_F( EnergyPlusFixture, RunPeriod_EndYearOnly )
+TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
 {
-	std::string const idf_objects = delimited_string({
-		"Version,",
-		"8.8;",
-		"SimulationControl, NO, NO, NO, YES, YES;",
-		"Timestep,4;",
-		"RunPeriod,",
-		",                        !- Name",
-		"2,                       !- Begin Month",
-		"27,                      !- Begin Day of Month",
-		",                        !- Begin Year",
-		"3,                       !- End Month",
-		"3,                       !- End Day of Month",
-		"1997,                    !- End Year",
-		"Tuesday,                 !- Day of Week for Start Day",
-		"Yes,                     !- Use Weather File Holidays and Special Days",
-		"Yes,                     !- Use Weather File Daylight Saving Period",
-		"No,                      !- Apply Weekend Holiday Rule",
-		"Yes,                     !- Use Weather File Rain Indicators",
-		"Yes;                     !- Use Weather File Snow Indicators",
-		"BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
-	});
+    std::string const idf_objects = delimited_string({
+        "Version,",
+        "8.8;",
+        "SimulationControl, NO, NO, NO, YES, YES;",
+        "Timestep,4;",
+        "RunPeriod,",
+        ",                        !- Name",
+        "2,                       !- Begin Month",
+        "27,                      !- Begin Day of Month",
+        ",                        !- Begin Year",
+        "3,                       !- End Month",
+        "3,                       !- End Day of Month",
+        "1997,                    !- End Year",
+        "Tuesday,                 !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
+        "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
+    });
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
-	bool errors_in_input( false );
-	int totalrps( 1 );
-	WeatherManager::GetRunPeriodData( totalrps, errors_in_input );
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool errors_in_input(false);
+    int totalrps(1);
+    WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
 
-	EXPECT_TRUE( errors_in_input );
-
+    EXPECT_TRUE(errors_in_input);
 }
-

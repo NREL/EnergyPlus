@@ -2882,7 +2882,7 @@ namespace WaterCoils {
             // Tuned Replaced by below to eliminate pow calls
             //			for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
             //				DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow( DryFinEfficncy,
-            //CoefPointer
+            // CoefPointer
             //-
             // 1
             //); 			} // CoefPointer
