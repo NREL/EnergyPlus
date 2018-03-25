@@ -3210,7 +3210,7 @@ namespace FanCoilUnits {
                         // FanCoil(  FanCoilNum ).Name ); 							ShowContinueError( "  Bad starting
                         // values for electric heating coil control to  meet zone load at constant temperature." );
                         //							ShowRecurringWarningErrorAtEnd( "Heating coil control failed in fan
-                        //coil  unit
+                        // coil  unit
                         //"
                         //+  FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
                         //							Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate =
