@@ -59,52 +59,54 @@
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test )
-	{
-		// Issue User file with RoomAirSettings:AirflowNetwork is failing with fatal error #6086
+TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
+{
+    // Issue User file with RoomAirSettings:AirflowNetwork is failing with fatal error #6086
 
-		std::string const idf_objects = delimited_string( {
-			"Version,8.6;",
-			"  RoomAirModelType,",
-			"  Skinny_Model,            !- Name",
-			"  South Skin,              !- Zone Name",
-			"  AirflowNetwork,          !- Room - Air Modeling Type",
-			"  Direct;                  !- Air Temperature Coupling Strategy",
+    std::string const idf_objects = delimited_string({
+        "Version,8.6;",
+        "  RoomAirModelType,",
+        "  Skinny_Model,            !- Name",
+        "  South Skin,              !- Zone Name",
+        "  AirflowNetwork,          !- Room - Air Modeling Type",
+        "  Direct;                  !- Air Temperature Coupling Strategy",
 
-			"  RoomAirModelType,",
-			"  Phat_Model,              !- Name",
-			"  Thermal Zone,            !- Zone Name",
-			"  AirflowNetwork,          !- Room - Air Modeling Type",
-			"  Direct;                  !- Air Temperature Coupling Strategy",
-		} );
+        "  RoomAirModelType,",
+        "  Phat_Model,              !- Name",
+        "  Thermal Zone,            !- Zone Name",
+        "  AirflowNetwork,          !- Room - Air Modeling Type",
+        "  Direct;                  !- Air Temperature Coupling Strategy",
+    });
 
-		ASSERT_TRUE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-		DataGlobals::NumOfZones = 2;
+    DataGlobals::NumOfZones = 2;
 
-		DataHeatBalance::Zone.allocate( 2 );
-		DataHeatBalance::Zone( 1 ).Name = "SOUTH SKIN";
-		DataHeatBalance::Zone( 2 ).Name = "THERMAL ZONE";
+    DataHeatBalance::Zone.allocate(2);
+    DataHeatBalance::Zone(1).Name = "SOUTH SKIN";
+    DataHeatBalance::Zone(2).Name = "THERMAL ZONE";
 
-		bool ErrorsFound( false );
+    bool ErrorsFound(false);
 
-		HeatBalanceAirManager::GetRoomAirModelParameters( ErrorsFound );
+    HeatBalanceAirManager::GetRoomAirModelParameters(ErrorsFound);
 
-		EXPECT_TRUE( ErrorsFound );
+    EXPECT_TRUE(ErrorsFound);
 
-		std::string const error_string = delimited_string( {
-			"   ** Severe  ** In RoomAirModelType = SKINNY_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
-			"   **   ~~~   ** This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.",
-			"   **   ~~~   ** AirflowNetwork:SimulationControl not found.",
-			"   ** Severe  ** In RoomAirModelType = PHAT_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
-			"   **   ~~~   ** This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.",
-			"   **   ~~~   ** AirflowNetwork:SimulationControl not found.",
-			"   ** Severe  ** Errors found in processing input for RoomAirModelType",
-		} );
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** In RoomAirModelType = SKINNY_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
+        "   **   ~~~   ** This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and "
+        "AirflowNetwork:Intrazone:Linkage.",
+        "   **   ~~~   ** AirflowNetwork:SimulationControl not found.",
+        "   ** Severe  ** In RoomAirModelType = PHAT_MODEL: Room-Air Modeling Type = AIRFLOWNETWORK.",
+        "   **   ~~~   ** This model requires AirflowNetwork:* objects to form a complete network, including AirflowNetwork:Intrazone:Node and "
+        "AirflowNetwork:Intrazone:Linkage.",
+        "   **   ~~~   ** AirflowNetwork:SimulationControl not found.",
+        "   ** Severe  ** Errors found in processing input for RoomAirModelType",
+    });
 
-		EXPECT_TRUE( compare_err_stream( error_string, true ) );
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
-		DataHeatBalance::Zone.deallocate( );
-	}
-
+    DataHeatBalance::Zone.deallocate();
 }
+
+} // namespace EnergyPlus
