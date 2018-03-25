@@ -50,13 +50,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/NodeInputManager.hh>
 
-//Fixture
+// Fixture
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::OutputProcessor;
@@ -67,47 +67,49 @@ using namespace EnergyPlus::NodeInputManager;
 
 namespace EnergyPlus {
 
+TEST_F(EnergyPlusFixture, JsonOutput_ParseJsonObject1)
+{
+    std::string const idf_objects = delimited_string({
+        "Output:JSON,",
+        "TimeSeriesAndTabular;",
+    });
 
-	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject1 ) {
-		std::string const idf_objects = delimited_string({
-				                                                 "Output:JSON,",
-				                                                 "TimeSeriesAndTabular;",
-		                                                 });
+    ASSERT_TRUE(process_idf(idf_objects));
 
-		ASSERT_TRUE( process_idf( idf_objects ) );
+    OutputSchema->setupOutputOptions();
 
-		OutputSchema->setupOutputOptions();
+    EXPECT_TRUE(OutputSchema->timeSeriesAndTabularEnabled());
+}
 
-		EXPECT_TRUE( OutputSchema->timeSeriesAndTabularEnabled() );
-	}
+TEST_F(EnergyPlusFixture, JsonOutput_ParseJsonObject2)
+{
+    std::string const idf_objects = delimited_string({
+        "Output:JSON,",
+        "TimeSeries;",
+    });
 
-	TEST_F( EnergyPlusFixture , JsonOutput_ParseJsonObject2 ) {
-		std::string const idf_objects = delimited_string({
-				                                                 "Output:JSON,",
-				                                                 "TimeSeries;",
-		                                                 });
+    ASSERT_TRUE(process_idf(idf_objects));
 
-		ASSERT_TRUE( process_idf( idf_objects ) );
+    OutputSchema->setupOutputOptions();
 
-		OutputSchema->setupOutputOptions();
+    EXPECT_TRUE(OutputSchema->timeSeriesEnabled());
+    compare_json_stream("");
+}
 
-		EXPECT_TRUE( OutputSchema->timeSeriesEnabled() );
-		compare_json_stream( "" );
-	}
+TEST_F(EnergyPlusFixture, JsonOutput_SimInfo)
+{
 
-	TEST_F( EnergyPlusFixture , JsonOutput_SimInfo ) {
+    OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
+    OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
+    OutputSchema->SimulationInformation.setInputModelURI("");
+    OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
+    OutputSchema->SimulationInformation.setNumErrorsSummary("1", "2");
+    OutputSchema->SimulationInformation.setNumErrorsSizing("0", "0");
+    OutputSchema->SimulationInformation.setNumErrorsWarmup("0", "2");
+    OutputSchema->SimulationInformation.setSimulationEnvironment("");
 
-		OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
-		OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
-		OutputSchema->SimulationInformation.setInputModelURI("");
-		OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
-		OutputSchema->SimulationInformation.setNumErrorsSummary("1","2");
-		OutputSchema->SimulationInformation.setNumErrorsSizing("0","0");
-		OutputSchema->SimulationInformation.setNumErrorsWarmup("0","2");
-		OutputSchema->SimulationInformation.setSimulationEnvironment("");
-
-		json result = OutputSchema->SimulationInformation.getJSON();
-		json expectedResult = R"( {
+    json result = OutputSchema->SimulationInformation.getJSON();
+    json expectedResult = R"( {
 					"ErrorSummary": {
 						"NumSevere": "2",
 								"NumWarnings": "1"
@@ -126,75 +128,81 @@ namespace EnergyPlus {
 					"SimulationEnvironment": "",
 					"StartDateTimeStamp": "2017.03.22 11:03"
 		} )"_json;
-		EXPECT_EQ( result.dump(), expectedResult.dump() );
-	}
+    EXPECT_EQ(result.dump(), expectedResult.dump());
+}
 
-	TEST_F( EnergyPlusFixture , JsonOutput_SimInfo_String) {
-		OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
-		OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
-		OutputSchema->SimulationInformation.setInputModelURI("");
-		OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
-		OutputSchema->SimulationInformation.setNumErrorsSummary("1","2");
-		OutputSchema->SimulationInformation.setNumErrorsSizing("0","0");
-		OutputSchema->SimulationInformation.setNumErrorsWarmup("0","2");
-		OutputSchema->SimulationInformation.setSimulationEnvironment("");
+TEST_F(EnergyPlusFixture, JsonOutput_SimInfo_String)
+{
+    OutputSchema->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
+    OutputSchema->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
+    OutputSchema->SimulationInformation.setInputModelURI("");
+    OutputSchema->SimulationInformation.setRunTime("00hr 08min  6.67sec");
+    OutputSchema->SimulationInformation.setNumErrorsSummary("1", "2");
+    OutputSchema->SimulationInformation.setNumErrorsSizing("0", "0");
+    OutputSchema->SimulationInformation.setNumErrorsWarmup("0", "2");
+    OutputSchema->SimulationInformation.setSimulationEnvironment("");
 
-		json result = OutputSchema->SimulationInformation.getJSON();
+    json result = OutputSchema->SimulationInformation.getJSON();
 
-		std::string expectedResult =
-				"{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummarySizing\": {\n        \"NumSevere\": \"0\",\n        \"NumWarnings\": \"0\"\n    },\n    \"ErrorSummaryWarmup\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"0\"\n    },\n    \"InputModelURI\": \"\",\n    \"ProgramVersion\": \"EnergyPlus, Version 8.6.0-0f5a10914b\",\n    \"RunTime\": \"00hr 08min  6.67sec\",\n    \"SimulationEnvironment\": \"\",\n    \"StartDateTimeStamp\": \"2017.03.22 11:03\"\n}";
-		EXPECT_EQ( result.dump(4), expectedResult );
-	};
+    std::string expectedResult =
+        "{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummarySizing\": {\n        "
+        "\"NumSevere\": \"0\",\n        \"NumWarnings\": \"0\"\n    },\n    \"ErrorSummaryWarmup\": {\n        \"NumSevere\": \"2\",\n        "
+        "\"NumWarnings\": \"0\"\n    },\n    \"InputModelURI\": \"\",\n    \"ProgramVersion\": \"EnergyPlus, Version 8.6.0-0f5a10914b\",\n    "
+        "\"RunTime\": \"00hr 08min  6.67sec\",\n    \"SimulationEnvironment\": \"\",\n    \"StartDateTimeStamp\": \"2017.03.22 11:03\"\n}";
+    EXPECT_EQ(result.dump(4), expectedResult);
+};
 
-	TEST_F( EnergyPlusFixture , JsonOutput_VariableInfo) {
+TEST_F(EnergyPlusFixture, JsonOutput_VariableInfo)
+{
 
+    //		std::string const idf_objects = delimited_string({
+    //		                                                         "Output:Variable,SalesFloor Inlet Node,System Node Temperature,timestep;",
+    //		                                                         "Output:Variable,SalesFloor Inlet Node,System Node Mass Flow Rate,timestep;",
+    //		                                                 });
+    //		ASSERT_TRUE( process_idf( idf_objects ) );
+    //		//OutputSchema->setupOutputOptions();
+    //
+    //		EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 2 );
+    // SetupNodeVarsForReporting();
+    // EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Temperature", RVariableTypes( 1 ).VarName );
+    // EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
+    // EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
+    // EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
+    int indexType = 1;
+    int repordId = 1;
 
-//		std::string const idf_objects = delimited_string({
-//		                                                         "Output:Variable,SalesFloor Inlet Node,System Node Temperature,timestep;",
-//		                                                         "Output:Variable,SalesFloor Inlet Node,System Node Mass Flow Rate,timestep;",
-//		                                                 });
-//		ASSERT_TRUE( process_idf( idf_objects ) );
-//		//OutputSchema->setupOutputOptions();
-//
-//		EXPECT_EQ( (int)OutputVariablesForSimulation.size(), 2 );
-		//SetupNodeVarsForReporting();
-		//EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Temperature", RVariableTypes( 1 ).VarName );
-		//EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
-		//EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
-		//EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
-		int indexType = 1;
-		int repordId = 1;
+    Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
 
-		Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
+    std::string expected_result = "{\n         \"Frequency\": \"Timestep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n "
+                                  "        \"Units\": \"C\"\n}";
+    EXPECT_EQ(expected_result, var.getJSON().dump('\t'));
 
-		std::string expected_result = "{\n         \"Frequency\": \"Timestep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n         \"Units\": \"C\"\n}";
-		EXPECT_EQ(expected_result, var.getJSON().dump('\t'));
-
-		json expectedObject = R"( {
+    json expectedObject = R"( {
 					"Frequency": "Timestep",
 					"Name": "SALESFLOOR INLET NODE:System Node Temperature",
 					"Units": "C"
 		} )"_json;
 
-		EXPECT_EQ( expectedObject, var.getJSON() );
-	};
+    EXPECT_EQ(expectedObject, var.getJSON());
+};
 
-	TEST_F( EnergyPlusFixture , JsonOutput_DataFrameInfo1) {
+TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo1)
+{
 
-		json OutputVars;
-		int indexType = 1;
-		int reportId = 1;
+    json OutputVars;
+    int indexType = 1;
+    int reportId = 1;
 
-		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-		reportId++;
-		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    reportId++;
+    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
 
-		OutputSchema->RITimestepTSData.addVariable(var0);
-		OutputSchema->RITimestepTSData.addVariable(var1);
+    OutputSchema->RITimestepTSData.addVariable(var0);
+    OutputSchema->RITimestepTSData.addVariable(var1);
 
-		OutputVars["Timestep"] = OutputSchema->RITimestepTSData.getVariablesJSON();
+    OutputVars["Timestep"] = OutputSchema->RITimestepTSData.getVariablesJSON();
 
-		json expectedObject = R"( {
+    json expectedObject = R"( {
 				"Timestep": [
 					 {
 						"Frequency": "Timestep",
@@ -208,34 +216,34 @@ namespace EnergyPlus {
 					}]
 		} )"_json;
 
-		// There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
-		// EXPECT_EQ( expectedObject.dump(), OutputVars.dump());
+    // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
+    // EXPECT_EQ( expectedObject.dump(), OutputVars.dump());
+};
 
-	};
+TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
+{
 
-	TEST_F( EnergyPlusFixture , JsonOutput_DataFrameInfo2) {
+    json OutputData;
+    int indexType = 1;
+    int reportId = 1;
 
-		json OutputData;
-		int indexType = 1;
-		int reportId = 1;
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    OutputSchema->RITimestepTSData.addVariable(var0);
+    OutputSchema->RITimestepTSData.newRow(2, 25, 14, 40); // month,day,hour,minute
+    OutputSchema->RITimestepTSData.newRow(2, 25, 14, 45); // month,day,hour,minute
 
-		Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-		OutputSchema->RITimestepTSData.addVariable(var0);
-		OutputSchema->RITimestepTSData.newRow(2,25,14,40); //month,day,hour,minute
-		OutputSchema->RITimestepTSData.newRow(2,25,14,45); //month,day,hour,minute
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 1.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 2.0);
 
-		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 1.0);
-		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    reportId++;
+    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
+    OutputSchema->RITimestepTSData.addVariable(var1);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 4.0);
 
-		reportId++;
-		Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
-		OutputSchema->RITimestepTSData.addVariable(var1);
-		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 3.0);
-		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
-		OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
-
-		json expectedObject = R"( {
+    json expectedObject = R"( {
 				"Timestep": {
 					"Cols":[
 						{
@@ -255,18 +263,18 @@ namespace EnergyPlus {
 				}
 		} )"_json;
 
-		// There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
-		// EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
+    // EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 
-		// If add one more, it also should go to the top of json cols array
-		reportId++;
-		Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-		OutputSchema->RITimestepTSData.addVariable(var2);
-		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 5.0);
-		OutputSchema->RITimestepTSData.pushVariableValue(reportId, 6.0);
-		OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
+    // If add one more, it also should go to the top of json cols array
+    reportId++;
+    Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    OutputSchema->RITimestepTSData.addVariable(var2);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 5.0);
+    OutputSchema->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
-		expectedObject = R"( {
+    expectedObject = R"( {
 				"Timestep": {
 					"Cols":[
 						{
@@ -290,31 +298,32 @@ namespace EnergyPlus {
 				}
 		} )"_json;
 
-		// There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
-		// EXPECT_EQ( expectedObject.dump(), OutputData.dump());
-	};
+    // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
+    // EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+};
 
-	TEST_F( EnergyPlusFixture , JsonOutput_TableInfo) {
+TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
+{
 
-		Array1D_string rowLabels( 2 );
-		rowLabels( 1 ) = "ZONE1DIRECTAIR";
-		rowLabels( 2 ) = "ZONE2DIRECTAIR";
+    Array1D_string rowLabels(2);
+    rowLabels(1) = "ZONE1DIRECTAIR";
+    rowLabels(2) = "ZONE2DIRECTAIR";
 
+    Array1D_string columnLabels(1);
+    columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
 
-		Array1D_string columnLabels(1);
-		columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
+    Array2D_string tableBody;
+    tableBody.allocate(columnLabels.size1(), rowLabels.size1());
+    tableBody = ""; // set entire table to blank as default
 
-		Array2D_string tableBody;
-		tableBody.allocate( columnLabels.size1(), rowLabels.size1() );
-		tableBody = ""; //set entire table to blank as default
+    tableBody(1, 1) = "5.22";
+    tableBody(1, 2) = "0.275000";
 
-		tableBody(1,1) =  "5.22";
-		tableBody(1,2) =  "0.275000";
+    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled",
+              "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
-		Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
-
-		json result = tbl.getJSON();
-		json expectedResult = R"( {
+    json result = tbl.getJSON();
+    json expectedResult = R"( {
 				"Cols": [
                         "User-Specified Maximum Air Flow Rate [m3/s]"
                     ],
@@ -330,56 +339,57 @@ namespace EnergyPlus {
                 "TableName": "AirTerminal:SingleDuct:Uncontrolled"
 		} )"_json;
 
-		EXPECT_EQ(result.dump(), expectedResult.dump());
-	};
+    EXPECT_EQ(result.dump(), expectedResult.dump());
+};
 
-	TEST_F( EnergyPlusFixture , JsonOutput_ReportInfo) {
+TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
+{
 
-		Array1D_string rowLabels( 2 );
-		rowLabels( 1 ) = "ZONE1DIRECTAIR";
-		rowLabels( 2 ) = "ZONE2DIRECTAIR";
+    Array1D_string rowLabels(2);
+    rowLabels(1) = "ZONE1DIRECTAIR";
+    rowLabels(2) = "ZONE2DIRECTAIR";
 
+    Array1D_string columnLabels(1);
+    columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
 
-		Array1D_string columnLabels(1);
-		columnLabels(1) = "User-Specified Maximum Air Flow Rate [m3/s]";
+    Array2D_string tableBody;
+    tableBody.allocate(columnLabels.size1(), rowLabels.size1());
 
-		Array2D_string tableBody;
-		tableBody.allocate( columnLabels.size1(), rowLabels.size1() );
+    tableBody(1, 1) = "5.22";
+    tableBody(1, 2) = "0.275000";
 
-		tableBody(1,1) =  "5.22";
-		tableBody(1,2) =  "0.275000";
+    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled",
+              "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
-		Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+    rowLabels.deallocate();
+    columnLabels.deallocate();
+    tableBody.deallocate();
 
-		rowLabels.deallocate();
-		columnLabels.deallocate();
-		tableBody.deallocate();
+    rowLabels.allocate(1);
+    columnLabels.allocate(3);
+    tableBody.allocate(columnLabels.size1(), rowLabels.size1());
 
-		rowLabels.allocate(1);
-		columnLabels.allocate(3);
-		tableBody.allocate( columnLabels.size1(), rowLabels.size1() );
+    rowLabels(1) = "FURNACE ACDXCOIL 1";
 
-		rowLabels( 1 ) = "FURNACE ACDXCOIL 1";
+    columnLabels(1) = "User-Specified rated_air_flow_rate [m3/s]";
+    columnLabels(2) = "User-Specified gross_rated_total_cooling_capacity [W]";
+    columnLabels(3) = "User-Specified gross_rated_sensible_heat_ratio";
 
-		columnLabels(1) = "User-Specified rated_air_flow_rate [m3/s]";
-		columnLabels(2) = "User-Specified gross_rated_total_cooling_capacity [W]";
-		columnLabels(3) = "User-Specified gross_rated_sensible_heat_ratio";
+    tableBody(1, 1) = "5.50";
+    tableBody(2, 1) = "100000.00";
+    tableBody(3, 1) = "100000.00";
 
+    Table tbl2(tableBody, rowLabels, columnLabels, "Coil:Cooling:DX:SingleSpeed",
+               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
-		tableBody(1,1) =  "5.50";
-		tableBody(2,1) =  "100000.00";
-		tableBody(3,1) =  "100000.00";
+    Report report;
+    report.Tables.push_back(tbl);
+    report.Tables.push_back(tbl2);
+    report.ReportName = "Component Sizing Summary";
+    report.ReportForString = "Entire Facility";
 
-		Table tbl2(tableBody, rowLabels, columnLabels, "Coil:Cooling:DX:SingleSpeed", "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
-
-		Report report;
-		report.Tables.push_back(tbl);
-		report.Tables.push_back(tbl2);
-		report.ReportName = "Component Sizing Summary";
-		report.ReportForString = "Entire Facility";
-
-		json result = report.getJSON();
-		json expectedResult = R"( {
+    json result = report.getJSON();
+    json expectedResult = R"( {
 				"For": "Entire Facility",
             "ReportName": "Component Sizing Summary",
             "Tables": [
@@ -417,8 +427,6 @@ namespace EnergyPlus {
 			]
 		} )"_json;
 
-		EXPECT_EQ(result.dump(), expectedResult.dump());
-	};
-}
-
-
+    EXPECT_EQ(result.dump(), expectedResult.dump());
+};
+} // namespace EnergyPlus

@@ -1326,7 +1326,7 @@ namespace PackagedTerminalHeatPump {
 
             //			if ( PTUnit( PTUnitNum ).MaxOATSupHeat > 21.0 ) {
             //				ShowWarningError( CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name + ": " + cNumericFields( 11 ) + "
-            //should  be
+            // should  be
             //<=  to 21."
             //); 				ShowContinueError( "..." + cNumericFields( 11 ) + " = " + TrimSigDigits( Numbers( 11 ), 1 ) );
             //			}

@@ -184,9 +184,8 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
-#include <EnergyPlus/PVWatts.hh>
-#include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -234,488 +233,489 @@ namespace EnergyPlus {
 
 void EnergyPlusFixture::SetUpTestCase()
 {
-		EnergyPlus::inputProcessor = InputProcessor::factory();
-	}
+    EnergyPlus::inputProcessor = InputProcessor::factory();
+}
 
 void EnergyPlusFixture::SetUp()
 {
-		clear_all_states();
+    clear_all_states();
 
-		show_message();
+    show_message();
 
-		this->eso_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->eio_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->mtr_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->err_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		this->json_stream = std::unique_ptr< std::ostringstream >( new std::ostringstream );
+    this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->eio_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
-		DataGlobals::eso_stream = this->eso_stream.get();
-		DataGlobals::eio_stream = this->eio_stream.get();
-		DataGlobals::mtr_stream = this->mtr_stream.get();
-		DataGlobals::err_stream = this->err_stream.get();
-		DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
+    DataGlobals::eso_stream = this->eso_stream.get();
+    DataGlobals::eio_stream = this->eio_stream.get();
+    DataGlobals::mtr_stream = this->mtr_stream.get();
+    DataGlobals::err_stream = this->err_stream.get();
+    DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
 
-		m_cout_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		m_redirect_cout = std::unique_ptr< RedirectCout >( new RedirectCout( m_cout_buffer ) );
+    m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
 
-		m_cerr_buffer = std::unique_ptr< std::ostringstream >( new std::ostringstream );
-		m_redirect_cerr = std::unique_ptr< RedirectCerr >( new RedirectCerr( m_cerr_buffer ) );
+    m_cerr_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    m_redirect_cerr = std::unique_ptr<RedirectCerr>(new RedirectCerr(m_cerr_buffer));
 
-		UtilityRoutines::outputErrorHeader = false;
+    UtilityRoutines::outputErrorHeader = false;
 
-		Psychrometrics::InitializePsychRoutines();
-		createCoilSelectionReportObj();
-	}
+    Psychrometrics::InitializePsychRoutines();
+    createCoilSelectionReportObj();
+}
 
 void EnergyPlusFixture::TearDown()
 {
 
-		clear_all_states();
+    clear_all_states();
 
-		{
-			IOFlags flags;
-			flags.DISPOSE( "DELETE" );
-			gio::close( OutputProcessor::OutputFileMeterDetails, flags );
-			gio::close( DataGlobals::OutputFileStandard, flags );
-			gio::close( DataGlobals::jsonOutputStreams.OutputFileJson, flags );
-			gio::close( DataGlobals::OutputStandardError, flags );
-			gio::close( DataGlobals::OutputFileInits, flags );
-			gio::close( DataGlobals::OutputFileDebug, flags );
-			gio::close( DataGlobals::OutputFileZoneSizing, flags );
-			gio::close( DataGlobals::OutputFileSysSizing, flags );
-			gio::close( DataGlobals::OutputFileMeters, flags );
-			gio::close( DataGlobals::OutputFileBNDetails, flags );
-			gio::close( DataGlobals::OutputFileZonePulse, flags );
-			gio::close( DataGlobals::OutputDElightIn, flags );
-			gio::close( DataGlobals::OutputFileShadingFrac, flags );
-		}
-	}
+    {
+        IOFlags flags;
+        flags.DISPOSE("DELETE");
+        gio::close(OutputProcessor::OutputFileMeterDetails, flags);
+        gio::close(DataGlobals::OutputFileStandard, flags);
+        gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
+        gio::close(DataGlobals::OutputStandardError, flags);
+        gio::close(DataGlobals::OutputFileInits, flags);
+        gio::close(DataGlobals::OutputFileDebug, flags);
+        gio::close(DataGlobals::OutputFileZoneSizing, flags);
+        gio::close(DataGlobals::OutputFileSysSizing, flags);
+        gio::close(DataGlobals::OutputFileMeters, flags);
+        gio::close(DataGlobals::OutputFileBNDetails, flags);
+        gio::close(DataGlobals::OutputFileZonePulse, flags);
+        gio::close(DataGlobals::OutputDElightIn, flags);
+        gio::close(DataGlobals::OutputFileShadingFrac, flags);
+    }
+}
 
-	void EnergyPlusFixture::clear_all_states()
-	{
-		// A to Z order
-		AirflowNetworkBalanceManager::clear_state();
-		BaseboardElectric::clear_state();
-		BaseboardRadiator::clear_state();
-		Boilers::clear_state();
-		BoilerSteam::clear_state();
-		BranchInputManager::clear_state();
-		CoolingPanelSimple::clear_state();
-		ChillerElectricEIR::clear_state();
-		ChillerExhaustAbsorption::clear_state();
-		ChillerGasAbsorption::clear_state();
-		ChillerIndirectAbsorption::clear_state();
-		CondenserLoopTowers::clear_state();
-		CoolTower::clear_state();
-		CrossVentMgr::clear_state();
-		CurveManager::clear_state();
-		DataAirflowNetwork::clear_state();
-		DataAirLoop::clear_state();
-		DataBranchAirLoopPlant::clear_state();
-		DataAirSystems::clear_state();
-		DataBranchNodeConnections::clear_state();
-		DataContaminantBalance::clear_state();
-		DataConvergParams::clear_state();
-		DataDefineEquip::clear_state();
-		DataEnvironment::clear_state();
-		DataErrorTracking::clear_state();
-		DataGenerators::clear_state();
-		DataGlobals::clear_state();
-		DataHeatBalance::clear_state();
-		DataHeatBalFanSys::clear_state();
-		DataHeatBalSurface::clear_state();
-		DataHVACGlobals::clear_state();
-		DataIPShortCuts::clear_state();
-		DataLoopNode::clear_state();
-		DataMoistureBalance::clear_state();
-		DataMoistureBalanceEMPD::clear_state();
-		DataOutputs::clear_state();
-		DataPlant::clear_state();
-		DataRoomAirModel::clear_state();
-		DataRuntimeLanguage::clear_state();
-		DataSizing::clear_state();
-		DataSurfaceLists::clear_state();
-		DataSurfaces::clear_state();
-		DataSystemVariables::clear_state();
-		DataUCSDSharedData::clear_state();
-		DataZoneControls::clear_state();
-		DataZoneEnergyDemands::clear_state();
-		DataZoneEquipment::clear_state();
-		DemandManager::clear_state();
-		DesiccantDehumidifiers::clear_state();
-		DirectAirManager::clear_state();
-		DualDuct::clear_state();
-		DXCoils::clear_state();
-		clearFacilityElectricPowerServiceObject();
-		EarthTube::clear_state();
-		EconomicLifeCycleCost::clear_state();
-		EconomicTariff::clear_state();
-		EMSManager::clear_state();
-		EvaporativeCoolers::clear_state();
-		EvaporativeFluidCoolers::clear_state();
-		ExteriorEnergyUse::clear_state();
-		FanCoilUnits::clear_state();
-		Fans::clear_state();
-		FaultsManager::clear_state();
-		FluidCoolers::clear_state();
-		FluidProperties::clear_state();
-		Furnaces::clear_state();
-		GlobalNames::clear_state();
-		GroundHeatExchangers::clear_state();
-		GroundTemperatureManager::clear_state();
-		HeatBalanceAirManager::clear_state();
-		HeatBalanceIntRadExchange::clear_state();
-		HeatBalanceManager::clear_state();
-		HeatBalanceSurfaceManager::clear_state();
-		HeatBalFiniteDiffManager::clear_state();
-		HeatPumpWaterToWaterSimple::clear_state();
-		HeatRecovery::clear_state();
-		HeatingCoils::clear_state();
-		HighTempRadiantSystem::clear_state();
-		Humidifiers::clear_state();
-		HVACControllers::clear_state();
-		HVACDXHeatPumpSystem::clear_state();
-		HVACDXSystem::clear_state();
-		HVACHXAssistedCoolingCoil::clear_state();
-		HVACFan::clearHVACFanObjects();
-		HVACManager::clear_state();
-		HVACSingleDuctInduc::clear_state();
-		HVACStandAloneERV::clear_state();
-		HVACUnitaryBypassVAV::clear_state();
-		HVACUnitarySystem::clear_state();
-		HVACVariableRefrigerantFlow::clear_state();
-		HybridModel::clear_state();
-		HysteresisPhaseChange::clear_state();
-		EnergyPlus::inputProcessor->clear_state();
-		IntegratedHeatPump::clear_state();
-		InternalHeatGains::clear_state();
-		LowTempRadiantSystem::clear_state();
-		MixedAir::clear_state();
-		MixerComponent::clear_state();
-		MoistureBalanceEMPDManager::clear_state();
-		NodeInputManager::clear_state();
-		OutAirNodeManager::clear_state();
-		OutdoorAirUnit::clear_state();
-		OutputProcessor::clear_state();
-		OutputReportPredefined::clear_state();
-		OutputReportTabular::clear_state();
-		OutputReportTabularAnnual::clear_state();
-		OutsideEnergySources::clear_state();
-		PackagedTerminalHeatPump::clear_state();
-		Pipes::clear_state();
-		PipeHeatTransfer::clear_state();
-		PlantCondLoopOperation::clear_state();
-		PlantChillers::clear_state();
-		PlantLoadProfile::clear_state();
-		PlantLoopSolver::clear_state();
-		PlantManager::clear_state();
-		PlantPipingSystemsManager::clear_state();
-		PlantPressureSystem::clear_state();
-		PlantUtilities::clear_state();
-		PlantPipingSystemsManager::clear_state();
-		PollutionModule::clear_state();
-		PoweredInductionUnits::clear_state();
-		Psychrometrics::clear_state();
-		Pumps::clear_state();
-		PurchasedAirManager::clear_state();
-		PVWatts::clear_state();
-		clearCoilSelectionReportObj(); // ReportCoilSelection
-		ReturnAirPathManager::clear_state();
-		RoomAirModelAirflowNetwork::clear_state();
-		RoomAirModelManager::clear_state();
-		RuntimeLanguageProcessor::clear_state();
-		ScheduleManager::clear_state();
-		SetPointManager::clear_state();
-		SimAirServingZones::clear_state();
-		SimulationManager::clear_state();
-		SingleDuct::clear_state();
-		SizingManager::clear_state();
-		SolarCollectors::clear_state();
-		SolarShading::clear_state();
-		SplitterComponent::clear_state();
-		SurfaceGeometry::clear_state();
-		SystemAvailabilityManager::clear_state();
-		SwimmingPool::clear_state();
-		ThermalComfort::clear_state();
-		UnitHeater::clear_state();
-		UnitVentilator::clear_state();
-		VariableSpeedCoils::clear_state();
-		VentilatedSlab::clear_state();
-		WaterCoils::clear_state();
-		WaterThermalTanks::clear_state();
-		WaterToAirHeatPumpSimple::clear_state();
-		WaterUse::clear_state();
-		WeatherManager::clear_state();
-		WindowAC::clear_state();
-		WindowComplexManager::clear_state();
-		WindowEquivalentLayer::clear_state();
-		WindowManager::clear_state();
-		ZoneAirLoopEquipmentManager::clear_state();
-		ZoneContaminantPredictorCorrector::clear_state();
-		ZoneDehumidifier::clear_state();
-		ZoneEquipmentManager::clear_state();
-		ZonePlenum::clear_state();
-		ZoneTempPredictorCorrector::clear_state();
-		ResultsFramework::clear_state();
-
-	}
+void EnergyPlusFixture::clear_all_states()
+{
+    // A to Z order
+    AirflowNetworkBalanceManager::clear_state();
+    BaseboardElectric::clear_state();
+    BaseboardRadiator::clear_state();
+    Boilers::clear_state();
+    BoilerSteam::clear_state();
+    BranchInputManager::clear_state();
+    CoolingPanelSimple::clear_state();
+    ChillerElectricEIR::clear_state();
+    ChillerExhaustAbsorption::clear_state();
+    ChillerGasAbsorption::clear_state();
+    ChillerIndirectAbsorption::clear_state();
+    CondenserLoopTowers::clear_state();
+    CoolTower::clear_state();
+    CrossVentMgr::clear_state();
+    CurveManager::clear_state();
+    DataAirflowNetwork::clear_state();
+    DataAirLoop::clear_state();
+    DataBranchAirLoopPlant::clear_state();
+    DataAirSystems::clear_state();
+    DataBranchNodeConnections::clear_state();
+    DataContaminantBalance::clear_state();
+    DataConvergParams::clear_state();
+    DataDefineEquip::clear_state();
+    DataEnvironment::clear_state();
+    DataErrorTracking::clear_state();
+    DataGenerators::clear_state();
+    DataGlobals::clear_state();
+    DataHeatBalance::clear_state();
+    DataHeatBalFanSys::clear_state();
+    DataHeatBalSurface::clear_state();
+    DataHVACGlobals::clear_state();
+    DataIPShortCuts::clear_state();
+    DataLoopNode::clear_state();
+    DataMoistureBalance::clear_state();
+    DataMoistureBalanceEMPD::clear_state();
+    DataOutputs::clear_state();
+    DataPlant::clear_state();
+    DataRoomAirModel::clear_state();
+    DataRuntimeLanguage::clear_state();
+    DataSizing::clear_state();
+    DataSurfaceLists::clear_state();
+    DataSurfaces::clear_state();
+    DataSystemVariables::clear_state();
+    DataUCSDSharedData::clear_state();
+    DataZoneControls::clear_state();
+    DataZoneEnergyDemands::clear_state();
+    DataZoneEquipment::clear_state();
+    DemandManager::clear_state();
+    DesiccantDehumidifiers::clear_state();
+    DirectAirManager::clear_state();
+    DualDuct::clear_state();
+    DXCoils::clear_state();
+    clearFacilityElectricPowerServiceObject();
+    EarthTube::clear_state();
+    EconomicLifeCycleCost::clear_state();
+    EconomicTariff::clear_state();
+    EMSManager::clear_state();
+    EvaporativeCoolers::clear_state();
+    EvaporativeFluidCoolers::clear_state();
+    ExteriorEnergyUse::clear_state();
+    FanCoilUnits::clear_state();
+    Fans::clear_state();
+    FaultsManager::clear_state();
+    FluidCoolers::clear_state();
+    FluidProperties::clear_state();
+    Furnaces::clear_state();
+    GlobalNames::clear_state();
+    GroundHeatExchangers::clear_state();
+    GroundTemperatureManager::clear_state();
+    HeatBalanceAirManager::clear_state();
+    HeatBalanceIntRadExchange::clear_state();
+    HeatBalanceManager::clear_state();
+    HeatBalanceSurfaceManager::clear_state();
+    HeatBalFiniteDiffManager::clear_state();
+    HeatPumpWaterToWaterSimple::clear_state();
+    HeatRecovery::clear_state();
+    HeatingCoils::clear_state();
+    HighTempRadiantSystem::clear_state();
+    Humidifiers::clear_state();
+    HVACControllers::clear_state();
+    HVACDXHeatPumpSystem::clear_state();
+    HVACDXSystem::clear_state();
+    HVACHXAssistedCoolingCoil::clear_state();
+    HVACFan::clearHVACFanObjects();
+    HVACManager::clear_state();
+    HVACSingleDuctInduc::clear_state();
+    HVACStandAloneERV::clear_state();
+    HVACUnitaryBypassVAV::clear_state();
+    HVACUnitarySystem::clear_state();
+    HVACVariableRefrigerantFlow::clear_state();
+    HybridModel::clear_state();
+    HysteresisPhaseChange::clear_state();
+    EnergyPlus::inputProcessor->clear_state();
+    IntegratedHeatPump::clear_state();
+    InternalHeatGains::clear_state();
+    LowTempRadiantSystem::clear_state();
+    MixedAir::clear_state();
+    MixerComponent::clear_state();
+    MoistureBalanceEMPDManager::clear_state();
+    NodeInputManager::clear_state();
+    OutAirNodeManager::clear_state();
+    OutdoorAirUnit::clear_state();
+    OutputProcessor::clear_state();
+    OutputReportPredefined::clear_state();
+    OutputReportTabular::clear_state();
+    OutputReportTabularAnnual::clear_state();
+    OutsideEnergySources::clear_state();
+    PackagedTerminalHeatPump::clear_state();
+    Pipes::clear_state();
+    PipeHeatTransfer::clear_state();
+    PlantCondLoopOperation::clear_state();
+    PlantChillers::clear_state();
+    PlantLoadProfile::clear_state();
+    PlantLoopSolver::clear_state();
+    PlantManager::clear_state();
+    PlantPipingSystemsManager::clear_state();
+    PlantPressureSystem::clear_state();
+    PlantUtilities::clear_state();
+    PlantPipingSystemsManager::clear_state();
+    PollutionModule::clear_state();
+    PoweredInductionUnits::clear_state();
+    Psychrometrics::clear_state();
+    Pumps::clear_state();
+    PurchasedAirManager::clear_state();
+    PVWatts::clear_state();
+    clearCoilSelectionReportObj(); // ReportCoilSelection
+    ReturnAirPathManager::clear_state();
+    RoomAirModelAirflowNetwork::clear_state();
+    RoomAirModelManager::clear_state();
+    RuntimeLanguageProcessor::clear_state();
+    ScheduleManager::clear_state();
+    SetPointManager::clear_state();
+    SimAirServingZones::clear_state();
+    SimulationManager::clear_state();
+    SingleDuct::clear_state();
+    SizingManager::clear_state();
+    SolarCollectors::clear_state();
+    SolarShading::clear_state();
+    SplitterComponent::clear_state();
+    SurfaceGeometry::clear_state();
+    SystemAvailabilityManager::clear_state();
+    SwimmingPool::clear_state();
+    ThermalComfort::clear_state();
+    UnitHeater::clear_state();
+    UnitVentilator::clear_state();
+    VariableSpeedCoils::clear_state();
+    VentilatedSlab::clear_state();
+    WaterCoils::clear_state();
+    WaterThermalTanks::clear_state();
+    WaterToAirHeatPumpSimple::clear_state();
+    WaterUse::clear_state();
+    WeatherManager::clear_state();
+    WindowAC::clear_state();
+    WindowComplexManager::clear_state();
+    WindowEquivalentLayer::clear_state();
+    WindowManager::clear_state();
+    ZoneAirLoopEquipmentManager::clear_state();
+    ZoneContaminantPredictorCorrector::clear_state();
+    ZoneDehumidifier::clear_state();
+    ZoneEquipmentManager::clear_state();
+    ZonePlenum::clear_state();
+    ZoneTempPredictorCorrector::clear_state();
+    ResultsFramework::clear_state();
+}
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
 {
-		std::ostringstream compare_text;
-		for( auto const & str : strings ) {
-			compare_text << str << delimiter;
-		}
-		return compare_text.str();
-	}
+    std::ostringstream compare_text;
+    for (auto const &str : strings) {
+        compare_text << str << delimiter;
+    }
+    return compare_text.str();
+}
 
 std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const &filePath)
 {
-		std::ifstream infile( filePath );
-		std::vector< std::string > lines;
-		std::string line;
+    std::ifstream infile(filePath);
+    std::vector<std::string> lines;
+    std::string line;
     while (std::getline(infile, line)) {
-			lines.push_back( line );
-		}
-		return lines;
-	}
+        lines.push_back(line);
+    }
+    return lines;
+}
 
-	bool EnergyPlusFixture::compare_json_stream( std::string const & expected_string, bool reset_stream ) {
-		auto const stream_str = this->json_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->json_stream->str( std::string() );
-		return are_equal;
-	}
+bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = this->json_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->json_stream->str(std::string());
+    return are_equal;
+}
 
-	bool EnergyPlusFixture::compare_eso_stream( std::string const & expected_string, bool reset_stream ) {
-		auto const stream_str = this->eso_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->eso_stream->str( std::string() );
-		return are_equal;
-	}
+bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = this->eso_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->eso_stream->str(std::string());
+    return are_equal;
+}
 
 bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
 {
-		auto const stream_str = this->eio_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->eio_stream->str( std::string() );
-		return are_equal;
-	}
+    auto const stream_str = this->eio_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->eio_stream->str(std::string());
+    return are_equal;
+}
 
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
-		auto const stream_str = this->mtr_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->mtr_stream->str( std::string() );
-		return are_equal;
-	}
+    auto const stream_str = this->mtr_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->mtr_stream->str(std::string());
+    return are_equal;
+}
 
 bool EnergyPlusFixture::compare_err_stream(std::string const &expected_string, bool reset_stream)
 {
-		auto const stream_str = this->err_stream->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->err_stream->str( std::string() );
-		return are_equal;
-	}
+    auto const stream_str = this->err_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->err_stream->str(std::string());
+    return are_equal;
+}
 
 bool EnergyPlusFixture::compare_cout_stream(std::string const &expected_string, bool reset_stream)
 {
-		auto const stream_str = this->m_cout_buffer->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->m_cout_buffer->str( std::string() );
-		return are_equal;
-	}
+    auto const stream_str = this->m_cout_buffer->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->m_cout_buffer->str(std::string());
+    return are_equal;
+}
 
 bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, bool reset_stream)
 {
-		auto const stream_str = this->m_cerr_buffer->str();
-		EXPECT_EQ( expected_string, stream_str );
-		bool are_equal = ( expected_string == stream_str );
-		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
-		return are_equal;
-	}
+    auto const stream_str = this->m_cerr_buffer->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->m_cerr_buffer->str(std::string());
+    return are_equal;
+}
 
-	bool EnergyPlusFixture::has_json_output( bool reset_stream )
-	{
-		auto const has_output = this->json_stream->str().size() > 0;
-		if ( reset_stream ) this->json_stream->str( std::string() );
-		return has_output;
-	}
+bool EnergyPlusFixture::has_json_output(bool reset_stream)
+{
+    auto const has_output = this->json_stream->str().size() > 0;
+    if (reset_stream) this->json_stream->str(std::string());
+    return has_output;
+}
 
-	bool EnergyPlusFixture::has_eso_output( bool reset_stream )
-	{
-		auto const has_output = this->eso_stream->str().size() > 0;
-		if ( reset_stream ) this->eso_stream->str( std::string() );
-		return has_output;
-	}
+bool EnergyPlusFixture::has_eso_output(bool reset_stream)
+{
+    auto const has_output = this->eso_stream->str().size() > 0;
+    if (reset_stream) this->eso_stream->str(std::string());
+    return has_output;
+}
 
-	bool EnergyPlusFixture::has_eio_output( bool reset_stream )
-	{
-		auto const has_output = this->eio_stream->str().size() > 0;
-		if ( reset_stream ) this->eio_stream->str( std::string() );
-		return has_output;
-	}
+bool EnergyPlusFixture::has_eio_output(bool reset_stream)
+{
+    auto const has_output = this->eio_stream->str().size() > 0;
+    if (reset_stream) this->eio_stream->str(std::string());
+    return has_output;
+}
 
-	bool EnergyPlusFixture::has_mtr_output( bool reset_stream )
-	{
-		auto const has_output = this->mtr_stream->str().size() > 0;
-		if ( reset_stream ) this->mtr_stream->str( std::string() );
-		return has_output;
-	}
+bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
+{
+    auto const has_output = this->mtr_stream->str().size() > 0;
+    if (reset_stream) this->mtr_stream->str(std::string());
+    return has_output;
+}
 
-	bool EnergyPlusFixture::has_err_output( bool reset_stream )
-	{
-		auto const has_output = this->err_stream->str().size() > 0;
-		if ( reset_stream ) this->err_stream->str( std::string() );
-		return has_output;
-	}
+bool EnergyPlusFixture::has_err_output(bool reset_stream)
+{
+    auto const has_output = this->err_stream->str().size() > 0;
+    if (reset_stream) this->err_stream->str(std::string());
+    return has_output;
+}
 
-	bool EnergyPlusFixture::has_cout_output( bool reset_stream )
-	{
-		auto const has_output = this->m_cout_buffer->str().size() > 0;
-		if ( reset_stream ) this->m_cout_buffer->str( std::string() );
-		return has_output;
-	}
+bool EnergyPlusFixture::has_cout_output(bool reset_stream)
+{
+    auto const has_output = this->m_cout_buffer->str().size() > 0;
+    if (reset_stream) this->m_cout_buffer->str(std::string());
+    return has_output;
+}
 
-	bool EnergyPlusFixture::has_cerr_output( bool reset_stream )
-	{
-		auto const has_output = this->m_cerr_buffer->str().size() > 0;
-		if ( reset_stream ) this->m_cerr_buffer->str( std::string() );
-		return has_output;
-	}
+bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
+{
+    auto const has_output = this->m_cerr_buffer->str().size() > 0;
+    if (reset_stream) this->m_cerr_buffer->str(std::string());
+    return has_output;
+}
 
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
-		bool success = true;
-		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
+    bool success = true;
+    inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
-		if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
+    if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
                                                {{"idf_order", 0},
-									{"north_axis", 0.0},
-									{"terrain", "Suburbs"},
-									{"loads_convergence_tolerance_value", 0.04},
-									{"temperature_convergence_tolerance_value", 0.4000},
-									{"solar_distribution", "FullExterior"},
-									{"maximum_number_of_warmup_days", 25},
+                                                {"north_axis", 0.0},
+                                                {"terrain", "Suburbs"},
+                                                {"loads_convergence_tolerance_value", 0.04},
+                                                {"temperature_convergence_tolerance_value", 0.4000},
+                                                {"solar_distribution", "FullExterior"},
+                                                {"maximum_number_of_warmup_days", 25},
                                                 {"minimum_number_of_warmup_days", 6}}}};
-		}
-		if (inputProcessor->epJSON.find("GlobalGeometryRules") == inputProcessor->epJSON.end()) {
+    }
+    if (inputProcessor->epJSON.find("GlobalGeometryRules") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["GlobalGeometryRules"] = {{"",
                                                           {{"idf_order", 0},
-									{"starting_vertex_position", "UpperLeftCorner"},
-									{"vertex_entry_direction", "Counterclockwise"},
-									{"coordinate_system", "Relative"},
-									{"daylighting_reference_point_coordinate_system", "Relative"},
+                                                           {"starting_vertex_position", "UpperLeftCorner"},
+                                                           {"vertex_entry_direction", "Counterclockwise"},
+                                                           {"coordinate_system", "Relative"},
+                                                           {"daylighting_reference_point_coordinate_system", "Relative"},
                                                            {"rectangular_surface_coordinate_system", "Relative"}}}};
-		}
+    }
 
-		int MaxArgs = 0;
-		int MaxAlpha = 0;
-		int MaxNumeric = 0;
-		inputProcessor->getMaxSchemaArgs( MaxArgs, MaxAlpha, MaxNumeric );
+    int MaxArgs = 0;
+    int MaxAlpha = 0;
+    int MaxNumeric = 0;
+    inputProcessor->getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
 
-		DataIPShortCuts::cAlphaFieldNames.allocate( MaxAlpha );
-		DataIPShortCuts::cAlphaArgs.allocate( MaxAlpha );
-		DataIPShortCuts::lAlphaFieldBlanks.dimension( MaxAlpha, false );
-		DataIPShortCuts::cNumericFieldNames.allocate( MaxNumeric );
-		DataIPShortCuts::rNumericArgs.dimension( MaxNumeric, 0.0 );
-		DataIPShortCuts::lNumericFieldBlanks.dimension( MaxNumeric, false );
+    DataIPShortCuts::cAlphaFieldNames.allocate(MaxAlpha);
+    DataIPShortCuts::cAlphaArgs.allocate(MaxAlpha);
+    DataIPShortCuts::lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
+    DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
+    DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 
-		bool is_valid = inputProcessor->validation->validate( inputProcessor->epJSON );
-		bool hasErrors = inputProcessor->processErrors();
+    bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
+    bool hasErrors = inputProcessor->processErrors();
 
-		inputProcessor->initializeMaps();
-		SimulationManager::PostIPProcessing();
-		// inputProcessor->state->printErrors();
+    inputProcessor->initializeMaps();
+    SimulationManager::PostIPProcessing();
+    // inputProcessor->state->printErrors();
 
-		bool successful_processing = success && is_valid && !hasErrors;
+    bool successful_processing = success && is_valid && !hasErrors;
 
-		if ( ! successful_processing && use_assertions ) {
-			EXPECT_TRUE( compare_err_stream( "" ) );
-		}
+    if (!successful_processing && use_assertions) {
+        EXPECT_TRUE(compare_err_stream(""));
+    }
 
-		return successful_processing;
-	}
+    return successful_processing;
+}
 
 bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
 {
 
-		std::unique_ptr< std::istream > idd_stream;
-		if( !idd.empty() ) {
-			idd_stream = std::unique_ptr<std::istringstream>( new std::istringstream( idd ) );
-		} else {
-			static auto const exeDirectory = FileSystem::getParentDirectoryPath( FileSystem::getAbsolutePath( FileSystem::getProgramPath() ) );
-			static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
-			static auto file_exists = FileSystem::fileExists( idd_location );
+    std::unique_ptr<std::istream> idd_stream;
+    if (!idd.empty()) {
+        idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
+    } else {
+        static auto const exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
+        static auto file_exists = FileSystem::fileExists(idd_location);
 
-			if ( ! file_exists ) {
-				// Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-				idd_location = FileSystem::getParentDirectoryPath( exeDirectory ) + "Energy+.schema.epJSON";
-				file_exists = FileSystem::fileExists( idd_location );
-			}
+        if (!file_exists) {
+            // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
+            idd_location = FileSystem::getParentDirectoryPath(exeDirectory) + "Energy+.schema.epJSON";
+            file_exists = FileSystem::fileExists(idd_location);
+        }
 
-			if ( ! file_exists ) {
+        if (!file_exists) {
             EXPECT_TRUE(file_exists) << "Energy+.schema.epJSON does not exist at search location." << std::endl
                                      << "epJSON Schema search location: \"" << idd_location << "\"";
-				errors_found = true;
-				return errors_found;
-			}
+            errors_found = true;
+            return errors_found;
+        }
 
-			idd_stream = std::unique_ptr<std::ifstream>( new std::ifstream( idd_location, std::ios_base::in | std::ios_base::binary ) );
-		}
+        idd_stream = std::unique_ptr<std::ifstream>(new std::ifstream(idd_location, std::ios_base::in | std::ios_base::binary));
+    }
 
-		if ( ! idd_stream->good() ) {
-			errors_found = true;
-			return errors_found;
-		}
+    if (!idd_stream->good()) {
+        errors_found = true;
+        return errors_found;
+    }
 
-		inputProcessor->schema = json::parse( *idd_stream );
+    inputProcessor->schema = json::parse(*idd_stream);
 
-		return errors_found;
-	}
+    return errors_found;
+}
 
 bool EnergyPlusFixture::compare_idf(std::string const &EP_UNUSED(name),
-		int const EP_UNUSED( num_alphas ),
-		int const EP_UNUSED( num_numbers ),
-		std::vector< std::string > const & EP_UNUSED( alphas ),
-		std::vector< bool > const & EP_UNUSED( alphas_blank ),
-		std::vector< Real64 > const & EP_UNUSED( numbers ),
+                                    int const EP_UNUSED(num_alphas),
+                                    int const EP_UNUSED(num_numbers),
+                                    std::vector<std::string> const &EP_UNUSED(alphas),
+                                    std::vector<bool> const &EP_UNUSED(alphas_blank),
+                                    std::vector<Real64> const &EP_UNUSED(numbers),
                                     std::vector<bool> const &EP_UNUSED(numbers_blank))
-	{
-		// using namespace InputProcessor;
+{
+    // using namespace InputProcessor;
 
-		// bool has_error = OverallErrorFlag;
+    // bool has_error = OverallErrorFlag;
 
-		// EXPECT_FALSE( OverallErrorFlag );
+    // EXPECT_FALSE( OverallErrorFlag );
 
-		// auto index = FindItemInSortedList( name, ListOfObjects, NumObjectDefs );
+    // auto index = FindItemInSortedList( name, ListOfObjects, NumObjectDefs );
 
-		// EXPECT_GT( index, 0 ) << "Could not find \"" << name << "\". Make sure to run process_idf first.";
-		// if ( index < 1 ) return false;
+    // EXPECT_GT( index, 0 ) << "Could not find \"" << name << "\". Make sure to run process_idf first.";
+    // if ( index < 1 ) return false;
 
-		// index = iListOfObjects( index );
-		// index = ObjectStartRecord( index );
+    // index = iListOfObjects( index );
+    // index = ObjectStartRecord( index );
 
-		// EXPECT_EQ( name, IDFRecords( index ).Name );
-		// if ( name != IDFRecords( index ).Name ) has_error = true;
-		// EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
-		// if ( num_alphas != IDFRecords( index ).NumAlphas ) has_error = true;
-		// EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
-		// if ( num_numbers != IDFRecords( index ).NumNumbers ) has_error = true;
-		// if ( ! compare_containers( alphas, IDFRecords( index ).Alphas ) ) has_error = true;
-		// if ( ! compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) ) has_error = true;
-		// if ( ! compare_containers( numbers, IDFRecords( index ).Numbers ) ) has_error = true;
-		// if ( ! compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) ) has_error = true;
+    // EXPECT_EQ( name, IDFRecords( index ).Name );
+    // if ( name != IDFRecords( index ).Name ) has_error = true;
+    // EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
+    // if ( num_alphas != IDFRecords( index ).NumAlphas ) has_error = true;
+    // EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
+    // if ( num_numbers != IDFRecords( index ).NumNumbers ) has_error = true;
+    // if ( ! compare_containers( alphas, IDFRecords( index ).Alphas ) ) has_error = true;
+    // if ( ! compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) ) has_error = true;
+    // if ( ! compare_containers( numbers, IDFRecords( index ).Numbers ) ) has_error = true;
+    // if ( ! compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) ) has_error = true;
 
-		// return ! has_error;
-		return false;
-	}
+    // return ! has_error;
+    return false;
+}
 
 } // namespace EnergyPlus
