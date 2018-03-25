@@ -51,22 +51,21 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataAirflowNetwork.hh>
 #include <AirflowNetworkBalanceManager.hh>
+#include <DataAirflowNetwork.hh>
 #include <DataSurfaces.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -84,197 +83,195 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 {
 
-	Zone.allocate(1);
-	Zone( 1 ).Name = "SOFF";
+    Zone.allocate(1);
+    Zone(1).Name = "SOFF";
 
-	Surface.allocate( 2 );
-	Surface( 1 ).Name = "WINDOW 1";
-	Surface( 1 ).Zone = 1;
-	Surface( 1 ).ZoneName = "SOFF";
-	Surface( 1 ).Azimuth = 0.0;
-	Surface( 1 ).ExtBoundCond = 0;
-	Surface( 1 ).HeatTransSurf = true;
-	Surface( 1 ).Tilt = 90.0;
-	Surface( 1 ).Sides = 4;
-	Surface( 2 ).Name = "WINDOW 2";
-	Surface( 2 ).Zone = 1;
-	Surface( 2 ).ZoneName = "SOFF";
-	Surface( 2 ).Azimuth = 180.0;
-	Surface( 2 ).ExtBoundCond = 0;
-	Surface( 2 ).HeatTransSurf = true;
-	Surface( 2 ).Tilt = 90.0;
-	Surface( 2 ).Sides = 4;
+    Surface.allocate(2);
+    Surface(1).Name = "WINDOW 1";
+    Surface(1).Zone = 1;
+    Surface(1).ZoneName = "SOFF";
+    Surface(1).Azimuth = 0.0;
+    Surface(1).ExtBoundCond = 0;
+    Surface(1).HeatTransSurf = true;
+    Surface(1).Tilt = 90.0;
+    Surface(1).Sides = 4;
+    Surface(2).Name = "WINDOW 2";
+    Surface(2).Zone = 1;
+    Surface(2).ZoneName = "SOFF";
+    Surface(2).Azimuth = 180.0;
+    Surface(2).ExtBoundCond = 0;
+    Surface(2).HeatTransSurf = true;
+    Surface(2).Tilt = 90.0;
+    Surface(2).Sides = 4;
 
-	SurfaceWindow.allocate( 2 );
-	SurfaceWindow( 1 ).OriginalClass = 11;
-	SurfaceWindow( 2 ).OriginalClass = 11;
-	NumOfZones = 1;
+    SurfaceWindow.allocate(2);
+    SurfaceWindow(1).OriginalClass = 11;
+    SurfaceWindow(2).OriginalClass = 11;
+    NumOfZones = 1;
 
-	TotPeople = 1; // Total number of people statements
-	People.allocate(TotPeople);
-	People( 1 ).ZonePtr = 1;
-	People( 1 ).NumberOfPeople = 100.0;
-	People( 1 ).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-	People( 1 ).AdaptiveCEN15251 = true;
+    TotPeople = 1; // Total number of people statements
+    People.allocate(TotPeople);
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 100.0;
+    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    People(1).AdaptiveCEN15251 = true;
 
-	std::string const idf_objects = delimited_string({
-		"Version,8.9;",
-		"Schedule:Constant,OnSch,,1.0;",
-		"Schedule:Constant,FreeRunningSeason,,0.0;",
-		"Schedule:Constant,Sempre 21,,21.0;",
-		"AirflowNetwork:SimulationControl,",
-		"  NaturalVentilation,           !- Name",
-		"  MultizoneWithoutDistribution, !- AirflowNetwork Control",
-		"  SurfaceAverageCalculation,    !- Wind Pressure Coefficient Type",
-		"  ,                             !- Height Selection for Local Wind Pressure Calculation",
-		"  LOWRISE,                      !- Building Type",
-		"  1000,                         !- Maximum Number of Iterations{ dimensionless }",
-		"  ZeroNodePressures,            !- Initialization Type",
-		"  0.0001,                       !- Relative Airflow Convergence Tolerance{ dimensionless }",
-		"  0.0001,                       !- Absolute Airflow Convergence Tolerance{ kg / s }",
-		"  -0.5,                         !- Convergence Acceleration Limit{ dimensionless }",
-		"  90,                           !- Azimuth Angle of Long Axis of Building{ deg }",
-		"  0.36;                         !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
-		"AirflowNetwork:MultiZone:Zone,",
-		"  Soff,                         !- Zone Name",
-		"  CEN15251Adaptive,             !- Ventilation Control Mode",
-		"  ,                             !- Ventilation Control Zone Temperature Setpoint Schedule Name",
-		"  ,                             !- Minimum Venting Open Factor{ dimensionless }",
-		"  ,                             !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
-		"  100,                          !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
-		"  ,                             !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
-		"  300000,                       !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
-		"  FreeRunningSeason;            !- Venting Availability Schedule Name",
-		"AirflowNetwork:MultiZone:Surface,",
-		"  window 1,                     !- Surface Name",
-		"  Simple Window,                !- Leakage Component Name",
-		"  ,                             !- External Node Name",
-		"  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
-		"  ZoneLevel;                    !- Ventilation Control Mode",
-		"AirflowNetwork:MultiZone:Surface,",
-		"  window 2,                     !- Surface Name",
-		"  Simple Window,                !- Leakage Component Name",
-		"  ,                             !- External Node Name",
-		"  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
-		"  ZoneLevel;                    !- Ventilation Control Mode",
-		"AirflowNetwork:MultiZone:Component:SimpleOpening,",
-		"  Simple Window,                !- Name",
-		"  0.0010,                       !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
-		"  0.65,                         !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
-		"  0.01,                         !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
-		"  0.78;                         !- Discharge Coefficient{ dimensionless }",
-	});
+    std::string const idf_objects = delimited_string({
+        "Version,8.9;",
+        "Schedule:Constant,OnSch,,1.0;",
+        "Schedule:Constant,FreeRunningSeason,,0.0;",
+        "Schedule:Constant,Sempre 21,,21.0;",
+        "AirflowNetwork:SimulationControl,",
+        "  NaturalVentilation,           !- Name",
+        "  MultizoneWithoutDistribution, !- AirflowNetwork Control",
+        "  SurfaceAverageCalculation,    !- Wind Pressure Coefficient Type",
+        "  ,                             !- Height Selection for Local Wind Pressure Calculation",
+        "  LOWRISE,                      !- Building Type",
+        "  1000,                         !- Maximum Number of Iterations{ dimensionless }",
+        "  ZeroNodePressures,            !- Initialization Type",
+        "  0.0001,                       !- Relative Airflow Convergence Tolerance{ dimensionless }",
+        "  0.0001,                       !- Absolute Airflow Convergence Tolerance{ kg / s }",
+        "  -0.5,                         !- Convergence Acceleration Limit{ dimensionless }",
+        "  90,                           !- Azimuth Angle of Long Axis of Building{ deg }",
+        "  0.36;                         !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+        "AirflowNetwork:MultiZone:Zone,",
+        "  Soff,                         !- Zone Name",
+        "  CEN15251Adaptive,             !- Ventilation Control Mode",
+        "  ,                             !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  ,                             !- Minimum Venting Open Factor{ dimensionless }",
+        "  ,                             !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100,                          !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  ,                             !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000,                       !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  FreeRunningSeason;            !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window 1,                     !- Surface Name",
+        "  Simple Window,                !- Leakage Component Name",
+        "  ,                             !- External Node Name",
+        "  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel;                    !- Ventilation Control Mode",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window 2,                     !- Surface Name",
+        "  Simple Window,                !- Leakage Component Name",
+        "  ,                             !- External Node Name",
+        "  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel;                    !- Ventilation Control Mode",
+        "AirflowNetwork:MultiZone:Component:SimpleOpening,",
+        "  Simple Window,                !- Name",
+        "  0.0010,                       !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+        "  0.65,                         !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+        "  0.01,                         !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+        "  0.78;                         !- Discharge Coefficient{ dimensionless }",
+    });
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	GetAirflowNetworkInput();
+    GetAirflowNetworkInput();
 
-	EXPECT_EQ( DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver );
+    EXPECT_EQ(DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver);
 
-	Zone.deallocate();
-	Surface.deallocate();
-	SurfaceWindow.deallocate();
-	People.deallocate();
-
+    Zone.deallocate();
+    Surface.deallocate();
+    SurfaceWindow.deallocate();
+    People.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 {
 
-	Zone.allocate(1);
-	Zone( 1 ).Name = "SOFF";
+    Zone.allocate(1);
+    Zone(1).Name = "SOFF";
 
-	Surface.allocate( 2 );
-	Surface( 1 ).Name = "WINDOW 1";
-	Surface( 1 ).Zone = 1;
-	Surface( 1 ).ZoneName = "SOFF";
-	Surface( 1 ).Azimuth = 0.0;
-	Surface( 1 ).ExtBoundCond = 0;
-	Surface( 1 ).HeatTransSurf = true;
-	Surface( 1 ).Tilt = 90.0;
-	Surface( 1 ).Sides = 4;
-	Surface( 2 ).Name = "WINDOW 2";
-	Surface( 2 ).Zone = 1;
-	Surface( 2 ).ZoneName = "SOFF";
-	Surface( 2 ).Azimuth = 180.0;
-	Surface( 2 ).ExtBoundCond = 0;
-	Surface( 2 ).HeatTransSurf = true;
-	Surface( 2 ).Tilt = 90.0;
-	Surface( 2 ).Sides = 4;
+    Surface.allocate(2);
+    Surface(1).Name = "WINDOW 1";
+    Surface(1).Zone = 1;
+    Surface(1).ZoneName = "SOFF";
+    Surface(1).Azimuth = 0.0;
+    Surface(1).ExtBoundCond = 0;
+    Surface(1).HeatTransSurf = true;
+    Surface(1).Tilt = 90.0;
+    Surface(1).Sides = 4;
+    Surface(2).Name = "WINDOW 2";
+    Surface(2).Zone = 1;
+    Surface(2).ZoneName = "SOFF";
+    Surface(2).Azimuth = 180.0;
+    Surface(2).ExtBoundCond = 0;
+    Surface(2).HeatTransSurf = true;
+    Surface(2).Tilt = 90.0;
+    Surface(2).Sides = 4;
 
-	SurfaceWindow.allocate( 2 );
-	SurfaceWindow( 1 ).OriginalClass = 11;
-	SurfaceWindow( 2 ).OriginalClass = 11;
-	NumOfZones = 1;
+    SurfaceWindow.allocate(2);
+    SurfaceWindow(1).OriginalClass = 11;
+    SurfaceWindow(2).OriginalClass = 11;
+    NumOfZones = 1;
 
-	TotPeople = 1; // Total number of people statements
-	People.allocate(TotPeople);
-	People( 1 ).ZonePtr = 1;
-	People( 1 ).NumberOfPeople = 100.0;
-	People( 1 ).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-	People( 1 ).AdaptiveCEN15251 = true;
+    TotPeople = 1; // Total number of people statements
+    People.allocate(TotPeople);
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 100.0;
+    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    People(1).AdaptiveCEN15251 = true;
 
-	std::string const idf_objects = delimited_string({
-		"Version,8.9;",
-		"Schedule:Constant,OnSch,,1.0;",
-		"Schedule:Constant,FreeRunningSeason,,0.0;",
-		"Schedule:Constant,Sempre 21,,21.0;",
-		"AirflowNetwork:SimulationControl,",
-		"  NaturalVentilation,           !- Name",
-		"  MultizoneWithoutDistribution, !- AirflowNetwork Control",
-		"  SurfaceAverageCalculation,    !- Wind Pressure Coefficient Type",
-		"  ,                             !- Height Selection for Local Wind Pressure Calculation",
-		"  LOWRISE,                      !- Building Type",
-		"  1000,                         !- Maximum Number of Iterations{ dimensionless }",
-		"  ZeroNodePressures,            !- Initialization Type",
-		"  0.0001,                       !- Relative Airflow Convergence Tolerance{ dimensionless }",
-		"  0.0001,                       !- Absolute Airflow Convergence Tolerance{ kg / s }",
-		"  -0.5,                         !- Convergence Acceleration Limit{ dimensionless }",
-		"  90,                           !- Azimuth Angle of Long Axis of Building{ deg }",
-		"  1.0,                          !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
-		"  No,                           !- Height Dependence of External Node Temperature",
-		"  SkylineLU;                    !- Solver",
-		"AirflowNetwork:MultiZone:Zone,",
-		"  Soff,                         !- Zone Name",
-		"  CEN15251Adaptive,             !- Ventilation Control Mode",
-		"  ,                             !- Ventilation Control Zone Temperature Setpoint Schedule Name",
-		"  ,                             !- Minimum Venting Open Factor{ dimensionless }",
-		"  ,                             !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
-		"  100,                          !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
-		"  ,                             !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
-		"  300000,                       !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
-		"  FreeRunningSeason;            !- Venting Availability Schedule Name",
-		"AirflowNetwork:MultiZone:Surface,",
-		"  window 1,                     !- Surface Name",
-		"  Simple Window,                !- Leakage Component Name",
-		"  ,                             !- External Node Name",
-		"  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
-		"  ZoneLevel;                    !- Ventilation Control Mode",
-		"AirflowNetwork:MultiZone:Surface,",
-		"  window 2,                     !- Surface Name",
-		"  Simple Window,                !- Leakage Component Name",
-		"  ,                             !- External Node Name",
-		"  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
-		"  ZoneLevel;                    !- Ventilation Control Mode",
-		"AirflowNetwork:MultiZone:Component:SimpleOpening,",
-		"  Simple Window,                !- Name",
-		"  0.0010,                       !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
-		"  0.65,                         !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
-		"  0.01,                         !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
-		"  0.78;                         !- Discharge Coefficient{ dimensionless }",
-	});
+    std::string const idf_objects = delimited_string({
+        "Version,8.9;",
+        "Schedule:Constant,OnSch,,1.0;",
+        "Schedule:Constant,FreeRunningSeason,,0.0;",
+        "Schedule:Constant,Sempre 21,,21.0;",
+        "AirflowNetwork:SimulationControl,",
+        "  NaturalVentilation,           !- Name",
+        "  MultizoneWithoutDistribution, !- AirflowNetwork Control",
+        "  SurfaceAverageCalculation,    !- Wind Pressure Coefficient Type",
+        "  ,                             !- Height Selection for Local Wind Pressure Calculation",
+        "  LOWRISE,                      !- Building Type",
+        "  1000,                         !- Maximum Number of Iterations{ dimensionless }",
+        "  ZeroNodePressures,            !- Initialization Type",
+        "  0.0001,                       !- Relative Airflow Convergence Tolerance{ dimensionless }",
+        "  0.0001,                       !- Absolute Airflow Convergence Tolerance{ kg / s }",
+        "  -0.5,                         !- Convergence Acceleration Limit{ dimensionless }",
+        "  90,                           !- Azimuth Angle of Long Axis of Building{ deg }",
+        "  1.0,                          !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+        "  No,                           !- Height Dependence of External Node Temperature",
+        "  SkylineLU;                    !- Solver",
+        "AirflowNetwork:MultiZone:Zone,",
+        "  Soff,                         !- Zone Name",
+        "  CEN15251Adaptive,             !- Ventilation Control Mode",
+        "  ,                             !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  ,                             !- Minimum Venting Open Factor{ dimensionless }",
+        "  ,                             !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100,                          !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  ,                             !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000,                       !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  FreeRunningSeason;            !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window 1,                     !- Surface Name",
+        "  Simple Window,                !- Leakage Component Name",
+        "  ,                             !- External Node Name",
+        "  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel;                    !- Ventilation Control Mode",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window 2,                     !- Surface Name",
+        "  Simple Window,                !- Leakage Component Name",
+        "  ,                             !- External Node Name",
+        "  1,                            !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel;                    !- Ventilation Control Mode",
+        "AirflowNetwork:MultiZone:Component:SimpleOpening,",
+        "  Simple Window,                !- Name",
+        "  0.0010,                       !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+        "  0.65,                         !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+        "  0.01,                         !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+        "  0.78;                         !- Discharge Coefficient{ dimensionless }",
+    });
 
-	ASSERT_TRUE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	GetAirflowNetworkInput();
+    GetAirflowNetworkInput();
 
-	EXPECT_EQ( DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver );
+    EXPECT_EQ(DataAirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, DataAirflowNetwork::AirflowNetworkSimu.solver);
 
-	Zone.deallocate();
-	Surface.deallocate();
-	SurfaceWindow.deallocate();
-	People.deallocate();
-
+    Zone.deallocate();
+    Surface.deallocate();
+    SurfaceWindow.deallocate();
+    People.deallocate();
 }
 
-}
+} // namespace EnergyPlus
