@@ -1313,8 +1313,9 @@ namespace ExternalInterface {
                             // verify whether we have duplicate FMU input variables in the idf
                             GlobalNames::VerifyUniqueInterObjectName(UniqueFMUInputVarNames, FMU(i).Instance(j).fmuInputVariable(k).Name,
                                                                      cCurrentModuleObject, FMU(i).Instance(j).Name, ErrorsFound);
-                            //							UtilityRoutines::VerifyName( FMU( i ).Instance( j ).fmuInputVariable( k ).Name,
-                            //FMU(
+                            //							UtilityRoutines::VerifyName( FMU( i ).Instance( j ).fmuInputVariable(
+                            //k
+                            //).Name,  FMU(
                             // i
                             //).Instance(
                             // j
