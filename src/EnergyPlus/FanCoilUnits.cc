@@ -3204,13 +3204,13 @@ namespace FanCoilUnits {
                         // FanCoil(  FanCoilNum ).Name ); 							ShowContinueError( "  Iteration limit
                         // exceeded in calculating heating coil output " );
                         //							ShowRecurringWarningErrorAtEnd( "Heating coil Iteration limit exceeded
-                        //in  fan  coil  unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
+                        // in  fan  coil  unit " + FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
                         //						} else if ( SolFlag == -2 ) {
                         //							ShowWarningError( "Heating coil control failed in fan coil unit " +
                         // FanCoil(  FanCoilNum ).Name ); 							ShowContinueError( "  Bad starting
                         // values for electric heating coil control to  meet zone load at constant temperature." );
-                        //							ShowRecurringWarningErrorAtEnd( "Heating coil control failed in fan coil
-                        //unit
+                        //							ShowRecurringWarningErrorAtEnd( "Heating coil control failed in fan
+                        // coil  unit
                         //"
                         //+  FanCoil( FanCoilNum ).Name, FanCoil( FanCoilNum ).MaxIterIndexC );
                         //							Node( FanCoil( FanCoilNum ).AirInNode ).MassFlowRate =
