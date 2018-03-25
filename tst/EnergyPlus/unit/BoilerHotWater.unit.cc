@@ -61,49 +61,48 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::Boilers;
 using namespace EnergyPlus::DataSizing;
 
-TEST_F( EnergyPlusFixture, Boiler_HotWaterSizingTest )
+TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
-	// unit test for autosizing boiler nominal capacity in Boiler:HotWater
-	Boilers::Boiler.allocate( 1 );
-	// Hardsized Hot Water Boiler
-	Boilers::Boiler( 1 ).LoopNum = 1;
-	Boilers::Boiler( 1 ).SizFac = 1.2;
-	Boilers::Boiler( 1 ).NomCap = 40000.0;
-	Boilers::Boiler( 1 ).NomCapWasAutoSized = false;
-	Boilers::Boiler( 1 ).VolFlowRate = 1.0;
-	Boilers::Boiler( 1 ).VolFlowRateWasAutoSized = false;
-	Boilers::Boiler( 1 ).TempDesBoilerOut = 82.0;
+    // unit test for autosizing boiler nominal capacity in Boiler:HotWater
+    Boilers::Boiler.allocate(1);
+    // Hardsized Hot Water Boiler
+    Boilers::Boiler(1).LoopNum = 1;
+    Boilers::Boiler(1).SizFac = 1.2;
+    Boilers::Boiler(1).NomCap = 40000.0;
+    Boilers::Boiler(1).NomCapWasAutoSized = false;
+    Boilers::Boiler(1).VolFlowRate = 1.0;
+    Boilers::Boiler(1).VolFlowRateWasAutoSized = false;
+    Boilers::Boiler(1).TempDesBoilerOut = 82.0;
 
-	DataPlant::PlantLoop.allocate( 1 );
-	DataSizing::PlantSizData.allocate( 1 );
-	// Hot Water Loop
-	DataPlant::PlantLoop( 1 ).PlantSizNum = 1;
-	DataPlant::PlantLoop( 1 ).FluidIndex = 1;
-	DataPlant::PlantLoop( 1 ).FluidName = "WATER";
-	DataSizing::PlantSizData( 1 ).DesVolFlowRate = 1.0;
-	DataSizing::PlantSizData( 1 ).DeltaT = 10.0;
-	DataPlant::PlantFirstSizesOkayToFinalize = true;
-	//now call sizing routine
-	Boilers::SizeBoiler( 1 );
-	// see if boiler volume flow rate returned is hard-sized value
-	EXPECT_DOUBLE_EQ( Boilers::Boiler( 1 ).VolFlowRate, 1.0 );
-	// see if boiler nominal capacity returned is hard-sized value
-	EXPECT_DOUBLE_EQ( Boilers::Boiler( 1 ).NomCap, 40000.0 );
+    DataPlant::PlantLoop.allocate(1);
+    DataSizing::PlantSizData.allocate(1);
+    // Hot Water Loop
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+    DataSizing::PlantSizData(1).DeltaT = 10.0;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    // now call sizing routine
+    Boilers::SizeBoiler(1);
+    // see if boiler volume flow rate returned is hard-sized value
+    EXPECT_DOUBLE_EQ(Boilers::Boiler(1).VolFlowRate, 1.0);
+    // see if boiler nominal capacity returned is hard-sized value
+    EXPECT_DOUBLE_EQ(Boilers::Boiler(1).NomCap, 40000.0);
 
-	// Autosized Hot Water Boiler
-	Boilers::Boiler( 1 ).NomCapWasAutoSized = true;
-	Boilers::Boiler( 1 ).VolFlowRateWasAutoSized = true;
-	Boilers::Boiler( 1 ).NomCap = DataSizing::AutoSize;
-	Boilers::Boiler( 1 ).VolFlowRate = DataSizing::AutoSize;
-	//now call sizing routine
-	Boilers::SizeBoiler( 1 );
-	// see if boiler volume flow rate returned is autosized value
-	EXPECT_NEAR( Boilers::Boiler( 1 ).VolFlowRate, 1.2, 0.000001 );
-	// see if boiler nominal capacity returned is autosized value
-	EXPECT_NEAR( Boilers::Boiler( 1 ).NomCap, 50409257.0, 1.0 );
-	// clear
-	Boilers::Boiler.deallocate();
-	DataSizing::PlantSizData.deallocate();
-	DataPlant::PlantLoop.deallocate();
-
+    // Autosized Hot Water Boiler
+    Boilers::Boiler(1).NomCapWasAutoSized = true;
+    Boilers::Boiler(1).VolFlowRateWasAutoSized = true;
+    Boilers::Boiler(1).NomCap = DataSizing::AutoSize;
+    Boilers::Boiler(1).VolFlowRate = DataSizing::AutoSize;
+    // now call sizing routine
+    Boilers::SizeBoiler(1);
+    // see if boiler volume flow rate returned is autosized value
+    EXPECT_NEAR(Boilers::Boiler(1).VolFlowRate, 1.2, 0.000001);
+    // see if boiler nominal capacity returned is autosized value
+    EXPECT_NEAR(Boilers::Boiler(1).NomCap, 50409257.0, 1.0);
+    // clear
+    Boilers::Boiler.deallocate();
+    DataSizing::PlantSizData.deallocate();
+    DataPlant::PlantLoop.deallocate();
 }

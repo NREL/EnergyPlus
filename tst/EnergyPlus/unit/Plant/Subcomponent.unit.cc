@@ -57,7 +57,8 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, Plant_Topology_Subcomponent ) {
+TEST_F(EnergyPlusFixture, Plant_Topology_Subcomponent)
+{
     EnergyPlus::DataPlant::SubcomponentData sc;
     EnergyPlus::DataPlant::SubSubcomponentData ssc;
     // Could test default constructor I guess...
