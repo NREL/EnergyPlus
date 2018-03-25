@@ -58,10 +58,10 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::RoomAirModelUserTempPattern;
 
-TEST_F( EnergyPlusFixture, RoomAirModelUserTempPattern_OutdoorDryBulbGradTest )
+TEST_F(EnergyPlusFixture, RoomAirModelUserTempPattern_OutdoorDryBulbGradTest)
 {
-	EXPECT_EQ( 8, OutdoorDryBulbGrad(20, 10, 8, 0, 2));
-	EXPECT_EQ( 2, OutdoorDryBulbGrad(-5, 10, 8, 0, 2));
-	EXPECT_EQ( 2, OutdoorDryBulbGrad( 5, 10, 8, 10, 2));
-	EXPECT_NEAR( 4.307, OutdoorDryBulbGrad( 5, 13, 8, 0, 2), .001);
+    EXPECT_EQ(8, OutdoorDryBulbGrad(20, 10, 8, 0, 2));
+    EXPECT_EQ(2, OutdoorDryBulbGrad(-5, 10, 8, 0, 2));
+    EXPECT_EQ(2, OutdoorDryBulbGrad(5, 10, 8, 10, 2));
+    EXPECT_NEAR(4.307, OutdoorDryBulbGrad(5, 13, 8, 0, 2), .001);
 }
