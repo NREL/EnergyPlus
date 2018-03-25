@@ -55,26 +55,29 @@
 #include <NodeInputManager.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
 //#include <EMSManager.hh>
-#include <SetPointManager.hh>
-#include <ScheduleManager.hh>
-#include <SimulationManager.hh>
+#include <BranchInputManager.hh>
+#include <DataEnvironment.hh>
+#include <DataHVACGlobals.hh>
 #include <ElectricPowerServiceManager.hh>
-#include <OutputReportPredefined.hh>
+#include <General.hh>
 #include <HeatBalanceManager.hh>
 #include <OutputProcessor.hh>
+#include <OutputReportPredefined.hh>
 #include <Plant/PlantManager.hh>
-#include <BranchInputManager.hh>
-#include <WeatherManager.hh>
-#include <DataHVACGlobals.hh>
 #include <PlantUtilities.hh>
-#include <DataEnvironment.hh>
-#include <General.hh>
+#include <ScheduleManager.hh>
+#include <SetPointManager.hh>
+#include <SimulationManager.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi ) {
-		// this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be met
-		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks that the HX will attempt to meet setpoint of 19 when the conditioniong fluid is 20 and cannot really make it to 19.  The HX still cools to down to 20.
+TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
+{
+    // this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be
+    // met this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks
+    // that the HX will attempt to meet setpoint of 19 when the conditioniong fluid is 20 and cannot really make it to 19.  The HX still cools to down
+    // to 20.
 
 		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
@@ -1093,14 +1096,12 @@ namespace EnergyPlus {
 
 			++EnvCount;
 
-
 			DataGlobals::BeginEnvrnFlag = true;
 			DataGlobals::EndEnvrnFlag = false;
 			DataEnvironment::EndMonthFlag = false;
 			DataGlobals::WarmupFlag = true;
 			DataGlobals::DayOfSim = 0;
 			DataGlobals::DayOfSimChr = "0";
-
 
 			while ( ( DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn ) || ( DataGlobals::WarmupFlag ) ) { // Begin day loop ...
 
@@ -1112,7 +1113,6 @@ namespace EnergyPlus {
 				DataGlobals::BeginDayFlag = true;
 				DataGlobals::EndDayFlag = false;
 
-
 				for ( DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay ) { // Begin hour loop ...
 
 					DataGlobals::BeginHourFlag = true;
@@ -1121,7 +1121,6 @@ namespace EnergyPlus {
 					for ( DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep ) {
 
 						DataGlobals::BeginTimeStepFlag = true;
-
 
 						// Set the End__Flag variables to true if necessary.  Note that
 						// each flag builds on the previous level.  EndDayFlag cannot be
@@ -1158,21 +1157,20 @@ namespace EnergyPlus {
 
 				} // ... End hour loop.
 
-
 			} // ... End day loop.
 
 		} // ... End environment loop.
 
-
 		EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0 , 0.01);
-
 	}
 
-	TEST_F( EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo ) {
+TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
+{
 
-		// this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be met
-		// this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.
-        // This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX still heats up to 20.
+    // this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be
+    // met this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.
+    // This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX
+    // still heats up to 20.
 
 		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
@@ -2191,14 +2189,12 @@ namespace EnergyPlus {
 
 			++EnvCount;
 
-
 			DataGlobals::BeginEnvrnFlag = true;
 			DataGlobals::EndEnvrnFlag = false;
 			DataEnvironment::EndMonthFlag = false;
 			DataGlobals::WarmupFlag = true;
 			DataGlobals::DayOfSim = 0;
 			DataGlobals::DayOfSimChr = "0";
-
 
 			while ( ( DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn ) || ( DataGlobals::WarmupFlag ) ) { // Begin day loop ...
 
@@ -2210,7 +2206,6 @@ namespace EnergyPlus {
 				DataGlobals::BeginDayFlag = true;
 				DataGlobals::EndDayFlag = false;
 
-
 				for ( DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay ) { // Begin hour loop ...
 
 					DataGlobals::BeginHourFlag = true;
@@ -2219,7 +2214,6 @@ namespace EnergyPlus {
 					for ( DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep ) {
 
 						DataGlobals::BeginTimeStepFlag = true;
-
 
 						// Set the End__Flag variables to true if necessary.  Note that
 						// each flag builds on the previous level.  EndDayFlag cannot be
@@ -2256,7 +2250,6 @@ namespace EnergyPlus {
 
 				} // ... End hour loop.
 
-
 			} // ... End day loop.
 
 		} // ... End environment loop.
@@ -2267,9 +2260,13 @@ namespace EnergyPlus {
 		EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0 , 0.01);
 	}
 
-	TEST_F( EnergyPlusFixture, PlantHXControlWithFirstHVACIteration ) {
+TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
+{
 		// this unit test is for issue #4959.  Added FirstHVACIteration to simulate and control routines
-		// unit test checks that the change to logic for #4959 does work to affect node mass flow rate.  The conditions are set up such that the demand side inlet is too warm to cool the supply side, so previous behavior would shut down flow.  Now if firstHVACIteration is true is should set flow request at the design max and if it is false set the flow request to 0.0.  The intent is setup enough structures to be able to call the routine ControlFluidHeatExchanger and check its behavior with FirstHVACIteration.
+    // unit test checks that the change to logic for #4959 does work to affect node mass flow rate.  The conditions are set up such that the demand
+    // side inlet is too warm to cool the supply side, so previous behavior would shut down flow.  Now if firstHVACIteration is true is should set
+    // flow request at the design max and if it is false set the flow request to 0.0.  The intent is setup enough structures to be able to call the
+    // routine ControlFluidHeatExchanger and check its behavior with FirstHVACIteration.
 
 		PlantHeatExchangerFluidToFluid::FluidHX.allocate(1);
 
@@ -2309,7 +2306,6 @@ namespace EnergyPlus {
 		DataLoopNode::Node( 4 ).MassFlowRateMaxAvail = 2.0;
 		DataLoopNode::Node( 4 ).MassFlowRateMax = 2.0;
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletTemp = 19.0;
-
 
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).ControlMode = PlantHeatExchangerFluidToFluid::CoolingDifferentialOnOff;
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).MinOperationTemp = 10.0;
@@ -2366,7 +2362,8 @@ namespace EnergyPlus {
 		EXPECT_NEAR( DataLoopNode::Node( 2 ).MassFlowRate, 0.0, 0.001 );
 	}
 
-	TEST_F( EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride ) {
+TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride)
+{
 		// this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride.
 		// unit test checks that the change for #5626 adjusts the temperature value used in central plant dispatch routines by the tolerance value.
 
@@ -2401,7 +2398,6 @@ namespace EnergyPlus {
 		DataLoopNode::Node( 3 ).MassFlowRateMaxAvail = 2.0;
 		DataLoopNode::Node( 3 ).MassFlowRateMax = 2.0;
 
-
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletTemp = 18.0;
 
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletNodeNum = 2;
@@ -2412,7 +2408,6 @@ namespace EnergyPlus {
 		DataLoopNode::Node( 4 ).MassFlowRateMaxAvail = 2.0;
 		DataLoopNode::Node( 4 ).MassFlowRateMax = 2.0;
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).DemandSideLoop.InletTemp = 19.0;
-
 
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).ControlMode = PlantHeatExchangerFluidToFluid::CoolingSetPointOnOffWithComponentOverride;
 		PlantHeatExchangerFluidToFluid::FluidHX( 1 ).MinOperationTemp = 10.0;
@@ -2457,7 +2452,6 @@ namespace EnergyPlus {
 		DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
 		DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 1 ).Comp( 1 ).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX( 1 ).SupplySideLoop.InletNodeNum;
 
-
 		DataPlant::PlantLoop( 2 ).Name = "HX demand side loop ";
 		DataPlant::PlantLoop( 2 ).FluidIndex = 1;
 		DataPlant::PlantLoop( 2 ).FluidName = "WATER";
@@ -2491,7 +2485,6 @@ namespace EnergyPlus {
 		PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger( 1, 1 );
 
 		EXPECT_NEAR( DataPlant::PlantLoop( 1 ).LoopSide( 2 ).Branch( 2 ).Comp( 1 ).FreeCoolCntrlMinCntrlTemp, 9.5, 0.001 );
-
 	}
 
-}
+} // namespace EnergyPlus

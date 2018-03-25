@@ -59,53 +59,53 @@
 
 using namespace EnergyPlus;
 
-TEST_F( EnergyPlusFixture, ERLExpression_TestExponentials ) {
-	// set the program state so that errors can be thrown
-	DataGlobals::DoingSizing = false;
-	DataGlobals::KickOffSimulation = false;
-	EMSManager::FinishProcessingUserInput = false;
+TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
+{
+    // set the program state so that errors can be thrown
+    DataGlobals::DoingSizing = false;
+    DataGlobals::KickOffSimulation = false;
+    EMSManager::FinishProcessingUserInput = false;
 
-	bool errorsFound = false;
+    bool errorsFound = false;
 
-	DataRuntimeLanguage::ErlExpression.allocate(1);
-	auto & erlExpression = DataRuntimeLanguage::ErlExpression(1);
-	erlExpression.Operator = DataRuntimeLanguage::FuncExp;
-	erlExpression.NumOperands = 1;
-	erlExpression.Operand.allocate(1);
+    DataRuntimeLanguage::ErlExpression.allocate(1);
+    auto &erlExpression = DataRuntimeLanguage::ErlExpression(1);
+    erlExpression.Operator = DataRuntimeLanguage::FuncExp;
+    erlExpression.NumOperands = 1;
+    erlExpression.Operand.allocate(1);
 
-	erlExpression.Operand(1).Number = -25;
-	auto response1 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
-	EXPECT_FALSE(errorsFound);
-	EXPECT_EQ(0, response1.Number); 
+    erlExpression.Operand(1).Number = -25;
+    auto response1 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_EQ(0, response1.Number);
 
-	erlExpression.Operand(1).Number = -20;
-	auto response2 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
-	EXPECT_FALSE(errorsFound);
-	EXPECT_EQ(0, response2.Number); 
+    erlExpression.Operand(1).Number = -20;
+    auto response2 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_EQ(0, response2.Number);
 
-	erlExpression.Operand(1).Number = -3;
-	auto response3 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
-	EXPECT_FALSE(errorsFound);
-	EXPECT_NEAR(0.05, response3.Number, 0.001); 
+    erlExpression.Operand(1).Number = -3;
+    auto response3 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_NEAR(0.05, response3.Number, 0.001);
 
-	erlExpression.Operand(1).Number = 0;
-	auto response4 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
-	EXPECT_FALSE(errorsFound);
-	EXPECT_NEAR(1, response4.Number, 0.001); 
+    erlExpression.Operand(1).Number = 0;
+    auto response4 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_NEAR(1, response4.Number, 0.001);
 
-	erlExpression.Operand(1).Number = 3;
-	auto response5 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
-	EXPECT_FALSE(errorsFound);
-	EXPECT_NEAR(20.08, response5.Number, 0.01); 
+    erlExpression.Operand(1).Number = 3;
+    auto response5 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_NEAR(20.08, response5.Number, 0.01);
 
-	erlExpression.Operand(1).Number = 700;
-	auto response6 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
-	EXPECT_TRUE(errorsFound);
-	EXPECT_EQ(0, response6.Number); 
+    erlExpression.Operand(1).Number = 700;
+    auto response6 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+    EXPECT_TRUE(errorsFound);
+    EXPECT_EQ(0, response6.Number);
 
-	erlExpression.Operand(1).Number = 710;
-	auto response7 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
-	EXPECT_TRUE(errorsFound);
-	EXPECT_EQ(0, response7.Number); 
-
+    erlExpression.Operand(1).Number = 710;
+    auto response7 = RuntimeLanguageProcessor::EvaluateExpression(1, errorsFound);
+    EXPECT_TRUE(errorsFound);
+    EXPECT_EQ(0, response7.Number);
 }

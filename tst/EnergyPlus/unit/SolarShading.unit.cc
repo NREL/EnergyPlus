@@ -51,7 +51,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -59,13 +58,14 @@
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -293,13 +293,11 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_polygon_contains_point )
 
 	EXPECT_TRUE( polygon_contains_point( numSides, Rectangle3d, PointInside, true, false, false ) );
 	EXPECT_FALSE( polygon_contains_point( numSides, Rectangle3d, PointOutside, true, false, false ) );
-
 }
 
 TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 {
-	std::string const idf_objects = delimited_string( {
-		"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
 		"  Building,                                                                          ",
 		"    DemoFDT,                 !- Name                                                 ",
 		"    0,                       !- North Axis {deg}                                     ",
@@ -607,8 +605,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 		"  ShadingProperty:Reflectance,                                                       ",
 		"    Zn001:Wall-South:Shade001,  !- Shading Surface Name                              ",
 		"    0.2,                     !- Diffuse Solar Reflectance of Unglazed Part of Shading",
-		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
-	} );
+                                                      "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"});
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -674,14 +671,11 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep )
 
 	EXPECT_NEAR( 0.6504, DifShdgRatioIsoSkyHRTS( 4, 9, 6 ), 0.0001 );
 	EXPECT_NEAR( 0.9152, DifShdgRatioHorizHRTS( 4, 9, 6 ), 0.0001 );
-
 }
-
 
 TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 {
-	std::string const idf_objects = delimited_string( {
-		"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
 		"  Building,                                                                          ",
 		"    DemoFDT,                 !- Name                                                 ",
 		"    0,                       !- North Axis {deg}                                     ",
@@ -1004,8 +998,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 		"  ShadingProperty:Reflectance,                                                       ",
 		"    Zn001:Wall-South:Shade001,  !- Shading Surface Name                              ",
 		"    0.2,                     !- Diffuse Solar Reflectance of Unglazed Part of Shading",
-		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
-	} );
+                                                      "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"});
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -1061,12 +1054,10 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 	DataSystemVariables::UseScheduledSunlitFrac = true;
 	SolarDistribution = FullExterior;
 
-
 	CalcSkyDifShading = true;
 	SolarShading::InitSolarCalculations();
 	SolarShading::SkyDifSolarShading();
 	CalcSkyDifShading = false;
-
 
 	ScheduleManager::UpdateScheduleValues();
 	DataBSDFWindow::SUNCOSTS( 4, 9, 1 ) = 0.1;
@@ -1077,20 +1068,19 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_ExternalShadingIO )
 	EXPECT_TRUE( UseScheduledSunlitFrac );
 	EXPECT_DOUBLE_EQ( 0.5432, ScheduleManager::LookUpScheduleValue( 2, 9, 4 ) );
 	EXPECT_FALSE( SolarShading::SUNCOS( 3 ) < 0.00001 );
-	EXPECT_DOUBLE_EQ( 0.00001, DataEnvironment::SunIsUpValue );;
+    EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
+    ;
 	EXPECT_FALSE( SolarShading::SUNCOS( 3 ) < DataEnvironment::SunIsUpValue );
 
 	EXPECT_DOUBLE_EQ( 1, SunlitFrac( 4, 9, 3 ) );
 	EXPECT_DOUBLE_EQ( 1, SunlitFrac( 4, 9, 6 ) );
 	EXPECT_DOUBLE_EQ( 0.5432, SunlitFrac( 4, 9, 9 ) );
 	SolarShading::clear_state();
-
 }
 
 TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 {
-	std::string const idf_objects = delimited_string({
-		"  Version,8.9;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,8.9;                                                                       ",
 		"  Building,                                                                          ",
 		"    DemoFDT,                 !- Name                                                 ",
 		"    0,                       !- North Axis {deg}                                     ",
@@ -1411,8 +1401,7 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 		"  ShadingProperty:Reflectance,                                                       ",
 		"    Zn001:Wall-South:Shade001,  !- Shading Surface Name                              ",
 		"    0.2,                     !- Diffuse Solar Reflectance of Unglazed Part of Shading",
-		"    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"
-	} );
+                                                      "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shadi"});
 
 	ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -1444,7 +1433,6 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 
 	SizingManager::GetZoneSizingInput();
 
-
 	SurfaceGeometry::CosZoneRelNorth.allocate( 1 );
 	SurfaceGeometry::SinZoneRelNorth.allocate( 1 );
 
@@ -1471,5 +1459,4 @@ TEST_F( EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading )
 			}
 		}
 	}
-
 }

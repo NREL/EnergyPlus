@@ -56,23 +56,24 @@
 
 namespace EnergyPlus {
 
-	TEST_F(EnergyPlusFixture, TestPipesInput) {
+TEST_F(EnergyPlusFixture, TestPipesInput)
+{
 
-		std::string const idf_objects = delimited_string({
-			"Pipe:Adiabatic,",
-			" Pipe Name,           !- Name",
-			" Pipe Inlet Node,     !- Inlet Node Name",
-			" Pipe Outlet Node;    !- Outlet Node Name",
-			"Pipe:Adiabatic:Steam,",
-			" Pipe Name 2,           !- Name",
-			" Pipe Inlet Node 2,     !- Inlet Node Name",
-			" Pipe Outlet Node 2;    !- Outlet Node Name",
-		});
+    std::string const idf_objects = delimited_string({
+        "Pipe:Adiabatic,",
+        " Pipe Name,           !- Name",
+        " Pipe Inlet Node,     !- Inlet Node Name",
+        " Pipe Outlet Node;    !- Outlet Node Name",
+        "Pipe:Adiabatic:Steam,",
+        " Pipe Name 2,           !- Name",
+        " Pipe Inlet Node 2,     !- Inlet Node Name",
+        " Pipe Outlet Node 2;    !- Outlet Node Name",
+    });
 
-		ASSERT_TRUE(process_idf(idf_objects));
-		Pipes::GetPipeInput();
-		EXPECT_EQ(2u, Pipes::LocalPipe.size());
-		EXPECT_EQ(DataPlant::TypeOf_Pipe, Pipes::LocalPipe(1).TypeOf);
-		EXPECT_EQ(DataPlant::TypeOf_PipeSteam, Pipes::LocalPipe(2).TypeOf);
-	}
+    ASSERT_TRUE(process_idf(idf_objects));
+    Pipes::GetPipeInput();
+    EXPECT_EQ(2u, Pipes::LocalPipe.size());
+    EXPECT_EQ(DataPlant::TypeOf_Pipe, Pipes::LocalPipe(1).TypeOf);
+    EXPECT_EQ(DataPlant::TypeOf_PipeSteam, Pipes::LocalPipe(2).TypeOf);
 }
+} // namespace EnergyPlus

@@ -52,30 +52,30 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <AirTerminalUnit.hh>
-#include <HVACFourPipeBeam.hh>
-#include <DataHeatBalance.hh>
-#include <DataZoneEquipment.hh>
-#include <DataLoopNode.hh>
-#include <NodeInputManager.hh>
-#include <DataDefineEquip.hh>
-#include <GeneralRoutines.hh>
-#include <SimulationManager.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <OutputReportPredefined.hh>
-#include <HeatBalanceManager.hh>
-#include <OutputProcessor.hh>
-#include <DataHVACGlobals.hh>
-#include <Plant/PlantManager.hh>
 #include <BranchInputManager.hh>
+#include <DataDefineEquip.hh>
+#include <DataHVACGlobals.hh>
+#include <DataHeatBalance.hh>
+#include <DataLoopNode.hh>
+#include <DataZoneEnergyDemands.hh>
+#include <DataZoneEquipment.hh>
+#include <ElectricPowerServiceManager.hh>
+#include <GeneralRoutines.hh>
+#include <HVACFourPipeBeam.hh>
+#include <HeatBalanceManager.hh>
+#include <NodeInputManager.hh>
+#include <OutputProcessor.hh>
+#include <OutputReportPredefined.hh>
+#include <Plant/PlantManager.hh>
+#include <PlantUtilities.hh>
+#include <SimulationManager.hh>
 #include <SizingManager.hh>
 #include <WeatherManager.hh>
-#include <PlantUtilities.hh>
-#include <DataZoneEnergyDemands.hh>
 
 namespace EnergyPlus {
 
-
-	TEST_F( EnergyPlusFixture, Beam_FactoryAllAutosize ) {
+TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
+{
 		std::string const idf_objects = delimited_string( {
 		"Version,8.4;",
 		"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,",
@@ -177,15 +177,18 @@ namespace EnergyPlus {
 
 		DataZoneEquipment::ZoneEquipConfig( 1 ).InletNode( 1 ) = 3;
 		bool ErrorsFound =  false;
-		DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneNode = NodeInputManager::GetOnlySingleNode( "Zone 1 Node", ErrorsFound, "Zone", "BeamTest", DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_ZoneNode, 1, DataLoopNode::ObjectIsNotParent, "Test zone node" );
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode =
+        NodeInputManager::GetOnlySingleNode("Zone 1 Node", ErrorsFound, "Zone", "BeamTest", DataLoopNode::NodeType_Air,
+                                            DataLoopNode::NodeConnectionType_ZoneNode, 1, DataLoopNode::ObjectIsNotParent, "Test zone node");
 
 		DataDefineEquip::NumAirDistUnits = 1;
 		DataDefineEquip::AirDistUnit.allocate( 1 );
-		DataDefineEquip::AirDistUnit( 1 ).EquipName( 1 ) = "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
+    DataDefineEquip::AirDistUnit(1).EquipName(1) =
+        "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
 		DataDefineEquip::AirDistUnit( 1 ).OutletNodeNum = 3;
 
-		DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory( DataDefineEquip::SingleDuctConstVolFourPipeBeam, DataDefineEquip::AirDistUnit( 1 ).EquipName( 1 ) );
-
+    DataDefineEquip::AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(
+        DataDefineEquip::SingleDuctConstVolFourPipeBeam, DataDefineEquip::AirDistUnit(1).EquipName(1));
 
 		//EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->name, "PERIMETER_TOP_ZN_4 4PIPE BEAM");
 
@@ -193,9 +196,7 @@ namespace EnergyPlus {
 
 		EXPECT_EQ( 3, DataZoneEquipment::ZoneEquipConfig( 1 ).AirDistUnitHeat( 1 ).OutNode );
 		//EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->aDUNum, 1 );
-
 	}
-
 
 	TEST_F( EnergyPlusFixture, Beam_sizeandSimulateOneZone )
 	{
@@ -1158,8 +1159,6 @@ namespace EnergyPlus {
 		"    CoolSys1 Demand Mixer-CoolSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name",
 		"    CoolSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name",
 
-
-
 		"  PlantLoop,",
 		"    Chilled Water Loop,             !- Name",
 		"    WATER,                   !- Fluid Type",
@@ -1478,7 +1477,6 @@ namespace EnergyPlus {
 		"    HeatSys1 Demand Inlet Node,!- Inlet Node Name",
 		"    HeatSys1 Demand Pipe-Load Profile Node;  !- Outlet Node Name",
 
-
 		"  Branch,",
 		"    HeatSys1 Demand Outlet Branch,  !- Name",
 		"    ,                        !- Pressure Drop Curve Name",
@@ -1696,7 +1694,6 @@ namespace EnergyPlus {
 		EXPECT_NEAR( DataLoopNode::Node( 39 ).MassFlowRate, 0.19320550334974979, 0.00001 );
 
 		EXPECT_NEAR( NonAirSysOutput, 8023.9273066417645, 0.0001 );
-
 
 		// next run with cooling load and neutral supply air
 		DataZoneEnergyDemands::ZoneSysEnergyDemand( 1 ).RemainingOutputRequired = -5000.0;
@@ -2692,8 +2689,6 @@ namespace EnergyPlus {
 			"    CoolSys1 Demand Mixer-CoolSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name",
 			"    CoolSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name",
 
-
-
 			"  PlantLoop,",
 			"    Chilled Water Loop,             !- Name",
 			"    WATER,                   !- Fluid Type",
@@ -3012,7 +3007,6 @@ namespace EnergyPlus {
 			"    HeatSys1 Demand Inlet Node,!- Inlet Node Name",
 			"    HeatSys1 Demand Pipe-Load Profile Node;  !- Outlet Node Name",
 
-
 			"  Branch,",
 			"    HeatSys1 Demand Outlet Branch,  !- Name",
 			"    ,                        !- Pressure Drop Curve Name",
@@ -3179,4 +3173,4 @@ namespace EnergyPlus {
 		ASSERT_ANY_THROW( SimulationManager::SetupSimulation( ErrorsFound ) );
 	}
 
-}
+} // namespace EnergyPlus

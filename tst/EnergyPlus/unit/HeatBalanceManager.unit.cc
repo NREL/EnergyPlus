@@ -51,23 +51,23 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <DataAirLoop.hh>
+#include <DataAirSystems.hh>
+#include <DataEnvironment.hh>
+#include <DataHVACGlobals.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataLoopNode.hh>
+#include <DataZoneEquipment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <ZoneEquipmentManager.hh>
-#include <HeatBalanceAirManager.hh>
-#include <ScheduleManager.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataZoneEquipment.hh>
-#include <DataLoopNode.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataHVACGlobals.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <HeatBalanceAirManager.hh>
 #include <OutAirNodeManager.hh>
-#include <DataEnvironment.hh>
+#include <ScheduleManager.hh>
+#include <ZoneEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -87,9 +87,9 @@ using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir) {
-		std::string const idf_objects = delimited_string(
+TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
 				{
+    std::string const idf_objects = delimited_string({
 						"ZoneAirBalance:OutdoorAir,\n",
 						"    LIVING ZONE Balance 1,   !- Name\n",
 						"    LIVING ZONE,             !- Zone Name\n",
@@ -113,8 +113,7 @@ namespace EnergyPlus {
 						"autocalculate,           !- Ceiling Height {m}",
 						"autocalculate;           !- Volume {m3}",
 
-				}
-		);
+    });
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
 		auto numZones = inputProcessor->getNumObjectsFound( "Zone" );
@@ -155,19 +154,16 @@ namespace EnergyPlus {
 		} );
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
 
-
 		bool ErrorsFound( false );
 
 		GetMaterialData( ErrorsFound );
 
 		EXPECT_FALSE( ErrorsFound );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2 )
 	{
-		std::string const idf_objects = delimited_string(
-			{
+    std::string const idf_objects = delimited_string({
 				"Version,8.6;",
 				"  WindowGap:DeflectionState,",
 				"    DeflectionState_813_Measured_Gap_1,  !- Name",
@@ -188,8 +184,7 @@ namespace EnergyPlus {
 				"    0.0100,                  !- Thickness {m}",
 				"    Gas_1_W_0_0100,          !- Gas (or Gas Mixture)",
 				"    101325.0000;             !- Pressure {Pa}",
-			}
-		);
+    });
 
 		ASSERT_FALSE( process_idf( idf_objects, false ) ); // expect errors
 		std::string const error_string = delimited_string( {
@@ -202,7 +197,6 @@ namespace EnergyPlus {
 		GetMaterialData( ErrorsFound );
 
 		EXPECT_FALSE( ErrorsFound );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ProcessZoneData )
@@ -258,28 +252,30 @@ namespace EnergyPlus {
 		cAlphaArgs( 2 ) = "ADAPTIVECONVECTIONALGORITHM"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 
 		ErrorsFound = false;
-		ProcessZoneData( cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
+    ProcessZoneData(cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks,
+                    cAlphaFieldNames, cNumericFieldNames, ErrorsFound);
 		EXPECT_FALSE( ErrorsFound );
 
 		ZoneNum = 2;
 		cAlphaArgs( 1 ) = "Zone Two"; // Name
 		cAlphaArgs( 2 ) = "InvalidChoice"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 		ErrorsFound = false;
-		ProcessZoneData( cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
+    ProcessZoneData(cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks,
+                    cAlphaFieldNames, cNumericFieldNames, ErrorsFound);
 		EXPECT_TRUE( ErrorsFound );
 
 		ZoneNum = 2;
 		cAlphaArgs( 1 ) = "Zone Two"; // Name
 		cAlphaArgs( 2 ) = "TARP"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 		ErrorsFound = false;
-		ProcessZoneData( cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
+    ProcessZoneData(cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks,
+                    cAlphaFieldNames, cNumericFieldNames, ErrorsFound);
 		EXPECT_FALSE( ErrorsFound );
 
 		EXPECT_EQ( "Zone One", Zone( 1 ).Name );
 		EXPECT_EQ( AdaptiveConvectionAlgorithm, Zone( 1 ).InsideConvectionAlgo );
 		EXPECT_EQ( "Zone Two", Zone( 2 ).Name );
 		EXPECT_EQ( ASHRAETARP, Zone( 2 ).InsideConvectionAlgo );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData )
@@ -318,7 +314,8 @@ namespace EnergyPlus {
 		NominalRforNominalUCalculation.allocate( 1 );
 		NominalRforNominalUCalculation( 1 ) = 0.0;
 		NominalR.allocate( TotMaterials );
-		NominalR( 1 ) = 0.4; // Set these explicity for each material layer to avoid random failures of check for NominalRforNominalUCalculation == 0.0 at end of GetConstructData
+    NominalR(1) = 0.4; // Set these explicity for each material layer to avoid random failures of check for NominalRforNominalUCalculation == 0.0 at
+                       // end of GetConstructData
 		NominalR( 2 ) = 0.4;
 		NominalR( 3 ) = 0.4;
 
@@ -335,7 +332,6 @@ namespace EnergyPlus {
 //		ErrorsFound = false;
 //		GetConstructData( ErrorsFound ); // returns ErrorsFound as true since layer 2 is invalid
 //		EXPECT_TRUE( ErrorsFound );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1 )
@@ -371,15 +367,13 @@ namespace EnergyPlus {
 		EXPECT_TRUE( ZoneAirMassFlow.BalanceMixing );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationTreatment, AddInfiltrationFlow );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationZoneType, MixingSourceZonesOnly );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2 )
 	{
 		// Test get input for ZoneAirMassFlowConservation object
 
-		std::string const idf_objects = delimited_string( {
-			"Version,8.3;",
+    std::string const idf_objects = delimited_string({"Version,8.3;",
 			"Building,",
 			"My Building, !- Name",
 			"30., !- North Axis{ deg }",
@@ -530,7 +524,8 @@ namespace EnergyPlus {
 		EXPECT_EQ( Node( 4 ).MassFlowRate, 0.0 ); // Zone 1 return node (max(0.0, 1-2)
 		EXPECT_EQ( Infiltration( 1 ).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
 		EXPECT_EQ( Mixing( 1 ).MixingMassFlowRate, 0.1 ); // Zone 1 to Zone 2 mixing flow rate (unchanged)
-		EXPECT_EQ( Node( 8 ).MassFlowRate, 2.0 ); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
+    EXPECT_EQ(Node(8).MassFlowRate,
+              2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
 		ZoneReOrder.deallocate();
 		ZoneEquipConfig.deallocate();
@@ -538,29 +533,18 @@ namespace EnergyPlus {
 		PrimaryAirSystem.deallocate();
 		AirLoopFlow.deallocate();
 		NumPrimaryAirSys = 0;
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3 )
 	{
 		// Test get input for ZoneAirMassFlowConservation object
 
-		std::string const idf_objects = delimited_string( {
-			"Version,8.3;",
-			"Building,",
-			"My Building, !- Name",
-			"30., !- North Axis{ deg }",
-			"City, !- Terrain",
-			"0.04, !- Loads Convergence Tolerance Value",
-			"0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
-			"FullExterior, !- Solar Distribution",
-			"25, !- Maximum Number of Warmup Days",
-			"6;                       !- Minimum Number of Warmup Days",
-			"ZoneAirMassFlowConservation,",
-			"No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
-			"None, !- Infiltration Balancing Method",
-			";                !- Infiltration Balancing Zones"
-		} );
+    std::string const idf_objects = delimited_string(
+        {"Version,8.3;", "Building,", "My Building, !- Name", "30., !- North Axis{ deg }", "City, !- Terrain",
+         "0.04, !- Loads Convergence Tolerance Value", "0.4, !- Temperature Convergence Tolerance Value{ deltaC }",
+         "FullExterior, !- Solar Distribution", "25, !- Maximum Number of Warmup Days", "6;                       !- Minimum Number of Warmup Days",
+         "ZoneAirMassFlowConservation,", "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance", "None, !- Infiltration Balancing Method",
+         ";                !- Infiltration Balancing Zones"});
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 
@@ -574,7 +558,6 @@ namespace EnergyPlus {
 		EXPECT_FALSE( ZoneAirMassFlow.BalanceMixing );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow );
 		EXPECT_EQ( ZoneAirMassFlow.InfiltrationZoneType, 0 );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVariableTest )
@@ -646,7 +629,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( "EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
 		EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
 		EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation )
@@ -688,7 +670,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( 0.4, Material( 1 ).Porosity );
 		// check initial moisture Content was reset
 		EXPECT_EQ( 0.4, Material( 1 ).InitMoisture ); // reset from 0.45 to 0.4 during get input
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest )
@@ -770,14 +751,13 @@ namespace EnergyPlus {
 		EXPECT_EQ( WarmupConvergenceValues( 1 ).PassFlag( 4 ), 1 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxHeatLoadValue, 0.05, 0.005 );
 		EXPECT_NEAR( WarmupConvergenceValues( 1 ).TestMaxCoolLoadValue, 0.05, 0.005 );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv )
 	{
 
-		std::string const idf_objects = delimited_string({
-			"  Version,8.9;",
+    std::string const idf_objects =
+        delimited_string({"  Version,8.9;",
 
 			"  Building,",
 			"    House with Local Air Nodes,  !- Name",
@@ -843,7 +823,6 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -871,7 +850,6 @@ namespace EnergyPlus {
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 			"    0.0;                     !- Sky Clearness",
-
 
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
@@ -914,7 +892,6 @@ namespace EnergyPlus {
 			"    0.9200000,               !- Solar Absorptance",
 			"    0.9200000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    CB11,                    !- Name",
 			"    MediumRough,             !- Roughness",
@@ -925,7 +902,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    GP01,                    !- Name",
@@ -938,7 +914,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    IN02,                    !- Name",
 			"    Rough,                   !- Roughness",
@@ -949,7 +924,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    IN05,                    !- Name",
@@ -962,7 +936,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    PW03,                    !- Name",
 			"    MediumSmooth,            !- Roughness",
@@ -973,7 +946,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7800000,               !- Solar Absorptance",
 			"    0.7800000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    CC03,                    !- Name",
@@ -986,7 +958,6 @@ namespace EnergyPlus {
 			"    0.6500000,               !- Solar Absorptance",
 			"    0.6500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    HF-A3,                   !- Name",
 			"    Smooth,                  !- Roughness",
@@ -998,7 +969,6 @@ namespace EnergyPlus {
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
 
-
 			"  Material:NoMass,",
 			"    AR02,                    !- Name",
 			"    VeryRough,               !- Roughness",
@@ -1006,7 +976,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7000000,               !- Solar Absorptance",
 			"    0.7000000;               !- Visible Absorptance",
-
 
 			"  Material:NoMass,",
 			"    CP02,                    !- Name",
@@ -1185,8 +1154,7 @@ namespace EnergyPlus {
 			"    Any Number,                   !- Schedule Type Limits Name",
 			"    Through: 12/31,               !- Field 1",
 			"    For: AllDays,                 !- Field 2",
-			"    Until: 24:00, 90;             !- Field 3"
-		});
+                          "    Until: 24:00, 90;             !- Field 3"});
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
@@ -1223,7 +1191,6 @@ namespace EnergyPlus {
 		DataZoneEquipment::ZoneEquipConfig( 1 ).ReturnNode( 1 ) = 4;
 
 		DataHeatBalance::TempEffBulkAir.allocate(6);
-
 
 		DataHeatBalance::HConvIn.allocate(6);
 		DataHeatBalance::HConvIn(1) = 0.5;
@@ -1265,7 +1232,6 @@ namespace EnergyPlus {
 		EXPECT_EQ( 20.0, Zone( 1 ).OutWetBulbTemp );
 		EXPECT_EQ( 1.5, Zone( 1 ).WindSpeed );
 		EXPECT_EQ( 90.0, Zone( 1 ).WindDir );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInputTest )
@@ -1333,4 +1299,4 @@ namespace EnergyPlus {
 		EXPECT_EQ( DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi" );
 	}
 
-}
+} // namespace EnergyPlus

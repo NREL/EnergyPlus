@@ -52,26 +52,26 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus::HeatBalanceSurfaceManager;
 
@@ -102,7 +102,6 @@ namespace EnergyPlus {
 		DataHeatBalance::Material.allocate( 1 );
 		DataHeatBalance::Material( 1 ).Name = "TestMaterial";
 
-
 		DataHeatBalSurface::HcExtSurf.allocate( SurfNum );
 		DataHeatBalSurface::HcExtSurf( SurfNum ) = 1.0;
 		DataHeatBalSurface::HAirExtSurf.allocate( SurfNum );
@@ -124,7 +123,6 @@ namespace EnergyPlus {
 		DataHeatBalSurface::QRadLWOutSrdSurfs( SurfNum ) = 1.0;
 		DataHeatBalSurface::QAdditionalHeatSourceOutside.allocate( SurfNum );
 		DataHeatBalSurface::QAdditionalHeatSourceOutside( SurfNum ) = 0.0;
-
 
 		DataHeatBalSurface::TH.allocate( 2,2,1 );
 		DataSurfaces::Surface.allocate( SurfNum );
@@ -151,7 +149,6 @@ namespace EnergyPlus {
 
 		EXPECT_TRUE( ErrorFlag );
 		EXPECT_TRUE( compare_err_stream( error_string, true ) );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf )
@@ -187,15 +184,12 @@ namespace EnergyPlus {
 		testZone.FloorArea = 1000;
 		testZone.IsControlled = true;
 		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
-		std::string const error_string01 = delimited_string( {
-			"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+    std::string const error_string01 =
+        delimited_string({"   ** Severe  ** Temperature (high) out of bounds (201.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
 			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-			"   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
-			"   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
-			"   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
-			"   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
-			"   **   ~~~   ** ...Zone is part of HVAC controlled system."
-		} );
+                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:", "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s", "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+                          "   **   ~~~   ** ...Zone is part of HVAC controlled system."});
 		EXPECT_TRUE( compare_err_stream( error_string01, true ) );
 		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
 
@@ -215,7 +209,6 @@ namespace EnergyPlus {
 		EXPECT_TRUE( compare_err_stream( error_string02, true ) );
 		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
 
-
 		// to cold - first time
 		surfTemp = -101;
 		DataGlobals::WarmupFlag = false;
@@ -225,15 +218,12 @@ namespace EnergyPlus {
 		testZone.FloorArea = 1000;
 		testZone.IsControlled = true;
 		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
-		std::string const error_string03 = delimited_string( {
-			"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+    std::string const error_string03 =
+        delimited_string({"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
 			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
-			"   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:",
-			"   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
-			"   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s",
-			"   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
-			"   **   ~~~   ** ...Zone is part of HVAC controlled system."
-		} );
+                          "   **   ~~~   ** Zone=\"TestZone\", Diagnostic Details:", "   **   ~~~   ** ...Internal Heat Gain [2.500E-003] W/m2",
+                          "   **   ~~~   ** ...Infiltration/Ventilation [0.500] m3/s", "   **   ~~~   ** ...Mixing/Cross Mixing [0.700] m3/s",
+                          "   **   ~~~   ** ...Zone is part of HVAC controlled system."});
 		EXPECT_TRUE( compare_err_stream( error_string03, true ) );
 		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
 
@@ -246,13 +236,11 @@ namespace EnergyPlus {
 		testZone.FloorArea = 1000;
 		testZone.IsControlled = true;
 		TestSurfTempCalcHeatBalanceInsideSurf( surfTemp, testSurface, testZone, cntWarmupSurfTemp );
-		std::string const error_string04 = delimited_string( {
-			"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
-			"   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00"
-		} );
+    std::string const error_string04 =
+        delimited_string({"   ** Severe  ** Temperature (low) out of bounds [-101.00] for zone=\"TestZone\", for surface=\"TestSurface\"",
+                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00"});
 		EXPECT_TRUE( compare_err_stream( error_string04, true ) );
 		EXPECT_TRUE( testZone.TempOutOfBoundsReported );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFactors)
@@ -286,7 +274,6 @@ namespace EnergyPlus {
 		ComputeIntThermalAbsorpFactors();
 
 		EXPECT_EQ( 0.2, DataHeatBalance::ITABSF( 1 ) );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
@@ -329,7 +316,6 @@ namespace EnergyPlus {
 		UpdateThermalHistories();
 
 		EXPECT_EQ( 12.5, DataHeatBalSurface::TuserHist( 1, 3 ) ); // Now check to see that it is shifting the temperature history properly
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfAirRefT )
@@ -402,7 +388,6 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -430,7 +415,6 @@ namespace EnergyPlus {
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 			"    0.0;                     !- Sky Clearness",
-
 
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
@@ -473,7 +457,6 @@ namespace EnergyPlus {
 			"    0.9200000,               !- Solar Absorptance",
 			"    0.9200000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    CB11,                    !- Name",
 			"    MediumRough,             !- Roughness",
@@ -484,7 +467,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    GP01,                    !- Name",
@@ -497,7 +479,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    IN02,                    !- Name",
 			"    Rough,                   !- Roughness",
@@ -508,7 +489,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    IN05,                    !- Name",
@@ -521,7 +501,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    PW03,                    !- Name",
 			"    MediumSmooth,            !- Roughness",
@@ -532,7 +511,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7800000,               !- Solar Absorptance",
 			"    0.7800000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    CC03,                    !- Name",
@@ -545,7 +523,6 @@ namespace EnergyPlus {
 			"    0.6500000,               !- Solar Absorptance",
 			"    0.6500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    HF-A3,                   !- Name",
 			"    Smooth,                  !- Roughness",
@@ -557,7 +534,6 @@ namespace EnergyPlus {
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
 
-
 			"  Material:NoMass,",
 			"    AR02,                    !- Name",
 			"    VeryRough,               !- Roughness",
@@ -565,7 +541,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7000000,               !- Solar Absorptance",
 			"    0.7000000;               !- Visible Absorptance",
-
 
 			"  Material:NoMass,",
 			"    CP02,                    !- Name",
@@ -828,15 +803,13 @@ namespace EnergyPlus {
 		DataHeatBalance::ZoneWinHeatGain.deallocate( );
 		DataHeatBalance::ZoneWinHeatGainRep.deallocate( );
 		DataHeatBalance::ZoneWinHeatGainRepEnergy.deallocate( );
-
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv )
 	{
 
-		std::string const idf_objects = delimited_string({
-			"  Version,8.9;",
+    std::string const idf_objects =
+        delimited_string({"  Version,8.9;",
 
 			"  Building,",
 			"    House with Local Air Nodes,  !- Name",
@@ -902,7 +875,6 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -930,7 +902,6 @@ namespace EnergyPlus {
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 			"    0.0;                     !- Sky Clearness",
-
 
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
@@ -973,7 +944,6 @@ namespace EnergyPlus {
 			"    0.9200000,               !- Solar Absorptance",
 			"    0.9200000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    CB11,                    !- Name",
 			"    MediumRough,             !- Roughness",
@@ -984,7 +954,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    GP01,                    !- Name",
@@ -997,7 +966,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    IN02,                    !- Name",
 			"    Rough,                   !- Roughness",
@@ -1008,7 +976,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    IN05,                    !- Name",
@@ -1021,7 +988,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    PW03,                    !- Name",
 			"    MediumSmooth,            !- Roughness",
@@ -1032,7 +998,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7800000,               !- Solar Absorptance",
 			"    0.7800000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    CC03,                    !- Name",
@@ -1045,7 +1010,6 @@ namespace EnergyPlus {
 			"    0.6500000,               !- Solar Absorptance",
 			"    0.6500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    HF-A3,                   !- Name",
 			"    Smooth,                  !- Roughness",
@@ -1057,7 +1021,6 @@ namespace EnergyPlus {
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
 
-
 			"  Material:NoMass,",
 			"    AR02,                    !- Name",
 			"    VeryRough,               !- Roughness",
@@ -1065,7 +1028,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7000000,               !- Solar Absorptance",
 			"    0.7000000;               !- Visible Absorptance",
-
 
 			"  Material:NoMass,",
 			"    CP02,                    !- Name",
@@ -1245,8 +1207,7 @@ namespace EnergyPlus {
 			"    Any Number,                   !- Schedule Type Limits Name",
 			"    Through: 12/31,               !- Field 1",
 			"    For: AllDays,                 !- Field 2",
-			"    Until: 24:00, 90;             !- Field 3"
-		});
+                          "    Until: 24:00, 90;             !- Field 3"});
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
@@ -1454,7 +1415,6 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -1482,7 +1442,6 @@ namespace EnergyPlus {
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 			"    0.0;                     !- Sky Clearness",
-
 
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
@@ -1525,7 +1484,6 @@ namespace EnergyPlus {
 			"    0.9200000,               !- Solar Absorptance",
 			"    0.9200000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    CB11,                    !- Name",
 			"    MediumRough,             !- Roughness",
@@ -1536,7 +1494,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    GP01,                    !- Name",
@@ -1549,7 +1506,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    IN02,                    !- Name",
 			"    Rough,                   !- Roughness",
@@ -1560,7 +1516,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    IN05,                    !- Name",
@@ -1573,7 +1528,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    PW03,                    !- Name",
 			"    MediumSmooth,            !- Roughness",
@@ -1584,7 +1538,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7800000,               !- Solar Absorptance",
 			"    0.7800000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    CC03,                    !- Name",
@@ -1597,7 +1550,6 @@ namespace EnergyPlus {
 			"    0.6500000,               !- Solar Absorptance",
 			"    0.6500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    HF-A3,                   !- Name",
 			"    Smooth,                  !- Roughness",
@@ -1609,7 +1561,6 @@ namespace EnergyPlus {
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
 
-
 			"  Material:NoMass,",
 			"    AR02,                    !- Name",
 			"    VeryRough,               !- Roughness",
@@ -1617,7 +1568,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7000000,               !- Solar Absorptance",
 			"    0.7000000;               !- Visible Absorptance",
-
 
 			"  Material:NoMass,",
 			"    CP02,                    !- Name",
@@ -1964,12 +1914,11 @@ namespace EnergyPlus {
 			DataHeatBalSurface::HGrdExtSurf( 1 ) );
 
 		// Test if LWR from surrounding surfaces correctly calculated
-		EXPECT_DOUBLE_EQ( StefanBoltzmann * 0.9 * 0.6 * ( pow_4( 25.0 + KelvinConv ) - pow_4( 20.0 + KelvinConv ) ),
-			DataHeatBalSurface::QRadLWOutSrdSurfs( 1 ) );
-		EXPECT_DOUBLE_EQ( StefanBoltzmann * 0.9 * ( 0.3 * ( pow_4( 25.0 + KelvinConv ) - pow_4( 20.0 + KelvinConv ) ) + 0.3 * ( pow_4( 25.0 + KelvinConv ) - pow_4( 20.0 + KelvinConv ) ) ),
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(1));
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 *
+                         (0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)) + 0.3 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv))),
 			DataHeatBalSurface::QRadLWOutSrdSurfs( 2 ) );
-		EXPECT_DOUBLE_EQ( StefanBoltzmann * 0.9 * 0.5 * ( pow_4( 25.0 + KelvinConv ) - pow_4( 20.0 + KelvinConv ) ),
-			DataHeatBalSurface::QRadLWOutSrdSurfs( 3 ) );
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + KelvinConv) - pow_4(20.0 + KelvinConv)), DataHeatBalSurface::QRadLWOutSrdSurfs(3));
 		EXPECT_DOUBLE_EQ( 0.0, DataHeatBalSurface::QRadLWOutSrdSurfs( 4 ) );
 	}
 
@@ -2013,14 +1962,13 @@ namespace EnergyPlus {
 		OutputProcessor::GetReportVariableInput( );
 
 		EXPECT_EQ( OutputProcessor::ReqRepVars( 2 ).VarName, "SURFACE CONSTRUCTION INDEX" );
-
 	}
 
 	TEST_F( EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceAddSourceTerm )
 	{
 
-		std::string const idf_objects = delimited_string( {
-			"  Version,8.9;",
+    std::string const idf_objects =
+        delimited_string({"  Version,8.9;",
 
 			"  Building,",
 			"    House with AirflowNetwork simulation,  !- Name",
@@ -2086,7 +2034,6 @@ namespace EnergyPlus {
 			"    -6.00,                   !- Time Zone {hr}",
 			"    190.00;                  !- Elevation {m}",
 
-
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
 			"    1,                       !- Month",
@@ -2114,7 +2061,6 @@ namespace EnergyPlus {
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
 			"    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 			"    0.0;                     !- Sky Clearness",
-
 
 			"  SizingPeriod:DesignDay,",
 			"    CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
@@ -2157,7 +2103,6 @@ namespace EnergyPlus {
 			"    0.9200000,               !- Solar Absorptance",
 			"    0.9200000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    CB11,                    !- Name",
 			"    MediumRough,             !- Roughness",
@@ -2168,7 +2113,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    GP01,                    !- Name",
@@ -2181,7 +2125,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    IN02,                    !- Name",
 			"    Rough,                   !- Roughness",
@@ -2192,7 +2135,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    IN05,                    !- Name",
@@ -2205,7 +2147,6 @@ namespace EnergyPlus {
 			"    0.7500000,               !- Solar Absorptance",
 			"    0.7500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    PW03,                    !- Name",
 			"    MediumSmooth,            !- Roughness",
@@ -2216,7 +2157,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7800000,               !- Solar Absorptance",
 			"    0.7800000;               !- Visible Absorptance",
-
 
 			"  Material,",
 			"    CC03,                    !- Name",
@@ -2229,7 +2169,6 @@ namespace EnergyPlus {
 			"    0.6500000,               !- Solar Absorptance",
 			"    0.6500000;               !- Visible Absorptance",
 
-
 			"  Material,",
 			"    HF-A3,                   !- Name",
 			"    Smooth,                  !- Roughness",
@@ -2241,7 +2180,6 @@ namespace EnergyPlus {
 			"    0.2000000,               !- Solar Absorptance",
 			"    0.2000000;               !- Visible Absorptance",
 
-
 			"  Material:NoMass,",
 			"    AR02,                    !- Name",
 			"    VeryRough,               !- Roughness",
@@ -2249,7 +2187,6 @@ namespace EnergyPlus {
 			"    0.9000000,               !- Thermal Absorptance",
 			"    0.7000000,               !- Solar Absorptance",
 			"    0.7000000;               !- Visible Absorptance",
-
 
 			"  Material:NoMass,",
 			"    CP02,                    !- Name",
@@ -2407,8 +2344,7 @@ namespace EnergyPlus {
 			"  SurfaceProperty:HeatBalanceSourceTerm,",
 			"    Living:Ceiling,             !- Surface Name",
 			"	 Sche_Q_Add_Heat,            !- Inside Face Heat Source Term Schedule Name",
-			"    ;                           !- Outside Face Heat Source Term Schedule Name"
-		} );
+                          "    ;                           !- Outside Face Heat Source Term Schedule Name"});
 
 		ASSERT_TRUE( process_idf( idf_objects ) );
 		bool ErrorsFound = false;
@@ -2522,7 +2458,6 @@ namespace EnergyPlus {
 		CalcHeatBalanceInsideSurf( );
 		EXPECT_EQ( 0.1, DataHeatBalSurface::QAdditionalHeatSourceInside( 6 ) );
 
-
 		DataZoneEquipment::ZoneEquipConfig.deallocate( );
 		DataSizing::ZoneEqSizing.deallocate( );
 		DataHeatBalFanSys::MAT.deallocate( ); // Zone temperature C
@@ -2540,7 +2475,6 @@ namespace EnergyPlus {
 		DataHeatBalance::ZoneWinHeatGain.deallocate( );
 		DataHeatBalance::ZoneWinHeatGainRep.deallocate( );
 		DataHeatBalance::ZoneWinHeatGainRepEnergy.deallocate( );
-
 	}
 
-}
+} // namespace EnergyPlus

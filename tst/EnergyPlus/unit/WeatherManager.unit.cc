@@ -149,9 +149,9 @@ TEST_F(EnergyPlusFixture, SkyTempTest )
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
 {
-	using DataEnvironment::WaterMainsTemp;
-	using DataEnvironment::Latitude;
 	using DataEnvironment::DayOfYear;
+    using DataEnvironment::Latitude;
+    using DataEnvironment::WaterMainsTemp;
 
 	WaterMainsTempsMethod = WeatherManager::CorrelationMethod;
 	WaterMainsTempsAnnualAvgAirTemp = 9.69;
@@ -215,7 +215,6 @@ TEST_F( EnergyPlusFixture, JGDate_Test )
 	EXPECT_EQ( 2000, gregorianYear );
 	EXPECT_EQ( 12, gregorianMonth );
 	EXPECT_EQ( 31, gregorianDay );
-
 }
 
 TEST_F( EnergyPlusFixture, interpolateWindDirectionTest )
@@ -285,17 +284,16 @@ TEST_F( EnergyPlusFixture, interpolateWindDirectionTest )
 	EXPECT_EQ( interpolateWindDirection( 10, 200, 0.7 ), 251. );
 	EXPECT_EQ( interpolateWindDirection( 160, 350, 0.3 ), 109. );
 	EXPECT_EQ( interpolateWindDirection( 160, 350, 0.7 ), 41. );
-
 }
 
-TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated ) {
+TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
+{
 
-	std::string const idf_objects = delimited_string({
-		"SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, WaterVelocitySchedule;",
+    std::string const idf_objects =
+        delimited_string({"SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, WaterVelocitySchedule;",
 		"Schedule:Constant, WaterTempSchedule, , 30;",
 		"Schedule:Constant, WaterVelocitySchedule, , 3.0;"
-		"SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
-	});
+                          "SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"});
 	ASSERT_TRUE(process_idf(idf_objects));
 
 	// need to populate the OSCM array by calling the get input for it
@@ -312,16 +310,14 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated ) {
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 2);
-
 }
 
-TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
+TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
+{
 
-	std::string const idf_objects = delimited_string({
-		"SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, ;",
+    std::string const idf_objects = delimited_string({"SurfaceProperty:Underwater, UnderwaterSurfaceName, 31.4159, WaterTempSchedule, ;",
 		"Schedule:Constant, WaterTempSchedule, , 30;",
-		"SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"
-	});
+                                                      "SurfaceProperty:OtherSideConditionsModel, UnderwaterSurfaceName, ConvectiveUnderwater;"});
 	ASSERT_TRUE(process_idf(idf_objects));
 
 	// need to populate the OSCM array by calling the get input for it
@@ -338,10 +334,10 @@ TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK ) {
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].OSCMIndex, 1);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].WaterTempScheduleIndex, 1);
 	EXPECT_EQ(WeatherManager::underwaterBoundaries[0].VelocityScheduleIndex, 0);
-
 }
 
-TEST_F( EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients ) {
+TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
+{
 	EXPECT_NEAR(2483.702, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 30.0), 0.01);
 	EXPECT_NEAR(2162.188, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 60.0), 0.01);
 	EXPECT_NEAR(1993.771, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 90.0), 0.01);

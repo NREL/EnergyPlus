@@ -51,19 +51,18 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -76,8 +75,9 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -109,8 +109,8 @@ using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::WaterCoils;
 
-
-TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
+TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
+{
 
 	bool ErrorsFound( false ); // function returns true on error
 	bool FirstHVACIteration( true ); // TRUE if 1st HVAC simulation of system timestep
@@ -1136,21 +1136,25 @@ TEST_F( EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest ) {
 		InitUnitHeater( UnitHeatNum, ZoneNum, FirstHVACIteration );
 		InitWaterCoil( CoilNum, FirstHVACIteration ); // init hot water heating coil
 
-		PltSizHeatNum = PlantUtilities::MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, WaterCoils::WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoils::WaterCoil( CoilNum ).WaterOutletNodeNum, ErrorsFound );
+    PltSizHeatNum =
+        PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, WaterCoils::WaterCoil(CoilNum).WaterInletNodeNum,
+                                           WaterCoils::WaterCoil(CoilNum).WaterOutletNodeNum, ErrorsFound);
 		EXPECT_FALSE( ErrorsFound );
 
 		HWMaxVolFlowRate = WaterCoils::WaterCoil( CoilNum ).MaxWaterVolFlowRate;
-		HWDensity = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "xxx" );
-		CpHW = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, DataGlobals::HWInitConvTemp, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "xxx" );
+    HWDensity = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
+                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "xxx");
+    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
+                                 PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, "xxx");
 		HWPlantDeltaTDesign = PlantSizData( PltSizHeatNum ).DeltaT;
 		// calculate hot water coil design capacity
 		HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
 		EXPECT_NEAR( HWCoilDesignCapacity, WaterCoils::WaterCoil( CoilNum ).DesWaterHeatingCoilRate, 1.0 );
 		EXPECT_NEAR( 188.51, WaterCoils::WaterCoil( CoilNum ).UACoil, 0.02 );
-
 }
 
-TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
+TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
+{
 
 	bool ErrorsFound( false ); // function returns true on error
 	bool FirstHVACIteration( true ); // TRUE if 1st HVAC simulation of system timestep
@@ -1364,13 +1368,14 @@ TEST_F( EnergyPlusFixture, UnitHeater_SimUnitHeaterTest ) {
 	EXPECT_NEAR( UHHeatingRate, UnitHeat( UnitHeatNum ).HeatPower, ConvTol );
 	// verify the heat rate delivered by the hot water heating coil
 	HWMassFlowRate = WaterCoils::WaterCoil( CoilNum ).InletWaterMassFlowRate;
-	CpHW = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, "UnitTest" );
+    CpHW = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, 60.0, PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                 "UnitTest");
 	HWCoilHeatingRate = HWMassFlowRate * CpHW * ( Node( WCWaterInletNode ).Temp - Node( WCWaterOutletNode ).Temp );
 	EXPECT_NEAR( HWCoilHeatingRate, WaterCoils::WaterCoil( CoilNum ).TotWaterHeatingCoilRate, ConvTol );
-
 }
 
-TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
+TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
+{
 
 	std::string const idf_objects = delimited_string( {
 		"Version,8.9;",
@@ -2436,7 +2441,8 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 	// set zone air node condition
 	Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp = 20.0;
 	Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat = 0.005;
-	Node( ZoneEquipConfig( 1 ).ZoneNode ).Enthalpy = Psychrometrics::PsyHFnTdbW( Node( ZoneEquipConfig( 1 ).ZoneNode ).Temp, Node( ZoneEquipConfig( 1 ).ZoneNode ).HumRat );
+    Node(ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(1).ZoneNode).Temp, Node(ZoneEquipConfig(1).ZoneNode).HumRat);
 	// set the zone loads
 	ZoneSysEnergyDemand( 1 ).TotalOutputRequired = 0.0;
 	ZoneSysEnergyDemand( 1 ).OutputRequiredToHeatingSP = 15000.0;
@@ -2455,5 +2461,4 @@ TEST_F( EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment ) {
 	EXPECT_NEAR( HeatingCoils::HeatingCoil( 2 ).HeatingCoilRate, 213.9, 1.0 );
 	// finaly check that RemaingingOutputRequired is zero
 	EXPECT_EQ( ZoneSysEnergyDemand( 1 ).RemainingOutputRequired, 0.0 );
-
 }

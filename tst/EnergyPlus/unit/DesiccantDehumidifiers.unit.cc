@@ -50,25 +50,24 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-
 // EnergyPlus Headers
-#include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <General.hh>
+#include <ElectricPowerServiceManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <ElectricPowerServiceManager.hh>
+#include <General.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -87,11 +86,10 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterCoils;
 using namespace ObjexxFCL;
 
-
-
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, DesiccantDehum_OnOASystemTest ) {
+TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
+{
 
 		std::string CompName( "" );
 		bool FirstHVACIteration( true );
@@ -560,7 +558,6 @@ namespace EnergyPlus {
 			"    1,                       !- Multiplier",
 			"    2.438400269,             !- Ceiling Height {m}",
 			"    103.311355591;           !- Volume {m3}",
-
 
 			"  Zone,",
 			"    SPACE5-1,                !- Name",
@@ -1449,7 +1446,6 @@ namespace EnergyPlus {
 			"    Through: 12/31,          !- Field 1",
 			"    For: AllDays,            !- Field 2",
 			"    Until: 24:00,117.239997864; !- Field 3",
-
 
 			"  Schedule:Compact,",
 			"    ShadeTransSch,           !- Name",
@@ -2853,13 +2849,15 @@ namespace EnergyPlus {
 		RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnWTdb( 0.0, 20.0 ) * ( RegCoilDesOutletTemp - RegCoilDesInletTemp );
 
 		for ( loop = 1; loop <= NumHeatingCoils; ++loop ) {
-			if ( HeatingCoil( loop ).Name == DesicDehum( DesicDehumNum ).RegenCoilName ) { CoilIndex = loop; }
+        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+            CoilIndex = loop;
+        }
 		}
 		EXPECT_EQ( RegCoilCapacity, HeatingCoil( CoilIndex ).NominalCapacity );
-
 	}
 
-	TEST_F( EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest ) {
+TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
+{
 
 		std::string CompName( "" );
 		bool FirstHVACIteration( true );
@@ -3553,7 +3551,6 @@ namespace EnergyPlus {
 			"    0.0,                     !- Minimum Value of x",
 			"    1.0;                     !- Maximum Value of x",
 
-
 			"  Curve:Cubic,",
 			"    PackagedRatedCoolCapFFlow,  !- Name",
 			"    0.47278589,              !- Coefficient1 Constant",
@@ -4034,13 +4031,15 @@ namespace EnergyPlus {
 		RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnWTdb( 0.0, 20.0 ) * ( RegCoilDesOutletTemp - RegCoilDesInletTemp );
 
 		for ( loop = 1; loop <= NumHeatingCoils; ++loop ) {
-			if ( HeatingCoil( loop ).Name == DesicDehum( DesicDehumNum ).RegenCoilName ) { CoilIndex = loop; }
+        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+            CoilIndex = loop;
+        }
 		}
 		EXPECT_EQ( RegCoilCapacity, HeatingCoil( CoilIndex ).NominalCapacity );
-
 	}
 
-	TEST_F( EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest ) {
+TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
+{
 
 		std::string CompName( "" );
 		bool FirstHVACIteration( true );
@@ -5457,14 +5456,16 @@ namespace EnergyPlus {
 		// simulate to determine HW coil design capacity
 		SimDesiccantDehumidifier( CompName, FirstHVACIteration, CompIndex );
 		for ( loop = 1; loop <= NumWaterCoils; ++loop ) {
-			if ( WaterCoil( loop ).Name == DesicDehum( DesicDehumNum ).RegenCoilName ) { CoilIndex = loop; }
+        if (WaterCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+            CoilIndex = loop;
+        }
 		}
 		// verify results
 		EXPECT_EQ( RegCoilCapacity, WaterCoil( CoilIndex ).DesWaterHeatingCoilRate );
-
 	}
 
-	TEST_F( EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest ) {
+TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
+{
 
 		// this unit test is derived from DesiccantDehum_OnPrimaryAirSystemTest but uses a VS dx coil instead
 
@@ -6160,7 +6161,6 @@ namespace EnergyPlus {
 			"    0.0,                     !- Minimum Value of x",
 			"    1.0;                     !- Maximum Value of x",
 
-
 			"  Curve:Cubic,",
 			"    PackagedRatedCoolCapFFlow,  !- Name",
 			"    0.47278589,              !- Coefficient1 Constant",
@@ -6555,7 +6555,6 @@ namespace EnergyPlus {
 			"    Temperature,             !- Input Unit Type for Y",
 			"    Dimensionless;           !- Output Unit Type",
 
-
 			"  Fan:ConstantVolume,",
 			"    Desiccant DXSystem Supply Fan,  !- Name",
 			"    FanAvailSched,           !- Availability Schedule Name",
@@ -6701,9 +6700,10 @@ namespace EnergyPlus {
 		RegCoilCapacity = RegCoilInletAirMassFlowRate * PsyCpAirFnWTdb( 0.0, 20.0 ) * ( RegCoilDesOutletTemp - RegCoilDesInletTemp );
 
 		for ( loop = 1; loop <= NumHeatingCoils; ++loop ) {
-			if ( HeatingCoil( loop ).Name == DesicDehum( DesicDehumNum ).RegenCoilName ) { CoilIndex = loop; }
+        if (HeatingCoil(loop).Name == DesicDehum(DesicDehumNum).RegenCoilName) {
+            CoilIndex = loop;
 		}
-		EXPECT_EQ( RegCoilCapacity, HeatingCoil( CoilIndex ).NominalCapacity );
-
 	}
+    EXPECT_EQ(RegCoilCapacity, HeatingCoil(CoilIndex).NominalCapacity);
 }
+} // namespace EnergyPlus

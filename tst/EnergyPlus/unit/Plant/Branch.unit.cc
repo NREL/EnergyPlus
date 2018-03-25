@@ -51,14 +51,15 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/Component.hh>
 #include <EnergyPlus/Plant/Branch.hh>
+#include <EnergyPlus/Plant/Component.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad) {
+TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad)
+{
     EnergyPlus::DataPlant::BranchData b;
     b.Comp.allocate(3);
 
@@ -82,7 +83,7 @@ TEST_F(EnergyPlusFixture, Plant_Topology_Branch_MaxAbsLoad) {
 
     b.Comp[0].MyLoad = 0;
     b.Comp[1].MyLoad = 0;
-    b.Comp[2].MyLoad = -22000;  // still highest via absolute value
+    b.Comp[2].MyLoad = -22000; // still highest via absolute value
     maxLoad = b.max_abs_Comp_MyLoad();
     ASSERT_NEAR(22000, maxLoad, 0.001);
 

@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 // EnergyPlus::OA System Hot Water Preheat Coil Simulation Test
 
 // Google Test Headers
@@ -53,15 +52,15 @@
 
 // EnergyPlus Headers
 
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <HVACControllers.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -76,7 +75,8 @@ using namespace EnergyPlus::WaterCoils;
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim ) {
+TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
+{
 
 		int AirLoopNum( 1 );
 		int OASysNum( 1 );
@@ -1058,10 +1058,10 @@ namespace EnergyPlus {
 		EXPECT_DOUBLE_EQ( WaterCoil( 1 ).InletAirTemp, -17.3 ); // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
 		EXPECT_DOUBLE_EQ( WaterCoil( 1 ).OutletAirTemp, -17.3 ); // preheat Hot Water coil is scheduled off
 		EXPECT_DOUBLE_EQ( 0.0, WaterCoil( 1 ).TotWaterHeatingCoilRate ); // preheat Hot Water coil is scheduled off
-
 	}
 
-	TEST_F( EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim ) {
+TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
+{
 
 		int AirLoopNum( 1 );
 		int OASysNum( 1 );
@@ -2041,14 +2041,14 @@ namespace EnergyPlus {
 
 		AirInletNodeNum = WaterCoil( 1 ).AirInletNodeNum;
 		CpAir = PsyCpAirFnWTdb( Node( AirInletNodeNum ).HumRat, Node( AirInletNodeNum ).Temp );
-		EXPECT_NEAR( WaterCoil( 1 ).TotWaterHeatingCoilRate, WaterCoil( 1 ).InletAirMassFlowRate * CpAir * ( WaterCoil( 1 ).OutletAirTemp - WaterCoil( 1 ).InletAirTemp ), 1.0 );
+    EXPECT_NEAR(WaterCoil(1).TotWaterHeatingCoilRate,
+                WaterCoil(1).InletAirMassFlowRate * CpAir * (WaterCoil(1).OutletAirTemp - WaterCoil(1).InletAirTemp), 1.0);
 
 		// test that OA sys water coil bypasses normal controller calls before air loop simulation
 		EXPECT_EQ( "PREHEAT COIL CONTROLLER", HVACControllers::ControllerProps( 1 ).ControllerName );
 		EXPECT_TRUE( HVACControllers::ControllerProps( 1 ).BypassControllerCalc );
 		// test that water coil knows which controller controls the HW coil
 		EXPECT_EQ( WaterCoil( 1 ).ControllerIndex, 1 );
-
 	}
 
-}
+} // namespace EnergyPlus
