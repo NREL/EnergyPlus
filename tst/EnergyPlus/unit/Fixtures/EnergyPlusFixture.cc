@@ -57,8 +57,8 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
@@ -70,10 +70,12 @@
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
@@ -82,11 +84,10 @@
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
@@ -104,54 +105,52 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DemandManager.hh>
-#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <EnergyPlus/HeatBalanceAirManager.hh>
-#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
-#include <EnergyPlus/HeatRecovery.hh>
-#include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HighTempRadiantSystem.hh>
-#include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HVACUnitarySystem.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -167,15 +166,16 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
-#include <EnergyPlus/PlantCondLoopOperation.hh>
-#include <EnergyPlus/PlantChillers.hh>
-#include <EnergyPlus/PlantLoadProfile.hh>
+#include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -197,13 +197,13 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
@@ -225,18 +225,20 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-#include <fstream>
 #include <algorithm>
+#include <fstream>
 
 using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-	void EnergyPlusFixture::SetUpTestCase() {
+void EnergyPlusFixture::SetUpTestCase()
+{
 		EnergyPlus::inputProcessor = InputProcessor::factory();
 	}
 
-	void EnergyPlusFixture::SetUp() {
+void EnergyPlusFixture::SetUp()
+{
 		clear_all_states();
 
 		show_message();
@@ -265,7 +267,8 @@ namespace EnergyPlus {
 		createCoilSelectionReportObj();
 	}
 
-	void EnergyPlusFixture::TearDown() {
+void EnergyPlusFixture::TearDown()
+{
 
 		clear_all_states();
 
@@ -285,7 +288,6 @@ namespace EnergyPlus {
 			gio::close( DataGlobals::OutputFileZonePulse, flags );
 			gio::close( DataGlobals::OutputDElightIn, flags );
 			gio::close( DataGlobals::OutputFileShadingFrac, flags );
-
 		}
 	}
 
@@ -458,7 +460,8 @@ namespace EnergyPlus {
 
 	}
 
-	std::string EnergyPlusFixture::delimited_string( std::vector<std::string> const & strings, std::string const & delimiter ) {
+std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
+{
 		std::ostringstream compare_text;
 		for( auto const & str : strings ) {
 			compare_text << str << delimiter;
@@ -466,12 +469,12 @@ namespace EnergyPlus {
 		return compare_text.str();
 	}
 
-	std::vector< std::string > EnergyPlusFixture::read_lines_in_file( std::string const & filePath ) {
+std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const &filePath)
+{
 		std::ifstream infile( filePath );
 		std::vector< std::string > lines;
 		std::string line;
-		while ( std::getline( infile, line ) )
-		{
+    while (std::getline(infile, line)) {
 			lines.push_back( line );
 		}
 		return lines;
@@ -493,7 +496,8 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_eio_stream( std::string const & expected_string, bool reset_stream ) {
+bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
+{
 		auto const stream_str = this->eio_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -501,7 +505,8 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_mtr_stream( std::string const & expected_string, bool reset_stream ) {
+bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
+{
 		auto const stream_str = this->mtr_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -509,7 +514,8 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_err_stream( std::string const & expected_string, bool reset_stream ) {
+bool EnergyPlusFixture::compare_err_stream(std::string const &expected_string, bool reset_stream)
+{
 		auto const stream_str = this->err_stream->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -517,7 +523,8 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_cout_stream( std::string const & expected_string, bool reset_stream ) {
+bool EnergyPlusFixture::compare_cout_stream(std::string const &expected_string, bool reset_stream)
+{
 		auto const stream_str = this->m_cout_buffer->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -525,7 +532,8 @@ namespace EnergyPlus {
 		return are_equal;
 	}
 
-	bool EnergyPlusFixture::compare_cerr_stream( std::string const & expected_string, bool reset_stream ) {
+bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, bool reset_stream)
+{
 		auto const stream_str = this->m_cerr_buffer->str();
 		EXPECT_EQ( expected_string, stream_str );
 		bool are_equal = ( expected_string == stream_str );
@@ -582,42 +590,30 @@ namespace EnergyPlus {
 		return has_output;
 	}
 
-
-	bool EnergyPlusFixture::process_idf( std::string const & idf_snippet, bool use_assertions ) {
+bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
+{
 		bool success = true;
 		inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
 		if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
-			inputProcessor->epJSON["Building"] = {
-					{
-							"Bldg",
-							{
-									{"idf_order", 0},
+        inputProcessor->epJSON["Building"] = {{"Bldg",
+                                               {{"idf_order", 0},
 									{"north_axis", 0.0},
 									{"terrain", "Suburbs"},
 									{"loads_convergence_tolerance_value", 0.04},
 									{"temperature_convergence_tolerance_value", 0.4000},
 									{"solar_distribution", "FullExterior"},
 									{"maximum_number_of_warmup_days", 25},
-									{"minimum_number_of_warmup_days", 6}
-							}
-					}
-			};
+                                                {"minimum_number_of_warmup_days", 6}}}};
 		}
 		if (inputProcessor->epJSON.find("GlobalGeometryRules") == inputProcessor->epJSON.end()) {
-			inputProcessor->epJSON["GlobalGeometryRules"] = {
-					{
-							"",
-							{
-									{"idf_order", 0},
+        inputProcessor->epJSON["GlobalGeometryRules"] = {{"",
+                                                          {{"idf_order", 0},
 									{"starting_vertex_position", "UpperLeftCorner"},
 									{"vertex_entry_direction", "Counterclockwise"},
 									{"coordinate_system", "Relative"},
 									{"daylighting_reference_point_coordinate_system", "Relative"},
-									{"rectangular_surface_coordinate_system", "Relative"}
-							}
-					}
-			};
+                                                           {"rectangular_surface_coordinate_system", "Relative"}}}};
 		}
 
 		int MaxArgs = 0;
@@ -648,7 +644,8 @@ namespace EnergyPlus {
 		return successful_processing;
 	}
 
-	bool EnergyPlusFixture::process_idd( std::string const & idd, bool & errors_found ) {
+bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
+{
 
 		std::unique_ptr< std::istream > idd_stream;
 		if( !idd.empty() ) {
@@ -665,8 +662,8 @@ namespace EnergyPlus {
 			}
 
 			if ( ! file_exists ) {
-				EXPECT_TRUE( file_exists ) <<
-					"Energy+.schema.epJSON does not exist at search location." << std::endl << "epJSON Schema search location: \"" << idd_location << "\"";
+            EXPECT_TRUE(file_exists) << "Energy+.schema.epJSON does not exist at search location." << std::endl
+                                     << "epJSON Schema search location: \"" << idd_location << "\"";
 				errors_found = true;
 				return errors_found;
 			}
@@ -684,15 +681,13 @@ namespace EnergyPlus {
 		return errors_found;
 	}
 
-	bool EnergyPlusFixture::compare_idf(
-		std::string const & EP_UNUSED( name ),
+bool EnergyPlusFixture::compare_idf(std::string const &EP_UNUSED(name),
 		int const EP_UNUSED( num_alphas ),
 		int const EP_UNUSED( num_numbers ),
 		std::vector< std::string > const & EP_UNUSED( alphas ),
 		std::vector< bool > const & EP_UNUSED( alphas_blank ),
 		std::vector< Real64 > const & EP_UNUSED( numbers ),
-		std::vector< bool > const & EP_UNUSED( numbers_blank )
-	)
+                                    std::vector<bool> const &EP_UNUSED(numbers_blank))
 	{
 		// using namespace InputProcessor;
 
@@ -723,4 +718,4 @@ namespace EnergyPlus {
 		return false;
 	}
 
-}
+} // namespace EnergyPlus

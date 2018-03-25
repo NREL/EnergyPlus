@@ -13,7 +13,7 @@
 
 func() {
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-  find src -name "*.hpp" -o -name "*.h" -o -name "*.hh" -o -name "*.cc" -o -name "*.cpp" -o -name "*.c" | xargs -n 1 -I '{}' $DIR/verify_file_formatting.sh '{}'
+  find src tst -name "*.hpp" -o -name "*.h" -o -name "*.hh" -o -name "*.cc" -o -name "*.cpp" -o -name "*.c" | xargs -n 1 -I '{}' $DIR/verify_file_formatting.sh '{}'
 }
 
 NUMERRORS=$(func | wc -l)

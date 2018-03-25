@@ -52,8 +52,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -65,9 +65,9 @@ namespace EnergyPlus {
 	// everything is cleaned up properly
 	struct RedirectCout
 	{
-		RedirectCout( std::unique_ptr<std::ostringstream> const & m_buffer )
-		: m_old_buffer( std::cout.rdbuf( m_buffer->rdbuf() ) )
-		{ }
+    RedirectCout(std::unique_ptr<std::ostringstream> const &m_buffer) : m_old_buffer(std::cout.rdbuf(m_buffer->rdbuf()))
+    {
+    }
 
 		~RedirectCout()
 		{
@@ -82,9 +82,9 @@ namespace EnergyPlus {
 	// everything is cleaned up properly
 	struct RedirectCerr
 	{
-		RedirectCerr( std::unique_ptr<std::ostringstream> const & m_buffer )
-		: m_old_buffer( std::cerr.rdbuf( m_buffer->rdbuf() ) )
-		{ }
+    RedirectCerr(std::unique_ptr<std::ostringstream> const &m_buffer) : m_old_buffer(std::cerr.rdbuf(m_buffer->rdbuf()))
+    {
+    }
 
 		~RedirectCerr()
 		{
@@ -99,7 +99,9 @@ namespace EnergyPlus {
 	{
 	protected:
 		static void SetUpTestCase();
-		static void TearDownTestCase() { }
+    static void TearDownTestCase()
+    {
+    }
 
 		// This is run every unit test for this fixture.
 		// It sets up the various stream redirections.
@@ -114,8 +116,7 @@ namespace EnergyPlus {
 		// This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
 		// Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
 		// unit test names change.
-		inline
-		void show_message()
+    inline void show_message()
 		{
 			// Gets information about the currently running test.
 			// Do NOT delete the returned object - it's managed by the UnitTest class.
@@ -132,8 +133,7 @@ namespace EnergyPlus {
 		// Example Usage:
 		// 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
 		// 		EXPECT_TRUE( compare_containers( Array1D_bool( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
-		template < class T, class T2 >
-		bool compare_containers( T const & expected_container, T2 const & actual_container )
+    template <class T, class T2> bool compare_containers(T const &expected_container, T2 const &actual_container)
 		{
 			bool is_valid = ( expected_container.size() == actual_container.size() );
 			EXPECT_EQ( expected_container.size(), actual_container.size() ) << "Containers are not equal size.";
@@ -248,15 +248,13 @@ namespace EnergyPlus {
 		// Will return true if data structures match and false if they do not.
 		// Usage (assuming "Version,8.3;" was parsed as an idf snippet):
 		// 		EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
-		bool compare_idf(
-			std::string const & name,
+    bool compare_idf(std::string const &name,
 			int const num_alphas,
 			int const num_numbers,
 			std::vector< std::string > const & alphas,
 			std::vector< bool > const & alphas_blank,
 			std::vector< Real64 > const & numbers,
-			std::vector< bool > const & numbers_blank
-		);
+                     std::vector<bool> const &numbers_blank);
 
 	private:
 		friend class InputProcessorFixture;
@@ -281,9 +279,8 @@ namespace EnergyPlus {
 		std::unique_ptr< std::ostringstream > m_delightin_stream;
 		std::unique_ptr< RedirectCout > m_redirect_cout;
 		std::unique_ptr< RedirectCerr > m_redirect_cerr;
-
 	};
 
-}
+} // namespace EnergyPlus
 
 #endif
