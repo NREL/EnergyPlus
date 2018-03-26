@@ -80,6 +80,7 @@
 #include <Vectors.hh>
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
+#include <WindowManager.hh>
 #include <WindowManagerExteriorOptical.hh>
 #include <WindowManagerExteriorThermal.hh>
 #include <WindowModel.hh>
