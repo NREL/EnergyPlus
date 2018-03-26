@@ -804,6 +804,8 @@ namespace DataSurfaces {
 
         void SetOutBulbTempAt();
 
+        void SetWindDirAt(Real64 const fac);
+
         void SetWindSpeedAt(Real64 const fac);
 
         Real64 getInsideAirTemperature(const int t_SurfNum) const;
