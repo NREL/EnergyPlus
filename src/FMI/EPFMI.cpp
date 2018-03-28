@@ -53,6 +53,18 @@ void getZoneH(double* h, int zoneNum) {
   *h = EnergyPlus::ZoneTempPredictorCorrector::HDot(zoneNum);
 }
 
+void getZoneVolume(double* volume, int zoneNum) {
+  *volume = EnergyPlus::DataHeatBalance::Zone( zoneNum ).Volume;
+}
+
+void getZoneFloorArea(double* area, int zoneNum) {
+  *area = EnergyPlus::DataHeatBalance::Zone( zoneNum ).FloorArea;
+}
+
+void getZoneCapacityMult(double* mult, int zoneNum) {
+  *mult = EnergyPlus::DataHeatBalance::Zone( zoneNum ).ZoneVolCapMultpSens;
+}
+
 // Pair of strings, first is a zone name, second is a variable name
 typedef std::pair<std::string, std::string> NamePair;
 
@@ -173,7 +185,6 @@ unsigned int setupExperiment(double tStart,
     if ( varInfo.varName == "T" ) {
       valueSetters[varInfo.varValueRef] = std::bind(setZoneTemperature, _1, varInfo.zoneNum);
     }
-
   }
 
   for ( size_t i = 0; i < g_nOut; ++i ) {
@@ -184,8 +195,13 @@ unsigned int setupExperiment(double tStart,
 
     if ( varInfo.varName == "QConSen_flow" ) {
       valueGetters[varInfo.varValueRef] = std::bind(getZoneH, _1, varInfo.zoneNum);
+    } else if ( varInfo.varName == "V" ) {
+      valueGetters[varInfo.varValueRef] = std::bind(getZoneVolume, _1, varInfo.zoneNum);
+    } else if ( varInfo.varName == "AFlo" ) {
+      valueGetters[varInfo.varValueRef] = std::bind(getZoneFloorArea, _1, varInfo.zoneNum);
+    } else if ( varInfo.varName == "mSenFac" ) {
+      valueGetters[varInfo.varValueRef] = std::bind(getZoneCapacityMult, _1, varInfo.zoneNum);
     }
-
   }
 
   return 0;
