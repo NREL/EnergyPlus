@@ -2530,10 +2530,10 @@ namespace HVACUnitarySystem {
                         UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) /
                         UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(DesignSpecMSHP(MSHPIndex).NumOfSpeedHeating);
                 }
-                // these coil types do not have an idle speed air flow rate
-                UnitarySystem(UnitarySysNum).IdleVolumeAirRate = 0.0;
-                UnitarySystem(UnitarySysNum).IdleMassFlowRate = 0.0;
-                UnitarySystem(UnitarySysNum).IdleSpeedRatio = 0.0;
+                // were these set to 0 previously because of mistake or an issue?
+                UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate( DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating ) * DesignSpecMSHP( MSHPIndex ).NoLoadAirFlowRateRatio;
+                UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( DesignSpecMSHP( MSHPIndex ).NumOfSpeedHeating ) * DesignSpecMSHP( MSHPIndex ).NoLoadAirFlowRateRatio;
+                UnitarySystem(UnitarySysNum).IdleSpeedRatio = 1.0;
             }
         } else if (UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit ||
                    UnitarySystem(UnitarySysNum).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
