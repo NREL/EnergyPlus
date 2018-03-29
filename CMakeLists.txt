@@ -157,7 +157,7 @@ option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging onl
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
 
-#ADD_SUBDIRECTORY(alpine)
+ADD_SUBDIRECTORY(alpine)
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
