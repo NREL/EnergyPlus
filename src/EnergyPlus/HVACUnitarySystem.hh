@@ -167,9 +167,10 @@ namespace HVACUnitarySystem {
         Array1D<Real64> HeatingVolFlowRatio; // The ratio of flow to max for this speed
         bool SingleModeFlag;                 // If yes, single mode operation
         Real64 NoLoadAirFlowRateRatio;       // fraction of supply air flow rate multiplier
+        bool blankNoLoadAirFlowRateRatio;    // logical used during sizing
 
         // Default Constructor
-        DesignSpecMSHPData() : NumOfSpeedCooling(0), NumOfSpeedHeating(0), SingleModeFlag(false), NoLoadAirFlowRateRatio(1.0)
+        DesignSpecMSHPData() : NumOfSpeedCooling(0), NumOfSpeedHeating(0), SingleModeFlag(false), NoLoadAirFlowRateRatio(1.0), blankNoLoadAirFlowRateRatio(false)
         {
         }
     };
