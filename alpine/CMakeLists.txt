@@ -109,6 +109,9 @@ target_link_libraries(alpine
   alpparser
 )
 
+add_executable(alpinedemo main.cpp)
+target_link_libraries(alpinedemo alpine)
+
 if( APPLE )
   target_link_libraries(alpine "-force_load ${JMODELICA_ROOT_DIR}/lib/RuntimeLibrary/libfmi1_me.a")
   target_link_libraries(alpine "-force_load ${JMODELICA_ROOT_DIR}/lib/RuntimeLibrary/libjmi.a")
