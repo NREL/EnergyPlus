@@ -473,6 +473,8 @@ namespace SimulationManager {
 
 		while ( Available ) {
 
+      if( epstatus == EPStatus::TERMINATING ) break;
+
 			GetNextEnvironment( Available, ErrorsFound );
 
 			if ( ! Available ) break;
@@ -550,6 +552,8 @@ namespace SimulationManager {
 					EndHourFlag = false;
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
+            if( epstatus == EPStatus::TERMINATING ) break;
+
 						if ( AnySlabsInModel || AnyBasementsInModel ) {
 							SimulateGroundDomains( false );
 						}
