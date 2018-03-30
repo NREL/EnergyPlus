@@ -136,7 +136,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen-3.3.2/ )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen/ )
 INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus )  # so that any source can #include <ConfiguredFunctions.hh>
 
 #### Create interface for JSON for Modern C++ so we can include it in targets

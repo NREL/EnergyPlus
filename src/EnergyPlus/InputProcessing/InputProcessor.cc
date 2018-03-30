@@ -71,8 +71,8 @@
 #include <InputProcessing/InputValidation.hh>
 #include <SortAndStringUtilities.hh>
 #include <UtilityRoutines.hh>
-#include <milo/dtoa.hpp>
-#include <milo/itoa.hpp>
+#include <milo/dtoa.h>
+#include <milo/itoa.h>
 
 namespace EnergyPlus {
 // Module containing the input processor routines
