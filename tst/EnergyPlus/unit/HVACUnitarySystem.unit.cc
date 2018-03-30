@@ -1405,8 +1405,8 @@ TEST_F( ZoneUnitarySystemTest, UnitarySystem_MultiStageGasHeatCoil_Only_ContFan 
     EXPECT_NEAR( Node( 2 ).Temp, Node( 2 ).TempSetPoint, 0.001 );
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT( Node( 2 ).Temp, Node( 3 ).Temp );
-    // no load air flow rate in UnitarySystemPerformance:Multispeed is blank (DS no load flow defaults to 1) so idle mass flow rate = max heating flow
-    EXPECT_EQ( UnitarySystem( 1 ).HeatMassFlowRate( UnitarySystem( 1 ).NumOfSpeedHeating ), UnitarySystem( 1 ).IdleMassFlowRate );
+    // no load air flow rate in UnitarySystemPerformance:Multispeed is blank (DS no load flow ratio defaults to 1) so idle mass flow rate = speed 1 heating flow
+    EXPECT_EQ( UnitarySystem( 1 ).HeatMassFlowRate( 1 ), UnitarySystem( 1 ).IdleMassFlowRate );
     // make sure control works at speed = 1
     EXPECT_EQ( UnitarySystem( 1 ).HeatingSpeedNum, 1 );
 
