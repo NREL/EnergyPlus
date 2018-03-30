@@ -2393,9 +2393,14 @@ namespace HVACUnitarySystem {
         }
 
         // initialize idle air flow rate variables in case these are needed in heating coil sizing when multi-speed cooling coil does not exist
-        UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirVolFlow;
+        // the multi-speed coils will overwrite this data and these variablse are only used for multi-speed coils in function SetOnOffMassFlowRate
+        if (UnitarySystem(UnitarySysNum).DesignFanVolFlowRate > 0.0) {
+            UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).DesignFanVolFlowRate;
+        } else {
+            UnitarySystem(UnitarySysNum).IdleVolumeAirRate = max(UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow, UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow);
+        }
         UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).IdleVolumeAirRate * StdRhoAir;
-        UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).IdleVolumeAirRate / UnitarySystem(UnitarySysNum).DesignFanVolFlowRate;
+        UnitarySystem(UnitarySysNum).IdleSpeedRatio = 1.0;
 
         // initialize multi-speed coils
         if ((UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit) ||
@@ -2442,6 +2447,10 @@ namespace HVACUnitarySystem {
                 UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
                 UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
                 UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
+            } else if (allocated(UnitarySystem(UnitarySysNum).CoolVolumeFlowRate)) {
+                UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).CoolVolumeFlowRate(1);
+                UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(1);
+                UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSCoolingSpeedRatio(1);
             }
 
         } else if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == CoilDX_MultiSpeedCooling) {
@@ -2583,7 +2592,7 @@ namespace HVACUnitarySystem {
             MSHPIndex = UnitarySystem(UnitarySysNum).DesignSpecMSHPIndex;
             if (MSHPIndex > 0) {
                 for (Iter = DesignSpecMSHP(MSHPIndex).NumOfSpeedHeating; Iter >= 1;
-                     --Iter) { // use reverse order since we divide by HeatVolumeFlowRate(max)
+                     --Iter) {
                     if (DesignSpecMSHP(MSHPIndex).HeatingVolFlowRatio(Iter) == AutoSize) {
                         DesignSpecMSHP(MSHPIndex).HeatingVolFlowRatio(Iter) = double(Iter) / double(DesignSpecMSHP(MSHPIndex).NumOfSpeedHeating);
                     }
@@ -2605,7 +2614,7 @@ namespace HVACUnitarySystem {
                     UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio.allocate(UnitarySystem(UnitarySysNum).NumOfSpeedHeating);
             }
 
-            for (Iter = 1; Iter <= UnitarySystem(UnitarySysNum).NumOfSpeedHeating; ++Iter) {
+            for (Iter = UnitarySystem(UnitarySysNum).NumOfSpeedHeating; Iter >= 1; --Iter) { // use reverse order since we divide by HeatVolumeFlowRate(max)
                 UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) =
                     VarSpeedCoil(UnitarySystem(UnitarySysNum).HeatingCoilIndex).MSRatedAirVolFlowRate(Iter);
                 UnitarySystem(UnitarySysNum).HeatMassFlowRate(Iter) = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(Iter) * StdRhoAir;
@@ -2614,7 +2623,7 @@ namespace HVACUnitarySystem {
                     UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedHeating);
             }
 
-            if (UnitarySystem(UnitarySysNum).CoolCoilExists) {
+            if (UnitarySystem(UnitarySysNum).CoolCoilExists && UnitarySystem(UnitarySysNum).NumOfSpeedHeating > 0) {
                 if (allocated(UnitarySystem(UnitarySysNum).CoolVolumeFlowRate) && MSHPIndex > 0) {
                     UnitarySystem(UnitarySysNum).IdleVolumeAirRate =
                         min(UnitarySystem(UnitarySysNum).IdleVolumeAirRate, UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio);
@@ -2622,15 +2631,30 @@ namespace HVACUnitarySystem {
                         min(UnitarySystem(UnitarySysNum).IdleMassFlowRate, UnitarySystem(UnitarySysNum).HeatMassFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio);
                     UnitarySystem(UnitarySysNum).IdleSpeedRatio =
                         min(UnitarySystem(UnitarySysNum).IdleSpeedRatio, UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(1));
-                } else if (MSHPIndex > 0) {
+                } else if (!allocated(UnitarySystem(UnitarySysNum).CoolVolumeFlowRate) && MSHPIndex > 0) {
                     UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
                     UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).HeatMassFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
                     UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
+                } else if (allocated(UnitarySystem(UnitarySysNum).CoolVolumeFlowRate)) {
+                    UnitarySystem(UnitarySysNum).IdleVolumeAirRate = 
+                        min(UnitarySystem(UnitarySysNum).IdleVolumeAirRate, UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(1));
+                    UnitarySystem(UnitarySysNum).IdleMassFlowRate =
+                        min(UnitarySystem(UnitarySysNum).IdleMassFlowRate, UnitarySystem(UnitarySysNum).HeatMassFlowRate(1));
+                    UnitarySystem(UnitarySysNum).IdleSpeedRatio =
+                        min(UnitarySystem(UnitarySysNum).IdleSpeedRatio, UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(1));
+                } else if (allocated(UnitarySystem(UnitarySysNum).HeatVolumeFlowRate)) {
+                    UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(1);
+                    UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).HeatMassFlowRate(1);
+                    UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(1);
                 }
             } else if (MSHPIndex > 0) {
                 UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
                 UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).HeatMassFlowRate(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
                 UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(1) * DesignSpecMSHP(MSHPIndex).NoLoadAirFlowRateRatio;
+            } else if (allocated(UnitarySystem(UnitarySysNum).HeatVolumeFlowRate)){
+                UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).HeatVolumeFlowRate(1);
+                UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).HeatMassFlowRate(1);
+                UnitarySystem(UnitarySysNum).IdleSpeedRatio = UnitarySystem(UnitarySysNum).MSHeatingSpeedRatio(1);
             }
         }
 
