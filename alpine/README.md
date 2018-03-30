@@ -66,20 +66,22 @@ Maybe other brew install commands...
 ```
 mkdir build-third-party
 cd build-third-party
-cmake ../third-party
+cmake ../alpine/third-party
 make -j8
 cd ../
 mkdir build
 cd build
 cmake ../
-make -j8
+make -j8 alpinedemo
 ```
 
 ### Running
 
+Not update to date with the vdp model, so this example is temporarily broken.
+
 ```
 cd <project-root>
-./build/alpine/alpine alpine/vdp.mo
+./build/alpine/alpinedemo alpine/vdp.mo
 ```
 
 
