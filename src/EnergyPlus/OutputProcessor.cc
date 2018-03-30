@@ -81,6 +81,7 @@
 #include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SortAndStringUtilities.hh>
+#include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.hpp>
 #include <milo/itoa.hpp>

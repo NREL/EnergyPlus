@@ -125,6 +125,7 @@ extern "C" {
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
 #include <ResultsSchema.hh>
+#include <ReportCoilSelection.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 #include <SimulationManager.hh>

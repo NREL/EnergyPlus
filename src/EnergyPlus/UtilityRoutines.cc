@@ -88,6 +88,7 @@ extern "C" {
 #include <SimulationManager.hh>
 #include <SolarShading.hh>
 #include <SystemReports.hh>
+#include <SQLiteProcedures.hh>
 #include <Timer.h>
 #include <UtilityRoutines.hh>
 
