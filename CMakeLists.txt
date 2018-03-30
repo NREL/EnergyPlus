@@ -146,6 +146,9 @@ INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus )  # so that any source 
 set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 if( BUILD_TESTING )
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  set(BUILD_GTEST ON CACHE BOOL "" FORCE)
+  set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
   include(CTest)
