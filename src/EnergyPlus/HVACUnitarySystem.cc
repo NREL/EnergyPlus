@@ -2392,15 +2392,17 @@ namespace HVACUnitarySystem {
                 UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirVolFlow / UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow;
         }
 
-        // initialize idle air flow rate variables in case these are needed in heating coil sizing when multi-speed cooling coil does not exist
+        // initialize idle air flow rate variables in case these are needed in multi-speed heating coil sizing when multi-speed cooling coil does not exist
         // the multi-speed coils will overwrite this data and these variablse are only used for multi-speed coils in function SetOnOffMassFlowRate
-        if (UnitarySystem(UnitarySysNum).DesignFanVolFlowRate > 0.0) {
-            UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).DesignFanVolFlowRate;
-        } else {
-            UnitarySystem(UnitarySysNum).IdleVolumeAirRate = max(UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow, UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow);
+        if (MultiOrVarSpeedCoolCoil(UnitarySysNum) || MultiOrVarSpeedHeatCoil(UnitarySysNum)) {
+            if (UnitarySystem(UnitarySysNum).DesignFanVolFlowRate > 0.0) {
+                UnitarySystem(UnitarySysNum).IdleVolumeAirRate = UnitarySystem(UnitarySysNum).DesignFanVolFlowRate;
+            } else {
+                UnitarySystem(UnitarySysNum).IdleVolumeAirRate = max(UnitarySystem(UnitarySysNum).MaxCoolAirVolFlow, UnitarySystem(UnitarySysNum).MaxHeatAirVolFlow);
+            }
+            UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).IdleVolumeAirRate * StdRhoAir;
+            UnitarySystem(UnitarySysNum).IdleSpeedRatio = 1.0;
         }
-        UnitarySystem(UnitarySysNum).IdleMassFlowRate = UnitarySystem(UnitarySysNum).IdleVolumeAirRate * StdRhoAir;
-        UnitarySystem(UnitarySysNum).IdleSpeedRatio = 1.0;
 
         // initialize multi-speed coils
         if ((UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit) ||

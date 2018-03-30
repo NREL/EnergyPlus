@@ -2582,6 +2582,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemSizingTest_ConfirmUnitarySystemSizingTest
     DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
     UnitarySystem.allocate(HVACUnitarySystem::NumUnitarySystem);
+    MultiOrVarSpeedCoolCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
+    MultiOrVarSpeedCoolCoil = false;
+    MultiOrVarSpeedHeatCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
+    MultiOrVarSpeedHeatCoil = false;
     UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
@@ -9417,6 +9421,10 @@ TEST_F(EnergyPlusFixture, UnitarySystem_SizingWithFans)
     DataEnvironment::StdRhoAir = 1000; // Prevent divide by zero in ReportSizingManager
 
     UnitarySystem.allocate(HVACUnitarySystem::NumUnitarySystem);
+    MultiOrVarSpeedCoolCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
+    MultiOrVarSpeedCoolCoil = false;
+    MultiOrVarSpeedHeatCoil.allocate(HVACUnitarySystem::NumUnitarySystem);
+    MultiOrVarSpeedHeatCoil = false;
     UnitarySystem(UnitarySysNum).UnitType = "AirLoopHVAC:UnitarySystem";
     UnitarySystem(UnitarySysNum).UnitarySystemType_Num = UnitarySystem_AnyCoilType;
     UnitarySystem(UnitarySysNum).RequestAutoSize = true;
