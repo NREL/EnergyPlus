@@ -99,8 +99,8 @@ static RE2::ErrorCode RegexpErrorToRE2(re2::RegexpStatusCode code) {
 
 static string trunc(const StringPiece& pattern) {
   if (pattern.size() < 100)
-    return pattern.ToString();
-  return pattern.substr(0, 100).ToString() + "...";
+    return string(pattern);
+  return string(pattern.substr(0, 100)) + "...";
 }
 
 
@@ -172,7 +172,7 @@ void RE2::Init(const StringPiece& pattern, const Options& options) {
     empty_group_names = new std::map<int, string>;
   });
 
-  pattern_ = pattern.ToString();
+  pattern_ = string(pattern);
   options_.Copy(options);
   entire_regexp_ = NULL;
   suffix_regexp_ = NULL;
@@ -196,12 +196,10 @@ void RE2::Init(const StringPiece& pattern, const Options& options) {
     }
     error_ = new string(status.Text());
     error_code_ = RegexpErrorToRE2(status.code());
-    error_arg_ = status.error_arg().ToString();
+    error_arg_ = string(status.error_arg());
     return;
   }
 
-  prefix_.clear();
-  prefix_foldcase_ = false;
   re2::Regexp* suffix;
   if (entire_regexp_->RequiredPrefix(&prefix_, &prefix_foldcase_, &suffix))
     suffix_regexp_ = suffix;
@@ -347,28 +345,9 @@ bool RE2::FindAndConsumeN(StringPiece* input, const RE2& re,
   }
 }
 
-// Returns the maximum submatch needed for the rewrite to be done by Replace().
-// E.g. if rewrite == "foo \\2,\\1", returns 2.
-int RE2::MaxSubmatch(const StringPiece& rewrite) {
-  int max = 0;
-  for (const char *s = rewrite.data(), *end = s + rewrite.size();
-       s < end; s++) {
-    if (*s == '\\') {
-      s++;
-      int c = (s < end) ? *s : -1;
-      if (isdigit(c)) {
-        int n = (c - '0');
-        if (n > max)
-          max = n;
-      }
-    }
-  }
-  return max;
-}
-
-bool RE2::Replace(string *str,
-                 const RE2& re,
-                 const StringPiece& rewrite) {
+bool RE2::Replace(string* str,
+                  const RE2& re,
+                  const StringPiece& rewrite) {
   StringPiece vec[kVecSize];
   int nvec = 1 + MaxSubmatch(rewrite);
   if (nvec > arraysize(vec))
@@ -386,9 +365,9 @@ bool RE2::Replace(string *str,
   return true;
 }
 
-int RE2::GlobalReplace(string *str,
-                      const RE2& re,
-                      const StringPiece& rewrite) {
+int RE2::GlobalReplace(string* str,
+                       const RE2& re,
+                       const StringPiece& rewrite) {
   StringPiece vec[kVecSize];
   int nvec = 1 + MaxSubmatch(rewrite);
   if (nvec > arraysize(vec))
@@ -399,7 +378,13 @@ int RE2::GlobalReplace(string *str,
   const char* lastend = NULL;
   string out;
   int count = 0;
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+  // Iterate just once when fuzzing. Otherwise, we easily get bogged down
+  // and coverage is unlikely to improve despite significant expense.
+  while (p == str->data()) {
+#else
   while (p <= ep) {
+#endif
     if (!re.Match(*str, static_cast<size_t>(p - str->data()),
                   str->size(), UNANCHORED, vec, nvec))
       break;
@@ -452,10 +437,10 @@ int RE2::GlobalReplace(string *str,
   return count;
 }
 
-bool RE2::Extract(const StringPiece &text,
-                 const RE2& re,
-                 const StringPiece &rewrite,
-                 string *out) {
+bool RE2::Extract(const StringPiece& text,
+                  const RE2& re,
+                  const StringPiece& rewrite,
+                  string* out) {
   StringPiece vec[kVecSize];
   int nvec = 1 + MaxSubmatch(rewrite);
   if (nvec > arraysize(vec))
@@ -515,14 +500,14 @@ bool RE2::PossibleMatchRange(string* min, string* max, int maxlen) const {
     n = maxlen;
 
   // Determine initial min max from prefix_ literal.
-  string pmin, pmax;
-  pmin = prefix_.substr(0, n);
-  pmax = prefix_.substr(0, n);
+  *min = prefix_.substr(0, n);
+  *max = prefix_.substr(0, n);
   if (prefix_foldcase_) {
-    // prefix is ASCII lowercase; change pmin to uppercase.
+    // prefix is ASCII lowercase; change *min to uppercase.
     for (int i = 0; i < n; i++) {
-      if ('a' <= pmin[i] && pmin[i] <= 'z')
-        pmin[i] += 'A' - 'a';
+      char& c = (*min)[i];
+      if ('a' <= c && c <= 'z')
+        c += 'A' - 'a';
     }
   }
 
@@ -530,13 +515,13 @@ bool RE2::PossibleMatchRange(string* min, string* max, int maxlen) const {
   string dmin, dmax;
   maxlen -= n;
   if (maxlen > 0 && prog_->PossibleMatchRange(&dmin, &dmax, maxlen)) {
-    pmin += dmin;
-    pmax += dmax;
-  } else if (pmax.size() > 0) {
+    min->append(dmin);
+    max->append(dmax);
+  } else if (!max->empty()) {
     // prog_->PossibleMatchRange has failed us,
     // but we still have useful information from prefix_.
-    // Round up pmax to allow any possible suffix.
-    pmax = PrefixSuccessor(pmax);
+    // Round up *max to allow any possible suffix.
+    PrefixSuccessor(max);
   } else {
     // Nothing useful.
     *min = "";
@@ -544,15 +529,13 @@ bool RE2::PossibleMatchRange(string* min, string* max, int maxlen) const {
     return false;
   }
 
-  *min = pmin;
-  *max = pmax;
   return true;
 }
 
 // Avoid possible locale nonsense in standard strcasecmp.
 // The string a is known to be all lowercase.
 static int ascii_strcasecmp(const char* a, const char* b, size_t len) {
-  const char *ae = a + len;
+  const char* ae = a + len;
 
   for (; a < ae; a++, b++) {
     uint8_t x = *a;
@@ -791,7 +774,7 @@ bool RE2::Match(const StringPiece& text,
 
 // Internal matcher - like Match() but takes Args not StringPieces.
 bool RE2::DoMatch(const StringPiece& text,
-                  Anchor anchor,
+                  Anchor re_anchor,
                   size_t* consumed,
                   const Arg* const* args,
                   int n) const {
@@ -819,7 +802,7 @@ bool RE2::DoMatch(const StringPiece& text,
     heapvec = vec;
   }
 
-  if (!Match(text, 0, text.size(), anchor, vec, nvec)) {
+  if (!Match(text, 0, text.size(), re_anchor, vec, nvec)) {
     delete[] heapvec;
     return false;
   }
@@ -851,41 +834,6 @@ bool RE2::DoMatch(const StringPiece& text,
   }
 
   delete[] heapvec;
-  return true;
-}
-
-// Append the "rewrite" string, with backslash subsitutions from "vec",
-// to string "out".
-bool RE2::Rewrite(string *out, const StringPiece &rewrite,
-                 const StringPiece *vec, int veclen) const {
-  for (const char *s = rewrite.data(), *end = s + rewrite.size();
-       s < end; s++) {
-    if (*s != '\\') {
-      out->push_back(*s);
-      continue;
-    }
-    s++;
-    int c = (s < end) ? *s : -1;
-    if (isdigit(c)) {
-      int n = (c - '0');
-      if (n >= veclen) {
-        if (options_.log_errors()) {
-          LOG(ERROR) << "requested group " << n
-                     << " in regexp " << rewrite.data();
-        }
-        return false;
-      }
-      StringPiece snip = vec[n];
-      if (snip.size() > 0)
-        out->append(snip.data(), snip.size());
-    } else if (c == '\\') {
-      out->push_back('\\');
-    } else {
-      if (options_.log_errors())
-        LOG(ERROR) << "invalid rewrite pattern: " << rewrite.data();
-      return false;
-    }
-  }
   return true;
 }
 
@@ -923,6 +871,62 @@ bool RE2::CheckRewriteString(const StringPiece& rewrite, string* error) const {
                   "but the regexp only has %d parenthesized subexpressions.",
                   max_token, NumberOfCapturingGroups());
     return false;
+  }
+  return true;
+}
+
+// Returns the maximum submatch needed for the rewrite to be done by Replace().
+// E.g. if rewrite == "foo \\2,\\1", returns 2.
+int RE2::MaxSubmatch(const StringPiece& rewrite) {
+  int max = 0;
+  for (const char *s = rewrite.data(), *end = s + rewrite.size();
+       s < end; s++) {
+    if (*s == '\\') {
+      s++;
+      int c = (s < end) ? *s : -1;
+      if (isdigit(c)) {
+        int n = (c - '0');
+        if (n > max)
+          max = n;
+      }
+    }
+  }
+  return max;
+}
+
+// Append the "rewrite" string, with backslash subsitutions from "vec",
+// to string "out".
+bool RE2::Rewrite(string* out,
+                  const StringPiece& rewrite,
+                  const StringPiece* vec,
+                  int veclen) const {
+  for (const char *s = rewrite.data(), *end = s + rewrite.size();
+       s < end; s++) {
+    if (*s != '\\') {
+      out->push_back(*s);
+      continue;
+    }
+    s++;
+    int c = (s < end) ? *s : -1;
+    if (isdigit(c)) {
+      int n = (c - '0');
+      if (n >= veclen) {
+        if (options_.log_errors()) {
+          LOG(ERROR) << "requested group " << n
+                     << " in regexp " << rewrite.data();
+        }
+        return false;
+      }
+      StringPiece snip = vec[n];
+      if (snip.size() > 0)
+        out->append(snip.data(), snip.size());
+    } else if (c == '\\') {
+      out->push_back('\\');
+    } else {
+      if (options_.log_errors())
+        LOG(ERROR) << "invalid rewrite pattern: " << rewrite.data();
+      return false;
+    }
   }
   return true;
 }

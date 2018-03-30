@@ -143,6 +143,8 @@ INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus )  # so that any source 
 # add_library( ModernJSON INTERFACE )
 # target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
 
+set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()

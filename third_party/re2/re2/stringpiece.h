@@ -30,6 +30,7 @@ namespace re2 {
 
 class StringPiece {
  public:
+  typedef std::char_traits<char> traits_type;
   typedef char value_type;
   typedef char* pointer;
   typedef const char* const_pointer;
@@ -90,6 +91,13 @@ class StringPiece {
     size_ = len;
   }
 
+  // Converts to `std::basic_string`.
+  template <typename A>
+  explicit operator std::basic_string<char, traits_type, A>() const {
+    if (!data_) return {};
+    return std::basic_string<char, traits_type, A>(data_, size_);
+  }
+
   std::string as_string() const {
     return std::string(data_, size_);
   }
@@ -115,24 +123,28 @@ class StringPiece {
   StringPiece substr(size_type pos = 0, size_type n = npos) const;
 
   int compare(const StringPiece& x) const {
-    int r = memcmp(data_, x.data_, std::min(size_, x.size_));
-    if (r == 0) {
-      if (size_ < x.size_) r = -1;
-      else if (size_ > x.size_) r = +1;
+    size_type min_size = std::min(size(), x.size());
+    if (min_size > 0) {
+      int r = memcmp(data(), x.data(), min_size);
+      if (r < 0) return -1;
+      if (r > 0) return 1;
     }
-    return r;
+    if (size() < x.size()) return -1;
+    if (size() > x.size()) return 1;
+    return 0;
   }
 
   // Does "this" start with "x"?
   bool starts_with(const StringPiece& x) const {
-    return size_ >= x.size_ &&
-           memcmp(data_, x.data_, x.size_) == 0;
+    return x.empty() ||
+           (size() >= x.size() && memcmp(data(), x.data(), x.size()) == 0);
   }
 
   // Does "this" end with "x"?
   bool ends_with(const StringPiece& x) const {
-    return size_ >= x.size_ &&
-           memcmp(data_ + size_ - x.size_, x.data_, x.size_) == 0;
+    return x.empty() ||
+           (size() >= x.size() &&
+            memcmp(data() + (size() - x.size()), x.data(), x.size()) == 0);
   }
 
   bool contains(const StringPiece& s) const {
@@ -150,8 +162,10 @@ class StringPiece {
 };
 
 inline bool operator==(const StringPiece& x, const StringPiece& y) {
-  return x.size() == y.size() &&
-         memcmp(x.data(), y.data(), x.size()) == 0;
+  StringPiece::size_type len = x.size();
+  if (len != y.size()) return false;
+  return x.data() == y.data() || len == 0 ||
+         memcmp(x.data(), y.data(), len) == 0;
 }
 
 inline bool operator!=(const StringPiece& x, const StringPiece& y) {
@@ -159,8 +173,9 @@ inline bool operator!=(const StringPiece& x, const StringPiece& y) {
 }
 
 inline bool operator<(const StringPiece& x, const StringPiece& y) {
-  int r = memcmp(x.data(), y.data(), std::min(x.size(), y.size()));
-  return ((r < 0) || ((r == 0) && (x.size() < y.size())));
+  StringPiece::size_type min_size = std::min(x.size(), y.size());
+  int r = min_size == 0 ? 0 : memcmp(x.data(), y.data(), min_size);
+  return (r < 0) || (r == 0 && x.size() < y.size());
 }
 
 inline bool operator>(const StringPiece& x, const StringPiece& y) {
@@ -175,9 +190,9 @@ inline bool operator>=(const StringPiece& x, const StringPiece& y) {
   return !(x < y);
 }
 
-}  // namespace re2
-
 // Allow StringPiece to be logged.
-std::ostream& operator<<(std::ostream& o, const re2::StringPiece& p);
+std::ostream& operator<<(std::ostream& o, const StringPiece& p);
+
+}  // namespace re2
 
 #endif  // RE2_STRINGPIECE_H_

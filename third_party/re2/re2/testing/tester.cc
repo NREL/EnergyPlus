@@ -7,7 +7,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/types.h>
 #include <string>
 
 #include "util/util.h"
@@ -221,7 +220,7 @@ TestInstance::TestInstance(const StringPiece& regexp_str, Prog::MatchKind kind,
   }
 
   // Create re string that will be used for RE and RE2.
-  string re = regexp_str.ToString();
+  string re = string(regexp_str);
   // Accomodate flags.
   // Regexp::Latin1 will be accomodated below.
   if (!(flags & Regexp::OneLine))
@@ -466,14 +465,6 @@ void TestInstance::RunSearch(Engine type,
         break;
       }
       result->have_submatch = true;
-
-      // Work around RE interface bug: PCRE returns -1 as the
-      // offsets for an unmatched subexpression, and RE should
-      // turn that into StringPiece(NULL) but in fact it uses
-      // StringPiece(text.begin() - 1, 0).  Oops.
-      for (int i = 0; i < nsubmatch; i++)
-        if (result->submatch[i].begin() == text.begin() - 1)
-          result->submatch[i] = StringPiece();
       delete[] argptr;
       delete[] a;
       break;

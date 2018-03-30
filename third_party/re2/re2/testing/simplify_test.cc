@@ -125,7 +125,7 @@ static Test tests[] = {
   // explicit (?:) in place of non-parenthesized empty strings,
   // to make them easier to spot for other parsers.
   { "(a|b|)", "([a-b]|(?:))" },
-  { "(|)", "()" },
+  { "(|)", "((?:)|(?:))" },
   { "a()", "a()" },
   { "(()|())", "(()|())" },
   { "(a|)", "(a|(?:))" },
@@ -231,6 +231,17 @@ static Test tests[] = {
   // capture. The new capture must have the cap of the old capture.
   // Failure to copy it results in cap=0 -> ToString() logs a fatal error.
   { "(a*aab)", "(aa+b)" },
+
+  // Test squashing of **, ++, ?? et cetera.
+  { "(?:(?:a){0,}){0,}", "a*" },
+  { "(?:(?:a){1,}){1,}", "a+" },
+  { "(?:(?:a){0,1}){0,1}", "a?" },
+  { "(?:(?:a){0,}){1,}", "a*" },
+  { "(?:(?:a){0,}){0,1}", "a*" },
+  { "(?:(?:a){1,}){0,}", "a*" },
+  { "(?:(?:a){1,}){0,1}", "a*" },
+  { "(?:(?:a){0,1}){0,}", "a*" },
+  { "(?:(?:a){0,1}){1,}", "a*" },
 };
 
 TEST(TestSimplify, SimpleRegexps) {
@@ -241,13 +252,13 @@ TEST(TestSimplify, SimpleRegexps) {
                                Regexp::MatchNL | (Regexp::LikePerl &
                                                   ~Regexp::OneLine),
                                &status);
-    CHECK(re != NULL) << " " << tests[i].regexp << " " << status.Text();
+    ASSERT_TRUE(re != NULL) << " " << tests[i].regexp << " " << status.Text();
     Regexp* sre = re->Simplify();
-    CHECK(sre != NULL);
+    ASSERT_TRUE(sre != NULL);
 
     // Check that already-simple regexps don't allocate new ones.
     if (strcmp(tests[i].regexp, tests[i].simplified) == 0) {
-      CHECK(re == sre) << " " << tests[i].regexp
+      ASSERT_TRUE(re == sre) << " " << tests[i].regexp
         << " " << re->ToString() << " " << sre->ToString();
     }
 
