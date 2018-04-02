@@ -1114,6 +1114,7 @@ namespace HeatBalanceHAMTManager {
         int matid;
         int itter;
         int cid;
+        int imsid; // FA
         // unused1208    INTEGER :: cid1
         int adj;
         int adjl;
@@ -1269,7 +1270,8 @@ namespace HeatBalanceHAMTManager {
                 // FA calc Wadds
                 if (cells(cid).imsid > 0) {
                     matid = cells(cid).matid;
-                    cells(cid).Wadds = (cells(cid).length(1) / Material(matid).Thickness) * (ims(cells(cid).imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp)));
+                    imsid = cells(cid).imsid;
+                    cells(cid).Wadds = (cells(cid).length(1) / Material(matid).Thickness) * (ims(imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp)));
                 }
                 else {
                     cells(cid).Wadds = 0;
