@@ -918,7 +918,7 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).volume = cells(cid).length(1) * Surface(sid).Area;
 
                     // FA connect internal moisture source with cell
-                    for (imsid = 1; sizeof(imsid); ++imsid) {
+                    for (imsid = 1; imsid < 10; ++imsid) {   // add the maximum number of moisture sources for this for loop
                         
                         if ((cells(cid).sid == ims(imsid).sid) &&
                             (cells(cid).lid == ims(imsid).lid)) {
