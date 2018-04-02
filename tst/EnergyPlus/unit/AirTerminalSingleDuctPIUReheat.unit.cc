@@ -920,7 +920,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "    Surface 2,               !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.5,                     !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1.0,                     !- Multiplier",
         "    4,                       !- Number of Vertices",
