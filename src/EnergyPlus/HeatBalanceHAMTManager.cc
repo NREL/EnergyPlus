@@ -922,7 +922,7 @@ namespace HeatBalanceHAMTManager {
                         
                         if ((cells(cid).sid == ims(imsid).sid) &&
                             (cells(cid).lid == ims(imsid).lid)) {
-                            cells(cid).imsid == imsid;
+                            cells(cid).imsid = imsid;
                         }                       
                     }
                     // end FA
