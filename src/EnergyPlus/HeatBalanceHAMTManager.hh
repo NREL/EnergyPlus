@@ -157,6 +157,7 @@ namespace HeatBalanceHAMTManager {
     // FA structure internal moisture source
     struct s_ims
     {
+        std::string name;
         int imsid;
         int sid;
         int lid;
@@ -164,7 +165,7 @@ namespace HeatBalanceHAMTManager {
         Real64 moistairflow;
 
         s_ims()
-            : imsid(-1), sid(-1), lid(-1), moistairflow(0.0)
+            : name(), imsid(-1), sid(-1), lid(-1), moistairflow(0.0)
         {
         }
     };

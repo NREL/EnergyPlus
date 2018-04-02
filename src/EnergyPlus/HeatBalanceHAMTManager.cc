@@ -638,13 +638,13 @@ namespace HeatBalanceHAMTManager {
                 cAlphaFieldNames, cNumericFieldNames);
 
             ims(item).imsid = item;
-            //ims(item).name = AlphaArray(1);
-            ims(item).sid = UtilityRoutines::FindItemInList(AlphaArray(1), Surface);
+            ims(item).name = AlphaArray(1);
+            ims(item).sid = UtilityRoutines::FindItemInList(AlphaArray(2), Surface);
             ims(item).lid = NumArray(1);
             ims(item).moistairflow = NumArray(2);
 
             if (ims(item).sid == 0) {
-                ShowSevereError(cHAMTObject7 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
+                ShowSevereError(cHAMTObject7 + ' ' + cAlphaFieldNames(2) + "=\"" + AlphaArray(2) + "\" is invalid (undefined).");
                 ShowContinueError("The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
                 ErrorsFound = true;
                 continue;
