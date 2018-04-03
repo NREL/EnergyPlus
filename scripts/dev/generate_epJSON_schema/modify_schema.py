@@ -113,7 +113,8 @@ extension_renaming = {
     'SurfaceProperty:ExposedFoundationPerimeter': 'surfaces',
     'SurfaceProperty:SurroundingSurfaces': 'surfaces',
     'ZoneHVAC:HybridUnitaryHVAC': 'modes',
-    'ShadowCalculation': 'shading_zone_groups'
+    'ShadowCalculation': 'shading_zone_groups',
+    'WindowShadingControl': 'fenestration_surfaces'
 }
 remaining_objects = [
     'Site:SpectrumData',
