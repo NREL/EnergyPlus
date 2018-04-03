@@ -454,7 +454,6 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    Zn001:Wall001,           !- Building Surface Name",
         "    ,                        !- Outside Boundary Condition Object",
         "    0.5000000,               !- View Factor to Ground",
-        "    ,                        !- Shading Control Name",
         "    ,                        !- Frame and Divider Name",
         "    1.0,                     !- Multiplier",
         "    4,                       !- Number of Vertices",
