@@ -101,6 +101,8 @@ namespace HeatBalanceHAMTManager {
 
     extern int TotCellsMax; // Maximum number of cells per material
 
+    extern int TotImsMax;  // FA maximum number of internal moisture sources
+
     extern bool latswitch;  // latent heat switch,
     extern bool rainswitch; // rain switch,
 

@@ -178,6 +178,8 @@ namespace HeatBalanceHAMTManager {
 
     int TotCellsMax(0); // Maximum number of cells per material
 
+    int TotImsMax(0);   // FA Maximum number of internal moisture sources
+
     bool latswitch(false);  // latent heat switch,
     bool rainswitch(false); // rain switch,
 
@@ -633,8 +635,10 @@ namespace HeatBalanceHAMTManager {
 
         ims.allocate(HAMTitems);
 
+        TotImsMax = HAMTitems;
+
         for (item = 1; item <= HAMTitems; ++item) {
-            inputProcessor->getObjectItem(cHAMTObject7, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks,
+            inputProcessor->getObjectItem(cHAMTObject8, item, AlphaArray, NumAlphas, NumArray, NumNums, status, lNumericBlanks, lAlphaBlanks,
                 cAlphaFieldNames, cNumericFieldNames);
 
             ims(item).imsid = item;
@@ -918,7 +922,7 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).volume = cells(cid).length(1) * Surface(sid).Area;
 
                     // FA connect internal moisture source with cell
-                    for (imsid = 1; imsid < 10; ++imsid) {   // add the maximum number of moisture sources for this for loop
+                    for (imsid = 1; imsid <= TotImsMax; ++imsid) {   
                         
                         if ((cells(cid).sid == ims(imsid).sid) &&
                             (cells(cid).lid == ims(imsid).lid)) {
