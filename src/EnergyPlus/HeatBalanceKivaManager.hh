@@ -113,6 +113,13 @@ namespace HeatBalanceKivaManager {
         Kiva::BoundaryConditions bcs;
         Real64 weightedPerimeter;
         int constructionNum;
+
+#ifdef GROUND_PLOT
+        Kiva::SnapshotSettings ss;
+        Kiva::GroundPlot gp;
+        std::string debugDir;
+        std::size_t plotNum;
+#endif
     };
 
     class KivaManager
@@ -135,6 +142,8 @@ namespace HeatBalanceKivaManager {
         std::vector<FoundationKiva> foundationInputs;
         std::vector<KivaInstanceMap> kivaInstances;
         Real64 timestep;
+
+        std::map<int, Real64> radiantTemps; // Surface average temperatures to use in radiant exchange calculations
 
         struct Settings
         {
