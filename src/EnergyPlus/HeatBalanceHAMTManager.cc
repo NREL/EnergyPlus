@@ -1275,7 +1275,7 @@ namespace HeatBalanceHAMTManager {
                 if (cells(cid).imsid > 0) {
                     matid = cells(cid).matid;
                     imsid = cells(cid).imsid;
-                    cells(cid).Wadds = (cells(cid).length(1) / Material(matid).Thickness) * (ims(imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp)));
+                    cells(cid).Wadds = Surface(sid).Area * (cells(cid).length(1) / Material(matid).Thickness) * (ims(imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp)));
                 }
                 else {
                     cells(cid).Wadds = 0;
@@ -1780,7 +1780,7 @@ namespace HeatBalanceHAMTManager {
         IdealGasConst = 2.16679;
 
         // Calculation according to eq(17) from Vaisala: Humidity conversion formulas (2013)
-        SatAbsHum = (IdealGasConst * VPSat) / (Temperature + 273.15);
+        SatAbsHum = ((IdealGasConst * VPSat) / (Temperature + 273.15)) / 1000;
 
         return SatAbsHum;
     }
