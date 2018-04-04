@@ -1114,6 +1114,8 @@ namespace HeatBalanceHAMTManager {
         Real64 tempmax;
         Real64 tempmin;
 
+        Real64 InternalMoistureSource; // FA
+
         int ii;
         int matid;
         int itter;
@@ -1275,7 +1277,19 @@ namespace HeatBalanceHAMTManager {
                 if (cells(cid).imsid > 0) {
                     matid = cells(cid).matid;
                     imsid = cells(cid).imsid;
-                    cells(cid).Wadds = Surface(sid).Area * (cells(cid).length(1) / Material(matid).Thickness) * (ims(imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp)));
+                    if (ims(imsid).moistairflow >= 0) {
+                        InternalMoistureSource = ims(imsid).moistairflow * (cells(IntConcell(sid)).rh * SatAbsHum(cells(IntConcell(sid)).temp) - SatAbsHum(cells(cid).temp));
+                    }
+                    else {
+                        InternalMoistureSource = -ims(imsid).moistairflow * (cells(ExtConcell(sid)).rh * SatAbsHum(cells(ExtConcell(sid)).temp) - SatAbsHum(cells(cid).temp));
+                    }
+                    
+                    if (InternalMoistureSource > 0) {
+                        cells(cid).Wadds = Surface(sid).Area * (cells(cid).length(1) / Material(matid).Thickness) * InternalMoistureSource;                      
+                    }
+                    else {
+                        cells(cid).Wadds = 0;
+                    }                    
                 }
                 else {
                     cells(cid).Wadds = 0;
