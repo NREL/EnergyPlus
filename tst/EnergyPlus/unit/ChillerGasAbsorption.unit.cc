@@ -98,7 +98,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
         "    0,                       !- Fuel Higher Heating Value {kJ/kg}                                            ",
         "    NaturalGas,              !- Fuel Type                                                                    ",
         "    ;                        !- Sizing Factor                                                                ",
-        "                                                                                                             ",
+        "    ! Add a comment to touch a unit test snippet                                                             ",
         "  Curve:Biquadratic,                                                                                         ",
         "    GasAbsFlatBiQuad,        !- Name                                                                         ",
         "    1.000000000,             !- Coefficient1 Constant                                                        ",
