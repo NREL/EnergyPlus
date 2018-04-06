@@ -202,7 +202,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitSpeed::CalcSpeedOutput( Psychrom
         this->mySizeFlag = false;
     }
 
-    if ( PLR == 0.0 ) {
+    if ( ( PLR == 0.0 ) || ( AirMassFlow == 0.0 ) ) {
         outletState.tdb = inletState.tdb;
         outletState.w = inletState.w;
         outletState.h = inletState.h;

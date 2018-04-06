@@ -2262,7 +2262,7 @@ namespace HVACUnitarySystem {
 			EqSizing.DesCoolingLoad = DXCoolCap;
 
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedCooling; ++Iter ) {
-				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = newCoil.performance.modes[ Iter - 1 ].ratedEvapAirFlowRate;
+				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = newCoil.performance.modes[ magicNominalModeNum ].speeds[ Iter - 1 ].evap_air_flow_rate;
 				UnitarySystem( UnitarySysNum ).CoolMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) * StdRhoAir;
 				// it seems the ratio should reference the actual flow rates, not the fan flow ???
 				if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate > 0.0 && UnitarySystem( UnitarySysNum ).FanExists ) {

@@ -148,7 +148,7 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
 
     if ( speedNum > 1 ) {
 
-        auto & thisspeed( this->speeds[ speedNum ] );
+        auto & thisspeed( this->speeds[ speedNum - 1 ] );
 
         auto out = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
 
