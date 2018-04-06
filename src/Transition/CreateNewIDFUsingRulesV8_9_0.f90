@@ -137,6 +137,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   ! for Schedule:Compact from 8.8 to 8.9
   CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
 
+  ! for new dx cooling coil from 8.8 to 8.9
+  CHARACTER(len=MaxNameLength) ::  CoolingCoilType=blank
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -378,7 +381,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1) = sVersionNum
                 nodiff=.false.
 
-    ! changes for this version
+    ! changes for this version - 8.8 --> 8.9
 
              CASE('ZONEHVAC:EQUIPMENTLIST')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -523,6 +526,103 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     ENDIF
                  ENDDO
 
+    ! changes for this new DX coil
+             CASE('AIRLOOPHVAC:UNITARYSYSTEM')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 nodiff=.true.
+                 ! replace cooling coil object type name
+                 CoolingCoilType = InArgs(15)
+                 IF ( SameString( CoolingCoilType(1:15), "Coil:Cooling:DX" ) ) THEN
+                     OutArgs(15) = "Coil:Cooling:DX"
+                 END IF
+
+             CASE('COIL:COOLING:DX:SINGLESPEED')
+                 nodiff=.false.
+                 ObjectName='Coil:Cooling:DX'
+                 ! store the date for later
+                 TempArgs=InArgs
+                 TempArgsNum=CurArgs
+
+                 ! write the Coil:Cooling:DX object
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TempArgs(1) ! Name
+                 OutArgs(2)=TempArgs(8) ! Evaporator Inlet Node Name
+                 OutArgs(3)=TempArgs(9) ! Evaporator Outlet Node Name
+                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
+                 OutArgs(5)=TempArgs(35) ! Condenser Zone Name
+                 OutArgs(6)=TempArgs(20) ! Condenser Inlet Node Name
+                 OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
+                 OutArgs(9)=TempArgs(28) ! Condensate Collection Water Storage Tank Name
+                 OutArgs(10)=TempArgs(27) ! Evaporative Condenser Supply Water Storage Tank Name
+                 CurArgs=10
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the Performance object
+                 OutArgs=Blank
+                 ObjectName='Coil:Cooling:DX:CurveFit:Performance'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Name
+                 OutArgs(2)=TempArgs(25) ! Crankcase Heater Capacity
+                 OutArgs(3)=TempArgs(15) ! Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+                 OutArgs(4)=TempArgs(26) ! Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
+                 !OutArgs(5)='' ! Unit Internal Static Air Pressure - Only defined for Coil:Cooling:DX:TwoSpeed previously
+                 !OutArgs(6)='' ! Method for Switching Operating Modes - Only defined for Coil:Cooling:DX:TwoStageWithHumidityControl previously
+                 !OutArgs(7)='' ! Operating Mode Number Schedule Name
+                 OutArgs(8)=TempArgs(29) ! Evaporative Condenser Basin Heater Capacity
+                 OutArgs(9)=TempArgs(30) ! Evaporative Condenser Basin Heater Setpoint Temperature
+                 OutArgs(10)=TempArgs(31) ! Evaporative Condenser Basin Heater Operating Schedule Name
+                 OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                 CurArgs=11
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the Operating Mode object
+                 OutArgs=Blank
+                 ObjectName='Coil:Cooling:DX:CurveFit:OperatingMode'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Name
+                 OutArgs(2)=TempArgs(3) ! Rated Gross Total Cooling Capacity
+                 OutArgs(3)=TempArgs(6) ! Rated Evaporator Air Flow Rate
+                 OutArgs(4)=TempArgs(22) ! Rated Condenser Air Flow Rate
+                 OutArgs(5)=TempArgs(18) ! Maximum Cycling Rate
+                 OutArgs(6)=TempArgs(17) ! Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+                 OutArgs(7)=TempArgs(19) ! Latent Capacity Time Constant
+                 OutArgs(8)=TempArgs(16) ! Nominal Time for Condensate Removal to Begin
+                 !OutArgs(9)='' ! Apply Latent Degradation to Speeds Greater than 1 - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 OutArgs(10)=TempArgs(21) ! Condenser Type
+                 OutArgs(11)=TempArgs(24) ! Nominal Evaporative Condenser Pump Power
+                 !OutArgs(12)='' ! Capacity Control Method
+                 OutArgs(13)='1' ! Nominal Speed Number
+                 OutArgs(14)=TRIM(TempArgs(1)) // TRIM(' Speed 1 Performance') ! Speed 1 Name
+                 CurArgs=14
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the Speed Performance object
+                 OutArgs=Blank
+                 ObjectName='Coil:Cooling:DX:CurveFit:Speed'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Speed 1 Performance') ! Name
+                 OutArgs(2)='1.0' ! Gross Total Cooling Capacity Fraction
+                 OutArgs(3)='1.0' ! Evaporator Air Flow Rate Fraction
+                 OutArgs(4)='1.0' ! Condenser Air Flow Rate Fraction
+                 OutArgs(5)=TempArgs(4) ! Gross Sensible Heat Ratio
+                 OutArgs(6)=TempArgs(5) ! Gross Cooling COP
+                 OutArgs(7)='1.0' ! Active Fraction of Coil Face Area
+                 OutArgs(8)=TempArgs(7) ! Rated Evaporator Fan Power Per Volume Flow Rate
+                 OutArgs(9)='1.0' ! Evaporative Condenser Pump Power Fraction
+                 OutArgs(10)=TempArgs(22) ! Evaporative Condenser Effectiveness
+                 OutArgs(11:15)=TempArgs(10:14) ! Total Cooling Capacity Function of Temperature Curve Name thru Part Load Fraction Correlation Curve Name
+                 !OutArgs(16)='' ! Rated Waste Heat Fraction of Power Input - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 !OutArgs(17)='' ! Waste Heat Function of Temperature Curve Name - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 OutArgs(18)=TempArgs(32) ! Sensible Heat Ratio Modifier Function of Temperature Curve Name
+                 OutArgs(19)=TempArgs(33) ! Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+                 CurArgs=19
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! already written
+                 Written = .true.
+    
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
