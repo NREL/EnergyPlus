@@ -100,8 +100,7 @@ namespace HeatBalanceHAMTManager {
     extern Real64 deltat; // time step in seconds
 
     extern int TotCellsMax; // Maximum number of cells per material
-
-    extern int TotImsMax;  // FA maximum number of internal moisture sources
+    extern int TotImsMax;   // Maximum number of internal moisture sources
 
     extern bool latswitch;  // latent heat switch,
     extern bool rainswitch; // rain switch,
@@ -115,10 +114,10 @@ namespace HeatBalanceHAMTManager {
         // Members
         int matid;        // Material Id Number
         int sid;          // Surface Id Number
-        int lid;          // FA Layer Id Number
-        int imsid;        // FA internal moisture source id
+        int lid;          // Layer Id Number
+        int imsid;        // Internal moisture source Id
         Real64 Qadds;     // Additional sources of heat
-        Real64 Wadds;     // FA Additional sources of water
+        Real64 Wadds;     // Additional sources of water
         Real64 density;   // Density
         Real64 wthermalc; // Moisture Dependant Thermal Conductivity
         Real64 spech;     // Specific Heat capacity
@@ -148,7 +147,7 @@ namespace HeatBalanceHAMTManager {
         Array1D_int adjsl;
 
         // Default Constructor
-        subcell()  // FA added lid, imsid and Wadds
+        subcell()
             : matid(-1), sid(-1), lid(-1), imsid(-1), Qadds(0.0), Wadds(0.0), density(-1.0), wthermalc(0.0), spech(0.0), htc(-1.0), vtc(-1.0), mu(-1.0), volume(0.0), temp(0.0),
               tempp1(0.0), tempp2(0.0), wreport(0.0), water(0.0), vp(0.0), vpp1(0.0), vpsat(0.0), rh(0.1), rhp1(0.1), rhp2(0.1), rhp(10.0),
               dwdphi(-1.0), dw(-1.0), origin(3, 0.0), length(3, 0.0), overlap(6, 0.0), dist(6, 0.0), adjs(6, 0), adjsl(6, 0)
@@ -156,7 +155,7 @@ namespace HeatBalanceHAMTManager {
         }
     };
 
-    // FA structure internal moisture source
+    // internal moisture source structure
     struct s_ims
     {
         std::string name;
@@ -194,7 +193,7 @@ namespace HeatBalanceHAMTManager {
 
     Real64 WVDC(Real64 const Temperature, Real64 const ambp);
 
-    Real64 SatAbsHum(Real64 const Temperature); // FA function declaration
+    Real64 SatAbsHum(Real64 const Temperature);
 
     //                                 COPYRIGHT NOTICE
 

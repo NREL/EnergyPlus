@@ -177,8 +177,7 @@ namespace HeatBalanceHAMTManager {
     Real64 deltat(0.0); // time step in seconds
 
     int TotCellsMax(0); // Maximum number of cells per material
-
-    int TotImsMax(0);   // FA Maximum number of internal moisture sources
+    int TotImsMax(0);
 
     bool latswitch(false);  // latent heat switch,
     bool rainswitch(false); // rain switch,
@@ -187,8 +186,7 @@ namespace HeatBalanceHAMTManager {
 
     // Object Data
     Array1D<subcell> cells;
-
-    Array1D<s_ims> ims; // FA internal moisture sources
+    Array1D<s_ims> ims;
 
     // Functions
 
@@ -259,8 +257,7 @@ namespace HeatBalanceHAMTManager {
         static std::string const cHAMTObject5("MaterialProperty:HeatAndMoistureTransfer:Diffusion");
         static std::string const cHAMTObject6("MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity");
         static std::string const cHAMTObject7("SurfaceProperties:VaporCoefficients");
-
-        static std::string const cHAMTObject8("Construction:InternalMoistureSource"); // FA
+        static std::string const cHAMTObject8("Construction:InternalMoistureSource");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -356,12 +353,9 @@ namespace HeatBalanceHAMTManager {
         inputProcessor->getObjectDefMaxArgs(cHAMTObject7, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-
-        // FA
         inputProcessor->getObjectDefMaxArgs(cHAMTObject8, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
-        // end FA
 
         ErrorsFound = false;
 
@@ -630,7 +624,6 @@ namespace HeatBalanceHAMTManager {
         }
 
 
-        // FA Internal Moisture Source
         HAMTitems = inputProcessor->getNumObjectsFound(cHAMTObject8); // Construction:InternalMoistureSource
 
         ims.allocate(HAMTitems);
@@ -654,7 +647,6 @@ namespace HeatBalanceHAMTManager {
                 continue;
             }
         }
-        // end FA
 
         AlphaArray.deallocate();
         cAlphaFieldNames.deallocate();
@@ -714,7 +706,7 @@ namespace HeatBalanceHAMTManager {
         int conid;
         int lid;
         int matid;
-        int imsid; // FA internal moisture source id
+        int imsid; // internal moisture source id
         int did;
         int adj1;
         int adj2;
@@ -898,7 +890,7 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).matid = matid;
                     cells(cid).sid = sid;
 
-                    cells(cid).lid = lid; // FA add layer number to cell info
+                    cells(cid).lid = lid;
 
                     cells(cid).temp = Material(matid).itemp;
                     cells(cid).tempp1 = Material(matid).itemp;
@@ -921,7 +913,6 @@ namespace HeatBalanceHAMTManager {
 
                     cells(cid).volume = cells(cid).length(1) * Surface(sid).Area;
 
-                    // FA connect internal moisture source with cell
                     for (imsid = 1; imsid <= TotImsMax; ++imsid) {   
                         
                         if ((cells(cid).sid == ims(imsid).sid) &&
@@ -929,7 +920,6 @@ namespace HeatBalanceHAMTManager {
                             cells(cid).imsid = imsid;
                         }                       
                     }
-                    // end FA
                 }
             }
 
@@ -1113,14 +1103,13 @@ namespace HeatBalanceHAMTManager {
         Real64 sumtp1;
         Real64 tempmax;
         Real64 tempmin;
-
-        Real64 InternalMoistureSource; // FA
+        Real64 InternalMoistureSource;
 
         int ii;
         int matid;
         int itter;
         int cid;
-        int imsid; // FA
+        int imsid;
         // unused1208    INTEGER :: cid1
         int adj;
         int adjl;
@@ -1273,7 +1262,6 @@ namespace HeatBalanceHAMTManager {
                     interp(Material(matid).ntc, Material(matid).tcwater, Material(matid).tcdata, cells(cid).water, cells(cid).wthermalc);
                 }
 
-                // FA calc Wadds
                 if (cells(cid).imsid > 0) {
                     matid = cells(cid).matid;
                     imsid = cells(cid).imsid;
@@ -1294,8 +1282,6 @@ namespace HeatBalanceHAMTManager {
                 else {
                     cells(cid).Wadds = 0;
                 }
-                // end FA
-
             }
 
             // Calculate Heat and Vapor resistances,
@@ -1475,7 +1461,7 @@ namespace HeatBalanceHAMTManager {
                 // Calculate the RH for the next time step
                 denominator = (phioosum + vpoosum * cells(cid).vpsat + wcap / deltat);
                 if (denominator != 0.0) {
-                    cells(cid).rhp1 = (phiorsum + vporsum + cells(cid).Wadds + (wcap * cells(cid).rh) / deltat) / denominator; // FA add Wadds
+                    cells(cid).rhp1 = (phiorsum + vporsum + cells(cid).Wadds + (wcap * cells(cid).rh) / deltat) / denominator;
                 } else {
                     ShowSevereError("CalcHeatBalHAMT: demoninator in calculating RH is zero.  Check material properties for accuracy.");
                     ShowContinueError("...Problem occurs in Material=\"" + Material(cells(cid).matid).Name + "\".");
@@ -1747,7 +1733,6 @@ namespace HeatBalanceHAMTManager {
         return WVDC;
     }
 
-    // FA Function to compute Satuartion Absolute Humidity
     Real64 SatAbsHum(Real64 const Temperature)
     {
         // FUNCTION INFORMATION:
@@ -1793,12 +1778,10 @@ namespace HeatBalanceHAMTManager {
 
         IdealGasConst = 2.16679;
 
-        // Calculation according to eq(17) from Vaisala: Humidity conversion formulas (2013)
         SatAbsHum = ((IdealGasConst * VPSat) / (Temperature + 273.15)) / 1000;
 
         return SatAbsHum;
     }
-    // End FA
 
     //                                 COPYRIGHT NOTICE
 
