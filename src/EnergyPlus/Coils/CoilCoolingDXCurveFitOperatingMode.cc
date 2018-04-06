@@ -112,8 +112,18 @@ Psychrometrics::PsychState CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode
     thisspeed.CondInletTemp = DataEnvironment::OutDryBulbTemp; // need to move this up and apply logic in DXCoils to find correct cond inlet temp
     thisspeed.ambPressure = inletState.p;
     thisspeed.AirMassFlow = inletState.massFlowRate;
-    if ( fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1 ) thisspeed.AirMassFlow = inletState.massFlowRate / PLR;
-    thisspeed.AirFF = inletState.massFlowRate / thisspeed.RatedAirMassFlowRate;
+    if ( fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1 ) {
+        if ( PLR > 0.0 ) {
+            thisspeed.AirMassFlow = inletState.massFlowRate / PLR;
+        } else {
+            thisspeed.AirMassFlow = 0.0;
+        }
+    }
+    if (thisspeed.RatedAirMassFlowRate > 0.0) {
+        thisspeed.AirFF = inletState.massFlowRate / thisspeed.RatedAirMassFlowRate;
+    } else {
+        thisspeed.AirFF = 0.0;
+    }
 
     auto outSpeed1 = thisspeed.CalcSpeedOutput(inletState, PLR, speedRatio, fanOpMode );
 
