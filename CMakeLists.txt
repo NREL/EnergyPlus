@@ -54,6 +54,7 @@ endif()
 
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
+option( BUILD_ALPINE "Build Alpine" OFF )
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
@@ -157,7 +158,9 @@ option( BUILD_GROUND_PLOT "Build ground plotting library (for Kiva debugging onl
 mark_as_advanced(FORCE BUILD_GROUND_PLOT)
 INCLUDE(third_party/cmake/kiva.cmake)
 
-ADD_SUBDIRECTORY(alpine)
+if( BUILD_ALPINE )
+  ADD_SUBDIRECTORY(alpine)
+endif()
 
 # of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
