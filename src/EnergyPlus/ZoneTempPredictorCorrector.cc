@@ -4143,7 +4143,7 @@ namespace ZoneTempPredictorCorrector {
 	  Real64 TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT;
 
     // Refer to https://bigladdersoftware.com/epx/docs/8-8/engineering-reference/basis-for-the-zone-and-air-system-integration.html#basis-for-the-zone-and-air-system-integration
-    Real64 hdot = TempIndCoef - TempDepCoef;
+    Real64 hdot = TempIndCoef - (TempDepCoef * ZT( ZoneNum ));
 
     return hdot;
   }
