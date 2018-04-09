@@ -4007,36 +4007,25 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-                // WSCO			if ( ! cAlphaArgs( 6 ).empty() ) {
-                // WSCO				if ( TotWinShadingControl > 0 ) {
-                // WSCO					SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( 6 ),
-                // WindowShadingControl, TotWinShadingControl );  WSCO				}  WSCO				if ( SurfaceTmp(
-                // SurfNum
-                // ).WindowShadingControlPtr == 0 ) {
-                // WSCO					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " +
-                // cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );  WSCO					ErrorsFound = true;  WSCO
-                // }
+//WSCO					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
+//WSCO						if ( TotWinShadingControl > 0 ) {
+//WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl, TotWinShadingControl );
+//WSCO						}
+//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
+//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );
+//WSCO							ErrorsFound = true;
+//WSCO						}
+//WSCO
+//WSCO						// Error if this is not an exterior window and shading device has been specified
+//WSCO						// PETER: should doors be disallowed too?
+//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {
+//WSCO
+//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + " because it is not an exterior window." );
+//WSCO							ErrorsFound = true;
+//WSCO						}
+//WSCO					}
 
-                // WSCO				// Error if this is not an exterior window and shading device has been specified
-                // WSCO				// PETER: should doors be disallowed too?
-                // WSCO				if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond !=
-                // ExternalEnvironment ) {
-
-                // WSCO					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " +
-                // cAlphaFieldNames( 6 ) + " because it is not an exterior window." );  WSCO					ErrorsFound = true;
-
-                // WSCO				} else if ( Construct( SurfaceTmp( SurfNum ).Construction ).WindowTypeEQL && SurfaceTmp( SurfNum
-                // ).WindowShadingControlPtr > 0 ) {
-
-                // WSCO					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " +
-                // cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
-                // WSCO					ShowContinueError( ".. equivalent layer window model does not use shading control object." );
-                // WSCO					ShowContinueError( ".. Shading control is set to none or zero, and simulation continues." );
-                // WSCO					SurfaceTmp( SurfNum ).WindowShadingControlPtr = 0;
-                // WSCO					}
-                // WSCO				}
-
-                // WSCO			CheckWindowShadingControlFrameDivider( "GetHTSubSurfaceData", ErrorsFound, SurfNum, 7 );
+                CheckWindowShadingControlFrameDivider( "GetHTSubSurfaceData", ErrorsFound, SurfNum, 7 );
 
                 if (SurfaceTmp(SurfNum).Sides == 3) { // Triangular window
                     if (!cAlphaArgs(6).empty()) {
@@ -4333,22 +4322,23 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
 
-                    // WSCO					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
-                    // WSCO						if ( TotWinShadingControl > 0 ) {
-                    // WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList(
-                    // cAlphaArgs( WindowShadingField
-                    // ), WindowShadingControl, TotWinShadingControl );  WSCO						}  WSCO if ( SurfaceTmp(
-                    // SurfNum ).WindowShadingControlPtr == 0 ) {
-                    // WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid
-                    // "
-                    // + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );  WSCO ErrorsFound = true;  WSCO
-                    // }  WSCO WSCO						// Error if this is not an exterior window and shading device has been
-                    // specified  WSCO						// PETER: should doors be disallowed too?  WSCO
-                    // if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {  WSCO
-                    // WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid
-                    // "
-                    // + cAlphaFieldNames( WindowShadingField ) + " because it is not an exterior window." );  WSCO ErrorsFound = true;  WSCO }  WSCO
-                    // }
+//WSCO					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
+//WSCO						if ( TotWinShadingControl > 0 ) {
+//WSCO							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl, TotWinShadingControl );
+//WSCO						}
+//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
+//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );
+//WSCO							ErrorsFound = true;
+//WSCO						}
+//WSCO
+//WSCO						// Error if this is not an exterior window and shading device has been specified
+//WSCO						// PETER: should doors be disallowed too?
+//WSCO						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr > 0 && SurfaceTmp( SurfNum ).ExtBoundCond != ExternalEnvironment ) {
+//WSCO
+//WSCO							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + " because it is not an exterior window." );
+//WSCO							ErrorsFound = true;
+//WSCO						}
+//WSCO					}
 
                     CheckWindowShadingControlFrameDivider("GetRectSubSurfaces", ErrorsFound, SurfNum, FrameField);
 
