@@ -4139,8 +4139,16 @@ namespace ZoneTempPredictorCorrector {
 
     CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
 
-	  Real64 TempDepCoef = SumHA + SumMCp;
-	  Real64 TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT;
+	  Real64 TempDepCoef = SumHA;// + SumMCp;
+	  Real64 TempIndCoef = SumIntGain + SumHATsurf;// - SumHATref + SumMCpT;
+
+    //std::cout << "SumHA: " << SumHA << std::endl;
+    //std::cout << "SumHA * T: " << SumHA * ZT( ZoneNum ) << std::endl;
+    //std::cout << "SumMCp: " << SumMCp << std::endl;
+    //std::cout << "SumIntGain: " << SumIntGain << std::endl;
+    //std::cout << "SumHATsurf: " << SumHATsurf << std::endl;
+    //std::cout << "SumHATref: " << SumHATref << std::endl;
+    //std::cout << "SumMCpT: " << SumMCpT << std::endl;
 
     // Refer to https://bigladdersoftware.com/epx/docs/8-8/engineering-reference/basis-for-the-zone-and-air-system-integration.html#basis-for-the-zone-and-air-system-integration
     Real64 hdot = TempIndCoef - (TempDepCoef * ZT( ZoneNum ));
