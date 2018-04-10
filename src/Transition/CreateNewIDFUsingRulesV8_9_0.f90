@@ -592,7 +592,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Name
                  OutArgs(2)=TempArgs(3) ! Rated Gross Total Cooling Capacity
                  OutArgs(3)=TempArgs(6) ! Rated Evaporator Air Flow Rate
-                 OutArgs(4)=TempArgs(22) ! Rated Condenser Air Flow Rate
+                 OutArgs(4)=TempArgs(23) ! Rated Condenser Air Flow Rate
                  OutArgs(5)=TempArgs(18) ! Maximum Cycling Rate
                  OutArgs(6)=TempArgs(17) ! Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
                  OutArgs(7)=TempArgs(19) ! Latent Capacity Time Constant
