@@ -4151,7 +4151,7 @@ namespace ZoneTempPredictorCorrector {
     //std::cout << "SumMCpT: " << SumMCpT << std::endl;
 
     // Refer to https://bigladdersoftware.com/epx/docs/8-8/engineering-reference/basis-for-the-zone-and-air-system-integration.html#basis-for-the-zone-and-air-system-integration
-    Real64 hdot = TempIndCoef - (TempDepCoef * ZT( ZoneNum ));
+    Real64 hdot = TempIndCoef - (TempDepCoef * MAT( ZoneNum ));
 
     return hdot;
   }

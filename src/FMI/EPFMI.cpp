@@ -6,6 +6,7 @@
 #include "../EnergyPlus/DataGlobals.hh"
 #include "../EnergyPlus/DataHeatBalFanSys.hh"
 #include "../EnergyPlus/DataHeatBalance.hh"
+#include "../EnergyPlus/DataEnvironment.hh"
 #include <functional>
 #include <map>
 #include <memory>
@@ -47,6 +48,7 @@ void getZoneTemperature(double* temp, int zoneNum) {
 
 void setZoneTemperature(const double* temp, int zoneNum) {
   EnergyPlus::DataHeatBalFanSys::ZT( zoneNum ) = *temp;
+  EnergyPlus::DataHeatBalFanSys::MAT( zoneNum ) = *temp;
 }
 
 void getZoneH(double* h, int zoneNum) {

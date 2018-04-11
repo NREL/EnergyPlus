@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "../EPFMI.hpp"
 #include "test-config.hpp"
+#include "../EnergyPlus/DataEnvironment.hh"
 
 
 TEST( EPFMI, Alpha ) {
@@ -38,7 +39,7 @@ const unsigned int outputValueReferences[] = {
 
   double tStart = 0.0;
   bool stopTimeDefined = true;
-  double tEnd = 86400;
+  double tEnd = 60 * 60 * 24 * 30;
 
   result = setupExperiment(tStart, stopTimeDefined, nullptr);
 
@@ -48,24 +49,38 @@ const unsigned int outputValueReferences[] = {
   double outputs[] = {0.0, 0.0, 0.0, 0.0};
   const unsigned int outputRefs[] = {6, 12, 18, 24};
 
-  double inputs[] = {21.0, 21.0};
+  double atticTemp = 21.0;
+  double inputs[] = {atticTemp, 21.0};
   const unsigned int inputRefs[] = {0, 1};
+
+  double lastTime = tStart;
 
   while ( time < tEnd ) {
     result = getNextEventTime(&eventInfo, nullptr);
-    std::cout << "Current time: " << time << std::endl;
-    std::cout << "Next event time: " << eventInfo.nextEventTime << std::endl;
-
-    result = setVariables(inputRefs, inputs, 2, nullptr);
-
-    result = getVariables(outputRefs, outputs, 4, nullptr); 
-    std::cout << "Output 6 - Attic QConSen_flow: " << outputs[0] << std::endl;
-    std::cout << "Output 12 - Attic Volume: " << outputs[1] << std::endl;
-    std::cout << "Output 18 - Attic AFlo: " << outputs[2] << std::endl;
-    std::cout << "Output 24 - Attic mSenFac: " << outputs[3] << std::endl;
 
     time = eventInfo.nextEventTime;
     setTime(time, nullptr);
+
+    double dt = time - lastTime;
+    lastTime = time;
+
+    inputs[0] = atticTemp;
+    result = setVariables(inputRefs, inputs, 2, nullptr);
+
+    // update atticTemp
+    
+    result = getVariables(outputRefs, outputs, 4, nullptr); 
+    double atticQFlow = outputs[0]; // J/s 
+    double atticVolume = outputs[1]; // m^3
+    double densityAir = 1.276; // kg/m^3
+    double heatCapacity = 1000.6; // J/kgK
+    double tempDot = atticQFlow / ( atticVolume * densityAir * heatCapacity );
+
+    atticTemp = atticTemp + (dt * tempDot);
+
+    std::cout << "Current time: " << time << std::endl;
+	  std::cout << "OutDryBulbTemp: " << EnergyPlus::DataEnvironment::OutDryBulbTemp << std::endl;
+    std::cout << "Attic Temp is: " << atticTemp << std::endl;
   }
 
   terminate(nullptr);
