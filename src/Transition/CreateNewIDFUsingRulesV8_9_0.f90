@@ -635,6 +635,248 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! already written
                  Written = .true.
     
+             CASE('COIL:COOLING:DX:TWOSPEED')
+                 nodiff=.false.
+                 ObjectName='Coil:Cooling:DX'
+                 ! store the date for later
+                 TempArgs=InArgs
+                 TempArgsNum=CurArgs
+
+                 ! write the Coil:Cooling:DX object
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TempArgs(1) ! Name
+                 OutArgs(2)=TempArgs(8) ! Evaporator Inlet Node Name
+                 OutArgs(3)=TempArgs(9) ! Evaporator Outlet Node Name
+                 OutArgs(4)=TempArgs(2) ! Availability Schedule Name
+                 OutArgs(5)=TempArgs(39) ! Condenser Zone Name - Coil:Cooling:DX:VariableSpeed never had this
+                 OutArgs(6)=TempArgs(21) ! Condenser Inlet Node Name
+                 OutArgs(7)=TRIM(TempArgs(1)) // TRIM(' Condenser Outlet Node') ! Condenser Outlet Node Name
+                 OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
+                 OutArgs(9)=TempArgs(31) ! Condensate Collection Water Storage Tank Name
+                 OutArgs(10)=TempArgs(30) ! Evaporative Condenser Supply Water Storage Tank Name
+                 CurArgs=10
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the Performance object
+                 OutArgs=Blank
+                 ObjectName='Coil:Cooling:DX:CurveFit:Performance'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Name
+                 OutArgs(2)='0.0' ! Crankcase Heater Capacity - Coil:Cooling:DX:TwoSpeed never had this
+                 OutArgs(3)=TempArgs(23) ! Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
+                 !OutArgs(4)='' ! Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation - Coil:Cooling:DX:TwoSpeed never had this
+                 !OutArgs(5)=TempArgs(7) ! Unit Internal Static Air Pressure
+                 !OutArgs(6)='' ! Method for Switching Operating Modes - Only defined for Coil:Cooling:DX:TwoStageWithHumidityControl previously
+                 !OutArgs(7)='' ! Operating Mode Number Schedule Name
+                 OutArgs(8)=TempArgs(32) ! Evaporative Condenser Basin Heater Capacity
+                 OutArgs(9)=TempArgs(33) ! Evaporative Condenser Basin Heater Setpoint Temperature
+                 OutArgs(10)=TempArgs(34) ! Evaporative Condenser Basin Heater Operating Schedule Name
+                 OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                 CurArgs=11
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the Operating Mode object
+                 OutArgs=Blank
+                 ObjectName='Coil:Cooling:DX:CurveFit:OperatingMode'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Name
+                 OutArgs(2)=TempArgs(3) ! Rated Gross Total Cooling Capacity
+                 OutArgs(3)=TempArgs(6) ! Rated Evaporator Air Flow Rate
+                 !OutArgs(4)=TempArgs(25) ! Rated Condenser Air Flow Rate
+                 !OutArgs(5)='' ! Maximum Cycling Rate - Coil:Cooling:DX:TwoSpeed never had this
+                 !OutArgs(6)='' ! Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity - Coil:Cooling:DX:TwoSpeed never had this
+                 !OutArgs(7)='' ! Latent Capacity Time Constant - Coil:Cooling:DX:TwoSpeed never had this
+                 !OutArgs(8)='' ! Nominal Time for Condensate Removal to Begin - Coil:Cooling:DX:TwoSpeed never had this
+                 !OutArgs(9)='' ! Apply Latent Degradation to Speeds Greater than 1 - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 OutArgs(10)=TempArgs(22) ! Condenser Type
+                 OutArgs(11)=TempArgs(26) ! Nominal Evaporative Condenser Pump Power
+                 OutArgs(12)='MultiSpeed' ! Capacity Control Method
+
+                 ErrFlag=.false.
+                 NumberOfSpeeds=2
+
+                 OutArgs(13)='2' ! Nominal Speed Number
+                 ! Save starting position of nominal speed values for scaling later
+                 ErrFlag=.false.
+                 DXNomSpeedStartArgNum = 24
+
+                 CurArgs=13
+                 DO SpeedNum=1,NumberOfSpeeds 
+                   CurArgs=CurArgs+1
+                   SpeedNumChar=RoundSigDigits(SpeedNum,0)
+                   OutArgs(CurArgs)=TRIM(TempArgs(1)) // ' Speed ' // TRIM(SpeedNumChar) //' Performance' ! Speed n Name
+                 ENDDO
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the Speed 1 Performance object
+                 OutArgs=Blank
+                 ObjectName='Coil:Cooling:DX:CurveFit:Speed'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // ' Speed 1 Performance' ! Name
+                 OutArgs(2)='1.0' ! Gross Total Cooling Capacity Fraction
+                 OutArgs(3)='1.0' ! Evaporator Air Flow Rate Fraction
+                 OutArgs(4)='1.0' ! Condenser Air Flow Rate Fraction
+                 OutArgs(5)=TempArgs(4) ! Gross Sensible Heat Ratio
+                 OutArgs(6)=TempArgs(5) ! Gross Cooling COP
+                 OutArgs(7)='1.0' ! Active Fraction of Coil Face Area
+                 !OutArgs(8)='' ! Rated Evaporator Fan Power Per Volume Flow Rate - Coil:Cooling:DX:TwoSpeed never had this
+                 OutArgs(9)='1.0' ! Evaporative Condenser Pump Power Fraction
+                 OutArgs(10)=TempArgs(24) ! Evaporative Condenser Effectiveness
+                 OutArgs(11)=TempArgs(10) ! Total Cooling Capacity Function of Temperature Curve Name
+                 OutArgs(12)=TempArgs(11) ! Total Cooling Capacity Function of Air Flow Fraction Curve Name
+                 OutArgs(13)=TempArgs(12) ! Energy Input Ratio Function of Temperature Curve Name
+                 OutArgs(14)=TempArgs(13) ! Energy Input Ratio Function of Air Flow Fraction Curve Name
+                 OutArgs(15)=TempArgs(14) ! Part Load Fraction Correlation Curve Name
+                 !OutArgs(16)='' ! Rated Waste Heat Fraction of Power Input - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 !OutArgs(17)='' ! Waste Heat Function of Temperature Curve Name - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 OutArgs(18)=TempArgs(35) ! Sensible Heat Ratio Modifier Function of Temperature Curve Name
+                 OutArgs(19)=TempArgs(36) ! Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+                 CurArgs=19
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! write the Speed 2 Performance objects
+                 OutArgs=Blank
+                 ObjectName='Coil:Cooling:DX:CurveFit:Speed'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1)=TRIM(TempArgs(1)) // ' Speed 2 Performance' ! Name
+
+                 ! Capacity is scaled by the capacity at high speed - but only if it's not autosized
+                 ErrFlag=.false.
+                 IF (SameString(TempArgs(3), 'AUTOSIZE') .OR. SameString(TempArgs(15), 'AUTOSIZE')) THEN
+                   ! If the high or low speed capacity is autosized then use old default ratio of 0.3333 for low speed fraction
+                   OutArgs(2)='0.3333' ! Gross Total Cooling Capacity Fraction
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                     'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
+                     ' Low Speed Gross Rated Total Cooling Capacity='//trim(TempArgs(15))//' was replaced with default sizing fraction.'//  &
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Gross Total Cooling Capacity Fraction = 0.3333.')
+                 ELSE
+                   DXTempValue1 = ProcessNumber(TempArgs(15),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(15))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   ErrFlag=.false.
+                   DXTempValue2 = ProcessNumber(TempArgs(3),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(3))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   IF ((DXTempValue1 .GT. 0.0) .AND. (DXTempValue2 .GT. 0.0)) THEN
+                     DXRatio = DXTempValue1/DXTempValue2
+                     OutArgs(2)=RoundSigDigits(DXRatio,4) ! Gross Total Cooling Capacity Fraction
+                   ELSE
+                     OutArgs(2)='' ! Gross Total Cooling Capacity Fraction
+                   ENDIF
+                 ENDIF
+
+                 ! Evaporator air flow is scaled by the flow at high speed - but only if it's not autosized
+                 ErrFlag=.false.
+                 IF (SameString(TempArgs(6), 'AUTOSIZE') .OR. SameString(TempArgs(18), 'AUTOSIZE')) THEN
+                   ! If the high or low speed air flow is autosized then use old default ratio of 0.3333 for low speed fraction
+                   OutArgs(3)='0.3333' ! Evaporator Air Flow Rate Fraction
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                     'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
+                     ' Low Speed Gross Rated Air Flow Rate='//trim(TempArgs(18))//' was replaced with default sizing fraction.'//  &
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Evaporator Air Flow Rate Fraction = 0.3333.')
+                 ELSE
+                   DXTempValue1 = ProcessNumber(TempArgs(18),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(18))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   ErrFlag=.false.
+                   DXTempValue2 = ProcessNumber(TempArgs(6),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(6))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   IF ((DXTempValue1 .GT. 0.0) .AND. (DXTempValue2 .GT. 0.0)) THEN
+                     DXRatio = DXTempValue1/DXTempValue2
+                     OutArgs(3)=RoundSigDigits(DXRatio,4) ! Evaporator Air Flow Rate Fraction
+                   ELSE
+                     OutArgs(3)='' ! Evaporator Air Flow Rate Fraction
+                   ENDIF
+                   ENDIF
+                 
+                 ! Condenser air flow is scaled by the flow at high speed
+                 ErrFlag=.false.
+                 IF (SameString(TempArgs(25), 'AUTOSIZE') .OR. SameString(TempArgs(28), 'AUTOSIZE')) THEN
+                   ! If the high or low speed air flow is autosized then use old default ratio of 0.3333 for low speed fraction
+                   OutArgs(4)='0.3333' ! Evaporator Air Flow Rate Fraction
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                     'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
+                     ' Low Speed Evaporative Condenser Air Flow Rate='//trim(TempArgs(28))//' was replaced with default sizing fraction.'//  &
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Air Flow Rate Fraction = 0.3333.')
+                 ELSE
+                   DXTempValue1 = ProcessNumber(TempArgs(28),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(28))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   ErrFlag=.false.
+                   DXTempValue2 = ProcessNumber(TempArgs(25),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(25))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   IF ((DXTempValue1 .GT. 0.0) .AND. (DXTempValue2 .GT. 0.0)) THEN
+                     DXRatio = DXTempValue1/DXTempValue2
+                     OutArgs(4)=RoundSigDigits(DXRatio,4) ! Condenser Air Flow Rate Fraction
+                   ELSE
+                     OutArgs(4)='' ! Condenser Air Flow Rate Fraction
+                   ENDIF
+                 ENDIF
+
+                 OutArgs(5)=TempArgs(16) ! Gross Sensible Heat Ratio
+                 OutArgs(6)=TempArgs(17) ! Gross Cooling COP
+                 OutArgs(7)='1.0' ! Active Fraction of Coil Face Area
+                 !OutArgs(8)='' ! Rated Evaporator Fan Power Per Volume Flow Rate - Coil:Cooling:DX:TwoSpeed never had this
+
+                 ! Evaporative Condenser Pump Power is scaled by the power at high speed
+                 ErrFlag=.false.
+                 IF (SameString(TempArgs(26), 'AUTOSIZE') .OR. SameString(TempArgs(29), 'AUTOSIZE')) THEN
+                   ! If the high or low speed air flow is autosized then use old default ratio of 0.3333 for low speed fraction
+                   OutArgs(9)='0.3333' ! Evaporator Air Flow Rate Fraction
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                     'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
+                     ' Low Speed Evaporative Condenser Air Flow Rate='//trim(TempArgs(29))//' was replaced with default sizing fraction.'//  &
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Pump Power Fraction = 0.3333.')
+                 ELSE
+                   DXTempValue1 = ProcessNumber(TempArgs(29),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(29))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   ErrFlag=.false.
+                   DXTempValue2 = ProcessNumber(TempArgs(26),ErrFlag)
+                   IF (ErrFlag) THEN
+                     CALL ShowSevereError('Invalid Number, Coil:Cooling:DX:TwoSpeed field, ['//  &
+                        trim(TempArgs(26))//'], Name='//TRIM(TempArgs(1)),Auditf)
+                   ENDIF
+                   IF ((DXTempValue1 .GT. 0.0) .AND. (DXTempValue2 .GT. 0.0)) THEN
+                     DXRatio = DXTempValue1/DXTempValue2
+                     OutArgs(9)=RoundSigDigits(DXRatio,4) ! Condenser Air Flow Rate Fraction
+                   ELSE
+                     OutArgs(9)='' ! Evaporative Condenser Pump Power Fraction
+                   ENDIF
+                 ENDIF
+
+                 OutArgs(10)=TempArgs(27) ! Evaporative Condenser Effectiveness
+                 OutArgs(11)=TempArgs(19) ! Total Cooling Capacity Function of Temperature Curve Name
+                 OutArgs(12)=TempArgs(11) ! Total Cooling Capacity Function of Air Flow Fraction Curve Name - use the High Speed Curve here?
+                 OutArgs(13)=TempArgs(20) ! Energy Input Ratio Function of Temperature Curve Name
+                 OutArgs(14)=TempArgs(13) ! Energy Input Ratio Function of Air Flow Fraction Curve Name - use the High Speed Curve here?
+                 OutArgs(15)=TempArgs(14) ! Part Load Fraction Correlation Curve Name - Coil:Cooling:DX:VariableSpeed just had one, use it for every speed
+                 !OutArgs(16)='' ! Rated Waste Heat Fraction of Power Input - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 !OutArgs(17)='' ! Waste Heat Function of Temperature Curve Name - Only defined for Coil:Cooling:DX:MultiSpeed previously
+                 OutArgs(18)=TempArgs(37) ! Sensible Heat Ratio Modifier Function of Temperature Curve Name
+                 OutArgs(19)=TempArgs(38) ! Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+                 CurArgs=19
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+
+                 ! already written
+                 Written = .true.
+    
              CASE('COIL:COOLING:DX:VARIABLESPEED')
                  nodiff=.false.
                  ObjectName='Coil:Cooling:DX'
