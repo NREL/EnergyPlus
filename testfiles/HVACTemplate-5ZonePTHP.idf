@@ -1782,7 +1782,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   Schedule:Constant,Always1,Any Number,1.0;
 
@@ -1835,7 +1836,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTHP,
     SPACE3-1,                !- Zone Name
@@ -1886,7 +1888,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTHP,
     SPACE4-1,                !- Zone Name
@@ -1937,7 +1940,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTHP,
     SPACE5-1,                !- Zone Name
@@ -1988,7 +1992,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 

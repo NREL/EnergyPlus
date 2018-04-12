@@ -1772,7 +1772,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   Schedule:Constant,Always1,,1.0;
 
@@ -1815,7 +1816,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTAC,
     SPACE3-1,                !- Zone Name
@@ -1856,7 +1858,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTAC,
     SPACE4-1,                !- Zone Name
@@ -1897,7 +1900,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Zone:PTAC,
     SPACE5-1,                !- Zone Name
@@ -1938,7 +1942,8 @@
     ,                        !- Design Specification Zone Air Distribution Object Name
     ,                        !- Baseboard Heating Type
     ,                        !- Baseboard Heating Availability Schedule Name
-    ;                        !- Baseboard Heating Capacity {W}
+    ,                        !- Baseboard Heating Capacity {W}
+    None;                    !- Capacity Control Method
 
   HVACTemplate:Plant:HotWaterLoop,
     Hot Water Loop,          !- Name
