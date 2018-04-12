@@ -43717,9 +43717,21 @@ Coil:Cooling:DX,
    A9, \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  A10; \field Evaporative Condenser Supply Water Storage Tank Name
+  A10, \field Evaporative Condenser Supply Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
+  A11; \field Fuel Type
+       \type choice
+       \key Electricity
+       \key NaturalGas
+       \key Propane
+       \key Diesel
+       \key Gasoline
+       \key FuelOil#1
+       \key FuelOil#2
+       \key OtherFuel1
+       \key OtherFuel2
+       \default Electricity
 
 Coil:Cooling:DX:CurveFit:Performance,
        \memo DX cooling coil performance specification referencing one or more
