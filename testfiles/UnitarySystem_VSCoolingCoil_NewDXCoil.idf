@@ -1666,6 +1666,7 @@ Coil:Cooling:DX:CurveFit:Performance,
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
     NewDXCoilOperatingMode;  !- Operating Mode 1 Name
 
 Coil:Cooling:DX:CurveFit:OperatingMode,

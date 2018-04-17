@@ -565,8 +565,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                  OutArgs(9)=TempArgs(28) ! Condensate Collection Water Storage Tank Name
                  OutArgs(10)=TempArgs(27) ! Evaporative Condenser Supply Water Storage Tank Name
-                 OutArgs(11)='Electricity' ! Fuel Type
-                 CurArgs=11
+                 CurArgs=10
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Performance object
@@ -583,8 +582,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TempArgs(29) ! Evaporative Condenser Basin Heater Capacity
                  OutArgs(9)=TempArgs(30) ! Evaporative Condenser Basin Heater Setpoint Temperature
                  OutArgs(10)=TempArgs(31) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                 OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                 CurArgs=11
+                 OutArgs(11)='Electricity' ! Compressor Fuel Type
+                 OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                 CurArgs=12
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Operating Mode object
@@ -656,8 +656,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                  OutArgs(9)=TempArgs(31) ! Condensate Collection Water Storage Tank Name
                  OutArgs(10)=TempArgs(30) ! Evaporative Condenser Supply Water Storage Tank Name
-                 OutArgs(11)='Electricity' ! Fuel Type
-                 CurArgs=11
+                 CurArgs=10
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Performance object
@@ -674,8 +673,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TempArgs(32) ! Evaporative Condenser Basin Heater Capacity
                  OutArgs(9)=TempArgs(33) ! Evaporative Condenser Basin Heater Setpoint Temperature
                  OutArgs(10)=TempArgs(34) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                 OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                 CurArgs=11
+                 OutArgs(11)='Electricity' ! Compressor Fuel Type
+                 OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                 CurArgs=12
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Operating Mode object
@@ -899,8 +899,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                  OutArgs(9)=TempArgs(9) ! Condensate Collection Water Storage Tank Name
                  OutArgs(10)=TempArgs(8) ! Evaporative Condenser Supply Water Storage Tank Name
-                 OutArgs(11)=TempArgs(17) ! Fuel Type
-                 CurArgs=11
+                 CurArgs=10
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Performance object
@@ -917,8 +916,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TempArgs(14) ! Evaporative Condenser Basin Heater Capacity
                  OutArgs(9)=TempArgs(15) ! Evaporative Condenser Basin Heater Setpoint Temperature
                  OutArgs(10)=TempArgs(16) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                 OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                 CurArgs=11
+                 OutArgs(11)=TempArgs(17) ! Compressor Fuel Type
+                 OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                 CurArgs=12
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Operating Mode object
@@ -1137,8 +1137,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TRIM(TempArgs(1)) // TRIM(' Performance') ! Performance Object Name
                  OutArgs(9)=TempArgs(18) ! Condensate Collection Water Storage Tank Name
                  OutArgs(10)=TempArgs(17) ! Evaporative Condenser Supply Water Storage Tank Name
-                 OutArgs(11)='Electricity' ! Fuel Type
-                 CurArgs=11
+                 CurArgs=10
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Performance object
@@ -1155,8 +1154,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(8)=TempArgs(19) ! Evaporative Condenser Basin Heater Capacity
                  OutArgs(9)=TempArgs(20) ! Evaporative Condenser Basin Heater Setpoint Temperature
                  OutArgs(10)=TempArgs(21) ! Evaporative Condenser Basin Heater Operating Schedule Name
-                 OutArgs(11)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
-                 CurArgs=11
+                 OutArgs(11)='Electricity' ! Compressor Fuel Type
+                 OutArgs(12)=TRIM(TempArgs(1)) // TRIM(' Operating Mode') ! Operating Mode 1 Name
+                 CurArgs=12
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                  ! write the Operating Mode object

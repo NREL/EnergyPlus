@@ -24,7 +24,8 @@ namespace EnergyPlus {
 		Real64 basin_heater_capacity;
 		Real64 basin_heater_setpoint_temperature;
 		std::string basin_heater_operating_shedule_name;
-		std::vector<std::string> operating_modes;
+        std::string compressor_fuel_type;
+        std::vector<std::string> operating_modes;
 
 	};
 

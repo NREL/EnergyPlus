@@ -43717,21 +43717,9 @@ Coil:Cooling:DX,
    A9, \field Condensate Collection Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  A10, \field Evaporative Condenser Supply Water Storage Tank Name
+  A10; \field Evaporative Condenser Supply Water Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  A11; \field Fuel Type
-       \type choice
-       \key Electricity
-       \key NaturalGas
-       \key Propane
-       \key Diesel
-       \key Gasoline
-       \key FuelOil#1
-       \key FuelOil#2
-       \key OtherFuel1
-       \key OtherFuel2
-       \default Electricity
 
 Coil:Cooling:DX:CurveFit:Performance,
        \memo DX cooling coil performance specification referencing one or more
@@ -43802,36 +43790,48 @@ Coil:Cooling:DX:CurveFit:Performance,
        \note throughout the entire simulation.
        \type object-list
        \object-list ScheduleNames
-   A5, \field Operating Mode 1 Name
+   A5, \field Compressor Fuel Type
+       \type choice
+       \key Electricity
+       \key NaturalGas
+       \key Propane
+       \key Diesel
+       \key Gasoline
+       \key FuelOil#1
+       \key FuelOil#2
+       \key OtherFuel1
+       \key OtherFuel2
+       \default Electricity
+   A6, \field Operating Mode 1 Name
        \note Operating Mode 1 is always used as the base design operating mode.
        \required-field
        \type object-list
        \object-list DXCoolingOperatingModeNames
-   A6, \field Operating Mode 2 Name
+   A7, \field Operating Mode 2 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-   A7, \field Operating Mode 3 Name
+   A8, \field Operating Mode 3 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-   A8, \field Operating Mode 4 Name
+   A9, \field Operating Mode 4 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-   A9, \field Operating Mode 5 Name
+  A10, \field Operating Mode 5 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A10, \field Operating Mode 6 Name
+  A11, \field Operating Mode 6 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A11, \field Operating Mode 7 Name
+  A12, \field Operating Mode 7 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A12, \field Operating Mode 8 Name
+  A13, \field Operating Mode 8 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A13, \field Operating Mode 9 Name
+  A14, \field Operating Mode 9 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
-  A14; \field Operating Mode 10 Name
+  A15; \field Operating Mode 10 Name
        \type object-list
        \object-list DXCoolingOperatingModeNames
 

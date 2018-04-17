@@ -47,7 +47,8 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(std::string n
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
         input_specs.basin_heater_operating_shedule_name = cAlphaArgs(4);
-        for(int fieldNum=5; fieldNum<=NumAlphas; fieldNum++) {
+        input_specs.compressor_fuel_type = cAlphaArgs(5);
+        for(int fieldNum=6; fieldNum<=NumAlphas; fieldNum++) {
             if(cAlphaArgs(fieldNum) == "") {
                 break;
             }

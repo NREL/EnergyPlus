@@ -2847,6 +2847,7 @@
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
     Sys 1 Furnace DX Cool Cooling Coil Operating Mode;  !- Operating Mode 1 Name
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
@@ -3225,6 +3226,7 @@
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
     Sys 2 Furnace DX Cool Cooling Coil Operating Mode;  !- Operating Mode 1 Name
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
@@ -3590,6 +3592,7 @@
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
     Sys 3 Heat Pump Air Source Cooling Coil Operating Mode;  !- Operating Mode 1 Name
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
@@ -4036,6 +4039,7 @@
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
     Sys 4 Heat Pump Air Source Cooling Coil Operating Mode;  !- Operating Mode 1 Name
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
@@ -4482,6 +4486,7 @@
     ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
+    Electricity,             !- Compressor Fuel Type
     Sys 5 Furnace DX Cool Cooling Coil Operating Mode;  !- Operating Mode 1 Name
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
