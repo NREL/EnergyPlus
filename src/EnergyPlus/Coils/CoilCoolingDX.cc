@@ -29,12 +29,12 @@ void CoilCoolingDX::instantiateFromInputSpec(CoilCoolingDXInputSpecification inp
     this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_inlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.evaporator_outlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
     if ( input_data.condenser_inlet_node_name != "" ) {
-        this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.condenser_inlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
+        this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.condenser_inlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 2, DataLoopNode::ObjectIsNotParent );
     } else {
         this->condInletNodeIndex = 0;
     }
     if ( input_data.condenser_outlet_node_name != "" ) {
-        this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.condenser_outlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+        this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode( input_data.condenser_outlet_node_name, errorsFound, this->object_name, input_data.name, DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 2, DataLoopNode::ObjectIsNotParent );
     } else {
         this->condOutletNodeIndex = 0;
     }
