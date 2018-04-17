@@ -17,7 +17,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(
     //bool errorsFound = false;
     this->name = input_data.name;
     for(auto & speed_name : input_data.speed_data_names) {
-        this->speeds.emplace_back(speed_name, this);
+        this->speeds.emplace_back(speed_name);
     }
 }
 
@@ -81,6 +81,11 @@ void CoilCoolingDXCurveFitOperatingMode::sizeOperatingMode() {
     std::string CompType = this->object_name;
     std::string CompName = this->name;
     bool PrintFlag = true;
+
+    // Set speed objects parent pointer (this is kind of a test - probably needs to be a separate init function)
+    for (auto & curSpeed : this->speeds) {
+        curSpeed.parentMode = this;
+    }
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
     std::string SizingString = "Rated Evaporator Air Flow Rate";

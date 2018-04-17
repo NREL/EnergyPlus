@@ -15,9 +15,9 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFitSpeedInputSpecification input_data, CoilCoolingDXCurveFitOperatingMode * _parentMode ) {
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFitSpeedInputSpecification input_data ) {
     this->original_input_specs = input_data;
-    this->parentMode = _parentMode;
+    //this->parentMode = _parentMode;
 //	this->mySizeFlag = true; // set up flag for sizing
     //bool errorsFound = false;
     this->name = input_data.name;
@@ -52,7 +52,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec( CoilCoolingDXCurveFit
 
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find, CoilCoolingDXCurveFitOperatingMode * parentMode):
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find):
 
 	// model inputs
 	TotalCapacity( 0.0 ),
@@ -141,7 +141,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(std::string name_to_find,
         input_specs.sensible_heat_ratio_modifier_function_of_temperature_curve_name = cAlphaArgs(8);
         input_specs.sensible_heat_ratio_modifier_function_of_flow_fraction_curve_name = cAlphaArgs(9);
 
-		this->instantiateFromInputSpec(input_specs, parentMode);
+		this->instantiateFromInputSpec(input_specs);
     }
 
     if (!found_it) {

@@ -41,10 +41,9 @@ namespace EnergyPlus {
     public:
         CoilCoolingDXCurveFitSpeed() {}
 
-        CoilCoolingDXCurveFitSpeed(std::string name, CoilCoolingDXCurveFitOperatingMode * parentMode);
+        CoilCoolingDXCurveFitSpeed(std::string name);
 
-        void instantiateFromInputSpec(CoilCoolingDXCurveFitSpeedInputSpecification input_data,
-                                      CoilCoolingDXCurveFitOperatingMode * parentMode);
+        void instantiateFromInputSpec(CoilCoolingDXCurveFitSpeedInputSpecification input_data);
 
         CoilCoolingDXCurveFitSpeedInputSpecification original_input_specs;
         CoilCoolingDXCurveFitOperatingMode * parentMode;
