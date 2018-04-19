@@ -4828,10 +4828,11 @@ namespace ZoneEquipmentManager {
                     } else if (!DataGlobals::DoingSizing && !DataGlobals::isPulseZoneSizing) {
                         if (thisZoneEquip.NumReturnFlowBasisNodes > 0) {
                             // Set base return air flow rate for node 1 using basis node flow rates
+                            Real64 basisNodesMassFlow = 0.0;
                             for (int nodeNum = 1; nodeNum <= thisZoneEquip.NumReturnFlowBasisNodes; ++nodeNum) {
-                                returnNodeMassFlow += DataLoopNode::Node(thisZoneEquip.ReturnFlowBasisNode(nodeNum)).MassFlowRate;
+                                basisNodesMassFlow += DataLoopNode::Node(thisZoneEquip.ReturnFlowBasisNode(nodeNum)).MassFlowRate;
                             }
-                            returnNodeMassFlow = max(0.0, (returnNodeMassFlow * returnSchedFrac));
+                            returnNodeMassFlow = max(0.0, (basisNodesMassFlow * returnSchedFrac));
                             fixedReturn(returnNum) = true;
                         } else {
                             // If only 1 return node, use the standard return mass flow
