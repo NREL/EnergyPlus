@@ -148,6 +148,8 @@ namespace Boilers {
 
             void getSizingFactor(Real64 &SizingFactor) override;
 
+            void SizeBoiler();
+
             // public getters/setters
             Real64 getDesignNominalCapacity();
             Real64 getDesignVolumeFlowRate();
@@ -219,8 +221,6 @@ namespace Boilers {
             static void GetBoilerInput();
 
             void InitBoiler(); // number of the current boiler being simulated
-
-            void SizeBoiler();
 
             void CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
                                  bool const RunFlag,     // TRUE if boiler operating
