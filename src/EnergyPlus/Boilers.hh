@@ -80,6 +80,12 @@ namespace Boilers {
 	};
 
     // water temperature evaluation method
+	enum class TemperatureEvaluationMode {
+		NotSet,
+		Entering,
+		Leaving,
+		default=NotSet,
+	};
     extern int const BoilerTempModeNotSet;
     extern int const EnteringBoilerTemp;
     extern int const LeavingBoilerTemp;
@@ -140,7 +146,7 @@ namespace Boilers {
         Real64 MaxPartLoadRat;        // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat;        // Optimal operating part load ratio
         Real64 OperPartLoadRat;       // Actual operating part load ratio
-        int CurveTempMode;            // water temp to use in curve, switch between entering and leaving
+        TemperatureEvaluationMode CurveTempMode;      // water temp to use in curve, switch between entering and leaving
         int EfficiencyCurvePtr;       // Index to efficiency curve
         EfficiencyCurveType EfficiencyCurveType;      // Type of efficiency curve
         Real64 TempUpLimitBoilerOut;  // C - Boiler outlet maximum temperature limit
@@ -162,7 +168,7 @@ namespace Boilers {
               NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowMode::default), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
-              CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
+              CurveTempMode(TemperatureEvaluationMode::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
               EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
               FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0)
         {
