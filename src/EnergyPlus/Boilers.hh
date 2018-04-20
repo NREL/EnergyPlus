@@ -178,13 +178,13 @@ namespace Boilers {
 
         // Default Constructor
         BoilerSpecs()
-            : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), /*Available(false), ON(false),*/ NomCap(0.0),
+            : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), NomCap(0.0),
               NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
-              ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), /*MassFlowRate(0.0),*/ SizFac(0.0),
-              BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), /*OperPartLoadRat(0.0),*/
+              ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), SizFac(0.0),
+              BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
               CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
               TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
-              CalculatedEffIndex(0), /*IsThisSized(false),*/ FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
+              CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
               FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars()),
               BoilerLoad(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
         {
