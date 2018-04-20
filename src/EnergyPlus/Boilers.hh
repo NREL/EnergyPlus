@@ -154,7 +154,7 @@ namespace Boilers {
             Real64 designMaxPartLoadRatio_;        // Maximum allowed operating part load ratio
             Real64 designOptimalPartLoadRatio_;        // Optimal operating part load ratio
             TemperatureEvaluationModeType CurveTempMode;      // water temp to use in curve, switch between entering and leaving
-            int EfficiencyCurvePtr;       // Index to efficiency curve
+            int curveEfficiencyIndex_;       // Index to efficiency curve
             EfficiencyCurveType EfficiencyCurveType;      // Type of efficiency curve
             Real64 designOutletTemperatureLimit_;  // C - Boiler outlet maximum temperature limit
             Real64 designParasiticElectricalLoad_;     // W - Parasitic electric power (e.g. forced draft fan)
@@ -183,7 +183,7 @@ namespace Boilers {
                   designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
                   ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), designSizingFactor_(0.0),
                   nodeHotWaterInletIndex_(0), nodeHotWaterOutletIndex_(0), designMinPartLoadRatio_(0.0), designMaxPartLoadRatio_(0.0), designOptimalPartLoadRatio_(0.0),
-                  CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
+                  CurveTempMode(TemperatureEvaluationModeType::default), curveEfficiencyIndex_(0), EfficiencyCurveType(EfficiencyCurveType::default),
                   designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
                   CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
                   FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars()),

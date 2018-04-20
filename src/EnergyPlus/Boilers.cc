@@ -289,10 +289,10 @@ namespace Boilers {
                 }
             }
 
-            boiler.EfficiencyCurvePtr = GetCurveIndex(cAlphaArgs(4));
-            if (boiler.EfficiencyCurvePtr > 0) {
+            boiler.curveEfficiencyIndex_ = GetCurveIndex(cAlphaArgs(4));
+            if (boiler.curveEfficiencyIndex_ > 0) {
                 {
-                    auto const SELECT_CASE_var(GetCurveType(boiler.EfficiencyCurvePtr));
+                    auto const SELECT_CASE_var(GetCurveType(boiler.curveEfficiencyIndex_));
                     if (SELECT_CASE_var == "LINEAR") {
                         boiler.EfficiencyCurveType = EfficiencyCurveType::Linear;
                     } else if (SELECT_CASE_var == "QUADRATIC") {
@@ -308,7 +308,7 @@ namespace Boilers {
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                        ShowContinueError("...Curve type for " + cAlphaFieldNames(4) + "  = " + GetCurveType(boiler.EfficiencyCurvePtr));
+                        ShowContinueError("...Curve type for " + cAlphaFieldNames(4) + "  = " + GetCurveType(boiler.curveEfficiencyIndex_));
                         ErrorsFound = true;
                     }
                 }
@@ -325,13 +325,13 @@ namespace Boilers {
                     if (!lAlphaFieldBlanks(3)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) + " must specify " +
+                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.curveEfficiencyIndex_) + " must specify " +
                                             cAlphaFieldNames(3));
                         ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Field " + cAlphaFieldNames(3) + " is blank");
-                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) +
+                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.curveEfficiencyIndex_) +
                                             " must specify either EnteringBoiler or LeavingBoiler");
                     }
                     ErrorsFound = true;
@@ -900,16 +900,16 @@ namespace Boilers {
         TheorFuelUse = BoilerLoad / BoilerEff;
 
         // calculate normalized efficiency based on curve object type
-        if (EfficiencyCurvePtr > 0) {
+        if (curveEfficiencyIndex_ > 0) {
             if (hasTwoVariableEfficiencyCurve()) {
                 if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
-                    EffCurveOutput = CurveValue(EfficiencyCurvePtr, OperPLR, Node(BoilerInletNode).Temp);
+                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR, Node(BoilerInletNode).Temp);
                 } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
-                    EffCurveOutput = CurveValue(EfficiencyCurvePtr, OperPLR, BoilerOutletTemp);
+                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR, BoilerOutletTemp);
                 }
 
             } else {
-                EffCurveOutput = CurveValue(EfficiencyCurvePtr, OperPLR);
+                EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR);
             }
         } else {
             EffCurveOutput = 1.0;
@@ -945,7 +945,7 @@ namespace Boilers {
 
         // warn if overall efficiency greater than 1.1
         if (!WarmupFlag && EffCurveOutput * BoilerEff > 1.1) {
-            if (BoilerLoad > 0.0 && EfficiencyCurvePtr > 0) {
+            if (BoilerLoad > 0.0 && curveEfficiencyIndex_ > 0) {
                 if (CalculatedEffError < 1) {
                     ++CalculatedEffError;
                     ShowWarningError("Boiler:HotWater \"" + Name + "\"");
