@@ -131,6 +131,13 @@ namespace Boilers {
         // Members
         public:
             std::string Name;             // user identifier
+            
+            // Operational fault parameters
+            bool FaultyBoilerFoulingFlag;     // True if the boiler has fouling fault
+            int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
+            Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
+
+        private:
             int FuelType;                 // resource type assignment
             int TypeNum;                  // plant loop type identifier
             int LoopNum;                  // plant loop connection
@@ -162,10 +169,6 @@ namespace Boilers {
             int EffCurveOutputIndex;      // efficiency curve output <=0 recurring warning error message index
             int CalculatedEffError;       // calculated efficiency >1.1 recurring warning error counter
             int CalculatedEffIndex;       // calculated efficiency >1.1 recurring warning error message index
-            // Operational fault parameters
-            bool FaultyBoilerFoulingFlag;     // True if the boiler has fouling fault
-            int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
-            Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
             std::string EndUseSubcategory;    // identifier use for the end use subcategory
             bool doOneTimeInitialisation;     // do the one time initialisation, i.e. locate on plantloops etc.
             bool doEnvironmentInitialisation; // do the environment initialisation, i.e. get inlet conditions etc.
