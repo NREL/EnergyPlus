@@ -80,7 +80,7 @@ namespace Boilers {
     };
 
     // water temperature evaluation method
-    enum class TemperatureEvaluationMode {
+    enum class TemperatureEvaluationModeType {
         NotSet,
         Entering,
         Leaving,
@@ -88,7 +88,7 @@ namespace Boilers {
     };
 
     // Boiler flow modes
-    enum class FlowMode {
+    enum class FlowModeType {
         NotSet,
         Constant,
         NotModulated,
@@ -129,7 +129,7 @@ namespace Boilers {
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
         Real64 Effic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        FlowMode FlowMode;                 // one of 3 modes for componet flow during operation
+        FlowModeType FlowMode;                 // one of 3 modes for componet flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;    // true if setpoint warning issued
         Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
@@ -143,7 +143,7 @@ namespace Boilers {
         Real64 MaxPartLoadRat;        // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat;        // Optimal operating part load ratio
         Real64 OperPartLoadRat;       // Actual operating part load ratio
-        TemperatureEvaluationMode CurveTempMode;      // water temp to use in curve, switch between entering and leaving
+        TemperatureEvaluationModeType CurveTempMode;      // water temp to use in curve, switch between entering and leaving
         int EfficiencyCurvePtr;       // Index to efficiency curve
         EfficiencyCurveType EfficiencyCurveType;      // Type of efficiency curve
         Real64 TempUpLimitBoilerOut;  // C - Boiler outlet maximum temperature limit

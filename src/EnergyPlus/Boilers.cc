@@ -154,7 +154,9 @@ namespace Boilers {
     {}
 
     void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
-    {}
+    {
+        InitBoiler();
+    }
 
     void clear_state()
     {
@@ -400,11 +402,11 @@ namespace Boilers {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
 
                 if (SELECT_CASE_var == "ENTERINGBOILER") {
-                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationMode::Entering;
+                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationModeType::Entering;
                 } else if (SELECT_CASE_var == "LEAVINGBOILER") {
-                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationMode::Leaving;
+                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationModeType::Leaving;
                 } else {
-                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationMode::NotSet;
+                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationModeType::NotSet;
                 }
             }
 
@@ -443,7 +445,7 @@ namespace Boilers {
                 auto const SELECT_CASE_var(Boiler(BoilerNum).EfficiencyCurveType);
                 if ((SELECT_CASE_var == EfficiencyCurveType::BiQuadratic) || (SELECT_CASE_var == EfficiencyCurveType::QuadraticLinear) ||
                     (SELECT_CASE_var == EfficiencyCurveType::BiCubic)) {                                // curve uses water temperature
-                    if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::NotSet) { // throw error
+                    if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::NotSet) { // throw error
                         if (!lAlphaFieldBlanks(3)) {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                             ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
@@ -489,23 +491,23 @@ namespace Boilers {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(7));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
-                    Boiler(BoilerNum).FlowMode = FlowMode::Constant;
+                    Boiler(BoilerNum).FlowMode = FlowModeType::Constant;
                 } else if (SELECT_CASE_var == "VARIABLEFLOW") { // backward compatible, clean out eventually
-                    Boiler(BoilerNum).FlowMode = FlowMode::LeavingSetPointModulated;
+                    Boiler(BoilerNum).FlowMode = FlowModeType::LeavingSetPointModulated;
                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
-                    Boiler(BoilerNum).FlowMode = FlowMode::LeavingSetPointModulated;
+                    Boiler(BoilerNum).FlowMode = FlowModeType::LeavingSetPointModulated;
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
-                    Boiler(BoilerNum).FlowMode = FlowMode::NotModulated;
+                    Boiler(BoilerNum).FlowMode = FlowModeType::NotModulated;
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
                     // We will assume variable flow if not specified
-                    Boiler(BoilerNum).FlowMode = FlowMode::NotModulated;
+                    Boiler(BoilerNum).FlowMode = FlowModeType::NotModulated;
                 }
             }
 
@@ -556,7 +558,7 @@ namespace Boilers {
         BoilerFuelTypeForOutputVariable.deallocate();
     }
 
-    void InitBoiler(int const BoilerNum) // number of the current boiler being simulated
+    void BoilerSpecs::InitBoiler() // number of the current boiler being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -607,19 +609,19 @@ namespace Boilers {
         if (MyFlag(BoilerNum)) {
             // Locate the boilers on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(Boiler(BoilerNum).Name, TypeOf_Boiler_Simple, Boiler(BoilerNum).LoopNum, Boiler(BoilerNum).LoopSideNum,
-                                    Boiler(BoilerNum).BranchNum, Boiler(BoilerNum).CompNum, _, Boiler(BoilerNum).TempUpLimitBoilerOut, _, _, _,
+            ScanPlantLoopsForObject(Name, TypeOf_Boiler_Simple, LoopNum, LoopSideNum,
+                                    BranchNum, CompNum, _, TempUpLimitBoilerOut, _, _, _,
                                     errFlag);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
 
-            if ((Boiler(BoilerNum).FlowMode == FlowMode::LeavingSetPointModulated) || (Boiler(BoilerNum).FlowMode == FlowMode::Constant)) {
+            if ((FlowMode == FlowModeType::LeavingSetPointModulated) || (FlowMode == FlowModeType::Constant)) {
                 // reset flow priority
-                PlantLoop(Boiler(BoilerNum).LoopNum)
-                    .LoopSide(Boiler(BoilerNum).LoopSideNum)
-                    .Branch(Boiler(BoilerNum).BranchNum)
-                    .Comp(Boiler(BoilerNum).CompNum)
+                PlantLoop(LoopNum)
+                    .LoopSide(LoopSideNum)
+                    .Branch(BranchNum)
+                    .Comp(CompNum)
                     .FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
             }
 
@@ -628,41 +630,41 @@ namespace Boilers {
 
         if (MyEnvrnFlag(BoilerNum) && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
-            rho = GetDensityGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                   PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex, RoutineName);
-            Boiler(BoilerNum).DesMassFlowRate = Boiler(BoilerNum).VolFlowRate * rho;
+            rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp,
+                                   PlantLoop(LoopNum).FluidIndex, RoutineName);
+            DesMassFlowRate = VolFlowRate * rho;
 
-            InitComponentNodes(0.0, Boiler(BoilerNum).DesMassFlowRate, Boiler(BoilerNum).BoilerInletNodeNum, Boiler(BoilerNum).BoilerOutletNodeNum,
-                               Boiler(BoilerNum).LoopNum, Boiler(BoilerNum).LoopSideNum, Boiler(BoilerNum).BranchNum, Boiler(BoilerNum).CompNum);
+            InitComponentNodes(0.0, DesMassFlowRate, BoilerInletNodeNum, BoilerOutletNodeNum,
+                               LoopNum, LoopSideNum, BranchNum, CompNum);
 
-            if (Boiler(BoilerNum).FlowMode == FlowMode::LeavingSetPointModulated) { // check if setpoint on outlet node
-                if ((Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                    (Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
+            if (FlowMode == FlowModeType::LeavingSetPointModulated) { // check if setpoint on outlet node
+                if ((Node(BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                    (Node(BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
                     if (!AnyEnergyManagementSystemInModel) {
-                        if (!Boiler(BoilerNum).ModulatedFlowErrDone) {
-                            ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler(BoilerNum).Name);
+                        if (!ModulatedFlowErrDone) {
+                            ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Name);
                             ShowContinueError(
                                 "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode, use a SetpointManager");
                             ShowContinueError("  The overall loop setpoint will be assumed for Boiler. The simulation continues ... ");
-                            Boiler(BoilerNum).ModulatedFlowErrDone = true;
+                            ModulatedFlowErrDone = true;
                         }
                     } else {
                         // need call to EMS to check node
                         FatalError = false; // but not really fatal yet, but should be.
-                        CheckIfNodeSetPointManagedByEMS(Boiler(BoilerNum).BoilerOutletNodeNum, iTemperatureSetPoint, FatalError);
+                        CheckIfNodeSetPointManagedByEMS(BoilerOutletNodeNum, iTemperatureSetPoint, FatalError);
                         if (FatalError) {
-                            if (!Boiler(BoilerNum).ModulatedFlowErrDone) {
+                            if (!ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " +
-                                                 Boiler(BoilerNum).Name);
+                                                 Name);
                                 ShowContinueError("  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode");
                                 ShowContinueError("  use a Setpoint Manager to establish a setpoint at the boiler outlet node ");
                                 ShowContinueError("  or use an EMS actuator to establish a setpoint at the boiler outlet node ");
                                 ShowContinueError("  The overall loop setpoint will be assumed for Boiler. The simulation continues ... ");
-                                Boiler(BoilerNum).ModulatedFlowErrDone = true;
+                                ModulatedFlowErrDone = true;
                             }
                         }
                     }
-                    Boiler(BoilerNum).ModulatedFlowSetToLoop = true; // this is for backward compatibility and could be removed
+                    ModulatedFlowSetToLoop = true; // this is for backward compatibility and could be removed
                 }
             }
 
@@ -675,17 +677,17 @@ namespace Boilers {
 
         // every iteration inits.  (most in calc routine)
 
-        if ((Boiler(BoilerNum).FlowMode == FlowMode::LeavingSetPointModulated) && Boiler(BoilerNum).ModulatedFlowSetToLoop) {
+        if ((FlowMode == FlowModeType::LeavingSetPointModulated) && ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
             {
-                auto const SELECT_CASE_var(PlantLoop(Boiler(BoilerNum).LoopNum).LoopDemandCalcScheme);
+                auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == SingleSetPoint) {
-                    Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPoint =
-                        Node(PlantLoop(Boiler(BoilerNum).LoopNum).TempSetPointNodeNum).TempSetPoint;
+                    Node(BoilerOutletNodeNum).TempSetPoint =
+                        Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
                 } else if (SELECT_CASE_var == DualSetPointDeadBand) {
-                    Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPointLo =
-                        Node(PlantLoop(Boiler(BoilerNum).LoopNum).TempSetPointNodeNum).TempSetPointLo;
+                    Node(BoilerOutletNodeNum).TempSetPointLo =
+                        Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
                 }
             }
         }
@@ -971,7 +973,7 @@ namespace Boilers {
 
         if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
-            if ((Boiler(BoilerNum).FlowMode == FlowMode::Constant) || (Boiler(BoilerNum).FlowMode == FlowMode::NotModulated)) {
+            if ((Boiler(BoilerNum).FlowMode == FlowModeType::Constant) || (Boiler(BoilerNum).FlowMode == FlowModeType::NotModulated)) {
                 // Then find the flow rate and outlet temp
                 BoilerMassFlowRate = BoilerMassFlowRateMax;
                 SetComponentFlowRate(BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, Boiler(BoilerNum).LoopNum, Boiler(BoilerNum).LoopSideNum,
@@ -985,7 +987,7 @@ namespace Boilers {
 
                 BoilerOutletTemp = BoilerDeltaTemp + Node(BoilerInletNode).Temp;
 
-            } else if (Boiler(BoilerNum).FlowMode == FlowMode::LeavingSetPointModulated) {
+            } else if (Boiler(BoilerNum).FlowMode == FlowModeType::LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
 
@@ -1055,9 +1057,9 @@ namespace Boilers {
                 Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
                 Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
 
-                if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Entering) {
+                if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Entering) {
                     EffCurveOutput = CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR, Node(BoilerInletNode).Temp);
-                } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Leaving) {
+                } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Leaving) {
                     EffCurveOutput = CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR, BoilerOutletTemp);
                 }
 
@@ -1079,9 +1081,9 @@ namespace Boilers {
                     if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
                         Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
                         Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
-                        if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Entering) {
+                        if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
-                        } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Leaving) {
+                        } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Leaving) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
                         }
                     }
@@ -1110,9 +1112,9 @@ namespace Boilers {
                     if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
                         Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
                         Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
-                        if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Entering) {
+                        if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
-                        } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Leaving) {
+                        } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Leaving) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
                         }
                     }
