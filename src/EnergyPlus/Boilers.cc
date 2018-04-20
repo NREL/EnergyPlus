@@ -150,22 +150,28 @@ namespace Boilers {
     }
 
     void BoilerSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
-    {}
-
-    void getDesignCapacities(const PlantLocation &calledFromLocation,
-                             Real64 &MaxLoad,
-                             Real64 &MinLoad,
-                             Real64 &OptLoad) {
-
+    {
+        InitBoiler();
+        CalcBoilerModel(CurLoad, RunFlag, EquipFlowCtrl);
+        UpdateBoilerRecords(CurLoad, RunFlag);
     }
 
-    void getSizingFactor(Real64 &SizFac) {
+    void BoilerSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        MinLoad = NomCap * MinPartLoadRat;
+        MaxLoad = NomCap * MaxPartLoadRat;
+        OptLoad = NomCap * OptPartLoadRat;
+    }
 
+    void BoilerSpecs::getSizingFactor(Real64 &SizingFactor)
+    {
+        SizingFactor = SizFac;
     }
 
     void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
         InitBoiler();
+        SizeBoiler();
     }
 
     void clear_state()
