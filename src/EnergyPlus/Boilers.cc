@@ -173,14 +173,14 @@ namespace Boilers {
                 EfficiencyCurveType == EfficiencyCurveType::BiCubic);
     }
 
-    void BoilerSpecs::clear_state()
+    void clear_state()
     {
         NumBoilers = 0;
         Boiler.deallocate();
         GetBoilerInputFlag = true;
     }
 
-    void BoilerSpecs::GetBoilerInput()
+    void GetBoilerInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
