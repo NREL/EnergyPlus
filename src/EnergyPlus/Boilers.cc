@@ -857,20 +857,20 @@ namespace Boilers {
         BoilerLoad = 0.0;
         ParasiticElecPower = 0.0;
         BoilerMassFlowRate = 0.0;
-        BoilerInletNode = Boiler(BoilerNum).BoilerInletNodeNum;
-        BoilerOutletNode = Boiler(BoilerNum).BoilerOutletNodeNum;
-        BoilerNomCap = Boiler(BoilerNum).NomCap;
-        BoilerMaxPLR = Boiler(BoilerNum).MaxPartLoadRat;
-        BoilerMinPLR = Boiler(BoilerNum).MinPartLoadRat;
-        BoilerEff = Boiler(BoilerNum).Effic;
-        TempUpLimitBout = Boiler(BoilerNum).TempUpLimitBoilerOut;
-        BoilerMassFlowRateMax = Boiler(BoilerNum).DesMassFlowRate;
-        ParasiticElecLoad = Boiler(BoilerNum).ParasiticElecLoad;
-        LoopNum = Boiler(BoilerNum).LoopNum;
-        LoopSideNum = Boiler(BoilerNum).LoopSideNum;
+        BoilerInletNode = BoilerInletNodeNum;
+        BoilerOutletNode = BoilerOutletNodeNum;
+        BoilerNomCap = NomCap;
+        BoilerMaxPLR = MaxPartLoadRat;
+        BoilerMinPLR = MinPartLoadRat;
+        BoilerEff = Effic;
+        TempUpLimitBout = TempUpLimitBoilerOut;
+        BoilerMassFlowRateMax = DesMassFlowRate;
+        ParasiticElecLoad = ParasiticElecLoad;
+        LoopNum = LoopNum;
+        LoopSideNum = LoopSideNum;
 
-        Cp = GetSpecificHeatGlycol(PlantLoop(Boiler(BoilerNum).LoopNum).FluidName, Node(BoilerInletNode).Temp,
-                                   PlantLoop(Boiler(BoilerNum).LoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Node(BoilerInletNode).Temp,
+                                   PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         // If the specified load is 0.0 or the boiler should not run then we leave this subroutine. Before leaving
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
@@ -881,17 +881,17 @@ namespace Boilers {
         }
 
         // If there is a fault of boiler fouling (zrp_Nov2016)
-        if (Boiler(BoilerNum).FaultyBoilerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
-            int FaultIndex = Boiler(BoilerNum).FaultyBoilerFoulingIndex;
+        if (FaultyBoilerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+            int FaultIndex = FaultyBoilerFoulingIndex;
             Real64 NomCap_ff = BoilerNomCap;
             Real64 BoilerEff_ff = BoilerEff;
 
             // calculate the Faulty Boiler Fouling Factor using fault information
-            Boiler(BoilerNum).FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultIndex).CalFoulingFactor();
+            FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultIndex).CalFoulingFactor();
 
             // update the boiler nominal capacity at faulty cases
-            BoilerNomCap = NomCap_ff * Boiler(BoilerNum).FaultyBoilerFoulingFactor;
-            BoilerEff = BoilerEff_ff * Boiler(BoilerNum).FaultyBoilerFoulingFactor;
+            BoilerNomCap = NomCap_ff * FaultyBoilerFoulingFactor;
+            BoilerEff = BoilerEff_ff * FaultyBoilerFoulingFactor;
         }
 
         // Set the current load equal to the boiler load
@@ -899,11 +899,11 @@ namespace Boilers {
 
         if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
-            if ((Boiler(BoilerNum).FlowMode == FlowModeType::Constant) || (Boiler(BoilerNum).FlowMode == FlowModeType::NotModulated)) {
+            if ((FlowMode == FlowModeType::Constant) || (FlowMode == FlowModeType::NotModulated)) {
                 // Then find the flow rate and outlet temp
                 BoilerMassFlowRate = BoilerMassFlowRateMax;
-                SetComponentFlowRate(BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, Boiler(BoilerNum).LoopNum, Boiler(BoilerNum).LoopSideNum,
-                                     Boiler(BoilerNum).BranchNum, Boiler(BoilerNum).CompNum);
+                SetComponentFlowRate(BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, LoopNum, LoopSideNum,
+                                     BranchNum, CompNum);
 
                 if ((BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
                     BoilerDeltaTemp = BoilerLoad / BoilerMassFlowRate / Cp;
@@ -913,12 +913,12 @@ namespace Boilers {
 
                 BoilerOutletTemp = BoilerDeltaTemp + Node(BoilerInletNode).Temp;
 
-            } else if (Boiler(BoilerNum).FlowMode == FlowModeType::LeavingSetPointModulated) {
+            } else if (FlowMode == FlowModeType::LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
 
                 {
-                    auto const SELECT_CASE_var(PlantLoop(Boiler(BoilerNum).LoopNum).LoopDemandCalcScheme);
+                    auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == SingleSetPoint) {
                         BoilerDeltaTemp = Node(BoilerOutletNode).TempSetPoint - Node(BoilerInletNode).Temp;
                     } else if (SELECT_CASE_var == DualSetPointDeadBand) {
@@ -938,8 +938,8 @@ namespace Boilers {
                 } else {
                     BoilerMassFlowRate = 0.0;
                 }
-                SetComponentFlowRate(BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, Boiler(BoilerNum).LoopNum, Boiler(BoilerNum).LoopSideNum,
-                                     Boiler(BoilerNum).BranchNum, Boiler(BoilerNum).CompNum);
+                SetComponentFlowRate(BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, LoopNum, LoopSideNum,
+                                     BranchNum, CompNum);
 
             } // End of Constant/Variable Flow If Block
 
@@ -978,19 +978,19 @@ namespace Boilers {
         TheorFuelUse = BoilerLoad / BoilerEff;
 
         // calculate normalized efficiency based on curve object type
-        if (Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
-            if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-                Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
+        if (EfficiencyCurvePtr > 0) {
+            if (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
+                EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
+                EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
 
-                if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Entering) {
-                    EffCurveOutput = CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR, Node(BoilerInletNode).Temp);
-                } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Leaving) {
-                    EffCurveOutput = CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR, BoilerOutletTemp);
+                if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
+                    EffCurveOutput = CurveValue(EfficiencyCurvePtr, OperPLR, Node(BoilerInletNode).Temp);
+                } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
+                    EffCurveOutput = CurveValue(EfficiencyCurvePtr, OperPLR, BoilerOutletTemp);
                 }
 
             } else {
-                EffCurveOutput = CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR);
+                EffCurveOutput = CurveValue(EfficiencyCurvePtr, OperPLR);
             }
         } else {
             EffCurveOutput = 1.0;
@@ -999,17 +999,17 @@ namespace Boilers {
         // warn if efficiency curve produces zero or negative results
         if (!WarmupFlag && EffCurveOutput <= 0.0) {
             if (BoilerLoad > 0.0) {
-                if (Boiler(BoilerNum).EffCurveOutputError < 1) {
-                    ++Boiler(BoilerNum).EffCurveOutputError;
-                    ShowWarningError("Boiler:HotWater \"" + Boiler(BoilerNum).Name + "\"");
+                if (EffCurveOutputError < 1) {
+                    ++EffCurveOutputError;
+                    ShowWarningError("Boiler:HotWater \"" + Name + "\"");
                     ShowContinueError("...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
-                    if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-                        Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                        Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
-                        if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Entering) {
+                    if (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
+                        EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
+                        EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
+                        if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
-                        } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Leaving) {
+                        } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
                         }
                     }
@@ -1018,9 +1018,9 @@ namespace Boilers {
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 0.01 and simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Boiler(BoilerNum).Name +
+                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Name +
                                                        "\": Boiler Efficiency Curve output is less than or equal to 0 warning continues...",
-                                                   Boiler(BoilerNum).EffCurveOutputIndex, EffCurveOutput, EffCurveOutput);
+                                                   EffCurveOutputIndex, EffCurveOutput, EffCurveOutput);
                 }
             }
             EffCurveOutput = 0.01;
@@ -1028,19 +1028,19 @@ namespace Boilers {
 
         // warn if overall efficiency greater than 1.1
         if (!WarmupFlag && EffCurveOutput * BoilerEff > 1.1) {
-            if (BoilerLoad > 0.0 && Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
-                if (Boiler(BoilerNum).CalculatedEffError < 1) {
-                    ++Boiler(BoilerNum).CalculatedEffError;
-                    ShowWarningError("Boiler:HotWater \"" + Boiler(BoilerNum).Name + "\"");
+            if (BoilerLoad > 0.0 && EfficiencyCurvePtr > 0) {
+                if (CalculatedEffError < 1) {
+                    ++CalculatedEffError;
+                    ShowWarningError("Boiler:HotWater \"" + Name + "\"");
                     ShowContinueError("...Calculated Boiler Efficiency is greater than 1.1.");
                     ShowContinueError("...Boiler Efficiency calculations shown below.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
-                    if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-                        Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                        Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
-                        if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Entering) {
+                    if (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
+                        EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
+                        EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
+                        if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
-                        } else if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::Leaving) {
+                        } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
                         }
                     }
@@ -1049,9 +1049,9 @@ namespace Boilers {
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 1.1 and simulation continues.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Boiler(BoilerNum).Name +
+                    ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Name +
                                                        "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...",
-                                                   Boiler(BoilerNum).CalculatedEffIndex, EffCurveOutput * BoilerEff, EffCurveOutput * BoilerEff);
+                                                   CalculatedEffIndex, EffCurveOutput * BoilerEff, EffCurveOutput * BoilerEff);
                 }
             }
             EffCurveOutput = 1.1;
