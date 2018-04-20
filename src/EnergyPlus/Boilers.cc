@@ -339,8 +339,8 @@ namespace Boilers {
             }
 
             boiler.designOutletTemperature_ = rNumericArgs(3);
-            boiler.VolFlowRate = rNumericArgs(4);
-            if (boiler.VolFlowRate == AutoSize) {
+            boiler.designVolumeFlowRate_ = rNumericArgs(4);
+            if (boiler.designVolumeFlowRate_ == AutoSize) {
                 boiler.VolFlowRateWasAutoSized = true;
             }
             boiler.MinPartLoadRat = rNumericArgs(5);
@@ -491,7 +491,7 @@ namespace Boilers {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp,
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
-            DesMassFlowRate = VolFlowRate * rho;
+            DesMassFlowRate = designVolumeFlowRate_ * rho;
 
             InitComponentNodes(0.0, DesMassFlowRate, BoilerInletNodeNum, BoilerOutletNodeNum,
                                LoopNum, LoopSideNum, BranchNum, CompNum);
@@ -596,7 +596,7 @@ namespace Boilers {
         Real64 VolFlowRateUser(0.0); // Hardsized volume flow for reporting
 
         tmpNomCap = designNominalCapacity_;
-        tmpBoilerVolFlowRate = VolFlowRate;
+        tmpBoilerVolFlowRate = designVolumeFlowRate_;
 
         PltSizNum = PlantLoop(LoopNum).PlantSizNum;
 
@@ -658,7 +658,7 @@ namespace Boilers {
             }
             if (PlantFirstSizesOkayToFinalize) {
                 if (VolFlowRateWasAutoSized) {
-                    VolFlowRate = tmpBoilerVolFlowRate;
+                    designVolumeFlowRate_ = tmpBoilerVolFlowRate;
                     if (PlantFinalSizesOkayToReport) {
                         ReportSizingOutput("Boiler:HotWater", Name, "Design Size Design Water Flow Rate [m3/s]",
                                            tmpBoilerVolFlowRate);
@@ -668,8 +668,8 @@ namespace Boilers {
                                            tmpBoilerVolFlowRate);
                     }
                 } else {
-                    if (VolFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0) {
-                        VolFlowRateUser = VolFlowRate;
+                    if (designVolumeFlowRate_ > 0.0 && tmpBoilerVolFlowRate > 0.0) {
+                        VolFlowRateUser = designVolumeFlowRate_;
                         if (PlantFinalSizesOkayToReport) {
                             ReportSizingOutput("Boiler:HotWater", Name, "Design Size Design Water Flow Rate [m3/s]",
                                                tmpBoilerVolFlowRate, "User-Specified Design Water Flow Rate [m3/s]", VolFlowRateUser);
@@ -695,8 +695,8 @@ namespace Boilers {
                 ErrorsFound = true;
             }
             if (!VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport &&
-                (VolFlowRate > 0.0)) { // Hard-sized with no sizing data
-                ReportSizingOutput("Boiler:HotWater", Name, "User-Specified Design Water Flow Rate [m3/s]", VolFlowRate);
+                (designVolumeFlowRate_ > 0.0)) { // Hard-sized with no sizing data
+                ReportSizingOutput("Boiler:HotWater", Name, "User-Specified Design Water Flow Rate [m3/s]", designVolumeFlowRate_);
             }
         }
 
