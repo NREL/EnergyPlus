@@ -165,7 +165,7 @@ namespace Boilers {
             // Operational fault parameters
             bool hasFoulingFault_;     // True if the boiler has fouling fault
             int faultFoulingIndex_;     // Index of the fault object corresponding to the boiler
-            Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
+            Real64 faultFoulingFactor_; // Boiler fouling factor
             std::string EndUseSubcategory;    // identifier use for the end use subcategory
             bool doOneTimeInitialisation;     // do the one time initialisation, i.e. locate on plantloops etc.
             bool doEnvironmentInitialisation; // do the environment initialisation, i.e. get inlet conditions etc.
@@ -186,7 +186,7 @@ namespace Boilers {
                   efficiencyCurveTemperatureMode_(TemperatureEvaluationModeType::default), curveEfficiencyIndex_(0), efficiencyCurveType_(EfficiencyCurveType::default),
                   designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
                   CalculatedEffIndex(0), hasFoulingFault_(false), faultFoulingIndex_(0),
-                  FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars()),
+                  faultFoulingFactor_(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars()),
                   BoilerLoad(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
             {
             }

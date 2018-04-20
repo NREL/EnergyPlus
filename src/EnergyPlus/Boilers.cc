@@ -809,11 +809,11 @@ namespace Boilers {
             Real64 BoilerEff_ff = BoilerEff;
 
             // calculate the Faulty Boiler Fouling Factor using fault information
-            FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultIndex).CalFoulingFactor();
+            faultFoulingFactor_ = FaultsBoilerFouling(FaultIndex).CalFoulingFactor();
 
             // update the boiler nominal capacity at faulty cases
-            BoilerNomCap = NomCap_ff * FaultyBoilerFoulingFactor;
-            BoilerEff = BoilerEff_ff * FaultyBoilerFoulingFactor;
+            BoilerNomCap = NomCap_ff * faultFoulingFactor_;
+            BoilerEff = BoilerEff_ff * faultFoulingFactor_;
         }
 
         // Set the current load equal to the boiler load
