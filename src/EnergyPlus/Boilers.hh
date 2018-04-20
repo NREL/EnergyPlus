@@ -193,18 +193,16 @@ namespace Boilers {
 
         void SizeBoiler();
 
-        void CalcBoilerModel(int &BoilerNum,         // boiler identifier
-            Real64 const MyLoad,    // W - hot water demand to be met by boiler
-            bool const RunFlag,     // TRUE if boiler operating
-            int const EquipFlowCtrl // Flow control mode for the equipment
+        void CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
+                             bool const RunFlag,     // TRUE if boiler operating
+                             int const EquipFlowCtrl // Flow control mode for the equipment
         );
 
         // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
         // *****************************************************************************
 
         void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
-            bool const RunFlag,  // boiler on when TRUE
-            int const Num        // boiler number
+                                 bool const RunFlag    // boiler on when TRUE
         );
 
         // End of Record Keeping subroutines for the BOILER:HOTWATER Module
