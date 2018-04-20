@@ -652,11 +652,9 @@ namespace Boilers {
 
         if (PltSizNum > 0) {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-
-                rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                       PlantLoop(LoopNum).FluidIndex, RoutineName);
-                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, TempDesBoilerOut,
-                                           PlantLoop(LoopNum).FluidIndex, RoutineName);
+                // TODO: temperatures here are different and inconsistent e.g. CWInitConvTemp
+                rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, TempDesBoilerOut, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 tmpNomCap = Cp * rho * SizFac * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
                 if (NomCapWasAutoSized) tmpNomCap = 0.0;
