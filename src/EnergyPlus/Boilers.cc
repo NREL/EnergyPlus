@@ -97,9 +97,9 @@ namespace Boilers {
     // The BLAST/DOE-2 empirical model based on mfg. data
 
     // Using/Aliasing
-    using namespace DataLoopNode;
-    using namespace DataHVACGlobals;
-    using namespace DataPrecisionGlobals;
+	using DataLoopNode::Node;
+	using DataHVACGlobals::SmallWaterVolFlow;
+	using DataHVACGlobals::TimeStepSys;
     using DataBranchAirLoopPlant::ControlType_SeriesActive;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SecInHour;
@@ -267,7 +267,7 @@ namespace Boilers {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-        using namespace DataGlobalConstants;
+		using DataGlobalConstants::AssignResourceTypeNum;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
@@ -480,10 +480,10 @@ namespace Boilers {
             Boiler(BoilerNum).SizFac = rNumericArgs(10);
             if (Boiler(BoilerNum).SizFac == 0.0) Boiler(BoilerNum).SizFac = 1.0;
 
-            Boiler(BoilerNum).BoilerInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                     NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            Boiler(BoilerNum).BoilerOutletNodeNum = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                      NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            Boiler(BoilerNum).BoilerInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
+                                                                     DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
+            Boiler(BoilerNum).BoilerOutletNodeNum = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
+                                                                      DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Hot Water Nodes");
 
             {
@@ -636,8 +636,8 @@ namespace Boilers {
                                Boiler(BoilerNum).LoopNum, Boiler(BoilerNum).LoopSideNum, Boiler(BoilerNum).BranchNum, Boiler(BoilerNum).CompNum);
 
             if (Boiler(BoilerNum).FlowMode == FlowMode::LeavingSetPointModulated) { // check if setpoint on outlet node
-                if ((Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
-                    (Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPointLo == SensedNodeFlagValue)) {
+                if ((Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                    (Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
                     if (!AnyEnergyManagementSystemInModel) {
                         if (!Boiler(BoilerNum).ModulatedFlowErrDone) {
                             ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler(BoilerNum).Name);
@@ -709,7 +709,8 @@ namespace Boilers {
         // the hot water flow rate and the hot water loop design delta T.
 
         // Using/Aliasing
-        using namespace DataSizing;
+		using DataSizing::PlantSizData;
+		using DataSizing::AutoVsHardSizingThreshold;
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToFinalize;
         using DataPlant::PlantFirstSizesOkayToReport;
