@@ -117,7 +117,6 @@ namespace Boilers {
 
     // Object Data
     Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
-    Array1D<ReportVars> BoilerReport; // report vars - dimension to number of machines
 
     // MODULE SUBROUTINES:
 
