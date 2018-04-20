@@ -222,7 +222,7 @@ namespace Boilers {
         static std::string const RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
-        int BoilerNum;                                  // boiler identifier
+        int BoilerNum(0);                               // boiler identifier
         int NumAlphas;                                  // Number of elements in the alpha array
         int NumNums;                                    // Number of elements in the numeric array
         int IOStat;                                     // IO Status when calling get input subroutine
@@ -243,15 +243,16 @@ namespace Boilers {
         if (allocated(Boiler)) return;
 
         Boiler.allocate(NumBoilers);
-        BoilerReport.allocate(NumBoilers);
-        CheckEquipName.allocate(NumBoilers);
+        //BoilerReport.allocate(NumBoilers);
+        //CheckEquipName.allocate(NumBoilers);
         BoilerFuelTypeForOutputVariable.allocate(NumBoilers);
-        CheckEquipName = true;
+        //CheckEquipName = true;
         BoilerFuelTypeForOutputVariable = "";
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
-        for (BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum) {
+        for (auto &boiler : Boiler) {
+            ++BoilerNum;
             inputProcessor->getObjectItem(cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
                                           lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
@@ -259,76 +260,76 @@ namespace Boilers {
             if (errFlag) {
                 ErrorsFound = true;
             }
-            Boiler(BoilerNum).Name = cAlphaArgs(1);
-            Boiler(BoilerNum).TypeNum = TypeOf_Boiler_Simple;
+            boiler.Name = cAlphaArgs(1);
+            boiler.TypeNum = TypeOf_Boiler_Simple;
 
             {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
 
                 if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "Electric";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("ELECTRICITY");
+                    boiler.FuelType = AssignResourceTypeNum("ELECTRICITY");
 
                 } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "Gas";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("NATURALGAS");
+                    boiler.FuelType = AssignResourceTypeNum("NATURALGAS");
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "Diesel";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("DIESEL");
+                    boiler.FuelType = AssignResourceTypeNum("DIESEL");
 
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "Gasoline";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("GASOLINE");
+                    boiler.FuelType = AssignResourceTypeNum("GASOLINE");
 
                 } else if (SELECT_CASE_var == "COAL") {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "Coal";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("COAL");
+                    boiler.FuelType = AssignResourceTypeNum("COAL");
 
                 } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
                            (SELECT_CASE_var == "DISTILLATE OIL")) {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "FuelOil#1";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("DISTILLATE OIL");
+                    boiler.FuelType = AssignResourceTypeNum("DISTILLATE OIL");
 
                 } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "FuelOil#2";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("RESIDUAL OIL");
+                    boiler.FuelType = AssignResourceTypeNum("RESIDUAL OIL");
 
                 } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
                            (SELECT_CASE_var == "PROPANE GAS")) {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "Propane";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("PROPANE");
+                    boiler.FuelType = AssignResourceTypeNum("PROPANE");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "OtherFuel1";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("OTHERFUEL1");
+                    boiler.FuelType = AssignResourceTypeNum("OTHERFUEL1");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL2") {
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "OtherFuel2";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("OTHERFUEL2");
+                    boiler.FuelType = AssignResourceTypeNum("OTHERFUEL2");
 
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
                     // Set to Electric to avoid errors when setting up output variables
                     BoilerFuelTypeForOutputVariable(BoilerNum) = "Electric";
-                    Boiler(BoilerNum).FuelType = AssignResourceTypeNum("ELECTRICITY");
+                    boiler.FuelType = AssignResourceTypeNum("ELECTRICITY");
                     ErrorsFound = true;
                 }
             }
 
-            Boiler(BoilerNum).NomCap = rNumericArgs(1);
+            boiler.NomCap = rNumericArgs(1);
             if (rNumericArgs(1) == 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
                 ShowContinueError("..." + cNumericFieldNames(1) + " must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (Boiler(BoilerNum).NomCap == AutoSize) {
-                Boiler(BoilerNum).NomCapWasAutoSized = true;
+            if (boiler.NomCap == AutoSize) {
+                boiler.NomCapWasAutoSized = true;
             }
 
-            Boiler(BoilerNum).Effic = rNumericArgs(2);
+            boiler.Effic = rNumericArgs(2);
             if (rNumericArgs(2) == 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(2) + '=' + RoundSigDigits(rNumericArgs(2), 3));
@@ -340,34 +341,34 @@ namespace Boilers {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
 
                 if (SELECT_CASE_var == "ENTERINGBOILER") {
-                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationModeType::Entering;
+                    boiler.CurveTempMode = TemperatureEvaluationModeType::Entering;
                 } else if (SELECT_CASE_var == "LEAVINGBOILER") {
-                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationModeType::Leaving;
+                    boiler.CurveTempMode = TemperatureEvaluationModeType::Leaving;
                 } else {
-                    Boiler(BoilerNum).CurveTempMode = TemperatureEvaluationModeType::NotSet;
+                    boiler.CurveTempMode = TemperatureEvaluationModeType::NotSet;
                 }
             }
 
-            Boiler(BoilerNum).EfficiencyCurvePtr = GetCurveIndex(cAlphaArgs(4));
-            if (Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
+            boiler.EfficiencyCurvePtr = GetCurveIndex(cAlphaArgs(4));
+            if (boiler.EfficiencyCurvePtr > 0) {
                 {
-                    auto const SELECT_CASE_var(GetCurveType(Boiler(BoilerNum).EfficiencyCurvePtr));
+                    auto const SELECT_CASE_var(GetCurveType(boiler.EfficiencyCurvePtr));
                     if (SELECT_CASE_var == "LINEAR") {
-                        Boiler(BoilerNum).EfficiencyCurveType = EfficiencyCurveType::Linear;
+                        boiler.EfficiencyCurveType = EfficiencyCurveType::Linear;
                     } else if (SELECT_CASE_var == "QUADRATIC") {
-                        Boiler(BoilerNum).EfficiencyCurveType = EfficiencyCurveType::Quadratic;
+                        boiler.EfficiencyCurveType = EfficiencyCurveType::Quadratic;
                     } else if (SELECT_CASE_var == "QUADRATICLINEAR") {
-                        Boiler(BoilerNum).EfficiencyCurveType = EfficiencyCurveType::QuadraticLinear;
+                        boiler.EfficiencyCurveType = EfficiencyCurveType::QuadraticLinear;
                     } else if (SELECT_CASE_var == "CUBIC") {
-                        Boiler(BoilerNum).EfficiencyCurveType = EfficiencyCurveType::Cubic;
+                        boiler.EfficiencyCurveType = EfficiencyCurveType::Cubic;
                     } else if (SELECT_CASE_var == "BICUBIC") {
-                        Boiler(BoilerNum).EfficiencyCurveType = EfficiencyCurveType::BiCubic;
+                        boiler.EfficiencyCurveType = EfficiencyCurveType::BiCubic;
                     } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                        Boiler(BoilerNum).EfficiencyCurveType = EfficiencyCurveType::BiQuadratic;
+                        boiler.EfficiencyCurveType = EfficiencyCurveType::BiQuadratic;
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
-                        ShowContinueError("...Curve type for " + cAlphaFieldNames(4) + "  = " + GetCurveType(Boiler(BoilerNum).EfficiencyCurvePtr));
+                        ShowContinueError("...Curve type for " + cAlphaFieldNames(4) + "  = " + GetCurveType(boiler.EfficiencyCurvePtr));
                         ErrorsFound = true;
                     }
                 }
@@ -380,20 +381,20 @@ namespace Boilers {
 
             // if curve uses temperature, make sure water temp mode has been set
             {
-                auto const SELECT_CASE_var(Boiler(BoilerNum).EfficiencyCurveType);
+                auto const SELECT_CASE_var(boiler.EfficiencyCurveType);
                 if ((SELECT_CASE_var == EfficiencyCurveType::BiQuadratic) || (SELECT_CASE_var == EfficiencyCurveType::QuadraticLinear) ||
                     (SELECT_CASE_var == EfficiencyCurveType::BiCubic)) {                                // curve uses water temperature
-                    if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationModeType::NotSet) { // throw error
+                    if (boiler.CurveTempMode == TemperatureEvaluationModeType::NotSet) { // throw error
                         if (!lAlphaFieldBlanks(3)) {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                             ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError("Boiler using curve type of " + GetCurveType(Boiler(BoilerNum).EfficiencyCurvePtr) + " must specify " +
+                            ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) + " must specify " +
                                               cAlphaFieldNames(3));
                             ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
                         } else {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                             ShowContinueError("Field " + cAlphaFieldNames(3) + " is blank");
-                            ShowContinueError("Boiler using curve type of " + GetCurveType(Boiler(BoilerNum).EfficiencyCurvePtr) +
+                            ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) +
                                               " must specify either EnteringBoiler or LeavingBoiler");
                         }
                         ErrorsFound = true;
@@ -401,59 +402,59 @@ namespace Boilers {
                 }
             }
 
-            Boiler(BoilerNum).TempDesBoilerOut = rNumericArgs(3);
-            Boiler(BoilerNum).VolFlowRate = rNumericArgs(4);
-            if (Boiler(BoilerNum).VolFlowRate == AutoSize) {
-                Boiler(BoilerNum).VolFlowRateWasAutoSized = true;
+            boiler.TempDesBoilerOut = rNumericArgs(3);
+            boiler.VolFlowRate = rNumericArgs(4);
+            if (boiler.VolFlowRate == AutoSize) {
+                boiler.VolFlowRateWasAutoSized = true;
             }
-            Boiler(BoilerNum).MinPartLoadRat = rNumericArgs(5);
-            Boiler(BoilerNum).MaxPartLoadRat = rNumericArgs(6);
-            Boiler(BoilerNum).OptPartLoadRat = rNumericArgs(7);
+            boiler.MinPartLoadRat = rNumericArgs(5);
+            boiler.MaxPartLoadRat = rNumericArgs(6);
+            boiler.OptPartLoadRat = rNumericArgs(7);
 
-            Boiler(BoilerNum).TempUpLimitBoilerOut = rNumericArgs(8);
+            boiler.TempUpLimitBoilerOut = rNumericArgs(8);
             // default to 99.9C if upper temperature limit is left blank.
-            if (Boiler(BoilerNum).TempUpLimitBoilerOut <= 0.0) {
-                Boiler(BoilerNum).TempUpLimitBoilerOut = 99.9;
+            if (boiler.TempUpLimitBoilerOut <= 0.0) {
+                boiler.TempUpLimitBoilerOut = 99.9;
             }
 
-            Boiler(BoilerNum).ParasiticElecLoad = rNumericArgs(9);
-            Boiler(BoilerNum).SizFac = rNumericArgs(10);
-            if (Boiler(BoilerNum).SizFac == 0.0) Boiler(BoilerNum).SizFac = 1.0;
+            boiler.ParasiticElecLoad = rNumericArgs(9);
+            boiler.SizFac = rNumericArgs(10);
+            if (boiler.SizFac == 0.0) boiler.SizFac = 1.0;
 
-            Boiler(BoilerNum).BoilerInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
-                                                                     DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            Boiler(BoilerNum).BoilerOutletNodeNum = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
-                                                                      DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            boiler.BoilerInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
+                                                          DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
+            boiler.BoilerOutletNodeNum = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
+                                                           DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Hot Water Nodes");
 
             {
                 auto const SELECT_CASE_var(cAlphaArgs(7));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
-                    Boiler(BoilerNum).FlowMode = FlowModeType::Constant;
+                    boiler.FlowMode = FlowModeType::Constant;
                 } else if (SELECT_CASE_var == "VARIABLEFLOW") { // backward compatible, clean out eventually
-                    Boiler(BoilerNum).FlowMode = FlowModeType::LeavingSetPointModulated;
+                    boiler.FlowMode = FlowModeType::LeavingSetPointModulated;
                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
-                    Boiler(BoilerNum).FlowMode = FlowModeType::LeavingSetPointModulated;
+                    boiler.FlowMode = FlowModeType::LeavingSetPointModulated;
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
-                    Boiler(BoilerNum).FlowMode = FlowModeType::NotModulated;
+                    boiler.FlowMode = FlowModeType::NotModulated;
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
                     // We will assume variable flow if not specified
-                    Boiler(BoilerNum).FlowMode = FlowModeType::NotModulated;
+                    boiler.FlowMode = FlowModeType::NotModulated;
                 }
             }
 
             if (NumAlphas > 7) {
-                Boiler(BoilerNum).EndUseSubcategory = cAlphaArgs(8);
+                boiler.EndUseSubcategory = cAlphaArgs(8);
             } else {
-                Boiler(BoilerNum).EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since
-                                                                // it appears this way in existing output files.
+                boiler.EndUseSubcategory = "Boiler"; // leave this as "boiler" instead of "general" like other end use subcategories since
+                                                     // it appears this way in existing output files.
             }
         }
 
@@ -461,35 +462,34 @@ namespace Boilers {
             ShowFatalError(RoutineName + "Errors found in processing " + cCurrentModuleObject + " input.");
         }
 
-        for (BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum) {
-            SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, BoilerReport(BoilerNum).BoilerLoad, "System", "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Heating Energy", OutputProcessor::Unit::J, BoilerReport(BoilerNum).BoilerEnergy, "System", "Sum",
-                                Boiler(BoilerNum).Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant");
+        for (auto &boiler : Boiler) {
+            ReportVars report(boiler.reportVariables);
+
+            SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, report.BoilerLoad, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Heating Energy", OutputProcessor::Unit::J, report.BoilerEnergy, "System", "Sum",
+                                boiler.Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant");
+
             if (UtilityRoutines::SameString(BoilerFuelTypeForOutputVariable(BoilerNum), "Electric")) {
                 SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Power", OutputProcessor::Unit::W,
-                                    BoilerReport(BoilerNum).FuelUsed, "System", "Average", Boiler(BoilerNum).Name);
+                                    report.FuelUsed, "System", "Average", boiler.Name);
             } else {
                 SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Rate", OutputProcessor::Unit::W,
-                                    BoilerReport(BoilerNum).FuelUsed, "System", "Average", Boiler(BoilerNum).Name);
+                                    report.FuelUsed, "System", "Average", boiler.Name);
             }
+
             SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Energy", OutputProcessor::Unit::J,
-                                BoilerReport(BoilerNum).FuelConsumed, "System", "Sum", Boiler(BoilerNum).Name, _,
-                                BoilerFuelTypeForOutputVariable(BoilerNum), "Heating", Boiler(BoilerNum).EndUseSubcategory, "Plant");
-            SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, BoilerReport(BoilerNum).BoilerInletTemp, "System", "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, BoilerReport(BoilerNum).BoilerOutletTemp, "System", "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, BoilerReport(BoilerNum).Mdot, "System", "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Ancillary Electric Power", OutputProcessor::Unit::W, BoilerReport(BoilerNum).ParasiticElecPower, "System",
-                                "Average", Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Ancillary Electric Energy", OutputProcessor::Unit::J, BoilerReport(BoilerNum).ParasiticElecConsumption,
-                                "System", "Sum", Boiler(BoilerNum).Name, _, "ELECTRICITY", "Heating", "Boiler Parasitic", "Plant");
-            SetupOutputVariable("Boiler Part Load Ratio", OutputProcessor::Unit::None, BoilerReport(BoilerNum).BoilerPLR, "System", "Average",
-                                Boiler(BoilerNum).Name);
+                                report.FuelConsumed, "System", "Sum", boiler.Name, _,
+                                BoilerFuelTypeForOutputVariable(BoilerNum), "Heating", boiler.EndUseSubcategory, "Plant");
+            SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, report.BoilerInletTemp, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, report.BoilerOutletTemp, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, report.Mdot, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Ancillary Electric Power", OutputProcessor::Unit::W, report.ParasiticElecPower, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Ancillary Electric Energy", OutputProcessor::Unit::J, report.ParasiticElecConsumption,
+                                "System", "Sum", boiler.Name, _, "ELECTRICITY", "Heating", "Boiler Parasitic", "Plant");
+            SetupOutputVariable("Boiler Part Load Ratio", OutputProcessor::Unit::None, report.BoilerPLR, "System", "Average", boiler.Name);
+
             if (AnyEnergyManagementSystemInModel) {
-                SetupEMSInternalVariable("Boiler Nominal Capacity", Boiler(BoilerNum).Name, "[W]", Boiler(BoilerNum).NomCap);
+                SetupEMSInternalVariable("Boiler Nominal Capacity", boiler.Name, "[W]", boiler.NomCap);
             }
         }
 
