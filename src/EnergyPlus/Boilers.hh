@@ -78,14 +78,6 @@ namespace Boilers {
 		TriQuadratic,
 		default=NotSet,
 	};
-    extern int const Linear;
-    extern int const BiLinear;
-    extern int const Quadratic;
-    extern int const BiQuadratic;
-    extern int const Cubic;
-    extern int const QuadraticLinear;
-    extern int const BiCubic;
-    extern int const TriQuadratic;
 
     // water temperature evaluation method
     extern int const BoilerTempModeNotSet;

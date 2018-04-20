@@ -109,16 +109,6 @@ namespace Boilers {
     using General::TrimSigDigits;
     using PlantUtilities::ScanPlantLoopsForObject;
 
-    // Boiler normalized efficiency curve types
-    int const Linear(1);
-    int const BiLinear(2);
-    int const Quadratic(3);
-    int const BiQuadratic(4);
-    int const Cubic(5);
-    int const QuadraticLinear(6);
-    int const BiCubic(7);
-    int const TriQuadratic(8);
-
     // water temperature evaluation method
     int const BoilerTempModeNotSet(100);
     int const EnteringBoilerTemp(101);
