@@ -111,14 +111,7 @@ namespace Boilers {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumBoilers(0);              // Number of boilers
-    Real64 FuelUsed(0.0);           // W - Boiler fuel used
-    Real64 ParasiticElecPower(0.0); // W - Parasitic electrical power (e.g. forced draft fan)
-    Real64 BoilerLoad(0.0);         // W - Boiler Load
-    Real64 BoilerMassFlowRate(0.0); // kg/s - Boiler mass flow rate
-    Real64 BoilerOutletTemp(0.0);   // W - Boiler outlet temperature
-    Real64 BoilerPLR(0.0);          // Boiler operating part-load ratio
     bool GetBoilerInputFlag(true);
-    Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
@@ -177,15 +170,7 @@ namespace Boilers {
     void clear_state()
     {
         NumBoilers = 0;
-        FuelUsed = 0.0;
-        ParasiticElecPower = 0.0;
-        BoilerLoad = 0.0;
-        BoilerMassFlowRate = 0.0;
-        BoilerOutletTemp = 0.0;
-        BoilerPLR = 0.0;
-        CheckEquipName.deallocate();
         Boiler.deallocate();
-        BoilerReport.deallocate();
         GetBoilerInputFlag = true;
     }
 
@@ -243,10 +228,7 @@ namespace Boilers {
         if (allocated(Boiler)) return;
 
         Boiler.allocate(NumBoilers);
-        //BoilerReport.allocate(NumBoilers);
-        //CheckEquipName.allocate(NumBoilers);
         BoilerFuelTypeForOutputVariable.allocate(NumBoilers);
-        //CheckEquipName = true;
         BoilerFuelTypeForOutputVariable = "";
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
@@ -845,10 +827,7 @@ namespace Boilers {
         Real64 TempUpLimitBout;       // C - boiler high temperature limit
         int BoilerInletNode;          // Boiler inlet node number
         int BoilerOutletNode;         // Boiler outlet node number
-        int LoopNum;                  // Plant loop with boiler
-        int LoopSideNum;              // Plant loop side with boiler (supply, demand)
         Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
-        Real64 ParasiticElecLoad;     // Boiler parasitic electric power at full load
         Real64 EffCurveOutput;        // Output of boiler efficiency curve
         Real64 Cp;
 
@@ -865,9 +844,6 @@ namespace Boilers {
         BoilerEff = Effic;
         TempUpLimitBout = TempUpLimitBoilerOut;
         BoilerMassFlowRateMax = DesMassFlowRate;
-        ParasiticElecLoad = ParasiticElecLoad;
-        LoopNum = LoopNum;
-        LoopSideNum = LoopSideNum;
 
         Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Node(BoilerInletNode).Temp,
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
