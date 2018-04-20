@@ -357,9 +357,9 @@ namespace Boilers {
             boiler.designSizingFactor_ = rNumericArgs(10);
             if (boiler.designSizingFactor_ == 0.0) boiler.designSizingFactor_ = 1.0;
 
-            boiler.BoilerInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
+            boiler.nodeHotWaterInletIndex_ = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
                                                           DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            boiler.BoilerOutletNodeNum = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
+            boiler.nodeHotWaterOutletIndex_ = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
                                                            DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(5), cAlphaArgs(6), "Hot Water Nodes");
 
@@ -493,12 +493,12 @@ namespace Boilers {
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
             designMassFlowRate_ = designVolumeFlowRate_ * rho;
 
-            InitComponentNodes(0.0, designMassFlowRate_, BoilerInletNodeNum, BoilerOutletNodeNum,
+            InitComponentNodes(0.0, designMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_,
                                LoopNum, LoopSideNum, BranchNum, CompNum);
 
             if (FlowMode == FlowModeType::LeavingSetPointModulated) { // check if setpoint on outlet node
-                if ((Node(BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                    (Node(BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
+                if ((Node(nodeHotWaterOutletIndex_).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                    (Node(nodeHotWaterOutletIndex_).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
                     if (!AnyEnergyManagementSystemInModel) {
                         if (!ModulatedFlowErrDone) {
                             ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Name);
@@ -510,7 +510,7 @@ namespace Boilers {
                     } else {
                         // need call to EMS to check node
                         FatalError = false; // but not really fatal yet, but should be.
-                        CheckIfNodeSetPointManagedByEMS(BoilerOutletNodeNum, iTemperatureSetPoint, FatalError);
+                        CheckIfNodeSetPointManagedByEMS(nodeHotWaterOutletIndex_, iTemperatureSetPoint, FatalError);
                         if (FatalError) {
                             if (!ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " +
@@ -542,10 +542,10 @@ namespace Boilers {
             {
                 auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == SingleSetPoint) {
-                    Node(BoilerOutletNodeNum).TempSetPoint =
+                    Node(nodeHotWaterOutletIndex_).TempSetPoint =
                         Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
                 } else if (SELECT_CASE_var == DualSetPointDeadBand) {
-                    Node(BoilerOutletNodeNum).TempSetPointLo =
+                    Node(nodeHotWaterOutletIndex_).TempSetPointLo =
                         Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
                 }
             }
@@ -700,7 +700,7 @@ namespace Boilers {
             }
         }
 
-        RegisterPlantCompDesignFlow(BoilerInletNodeNum, tmpBoilerVolFlowRate);
+        RegisterPlantCompDesignFlow(nodeHotWaterInletIndex_, tmpBoilerVolFlowRate);
 
         if (PlantFinalSizesOkayToReport) {
             // create predefined report
@@ -782,8 +782,8 @@ namespace Boilers {
         BoilerLoad = 0.0;
         ParasiticElecPower = 0.0;
         BoilerMassFlowRate = 0.0;
-        BoilerInletNode = BoilerInletNodeNum;
-        BoilerOutletNode = BoilerOutletNodeNum;
+        BoilerInletNode = nodeHotWaterInletIndex_;
+        BoilerOutletNode = nodeHotWaterOutletIndex_;
         BoilerNomCap = designNominalCapacity_;
         BoilerMaxPLR = designMaxPartLoadRatio_;
         BoilerMinPLR = designMinPartLoadRatio_;
@@ -1000,9 +1000,9 @@ namespace Boilers {
 
         if (MyLoad <= 0 || !RunFlag) {
             // set node temperatures
-            SafeCopyPlantNode(BoilerInletNodeNum, BoilerOutletNodeNum);
-            Node(BoilerOutletNodeNum).Temp = Node(BoilerInletNodeNum).Temp;
-            reportVariables.BoilerOutletTemp = Node(BoilerInletNodeNum).Temp;
+            SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
+            Node(nodeHotWaterOutletIndex_).Temp = Node(nodeHotWaterInletIndex_).Temp;
+            reportVariables.BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
             reportVariables.BoilerLoad = 0.0;
             reportVariables.FuelUsed = 0.0;
             reportVariables.ParasiticElecPower = 0.0;
@@ -1010,8 +1010,8 @@ namespace Boilers {
 
         } else {
             // set node temperatures
-            SafeCopyPlantNode(BoilerInletNodeNum, BoilerOutletNodeNum);
-            Node(BoilerOutletNodeNum).Temp = BoilerOutletTemp;
+            SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
+            Node(nodeHotWaterOutletIndex_).Temp = BoilerOutletTemp;
             reportVariables.BoilerOutletTemp = BoilerOutletTemp;
             reportVariables.BoilerLoad = BoilerLoad;
             reportVariables.FuelUsed = FuelUsed;
@@ -1019,8 +1019,8 @@ namespace Boilers {
             reportVariables.BoilerPLR = BoilerPLR;
         }
 
-        reportVariables.BoilerInletTemp = Node(BoilerInletNodeNum).Temp;
-        reportVariables.Mdot = Node(BoilerOutletNodeNum).MassFlowRate;
+        reportVariables.BoilerInletTemp = Node(nodeHotWaterInletIndex_).Temp;
+        reportVariables.Mdot = Node(nodeHotWaterOutletIndex_).MassFlowRate;
 
         reportVariables.BoilerEnergy = reportVariables.BoilerLoad * ReportingConstant;
         reportVariables.FuelConsumed = reportVariables.FuelUsed * ReportingConstant;
