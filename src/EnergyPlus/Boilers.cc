@@ -353,7 +353,7 @@ namespace Boilers {
                 boiler.TempUpLimitBoilerOut = 99.9;
             }
 
-            boiler.ParasiticElecLoad = rNumericArgs(9);
+            boiler.designParasiticElectricalLoad_ = rNumericArgs(9);
             boiler.designSizingFactor_ = rNumericArgs(10);
             if (boiler.designSizingFactor_ == 0.0) boiler.designSizingFactor_ = 1.0;
 
@@ -974,7 +974,7 @@ namespace Boilers {
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
         FuelUsed = TheorFuelUse / EffCurveOutput;
-        if (BoilerLoad > 0.0) ParasiticElecPower = ParasiticElecLoad * OperPLR;
+        if (BoilerLoad > 0.0) ParasiticElecPower = designParasiticElectricalLoad_ * OperPLR;
     }
 
     // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module

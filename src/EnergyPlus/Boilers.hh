@@ -157,7 +157,7 @@ namespace Boilers {
             int EfficiencyCurvePtr;       // Index to efficiency curve
             EfficiencyCurveType EfficiencyCurveType;      // Type of efficiency curve
             Real64 TempUpLimitBoilerOut;  // C - Boiler outlet maximum temperature limit
-            Real64 ParasiticElecLoad;     // W - Parasitic electric power (e.g. forced draft fan)
+            Real64 designParasiticElectricalLoad_;     // W - Parasitic electric power (e.g. forced draft fan)
             int EffCurveOutputError;      // efficiency curve output <=0 recurring warning error counter
             int EffCurveOutputIndex;      // efficiency curve output <=0 recurring warning error message index
             int CalculatedEffError;       // calculated efficiency >1.1 recurring warning error counter
@@ -184,7 +184,7 @@ namespace Boilers {
                   ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), designSizingFactor_(0.0),
                   nodeHotWaterInletIndex_(0), nodeHotWaterOutletIndex_(0), designMinPartLoadRatio_(0.0), designMaxPartLoadRatio_(0.0), designOptimalPartLoadRatio_(0.0),
                   CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
-                  TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
+                  TempUpLimitBoilerOut(0.0), designParasiticElectricalLoad_(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
                   CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
                   FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars()),
                   BoilerLoad(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
