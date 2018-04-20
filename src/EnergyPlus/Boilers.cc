@@ -651,60 +651,6 @@ namespace Boilers {
             }
         }
 
-
-        if (PltSizNum > 0) {
-            if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                // TODO: temperatures here are different and inconsistent e.g. CWInitConvTemp
-                rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
-                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, TempDesBoilerOut, PlantLoop(LoopNum).FluidIndex, RoutineName);
-                tmpNomCap = Cp * rho * SizFac * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
-            }
-            else {
-                if (NomCapWasAutoSized) tmpNomCap = 0.0;
-            }
-            if (PlantFirstSizesOkayToFinalize) {
-                if (NomCapWasAutoSized) {
-                    NomCap = tmpNomCap;
-                    if (PlantFinalSizesOkayToReport) {
-                        ReportSizingOutput("Boiler:HotWater", Name, "Design Size Nominal Capacity [W]", tmpNomCap);
-                    }
-                    if (PlantFirstSizesOkayToReport) {
-                        ReportSizingOutput("Boiler:HotWater", Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
-                    }
-                }
-                else { // Hard-sized with sizing data
-                    if (NomCap > 0.0 && tmpNomCap > 0.0) {
-                        NomCapUser = NomCap;
-                        if (PlantFinalSizesOkayToReport) {
-                            ReportSizingOutput("Boiler:HotWater", Name, "Design Size Nominal Capacity [W]", tmpNomCap,
-                                "User-Specified Nominal Capacity [W]", NomCapUser);
-                            if (DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizeBoilerHotWater: Potential issue with equipment sizing for " + Name);
-                                    ShowContinueError("User-Specified Nominal Capacity of " + RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + RoundSigDigits(tmpNomCap, 2) + " [W]");
-                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
-                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
-                                }
-                            }
-                        }
-                        tmpNomCap = NomCapUser;
-                    }
-                }
-            }
-        }
-        else {
-            if (NomCapWasAutoSized && PlantFirstSizesOkayToFinalize) {
-                ShowSevereError("Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError("Occurs in Boiler object=" + Name);
-                ErrorsFound = true;
-            }
-            if (!NomCapWasAutoSized && PlantFinalSizesOkayToReport &&
-                (NomCap > 0.0)) { // Hard-sized with no sizing data
-                ReportSizingOutput("Boiler:HotWater", Name, "User-Specified Nominal Capacity [W]", NomCap);
-            }
-        }
-
         RegisterPlantCompDesignFlow(BoilerInletNodeNum, tmpBoilerVolFlowRate);
 
         if (PlantFinalSizesOkayToReport) {
