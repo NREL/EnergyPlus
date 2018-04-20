@@ -75,7 +75,6 @@ namespace Boilers {
         Cubic,
         QuadraticLinear,
         BiCubic,
-        TriQuadratic, // TODO: delete as this will always fall through to error
         default=NotSet,
     };
 
