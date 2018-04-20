@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     DataSizing::PlantSizData(1).DeltaT = 10.0;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     // now call sizing routine
-    Boilers::SizeBoiler(1);
+    Boilers::Boiler(1).SizeBoiler();
     // see if boiler volume flow rate returned is hard-sized value
     EXPECT_DOUBLE_EQ(Boilers::Boiler(1).VolFlowRate, 1.0);
     // see if boiler nominal capacity returned is hard-sized value
@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     Boilers::Boiler(1).NomCap = DataSizing::AutoSize;
     Boilers::Boiler(1).VolFlowRate = DataSizing::AutoSize;
     // now call sizing routine
-    Boilers::SizeBoiler(1);
+    Boilers::Boiler(1).SizeBoiler();
     // see if boiler volume flow rate returned is autosized value
     EXPECT_NEAR(Boilers::Boiler(1).VolFlowRate, 1.2, 0.000001);
     // see if boiler nominal capacity returned is autosized value
