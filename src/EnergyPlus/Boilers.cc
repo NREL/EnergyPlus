@@ -780,10 +780,9 @@ namespace Boilers {
         }
     }
 
-    void CalcBoilerModel(int &BoilerNum,         // boiler identifier
-                         Real64 const MyLoad,    // W - hot water demand to be met by boiler
-                         bool const RunFlag,     // TRUE if boiler operating
-                         int const EquipFlowCtrl // Flow control mode for the equipment
+    void BoilerSpecs::CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
+                                      bool const RunFlag,     // TRUE if boiler operating
+                                      int const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
         // SUBROUTINE INFORMATION:
