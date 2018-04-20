@@ -169,7 +169,7 @@ namespace Boilers {
             std::string EndUseSubcategory;    // identifier use for the end use subcategory
             bool doOneTimeInitialisation;     // do the one time initialisation, i.e. locate on plantloops etc.
             bool doEnvironmentInitialisation; // do the environment initialisation, i.e. get inlet conditions etc.
-            ReportVars reportVariables;
+            ReportVars reportVariables;       // store the reporting variables on each boiler
             Real64 BoilerLoad;                // W - Boiler Load
             Real64 ParasiticElecPower;        // W - Parasitic electrical power (e.g. forced draft fan)
             Real64 BoilerMassFlowRate;        // kg/s - Boiler mass flow rate
