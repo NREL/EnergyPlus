@@ -167,6 +167,13 @@ namespace Boilers {
         SizeBoiler();
     }
 
+    bool BoilerSpecs::hasTwoVariableEfficiencyCurve()
+    {
+        return (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
+                EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
+                EfficiencyCurveType == EfficiencyCurveType::BiCubic);
+    }
+
     void clear_state()
     {
         NumBoilers = 0;
@@ -362,25 +369,21 @@ namespace Boilers {
             }
 
             // if curve uses temperature, make sure water temp mode has been set
-            {
-                auto const SELECT_CASE_var(boiler.EfficiencyCurveType);
-                if ((SELECT_CASE_var == EfficiencyCurveType::BiQuadratic) || (SELECT_CASE_var == EfficiencyCurveType::QuadraticLinear) ||
-                    (SELECT_CASE_var == EfficiencyCurveType::BiCubic)) {                                // curve uses water temperature
-                    if (boiler.CurveTempMode == TemperatureEvaluationModeType::NotSet) { // throw error
-                        if (!lAlphaFieldBlanks(3)) {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                            ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
-                            ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) + " must specify " +
-                                              cAlphaFieldNames(3));
-                            ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                            ShowContinueError("Field " + cAlphaFieldNames(3) + " is blank");
-                            ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) +
-                                              " must specify either EnteringBoiler or LeavingBoiler");
-                        }
-                        ErrorsFound = true;
+            if (boiler.hasTwoVariableEfficiencyCurve()) {                                // curve uses water temperature
+                if (boiler.CurveTempMode == TemperatureEvaluationModeType::NotSet) { // throw error
+                    if (!lAlphaFieldBlanks(3)) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                        ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
+                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) + " must specify " +
+                                            cAlphaFieldNames(3));
+                        ShowContinueError("Available choices are EnteringBoiler or LeavingBoiler");
+                    } else {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                        ShowContinueError("Field " + cAlphaFieldNames(3) + " is blank");
+                        ShowContinueError("Boiler using curve type of " + GetCurveType(boiler.EfficiencyCurvePtr) +
+                                            " must specify either EnteringBoiler or LeavingBoiler");
                     }
+                    ErrorsFound = true;
                 }
             }
 
@@ -951,10 +954,7 @@ namespace Boilers {
 
         // calculate normalized efficiency based on curve object type
         if (EfficiencyCurvePtr > 0) {
-            if (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-                EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
-
+            if (hasTwoVariableEfficiencyCurve()) {
                 if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
                     EffCurveOutput = CurveValue(EfficiencyCurvePtr, OperPLR, Node(BoilerInletNode).Temp);
                 } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
@@ -976,9 +976,7 @@ namespace Boilers {
                     ShowWarningError("Boiler:HotWater \"" + Name + "\"");
                     ShowContinueError("...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
-                    if (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-                        EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                        EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
+                    if (hasTwoVariableEfficiencyCurve()) {
                         if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
                         } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
@@ -1007,9 +1005,7 @@ namespace Boilers {
                     ShowContinueError("...Calculated Boiler Efficiency is greater than 1.1.");
                     ShowContinueError("...Boiler Efficiency calculations shown below.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
-                    if (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-                        EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                        EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
+                    if (hasTwoVariableEfficiencyCurve()) {
                         if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
                         } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {

@@ -215,6 +215,8 @@ namespace Boilers {
                              int const EquipFlowCtrl // Flow control mode for the equipment
         );
 
+        bool hasTwoVariableEfficiencyCurve();
+
         // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
         // *****************************************************************************
 
