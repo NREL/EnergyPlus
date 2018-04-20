@@ -194,6 +194,9 @@ namespace Boilers {
             {
             }
 
+            // static member functions
+            static void GetBoilerInput();
+
             // member functions
             static PlantComponent *factory(std::string objectName);
 
@@ -237,8 +240,6 @@ namespace Boilers {
     extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
 
     void clear_state();
-
-    void GetBoilerInput();
 
 } // namespace Boilers
 

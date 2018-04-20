@@ -180,7 +180,7 @@ namespace Boilers {
         GetBoilerInputFlag = true;
     }
 
-    void GetBoilerInput()
+    void BoilerSpecs::GetBoilerInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
