@@ -1076,42 +1076,18 @@ namespace Boilers {
         // PURPOSE OF THIS SUBROUTINE:
         // boiler simulation reporting
 
-        // METHODOLOGY EMPLOYED:na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
         // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int BoilerInletNode;      // Boiler inlet node number
-        int BoilerOutletNode;     // Boiler outlet node number
         Real64 ReportingConstant; // constant for converting power to energy
-
         ReportingConstant = TimeStepSys * SecInHour;
-
-        BoilerInletNode = BoilerInletNodeNum;
-        BoilerOutletNode = BoilerOutletNodeNum;
 
         if (MyLoad <= 0 || !RunFlag) {
             // set node temperatures
-            SafeCopyPlantNode(BoilerInletNode, BoilerOutletNode);
-            Node(BoilerOutletNode).Temp = Node(BoilerInletNode).Temp;
-            reportVariables.BoilerOutletTemp = Node(BoilerInletNode).Temp;
+            SafeCopyPlantNode(BoilerInletNodeNum, BoilerOutletNodeNum);
+            Node(BoilerOutletNodeNum).Temp = Node(BoilerInletNodeNum).Temp;
+            reportVariables.BoilerOutletTemp = Node(BoilerInletNodeNum).Temp;
             reportVariables.BoilerLoad = 0.0;
             reportVariables.FuelUsed = 0.0;
             reportVariables.ParasiticElecPower = 0.0;
@@ -1119,8 +1095,8 @@ namespace Boilers {
 
         } else {
             // set node temperatures
-            SafeCopyPlantNode(BoilerInletNode, BoilerOutletNode);
-            Node(BoilerOutletNode).Temp = BoilerOutletTemp;
+            SafeCopyPlantNode(BoilerInletNodeNum, BoilerOutletNodeNum);
+            Node(BoilerOutletNodeNum).Temp = BoilerOutletTemp;
             reportVariables.BoilerOutletTemp = BoilerOutletTemp;
             reportVariables.BoilerLoad = BoilerLoad;
             reportVariables.FuelUsed = FuelUsed;
@@ -1128,8 +1104,8 @@ namespace Boilers {
             reportVariables.BoilerPLR = BoilerPLR;
         }
 
-        reportVariables.BoilerInletTemp = Node(BoilerInletNode).Temp;
-        reportVariables.Mdot = Node(BoilerOutletNode).MassFlowRate;
+        reportVariables.BoilerInletTemp = Node(BoilerInletNodeNum).Temp;
+        reportVariables.Mdot = Node(BoilerOutletNodeNum).MassFlowRate;
 
         reportVariables.BoilerEnergy = reportVariables.BoilerLoad * ReportingConstant;
         reportVariables.FuelConsumed = reportVariables.FuelUsed * ReportingConstant;
