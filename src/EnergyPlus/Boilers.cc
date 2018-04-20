@@ -1065,9 +1065,8 @@ namespace Boilers {
     // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
     // *****************************************************************************
 
-    void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
-                             bool const RunFlag,  // boiler on when TRUE
-                             int const Num        // boiler number
+    void BoilerSpecs::UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
+                                          bool const RunFlag  // boiler on when TRUE
     )
     {
         // SUBROUTINE INFORMATION:
@@ -1105,36 +1104,36 @@ namespace Boilers {
 
         ReportingConstant = TimeStepSys * SecInHour;
 
-        BoilerInletNode = Boiler(Num).BoilerInletNodeNum;
-        BoilerOutletNode = Boiler(Num).BoilerOutletNodeNum;
+        BoilerInletNode = BoilerInletNodeNum;
+        BoilerOutletNode = BoilerOutletNodeNum;
 
         if (MyLoad <= 0 || !RunFlag) {
             // set node temperatures
             SafeCopyPlantNode(BoilerInletNode, BoilerOutletNode);
             Node(BoilerOutletNode).Temp = Node(BoilerInletNode).Temp;
-            BoilerReport(Num).BoilerOutletTemp = Node(BoilerInletNode).Temp;
-            BoilerReport(Num).BoilerLoad = 0.0;
-            BoilerReport(Num).FuelUsed = 0.0;
-            BoilerReport(Num).ParasiticElecPower = 0.0;
-            BoilerReport(Num).BoilerPLR = 0.0;
+            reportVariables.BoilerOutletTemp = Node(BoilerInletNode).Temp;
+            reportVariables.BoilerLoad = 0.0;
+            reportVariables.FuelUsed = 0.0;
+            reportVariables.ParasiticElecPower = 0.0;
+            reportVariables.BoilerPLR = 0.0;
 
         } else {
             // set node temperatures
             SafeCopyPlantNode(BoilerInletNode, BoilerOutletNode);
             Node(BoilerOutletNode).Temp = BoilerOutletTemp;
-            BoilerReport(Num).BoilerOutletTemp = BoilerOutletTemp;
-            BoilerReport(Num).BoilerLoad = BoilerLoad;
-            BoilerReport(Num).FuelUsed = FuelUsed;
-            BoilerReport(Num).ParasiticElecPower = ParasiticElecPower;
-            BoilerReport(Num).BoilerPLR = BoilerPLR;
+            reportVariables.BoilerOutletTemp = BoilerOutletTemp;
+            reportVariables.BoilerLoad = BoilerLoad;
+            reportVariables.FuelUsed = FuelUsed;
+            reportVariables.ParasiticElecPower = ParasiticElecPower;
+            reportVariables.BoilerPLR = BoilerPLR;
         }
 
-        BoilerReport(Num).BoilerInletTemp = Node(BoilerInletNode).Temp;
-        BoilerReport(Num).Mdot = Node(BoilerOutletNode).MassFlowRate;
+        reportVariables.BoilerInletTemp = Node(BoilerInletNode).Temp;
+        reportVariables.Mdot = Node(BoilerOutletNode).MassFlowRate;
 
-        BoilerReport(Num).BoilerEnergy = BoilerReport(Num).BoilerLoad * ReportingConstant;
-        BoilerReport(Num).FuelConsumed = BoilerReport(Num).FuelUsed * ReportingConstant;
-        BoilerReport(Num).ParasiticElecConsumption = BoilerReport(Num).ParasiticElecPower * ReportingConstant;
+        reportVariables.BoilerEnergy = reportVariables.BoilerLoad * ReportingConstant;
+        reportVariables.FuelConsumed = reportVariables.FuelUsed * ReportingConstant;
+        reportVariables.ParasiticElecConsumption = reportVariables.ParasiticElecPower * ReportingConstant;
     }
 
     // End of Record Keeping subroutines for the BOILER:HOTWATER Module
