@@ -203,6 +203,11 @@ namespace Boilers {
         LoopNum = loopNumber;
     }
 
+    void BoilerSpecs::setDesignOutletTemperature(Real64 const temperature)
+    {
+        designOutletTemperature_ = temperature;
+    }
+
     void clear_state()
     {
         NumBoilers = 0;

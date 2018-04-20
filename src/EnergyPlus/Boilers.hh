@@ -156,6 +156,7 @@ namespace Boilers {
             void setDesignVolumeFlowRate(Real64 const flowRate);
             void setDesignSizingFactor(Real64 const sizingFactor);
             void setLoopNumber(int const loopNumber);
+            void setDesignOutletTemperature(Real64 const temperature);
 
         private:
             int FuelType;                 // resource type assignment
