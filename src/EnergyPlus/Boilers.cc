@@ -638,7 +638,6 @@ namespace Boilers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum(0);        // Plant Sizing index corresponding to CurLoopNum
         bool ErrorsFound(false); // If errors detected in input
-        std::string equipName;   // Name of boiler object
         Real64 rho;
         Real64 Cp;
         Real64 tmpNomCap;            // local nominal capacity cooling power
@@ -757,10 +756,9 @@ namespace Boilers {
 
         if (PlantFinalSizesOkayToReport) {
             // create predefined report
-            equipName = Name;
-            PreDefTableEntry(pdchMechType, equipName, "Boiler:HotWater");
-            PreDefTableEntry(pdchMechNomEff, equipName, Effic);
-            PreDefTableEntry(pdchMechNomCap, equipName, NomCap);
+            PreDefTableEntry(pdchMechType, Name, "Boiler:HotWater");
+            PreDefTableEntry(pdchMechNomEff, Name, Effic);
+            PreDefTableEntry(pdchMechNomCap, Name, NomCap);
         }
 
         if (ErrorsFound) {
