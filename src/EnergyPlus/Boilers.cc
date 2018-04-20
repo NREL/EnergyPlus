@@ -150,9 +150,9 @@ namespace Boilers {
 
     void BoilerSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        MinLoad = NomCap * MinPartLoadRat;
-        MaxLoad = NomCap * MaxPartLoadRat;
-        OptLoad = NomCap * OptPartLoadRat;
+        MinLoad = designNominalCapacity_ * MinPartLoadRat;
+        MaxLoad = designNominalCapacity_ * MaxPartLoadRat;
+        OptLoad = designNominalCapacity_ * OptPartLoadRat;
     }
 
     void BoilerSpecs::getSizingFactor(Real64 &SizingFactor)
@@ -258,18 +258,18 @@ namespace Boilers {
                 ErrorsFound = true;
             }
 
-            boiler.NomCap = rNumericArgs(1);
+            boiler.designNominalCapacity_ = rNumericArgs(1);
             if (rNumericArgs(1) == 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
                 ShowContinueError("..." + cNumericFieldNames(1) + " must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (boiler.NomCap == AutoSize) {
+            if (boiler.designNominalCapacity_ == AutoSize) {
                 boiler.NomCapWasAutoSized = true;
             }
 
-            boiler.Effic = rNumericArgs(2);
+            boiler.designEfficiency_ = rNumericArgs(2);
             if (rNumericArgs(2) == 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(2) + '=' + RoundSigDigits(rNumericArgs(2), 3));
@@ -338,7 +338,7 @@ namespace Boilers {
                 }
             }
 
-            boiler.TempDesBoilerOut = rNumericArgs(3);
+            boiler.designOutletTemperature_ = rNumericArgs(3);
             boiler.VolFlowRate = rNumericArgs(4);
             if (boiler.VolFlowRate == AutoSize) {
                 boiler.VolFlowRateWasAutoSized = true;
@@ -423,7 +423,7 @@ namespace Boilers {
             SetupOutputVariable("Boiler Part Load Ratio", OutputProcessor::Unit::None, report.BoilerPLR, "System", "Average", boiler.Name);
 
             if (AnyEnergyManagementSystemInModel) {
-                SetupEMSInternalVariable("Boiler Nominal Capacity", boiler.Name, "[W]", boiler.NomCap);
+                SetupEMSInternalVariable("Boiler Nominal Capacity", boiler.Name, "[W]", boiler.designNominalCapacity_);
             }
         }
     }
@@ -595,7 +595,7 @@ namespace Boilers {
         Real64 NomCapUser(0.0);      // Hardsized nominal capacity for reporting
         Real64 VolFlowRateUser(0.0); // Hardsized volume flow for reporting
 
-        tmpNomCap = NomCap;
+        tmpNomCap = designNominalCapacity_;
         tmpBoilerVolFlowRate = VolFlowRate;
 
         PltSizNum = PlantLoop(LoopNum).PlantSizNum;
@@ -604,14 +604,14 @@ namespace Boilers {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                 // TODO: temperatures here are different and inconsistent e.g. CWInitConvTemp
                 rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
-                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, TempDesBoilerOut, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, designOutletTemperature_, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 tmpNomCap = Cp * rho * SizFac * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
                 if (NomCapWasAutoSized) tmpNomCap = 0.0;
             }
             if (PlantFirstSizesOkayToFinalize) {
                 if (NomCapWasAutoSized) {
-                    NomCap = tmpNomCap;
+                    designNominalCapacity_ = tmpNomCap;
                     if (PlantFinalSizesOkayToReport) {
                         ReportSizingOutput("Boiler:HotWater", Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
@@ -619,8 +619,8 @@ namespace Boilers {
                         ReportSizingOutput("Boiler:HotWater", Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else { // Hard-sized with sizing data
-                    if (NomCap > 0.0 && tmpNomCap > 0.0) {
-                        NomCapUser = NomCap;
+                    if (designNominalCapacity_ > 0.0 && tmpNomCap > 0.0) {
+                        NomCapUser = designNominalCapacity_;
                         if (PlantFinalSizesOkayToReport) {
                             ReportSizingOutput("Boiler:HotWater", Name, "Design Size Nominal Capacity [W]", tmpNomCap,
                                                "User-Specified Nominal Capacity [W]", NomCapUser);
@@ -645,8 +645,8 @@ namespace Boilers {
                 ErrorsFound = true;
             }
             if (!NomCapWasAutoSized && PlantFinalSizesOkayToReport &&
-                (NomCap > 0.0)) { // Hard-sized with no sizing data
-                ReportSizingOutput("Boiler:HotWater", Name, "User-Specified Nominal Capacity [W]", NomCap);
+                (designNominalCapacity_ > 0.0)) { // Hard-sized with no sizing data
+                ReportSizingOutput("Boiler:HotWater", Name, "User-Specified Nominal Capacity [W]", designNominalCapacity_);
             }
         }
 
@@ -705,8 +705,8 @@ namespace Boilers {
         if (PlantFinalSizesOkayToReport) {
             // create predefined report
             PreDefTableEntry(pdchMechType, Name, "Boiler:HotWater");
-            PreDefTableEntry(pdchMechNomEff, Name, Effic);
-            PreDefTableEntry(pdchMechNomCap, Name, NomCap);
+            PreDefTableEntry(pdchMechNomEff, Name, designEfficiency_);
+            PreDefTableEntry(pdchMechNomCap, Name, designNominalCapacity_);
         }
 
         if (ErrorsFound) {
@@ -784,10 +784,10 @@ namespace Boilers {
         BoilerMassFlowRate = 0.0;
         BoilerInletNode = BoilerInletNodeNum;
         BoilerOutletNode = BoilerOutletNodeNum;
-        BoilerNomCap = NomCap;
+        BoilerNomCap = designNominalCapacity_;
         BoilerMaxPLR = MaxPartLoadRat;
         BoilerMinPLR = MinPartLoadRat;
-        BoilerEff = Effic;
+        BoilerEff = designEfficiency_;
         TempUpLimitBout = TempUpLimitBoilerOut;
         BoilerMassFlowRateMax = DesMassFlowRate;
 
