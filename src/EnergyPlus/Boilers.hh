@@ -177,6 +177,41 @@ namespace Boilers {
         void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+
+        void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
+            std::string const &BoilerName, // boiler identifier
+            int const EquipFlowCtrl,       // Flow control mode for the equipment
+            int &CompIndex,                // boiler counter/identifier
+            bool const RunFlag,            // if TRUE run boiler simulation--boiler is ON
+            bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
+            Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
+            Real64 &MaxCap,                // W - maximum boiler operating capacity
+            Real64 &MinCap,                // W - minimum boiler operating capacity
+            Real64 &OptCap,                // W - optimal boiler operating capacity
+            bool const GetSizingFactor,    // TRUE when just the sizing factor is requested
+            Real64 &SizingFactor           // sizing factor
+        );
+
+        void InitBoiler(); // number of the current boiler being simulated
+
+        void SizeBoiler();
+
+        void CalcBoilerModel(int &BoilerNum,         // boiler identifier
+            Real64 const MyLoad,    // W - hot water demand to be met by boiler
+            bool const RunFlag,     // TRUE if boiler operating
+            int const EquipFlowCtrl // Flow control mode for the equipment
+        );
+
+        // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
+        // *****************************************************************************
+
+        void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
+            bool const RunFlag,  // boiler on when TRUE
+            int const Num        // boiler number
+        );
+
+        // End of Record Keeping subroutines for the BOILER:HOTWATER Module
+        // *****************************************************************************
     };
 
     struct ReportVars
@@ -209,42 +244,7 @@ namespace Boilers {
 
     void clear_state();
 
-    void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
-                   std::string const &BoilerName, // boiler identifier
-                   int const EquipFlowCtrl,       // Flow control mode for the equipment
-                   int &CompIndex,                // boiler counter/identifier
-                   bool const RunFlag,            // if TRUE run boiler simulation--boiler is ON
-                   bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-                   Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
-                   Real64 &MaxCap,                // W - maximum boiler operating capacity
-                   Real64 &MinCap,                // W - minimum boiler operating capacity
-                   Real64 &OptCap,                // W - optimal boiler operating capacity
-                   bool const GetSizingFactor,    // TRUE when just the sizing factor is requested
-                   Real64 &SizingFactor           // sizing factor
-    );
-
     void GetBoilerInput();
-
-    void InitBoiler(int const BoilerNum); // number of the current boiler being simulated
-
-    void SizeBoiler(int const BoilerNum);
-
-    void CalcBoilerModel(int &BoilerNum,         // boiler identifier
-                         Real64 const MyLoad,    // W - hot water demand to be met by boiler
-                         bool const RunFlag,     // TRUE if boiler operating
-                         int const EquipFlowCtrl // Flow control mode for the equipment
-    );
-
-    // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
-
-    void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
-                             bool const RunFlag,  // boiler on when TRUE
-                             int const Num        // boiler number
-    );
-
-    // End of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
 
 } // namespace Boilers
 
