@@ -88,10 +88,6 @@ namespace Boilers {
 		LeavingSetPointModulated,
 		default=NotSet,
 	};
-    extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
 
     // DERIVED TYPE DEFINITIONS
 

@@ -124,12 +124,6 @@ namespace Boilers {
     int const EnteringBoilerTemp(101);
     int const LeavingBoilerTemp(102);
 
-    // Boiler flow modes
-    int const FlowModeNotSet(200);
-    int const ConstantFlow(201);
-    int const NotModulated(202);
-    int const LeavingSetPointModulated(203);
-
     // MODULE VARIABLE DECLARATIONS:
     int NumBoilers(0);              // Number of boilers
     Real64 FuelUsed(0.0);           // W - Boiler fuel used
