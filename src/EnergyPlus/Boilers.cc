@@ -152,6 +152,17 @@ namespace Boilers {
     void BoilerSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
     {}
 
+    void getDesignCapacities(const PlantLocation &calledFromLocation,
+                             Real64 &MaxLoad,
+                             Real64 &MinLoad,
+                             Real64 &OptLoad) {
+
+    }
+
+    void getSizingFactor(Real64 &SizFac) {
+
+    }
+
     void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
         InitBoiler();

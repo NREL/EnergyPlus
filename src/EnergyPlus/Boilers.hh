@@ -179,7 +179,14 @@ namespace Boilers {
 
         void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
             std::string const &BoilerName, // boiler identifier
