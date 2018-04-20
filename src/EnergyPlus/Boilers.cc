@@ -173,33 +173,39 @@ namespace Boilers {
                 efficiencyCurveType_ == EfficiencyCurveType::BiCubic);
     }
 
-    Real64 BoilerSpecs::getDesignNominalCapacity() {
+    Real64 BoilerSpecs::getDesignNominalCapacity()
+    {
         return designNominalCapacity_;
     }
 
-    Real64 BoilerSpecs::getDesignVolumeFlowRate() {
+    Real64 BoilerSpecs::getDesignVolumeFlowRate()
+    {
         return designVolumeFlowRate_;
     }
 
-    void BoilerSpecs::setDesignNominalCapacity(Real64 const capacity) {
+    void BoilerSpecs::setDesignNominalCapacity(Real64 const capacity)
+    {
         using DataSizing::AutoSize;
 
         designNominalCapacity_ = capacity;
         designNominalCapacityWasAutoSized_ = (designNominalCapacity_ == AutoSize);
     }
 
-    void BoilerSpecs::setDesignVolumeFlowRate(Real64 const flowRate) {
+    void BoilerSpecs::setDesignVolumeFlowRate(Real64 const flowRate)
+    {
         using DataSizing::AutoSize;
 
         designVolumeFlowRate_ = flowRate;
         designVolumeFlowRateWasAutoSized_ = (designVolumeFlowRate_ == AutoSize);
     }
 
-    void BoilerSpecs::setDesignSizingFactor(Real64 const sizingFactor) {
+    void BoilerSpecs::setDesignSizingFactor(Real64 const sizingFactor)
+    {
         designSizingFactor_ = sizingFactor;
     }
 
-    void BoilerSpecs::setLoopNumber(int const loopNumber) {
+    void BoilerSpecs::setLoopNumber(int const loopNumber)
+    {
         LoopNum = loopNumber;
     }
 
