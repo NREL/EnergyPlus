@@ -281,11 +281,11 @@ namespace Boilers {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
 
                 if (SELECT_CASE_var == "ENTERINGBOILER") {
-                    boiler.CurveTempMode = TemperatureEvaluationModeType::Entering;
+                    boiler.efficiencyCurveTemperatureMode_ = TemperatureEvaluationModeType::Entering;
                 } else if (SELECT_CASE_var == "LEAVINGBOILER") {
-                    boiler.CurveTempMode = TemperatureEvaluationModeType::Leaving;
+                    boiler.efficiencyCurveTemperatureMode_ = TemperatureEvaluationModeType::Leaving;
                 } else {
-                    boiler.CurveTempMode = TemperatureEvaluationModeType::NotSet;
+                    boiler.efficiencyCurveTemperatureMode_ = TemperatureEvaluationModeType::NotSet;
                 }
             }
 
@@ -321,7 +321,7 @@ namespace Boilers {
 
             // if curve uses temperature, make sure water temp mode has been set
             if (boiler.hasTwoVariableEfficiencyCurve()) {                                // curve uses water temperature
-                if (boiler.CurveTempMode == TemperatureEvaluationModeType::NotSet) { // throw error
+                if (boiler.efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::NotSet) { // throw error
                     if (!lAlphaFieldBlanks(3)) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
@@ -902,9 +902,9 @@ namespace Boilers {
         // calculate normalized efficiency based on curve object type
         if (curveEfficiencyIndex_ > 0) {
             if (hasTwoVariableEfficiencyCurve()) {
-                if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
+                if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                     EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR, Node(BoilerInletNode).Temp);
-                } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
+                } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
                     EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR, BoilerOutletTemp);
                 }
 
@@ -924,9 +924,9 @@ namespace Boilers {
                     ShowContinueError("...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
                     if (hasTwoVariableEfficiencyCurve()) {
-                        if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
+                        if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
-                        } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
+                        } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
                         }
                     }
@@ -953,9 +953,9 @@ namespace Boilers {
                     ShowContinueError("...Boiler Efficiency calculations shown below.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
                     if (hasTwoVariableEfficiencyCurve()) {
-                        if (CurveTempMode == TemperatureEvaluationModeType::Entering) {
+                        if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
-                        } else if (CurveTempMode == TemperatureEvaluationModeType::Leaving) {
+                        } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
                         }
                     }

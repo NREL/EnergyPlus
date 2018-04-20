@@ -153,7 +153,7 @@ namespace Boilers {
             Real64 designMinPartLoadRatio_;        // Minimum allowed operating part load ratio
             Real64 designMaxPartLoadRatio_;        // Maximum allowed operating part load ratio
             Real64 designOptimalPartLoadRatio_;        // Optimal operating part load ratio
-            TemperatureEvaluationModeType CurveTempMode;      // water temp to use in curve, switch between entering and leaving
+            TemperatureEvaluationModeType efficiencyCurveTemperatureMode_;      // water temp to use in curve, switch between entering and leaving
             int curveEfficiencyIndex_;       // Index to efficiency curve
             EfficiencyCurveType efficiencyCurveType_;      // Type of efficiency curve
             Real64 designOutletTemperatureLimit_;  // C - Boiler outlet maximum temperature limit
@@ -183,7 +183,7 @@ namespace Boilers {
                   designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0), designFlowMode_(FlowModeType::default), ModulatedFlowSetToLoop(false),
                   ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), designSizingFactor_(0.0),
                   nodeHotWaterInletIndex_(0), nodeHotWaterOutletIndex_(0), designMinPartLoadRatio_(0.0), designMaxPartLoadRatio_(0.0), designOptimalPartLoadRatio_(0.0),
-                  CurveTempMode(TemperatureEvaluationModeType::default), curveEfficiencyIndex_(0), efficiencyCurveType_(EfficiencyCurveType::default),
+                  efficiencyCurveTemperatureMode_(TemperatureEvaluationModeType::default), curveEfficiencyIndex_(0), efficiencyCurveType_(EfficiencyCurveType::default),
                   designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
                   CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
                   FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars()),
