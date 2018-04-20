@@ -150,9 +150,9 @@ namespace Boilers {
 
     void BoilerSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        MinLoad = designNominalCapacity_ * MinPartLoadRat;
-        MaxLoad = designNominalCapacity_ * MaxPartLoadRat;
-        OptLoad = designNominalCapacity_ * OptPartLoadRat;
+        MinLoad = designNominalCapacity_ * designMinPartLoadRatio_;
+        MaxLoad = designNominalCapacity_ * designMaxPartLoadRatio_;
+        OptLoad = designNominalCapacity_ * designOptimalPartLoadRatio_;
     }
 
     void BoilerSpecs::getSizingFactor(Real64 &SizingFactor)
@@ -343,9 +343,9 @@ namespace Boilers {
             if (boiler.designVolumeFlowRate_ == AutoSize) {
                 boiler.designVolumeFlowRateWasAutoSized_ = true;
             }
-            boiler.MinPartLoadRat = rNumericArgs(5);
-            boiler.MaxPartLoadRat = rNumericArgs(6);
-            boiler.OptPartLoadRat = rNumericArgs(7);
+            boiler.designMinPartLoadRatio_ = rNumericArgs(5);
+            boiler.designMaxPartLoadRatio_ = rNumericArgs(6);
+            boiler.designOptimalPartLoadRatio_ = rNumericArgs(7);
 
             boiler.TempUpLimitBoilerOut = rNumericArgs(8);
             // default to 99.9C if upper temperature limit is left blank.
@@ -785,8 +785,8 @@ namespace Boilers {
         BoilerInletNode = BoilerInletNodeNum;
         BoilerOutletNode = BoilerOutletNodeNum;
         BoilerNomCap = designNominalCapacity_;
-        BoilerMaxPLR = MaxPartLoadRat;
-        BoilerMinPLR = MinPartLoadRat;
+        BoilerMaxPLR = designMaxPartLoadRatio_;
+        BoilerMinPLR = designMinPartLoadRatio_;
         BoilerEff = designEfficiency_;
         TempUpLimitBout = TempUpLimitBoilerOut;
         BoilerMassFlowRateMax = designMassFlowRate_;

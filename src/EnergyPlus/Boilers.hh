@@ -150,9 +150,9 @@ namespace Boilers {
             Real64 designSizingFactor_;                // sizing factor
             int BoilerInletNodeNum;       // Node number at the boiler inlet
             int BoilerOutletNodeNum;      // Node number at the boiler outlet
-            Real64 MinPartLoadRat;        // Minimum allowed operating part load ratio
-            Real64 MaxPartLoadRat;        // Maximum allowed operating part load ratio
-            Real64 OptPartLoadRat;        // Optimal operating part load ratio
+            Real64 designMinPartLoadRatio_;        // Minimum allowed operating part load ratio
+            Real64 designMaxPartLoadRatio_;        // Maximum allowed operating part load ratio
+            Real64 designOptimalPartLoadRatio_;        // Optimal operating part load ratio
             TemperatureEvaluationModeType CurveTempMode;      // water temp to use in curve, switch between entering and leaving
             int EfficiencyCurvePtr;       // Index to efficiency curve
             EfficiencyCurveType EfficiencyCurveType;      // Type of efficiency curve
@@ -182,7 +182,7 @@ namespace Boilers {
                 : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), designNominalCapacity_(0.0),
                   designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
                   ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), designSizingFactor_(0.0),
-                  BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
+                  BoilerInletNodeNum(0), BoilerOutletNodeNum(0), designMinPartLoadRatio_(0.0), designMaxPartLoadRatio_(0.0), designOptimalPartLoadRatio_(0.0),
                   CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
                   TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
                   CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
