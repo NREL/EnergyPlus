@@ -158,16 +158,19 @@ namespace Boilers {
         int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
         Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
         std::string EndUseSubcategory;    // identifier use for the end use subcategory
+        bool doOneTimeInitialisation;     // do the one time initialisation, i.e. locate on plantloops etc.
+        bool doEnvironmentInitialisation; // do the environment initialisation, i.e. get inlet conditions etc.
 
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
-              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowMode::default), ModulatedFlowSetToLoop(false),
+              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
-              CurveTempMode(TemperatureEvaluationMode::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
-              EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
-              FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0)
+              CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
+              TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
+              CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
+              FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true)
         {
         }
 

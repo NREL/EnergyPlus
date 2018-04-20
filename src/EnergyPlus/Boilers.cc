@@ -118,7 +118,6 @@ namespace Boilers {
     Real64 BoilerOutletTemp(0.0);   // W - Boiler outlet temperature
     Real64 BoilerPLR(0.0);          // Boiler operating part-load ratio
     bool GetBoilerInputFlag(true);
-    bool BoilerOneTimeFlag(true);
     Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
@@ -171,7 +170,6 @@ namespace Boilers {
         Boiler.deallocate();
         BoilerReport.deallocate();
         GetBoilerInputFlag = true;
-        BoilerOneTimeFlag = true;
     }
 
     void SimBoiler(std::string const &EP_UNUSED(BoilerType), // boiler type (used in CASE statement)
@@ -590,23 +588,12 @@ namespace Boilers {
         static std::string const RoutineName("InitBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // environment flag
-        static Array1D_bool MyFlag;
         Real64 rho;
         bool FatalError;
         bool errFlag;
 
-        // Do the one time initializations
-        if (BoilerOneTimeFlag) {
-            MyFlag.allocate(NumBoilers);
-            MyEnvrnFlag.allocate(NumBoilers);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            BoilerOneTimeFlag = false;
-        }
-
         // Init more variables
-        if (MyFlag(BoilerNum)) {
+        if (doOneTimeInitialisation) {
             // Locate the boilers on the plant loops for later usage
             errFlag = false;
             ScanPlantLoopsForObject(Name, TypeOf_Boiler_Simple, LoopNum, LoopSideNum,
@@ -625,10 +612,10 @@ namespace Boilers {
                     .FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
             }
 
-            MyFlag(BoilerNum) = false;
+            doOneTimeInitialisation = false;
         }
 
-        if (MyEnvrnFlag(BoilerNum) && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
+        if (doEnvironmentInitialisation && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp,
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
@@ -668,11 +655,11 @@ namespace Boilers {
                 }
             }
 
-            MyEnvrnFlag(BoilerNum) = false;
+            doEnvironmentInitialisation = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag(BoilerNum) = true;
+            doEnvironmentInitialisation = true;
         }
 
         // every iteration inits.  (most in calc routine)
