@@ -148,6 +148,15 @@ namespace Boilers {
 
             void getSizingFactor(Real64 &SizingFactor) override;
 
+            // public getters/setters
+            Real64 getDesignNominalCapacity();
+            Real64 getDesignVolumeFlowRate();
+
+            void setDesignNominalCapacity(Real64 const capacity);
+            void setDesignVolumeFlowRate(Real64 const flowRate);
+            void setDesignSizingFactor(Real64 const sizingFactor);
+            void setLoopNumber(int const loopNumber);
+
         private:
             int FuelType;                 // resource type assignment
             int TypeNum;                  // plant loop type identifier
