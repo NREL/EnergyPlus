@@ -184,9 +184,9 @@ namespace Boilers {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void getSizingFactor(Real64 &SizFac) override;
 
         void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void getSizingFactor(Real64 &SizingFactor) override;
 
 
         void InitBoiler(); // number of the current boiler being simulated
