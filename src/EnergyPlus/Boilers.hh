@@ -236,9 +236,6 @@ namespace Boilers {
 
     // Object Data
     extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
-    extern Array1D<ReportVars> BoilerReport; // report vars - dimension to number of machines
-
-    // Functions
 
 } // namespace Boilers
 
