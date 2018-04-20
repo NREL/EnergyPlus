@@ -266,7 +266,7 @@ namespace Boilers {
                 ErrorsFound = true;
             }
             if (boiler.designNominalCapacity_ == AutoSize) {
-                boiler.NomCapWasAutoSized = true;
+                boiler.designNominalCapacityWasAutoSized_ = true;
             }
 
             boiler.designEfficiency_ = rNumericArgs(2);
@@ -607,10 +607,10 @@ namespace Boilers {
                 Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, designOutletTemperature_, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 tmpNomCap = Cp * rho * SizFac * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
-                if (NomCapWasAutoSized) tmpNomCap = 0.0;
+                if (designNominalCapacityWasAutoSized_) tmpNomCap = 0.0;
             }
             if (PlantFirstSizesOkayToFinalize) {
-                if (NomCapWasAutoSized) {
+                if (designNominalCapacityWasAutoSized_) {
                     designNominalCapacity_ = tmpNomCap;
                     if (PlantFinalSizesOkayToReport) {
                         ReportSizingOutput("Boiler:HotWater", Name, "Design Size Nominal Capacity [W]", tmpNomCap);
@@ -639,12 +639,12 @@ namespace Boilers {
                 }
             }
         } else {
-            if (NomCapWasAutoSized && PlantFirstSizesOkayToFinalize) {
+            if (designNominalCapacityWasAutoSized_ && PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object");
                 ShowContinueError("Occurs in Boiler object=" + Name);
                 ErrorsFound = true;
             }
-            if (!NomCapWasAutoSized && PlantFinalSizesOkayToReport &&
+            if (!designNominalCapacityWasAutoSized_ && PlantFinalSizesOkayToReport &&
                 (designNominalCapacity_ > 0.0)) { // Hard-sized with no sizing data
                 ReportSizingOutput("Boiler:HotWater", Name, "User-Specified Nominal Capacity [W]", designNominalCapacity_);
             }

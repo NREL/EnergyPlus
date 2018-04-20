@@ -138,7 +138,7 @@ namespace Boilers {
             int BranchNum;                // plant loop branch connection
             int CompNum;                  // plant loop component connection
             Real64 designNominalCapacity_;                // W - design nominal capacity of Boiler
-            bool NomCapWasAutoSized;      // true if previous was set to autosize input
+            bool designNominalCapacityWasAutoSized_;      // true if previous was set to autosize input
             Real64 designEfficiency_;                 // boiler efficiency at design conditions
             Real64 designOutletTemperature_;      // C - Boiler design outlet temperature
             FlowModeType FlowMode;                 // one of 3 modes for componet flow during operation
@@ -180,7 +180,7 @@ namespace Boilers {
             // Default Constructor
             BoilerSpecs()
                 : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), designNominalCapacity_(0.0),
-                  NomCapWasAutoSized(false), designEfficiency_(0.0), designOutletTemperature_(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
+                  designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
                   ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), SizFac(0.0),
                   BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
                   CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
