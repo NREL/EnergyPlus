@@ -113,6 +113,28 @@ namespace Boilers {
 
     // Types
 
+    struct ReportVars
+    {
+        // Members
+        Real64 BoilerLoad;               // W - Boiler operating load
+        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
+        Real64 FuelUsed;                 // W - Boiler fuel used
+        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
+        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
+        Real64 BoilerOutletTemp;         // C - Boiler outlet temperature
+        Real64 Mdot;                     // kg/s - Boiler mass flow rate
+        Real64 ParasiticElecPower;       // W - Parasitic Electrical Power (e.g. forced draft fan)
+        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+        Real64 BoilerPLR;                // Boiler operating part-load ratio
+
+                                         // Default Constructor
+        ReportVars()
+            : BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
+            ParasiticElecPower(0.0), ParasiticElecConsumption(0.0), BoilerPLR(0.0)
+        {
+        }
+    };
+
     struct BoilerSpecs : public PlantComponent
     {
         // Members
@@ -160,6 +182,7 @@ namespace Boilers {
         std::string EndUseSubcategory;    // identifier use for the end use subcategory
         bool doOneTimeInitialisation;     // do the one time initialisation, i.e. locate on plantloops etc.
         bool doEnvironmentInitialisation; // do the environment initialisation, i.e. get inlet conditions etc.
+        ReportVars reportVariables;
 
         // Default Constructor
         BoilerSpecs()
@@ -170,7 +193,7 @@ namespace Boilers {
               CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
               TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
               CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
-              FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true)
+              FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars())
         {
         }
 
@@ -207,28 +230,8 @@ namespace Boilers {
 
         // End of Record Keeping subroutines for the BOILER:HOTWATER Module
         // *****************************************************************************
-    };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 BoilerLoad;               // W - Boiler operating load
-        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
-        Real64 FuelUsed;                 // W - Boiler fuel used
-        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
-        Real64 BoilerOutletTemp;         // C - Boiler outlet temperature
-        Real64 Mdot;                     // kg/s - Boiler mass flow rate
-        Real64 ParasiticElecPower;       // W - Parasitic Electrical Power (e.g. forced draft fan)
-        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-        Real64 BoilerPLR;                // Boiler operating part-load ratio
 
-        // Default Constructor
-        ReportVars()
-            : BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
-              ParasiticElecPower(0.0), ParasiticElecConsumption(0.0), BoilerPLR(0.0)
-        {
-        }
     };
 
     // Object Data
