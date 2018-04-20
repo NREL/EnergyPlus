@@ -803,7 +803,7 @@ namespace Boilers {
         }
 
         // If there is a fault of boiler fouling (zrp_Nov2016)
-        if (FaultyBoilerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
+        if (hasFoulingFault_ && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             int FaultIndex = FaultyBoilerFoulingIndex;
             Real64 NomCap_ff = BoilerNomCap;
             Real64 BoilerEff_ff = BoilerEff;
