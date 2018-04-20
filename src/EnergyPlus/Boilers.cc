@@ -341,7 +341,7 @@ namespace Boilers {
             boiler.designOutletTemperature_ = rNumericArgs(3);
             boiler.designVolumeFlowRate_ = rNumericArgs(4);
             if (boiler.designVolumeFlowRate_ == AutoSize) {
-                boiler.VolFlowRateWasAutoSized = true;
+                boiler.designVolumeFlowRateWasAutoSized_ = true;
             }
             boiler.MinPartLoadRat = rNumericArgs(5);
             boiler.MaxPartLoadRat = rNumericArgs(6);
@@ -654,10 +654,10 @@ namespace Boilers {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                 tmpBoilerVolFlowRate = PlantSizData(PltSizNum).DesVolFlowRate * SizFac;
             } else {
-                if (VolFlowRateWasAutoSized) tmpBoilerVolFlowRate = 0.0;
+                if (designVolumeFlowRateWasAutoSized_) tmpBoilerVolFlowRate = 0.0;
             }
             if (PlantFirstSizesOkayToFinalize) {
-                if (VolFlowRateWasAutoSized) {
+                if (designVolumeFlowRateWasAutoSized_) {
                     designVolumeFlowRate_ = tmpBoilerVolFlowRate;
                     if (PlantFinalSizesOkayToReport) {
                         ReportSizingOutput("Boiler:HotWater", Name, "Design Size Design Water Flow Rate [m3/s]",
@@ -689,12 +689,12 @@ namespace Boilers {
                 }
             }
         } else {
-            if (VolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize) {
+            if (designVolumeFlowRateWasAutoSized_ && PlantFirstSizesOkayToFinalize) {
                 ShowSevereError("Autosizing of Boiler design flow rate requires a loop Sizing:Plant object");
                 ShowContinueError("Occurs in Boiler object=" + Name);
                 ErrorsFound = true;
             }
-            if (!VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport &&
+            if (!designVolumeFlowRateWasAutoSized_ && PlantFinalSizesOkayToReport &&
                 (designVolumeFlowRate_ > 0.0)) { // Hard-sized with no sizing data
                 ReportSizingOutput("Boiler:HotWater", Name, "User-Specified Design Water Flow Rate [m3/s]", designVolumeFlowRate_);
             }

@@ -145,7 +145,7 @@ namespace Boilers {
             bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
             bool ModulatedFlowErrDone;    // true if setpoint warning issued
             Real64 designVolumeFlowRate_;           // m3/s - Boiler water design volumetric flow rate
-            bool VolFlowRateWasAutoSized; // true if previous was set to autosize input
+            bool designVolumeFlowRateWasAutoSized_; // true if previous was set to autosize input
             Real64 designMassFlowRate_;       // kg/s - Boiler water design mass flow rate
             Real64 SizFac;                // sizing factor
             int BoilerInletNodeNum;       // Node number at the boiler inlet
@@ -181,7 +181,7 @@ namespace Boilers {
             BoilerSpecs()
                 : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), designNominalCapacity_(0.0),
                   NomCapWasAutoSized(false), designEfficiency_(0.0), designOutletTemperature_(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
-                  ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), VolFlowRateWasAutoSized(false), designMassFlowRate_(0.0), SizFac(0.0),
+                  ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), SizFac(0.0),
                   BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
                   CurveTempMode(TemperatureEvaluationModeType::default), EfficiencyCurvePtr(0), EfficiencyCurveType(EfficiencyCurveType::default),
                   TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
