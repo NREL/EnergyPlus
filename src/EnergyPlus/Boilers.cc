@@ -109,11 +109,6 @@ namespace Boilers {
     using General::TrimSigDigits;
     using PlantUtilities::ScanPlantLoopsForObject;
 
-    // water temperature evaluation method
-    int const BoilerTempModeNotSet(100);
-    int const EnteringBoilerTemp(101);
-    int const LeavingBoilerTemp(102);
-
     // MODULE VARIABLE DECLARATIONS:
     int NumBoilers(0);              // Number of boilers
     Real64 FuelUsed(0.0);           // W - Boiler fuel used

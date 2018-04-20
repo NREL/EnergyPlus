@@ -86,9 +86,6 @@ namespace Boilers {
 		Leaving,
 		default=NotSet,
 	};
-    extern int const BoilerTempModeNotSet;
-    extern int const EnteringBoilerTemp;
-    extern int const LeavingBoilerTemp;
 
     // Boiler flow modes
 	enum class FlowMode {
