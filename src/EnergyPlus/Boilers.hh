@@ -137,6 +137,17 @@ namespace Boilers {
             int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
             Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
 
+                                              // member functions
+            static PlantComponent *factory(std::string objectName);
+
+            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+
+            void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+            void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+            void getSizingFactor(Real64 &SizingFactor) override;
+
         private:
             int FuelType;                 // resource type assignment
             int TypeNum;                  // plant loop type identifier
@@ -196,21 +207,6 @@ namespace Boilers {
 
             // static member functions
             static void GetBoilerInput();
-
-            // member functions
-            static PlantComponent *factory(std::string objectName);
-
-            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
-
-            void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                                     Real64 &MaxLoad,
-                                     Real64 &MinLoad,
-                                     Real64 &OptLoad) override;
-
-
-            void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
-            void getSizingFactor(Real64 &SizingFactor) override;
-
 
             void InitBoiler(); // number of the current boiler being simulated
 
