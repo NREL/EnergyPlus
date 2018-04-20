@@ -199,6 +199,7 @@ namespace Boilers {
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobalConstants::AssignResourceTypeNum;
+        using DataGlobalConstants::GetResourceTypeChar;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
@@ -219,7 +220,6 @@ namespace Boilers {
         int IOStat;                                     // IO Status when calling get input subroutine
         static bool ErrorsFound(false);                 // Flag to show errors were found during GetInput
         bool errFlag;                                   // Flag to show errors were found during function call
-        Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
         // GET NUMBER OF ALL EQUIPMENT
         cCurrentModuleObject = "Boiler:HotWater";
@@ -234,8 +234,6 @@ namespace Boilers {
         if (allocated(Boiler)) return;
 
         Boiler.allocate(NumBoilers);
-        BoilerFuelTypeForOutputVariable.allocate(NumBoilers);
-        BoilerFuelTypeForOutputVariable = "";
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
 
@@ -251,59 +249,13 @@ namespace Boilers {
             boiler.Name = cAlphaArgs(1);
             boiler.TypeNum = TypeOf_Boiler_Simple;
 
-            {
-                auto const SELECT_CASE_var(cAlphaArgs(2));
-
-                if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Electric";
-                    boiler.FuelType = AssignResourceTypeNum("ELECTRICITY");
-
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Gas";
-                    boiler.FuelType = AssignResourceTypeNum("NATURALGAS");
-
-                } else if (SELECT_CASE_var == "DIESEL") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Diesel";
-                    boiler.FuelType = AssignResourceTypeNum("DIESEL");
-
-                } else if (SELECT_CASE_var == "GASOLINE") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Gasoline";
-                    boiler.FuelType = AssignResourceTypeNum("GASOLINE");
-
-                } else if (SELECT_CASE_var == "COAL") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Coal";
-                    boiler.FuelType = AssignResourceTypeNum("COAL");
-
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "FuelOil#1";
-                    boiler.FuelType = AssignResourceTypeNum("DISTILLATE OIL");
-
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "FuelOil#2";
-                    boiler.FuelType = AssignResourceTypeNum("RESIDUAL OIL");
-
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Propane";
-                    boiler.FuelType = AssignResourceTypeNum("PROPANE");
-
-                } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "OtherFuel1";
-                    boiler.FuelType = AssignResourceTypeNum("OTHERFUEL1");
-
-                } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "OtherFuel2";
-                    boiler.FuelType = AssignResourceTypeNum("OTHERFUEL2");
-
-                } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                    // Set to Electric to avoid errors when setting up output variables
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Electric";
-                    boiler.FuelType = AssignResourceTypeNum("ELECTRICITY");
-                    ErrorsFound = true;
-                }
+            boiler.FuelType = AssignResourceTypeNum(cAlphaArgs(2));
+            if (boiler.FuelType == 0) {
+                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
+                ShowContinueError("Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
+                // Set to Electric to avoid errors when setting up output variables
+                boiler.FuelType = AssignResourceTypeNum("ELECTRICITY");
+                ErrorsFound = true;
             }
 
             boiler.NomCap = rNumericArgs(1);
@@ -448,22 +400,20 @@ namespace Boilers {
 
         for (auto &boiler : Boiler) {
             ReportVars report(boiler.reportVariables);
+            std::string const fuelType(GetResourceTypeChar(boiler.FuelType));
 
             SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, report.BoilerLoad, "System", "Average", boiler.Name);
             SetupOutputVariable("Boiler Heating Energy", OutputProcessor::Unit::J, report.BoilerEnergy, "System", "Sum",
                                 boiler.Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant");
 
-            if (UtilityRoutines::SameString(BoilerFuelTypeForOutputVariable(BoilerNum), "Electric")) {
-                SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Power", OutputProcessor::Unit::W,
-                                    report.FuelUsed, "System", "Average", boiler.Name);
+            if (UtilityRoutines::SameString(fuelType, "Electricity")) {
+                SetupOutputVariable("Boiler " + fuelType + " Power", OutputProcessor::Unit::W, report.FuelUsed, "System", "Average", boiler.Name);
             } else {
-                SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Rate", OutputProcessor::Unit::W,
-                                    report.FuelUsed, "System", "Average", boiler.Name);
+                SetupOutputVariable("Boiler " + fuelType + " Rate", OutputProcessor::Unit::W, report.FuelUsed, "System", "Average", boiler.Name);
             }
 
-            SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Energy", OutputProcessor::Unit::J,
-                                report.FuelConsumed, "System", "Sum", boiler.Name, _,
-                                BoilerFuelTypeForOutputVariable(BoilerNum), "Heating", boiler.EndUseSubcategory, "Plant");
+            SetupOutputVariable("Boiler " + fuelType + " Energy", OutputProcessor::Unit::J, report.FuelConsumed, "System", "Sum", boiler.Name, _,
+                                fuelType, "Heating", boiler.EndUseSubcategory, "Plant");
             SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, report.BoilerInletTemp, "System", "Average", boiler.Name);
             SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, report.BoilerOutletTemp, "System", "Average", boiler.Name);
             SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, report.Mdot, "System", "Average", boiler.Name);
@@ -476,8 +426,6 @@ namespace Boilers {
                 SetupEMSInternalVariable("Boiler Nominal Capacity", boiler.Name, "[W]", boiler.NomCap);
             }
         }
-
-        BoilerFuelTypeForOutputVariable.deallocate();
     }
 
     void BoilerSpecs::InitBoiler() // number of the current boiler being simulated
