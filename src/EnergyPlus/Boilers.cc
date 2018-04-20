@@ -168,9 +168,9 @@ namespace Boilers {
 
     bool BoilerSpecs::hasTwoVariableEfficiencyCurve()
     {
-        return (EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-                EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
-                EfficiencyCurveType == EfficiencyCurveType::BiCubic);
+        return (efficiencyCurveType_ == EfficiencyCurveType::BiQuadratic ||
+                efficiencyCurveType_ == EfficiencyCurveType::QuadraticLinear ||
+                efficiencyCurveType_ == EfficiencyCurveType::BiCubic);
     }
 
     void clear_state()
@@ -294,17 +294,17 @@ namespace Boilers {
                 {
                     auto const SELECT_CASE_var(GetCurveType(boiler.curveEfficiencyIndex_));
                     if (SELECT_CASE_var == "LINEAR") {
-                        boiler.EfficiencyCurveType = EfficiencyCurveType::Linear;
+                        boiler.efficiencyCurveType_ = EfficiencyCurveType::Linear;
                     } else if (SELECT_CASE_var == "QUADRATIC") {
-                        boiler.EfficiencyCurveType = EfficiencyCurveType::Quadratic;
+                        boiler.efficiencyCurveType_ = EfficiencyCurveType::Quadratic;
                     } else if (SELECT_CASE_var == "QUADRATICLINEAR") {
-                        boiler.EfficiencyCurveType = EfficiencyCurveType::QuadraticLinear;
+                        boiler.efficiencyCurveType_ = EfficiencyCurveType::QuadraticLinear;
                     } else if (SELECT_CASE_var == "CUBIC") {
-                        boiler.EfficiencyCurveType = EfficiencyCurveType::Cubic;
+                        boiler.efficiencyCurveType_ = EfficiencyCurveType::Cubic;
                     } else if (SELECT_CASE_var == "BICUBIC") {
-                        boiler.EfficiencyCurveType = EfficiencyCurveType::BiCubic;
+                        boiler.efficiencyCurveType_ = EfficiencyCurveType::BiCubic;
                     } else if (SELECT_CASE_var == "BIQUADRATIC") {
-                        boiler.EfficiencyCurveType = EfficiencyCurveType::BiQuadratic;
+                        boiler.efficiencyCurveType_ = EfficiencyCurveType::BiQuadratic;
                     } else {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                         ShowContinueError("Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
