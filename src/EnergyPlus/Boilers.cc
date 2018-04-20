@@ -366,23 +366,23 @@ namespace Boilers {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(7));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
-                    boiler.FlowMode = FlowModeType::Constant;
+                    boiler.designFlowMode_ = FlowModeType::Constant;
                 } else if (SELECT_CASE_var == "VARIABLEFLOW") { // backward compatible, clean out eventually
-                    boiler.FlowMode = FlowModeType::LeavingSetPointModulated;
+                    boiler.designFlowMode_ = FlowModeType::LeavingSetPointModulated;
                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
-                    boiler.FlowMode = FlowModeType::LeavingSetPointModulated;
+                    boiler.designFlowMode_ = FlowModeType::LeavingSetPointModulated;
                 } else if (SELECT_CASE_var == "NOTMODULATED") {
-                    boiler.FlowMode = FlowModeType::NotModulated;
+                    boiler.designFlowMode_ = FlowModeType::NotModulated;
                 } else {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
                     ShowContinueError("Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError("Flow mode NotModulated is assumed and the simulation continues.");
                     // We will assume variable flow if not specified
-                    boiler.FlowMode = FlowModeType::NotModulated;
+                    boiler.designFlowMode_ = FlowModeType::NotModulated;
                 }
             }
 
@@ -475,7 +475,7 @@ namespace Boilers {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
 
-            if ((FlowMode == FlowModeType::LeavingSetPointModulated) || (FlowMode == FlowModeType::Constant)) {
+            if ((designFlowMode_ == FlowModeType::LeavingSetPointModulated) || (designFlowMode_ == FlowModeType::Constant)) {
                 // reset flow priority
                 PlantLoop(LoopNum)
                     .LoopSide(LoopSideNum)
@@ -496,7 +496,7 @@ namespace Boilers {
             InitComponentNodes(0.0, designMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_,
                                LoopNum, LoopSideNum, BranchNum, CompNum);
 
-            if (FlowMode == FlowModeType::LeavingSetPointModulated) { // check if setpoint on outlet node
+            if (designFlowMode_ == FlowModeType::LeavingSetPointModulated) { // check if setpoint on outlet node
                 if ((Node(nodeHotWaterOutletIndex_).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (Node(nodeHotWaterOutletIndex_).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
                     if (!AnyEnergyManagementSystemInModel) {
@@ -536,7 +536,7 @@ namespace Boilers {
 
         // every iteration inits.  (most in calc routine)
 
-        if ((FlowMode == FlowModeType::LeavingSetPointModulated) && ModulatedFlowSetToLoop) {
+        if ((designFlowMode_ == FlowModeType::LeavingSetPointModulated) && ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
             //  could be removed with transition, testing , model change, period of being obsolete.
             {
@@ -821,7 +821,7 @@ namespace Boilers {
 
         if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
-            if ((FlowMode == FlowModeType::Constant) || (FlowMode == FlowModeType::NotModulated)) {
+            if ((designFlowMode_ == FlowModeType::Constant) || (designFlowMode_ == FlowModeType::NotModulated)) {
                 // Then find the flow rate and outlet temp
                 BoilerMassFlowRate = BoilerMassFlowRateMax;
                 SetComponentFlowRate(BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, LoopNum, LoopSideNum,
@@ -835,7 +835,7 @@ namespace Boilers {
 
                 BoilerOutletTemp = BoilerDeltaTemp + Node(BoilerInletNode).Temp;
 
-            } else if (FlowMode == FlowModeType::LeavingSetPointModulated) {
+            } else if (designFlowMode_ == FlowModeType::LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
 

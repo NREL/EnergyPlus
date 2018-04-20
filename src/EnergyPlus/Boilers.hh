@@ -141,7 +141,7 @@ namespace Boilers {
             bool designNominalCapacityWasAutoSized_;      // true if previous was set to autosize input
             Real64 designEfficiency_;                 // boiler efficiency at design conditions
             Real64 designOutletTemperature_;      // C - Boiler design outlet temperature
-            FlowModeType FlowMode;                 // one of 3 modes for componet flow during operation
+            FlowModeType designFlowMode_;                 // one of 3 modes for componet flow during operation
             bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
             bool ModulatedFlowErrDone;    // true if setpoint warning issued
             Real64 designVolumeFlowRate_;           // m3/s - Boiler water design volumetric flow rate
@@ -180,7 +180,7 @@ namespace Boilers {
             // Default Constructor
             BoilerSpecs()
                 : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), designNominalCapacity_(0.0),
-                  designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0), FlowMode(FlowModeType::default), ModulatedFlowSetToLoop(false),
+                  designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0), designFlowMode_(FlowModeType::default), ModulatedFlowSetToLoop(false),
                   ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), designSizingFactor_(0.0),
                   nodeHotWaterInletIndex_(0), nodeHotWaterOutletIndex_(0), designMinPartLoadRatio_(0.0), designMaxPartLoadRatio_(0.0), designOptimalPartLoadRatio_(0.0),
                   CurveTempMode(TemperatureEvaluationModeType::default), curveEfficiencyIndex_(0), EfficiencyCurveType(EfficiencyCurveType::default),
