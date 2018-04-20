@@ -81,6 +81,13 @@ namespace Boilers {
     extern int const LeavingBoilerTemp;
 
     // Boiler flow modes
+	enum class FlowMode {
+		NotSet,
+		Constant,
+		NotModulated,
+		LeavingSetPointModulated,
+		default=NotSet,
+	};
     extern int const FlowModeNotSet;
     extern int const ConstantFlow;
     extern int const NotModulated;
@@ -119,7 +126,7 @@ namespace Boilers {
         bool NomCapWasAutoSized;      // true if previous was set to autosize input
         Real64 Effic;                 // boiler efficiency at design conditions
         Real64 TempDesBoilerOut;      // C - Boiler design outlet temperature
-        int FlowMode;                 // one of 3 modes for componet flow during operation
+        FlowMode FlowMode;                 // one of 3 modes for componet flow during operation
         bool ModulatedFlowSetToLoop;  // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;    // true if setpoint warning issued
         Real64 VolFlowRate;           // m3/s - Boiler water design volumetric flow rate
@@ -152,7 +159,7 @@ namespace Boilers {
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
-              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+              NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowMode::default), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
               CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), EfficiencyCurveType(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
