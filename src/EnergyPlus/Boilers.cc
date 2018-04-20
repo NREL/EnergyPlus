@@ -157,7 +157,7 @@ namespace Boilers {
 
     void BoilerSpecs::getSizingFactor(Real64 &SizingFactor)
     {
-        SizingFactor = SizFac;
+        SizingFactor = designSizingFactor_;
     }
 
     void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
@@ -354,8 +354,8 @@ namespace Boilers {
             }
 
             boiler.ParasiticElecLoad = rNumericArgs(9);
-            boiler.SizFac = rNumericArgs(10);
-            if (boiler.SizFac == 0.0) boiler.SizFac = 1.0;
+            boiler.designSizingFactor_ = rNumericArgs(10);
+            if (boiler.designSizingFactor_ == 0.0) boiler.designSizingFactor_ = 1.0;
 
             boiler.BoilerInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
                                                           DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
@@ -605,7 +605,7 @@ namespace Boilers {
                 // TODO: temperatures here are different and inconsistent e.g. CWInitConvTemp
                 rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, designOutletTemperature_, PlantLoop(LoopNum).FluidIndex, RoutineName);
-                tmpNomCap = Cp * rho * SizFac * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
+                tmpNomCap = Cp * rho * designSizingFactor_ * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
                 if (designNominalCapacityWasAutoSized_) tmpNomCap = 0.0;
             }
@@ -652,7 +652,7 @@ namespace Boilers {
 
         if (PltSizNum > 0) {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                tmpBoilerVolFlowRate = PlantSizData(PltSizNum).DesVolFlowRate * SizFac;
+                tmpBoilerVolFlowRate = PlantSizData(PltSizNum).DesVolFlowRate * designSizingFactor_;
             } else {
                 if (designVolumeFlowRateWasAutoSized_) tmpBoilerVolFlowRate = 0.0;
             }
