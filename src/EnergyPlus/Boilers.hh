@@ -215,6 +215,10 @@ namespace Boilers {
                                  int const EquipFlowCtrl // Flow control mode for the equipment
             );
 
+            static void clear_state();
+
+            static void GetBoilerInput();
+
             bool hasTwoVariableEfficiencyCurve();
 
             // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
@@ -235,10 +239,6 @@ namespace Boilers {
     extern Array1D<ReportVars> BoilerReport; // report vars - dimension to number of machines
 
     // Functions
-
-    void clear_state();
-
-    void GetBoilerInput();
 
 } // namespace Boilers
 
