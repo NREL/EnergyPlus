@@ -188,19 +188,6 @@ namespace Boilers {
 
         void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
-            std::string const &BoilerName, // boiler identifier
-            int const EquipFlowCtrl,       // Flow control mode for the equipment
-            int &CompIndex,                // boiler counter/identifier
-            bool const RunFlag,            // if TRUE run boiler simulation--boiler is ON
-            bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-            Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
-            Real64 &MaxCap,                // W - maximum boiler operating capacity
-            Real64 &MinCap,                // W - minimum boiler operating capacity
-            Real64 &OptCap,                // W - optimal boiler operating capacity
-            bool const GetSizingFactor,    // TRUE when just the sizing factor is requested
-            Real64 &SizingFactor           // sizing factor
-        );
 
         void InitBoiler(); // number of the current boiler being simulated
 
