@@ -154,6 +154,28 @@ namespace Boilers {
     //*************************************************************************
 
     // Functions
+	PlantComponent *BoilerSpecs::factory(std::string objectName)
+	{
+		if (GetBoilerInputFlag) {
+			GetBoilerInput();
+			GetBoilerInputFlag = false;
+		}
+		// Now look for this particular boiler in the list
+		for (auto &boiler : Boiler) {
+			if (boiler.Name == objectName) {
+				return &boiler;
+			}
+		}
+		// If we didn't find it, fatal
+		ShowFatalError("Boiler::factory: Error getting inputs for boiler named: " + objectName);
+		return nullptr;
+	}
+
+	void BoilerSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
+	{}
+
+	void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+	{}
 
     void clear_state()
     {

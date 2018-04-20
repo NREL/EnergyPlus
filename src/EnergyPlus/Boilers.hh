@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -102,7 +103,7 @@ namespace Boilers {
 
     // Types
 
-    struct BoilerSpecs
+    struct BoilerSpecs : public PlantComponent
     {
         // Members
         std::string Name;             // user identifier
@@ -159,6 +160,13 @@ namespace Boilers {
               FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0)
         {
         }
+
+		// member functions
+		static PlantComponent *factory(std::string objectName);
+
+		void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+
+		void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
     };
 
     struct ReportVars
