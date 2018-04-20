@@ -491,9 +491,9 @@ namespace Boilers {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp,
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
-            DesMassFlowRate = designVolumeFlowRate_ * rho;
+            designMassFlowRate_ = designVolumeFlowRate_ * rho;
 
-            InitComponentNodes(0.0, DesMassFlowRate, BoilerInletNodeNum, BoilerOutletNodeNum,
+            InitComponentNodes(0.0, designMassFlowRate_, BoilerInletNodeNum, BoilerOutletNodeNum,
                                LoopNum, LoopSideNum, BranchNum, CompNum);
 
             if (FlowMode == FlowModeType::LeavingSetPointModulated) { // check if setpoint on outlet node
@@ -789,7 +789,7 @@ namespace Boilers {
         BoilerMinPLR = MinPartLoadRat;
         BoilerEff = designEfficiency_;
         TempUpLimitBout = TempUpLimitBoilerOut;
-        BoilerMassFlowRateMax = DesMassFlowRate;
+        BoilerMassFlowRateMax = designMassFlowRate_;
 
         Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Node(BoilerInletNode).Temp,
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
