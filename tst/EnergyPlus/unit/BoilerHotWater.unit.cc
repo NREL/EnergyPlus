@@ -67,11 +67,11 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     Boilers::Boiler.allocate(1);
     // Hardsized Hot Water Boiler
     Boilers::Boiler(1).LoopNum = 1;
-    Boilers::Boiler(1).SizFac = 1.2;
+    Boilers::Boiler(1).designSizingFactor_ = 1.2;
     Boilers::Boiler(1).designNominalCapacity_ = 40000.0;
-    Boilers::Boiler(1).NomCapWasAutoSized = false;
+    Boilers::Boiler(1).designNominalCapacityWasAutoSized_ = false;
     Boilers::Boiler(1).designVolumeFlowRate_ = 1.0;
-    Boilers::Boiler(1).VolFlowRateWasAutoSized = false;
+    Boilers::Boiler(1).designVolumeFlowRateWasAutoSized_ = false;
     Boilers::Boiler(1).designOutletTemperature_ = 82.0;
 
     DataPlant::PlantLoop.allocate(1);
@@ -91,8 +91,8 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     EXPECT_DOUBLE_EQ(Boilers::Boiler(1).designNominalCapacity_, 40000.0);
 
     // Autosized Hot Water Boiler
-    Boilers::Boiler(1).NomCapWasAutoSized = true;
-    Boilers::Boiler(1).VolFlowRateWasAutoSized = true;
+    Boilers::Boiler(1).designNominalCapacityWasAutoSized_ = true;
+    Boilers::Boiler(1).designVolumeFlowRateWasAutoSized_ = true;
     Boilers::Boiler(1).designNominalCapacity_ = DataSizing::AutoSize;
     Boilers::Boiler(1).designVolumeFlowRate_ = DataSizing::AutoSize;
     // now call sizing routine
