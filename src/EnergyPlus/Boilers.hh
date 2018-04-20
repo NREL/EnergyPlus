@@ -66,35 +66,35 @@ namespace Boilers {
     // MODULE PARAMETER DEFINITIONS
 
     // Boiler normalized efficiency curve types
-	enum class EfficiencyCurveType {
-		NotSet,
-		Linear,
-		BiLinear,
-		Quadratic,
-		BiQuadratic,
-		Cubic,
-		QuadraticLinear,
-		BiCubic,
-		TriQuadratic,
-		default=NotSet,
-	};
+    enum class EfficiencyCurveType {
+        NotSet,
+        Linear,
+        BiLinear,
+        Quadratic,
+        BiQuadratic,
+        Cubic,
+        QuadraticLinear,
+        BiCubic,
+        TriQuadratic, // TODO: delete as this will always fall through to error
+        default=NotSet,
+    };
 
     // water temperature evaluation method
-	enum class TemperatureEvaluationMode {
-		NotSet,
-		Entering,
-		Leaving,
-		default=NotSet,
-	};
+    enum class TemperatureEvaluationMode {
+        NotSet,
+        Entering,
+        Leaving,
+        default=NotSet,
+    };
 
     // Boiler flow modes
-	enum class FlowMode {
-		NotSet,
-		Constant,
-		NotModulated,
-		LeavingSetPointModulated,
-		default=NotSet,
-	};
+    enum class FlowMode {
+        NotSet,
+        Constant,
+        NotModulated,
+        LeavingSetPointModulated,
+        default=NotSet,
+    };
 
     // DERIVED TYPE DEFINITIONS
 
@@ -171,12 +171,12 @@ namespace Boilers {
         {
         }
 
-		// member functions
-		static PlantComponent *factory(std::string objectName);
+        // member functions
+        static PlantComponent *factory(std::string objectName);
 
-		void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-		void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
     };
 
     struct ReportVars

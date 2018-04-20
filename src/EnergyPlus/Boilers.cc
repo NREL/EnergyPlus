@@ -97,9 +97,9 @@ namespace Boilers {
     // The BLAST/DOE-2 empirical model based on mfg. data
 
     // Using/Aliasing
-	using DataLoopNode::Node;
-	using DataHVACGlobals::SmallWaterVolFlow;
-	using DataHVACGlobals::TimeStepSys;
+    using DataLoopNode::Node;
+    using DataHVACGlobals::SmallWaterVolFlow;
+    using DataHVACGlobals::TimeStepSys;
     using DataBranchAirLoopPlant::ControlType_SeriesActive;
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::SecInHour;
@@ -133,28 +133,28 @@ namespace Boilers {
     //*************************************************************************
 
     // Functions
-	PlantComponent *BoilerSpecs::factory(std::string objectName)
-	{
-		if (GetBoilerInputFlag) {
-			GetBoilerInput();
-			GetBoilerInputFlag = false;
-		}
-		// Now look for this particular boiler in the list
-		for (auto &boiler : Boiler) {
-			if (boiler.Name == objectName) {
-				return &boiler;
-			}
-		}
-		// If we didn't find it, fatal
-		ShowFatalError("Boiler::factory: Error getting inputs for boiler named: " + objectName);
-		return nullptr;
-	}
+    PlantComponent *BoilerSpecs::factory(std::string objectName)
+    {
+        if (GetBoilerInputFlag) {
+            GetBoilerInput();
+            GetBoilerInputFlag = false;
+        }
+        // Now look for this particular boiler in the list
+        for (auto &boiler : Boiler) {
+            if (boiler.Name == objectName) {
+                return &boiler;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("Boiler::factory: Error getting inputs for boiler named: " + objectName);
+        return nullptr;
+    }
 
-	void BoilerSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
-	{}
+    void BoilerSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
+    {}
 
-	void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
-	{}
+    void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    {}
 
     void clear_state()
     {
@@ -229,9 +229,9 @@ namespace Boilers {
 
         // Initialize Loop Equipment
         if (InitLoopEquip) {
-            //			Boiler( BoilerNum ).IsThisSized = false;
+            //            Boiler( BoilerNum ).IsThisSized = false;
             InitBoiler(BoilerNum);
-            //			Boiler( BoilerNum ).IsThisSized = true;
+            //            Boiler( BoilerNum ).IsThisSized = true;
             SizeBoiler(BoilerNum);
             MinCap = Boiler(BoilerNum).NomCap * Boiler(BoilerNum).MinPartLoadRat;
             MaxCap = Boiler(BoilerNum).NomCap * Boiler(BoilerNum).MaxPartLoadRat;
@@ -267,7 +267,7 @@ namespace Boilers {
 
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
-		using DataGlobalConstants::AssignResourceTypeNum;
+        using DataGlobalConstants::AssignResourceTypeNum;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
         using CurveManager::GetCurveIndex;
@@ -709,8 +709,8 @@ namespace Boilers {
         // the hot water flow rate and the hot water loop design delta T.
 
         // Using/Aliasing
-		using DataSizing::PlantSizData;
-		using DataSizing::AutoVsHardSizingThreshold;
+        using DataSizing::PlantSizData;
+        using DataSizing::AutoVsHardSizingThreshold;
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToFinalize;
         using DataPlant::PlantFirstSizesOkayToReport;
@@ -1053,7 +1053,7 @@ namespace Boilers {
         // calculate normalized efficiency based on curve object type
         if (Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
             if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-				Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
+                Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
                 Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
 
                 if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Entering) {
@@ -1078,7 +1078,7 @@ namespace Boilers {
                     ShowContinueError("...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
                     if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-						Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
+                        Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
                         Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
                         if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
@@ -1109,7 +1109,7 @@ namespace Boilers {
                     ShowContinueError("...Boiler Efficiency calculations shown below.");
                     ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
                     if (Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiQuadratic ||
-						Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
+                        Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::QuadraticLinear ||
                         Boiler(BoilerNum).EfficiencyCurveType == EfficiencyCurveType::BiCubic) {
                         if (Boiler(BoilerNum).CurveTempMode == TemperatureEvaluationMode::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(BoilerInletNode).Temp, 2));
