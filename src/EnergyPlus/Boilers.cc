@@ -163,7 +163,7 @@ namespace Boilers {
     void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
         InitBoiler();
-        SizeBoiler();
+        doSizing();
     }
 
     bool BoilerSpecs::hasTwoVariableEfficiencyCurve()
@@ -598,7 +598,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::SizeBoiler()
+    void BoilerSpecs::doSizing()
     {
 
         // SUBROUTINE INFORMATION:

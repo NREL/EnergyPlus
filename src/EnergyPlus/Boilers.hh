@@ -148,7 +148,7 @@ namespace Boilers {
 
             void getSizingFactor(Real64 &SizingFactor) override;
 
-            void SizeBoiler();
+            void doSizing();
 
             // public getters/setters
             Real64 getDesignNominalCapacity();
