@@ -126,7 +126,7 @@ namespace Boilers {
         }
     };
 
-    class BoilerSpecs : public PlantComponent
+    class BoilerObject : public PlantComponent
     {
         // Members
         public:
@@ -166,7 +166,7 @@ namespace Boilers {
             void setDesignOutletTemperatureLimit(Real64 const temperature);
 
             // Default Constructor
-            BoilerSpecs()
+            BoilerObject()
                 : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), designNominalCapacity_(0.0),
                   designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0),
                   designFlowMode_(FlowModeType::default), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0),
@@ -249,7 +249,7 @@ namespace Boilers {
     };
 
     // Object Data
-    extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
+    extern Array1D<BoilerObject> Boiler;      // boiler data - dimension to number of machines
 
     void clear_state();
 

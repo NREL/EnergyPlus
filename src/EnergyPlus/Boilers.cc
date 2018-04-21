@@ -116,7 +116,7 @@ namespace Boilers {
     // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
     // Object Data
-    Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
+    Array1D<BoilerObject> Boiler;      // boiler data - dimension to number of machines
 
     // MODULE SUBROUTINES:
 
@@ -124,7 +124,7 @@ namespace Boilers {
     //*************************************************************************
 
     // Functions
-    PlantComponent *BoilerSpecs::factory(std::string objectName)
+    PlantComponent *BoilerObject::factory(std::string objectName)
     {
         if (GetBoilerInputFlag) {
             GetBoilerInput();
@@ -141,49 +141,49 @@ namespace Boilers {
         return nullptr;
     }
 
-    void BoilerSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
+    void BoilerObject::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
     {
         InitBoiler();
         CalcBoilerModel(CurLoad, RunFlag, EquipFlowCtrl);
         UpdateBoilerRecords(CurLoad, RunFlag);
     }
 
-    void BoilerSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BoilerObject::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = designNominalCapacity_ * designMinPartLoadRatio_;
         MaxLoad = designNominalCapacity_ * designMaxPartLoadRatio_;
         OptLoad = designNominalCapacity_ * designOptimalPartLoadRatio_;
     }
 
-    void BoilerSpecs::getSizingFactor(Real64 &SizingFactor)
+    void BoilerObject::getSizingFactor(Real64 &SizingFactor)
     {
         SizingFactor = designSizingFactor_;
     }
 
-    void BoilerSpecs::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void BoilerObject::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
         InitBoiler();
         doSizing();
     }
 
-    bool BoilerSpecs::hasTwoVariableEfficiencyCurve()
+    bool BoilerObject::hasTwoVariableEfficiencyCurve()
     {
         return (efficiencyCurveType_ == EfficiencyCurveType::BiQuadratic ||
                 efficiencyCurveType_ == EfficiencyCurveType::QuadraticLinear ||
                 efficiencyCurveType_ == EfficiencyCurveType::BiCubic);
     }
 
-    Real64 BoilerSpecs::getDesignNominalCapacity()
+    Real64 BoilerObject::getDesignNominalCapacity()
     {
         return designNominalCapacity_;
     }
 
-    Real64 BoilerSpecs::getDesignVolumeFlowRate()
+    Real64 BoilerObject::getDesignVolumeFlowRate()
     {
         return designVolumeFlowRate_;
     }
 
-    void BoilerSpecs::setDesignNominalCapacity(Real64 const capacity)
+    void BoilerObject::setDesignNominalCapacity(Real64 const capacity)
     {
         using DataSizing::AutoSize;
 
@@ -191,7 +191,7 @@ namespace Boilers {
         designNominalCapacityWasAutoSized_ = (designNominalCapacity_ == AutoSize);
     }
 
-    void BoilerSpecs::setDesignVolumeFlowRate(Real64 const flowRate)
+    void BoilerObject::setDesignVolumeFlowRate(Real64 const flowRate)
     {
         using DataSizing::AutoSize;
 
@@ -199,7 +199,7 @@ namespace Boilers {
         designVolumeFlowRateWasAutoSized_ = (designVolumeFlowRate_ == AutoSize);
     }
 
-    void BoilerSpecs::setDesignSizingFactor(Real64 const sizingFactor)
+    void BoilerObject::setDesignSizingFactor(Real64 const sizingFactor)
     {
         if (sizingFactor > 0.0) {
             designSizingFactor_ = sizingFactor;
@@ -209,17 +209,17 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::setLoopNumber(int const loopNumber)
+    void BoilerObject::setLoopNumber(int const loopNumber)
     {
         LoopNum = loopNumber;
     }
 
-    void BoilerSpecs::setDesignOutletTemperature(Real64 const temperature)
+    void BoilerObject::setDesignOutletTemperature(Real64 const temperature)
     {
         designOutletTemperature_ = temperature;
     }
 
-    void BoilerSpecs::setDesignOutletTemperatureLimit(Real64 const temperature)
+    void BoilerObject::setDesignOutletTemperatureLimit(Real64 const temperature)
     {
         if (temperature > 0.0) {
             designOutletTemperatureLimit_ = temperature;
@@ -236,7 +236,7 @@ namespace Boilers {
         GetBoilerInputFlag = true;
     }
 
-    void BoilerSpecs::GetBoilerInput()
+    void BoilerObject::GetBoilerInput()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -474,7 +474,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::InitBoiler() // number of the current boiler being simulated
+    void BoilerObject::InitBoiler() // number of the current boiler being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -598,7 +598,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::doSizing()
+    void BoilerObject::doSizing()
     {
 
         // SUBROUTINE INFORMATION:
@@ -760,7 +760,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
+    void BoilerObject::CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
                                       bool const RunFlag,     // TRUE if boiler operating
                                       int const EquipFlowCtrl // Flow control mode for the equipment
     )
@@ -1026,7 +1026,7 @@ namespace Boilers {
     // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
     // *****************************************************************************
 
-    void BoilerSpecs::UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
+    void BoilerObject::UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
                                           bool const RunFlag  // boiler on when TRUE
     )
     {
