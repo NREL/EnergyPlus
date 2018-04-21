@@ -811,8 +811,6 @@ namespace Boilers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 operatingEfficiency;             // boiler efficiency
         Real64 operatingCapacity;          // W - boiler nominal capacity
-        //Real64 BoilerMaxPLR;          // boiler maximum part load ratio
-        //Real64 BoilerMinPLR;          // boiler minimum part load ratio
         Real64 TheorFuelUse;          // Theoretical (stoichiometric) fuel use
         Real64 OperPLR;               // operating part load ratio
         Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
