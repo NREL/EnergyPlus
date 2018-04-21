@@ -822,7 +822,7 @@ namespace Boilers {
 
         operatingLoad_ = 0.0;
         operatingParasiticElectricalPower_ = 0.0;
-        BoilerMassFlowRate = 0.0;
+        operatingMassFlowRate_ = 0.0;
         operatingCapacity = designNominalCapacity_;
         operatingEfficiency = designEfficiency_;
         TempUpLimitBout = designOutletTemperatureLimit_;
@@ -835,7 +835,7 @@ namespace Boilers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == ControlType_SeriesActive) BoilerMassFlowRate = Node(nodeHotWaterInletIndex_).MassFlowRate;
+            if (EquipFlowCtrl == ControlType_SeriesActive) operatingMassFlowRate_ = Node(nodeHotWaterInletIndex_).MassFlowRate;
             return;
         }
 
@@ -856,12 +856,12 @@ namespace Boilers {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((designFlowMode_ == FlowModeType::Constant) || (designFlowMode_ == FlowModeType::NotModulated)) {
                 // Then find the flow rate and outlet temp
-                BoilerMassFlowRate = BoilerMassFlowRateMax;
-                SetComponentFlowRate(BoilerMassFlowRate, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
+                operatingMassFlowRate_ = BoilerMassFlowRateMax;
+                SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
                                      BranchNum, CompNum);
 
-                if ((BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
-                    BoilerDeltaTemp = operatingLoad_ / BoilerMassFlowRate / Cp;
+                if ((operatingMassFlowRate_ != 0.0) && (MyLoad > 0.0)) {
+                    BoilerDeltaTemp = operatingLoad_ / operatingMassFlowRate_ / Cp;
                 } else {
                     BoilerDeltaTemp = 0.0;
                 }
@@ -886,27 +886,27 @@ namespace Boilers {
                 BoilerOutletTemp = BoilerDeltaTemp + Node(nodeHotWaterInletIndex_).Temp;
 
                 if ((BoilerDeltaTemp > 0.0) && (operatingLoad_ > 0.0)) {
-                    BoilerMassFlowRate = operatingLoad_ / Cp / BoilerDeltaTemp;
+                    operatingMassFlowRate_ = operatingLoad_ / Cp / BoilerDeltaTemp;
 
-                    BoilerMassFlowRate = min(BoilerMassFlowRateMax, BoilerMassFlowRate);
+                    operatingMassFlowRate_ = min(BoilerMassFlowRateMax, operatingMassFlowRate_);
 
                 } else {
-                    BoilerMassFlowRate = 0.0;
+                    operatingMassFlowRate_ = 0.0;
                 }
-                SetComponentFlowRate(BoilerMassFlowRate, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
+                SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
                                      BranchNum, CompNum);
 
             } // End of Constant/Variable Flow If Block
 
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
-            BoilerMassFlowRate = Node(nodeHotWaterInletIndex_).MassFlowRate;
+            operatingMassFlowRate_ = Node(nodeHotWaterInletIndex_).MassFlowRate;
 
-            if ((MyLoad > 0.0) && (BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
+            if ((MyLoad > 0.0) && (operatingMassFlowRate_ > 0.0)) { // this boiler has a heat load
                 operatingLoad_ = MyLoad;
                 if (operatingLoad_ > operatingCapacity * designMaxPartLoadRatio_) operatingLoad_ = operatingCapacity * designMaxPartLoadRatio_;
                 if (operatingLoad_ < operatingCapacity * designMinPartLoadRatio_) operatingLoad_ = operatingCapacity * designMinPartLoadRatio_;
-                BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp + operatingLoad_ / (BoilerMassFlowRate * Cp);
+                BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp + operatingLoad_ / (operatingMassFlowRate_ * Cp);
                 BoilerDeltaTemp = BoilerOutletTemp - Node(nodeHotWaterInletIndex_).Temp;
             } else {
                 operatingLoad_ = 0.0;
