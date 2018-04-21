@@ -933,13 +933,13 @@ namespace Boilers {
         if (curveEfficiencyIndex_ > 0) {
             if (hasTwoVariableEfficiencyCurve()) {
                 if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
-                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR, Node(nodeHotWaterInletIndex_).Temp);
+                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, Node(nodeHotWaterInletIndex_).Temp);
                 } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
-                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR, BoilerOutletTemp);
+                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, BoilerOutletTemp);
                 }
 
             } else {
-                EffCurveOutput = CurveValue(curveEfficiencyIndex_, OperPLR);
+                EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_);
             }
         } else {
             EffCurveOutput = 1.0;
@@ -952,7 +952,7 @@ namespace Boilers {
                     ++EffCurveOutputError;
                     ShowWarningError("Boiler:HotWater \"" + Name + "\"");
                     ShowContinueError("...Normalized Boiler Efficiency Curve output is less than or equal to 0.");
-                    ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
+                    ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(operatingPartLoadRatio_, 5));
                     if (hasTwoVariableEfficiencyCurve()) {
                         if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(nodeHotWaterInletIndex_).Temp, 2));
@@ -981,7 +981,7 @@ namespace Boilers {
                     ShowWarningError("Boiler:HotWater \"" + Name + "\"");
                     ShowContinueError("...Calculated Boiler Efficiency is greater than 1.1.");
                     ShowContinueError("...Boiler Efficiency calculations shown below.");
-                    ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(OperPLR, 5));
+                    ShowContinueError("...Curve input x value (PLR)     = " + TrimSigDigits(operatingPartLoadRatio_, 5));
                     if (hasTwoVariableEfficiencyCurve()) {
                         if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(nodeHotWaterInletIndex_).Temp, 2));
@@ -1046,7 +1046,7 @@ namespace Boilers {
             reportVariables_.BoilerLoad = operatingLoad_;
             reportVariables_.FuelUsed = FuelUsed;
             reportVariables_.ParasiticElecPower = ParasiticElecPower;
-            reportVariables_.BoilerPLR = BoilerPLR;
+            reportVariables_.BoilerPLR = operatingPartLoadRatio_;
         }
 
         reportVariables_.BoilerInletTemp = Node(nodeHotWaterInletIndex_).Temp;
