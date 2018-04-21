@@ -57,48 +57,51 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-using namespace EnergyPlus;
-using namespace EnergyPlus::Boilers;
-using namespace EnergyPlus::DataSizing;
+using EnergyPlus::EnergyPlusFixture;
+using EnergyPlus::Boilers::Boiler;
+using EnergyPlus::DataPlant::PlantLoop;
+using EnergyPlus::DataPlant::PlantFirstSizesOkayToFinalize;
+using EnergyPlus::DataSizing::AutoSize;
+using EnergyPlus::DataSizing::PlantSizData;
 
 TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
     // unit test for autosizing boiler nominal capacity in Boiler:HotWater
-    Boilers::Boiler.allocate(1);
+    Boiler.allocate(1);
     // Hardsized Hot Water Boiler
-    Boilers::Boiler(1).setLoopNumber(1);
-    Boilers::Boiler(1).setDesignSizingFactor(1.2);
-    Boilers::Boiler(1).setDesignNominalCapacity(40000.0);
-    Boilers::Boiler(1).setDesignVolumeFlowRate(1.0);
-    Boilers::Boiler(1).setDesignOutletTemperature(82.0);
+    Boiler(1).setLoopNumber(1);
+    Boiler(1).setDesignSizingFactor(1.2);
+    Boiler(1).setDesignNominalCapacity(40000.0);
+    Boiler(1).setDesignVolumeFlowRate(1.0);
+    Boiler(1).setDesignOutletTemperature(82.0);
 
-    DataPlant::PlantLoop.allocate(1);
-    DataSizing::PlantSizData.allocate(1);
+    PlantLoop.allocate(1);
+    PlantSizData.allocate(1);
     // Hot Water Loop
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 10.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    PlantLoop(1).PlantSizNum = 1;
+    PlantLoop(1).FluidIndex = 1;
+    PlantLoop(1).FluidName = "WATER";
+    PlantSizData(1).DesVolFlowRate = 1.0;
+    PlantSizData(1).DeltaT = 10.0;
+    PlantFirstSizesOkayToFinalize = true;
     // now call sizing routine
-    Boilers::Boiler(1).doSizing();
+    Boiler(1).doSizing();
     // see if boiler volume flow rate returned is hard-sized value
-    EXPECT_DOUBLE_EQ(Boilers::Boiler(1).getDesignVolumeFlowRate(), 1.0);
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignVolumeFlowRate(), 1.0);
     // see if boiler nominal capacity returned is hard-sized value
-    EXPECT_DOUBLE_EQ(Boilers::Boiler(1).getDesignNominalCapacity(), 40000.0);
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignNominalCapacity(), 40000.0);
 
     // Autosized Hot Water Boiler
-    Boilers::Boiler(1).setDesignNominalCapacity(DataSizing::AutoSize);
-    Boilers::Boiler(1).setDesignVolumeFlowRate(DataSizing::AutoSize);
+    Boiler(1).setDesignNominalCapacity(AutoSize);
+    Boiler(1).setDesignVolumeFlowRate(AutoSize);
     // now call sizing routine
-    Boilers::Boiler(1).doSizing();
+    Boiler(1).doSizing();
     // see if boiler volume flow rate returned is autosized value
-    EXPECT_NEAR(Boilers::Boiler(1).getDesignVolumeFlowRate(), 1.2, 0.000001);
+    EXPECT_NEAR(Boiler(1).getDesignVolumeFlowRate(), 1.2, 0.000001);
     // see if boiler nominal capacity returned is autosized value
-    EXPECT_NEAR(Boilers::Boiler(1).getDesignNominalCapacity(), 50409257.0, 1.0);
+    EXPECT_NEAR(Boiler(1).getDesignNominalCapacity(), 50409257.0, 1.0);
     // clear
-    Boilers::Boiler.deallocate();
-    DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    Boiler.deallocate();
+    PlantSizData.deallocate();
+    PlantLoop.deallocate();
 }
