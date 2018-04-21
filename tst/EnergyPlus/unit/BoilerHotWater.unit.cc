@@ -120,7 +120,7 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenNotRequired)
 
 TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenRequired)
 {
-    // set the hardsized values
+    // set the values to AutoSize
     Boiler(1).setDesignNominalCapacity(AutoSize);
     Boiler(1).setDesignVolumeFlowRate(AutoSize);
 
