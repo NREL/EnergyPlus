@@ -821,7 +821,7 @@ namespace Boilers {
 
         // FLOW
 
-        BoilerLoad = 0.0;
+        operatingLoad_ = 0.0;
         ParasiticElecPower = 0.0;
         BoilerMassFlowRate = 0.0;
         operatingCapacity = designNominalCapacity_;
@@ -851,7 +851,7 @@ namespace Boilers {
         }
 
         // Set the current load equal to the boiler load
-        BoilerLoad = MyLoad;
+        operatingLoad_ = MyLoad;
 
         if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
@@ -862,7 +862,7 @@ namespace Boilers {
                                      BranchNum, CompNum);
 
                 if ((BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
-                    BoilerDeltaTemp = BoilerLoad / BoilerMassFlowRate / Cp;
+                    BoilerDeltaTemp = operatingLoad_ / BoilerMassFlowRate / Cp;
                 } else {
                     BoilerDeltaTemp = 0.0;
                 }
@@ -886,8 +886,8 @@ namespace Boilers {
 
                 BoilerOutletTemp = BoilerDeltaTemp + Node(nodeHotWaterInletIndex_).Temp;
 
-                if ((BoilerDeltaTemp > 0.0) && (BoilerLoad > 0.0)) {
-                    BoilerMassFlowRate = BoilerLoad / Cp / BoilerDeltaTemp;
+                if ((BoilerDeltaTemp > 0.0) && (operatingLoad_ > 0.0)) {
+                    BoilerMassFlowRate = operatingLoad_ / Cp / BoilerDeltaTemp;
 
                     BoilerMassFlowRate = min(BoilerMassFlowRateMax, BoilerMassFlowRate);
 
@@ -904,13 +904,13 @@ namespace Boilers {
             BoilerMassFlowRate = Node(nodeHotWaterInletIndex_).MassFlowRate;
 
             if ((MyLoad > 0.0) && (BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
-                BoilerLoad = MyLoad;
-                if (BoilerLoad > operatingCapacity * designMaxPartLoadRatio_) BoilerLoad = operatingCapacity * designMaxPartLoadRatio_;
-                if (BoilerLoad < operatingCapacity * designMinPartLoadRatio_) BoilerLoad = operatingCapacity * designMinPartLoadRatio_;
-                BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp + BoilerLoad / (BoilerMassFlowRate * Cp);
+                operatingLoad_ = MyLoad;
+                if (operatingLoad_ > operatingCapacity * designMaxPartLoadRatio_) operatingLoad_ = operatingCapacity * designMaxPartLoadRatio_;
+                if (operatingLoad_ < operatingCapacity * designMinPartLoadRatio_) operatingLoad_ = operatingCapacity * designMinPartLoadRatio_;
+                BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp + operatingLoad_ / (BoilerMassFlowRate * Cp);
                 BoilerDeltaTemp = BoilerOutletTemp - Node(nodeHotWaterInletIndex_).Temp;
             } else {
-                BoilerLoad = 0.0;
+                operatingLoad_ = 0.0;
                 BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
             }
 
@@ -919,11 +919,11 @@ namespace Boilers {
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
         if (BoilerOutletTemp > TempUpLimitBout) {
             BoilerDeltaTemp = 0.0;
-            BoilerLoad = 0.0;
+            operatingLoad_ = 0.0;
             BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
         }
 
-        OperPLR = BoilerLoad / operatingCapacity;
+        OperPLR = operatingLoad_ / operatingCapacity;
         OperPLR = min(OperPLR, designMaxPartLoadRatio_);
         OperPLR = max(OperPLR, designMinPartLoadRatio_);
 
@@ -931,7 +931,7 @@ namespace Boilers {
         BoilerPLR = OperPLR;
 
         // calculate theoretical fuel use based on nominal thermal efficiency
-        TheorFuelUse = BoilerLoad / operatingEfficiency;
+        TheorFuelUse = operatingLoad_ / operatingEfficiency;
 
         // calculate normalized efficiency based on curve object type
         if (curveEfficiencyIndex_ > 0) {
@@ -951,7 +951,7 @@ namespace Boilers {
 
         // warn if efficiency curve produces zero or negative results
         if (!WarmupFlag && EffCurveOutput <= 0.0) {
-            if (BoilerLoad > 0.0) {
+            if (operatingLoad_ > 0.0) {
                 if (EffCurveOutputError < 1) {
                     ++EffCurveOutputError;
                     ShowWarningError("Boiler:HotWater \"" + Name + "\"");
@@ -979,7 +979,7 @@ namespace Boilers {
 
         // warn if overall efficiency greater than 1.1
         if (!WarmupFlag && EffCurveOutput * operatingEfficiency > 1.1) {
-            if (BoilerLoad > 0.0 && curveEfficiencyIndex_ > 0) {
+            if (operatingLoad_ > 0.0 && curveEfficiencyIndex_ > 0) {
                 if (CalculatedEffError < 1) {
                     ++CalculatedEffError;
                     ShowWarningError("Boiler:HotWater \"" + Name + "\"");
@@ -1008,7 +1008,7 @@ namespace Boilers {
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
         FuelUsed = TheorFuelUse / EffCurveOutput;
-        if (BoilerLoad > 0.0) ParasiticElecPower = designParasiticElectricalLoad_ * OperPLR;
+        if (operatingLoad_ > 0.0) ParasiticElecPower = designParasiticElectricalLoad_ * OperPLR;
     }
 
     // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
@@ -1047,7 +1047,7 @@ namespace Boilers {
             SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
             Node(nodeHotWaterOutletIndex_).Temp = BoilerOutletTemp;
             reportVariables_.BoilerOutletTemp = BoilerOutletTemp;
-            reportVariables_.BoilerLoad = BoilerLoad;
+            reportVariables_.BoilerLoad = operatingLoad_;
             reportVariables_.FuelUsed = FuelUsed;
             reportVariables_.ParasiticElecPower = ParasiticElecPower;
             reportVariables_.BoilerPLR = BoilerPLR;
