@@ -811,8 +811,8 @@ namespace Boilers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 operatingEfficiency;             // boiler efficiency
         Real64 operatingCapacity;          // W - boiler nominal capacity
-        Real64 BoilerMaxPLR;          // boiler maximum part load ratio
-        Real64 BoilerMinPLR;          // boiler minimum part load ratio
+        //Real64 BoilerMaxPLR;          // boiler maximum part load ratio
+        //Real64 BoilerMinPLR;          // boiler minimum part load ratio
         Real64 TheorFuelUse;          // Theoretical (stoichiometric) fuel use
         Real64 OperPLR;               // operating part load ratio
         Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
@@ -831,8 +831,6 @@ namespace Boilers {
         BoilerInletNode = nodeHotWaterInletIndex_;
         BoilerOutletNode = nodeHotWaterOutletIndex_;
         operatingCapacity = designNominalCapacity_;
-        BoilerMaxPLR = designMaxPartLoadRatio_;
-        BoilerMinPLR = designMinPartLoadRatio_;
         operatingEfficiency = designEfficiency_;
         TempUpLimitBout = designOutletTemperatureLimit_;
         BoilerMassFlowRateMax = designMassFlowRate_;
@@ -913,8 +911,8 @@ namespace Boilers {
 
             if ((MyLoad > 0.0) && (BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
                 BoilerLoad = MyLoad;
-                if (BoilerLoad > operatingCapacity * BoilerMaxPLR) BoilerLoad = operatingCapacity * BoilerMaxPLR;
-                if (BoilerLoad < operatingCapacity * BoilerMinPLR) BoilerLoad = operatingCapacity * BoilerMinPLR;
+                if (BoilerLoad > operatingCapacity * designMaxPartLoadRatio_) BoilerLoad = operatingCapacity * designMaxPartLoadRatio_;
+                if (BoilerLoad < operatingCapacity * designMinPartLoadRatio_) BoilerLoad = operatingCapacity * designMinPartLoadRatio_;
                 BoilerOutletTemp = Node(BoilerInletNode).Temp + BoilerLoad / (BoilerMassFlowRate * Cp);
                 BoilerDeltaTemp = BoilerOutletTemp - Node(BoilerInletNode).Temp;
             } else {
@@ -932,8 +930,8 @@ namespace Boilers {
         }
 
         OperPLR = BoilerLoad / operatingCapacity;
-        OperPLR = min(OperPLR, BoilerMaxPLR);
-        OperPLR = max(OperPLR, BoilerMinPLR);
+        OperPLR = min(OperPLR, designMaxPartLoadRatio_);
+        OperPLR = max(OperPLR, designMinPartLoadRatio_);
 
         // set report variable
         BoilerPLR = OperPLR;
