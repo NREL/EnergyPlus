@@ -64,6 +64,74 @@ using EnergyPlus::DataPlant::PlantFirstSizesOkayToFinalize;
 using EnergyPlus::DataSizing::AutoSize;
 using EnergyPlus::DataSizing::PlantSizData;
 
+class BoilerSizingFixture : public EnergyPlusFixture
+{
+    protected:
+        virtual void SetUp()
+        {
+            // call the parent setup
+            EnergyPlusFixture::SetUp();
+
+            // global variables
+            PlantFirstSizesOkayToFinalize = true;
+
+            // sizing data
+            PlantSizData.allocate(1);
+            PlantSizData(1).DesVolFlowRate = 1.0;
+            PlantSizData(1).DeltaT = 10.0;
+
+            // hot water loop
+            PlantLoop.allocate(1);
+            PlantLoop(1).PlantSizNum = 1;
+            PlantLoop(1).FluidIndex = 1;
+            PlantLoop(1).FluidName = "WATER";
+            
+            // setup required boiler data
+            Boiler.allocate(1);
+            Boiler(1).setLoopNumber(1);
+            Boiler(1).setDesignSizingFactor(1.2);
+            Boiler(1).setDesignOutletTemperature(82.0);
+        }
+
+        virtual void TearDown()
+        {
+            PlantLoop.deallocate();
+            PlantSizData.deallocate();
+            Boiler.deallocate();
+
+            // call the parent tear down
+            EnergyPlusFixture::TearDown();
+        }
+};
+
+TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenNotRequired)
+{
+    // set the hardsized values
+    Boiler(1).setDesignNominalCapacity(40000.0);
+    Boiler(1).setDesignVolumeFlowRate(1.0);
+
+    // do the sizing
+    Boiler(1).doSizing();
+
+    // confirm the values have not been changed by the sizing
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignVolumeFlowRate(), 1.0);
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignNominalCapacity(), 40000.0);
+}
+
+TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenRequired)
+{
+    // set the hardsized values
+    Boiler(1).setDesignNominalCapacity(AutoSize);
+    Boiler(1).setDesignVolumeFlowRate(AutoSize);
+
+    // do the sizing
+    Boiler(1).doSizing();
+
+    // confirm the values have been set by the sizing
+    EXPECT_NEAR(Boiler(1).getDesignVolumeFlowRate(), 1.2, 0.000001);
+    EXPECT_NEAR(Boiler(1).getDesignNominalCapacity(), 50409257.0, 1.0);
+}
+
 TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
     // unit test for autosizing boiler nominal capacity in Boiler:HotWater
