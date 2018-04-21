@@ -397,11 +397,7 @@ namespace Boilers {
             boiler.designMaxPartLoadRatio_ = rNumericArgs(6);
             boiler.designOptimalPartLoadRatio_ = rNumericArgs(7);
 
-            boiler.designOutletTemperatureLimit_ = rNumericArgs(8);
-            // default to 99.9C if upper temperature limit is left blank.
-            if (boiler.designOutletTemperatureLimit_ <= 0.0) {
-                boiler.designOutletTemperatureLimit_ = 99.9;
-            }
+            boiler.setDesignOutletTemperatureLimit(rNumericArgs(8));
 
             boiler.designParasiticElectricalLoad_ = rNumericArgs(9);
             boiler.designSizingFactor_ = rNumericArgs(10);
