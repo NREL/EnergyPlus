@@ -201,7 +201,12 @@ namespace Boilers {
 
     void BoilerSpecs::setDesignSizingFactor(Real64 const sizingFactor)
     {
-        designSizingFactor_ = sizingFactor;
+        if (sizingFactor > 0.0) {
+            designSizingFactor_ = sizingFactor;
+        }
+        else {
+            designSizingFactor_ = 1.0;
+        }
     }
 
     void BoilerSpecs::setLoopNumber(int const loopNumber)

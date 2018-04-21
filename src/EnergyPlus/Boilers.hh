@@ -156,6 +156,8 @@ namespace Boilers {
 
             void setDesignNominalCapacity(Real64 const capacity);
             void setDesignVolumeFlowRate(Real64 const flowRate);
+
+            // set the sizing factor for the boiler, if sizingFactor <= 0.0, it is set to 1.0
             void setDesignSizingFactor(Real64 const sizingFactor);
             void setLoopNumber(int const loopNumber);
             void setDesignOutletTemperature(Real64 const temperature);
