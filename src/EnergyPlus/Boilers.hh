@@ -162,6 +162,9 @@ namespace Boilers {
             void setLoopNumber(int const loopNumber);
             void setDesignOutletTemperature(Real64 const temperature);
 
+            // set the outlet limit temperature, if temperature <= 0.0, set it to 99.9
+            void setDesignOutletTemperatureLimit(Real64 const temperature);
+
             // Default Constructor
             BoilerSpecs()
                 : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), designNominalCapacity_(0.0),

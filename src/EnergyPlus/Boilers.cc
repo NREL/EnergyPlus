@@ -219,6 +219,16 @@ namespace Boilers {
         designOutletTemperature_ = temperature;
     }
 
+    void BoilerSpecs::setDesignOutletTemperatureLimit(Real64 const temperature)
+    {
+        if (temperature > 0.0) {
+            designOutletTemperatureLimit_ = temperature;
+        }
+        else {
+            designOutletTemperatureLimit_ = 99.9;
+        }
+    }
+
     void clear_state()
     {
         NumBoilers = 0;
