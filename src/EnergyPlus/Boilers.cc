@@ -377,10 +377,7 @@ namespace Boilers {
             }
 
             boiler.designOutletTemperature_ = rNumericArgs(3);
-            boiler.designVolumeFlowRate_ = rNumericArgs(4);
-            if (boiler.designVolumeFlowRate_ == AutoSize) {
-                boiler.designVolumeFlowRateWasAutoSized_ = true;
-            }
+            boiler.setDesignVolumeFlowRate(rNumericArgs(4));
             boiler.designMinPartLoadRatio_ = rNumericArgs(5);
             boiler.designMaxPartLoadRatio_ = rNumericArgs(6);
             boiler.designOptimalPartLoadRatio_ = rNumericArgs(7);
