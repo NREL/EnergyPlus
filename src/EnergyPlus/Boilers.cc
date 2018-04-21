@@ -155,9 +155,9 @@ namespace Boilers {
         OptLoad = designNominalCapacity_ * designOptimalPartLoadRatio_;
     }
 
-    void BoilerObject::getSizingFactor(Real64 &SizingFactor)
+    void BoilerObject::getSizingFactor(Real64 &SizFac)
     {
-        SizingFactor = designSizingFactor_;
+        SizFac = designSizingFactor_;
     }
 
     void BoilerObject::onInitLoopEquip(const PlantLocation &calledFromLocation)

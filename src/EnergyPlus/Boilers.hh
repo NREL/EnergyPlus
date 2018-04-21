@@ -146,7 +146,7 @@ namespace Boilers {
 
             void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-            void getSizingFactor(Real64 &SizingFactor) override;
+            void getSizingFactor(Real64 &SizFac) override;
 
             void doSizing();
 
