@@ -866,7 +866,7 @@ namespace Boilers {
                     BoilerDeltaTemp = 0.0;
                 }
 
-                BoilerOutletTemp = BoilerDeltaTemp + Node(nodeHotWaterInletIndex_).Temp;
+                operatingOutletTemperature_ = BoilerDeltaTemp + Node(nodeHotWaterInletIndex_).Temp;
 
             } else if (designFlowMode_ == FlowModeType::LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
@@ -883,7 +883,7 @@ namespace Boilers {
                     }
                 }
 
-                BoilerOutletTemp = BoilerDeltaTemp + Node(nodeHotWaterInletIndex_).Temp;
+                operatingOutletTemperature_ = BoilerDeltaTemp + Node(nodeHotWaterInletIndex_).Temp;
 
                 if ((BoilerDeltaTemp > 0.0) && (operatingLoad_ > 0.0)) {
                     operatingMassFlowRate_ = operatingLoad_ / Cp / BoilerDeltaTemp;
@@ -906,20 +906,20 @@ namespace Boilers {
                 operatingLoad_ = MyLoad;
                 if (operatingLoad_ > operatingCapacity * designMaxPartLoadRatio_) operatingLoad_ = operatingCapacity * designMaxPartLoadRatio_;
                 if (operatingLoad_ < operatingCapacity * designMinPartLoadRatio_) operatingLoad_ = operatingCapacity * designMinPartLoadRatio_;
-                BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp + operatingLoad_ / (operatingMassFlowRate_ * Cp);
-                BoilerDeltaTemp = BoilerOutletTemp - Node(nodeHotWaterInletIndex_).Temp;
+                operatingOutletTemperature_ = Node(nodeHotWaterInletIndex_).Temp + operatingLoad_ / (operatingMassFlowRate_ * Cp);
+                BoilerDeltaTemp = operatingOutletTemperature_ - Node(nodeHotWaterInletIndex_).Temp;
             } else {
                 operatingLoad_ = 0.0;
-                BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
+                operatingOutletTemperature_ = Node(nodeHotWaterInletIndex_).Temp;
             }
 
         } // End of the FlowLock If block
 
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
-        if (BoilerOutletTemp > TempUpLimitBout) {
+        if (operatingOutletTemperature_ > TempUpLimitBout) {
             BoilerDeltaTemp = 0.0;
             operatingLoad_ = 0.0;
-            BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
+            operatingOutletTemperature_ = Node(nodeHotWaterInletIndex_).Temp;
         }
 
         operatingPartLoadRatio_ = operatingLoad_ / operatingCapacity;
@@ -935,7 +935,7 @@ namespace Boilers {
                 if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                     EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, Node(nodeHotWaterInletIndex_).Temp);
                 } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
-                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, BoilerOutletTemp);
+                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, operatingOutletTemperature_);
                 }
 
             } else {
@@ -957,7 +957,7 @@ namespace Boilers {
                         if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(nodeHotWaterInletIndex_).Temp, 2));
                         } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
-                            ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
+                            ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(operatingOutletTemperature_, 2));
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(EffCurveOutput, 5));
@@ -986,7 +986,7 @@ namespace Boilers {
                         if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + TrimSigDigits(Node(nodeHotWaterInletIndex_).Temp, 2));
                         } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
-                            ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(BoilerOutletTemp, 2));
+                            ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(operatingOutletTemperature_, 2));
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(EffCurveOutput, 5));
@@ -1041,8 +1041,8 @@ namespace Boilers {
         } else {
             // set node temperatures
             SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
-            Node(nodeHotWaterOutletIndex_).Temp = BoilerOutletTemp;
-            reportVariables_.BoilerOutletTemp = BoilerOutletTemp;
+            Node(nodeHotWaterOutletIndex_).Temp = operatingOutletTemperature_;
+            reportVariables_.BoilerOutletTemp = operatingOutletTemperature_;
             reportVariables_.BoilerLoad = operatingLoad_;
             reportVariables_.FuelUsed = operatingFuelUsed_;
             reportVariables_.ParasiticElecPower = operatingParasiticElectricalPower_;
