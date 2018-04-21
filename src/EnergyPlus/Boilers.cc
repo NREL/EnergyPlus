@@ -299,16 +299,13 @@ namespace Boilers {
                 ErrorsFound = true;
             }
 
-            boiler.designNominalCapacity_ = rNumericArgs(1);
             if (rNumericArgs(1) == 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(1) + '=' + RoundSigDigits(rNumericArgs(1), 2));
                 ShowContinueError("..." + cNumericFieldNames(1) + " must be greater than 0.0");
                 ErrorsFound = true;
             }
-            if (boiler.designNominalCapacity_ == AutoSize) {
-                boiler.designNominalCapacityWasAutoSized_ = true;
-            }
+            boiler.setDesignNominalCapacity(rNumericArgs(1));
 
             boiler.designEfficiency_ = rNumericArgs(2);
             if (rNumericArgs(2) == 0.0) {
