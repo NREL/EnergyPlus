@@ -221,7 +221,7 @@ namespace Boilers {
             Real64 BoilerMassFlowRate;        // kg/s - Boiler mass flow rate
             Real64 BoilerOutletTemp;          // W - Boiler outlet temperature
             Real64 operatingPartLoadRatio_;                 // Boiler operating part-load ratio
-            Real64 FuelUsed;                  // W - Boiler fuel used
+            Real64 operatingFuelUsed_;                  // W - Boiler fuel used
 
             // static member functions
             static void GetBoilerInput();

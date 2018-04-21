@@ -811,7 +811,7 @@ namespace Boilers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 operatingEfficiency;             // boiler efficiency
         Real64 operatingCapacity;          // W - boiler nominal capacity
-        Real64 TheorFuelUse;          // Theoretical (stoichiometric) fuel use
+        Real64 theoreticalFuelUse;          // Theoretical (stoichiometric) fuel use
         Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
         Real64 TempUpLimitBout;       // C - boiler high temperature limit
         Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
@@ -927,7 +927,7 @@ namespace Boilers {
         operatingPartLoadRatio_ = max(operatingPartLoadRatio_, designMinPartLoadRatio_);
 
         // calculate theoretical fuel use based on nominal thermal efficiency
-        TheorFuelUse = operatingLoad_ / operatingEfficiency;
+        theoreticalFuelUse = operatingLoad_ / operatingEfficiency;
 
         // calculate normalized efficiency based on curve object type
         if (curveEfficiencyIndex_ > 0) {
@@ -1003,8 +1003,8 @@ namespace Boilers {
         }
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
-        FuelUsed = TheorFuelUse / EffCurveOutput;
         if (operatingLoad_ > 0.0) ParasiticElecPower = designParasiticElectricalLoad_ * OperPLR;
+        operatingFuelUsed_ = theoreticalFuelUse / EffCurveOutput;
     }
 
     // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
@@ -1044,7 +1044,7 @@ namespace Boilers {
             Node(nodeHotWaterOutletIndex_).Temp = BoilerOutletTemp;
             reportVariables_.BoilerOutletTemp = BoilerOutletTemp;
             reportVariables_.BoilerLoad = operatingLoad_;
-            reportVariables_.FuelUsed = FuelUsed;
+            reportVariables_.FuelUsed = operatingFuelUsed_;
             reportVariables_.ParasiticElecPower = ParasiticElecPower;
             reportVariables_.BoilerPLR = operatingPartLoadRatio_;
         }
