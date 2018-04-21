@@ -107,8 +107,8 @@ class BoilerSizingFixture : public EnergyPlusFixture
 TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenNotRequired)
 {
     // set the hardsized values
-    Boiler(1).setDesignNominalCapacity(40000.0);
     Boiler(1).setDesignVolumeFlowRate(1.0);
+    Boiler(1).setDesignNominalCapacity(40000.0);
 
     // do the sizing
     Boiler(1).doSizing();
@@ -121,8 +121,8 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenNotRequired)
 TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenRequired)
 {
     // set the values to AutoSize
-    Boiler(1).setDesignNominalCapacity(AutoSize);
     Boiler(1).setDesignVolumeFlowRate(AutoSize);
+    Boiler(1).setDesignNominalCapacity(AutoSize);
 
     // do the sizing
     Boiler(1).doSizing();
