@@ -220,7 +220,7 @@ namespace Boilers {
             Real64 ParasiticElecPower;        // W - Parasitic electrical power (e.g. forced draft fan)
             Real64 BoilerMassFlowRate;        // kg/s - Boiler mass flow rate
             Real64 BoilerOutletTemp;          // W - Boiler outlet temperature
-            Real64 BoilerPLR;                 // Boiler operating part-load ratio
+            Real64 operatingPartLoadRatio_;                 // Boiler operating part-load ratio
             Real64 FuelUsed;                  // W - Boiler fuel used
 
             // static member functions

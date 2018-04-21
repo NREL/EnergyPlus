@@ -812,7 +812,6 @@ namespace Boilers {
         Real64 operatingEfficiency;             // boiler efficiency
         Real64 operatingCapacity;          // W - boiler nominal capacity
         Real64 TheorFuelUse;          // Theoretical (stoichiometric) fuel use
-        Real64 OperPLR;               // operating part load ratio
         Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
         Real64 TempUpLimitBout;       // C - boiler high temperature limit
         Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
@@ -923,12 +922,9 @@ namespace Boilers {
             BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
         }
 
-        OperPLR = operatingLoad_ / operatingCapacity;
-        OperPLR = min(OperPLR, designMaxPartLoadRatio_);
-        OperPLR = max(OperPLR, designMinPartLoadRatio_);
-
-        // set report variable
-        BoilerPLR = OperPLR;
+        operatingPartLoadRatio_ = operatingLoad_ / operatingCapacity;
+        operatingPartLoadRatio_ = min(operatingPartLoadRatio_, designMaxPartLoadRatio_);
+        operatingPartLoadRatio_ = max(operatingPartLoadRatio_, designMinPartLoadRatio_);
 
         // calculate theoretical fuel use based on nominal thermal efficiency
         TheorFuelUse = operatingLoad_ / operatingEfficiency;
