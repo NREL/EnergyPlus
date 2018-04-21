@@ -809,8 +809,8 @@ namespace Boilers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 BoilerEff;             // boiler efficiency
         Real64 BoilerNomCap;          // W - boiler nominal capacity
+        Real64 operatingEfficiency;             // boiler efficiency
         Real64 BoilerMaxPLR;          // boiler maximum part load ratio
         Real64 BoilerMinPLR;          // boiler minimum part load ratio
         Real64 TheorFuelUse;          // Theoretical (stoichiometric) fuel use
@@ -833,7 +833,7 @@ namespace Boilers {
         BoilerNomCap = designNominalCapacity_;
         BoilerMaxPLR = designMaxPartLoadRatio_;
         BoilerMinPLR = designMinPartLoadRatio_;
-        BoilerEff = designEfficiency_;
+        operatingEfficiency = designEfficiency_;
         TempUpLimitBout = designOutletTemperatureLimit_;
         BoilerMassFlowRateMax = designMassFlowRate_;
 
@@ -852,14 +852,14 @@ namespace Boilers {
         if (FaultyBoilerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             int FaultIndex = FaultyBoilerFoulingIndex;
             Real64 NomCap_ff = BoilerNomCap;
-            Real64 BoilerEff_ff = BoilerEff;
+            Real64 BoilerEff_ff = operatingEfficiency;
 
             // calculate the Faulty Boiler Fouling Factor using fault information
             FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultIndex).CalFoulingFactor();
 
             // update the boiler nominal capacity at faulty cases
             BoilerNomCap = NomCap_ff * FaultyBoilerFoulingFactor;
-            BoilerEff = BoilerEff_ff * FaultyBoilerFoulingFactor;
+            operatingEfficiency *= FaultyBoilerFoulingFactor;
         }
 
         // Set the current load equal to the boiler load
@@ -943,7 +943,7 @@ namespace Boilers {
         BoilerPLR = OperPLR;
 
         // calculate theoretical fuel use based on nominal thermal efficiency
-        TheorFuelUse = BoilerLoad / BoilerEff;
+        TheorFuelUse = BoilerLoad / operatingEfficiency;
 
         // calculate normalized efficiency based on curve object type
         if (curveEfficiencyIndex_ > 0) {
@@ -977,7 +977,7 @@ namespace Boilers {
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(EffCurveOutput, 5));
-                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(EffCurveOutput * BoilerEff, 5) +
+                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(EffCurveOutput * operatingEfficiency, 5) +
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 0.01 and simulation continues.");
                 } else {
@@ -990,7 +990,7 @@ namespace Boilers {
         }
 
         // warn if overall efficiency greater than 1.1
-        if (!WarmupFlag && EffCurveOutput * BoilerEff > 1.1) {
+        if (!WarmupFlag && EffCurveOutput * operatingEfficiency > 1.1) {
             if (BoilerLoad > 0.0 && curveEfficiencyIndex_ > 0) {
                 if (CalculatedEffError < 1) {
                     ++CalculatedEffError;
@@ -1006,13 +1006,13 @@ namespace Boilers {
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(EffCurveOutput, 5));
-                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(EffCurveOutput * BoilerEff, 5) +
+                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(EffCurveOutput * operatingEfficiency, 5) +
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 1.1 and simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Name +
                                                        "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...",
-                                                   CalculatedEffIndex, EffCurveOutput * BoilerEff, EffCurveOutput * BoilerEff);
+                                                   CalculatedEffIndex, EffCurveOutput * operatingEfficiency, EffCurveOutput * operatingEfficiency);
                 }
             }
             EffCurveOutput = 1.1;
