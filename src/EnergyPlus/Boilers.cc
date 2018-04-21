@@ -809,8 +809,8 @@ namespace Boilers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 BoilerNomCap;          // W - boiler nominal capacity
         Real64 operatingEfficiency;             // boiler efficiency
+        Real64 operatingCapacity;          // W - boiler nominal capacity
         Real64 BoilerMaxPLR;          // boiler maximum part load ratio
         Real64 BoilerMinPLR;          // boiler minimum part load ratio
         Real64 TheorFuelUse;          // Theoretical (stoichiometric) fuel use
@@ -830,7 +830,7 @@ namespace Boilers {
         BoilerMassFlowRate = 0.0;
         BoilerInletNode = nodeHotWaterInletIndex_;
         BoilerOutletNode = nodeHotWaterOutletIndex_;
-        BoilerNomCap = designNominalCapacity_;
+        operatingCapacity = designNominalCapacity_;
         BoilerMaxPLR = designMaxPartLoadRatio_;
         BoilerMinPLR = designMinPartLoadRatio_;
         operatingEfficiency = designEfficiency_;
@@ -851,14 +851,14 @@ namespace Boilers {
         // If there is a fault of boiler fouling (zrp_Nov2016)
         if (FaultyBoilerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
             int FaultIndex = FaultyBoilerFoulingIndex;
-            Real64 NomCap_ff = BoilerNomCap;
+            Real64 NomCap_ff = operatingCapacity;
             Real64 BoilerEff_ff = operatingEfficiency;
 
             // calculate the Faulty Boiler Fouling Factor using fault information
-            FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultIndex).CalFoulingFactor();
+            FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultyBoilerFoulingIndex).CalFoulingFactor();
 
             // update the boiler nominal capacity at faulty cases
-            BoilerNomCap = NomCap_ff * FaultyBoilerFoulingFactor;
+            operatingCapacity *= FaultyBoilerFoulingFactor;
             operatingEfficiency *= FaultyBoilerFoulingFactor;
         }
 
@@ -917,8 +917,8 @@ namespace Boilers {
 
             if ((MyLoad > 0.0) && (BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
                 BoilerLoad = MyLoad;
-                if (BoilerLoad > BoilerNomCap * BoilerMaxPLR) BoilerLoad = BoilerNomCap * BoilerMaxPLR;
-                if (BoilerLoad < BoilerNomCap * BoilerMinPLR) BoilerLoad = BoilerNomCap * BoilerMinPLR;
+                if (BoilerLoad > operatingCapacity * BoilerMaxPLR) BoilerLoad = operatingCapacity * BoilerMaxPLR;
+                if (BoilerLoad < operatingCapacity * BoilerMinPLR) BoilerLoad = operatingCapacity * BoilerMinPLR;
                 BoilerOutletTemp = Node(BoilerInletNode).Temp + BoilerLoad / (BoilerMassFlowRate * Cp);
                 BoilerDeltaTemp = BoilerOutletTemp - Node(BoilerInletNode).Temp;
             } else {
@@ -935,7 +935,7 @@ namespace Boilers {
             BoilerOutletTemp = Node(BoilerInletNode).Temp;
         }
 
-        OperPLR = BoilerLoad / BoilerNomCap;
+        OperPLR = BoilerLoad / operatingCapacity;
         OperPLR = min(OperPLR, BoilerMaxPLR);
         OperPLR = max(OperPLR, BoilerMinPLR);
 
