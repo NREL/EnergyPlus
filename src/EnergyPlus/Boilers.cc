@@ -850,10 +850,6 @@ namespace Boilers {
 
         // If there is a fault of boiler fouling (zrp_Nov2016)
         if (FaultyBoilerFoulingFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
-            int FaultIndex = FaultyBoilerFoulingIndex;
-            Real64 NomCap_ff = operatingCapacity;
-            Real64 BoilerEff_ff = operatingEfficiency;
-
             // calculate the Faulty Boiler Fouling Factor using fault information
             FaultyBoilerFoulingFactor = FaultsBoilerFouling(FaultyBoilerFoulingIndex).CalFoulingFactor();
 
