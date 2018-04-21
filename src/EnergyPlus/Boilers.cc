@@ -821,7 +821,7 @@ namespace Boilers {
         // FLOW
 
         operatingLoad_ = 0.0;
-        ParasiticElecPower = 0.0;
+        operatingParasiticElectricalPower_ = 0.0;
         BoilerMassFlowRate = 0.0;
         operatingCapacity = designNominalCapacity_;
         operatingEfficiency = designEfficiency_;
@@ -1004,7 +1004,7 @@ namespace Boilers {
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
         operatingFuelUsed_ = theoreticalFuelUse / EffCurveOutput;
-        if (operatingLoad_ > 0.0) ParasiticElecPower = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
+        if (operatingLoad_ > 0.0) operatingParasiticElectricalPower_ = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
     }
 
     // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
@@ -1045,7 +1045,7 @@ namespace Boilers {
             reportVariables_.BoilerOutletTemp = BoilerOutletTemp;
             reportVariables_.BoilerLoad = operatingLoad_;
             reportVariables_.FuelUsed = operatingFuelUsed_;
-            reportVariables_.ParasiticElecPower = ParasiticElecPower;
+            reportVariables_.ParasiticElecPower = operatingParasiticElectricalPower_;
             reportVariables_.BoilerPLR = operatingPartLoadRatio_;
         }
 

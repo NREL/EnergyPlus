@@ -176,7 +176,7 @@ namespace Boilers {
                   efficiencyCurveType_(EfficiencyCurveType::default), designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0),
                   EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false),
                   FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true),
-                  reportVariables_(ReportVariables()), operatingLoad_(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
+                  reportVariables_(ReportVariables()), operatingLoad_(0.0), operatingParasiticElectricalPower_(0.0), BoilerMassFlowRate(0.0)
             {
             }
 
@@ -217,7 +217,7 @@ namespace Boilers {
             bool doEnvironmentInitialisation; // do the environment initialisation, i.e. get inlet conditions etc.
             ReportVariables reportVariables_;       // store the reporting variables on each boiler
             Real64 operatingLoad_;                // W - Boiler Load
-            Real64 ParasiticElecPower;        // W - Parasitic electrical power (e.g. forced draft fan)
+            Real64 operatingParasiticElectricalPower_;        // W - Parasitic electrical power (e.g. forced draft fan)
             Real64 BoilerMassFlowRate;        // kg/s - Boiler mass flow rate
             Real64 BoilerOutletTemp;          // W - Boiler outlet temperature
             Real64 operatingPartLoadRatio_;                 // Boiler operating part-load ratio
