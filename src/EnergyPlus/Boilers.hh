@@ -168,14 +168,15 @@ namespace Boilers {
             // Default Constructor
             BoilerSpecs()
                 : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), designNominalCapacity_(0.0),
-                  designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0), designFlowMode_(FlowModeType::default), ModulatedFlowSetToLoop(false),
-                  ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0), designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), designSizingFactor_(0.0),
-                  nodeHotWaterInletIndex_(0), nodeHotWaterOutletIndex_(0), designMinPartLoadRatio_(0.0), designMaxPartLoadRatio_(0.0), designOptimalPartLoadRatio_(0.0),
-                  efficiencyCurveTemperatureMode_(TemperatureEvaluationModeType::default), curveEfficiencyIndex_(0), efficiencyCurveType_(EfficiencyCurveType::default),
-                  designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0),
-                  CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
-                  FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true), reportVariables(ReportVars()),
-                  BoilerLoad(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
+                  designNominalCapacityWasAutoSized_(false), designEfficiency_(0.0), designOutletTemperature_(0.0),
+                  designFlowMode_(FlowModeType::default), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), designVolumeFlowRate_(0.0),
+                  designVolumeFlowRateWasAutoSized_(false), designMassFlowRate_(0.0), designSizingFactor_(0.0), nodeHotWaterInletIndex_(0),
+                  nodeHotWaterOutletIndex_(0), designMinPartLoadRatio_(0.0), designMaxPartLoadRatio_(0.0), designOptimalPartLoadRatio_(0.0),
+                  efficiencyCurveTemperatureMode_(TemperatureEvaluationModeType::default), curveEfficiencyIndex_(0),
+                  efficiencyCurveType_(EfficiencyCurveType::default), designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0),
+                  EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false),
+                  FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true),
+                  reportVariables(ReportVars()), BoilerLoad(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
             {
             }
 
