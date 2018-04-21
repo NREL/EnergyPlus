@@ -400,8 +400,8 @@ namespace Boilers {
             boiler.setDesignOutletTemperatureLimit(rNumericArgs(8));
 
             boiler.designParasiticElectricalLoad_ = rNumericArgs(9);
-            boiler.designSizingFactor_ = rNumericArgs(10);
-            if (boiler.designSizingFactor_ == 0.0) boiler.designSizingFactor_ = 1.0;
+
+            boiler.setDesignSizingFactor(rNumericArgs(10));
 
             boiler.nodeHotWaterInletIndex_ = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeType_Water,
                                                           DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
