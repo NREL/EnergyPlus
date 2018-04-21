@@ -1003,8 +1003,8 @@ namespace Boilers {
         }
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
-        if (operatingLoad_ > 0.0) ParasiticElecPower = designParasiticElectricalLoad_ * OperPLR;
         operatingFuelUsed_ = theoreticalFuelUse / EffCurveOutput;
+        if (operatingLoad_ > 0.0) ParasiticElecPower = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
     }
 
     // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
