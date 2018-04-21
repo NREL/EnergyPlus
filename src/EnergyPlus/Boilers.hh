@@ -104,7 +104,7 @@ namespace Boilers {
 
     // Types
 
-    struct ReportVars
+    struct ReportVariables
     {
         // Members
         Real64 BoilerLoad;               // W - Boiler operating load
@@ -119,7 +119,7 @@ namespace Boilers {
         Real64 BoilerPLR;                // Boiler operating part-load ratio
 
                                          // Default Constructor
-        ReportVars()
+        ReportVariables()
             : BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
             ParasiticElecPower(0.0), ParasiticElecConsumption(0.0), BoilerPLR(0.0)
         {
@@ -176,7 +176,7 @@ namespace Boilers {
                   efficiencyCurveType_(EfficiencyCurveType::default), designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0),
                   EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false),
                   FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true),
-                  reportVariables(ReportVars()), BoilerLoad(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
+                  reportVariables_(ReportVariables()), BoilerLoad(0.0), ParasiticElecPower(0.0), BoilerMassFlowRate(0.0)
             {
             }
 
@@ -215,7 +215,7 @@ namespace Boilers {
             std::string EndUseSubcategory;    // identifier use for the end use subcategory
             bool doOneTimeInitialisation;     // do the one time initialisation, i.e. locate on plantloops etc.
             bool doEnvironmentInitialisation; // do the environment initialisation, i.e. get inlet conditions etc.
-            ReportVars reportVariables;       // store the reporting variables on each boiler
+            ReportVariables reportVariables_;       // store the reporting variables on each boiler
             Real64 BoilerLoad;                // W - Boiler Load
             Real64 ParasiticElecPower;        // W - Parasitic electrical power (e.g. forced draft fan)
             Real64 BoilerMassFlowRate;        // kg/s - Boiler mass flow rate

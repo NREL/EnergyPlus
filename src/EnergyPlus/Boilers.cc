@@ -445,7 +445,7 @@ namespace Boilers {
         }
 
         for (auto &boiler : Boiler) {
-            ReportVars report(boiler.reportVariables);
+            ReportVariables report(boiler.reportVariables_);
             std::string const fuelType(GetResourceTypeChar(boiler.FuelType));
 
             SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, report.BoilerLoad, "System", "Average", boiler.Name);
@@ -1048,29 +1048,29 @@ namespace Boilers {
             // set node temperatures
             SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
             Node(nodeHotWaterOutletIndex_).Temp = Node(nodeHotWaterInletIndex_).Temp;
-            reportVariables.BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
-            reportVariables.BoilerLoad = 0.0;
-            reportVariables.FuelUsed = 0.0;
-            reportVariables.ParasiticElecPower = 0.0;
-            reportVariables.BoilerPLR = 0.0;
+            reportVariables_.BoilerOutletTemp = Node(nodeHotWaterInletIndex_).Temp;
+            reportVariables_.BoilerLoad = 0.0;
+            reportVariables_.FuelUsed = 0.0;
+            reportVariables_.ParasiticElecPower = 0.0;
+            reportVariables_.BoilerPLR = 0.0;
 
         } else {
             // set node temperatures
             SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
             Node(nodeHotWaterOutletIndex_).Temp = BoilerOutletTemp;
-            reportVariables.BoilerOutletTemp = BoilerOutletTemp;
-            reportVariables.BoilerLoad = BoilerLoad;
-            reportVariables.FuelUsed = FuelUsed;
-            reportVariables.ParasiticElecPower = ParasiticElecPower;
-            reportVariables.BoilerPLR = BoilerPLR;
+            reportVariables_.BoilerOutletTemp = BoilerOutletTemp;
+            reportVariables_.BoilerLoad = BoilerLoad;
+            reportVariables_.FuelUsed = FuelUsed;
+            reportVariables_.ParasiticElecPower = ParasiticElecPower;
+            reportVariables_.BoilerPLR = BoilerPLR;
         }
 
-        reportVariables.BoilerInletTemp = Node(nodeHotWaterInletIndex_).Temp;
-        reportVariables.Mdot = Node(nodeHotWaterOutletIndex_).MassFlowRate;
+        reportVariables_.BoilerInletTemp = Node(nodeHotWaterInletIndex_).Temp;
+        reportVariables_.Mdot = Node(nodeHotWaterOutletIndex_).MassFlowRate;
 
-        reportVariables.BoilerEnergy = reportVariables.BoilerLoad * ReportingConstant;
-        reportVariables.FuelConsumed = reportVariables.FuelUsed * ReportingConstant;
-        reportVariables.ParasiticElecConsumption = reportVariables.ParasiticElecPower * ReportingConstant;
+        reportVariables_.BoilerEnergy = reportVariables_.BoilerLoad * ReportingConstant;
+        reportVariables_.FuelConsumed = reportVariables_.FuelUsed * ReportingConstant;
+        reportVariables_.ParasiticElecConsumption = reportVariables_.ParasiticElecPower * ReportingConstant;
     }
 
     // End of Record Keeping subroutines for the BOILER:HOTWATER Module
