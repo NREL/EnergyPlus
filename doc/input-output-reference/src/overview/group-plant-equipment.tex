@@ -3888,42 +3888,24 @@ This field is used to control which value for hot water temperature is used when
 
 \paragraph{Field: Normalized Boiler Efficiency Curve Name}\label{field-normalized-boiler-efficiency-curve-name}
 
-This alpha field contains the curve name which describes the normalized heating efficiency (as a fraction of nominal thermal efficiency) of the boiler's burner. If this field is left blank, the nominal thermal efficiency is assumed to be constant (i.e., Fuel Used is equal to the Theoretical Fuel Use in the equation above). When a boiler efficiency curve is used, the curve may be any valid curve object with 1 (PLR) or 2 (PLR and boiler outlet water temperature) independent variables. A tri-quadratic curve object is not allowed since it uses 3 independent variables. The linear, quadratic, and cubic curve types may be used when the boiler efficiency is solely a function of boiler part-load ratio (PLR). When this type of curve is used, the boiler should operate at (or very near) the design boiler water outlet temperature. Other curve types may be used when the boiler efficiency is a function of both PLR and boiler water temperature. Examples of valid single and dual independent variable equations are shown below. For all curve types PLR is always the x independent variable. When using 2 independent variables, the boiler outlet water temperature (Toutlet) is always the y independent variable.
-
-\begin{equation}
-Quadratic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2}
-\end{equation}
-
-\begin{equation}
-Cubic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot PL{R^3}
-\end{equation}
-
-\begin{equation}
-Cubic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot PL{R^3}
-\end{equation}
-
-\begin{equation}
-BiQuadratic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot {T_w}^2 + {A_5}\cdot PLR\cdot {T_w}
-\end{equation}
-
-\begin{equation}
-QuadraticLinear \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot PLR\cdot {T_w} + {A_5}\cdot PL{R^2}\cdot {T_w}
-\end{equation}
-
-\begin{equation}
-\begin{array}{l}
-  \rm{Bicubic} \to \rm{Eff} = A_0 + A_1 \cdot \rm{PLR} + A_2 \cdot \rm{PLR}^2 + A_3 \cdot T_w + A_4 T_w^2 + A_5 \rm{PLR} \cdot T_w + A_6 \rm{PLR}^3 \\
-  \quad \quad \quad \quad \quad \quad \quad  + A_7 \cdot T_w^3 + A_8 \cdot \rm{PLR}^2 \cdot T_w + A_9 \cdot \rm{PLR} \cdot T_w^2
-\end{array}
-\end{equation}
-
-where
-
-Eff = normalized boiler efficiency
-
-PLR = boiler part-load ratio
-
-T\(_{w}\) = boiler water temperature {[}ºC{]} {]}, this can be either entering or leaving temperature depending on the setting in the previous field
+This alpha field contains the curve name which describes the normalized heating efficiency (as a fraction of nominal thermal efficiency) of the boiler's burner. If this field is left blank, the nominal thermal efficiency is assumed to be constant. When a boiler efficiency curve is used, the curve may be any valid curve object with 1 (PLR) or 2 (PLR and boiler water temperature) independent variables. The water temperature may be the inlet or outlet temperature as specified above. A tri-quadratic curve object is not allowed since it uses 3 independent variables. The linear, quadratic, and cubic curve types may be used when the boiler efficiency is solely a function of boiler part-load ratio (PLR). When this type of curve is used, the boiler should operate at (or very near) the design boiler water outlet temperature. Other curve types may be used when the boiler efficiency is a function of both PLR and boiler water temperature. Examples of valid single and dual independent variable equations are shown below. For all curve types PLR is always the x independent variable. When using 2 independent variables, the boiler water temperature (Twater) is always the y independent variable. The available curve types are:
+\begin{align}
+\mathrm{Linear} \to Eff ={}& {A_0} + {A_1}\cdot PLR\\
+\mathrm{Quadratic} \to Eff ={}& {A_0} + {A_1} \cdot PLR + {A_2}\cdot PL{R^2}\\
+\mathrm{Cubic} \to Eff ={}& {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot PL{R^3}\\
+\mathrm{BiQuadratic} \to Eff ={}& {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot {T_w}^2 + {A_5}\cdot PLR\cdot {T_w}\\
+\mathrm{QuadraticLinear} \to Eff ={}& {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}\cdot PLR\cdot {T_w} + {A_5}\cdot PL{R^2}\cdot {T_w}\\
+\begin{split}
+\mathrm{Bicubic} \to Eff ={}& A_0 + A_1 \cdot PLR + A_2 \cdot PLR^2 + A_3 \cdot T_w + A_4 T_w^2 + A_5 \cdot PLR \cdot T_w + A_6 \cdot PLR^3 +\\
+&A_7 \cdot T_w^3 + A_8 \cdot PLR^2 \cdot T_w + A_9 \cdot PLR \cdot T_w^2
+\end{split}
+\end{align}
+\noindent where
+\begin{description}[labelwidth=1cm, leftmargin=!]
+\item[$Eff$] is normalized boiler efficiency.
+\item[$PLR$] is boiler part-load ratio.
+\item[$T_w$] is boiler water temperature in Celcius, this can be either entering or leaving temperature depending on the setting in the previous field.
+\end{description}
 
 \paragraph{Field: Design Water Outlet Temperature}\label{field-design-water-outlet-temperature}
 
