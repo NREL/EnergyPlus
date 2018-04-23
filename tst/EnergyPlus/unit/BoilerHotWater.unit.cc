@@ -110,6 +110,10 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenNotRequired)
     Boiler(1).setDesignVolumeFlowRate(1.0);
     Boiler(1).setDesignNominalCapacity(40000.0);
 
+    // confirm the values have not been changed by the sizing
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignVolumeFlowRate(), 1.0);
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignNominalCapacity(), 40000.0);
+
     // do the sizing
     Boiler(1).doSizing();
 
@@ -123,6 +127,10 @@ TEST_F(BoilerSizingFixture, BoilerHotWaterSizingWhenRequired)
     // set the values to AutoSize
     Boiler(1).setDesignVolumeFlowRate(AutoSize);
     Boiler(1).setDesignNominalCapacity(AutoSize);
+
+    // confirm the values have not been changed by the sizing
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignVolumeFlowRate(), AutoSize);
+    EXPECT_DOUBLE_EQ(Boiler(1).getDesignNominalCapacity(), AutoSize);
 
     // do the sizing
     Boiler(1).doSizing();
