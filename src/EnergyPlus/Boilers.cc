@@ -650,6 +650,7 @@ namespace Boilers {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                 // TODO: temperatures here are different and inconsistent e.g. CWInitConvTemp
                 rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                // TODO: this is the only place designOutletTemperature_ is used. why not use the PlantSizing temperature?
                 Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, designOutletTemperature_, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 tmpNomCap = Cp * rho * designSizingFactor_ * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
