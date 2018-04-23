@@ -3954,7 +3954,7 @@ The default, if not specified, is \textbf{NotModulated}.
 
 \paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-000}
 
-This optional numeric field contains the parasitic electric power (\si{\watt}) consumed by a forced draft fan or other electrical device associated with the boiler. This parasitic electric load is consumed whenever the boiler is operating, and the model assumes that this parasitic power does not contribute to heating the water. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
+This optional numeric field contains the parasitic electric power (\si{\watt}) consumed by a forced draft fan or other electrical device associated with the boiler at a PLR of 1.0. A parasitic electric load is consumed whenever the boiler is operating, and the model assumes that this parasitic power does not contribute to heating the water. The actual parasitic load consumed is the product of this field's value and the boiler PLR. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
 
 \paragraph{Field: Sizing Factor}\label{field-sizing-factor-10}
 
