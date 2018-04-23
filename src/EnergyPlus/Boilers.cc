@@ -814,7 +814,6 @@ namespace Boilers {
         Real64 operatingCapacity;          // W - boiler nominal capacity
         Real64 theoreticalFuelUse;          // Theoretical (stoichiometric) fuel use
         Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
-        Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
         Real64 EffCurveOutput;        // Output of boiler efficiency curve
         Real64 Cp;
 
@@ -825,7 +824,6 @@ namespace Boilers {
         operatingMassFlowRate_ = 0.0;
         operatingCapacity = designNominalCapacity_;
         operatingEfficiency = designEfficiency_;
-        BoilerMassFlowRateMax = designMassFlowRate_;
 
         Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Node(nodeHotWaterInletIndex_).Temp,
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
@@ -855,7 +853,7 @@ namespace Boilers {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((designFlowMode_ == FlowModeType::Constant) || (designFlowMode_ == FlowModeType::NotModulated)) {
                 // Then find the flow rate and outlet temp
-                operatingMassFlowRate_ = BoilerMassFlowRateMax;
+                operatingMassFlowRate_ = designMassFlowRate_;
                 SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
                                      BranchNum, CompNum);
 
@@ -887,7 +885,7 @@ namespace Boilers {
                 if ((BoilerDeltaTemp > 0.0) && (operatingLoad_ > 0.0)) {
                     operatingMassFlowRate_ = operatingLoad_ / Cp / BoilerDeltaTemp;
 
-                    operatingMassFlowRate_ = min(BoilerMassFlowRateMax, operatingMassFlowRate_);
+                    operatingMassFlowRate_ = min(designMassFlowRate_, operatingMassFlowRate_);
 
                 } else {
                     operatingMassFlowRate_ = 0.0;
