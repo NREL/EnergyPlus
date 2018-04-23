@@ -250,8 +250,6 @@ namespace Boilers {
         // METHODOLOGY EMPLOYED:
         // standard EnergyPlus input retrieval using input Processor
 
-        // REFERENCES: na
-
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobalConstants::AssignResourceTypeNum;
@@ -784,8 +782,6 @@ namespace Boilers {
         // and a second order polynomial fit of performance data to obtain part
         // load performance
 
-        // REFERENCES:
-
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
@@ -801,13 +797,8 @@ namespace Boilers {
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcBoilerModel");
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 operatingEfficiency;             // boiler efficiency
@@ -816,8 +807,6 @@ namespace Boilers {
         Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
         Real64 EffCurveOutput;        // Output of boiler efficiency curve
         Real64 Cp;
-
-        // FLOW
 
         operatingLoad_ = 0.0;
         operatingParasiticElectricalPower_ = 0.0;
