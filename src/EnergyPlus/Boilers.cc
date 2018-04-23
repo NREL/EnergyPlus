@@ -814,7 +814,6 @@ namespace Boilers {
         Real64 operatingCapacity;          // W - boiler nominal capacity
         Real64 theoreticalFuelUse;          // Theoretical (stoichiometric) fuel use
         Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
-        Real64 TempUpLimitBout;       // C - boiler high temperature limit
         Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
         Real64 EffCurveOutput;        // Output of boiler efficiency curve
         Real64 Cp;
@@ -826,7 +825,6 @@ namespace Boilers {
         operatingMassFlowRate_ = 0.0;
         operatingCapacity = designNominalCapacity_;
         operatingEfficiency = designEfficiency_;
-        TempUpLimitBout = designOutletTemperatureLimit_;
         BoilerMassFlowRateMax = designMassFlowRate_;
 
         Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, Node(nodeHotWaterInletIndex_).Temp,
@@ -917,7 +915,7 @@ namespace Boilers {
         } // End of the FlowLock If block
 
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
-        if (operatingOutletTemperature_ > TempUpLimitBout) {
+        if (operatingOutletTemperature_ > designOutletTemperatureLimit_) {
             BoilerDeltaTemp = 0.0;
             operatingLoad_ = 0.0;
             operatingOutletTemperature_ = Node(nodeHotWaterInletIndex_).Temp;
