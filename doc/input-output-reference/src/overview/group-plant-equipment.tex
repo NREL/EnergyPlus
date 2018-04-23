@@ -3941,7 +3941,16 @@ This numeric field contains the outlet temperature upper limit. If this field is
 
 \paragraph{Field: Boiler Flow Mode}\label{field-boiler-flow-mode}
 
-This choice field determines how the boiler operates with respect to the intended fluid flow through the device.~ There are three different choices for specifying operating modes for the intended flow behavior:~ ``NotModulated,'' ``ConstantFlow,'' and ``LeavingSetpointModulated.''~ NotModulated is useful for either variable or constant speed pumping arrangements where the boiler is passive in the sense that although it makes a nominal request for its design flow rate it can operate at varying flow rates.~ ConstantFlow is useful for constant speed pumping arrangements where the boiler's request for flow is more strict and can increase the overall loop flow.~ LeavingSetpointModulated changes the boiler model to internally vary the flow rate so that the temperature leaving the boiler matches a setpoint.~ In all cases the operation of the external plant system can also impact the flow through the boiler -- for example if the relative sizes and operation are such that flow is restricted and the requests cannot be met.~~ The default, if not specified, is NotModulated.
+This choice field determines how the boiler operates with respect to the intended fluid flow through the device. There are three different choices for specifying operating modes for the intended flow behavior:
+\begin{description}[labelwidth=5.5cm, leftmargin=!]
+\item[NotModulated] NotModulated is useful for either variable or constant speed pumping arrangements where the boiler is passive in the sense that although it makes a nominal request for its design flow rate, it can operate at varying flow rates.
+\item[ConstantFlow] ConstantFlow is useful for constant speed pumping arrangements where the boiler's request for flow is more strict and can increase the overall loop flow.
+\item[LeavingSetpointModulated] LeavingSetpointModulated changes the boiler model to internally vary the flow rate so that the temperature leaving the boiler matches a setpoint.
+\end{description}
+
+In all cases the operation of the external plant system can also impact the flow through the boiler -- for example if the relative sizes and operation are such that flow is restricted and the requests cannot be met.
+
+The default, if not specified, is \textbf{NotModulated}.
 
 \paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-000}
 
