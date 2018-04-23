@@ -235,17 +235,10 @@ namespace Boilers {
 
             bool hasTwoVariableEfficiencyCurve();
 
-            // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
-            // *****************************************************************************
 
             void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
                                      bool const RunFlag    // boiler on when TRUE
             );
-
-            // End of Record Keeping subroutines for the BOILER:HOTWATER Module
-            // *****************************************************************************
-
-
     };
 
     // Object Data
