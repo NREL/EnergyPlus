@@ -3964,10 +3964,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 
 This optional field allows you to specify a user-defined end-use subcategory, e.g. ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
 
+\subsubsection{Input Example}
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
-
   Boiler:HotWater,
       Condensing Boiler,   !- Boiler Name
       NaturalGas,          !- Fuel Type
