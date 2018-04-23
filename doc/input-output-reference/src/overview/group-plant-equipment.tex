@@ -3880,11 +3880,11 @@ This numeric field contains the nominal operating capacity (\si{\watt}) of the b
 
 \paragraph{Field: Nominal Thermal Efficiency}\label{field-nominal-thermal-efficiency}
 
-This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0 and the temperature entered for the Design Boiler Water Outlet Temp. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
+This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner. This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0 and the temperature entered for the Design Boiler Water Outlet Temp. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturer's (or particular data set's) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and \SI{50,000}{\kilo\joule\per\kilogram} respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
 
 \paragraph{Field: Efficiency Curve Temperature Evaluation Variable}\label{field-efficiency-curve-temperature-evaluation-variable}
 
-This field is used to control which value for hot water temperature is used when evaluating the efficiency curve specified in the next field (if applicable).~ There are two options,~ EnteringBoiler or LeavingBoiler.~ EnteringBoiler indicates that the efficiency curves will be evaluated using the temperature at boiler inlet node.~ LeavingBoiler indicates that the efficiency curves will be evaluated using the temperature at the boiler outlet.~ This field is only used if type of curve is one that uses temperature as a independent variable.
+This field is used to control which value for hot water temperature is used when evaluating the efficiency curve specified in the next field (if applicable). There are two options: \textbf{EnteringBoiler}, or \textbf{LeavingBoiler}. \textbf{EnteringBoiler} indicates that the efficiency curves will be evaluated using the temperature at boiler inlet node. \textbf{LeavingBoiler} indicates that the efficiency curves will be evaluated using the temperature at the boiler outlet. This field is only used if type of curve is one that uses temperature as an independent variable.
 
 \paragraph{Field: Normalized Boiler Efficiency Curve Name}\label{field-normalized-boiler-efficiency-curve-name}
 
@@ -3953,7 +3953,7 @@ This optional numeric field allows the user to specify a sizing factor for this 
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-10}
 
-This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+This optional field allows you to specify a user-defined end-use subcategory, e.g. ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
 
 An example of this statement in an IDF is:
 
@@ -4017,10 +4017,9 @@ Outputs available from the boiler:
   HVAC,Average,Boiler Part Load Ratio
 \end{itemize}
 
-~ One of the following blocks will be applicable based on fuel type:
+\noindent One of the following blocks will be applicable based on fuel type:
 
 Electric:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler Electric Power {[}W{]}
@@ -4029,7 +4028,6 @@ Electric:
 \end{itemize}
 
 Gas:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler Gas Rate {[}W{]}
@@ -4038,7 +4036,6 @@ Gas:
 \end{itemize}
 
 Propane:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler Propane Rate {[}W{]}
@@ -4047,7 +4044,6 @@ Propane:
 \end{itemize}
 
 FuelOil\#1:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler FuelOil\#1 Rate {[}W{]}
@@ -4056,7 +4052,6 @@ FuelOil\#1:
 \end{itemize}
 
 FuelOil\#2:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler FuelOil\#2 Rate {[}W{]}
@@ -4065,7 +4060,6 @@ FuelOil\#2:
 \end{itemize}
 
 Coal:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler Coal Rate {[}W{]}
@@ -4074,7 +4068,6 @@ Coal:
 \end{itemize}
 
 Diesel:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler Diesel Rate {[}W{]}
@@ -4083,7 +4076,6 @@ Diesel:
 \end{itemize}
 
 Gasoline:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler Gasoline Rate {[}W{]}
@@ -4092,7 +4084,6 @@ Gasoline:
 \end{itemize}
 
 OtherFuel1:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler OtherFuel1 Rate {[}W{]}
@@ -4101,7 +4092,6 @@ OtherFuel1:
 \end{itemize}
 
 OtherFuel2:
-
 \begin{itemize}
 \item
   HVAC,Average,Boiler OtherFuel2 Rate {[}W{]}
@@ -4133,7 +4123,7 @@ This output is the operating part-load ratio of the boiler. The part-load ratio 
 
 \paragraph{Boiler Electric Power {[}W{]}}\label{boiler-electric-power-w}
 
-These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
+These outputs are the energy input to the boiler. Valid fuel types are: Electric, Gas (natural gas), Propane, FuelOil\#1, FuelOil\#2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
 \paragraph{Boiler Ancillary Electric Power {[}W{]}}\label{boiler-ancillary-electric-power-w}
 
