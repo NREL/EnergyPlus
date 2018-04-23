@@ -816,10 +816,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  IF (SameString(TempArgs(3), 'AUTOSIZE') .OR. SameString(TempArgs(15), 'AUTOSIZE')) THEN
                    ! If the high or low speed capacity is autosized then use old default ratio of 0.3333 for low speed fraction
                    OutArgs(2)='0.3333' ! Gross Total Cooling Capacity Fraction
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                   CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Gross Rated Total Cooling Capacity='//trim(TempArgs(15))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Gross Total Cooling Capacity Fraction = 0.3333.')
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Gross Total Cooling Capacity Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(15),ErrFlag)
                    IF (ErrFlag) THEN
@@ -845,10 +845,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  IF (SameString(TempArgs(6), 'AUTOSIZE') .OR. SameString(TempArgs(18), 'AUTOSIZE')) THEN
                    ! If the high or low speed air flow is autosized then use old default ratio of 0.3333 for low speed fraction
                    OutArgs(3)='0.3333' ! Evaporator Air Flow Rate Fraction
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                   CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Gross Rated Air Flow Rate='//trim(TempArgs(18))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Evaporator Air Flow Rate Fraction = 0.3333.')
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Evaporator Air Flow Rate Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(18),ErrFlag)
                    IF (ErrFlag) THEN
@@ -874,10 +874,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  IF (SameString(TempArgs(25), 'AUTOSIZE') .OR. SameString(TempArgs(28), 'AUTOSIZE')) THEN
                    ! If the high or low speed air flow is autosized then use old default ratio of 0.3333 for low speed fraction
                    OutArgs(4)='0.3333' ! Evaporator Air Flow Rate Fraction
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                   CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Evaporative Condenser Air Flow Rate='//trim(TempArgs(28))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Air Flow Rate Fraction = 0.3333.')
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Air Flow Rate Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(28),ErrFlag)
                    IF (ErrFlag) THEN
@@ -908,10 +908,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  IF (SameString(TempArgs(26), 'AUTOSIZE') .OR. SameString(TempArgs(29), 'AUTOSIZE')) THEN
                    ! If the high or low speed air flow is autosized then use old default ratio of 0.3333 for low speed fraction
                    OutArgs(9)='0.3333' ! Evaporator Air Flow Rate Fraction
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                   CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoSpeed (old)='//trim(TempArgs(1))//  &
                      ' Low Speed Evaporative Condenser Air Flow Rate='//trim(TempArgs(29))//' was replaced with default sizing fraction.'//  &
-                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Pump Power Fraction = 0.3333.')
+                     ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed 2 Performance, Condenser Pump Power Fraction = 0.3333.',Auditf)
                  ELSE
                    DXTempValue1 = ProcessNumber(TempArgs(29),ErrFlag)
                    IF (ErrFlag) THEN
@@ -1038,10 +1038,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(7)=TempArgs(32) ! Latent Capacity Time Constant
                  OutArgs(8)=TempArgs(29) ! Nominal Time for Condensate Removal to Begin
                  OutArgs(9)=TempArgs(11) ! Apply Latent Degradation to Speeds Greater than 1
-                 CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                 CALL ShowWarningError( &
                    'Coil:Cooling:DX:MultiSpeed (old)="' //trim(TempArgs(1))// '".' //  &
                    ' Using Speed 1 values for Nominal Time for Condensate Removal to Begin, Ratio of Initial Moisture Evaporation Rate, '//  &
-                   ' Maximum Cycling Rate, and Latent Capacity Time Constant in Coil:Cooling:DX:CurveFit:OperatingMode='//TRIM(TempArgs(1)) // '.')
+                   ' Maximum Cycling Rate, and Latent Capacity Time Constant in Coil:Cooling:DX:CurveFit:OperatingMode='//TRIM(TempArgs(1)) // '.',Auditf)
                  
                  OutArgs(10)=TempArgs(6) ! Condenser Type
                  OutArgs(11)=TempArgs(DXNomSpeedStartArgNum+18) ! Nominal Evaporative Condenser Pump Power
@@ -1071,11 +1071,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      IF (SameString(TempArgs(DXSpeedStartArgNum), 'AUTOSIZE') .OR. SameString(TempArgs(DXNomSpeedStartArgNum), 'AUTOSIZE')) THEN
                        ! If the high or low speed capacity is autosized then use old default ratio of 0.3333 for low speed fraction
                        OutArgs(2)=RoundSigDigits(DXSpeedRatio,4) ! Gross Total Cooling Capacity Fraction
-                       CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                       CALL ShowWarningError( &
                          'Coil:Cooling:DX:MultiSpeed (old)="' //trim(TempArgs(1))// '".' //  &
                          ' Speed ' // TRIM(RoundSigDigits(SpeedNum,0)) // ' Gross Rated Total Cooling Capacity='//trim(TempArgs(DXNomSpeedStartArgNum))//' was replaced with default sizing fraction.'//  &
                          ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed ' // RoundSigDigits(SpeedNum,0) // &
-                         ' Performance, Gross Total Cooling Capacity Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.')
+                         ' Performance, Gross Total Cooling Capacity Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.',Auditf)
                      ELSE
                         ! Capacity is scaled by the capacity at the nominal speed
                        ErrFlag=.false.
@@ -1102,11 +1102,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      IF (SameString(TempArgs(DXSpeedStartArgNum+3), 'AUTOSIZE') .OR. SameString(TempArgs(DXNomSpeedStartArgNum+3), 'AUTOSIZE')) THEN
                        ! If the high or low speed capacity is autosized then use old default ratio of 0.3333 for low speed fraction
                        OutArgs(3)=RoundSigDigits(DXSpeedRatio,4) ! Evaporator Air Flow Rate Fraction
-                       CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                       CALL ShowWarningError( &
                          'Coil:Cooling:DX:MultiSpeed (old)="' //trim(TempArgs(1))// '".' //  &
                          ' Speed ' // TRIM(RoundSigDigits(SpeedNum,0)) // ' Rated Air Flow Rate='//trim(TempArgs(DXNomSpeedStartArgNum+3))//' was replaced with default sizing fraction.'//  &
                          ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed ' // RoundSigDigits(SpeedNum,0) // &
-                         ' Performance, Evaporator Air Flow Rate Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.')
+                         ' Performance, Evaporator Air Flow Rate Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.',Auditf)
                      ELSE
                        ! Evaporator air flow is scaled by the flow at nominal speed
                        ErrFlag=.false.
@@ -1133,11 +1133,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      IF (SameString(TempArgs(DXSpeedStartArgNum+17), 'AUTOSIZE') .OR. SameString(TempArgs(DXNomSpeedStartArgNum+17), 'AUTOSIZE')) THEN
                        ! If the high or low speed capacity is autosized then use old default ratio of 0.3333 for low speed fraction
                        OutArgs(4)=RoundSigDigits(DXSpeedRatio,4) ! Condenser Air Flow Rate Fraction
-                       CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                       CALL ShowWarningError( &
                          'Coil:Cooling:DX:MultiSpeed (old)="' //trim(TempArgs(1))// '".' //  &
                          ' Speed ' // TRIM(RoundSigDigits(SpeedNum,0)) // ' Evaporative Condenser Air Flow Rate='//trim(TempArgs(DXNomSpeedStartArgNum+17))//' was replaced with default sizing fraction.'//  &
                          ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed ' // RoundSigDigits(SpeedNum,0) // &
-                         ' Performance, Evaporator Air Flow Rate Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.')
+                         ' Performance, Evaporator Air Flow Rate Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.',Auditf)
                      ELSE
                        ! Condenser air flow is scaled by the flow at the nominal speed
                        ErrFlag=.false.
@@ -1169,11 +1169,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      IF (SameString(TempArgs(DXSpeedStartArgNum+18), 'AUTOSIZE') .OR. SameString(TempArgs(DXNomSpeedStartArgNum+18), 'AUTOSIZE')) THEN
                        ! If the high or low speed capacity is autosized then use old default ratio of 0.3333 for low speed fraction
                        OutArgs(9)=RoundSigDigits(DXSpeedRatio,4) ! Evaporative Condenser Pump Power Fraction
-                       CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                       CALL ShowWarningError( &
                          'Coil:Cooling:DX:MultiSpeed (old)="' //trim(TempArgs(1))// '".' //  &
                          ' Speed ' // TRIM(RoundSigDigits(SpeedNum,0)) // ' Rated Evaporative Condenser Pump Power Consumption='//trim(TempArgs(DXNomSpeedStartArgNum+18))//' was replaced with default sizing fraction.'//  &
                          ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(TempArgs(1)) // ' Speed ' // RoundSigDigits(SpeedNum,0) // &
-                         ' Performance, Evaporator Air Flow Rate Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.')
+                         ' Performance, Evaporator Air Flow Rate Fraction = ' // RoundSigDigits(DXSpeedRatio,4) // '.',Auditf)
                      ELSE
                        ! Evaporative Condenser Pump Power is scaled by the power at the nominal speed
                        ErrFlag=.false.
@@ -1493,10 +1493,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    OutArgs(7)=MultiStageDXPerformance(iDXStg1Perf)%LatentCapTimeConst ! Latent Capacity Time Constant
                    OutArgs(8)=MultiStageDXPerformance(iDXStg1Perf)%NomTimeForCondensRemoval ! Nominal Time for Condensate Removal to Begin
                    OutArgs(9)='Yes' ! Apply Latent Degradation to Speeds Greater than 1 - Yes for Coil:Cooling:DX:TwoStageWithHumidityControlMode
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                   CALL ShowWarningError( &
                      'Coil:Cooling:DX:TwoStageWithHumidityControlMode (old)="' //trim(TempArgs(1))// '".' //  &
                      ' Using Stage 1 values for Nominal Time for Condensate Removal to Begin, Ratio of Initial Moisture Evaporation Rate, '//  &
-                     ' Maximum Cycling Rate, Latent Capacity Time Constant, and Condenser Type in Coil:Cooling:DX:CurveFit:OperatingMode='//TRIM(TempArgs(1)) // '.')
+                     ' Maximum Cycling Rate, Latent Capacity Time Constant, and Condenser Type in Coil:Cooling:DX:CurveFit:OperatingMode='//TRIM(TempArgs(1)) // '.',Auditf)
                    
                    OutArgs(10)=MultiStageDXPerformance(iDXStg1Perf)%CondType ! Condenser Type
                    OutArgs(11)=MultiStageDXPerformance(iDXStg1Perf)%EvapCondPumpPower ! Nominal Evaporative Condenser Pump Power
@@ -1525,11 +1525,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                        IF (SameString(MultiStageDXPerformance(iDXStg1Perf)%GrossRatedTotCoolCap, 'AUTOSIZE') .OR. SameString(MultiStageDXPerformance(iDXNomPerf)%GrossRatedTotCoolCap, 'AUTOSIZE')) THEN
                          ! If the high or low speed value is autosized then use old default ratio of 0.5 for low speed fraction
                          OutArgs(2)='0.50' ! Gross Total Cooling Capacity Fraction
-                         CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                         CALL ShowWarningError( &
                            'Coil:Cooling:DX:TwoStageWithHumidityControlMode (old)="' //trim(TempArgs(1))// '".' //  &
                            ' Stage 1 Gross Rated Total Cooling Capacity='//trim(MultiStageDXPerformance(iDXStg1Perf)%GrossRatedTotCoolCap)//' was replaced with default sizing fraction.'//  &
                            ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(OutArgs(1))// &
-                           ', Gross Total Cooling Capacity Fraction = 0.50.')
+                           ', Gross Total Cooling Capacity Fraction = 0.50.',Auditf)
                        ELSE
                           ! Capacity is scaled by the capacity at the nominal speed
                          ErrFlag=.false.
@@ -1556,11 +1556,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                        IF (SameString(MultiStageDXPerformance(iDXNomPerf)%RatedAirFlowRate, 'AUTOSIZE') .OR. SameString(MultiStageDXPerformance(iDXNomPerf)%RatedAirFlowRate, 'AUTOSIZE')) THEN
                          ! If the high or low speed value is autosized then use old default ratio of 0.5 for low speed fraction
                          OutArgs(3)='0.50' ! Evaporator Air Flow Rate Fraction
-                         CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                         CALL ShowWarningError( &
                            'Coil:Cooling:DX:TwoStageWithHumidityControlMode (old)="' //trim(TempArgs(1))// '".' //  &
                            ' Stage 1 Rated Air Flow Rate='//trim(MultiStageDXPerformance(iDXStg1Perf)%RatedAirFlowRate)//' was replaced with default sizing fraction.'//  &
                            ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(OutArgs(1))// &
-                           ' , Evaporator Air Flow Rate Fraction = 0.50.')
+                           ' , Evaporator Air Flow Rate Fraction = 0.50.',Auditf)
                        ELSE
                          ! Evaporator air flow is scaled by the flow at nominal speed
                          ErrFlag=.false.
@@ -1587,11 +1587,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                        IF (SameString(MultiStageDXPerformance(iDXStg1Perf)%EvapCondAirFlowRate, 'AUTOSIZE') .OR. SameString(MultiStageDXPerformance(iDXNomPerf)%EvapCondAirFlowRate, 'AUTOSIZE')) THEN
                          ! If the high or low speed value is autosized then use old default ratio of 0.5 for low speed fraction
                          OutArgs(4)='0.50' ! Condenser Air Flow Rate Fraction
-                         CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                         CALL ShowWarningError( &
                            'Coil:Cooling:DX:TwoStageWithHumidityControlMode (old)="' //trim(TempArgs(1))// '".' //  &
                            ' Stage 1 Gross Rated Total Cooling Capacity='//trim(MultiStageDXPerformance(iDXStg1Perf)%EvapCondAirFlowRate)//' was replaced with default sizing fraction.'//  &
                            ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(OutArgs(1))// &
-                           ', Condenser Air Flow Rate Fraction = 0.50.')
+                           ', Condenser Air Flow Rate Fraction = 0.50.',Auditf)
                        ELSE
                          ! Condenser air flow is scaled by the flow at the nominal speed
                          ErrFlag=.false.
@@ -1634,11 +1634,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                        IF (SameString(MultiStageDXPerformance(iDXStg1Perf)%EvapCondPumpPower, 'AUTOSIZE') .OR. SameString(MultiStageDXPerformance(iDXNomPerf)%EvapCondPumpPower, 'AUTOSIZE')) THEN
                          ! If the high or low speed value is autosized then use old default ratio of 0.5 for low speed fraction
                          OutArgs(9)='0.50' ! Evaporative Condenser Pump Power Fraction
-                         CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                         CALL ShowWarningError( &
                            'Coil:Cooling:DX:TwoStageWithHumidityControlMode (old)="' //trim(TempArgs(1))// '".' //  &
                            ' Stage 1 Evaporative Condenser Pump Rated Power Consumption='//trim(MultiStageDXPerformance(iDXStg1Perf)%EvapCondPumpPower)//' was replaced with default sizing fraction.'//  &
                            ' Coil:Cooling:DX:CurveFit:Speed='//TRIM(OutArgs(1))// &
-                           ', Evaporative Condenser Pump Power Fraction = 0.50.')
+                           ', Evaporative Condenser Pump Power Fraction = 0.50.',Auditf)
                        ELSE
                          ! Evaporative Condenser Pump Power is scaled by the power at the nominal speed
                          ErrFlag=.false.
