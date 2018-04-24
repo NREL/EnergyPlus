@@ -145,7 +145,8 @@ namespace Boilers {
     {
         InitBoiler();
         CalcBoilerModel(CurLoad, RunFlag, EquipFlowCtrl);
-        UpdateBoilerRecords(CurLoad, RunFlag);
+        update();
+        report();
     }
 
     void BoilerObject::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
