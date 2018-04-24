@@ -217,11 +217,15 @@ namespace Boilers {
             bool doEnvironmentInitialisation;                                   // do the environment initialisation, i.e. get inlet conditions etc.
             ReportVariables reportVariables_;                                   // store the reporting variables on each boiler
             Real64 operatingLoad_;                                              // W - Boiler Load
+            Real64 operatingHeatingEnergy_;                                     // J - Boiler energy integrated over time
             Real64 operatingParasiticElectricalPower_;                          // W - Parasitic electrical power (e.g. forced draft fan)
+            Real64 operatingParasiticElectricalConsumption_;                    // J - Parasitic Electrical Consumption (e.g. forced draft fan)
             Real64 operatingMassFlowRate_;                                      // kg/s - Boiler mass flow rate
-            Real64 operatingOutletTemperature_;                                 // W - Boiler outlet temperature
+            Real64 operatingInletTemperature_;                                  // C - Boiler inlet temperature
+            Real64 operatingOutletTemperature_;                                 // C - Boiler outlet temperature
             Real64 operatingPartLoadRatio_;                                     // Boiler operating part-load ratio
-            Real64 operatingFuelUsed_;                                          // W - Boiler fuel used
+            Real64 operatingFuelUseRate_;                                       // W - Boiler fuel used
+            Real64 operatingFuelUse_;                                           // J - Boiler Fuel consumed integrated over time
 
             // static member functions
             static void GetBoilerInput();
@@ -235,10 +239,17 @@ namespace Boilers {
 
             bool hasTwoVariableEfficiencyCurve();
 
+            void clearOperatingVariables();
 
             void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
                                      bool const RunFlag    // boiler on when TRUE
             );
+
+            // transfer data from the boiler to outlet nodes
+            void update();
+
+            // update all reporting variables
+            void report();
     };
 
     // Object Data

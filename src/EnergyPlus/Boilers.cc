@@ -173,6 +173,21 @@ namespace Boilers {
                 efficiencyCurveType_ == EfficiencyCurveType::BiCubic);
     }
 
+    void BoilerObject::clearOperatingVariables()
+    {
+        // clear all operating variables, should be called in init
+        operatingLoad_ = 0.0;
+        operatingHeatingEnergy_ = 0.0;
+        operatingParasiticElectricalPower_ = 0.0;
+        operatingParasiticElectricalConsumption_ = 0.0;
+        operatingMassFlowRate_ = 0.0;
+        operatingInletTemperature_ = 0.0;
+        operatingOutletTemperature_ = 0.0;
+        operatingPartLoadRatio_ = 0.0;
+        operatingFuelUseRate_ = 0.0;
+        operatingFuelUse_ = 0.0;
+    }
+
     Real64 BoilerObject::getDesignNominalCapacity()
     {
         return designNominalCapacity_;
@@ -508,6 +523,9 @@ namespace Boilers {
         bool FatalError;
         bool errFlag;
 
+        // clear all operating variables to ensure they are updated following the initialisation
+        clearOperatingVariables();
+
         // Init more variables
         if (doOneTimeInitialisation) {
             // Locate the boilers on the plant loops for later usage
@@ -579,6 +597,8 @@ namespace Boilers {
         }
 
         // every iteration inits.  (most in calc routine)
+        // set the operating inlet temperature from the inlet node
+        operatingInletTemperature_ = Node(nodeHotWaterInletIndex_).Temp;
 
         if ((designFlowMode_ == FlowModeType::LeavingSetPointModulated) && ModulatedFlowSetToLoop) {
             // fix for clumsy old input that worked because loop setpoint was spread.
@@ -989,7 +1009,7 @@ namespace Boilers {
         }
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
-        operatingFuelUsed_ = theoreticalFuelUse / EffCurveOutput;
+        operatingFuelUseRate_ = theoreticalFuelUse / EffCurveOutput;
         if (operatingLoad_ > 0.0) operatingParasiticElectricalPower_ = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
     }
 
@@ -1041,6 +1061,27 @@ namespace Boilers {
         reportVariables_.BoilerEnergy = reportVariables_.BoilerLoad * ReportingConstant;
         reportVariables_.FuelConsumed = reportVariables_.FuelUsed * ReportingConstant;
         reportVariables_.ParasiticElecConsumption = reportVariables_.ParasiticElecPower * ReportingConstant;
+    }
+
+    void BoilerObject::update()
+    {
+        using PlantUtilities::SafeCopyPlantNode;
+
+        // copy the date from the inlet to outlet
+        SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
+
+        // update the outlet temperature
+        Node(nodeHotWaterOutletIndex_).Temp = operatingOutletTemperature_;
+    }
+
+    void BoilerObject::report()
+    {
+        Real64 const reportingConstant(TimeStepSys * SecInHour); // constant for converting power to energy
+
+        // update integrated values based on the operating conditions
+        operatingHeatingEnergy_ = operatingLoad_ * reportingConstant;
+        operatingFuelUse_ = operatingFuelUseRate_ * reportingConstant;
+        operatingParasiticElectricalConsumption_ = operatingParasiticElectricalPower_ * reportingConstant;
     }
 
     // End of Record Keeping subroutines for the BOILER:HOTWATER Module
