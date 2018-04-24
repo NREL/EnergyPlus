@@ -210,9 +210,9 @@ namespace Boilers {
 
             void initialise(); // number of the current boiler being simulated
 
-            void CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
-                                 bool const RunFlag,     // TRUE if boiler operating
-                                 int const EquipFlowCtrl // Flow control mode for the equipment
+            void calculate(Real64 const MyLoad,    // W - hot water demand to be met by boiler
+                           bool const RunFlag,     // TRUE if boiler operating
+                           int const EquipFlowCtrl // Flow control mode for the equipment
             );
 
             bool hasTwoVariableEfficiencyCurve();

@@ -144,7 +144,7 @@ namespace Boilers {
     void BoilerObject::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
     {
         initialise();
-        CalcBoilerModel(CurLoad, RunFlag, EquipFlowCtrl);
+        calculate(CurLoad, RunFlag, EquipFlowCtrl);
         update();
         report();
     }
@@ -779,7 +779,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerObject::CalcBoilerModel(Real64 const MyLoad,    // W - hot water demand to be met by boiler
+    void BoilerObject::calculate(Real64 const MyLoad,    // W - hot water demand to be met by boiler
                                       bool const RunFlag,     // TRUE if boiler operating
                                       int const EquipFlowCtrl // Flow control mode for the equipment
     )
