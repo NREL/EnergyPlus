@@ -55,6 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <Boilers.hh>
 #include <BranchInputManager.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
@@ -1018,6 +1019,7 @@ namespace PlantManager {
                             this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
                             this_comp.GeneralEquipType = GenEquipTypes_Boiler;
                             this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            this_comp.compPtr = Boilers::BoilerObject::factory(CompNames(CompNum));
                         } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:Steam")) {
                             this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
                             this_comp.GeneralEquipType = GenEquipTypes_Boiler;
