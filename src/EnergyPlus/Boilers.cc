@@ -141,7 +141,7 @@ namespace Boilers {
         return nullptr;
     }
 
-    void BoilerObject::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl)
+    void BoilerObject::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl)
     {
         initialise();
         calculate(CurLoad, RunFlag, EquipFlowCtrl);
@@ -149,7 +149,7 @@ namespace Boilers {
         report();
     }
 
-    void BoilerObject::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void BoilerObject::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MinLoad = designNominalCapacity_ * designMinPartLoadRatio_;
         MaxLoad = designNominalCapacity_ * designMaxPartLoadRatio_;
@@ -161,7 +161,7 @@ namespace Boilers {
         SizFac = designSizingFactor_;
     }
 
-    void BoilerObject::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void BoilerObject::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         initialise();
         doSizing();
