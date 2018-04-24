@@ -117,7 +117,7 @@ namespace Boilers {
                                               // member functions
             static PlantComponent *factory(std::string objectName);
 
-            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl) override;
 
             void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 

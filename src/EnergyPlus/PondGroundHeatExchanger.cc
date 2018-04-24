@@ -161,7 +161,8 @@ namespace PondGroundHeatExchanger {
     void PondGroundHeatExchangerData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,
                                                Real64 &EP_UNUSED(CurLoad),
-                                               bool const EP_UNUSED(RunFlag))
+                                               bool const EP_UNUSED(RunFlag),
+                                               int const EP_UNUSED(EquipFlowCtrl))
     {
         this->InitPondGroundHeatExchanger(FirstHVACIteration);
         this->CalcPondGroundHeatExchanger();

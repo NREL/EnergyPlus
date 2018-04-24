@@ -297,19 +297,19 @@ namespace PlantLoopEquip {
         // Pipe has no special types at the moment, so find it this way
         if (GeneralEquipType == GenEquipTypes_Pipe) {
             if (EquipTypeNum == TypeOf_Pipe) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_PipeSteam) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_PipeExterior) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_PipeInterior) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_PipeUnderground) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_PipingSystemPipeCircuit) {
                 SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration);
@@ -688,7 +688,7 @@ namespace PlantLoopEquip {
             // BOILERS
         } else if (GeneralEquipType == GenEquipTypes_Boiler) {
             if (EquipTypeNum == TypeOf_Boiler_Simple) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;
                 }
@@ -808,13 +808,13 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_GroundHeatExchanger) {
 
             if (EquipTypeNum == TypeOf_GrndHtExchgSystem) { // 'GROUND HEAT EXCHANGER:SYSTEM'
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgSurface) { // 'GROUND HEAT EXCHANGER:SURFACE'
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgPond) { // 'GROUND HEAT EXCHANGER:POND'
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgHorizTrench) {
                 SimPipingSystemCircuit(sim_component.Name, sim_component.CompNum, InitLoopEquip, FirstHVACIteration);
@@ -824,7 +824,7 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_GrndHtExchgSlinky) { // 'GROUND HEAT EXCHANGER:SLINKY'
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
             }
             // THERMAL STORAGE
         } else if (GeneralEquipType == GenEquipTypes_ThermalStorage) {
@@ -985,7 +985,7 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_LoadProfile) { // DSU2 draft out InitLoopEquip on a demand side component
 
             if (EquipTypeNum == TypeOf_PlantLoadProfile) {
-                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag, EquipFlowCtrl);
                 if (InitLoopEquip) {
                     sim_component.CompNum = EquipNum;
                 }

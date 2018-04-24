@@ -141,7 +141,7 @@ namespace Boilers {
         return nullptr;
     }
 
-    void BoilerObject::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
+    void BoilerObject::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl)
     {
         initialise();
         calculate(CurLoad, RunFlag, EquipFlowCtrl);

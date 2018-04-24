@@ -120,7 +120,7 @@ namespace PlantLoadProfile {
         // Functions
         static PlantComponent *factory(std::string objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl) override;
 
         void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 

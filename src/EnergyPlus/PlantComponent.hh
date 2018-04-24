@@ -59,7 +59,7 @@ class PlantComponent
 {
 
 public:
-    virtual void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) = 0;
+    virtual void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl) = 0;
 
     virtual void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
                                      Real64 &EP_UNUSED(MaxLoad),

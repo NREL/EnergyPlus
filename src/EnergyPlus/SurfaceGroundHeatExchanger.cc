@@ -213,7 +213,8 @@ namespace SurfaceGroundHeatExchanger {
     void SurfaceGroundHeatExchangerData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                                   bool const FirstHVACIteration,
                                                   Real64 &EP_UNUSED(CurLoad),
-                                                  bool const EP_UNUSED(RunFlag))
+                                                  bool const EP_UNUSED(RunFlag),
+                                                  int const EP_UNUSED(EquipFlowCtrl))
     {
         this->InitSurfaceGroundHeatExchanger();
         this->CalcSurfaceGroundHeatExchanger(FirstHVACIteration);

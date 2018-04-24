@@ -245,7 +245,7 @@ namespace SurfaceGroundHeatExchanger {
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag, int const EquipFlowCtrl) override;
 
         static PlantComponent *factory(int const objectType, std::string const objectName);
 
