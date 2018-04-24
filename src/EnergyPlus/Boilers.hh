@@ -103,29 +103,6 @@ namespace Boilers {
     // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
     // Types
-
-    struct ReportVariables
-    {
-        // Members
-        Real64 BoilerLoad;               // W - Boiler operating load
-        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
-        Real64 FuelUsed;                 // W - Boiler fuel used
-        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
-        Real64 BoilerOutletTemp;         // C - Boiler outlet temperature
-        Real64 Mdot;                     // kg/s - Boiler mass flow rate
-        Real64 ParasiticElecPower;       // W - Parasitic Electrical Power (e.g. forced draft fan)
-        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-        Real64 BoilerPLR;                // Boiler operating part-load ratio
-
-                                         // Default Constructor
-        ReportVariables()
-            : BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
-            ParasiticElecPower(0.0), ParasiticElecConsumption(0.0), BoilerPLR(0.0)
-        {
-        }
-    };
-
     class BoilerObject : public PlantComponent
     {
         // Members
@@ -176,7 +153,9 @@ namespace Boilers {
                   efficiencyCurveType_(EfficiencyCurveType::default), designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0),
                   EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false),
                   FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true),
-                  reportVariables_(ReportVariables()), operatingLoad_(0.0), operatingParasiticElectricalPower_(0.0), operatingMassFlowRate_(0.0)
+                  operatingLoad_(0.0), operatingHeatingEnergy_(0.0), operatingParasiticElectricalPower_(0.0),
+                  operatingParasiticElectricalConsumption_(0.0), operatingMassFlowRate_(0.0), operatingInletTemperature_(0.0),
+                  operatingPartLoadRatio_(0.0), operatingFuelUseRate_(0.0), operatingFuelUse_(0.0)
             {
             }
 
@@ -215,7 +194,6 @@ namespace Boilers {
             std::string EndUseSubcategory;                                      // identifier use for the end use subcategory
             bool doOneTimeInitialisation;                                       // do the one time initialisation, i.e. locate on plantloops etc.
             bool doEnvironmentInitialisation;                                   // do the environment initialisation, i.e. get inlet conditions etc.
-            ReportVariables reportVariables_;                                   // store the reporting variables on each boiler
             Real64 operatingLoad_;                                              // W - Boiler Load
             Real64 operatingHeatingEnergy_;                                     // J - Boiler energy integrated over time
             Real64 operatingParasiticElectricalPower_;                          // W - Parasitic electrical power (e.g. forced draft fan)

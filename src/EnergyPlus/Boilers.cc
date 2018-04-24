@@ -1012,56 +1012,6 @@ namespace Boilers {
         if (operatingLoad_ > 0.0) operatingParasiticElectricalPower_ = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
     }
 
-    // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
-
-    void BoilerObject::UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
-                                          bool const RunFlag  // boiler on when TRUE
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Dan Fisher
-        //       DATE WRITTEN:    October 1998
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // boiler simulation reporting
-
-        // Using/Aliasing
-        using PlantUtilities::SafeCopyPlantNode;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant; // constant for converting power to energy
-        ReportingConstant = TimeStepSys * SecInHour;
-
-        if (MyLoad <= 0 || !RunFlag) {
-            // set node temperatures
-            SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
-            Node(nodeHotWaterOutletIndex_).Temp = operatingInletTemperature_;
-            reportVariables_.BoilerOutletTemp = operatingInletTemperature_;
-            reportVariables_.BoilerLoad = 0.0;
-            reportVariables_.FuelUsed = 0.0;
-            reportVariables_.ParasiticElecPower = 0.0;
-            reportVariables_.BoilerPLR = 0.0;
-
-        } else {
-            // set node temperatures
-            SafeCopyPlantNode(nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_);
-            Node(nodeHotWaterOutletIndex_).Temp = operatingOutletTemperature_;
-            reportVariables_.BoilerOutletTemp = operatingOutletTemperature_;
-            reportVariables_.BoilerLoad = operatingLoad_;
-            reportVariables_.FuelUsed = operatingFuelUseRate_;
-            reportVariables_.ParasiticElecPower = operatingParasiticElectricalPower_;
-            reportVariables_.BoilerPLR = operatingPartLoadRatio_;
-        }
-
-        reportVariables_.BoilerInletTemp = operatingInletTemperature_;
-        reportVariables_.Mdot = Node(nodeHotWaterOutletIndex_).MassFlowRate;
-
-        reportVariables_.BoilerEnergy = reportVariables_.BoilerLoad * ReportingConstant;
-        reportVariables_.FuelConsumed = reportVariables_.FuelUsed * ReportingConstant;
-        reportVariables_.ParasiticElecConsumption = reportVariables_.ParasiticElecPower * ReportingConstant;
-    }
-
     void BoilerObject::update()
     {
         using PlantUtilities::SafeCopyPlantNode;
@@ -1082,10 +1032,6 @@ namespace Boilers {
         operatingFuelUse_ = operatingFuelUseRate_ * reportingConstant;
         operatingParasiticElectricalConsumption_ = operatingParasiticElectricalPower_ * reportingConstant;
     }
-
-    // End of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
-
 } // namespace Boilers
 
 } // namespace EnergyPlus
