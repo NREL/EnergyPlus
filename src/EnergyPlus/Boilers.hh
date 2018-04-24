@@ -219,10 +219,6 @@ namespace Boilers {
 
             void clearOperatingVariables();
 
-            void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
-                                     bool const RunFlag    // boiler on when TRUE
-            );
-
             // transfer data from the boiler to outlet nodes
             void update();
 
