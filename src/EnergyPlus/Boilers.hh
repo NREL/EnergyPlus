@@ -107,6 +107,10 @@ namespace Boilers {
     {
         // Members
         public:
+            virtual ~BoilerObject()
+            {
+            }
+
             std::string Name;             // user identifier
             
             // Operational fault parameters
