@@ -143,7 +143,7 @@ namespace Boilers {
 
     void BoilerObject::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
     {
-        InitBoiler();
+        initialise();
         CalcBoilerModel(CurLoad, RunFlag, EquipFlowCtrl);
         update();
         report();
@@ -163,7 +163,7 @@ namespace Boilers {
 
     void BoilerObject::onInitLoopEquip(const PlantLocation &calledFromLocation)
     {
-        InitBoiler();
+        initialise();
         doSizing();
     }
 
@@ -488,7 +488,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerObject::InitBoiler() // number of the current boiler being simulated
+    void BoilerObject::initialise() // number of the current boiler being simulated
     {
 
         // SUBROUTINE INFORMATION:
