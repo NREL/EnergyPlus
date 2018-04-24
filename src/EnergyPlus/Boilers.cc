@@ -459,28 +459,27 @@ namespace Boilers {
         }
 
         for (auto &boiler : Boiler) {
-            ReportVariables report(boiler.reportVariables_);
             std::string const fuelType(GetResourceTypeChar(boiler.FuelType));
 
-            SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, report.BoilerLoad, "System", "Average", boiler.Name);
-            SetupOutputVariable("Boiler Heating Energy", OutputProcessor::Unit::J, report.BoilerEnergy, "System", "Sum",
+            SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, boiler.operatingLoad_, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Heating Energy", OutputProcessor::Unit::J, boiler.operatingHeatingEnergy_, "System", "Sum",
                                 boiler.Name, _, "ENERGYTRANSFER", "BOILERS", _, "Plant");
 
             if (UtilityRoutines::SameString(fuelType, "Electricity")) {
-                SetupOutputVariable("Boiler " + fuelType + " Power", OutputProcessor::Unit::W, report.FuelUsed, "System", "Average", boiler.Name);
+                SetupOutputVariable("Boiler " + fuelType + " Power", OutputProcessor::Unit::W, boiler.operatingFuelUseRate_, "System", "Average", boiler.Name);
             } else {
-                SetupOutputVariable("Boiler " + fuelType + " Rate", OutputProcessor::Unit::W, report.FuelUsed, "System", "Average", boiler.Name);
+                SetupOutputVariable("Boiler " + fuelType + " Rate", OutputProcessor::Unit::W, boiler.operatingFuelUseRate_, "System", "Average", boiler.Name);
             }
 
-            SetupOutputVariable("Boiler " + fuelType + " Energy", OutputProcessor::Unit::J, report.FuelConsumed, "System", "Sum", boiler.Name, _,
+            SetupOutputVariable("Boiler " + fuelType + " Energy", OutputProcessor::Unit::J, boiler.operatingFuelUse_, "System", "Sum", boiler.Name, _,
                                 fuelType, "Heating", boiler.EndUseSubcategory, "Plant");
-            SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, report.BoilerInletTemp, "System", "Average", boiler.Name);
-            SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, report.BoilerOutletTemp, "System", "Average", boiler.Name);
-            SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, report.Mdot, "System", "Average", boiler.Name);
-            SetupOutputVariable("Boiler Ancillary Electric Power", OutputProcessor::Unit::W, report.ParasiticElecPower, "System", "Average", boiler.Name);
-            SetupOutputVariable("Boiler Ancillary Electric Energy", OutputProcessor::Unit::J, report.ParasiticElecConsumption,
+            SetupOutputVariable("Boiler Inlet Temperature", OutputProcessor::Unit::C, boiler.operatingInletTemperature_, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Outlet Temperature", OutputProcessor::Unit::C, boiler.operatingOutletTemperature_, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, boiler.operatingMassFlowRate_, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Ancillary Electric Power", OutputProcessor::Unit::W, boiler.operatingParasiticElectricalPower_, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Ancillary Electric Energy", OutputProcessor::Unit::J, boiler.operatingParasiticElectricalConsumption_,
                                 "System", "Sum", boiler.Name, _, "ELECTRICITY", "Heating", "Boiler Parasitic", "Plant");
-            SetupOutputVariable("Boiler Part Load Ratio", OutputProcessor::Unit::None, report.BoilerPLR, "System", "Average", boiler.Name);
+            SetupOutputVariable("Boiler Part Load Ratio", OutputProcessor::Unit::None, boiler.operatingPartLoadRatio_, "System", "Average", boiler.Name);
 
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable("Boiler Nominal Capacity", boiler.Name, "[W]", boiler.designNominalCapacity_);
