@@ -1049,7 +1049,7 @@ namespace Boilers {
             Node(nodeHotWaterOutletIndex_).Temp = operatingOutletTemperature_;
             reportVariables_.BoilerOutletTemp = operatingOutletTemperature_;
             reportVariables_.BoilerLoad = operatingLoad_;
-            reportVariables_.FuelUsed = operatingFuelUsed_;
+            reportVariables_.FuelUsed = operatingFuelUseRate_;
             reportVariables_.ParasiticElecPower = operatingParasiticElectricalPower_;
             reportVariables_.BoilerPLR = operatingPartLoadRatio_;
         }
