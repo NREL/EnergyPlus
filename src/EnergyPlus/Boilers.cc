@@ -527,7 +527,7 @@ namespace Boilers {
         clearOperatingVariables();
 
         // Init more variables
-        if (doOneTimeInitialisation) {
+        if (doOneTimeInitialisation_) {
             // Locate the boilers on the plant loops for later usage
             errFlag = false;
             ScanPlantLoopsForObject(Name, TypeOf_Boiler_Simple, LoopNum, LoopSideNum,
@@ -546,10 +546,10 @@ namespace Boilers {
                     .FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
             }
 
-            doOneTimeInitialisation = false;
+            doOneTimeInitialisation_ = false;
         }
 
-        if (doEnvironmentInitialisation && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
+        if (doEnvironmentInitialisation_ && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp,
                                    PlantLoop(LoopNum).FluidIndex, RoutineName);
@@ -589,11 +589,11 @@ namespace Boilers {
                 }
             }
 
-            doEnvironmentInitialisation = false;
+            doEnvironmentInitialisation_ = false;
         }
 
         if (!BeginEnvrnFlag) {
-            doEnvironmentInitialisation = true;
+            doEnvironmentInitialisation_ = true;
         }
 
         // every iteration inits.  (most in calc routine)

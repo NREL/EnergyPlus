@@ -156,7 +156,7 @@ namespace Boilers {
                   efficiencyCurveTemperatureMode_(TemperatureEvaluationModeType::Default), curveEfficiencyIndex_(0),
                   efficiencyCurveType_(EfficiencyCurveType::Default), designOutletTemperatureLimit_(0.0), designParasiticElectricalLoad_(0.0),
                   EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false),
-                  FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation(true), doEnvironmentInitialisation(true),
+                  FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), doOneTimeInitialisation_(true), doEnvironmentInitialisation_(true),
                   operatingLoad_(0.0), operatingHeatingEnergy_(0.0), operatingParasiticElectricalPower_(0.0),
                   operatingParasiticElectricalConsumption_(0.0), operatingMassFlowRate_(0.0), operatingInletTemperature_(0.0),
                   operatingPartLoadRatio_(0.0), operatingFuelUseRate_(0.0), operatingFuelUse_(0.0)
@@ -196,8 +196,8 @@ namespace Boilers {
             int CalculatedEffError;                                             // calculated efficiency >1.1 recurring warning error counter
             int CalculatedEffIndex;                                             // calculated efficiency >1.1 recurring warning error message index
             std::string EndUseSubcategory;                                      // identifier use for the end use subcategory
-            bool doOneTimeInitialisation;                                       // do the one time initialisation, i.e. locate on plantloops etc.
-            bool doEnvironmentInitialisation;                                   // do the environment initialisation, i.e. get inlet conditions etc.
+            bool doOneTimeInitialisation_;                                      // do the one time initialisation, i.e. locate on plantloops etc.
+            bool doEnvironmentInitialisation_;                                  // do the environment initialisation, i.e. get inlet conditions etc.
             Real64 operatingLoad_;                                              // W - Boiler Load
             Real64 operatingHeatingEnergy_;                                     // J - Boiler energy integrated over time
             Real64 operatingParasiticElectricalPower_;                          // W - Parasitic electrical power (e.g. forced draft fan)
