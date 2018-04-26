@@ -273,6 +273,10 @@ namespace PlantLoopEquip {
                                                            sim_component.OptLoad);
                 sim_component.compPtr->getDesignTemperatures(sim_component.TempDesCondIn, sim_component.TempDesEvapOut);
 
+                if (GetCompSizFac) {
+                    sim_component.compPtr->getSizingFactor(sim_component.SizFac);
+                }
+
                 // KLUGEY HACK ALERT!!!
                 // Some components before transition were never checking InitLoopEquip, and each call to SimXYZ would actually just pass through the
                 // calculation Other components, on the other hand, would check InitLoopEquip, do a few things, then exit early without doing any
@@ -286,9 +290,6 @@ namespace PlantLoopEquip {
                     compsToSimAfterInitLoopEquip.end()) {
                     return;
                 }
-            }
-            if (GetCompSizFac) {
-                sim_component.compPtr->getSizingFactor(sim_component.SizFac);
             }
         }
 
