@@ -824,7 +824,7 @@ namespace Boilers {
         Real64 operatingEfficiency;             // boiler efficiency
         Real64 operatingCapacity;          // W - boiler nominal capacity
         Real64 theoreticalFuelUse;          // Theoretical (stoichiometric) fuel use
-        Real64 EffCurveOutput;        // Output of boiler efficiency curve
+        Real64 efficiencyCurveOutput;        // Output of boiler efficiency curve
         Real64 Cp;
 
         operatingLoad_ = 0.0;
@@ -934,20 +934,20 @@ namespace Boilers {
         if (curveEfficiencyIndex_ > 0) {
             if (hasTwoVariableEfficiencyCurve()) {
                 if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
-                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, operatingInletTemperature_);
+                    efficiencyCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, operatingInletTemperature_);
                 } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
-                    EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, operatingOutletTemperature_);
+                    efficiencyCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, operatingOutletTemperature_);
                 }
 
             } else {
-                EffCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_);
+                efficiencyCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_);
             }
         } else {
-            EffCurveOutput = 1.0;
+            efficiencyCurveOutput = 1.0;
         }
 
         // warn if efficiency curve produces zero or negative results
-        if (!WarmupFlag && EffCurveOutput <= 0.0) {
+        if (!WarmupFlag && efficiencyCurveOutput <= 0.0) {
             if (operatingLoad_ > 0.0) {
                 if (EffCurveOutputError < 1) {
                     ++EffCurveOutputError;
@@ -961,21 +961,21 @@ namespace Boilers {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(operatingOutletTemperature_, 2));
                         }
                     }
-                    ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(EffCurveOutput, 5));
-                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(EffCurveOutput * operatingEfficiency, 5) +
+                    ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(efficiencyCurveOutput, 5));
+                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(efficiencyCurveOutput * operatingEfficiency, 5) +
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 0.01 and simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Name +
                                                        "\": Boiler Efficiency Curve output is less than or equal to 0 warning continues...",
-                                                   EffCurveOutputIndex, EffCurveOutput, EffCurveOutput);
+                                                   EffCurveOutputIndex, efficiencyCurveOutput, efficiencyCurveOutput);
                 }
             }
-            EffCurveOutput = 0.01;
+            efficiencyCurveOutput = 0.01;
         }
 
         // warn if overall efficiency greater than 1.1
-        if (!WarmupFlag && EffCurveOutput * operatingEfficiency > 1.1) {
+        if (!WarmupFlag && efficiencyCurveOutput * operatingEfficiency > 1.1) {
             if (operatingLoad_ > 0.0 && curveEfficiencyIndex_ > 0) {
                 if (CalculatedEffError < 1) {
                     ++CalculatedEffError;
@@ -990,21 +990,21 @@ namespace Boilers {
                             ShowContinueError("...Curve input y value (Toutlet) = " + TrimSigDigits(operatingOutletTemperature_, 2));
                         }
                     }
-                    ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(EffCurveOutput, 5));
-                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(EffCurveOutput * operatingEfficiency, 5) +
+                    ShowContinueError("...Curve output (normalized eff) = " + TrimSigDigits(efficiencyCurveOutput, 5));
+                    ShowContinueError("...Calculated Boiler efficiency  = " + TrimSigDigits(efficiencyCurveOutput * operatingEfficiency, 5) +
                                       " (Boiler efficiency = Nominal Thermal Efficiency * Normalized Boiler Efficiency Curve output)");
                     ShowContinueErrorTimeStamp("...Curve output reset to 1.1 and simulation continues.");
                 } else {
                     ShowRecurringWarningErrorAtEnd("Boiler:HotWater \"" + Name +
                                                        "\": Calculated Boiler Efficiency is greater than 1.1 warning continues...",
-                                                   CalculatedEffIndex, EffCurveOutput * operatingEfficiency, EffCurveOutput * operatingEfficiency);
+                                                   CalculatedEffIndex, efficiencyCurveOutput * operatingEfficiency, efficiencyCurveOutput * operatingEfficiency);
                 }
             }
-            EffCurveOutput = 1.1;
+            efficiencyCurveOutput = 1.1;
         }
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
-        operatingFuelUseRate_ = theoreticalFuelUse / EffCurveOutput;
+        operatingFuelUseRate_ = theoreticalFuelUse / efficiencyCurveOutput;
         if (operatingLoad_ > 0.0) {
             operatingParasiticElectricalPower_ = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
         }
