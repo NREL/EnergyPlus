@@ -668,6 +668,7 @@ namespace Boilers {
                 rho = GetDensityGlycol(PlantLoop(LoopNum).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(LoopNum).FluidIndex, RoutineName);
                 // TODO: this is the only place designOutletTemperature_ is used. why not use the PlantSizing temperature?
                 Cp = GetSpecificHeatGlycol(PlantLoop(LoopNum).FluidName, designOutletTemperature_, PlantLoop(LoopNum).FluidIndex, RoutineName);
+                // TODO: should the capacity be calculated from the design volume flow rate once it has been calculated? (switch order of autosize)
                 tmpNomCap = Cp * rho * designSizingFactor_ * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
                 if (designNominalCapacityWasAutoSized_) tmpNomCap = 0.0;
@@ -891,6 +892,7 @@ namespace Boilers {
                     // calculate and clamp the mass flow rate if the boiler is operating
                     operatingMassFlowRate_ = operatingLoad_ / (Cp * operatingTemperatureDifference);
                     operatingMassFlowRate_ = min(designMassFlowRate_, operatingMassFlowRate_);
+                    // TODO: should the outlet temp be recalculated here? if there's a reduction in flow, the temp will be higher
                 }
             } // End of Constant/Variable Flow If Block
 
