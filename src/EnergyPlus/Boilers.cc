@@ -873,27 +873,26 @@ namespace Boilers {
                 // Then find the flow rate and outlet temp
 
                 {
+                    // set the outlet temperature based on the outlet setpoint
                     auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == SingleSetPoint) {
-                        BoilerDeltaTemp = Node(nodeHotWaterOutletIndex_).TempSetPoint - operatingInletTemperature_;
+                        operatingOutletTemperature_ = Node(nodeHotWaterOutletIndex_).TempSetPoint;
                     } else if (SELECT_CASE_var == DualSetPointDeadBand) {
-                        BoilerDeltaTemp = Node(nodeHotWaterOutletIndex_).TempSetPointLo - operatingInletTemperature_;
+                        operatingOutletTemperature_ = Node(nodeHotWaterOutletIndex_).TempSetPointLo;
                     } else {
                         assert(false);
                     }
                 }
 
-                operatingOutletTemperature_ = BoilerDeltaTemp + operatingInletTemperature_;
+                // calculate the temperature difference and initialise the mass flow rate to 0.0
+                BoilerDeltaTemp = operatingOutletTemperature_ - operatingInletTemperature_;
+                operatingMassFlowRate_ = 0.0;
 
                 if ((BoilerDeltaTemp > 0.0) && (operatingLoad_ > 0.0)) {
-                    operatingMassFlowRate_ = operatingLoad_ / Cp / BoilerDeltaTemp;
-
+                    // calculate and clamp the mass flow rate if the boiler is operating
+                    operatingMassFlowRate_ = operatingLoad_ / (Cp * BoilerDeltaTemp);
                     operatingMassFlowRate_ = min(designMassFlowRate_, operatingMassFlowRate_);
-
-                } else {
-                    operatingMassFlowRate_ = 0.0;
                 }
-
             } // End of Constant/Variable Flow If Block
 
             SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
