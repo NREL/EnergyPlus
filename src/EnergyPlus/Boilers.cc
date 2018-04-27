@@ -933,12 +933,15 @@ namespace Boilers {
         // calculate normalized efficiency based on curve object type
         if (curveEfficiencyIndex_ > 0) {
             if (hasTwoVariableEfficiencyCurve()) {
+                Real64 evaluationTemperature(0.0);
                 if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Entering) {
-                    efficiencyCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, operatingInletTemperature_);
+                    evaluationTemperature = operatingInletTemperature_;
                 } else if (efficiencyCurveTemperatureMode_ == TemperatureEvaluationModeType::Leaving) {
-                    efficiencyCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, operatingOutletTemperature_);
+                    evaluationTemperature = operatingOutletTemperature_;
+                } else {
+                    assert(false);
                 }
-
+                efficiencyCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_, evaluationTemperature);
             } else {
                 efficiencyCurveOutput = CurveValue(curveEfficiencyIndex_, operatingPartLoadRatio_);
             }
