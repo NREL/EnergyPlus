@@ -901,16 +901,16 @@ namespace Boilers {
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
             operatingMassFlowRate_ = Node(nodeHotWaterInletIndex_).MassFlowRate;
+            operatingOutletTemperature_ = operatingInletTemperature_;
 
-            if ((MyLoad > 0.0) && (operatingMassFlowRate_ > 0.0)) { // this boiler has a heat load
-                operatingLoad_ = MyLoad;
-                if (operatingLoad_ > operatingCapacity * designMaxPartLoadRatio_) operatingLoad_ = operatingCapacity * designMaxPartLoadRatio_;
-                if (operatingLoad_ < operatingCapacity * designMinPartLoadRatio_) operatingLoad_ = operatingCapacity * designMinPartLoadRatio_;
-                operatingOutletTemperature_ = operatingInletTemperature_ + operatingLoad_ / (operatingMassFlowRate_ * Cp);
-                BoilerDeltaTemp = operatingOutletTemperature_ - operatingInletTemperature_;
+            if ((operatingLoad_ > 0.0) && (operatingMassFlowRate_ > 0.0)) { // this boiler has a heat load
+                // clamp the operating load and then calculate the outlet temperature
+                operatingLoad_ = min(operatingLoad_, operatingCapacity * designMaxPartLoadRatio_);
+                operatingLoad_ = max(operatingLoad_, operatingCapacity * designMinPartLoadRatio_);
+                operatingOutletTemperature_ += operatingLoad_ / (operatingMassFlowRate_ * Cp);
             } else {
+                // clear the load if the boiler does not run
                 operatingLoad_ = 0.0;
-                operatingOutletTemperature_ = operatingInletTemperature_;
             }
 
         } // End of the FlowLock If block
