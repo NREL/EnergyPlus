@@ -489,7 +489,6 @@ namespace Boilers {
 
     void BoilerObject::initialise() // number of the current boiler being simulated
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2002
@@ -618,7 +617,6 @@ namespace Boilers {
 
     void BoilerObject::doSizing()
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   April 2002
@@ -898,7 +896,6 @@ namespace Boilers {
 
             SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
                                  BranchNum, CompNum);
-
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
             operatingMassFlowRate_ = Node(nodeHotWaterInletIndex_).MassFlowRate;
@@ -913,7 +910,6 @@ namespace Boilers {
                 // clear the load if the boiler does not run
                 operatingLoad_ = 0.0;
             }
-
         } // End of the FlowLock If block
 
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
