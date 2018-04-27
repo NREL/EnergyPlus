@@ -886,12 +886,12 @@ namespace Boilers {
                 }
 
                 // calculate the temperature difference and initialise the mass flow rate to 0.0
-                Real64 const BoilerDeltaTemp = operatingOutletTemperature_ - operatingInletTemperature_;
+                Real64 const operatingTemperatureDifference = operatingOutletTemperature_ - operatingInletTemperature_;
                 operatingMassFlowRate_ = 0.0;
 
-                if ((BoilerDeltaTemp > 0.0) && (operatingLoad_ > 0.0)) {
+                if ((operatingTemperatureDifference > 0.0) && (operatingLoad_ > 0.0)) {
                     // calculate and clamp the mass flow rate if the boiler is operating
-                    operatingMassFlowRate_ = operatingLoad_ / (Cp * BoilerDeltaTemp);
+                    operatingMassFlowRate_ = operatingLoad_ / (Cp * operatingTemperatureDifference);
                     operatingMassFlowRate_ = min(designMassFlowRate_, operatingMassFlowRate_);
                 }
             } // End of Constant/Variable Flow If Block
