@@ -13,7 +13,7 @@
 ! https://energy.gov/eere/femp/building-life-cycle-cost-programs
 ! The file is converted to EnergyPlus objects using a spreadsheet called
 ! ConvertENCOSTtoEnergyPlusLifeCycleCost.xls (available from the development team), 
-! or by running the Python script encost_to_idf.py (also available from the development team).
+! or by running the Python script update_nist_escalation.py (also available from the development team).
 ! The escalation rates below should match the values in Tables Ca-1 to Ca-5 of the Annual Supplement.
 
 VERSION,
