@@ -12572,6 +12572,7 @@ namespace DXCoils {
         using DataHVACGlobals::TimeStepSys;
         using DataWater::WaterStorage;
         using Psychrometrics::RhoH2O;
+		using DataAirLoop::AFNLoopDXCoilRTF;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoWater;
@@ -12675,7 +12676,10 @@ namespace DXCoils {
         }
 
         LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
-    }
+		if (DXCoil(DXCoilNum).AirLoopNum > 0) {
+			AFNLoopDXCoilRTF(DXCoil(DXCoilNum).AirLoopNum) = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+		}
+	}
 
     void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum)
     {
@@ -16053,6 +16057,31 @@ namespace DXCoils {
             DXCoil(DXCoilNum).MSHPHeatRecActive = true;
         }
     }
+
+	void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         L. Gu
+        //       DATE WRITTEN   March, 2018
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Set AirLoopNum for AFN model with multiple AirLoops
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int WhichCoil;
+
+        if (GetCoilsInputFlag) {
+            GetDXCoils();
+            GetCoilsInputFlag = false;
+        }
+
+        WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
+        if (WhichCoil != 0) {
+			DXCoil(WhichCoil).AirLoopNum = AirLoopNum;
+        } else {
+            ShowSevereError("SetDXCoilAirLoopNumber: Could not find Coil \"Name=\"" + CoilName + "\"");
+        }
+    }// must match coil names for the coil type
 
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.

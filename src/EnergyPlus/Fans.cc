@@ -2491,7 +2491,7 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::LoopOnOffFanRTF;
+        using DataAirLoop::AFNLoopOnOffFanRTF;
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2514,8 +2514,10 @@ namespace Fans {
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-            LoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
-        }
+			if (Fan(FanNum).AirLoopNum > 0) {
+				AFNLoopOnOffFanRTF(Fan(FanNum).AirLoopNum) = Fan(FanNum).FanRuntimeFraction;
+			}
+		}
     }
 
     //        End of Reporting subroutines for the Fan Module
@@ -3173,6 +3175,11 @@ namespace Fans {
         FanNumericFields.deallocate();
         UniqueFanNames.clear();
     }
+
+	void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum)
+	{
+		Fan(FanIndex).AirLoopNum = AirLoopNum;
+	}
 
     // End of Utility subroutines for the Fan Module
     // *****************************************************************************

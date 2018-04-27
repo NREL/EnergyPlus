@@ -1373,7 +1373,7 @@ namespace HeatingCoils {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataAirLoop::LoopHeatingCoilMaxRTF;
+        using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -1506,10 +1506,15 @@ namespace HeatingCoils {
 
         QCoilActual = HeatingCoilLoad;
         if (std::abs(HeatingCoil(CoilNum).NominalCapacity) < 1.e-8) {
-            LoopHeatingCoilMaxRTF = max(LoopHeatingCoilMaxRTF, 0.0);
-        } else {
-            LoopHeatingCoilMaxRTF = max(LoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
-        }
+			if (HeatingCoil(CoilNum).AirLoopNum > 0) {
+				AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) = max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), 0.0);
+			}
+		} else {
+			if (HeatingCoil(CoilNum).AirLoopNum > 0) {
+				AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) =
+					max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
+			}
+		}
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
@@ -1754,7 +1759,7 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataAirLoop::LoopHeatingCoilMaxRTF;
+        using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
@@ -1933,8 +1938,11 @@ namespace HeatingCoils {
         HeatingCoil(CoilNum).OutletAirEnthalpy = PsyHFnTdbW(HeatingCoil(CoilNum).OutletAirTemp, HeatingCoil(CoilNum).OutletAirHumRat);
 
         QCoilActual = HeatingCoilLoad;
-        LoopHeatingCoilMaxRTF = max(LoopHeatingCoilMaxRTF, HeatingCoil(CoilNum).RTF);
-        ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
+		if (HeatingCoil(CoilNum).AirLoopNum > 0) {
+			AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) =
+				max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), HeatingCoil(CoilNum).RTF);
+		}
+		ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
@@ -3233,8 +3241,30 @@ namespace HeatingCoils {
         }
     }
 
-    //        End of Utility subroutines for the HeatingCoil Module
+	void SetHeatingCoilAirLoopNumber(std::string const &HeatingCoilName, int AirLoopNum, bool &ErrorsFound)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         L.Gu
+		//       DATE WRITTEN   March 2018
 
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets an AirLoopNum for a given heating Coil
+
+		int HeatingCoilIndex;
+
+		if (GetCoilsInputFlag) { // First time subroutine has been entered
+			GetHeatingCoilInput();
+			GetCoilsInputFlag = false;
+		}
+
+		HeatingCoilIndex = UtilityRoutines::FindItem(HeatingCoilName, HeatingCoil);
+		if (HeatingCoilIndex == 0) {
+			ShowSevereError("GetCoilIndex: Heating coil not found=" + HeatingCoilName);
+			ErrorsFound = true;
+		} else {
+			HeatingCoil(HeatingCoilIndex).AirLoopNum = AirLoopNum;
+		}
+	}
 } // namespace HeatingCoils
 
 } // namespace EnergyPlus

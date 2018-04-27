@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <BranchInputManager.hh>
+#include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
@@ -370,7 +371,15 @@ namespace SimAirServingZones {
         using BranchInputManager::GetNumSplitterMixerInConntrList;
         using BranchInputManager::NumBranchesInBranchList;
         using BranchInputManager::NumCompsInBranch;
-        using DataConvergParams::AirLoopConvergence;
+		using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+		using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
+		using DataAirflowNetwork::SimulateAirflowNetwork;
+		using DataAirLoop::LoopCompCycRatio;
+		using DataAirLoop::LoopFanOperationMode; // OnOff fan operation mode
+		using DataAirLoop::LoopOnOffFanPartLoadRatio;
+		using DataAirLoop::LoopSystemOffMassFlowrate;
+		using DataAirLoop::LoopSystemOnMassFlowrate;
+		using DataConvergParams::AirLoopConvergence;
         using General::RoundSigDigits;
         using HVACControllers::CheckCoilWaterInletNode;
         using HVACControllers::GetControllerActuatorNodeNum;
@@ -523,6 +532,24 @@ namespace SimAirServingZones {
         AirLoopFlow.allocate(NumPrimaryAirSys);
         AirLoopConvergence.allocate(NumPrimaryAirSys);
         UnitarySysEqSizing.allocate(NumPrimaryAirSys);
+		if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+			LoopOnOffFanPartLoadRatio.allocate(NumPrimaryAirSys);
+			LoopOnOffFanPartLoadRatio = 0.0;
+			LoopFanOperationMode.allocate(NumPrimaryAirSys);
+			LoopFanOperationMode = 0;
+			LoopSystemOnMassFlowrate.allocate(NumPrimaryAirSys);
+			LoopSystemOnMassFlowrate = 0.0;
+			LoopSystemOffMassFlowrate.allocate(NumPrimaryAirSys);
+			LoopSystemOffMassFlowrate = 0.0;
+			LoopCompCycRatio.allocate(NumPrimaryAirSys);
+			LoopCompCycRatio = 0.0;
+			AFNLoopHeatingCoilMaxRTF.allocate(NumPrimaryAirSys);
+			AFNLoopHeatingCoilMaxRTF = 0.0;
+			AFNLoopOnOffFanRTF.allocate(NumPrimaryAirSys);
+			AFNLoopOnOffFanRTF = 0.0;
+			AFNLoopDXCoilRTF.allocate(NumPrimaryAirSys);
+			AFNLoopDXCoilRTF = 0.0;
+		}
 
         DataHVACGlobals::GetAirPathDataDone = true; // used by HVACUnitarySystem::GetUnitarySystemInputData to determine if airloops are setup yet
         if (NumPrimaryAirSys <= 0) {

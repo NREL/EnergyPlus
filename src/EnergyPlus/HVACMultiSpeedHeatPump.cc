@@ -56,6 +56,7 @@
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
+#include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataBranchNodeConnections.hh>
@@ -680,7 +681,8 @@ namespace HVACMultiSpeedHeatPump {
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
-                                    break;
+									MSHeatPump(MSHPNum).AirLoopNumber = AirLoopNumber;
+									break;
                                 }
                                 MSHeatPump(MSHPNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                 if (AirLoopFound) break;
@@ -3283,7 +3285,10 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataAirLoop::LoopCompCycRatio;
+		using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+		using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
+		using DataAirflowNetwork::SimulateAirflowNetwork;
+		using DataAirLoop::LoopCompCycRatio;
         using DataAirLoop::LoopFanOperationMode;
         using DataAirLoop::LoopOnOffFanPartLoadRatio;
         using DataAirLoop::LoopSystemOffMassFlowrate;
@@ -3297,12 +3302,14 @@ namespace HVACMultiSpeedHeatPump {
             MSHPHeatRecovery(MSHeatPumpNum);
         }
 
-        LoopSystemOnMassFlowrate = CompOnMassFlow;
-        LoopSystemOffMassFlowrate = CompOffMassFlow;
-        LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
-        LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
-        LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
-    }
+        if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+			LoopSystemOnMassFlowrate(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = CompOnMassFlow;
+			LoopSystemOffMassFlowrate(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = CompOffMassFlow;
+			LoopFanOperationMode(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = MSHeatPump(MSHeatPumpNum).OpMode;
+			LoopOnOffFanPartLoadRatio(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
+			LoopCompCycRatio(MSHeatPump(MSHeatPumpNum).AirLoopNumber) = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+		}
+	}
 
     //******************************************************************************
 

@@ -677,7 +677,7 @@ namespace Furnaces {
         }
 
         // Report the current Furnace output
-        ReportFurnace(FurnaceNum);
+        ReportFurnace(FurnaceNum, AirLoopNum);
 
         // Reset OnOffFanPartLoadFraction to 1 in case another on/off fan is called without a part-load curve
         OnOffFanPartLoadFraction = 1.0;
@@ -4458,7 +4458,7 @@ namespace Furnaces {
         // Using/Aliasing
         using DataAirLoop::AirLoopControlInfo;
         using DataAirLoop::AirToZoneNodeInfo;
-        using DataAirLoop::LoopHeatingCoilMaxRTF;
+        using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::SimulateAirflowNetwork;
         using DataHeatBalFanSys::TempControlType;
@@ -5429,8 +5429,10 @@ namespace Furnaces {
         }
 
         // AirflowNetwork global variable
-        LoopHeatingCoilMaxRTF = 0.0;
-    }
+		if (SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
+			AFNLoopHeatingCoilMaxRTF(AirLoopNum) = 0.0;
+		}
+	}
 
     void SetOnOffMassFlowRate(int const FurnaceNum,             // index to furnace
                               int const EP_UNUSED(AirLoopNum),  // index to air loop !unused1208
@@ -8516,7 +8518,7 @@ namespace Furnaces {
     // Beginning of Reporting subroutines for the Furnace Module
     // *****************************************************************************
 
-    void ReportFurnace(int const FurnaceNum)
+    void ReportFurnace(int const FurnaceNum, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8533,7 +8535,10 @@ namespace Furnaces {
         // Update global variables used by AirflowNetwork module.
 
         // Using/Aliasing
-        using DataAirLoop::LoopFanOperationMode;
+		using DataAirflowNetwork::AirflowNetworkControlMultiADS;
+		using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
+		using DataAirflowNetwork::SimulateAirflowNetwork;
+		using DataAirLoop::LoopFanOperationMode;
         using DataAirLoop::LoopOnOffFanPartLoadRatio;
         using DataAirLoop::LoopSystemOffMassFlowrate;
         using DataAirLoop::LoopSystemOnMassFlowrate;
@@ -8552,26 +8557,28 @@ namespace Furnaces {
         }
 
         // Set mass flow rates during on and off cylce using an OnOff fan
-        LoopSystemOnMassFlowrate = CompOnMassFlow;
-        LoopSystemOffMassFlowrate = CompOffMassFlow;
-        LoopFanOperationMode = Furnace(FurnaceNum).OpMode;
-        LoopOnOffFanPartLoadRatio = Furnace(FurnaceNum).FanPartLoadRatio;
-        OnOffRatio = LoopOnOffFanPartLoadRatio;
-        if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir) {
-            LoopOnOffFanPartLoadRatio =
-                max(Furnace(FurnaceNum).FanPartLoadRatio, Furnace(FurnaceNum).HeatPartLoadRatio, Furnace(FurnaceNum).CoolPartLoadRatio);
-            LoopOnOffFanPartLoadRatio = min(1.0, LoopOnOffFanPartLoadRatio);
-        }
-        if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool) {
-            if (Furnace(FurnaceNum).HeatPartLoadRatio == 0.0 && Furnace(FurnaceNum).CoolPartLoadRatio == 0.0 &&
-                Furnace(FurnaceNum).FanPartLoadRatio > 0.0) {
-                if (CompOnMassFlow < max(Furnace(FurnaceNum).MaxCoolAirMassFlow, Furnace(FurnaceNum).MaxHeatAirMassFlow) && CompOnMassFlow > 0.0) {
-                    ratio = max(Furnace(FurnaceNum).MaxCoolAirMassFlow, Furnace(FurnaceNum).MaxHeatAirMassFlow) / CompOnMassFlow;
-                    LoopOnOffFanPartLoadRatio = LoopOnOffFanPartLoadRatio * ratio;
-                }
-            }
-        }
-
+		if (SimulateAirflowNetwork == AirflowNetworkControlMultiADS || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+			LoopSystemOnMassFlowrate(AirLoopNum) = CompOnMassFlow;
+			LoopSystemOffMassFlowrate(AirLoopNum) = CompOffMassFlow;
+			LoopFanOperationMode(AirLoopNum) = Furnace(FurnaceNum).OpMode;
+			LoopOnOffFanPartLoadRatio(AirLoopNum) = Furnace(FurnaceNum).FanPartLoadRatio;
+			OnOffRatio = LoopOnOffFanPartLoadRatio(AirLoopNum);
+			if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir) {
+				LoopOnOffFanPartLoadRatio(AirLoopNum) =
+					max(Furnace(FurnaceNum).FanPartLoadRatio, Furnace(FurnaceNum).HeatPartLoadRatio, Furnace(FurnaceNum).CoolPartLoadRatio);
+				LoopOnOffFanPartLoadRatio(AirLoopNum) = min(1.0, LoopOnOffFanPartLoadRatio(AirLoopNum));
+			}
+			if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool) {
+				if (Furnace(FurnaceNum).HeatPartLoadRatio == 0.0 && Furnace(FurnaceNum).CoolPartLoadRatio == 0.0 &&
+					Furnace(FurnaceNum).FanPartLoadRatio > 0.0) {
+					if (CompOnMassFlow < max(Furnace(FurnaceNum).MaxCoolAirMassFlow, Furnace(FurnaceNum).MaxHeatAirMassFlow) &&
+						CompOnMassFlow > 0.0) {
+						ratio = max(Furnace(FurnaceNum).MaxCoolAirMassFlow, Furnace(FurnaceNum).MaxHeatAirMassFlow) / CompOnMassFlow;
+						LoopOnOffFanPartLoadRatio(AirLoopNum) = LoopOnOffFanPartLoadRatio(AirLoopNum) * ratio;
+					}
+				}
+			}
+		}
         DataHVACGlobals::OnOffFanPartLoadFraction =
             1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
     }

@@ -80,14 +80,16 @@ namespace DataAirLoop {
     // Variables specific to AirflowNetwork simulations.
     // Avoid using these for other purposes since these variables are only reset to 0 within AirflowNetworkBalanceManager, line 322.
     // Non-AFN simulations may have multiple air loops and use of these variables may yield unintended results.
-    extern int LoopFanOperationMode;         // OnOff fan operation mode
-    extern Real64 LoopSystemOnMassFlowrate;  // Loop mass flow rate during on cycle using an OnOff fan
-    extern Real64 LoopSystemOffMassFlowrate; // Loop mass flow rate during off cycle using an OnOff fan
-    extern Real64 LoopOnOffFanPartLoadRatio; // OnOff fan part load ratio
-    extern Real64 LoopHeatingCoilMaxRTF;     // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
-    extern Real64 LoopOnOffFanRTF;           // OnOff fan run time fraction in an HVAC Air Loop
-    extern Real64 LoopDXCoilRTF;             // OnOff fan run time fraction in an HVAC Air Loop
-    extern Real64 LoopCompCycRatio;          // Loop compressor cycling ratio for multispeed heat pump
+    extern Real64 LoopDXCoilRTF; // OnOff fan run time fraction in an HVAC Air Loop
+
+    extern Array1D<int> LoopFanOperationMode;         // OnOff fan operation mode
+    extern Array1D<Real64> LoopSystemOnMassFlowrate;  // Loop mass flow rate during on cycle using an OnOff fan
+    extern Array1D<Real64> LoopSystemOffMassFlowrate; // Loop mass flow rate during off cycle using an OnOff fan
+    extern Array1D<Real64> LoopOnOffFanPartLoadRatio; // OnOff fan part load ratio
+    extern Array1D<Real64> LoopCompCycRatio;          // Loop compressor cycling ratio for multispeed heat pump
+    extern Array1D<Real64> AFNLoopHeatingCoilMaxRTF;  // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
+    extern Array1D<Real64> AFNLoopOnOffFanRTF;        // OnOff fan run time fraction in an HVAC Air Loop
+    extern Array1D<Real64> AFNLoopDXCoilRTF;          // OnOff fan run time fraction in an HVAC Air Loop
 
     // Types
 

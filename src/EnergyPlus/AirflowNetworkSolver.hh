@@ -343,6 +343,17 @@ namespace AirflowNetworkSolver {
                       int &NF             // Number of flows, either 1 or 2
     );
 
+    void GenericDuct(Real64 const Length,   // Duct length
+                     Real64 const Diameter, // Duct diameter
+                     int const LFLAG,       // Initialization flag.If = 1, use laminar relationship
+                     Real64 const PDROP,    // Total pressure drop across a component (P1 - P2) [Pa]
+                     int const n,           // Node 1 number
+                     int const M,           // Node 2 number
+                     Array1A<Real64> F,     // Airflow through the component [kg/s]
+                     Array1A<Real64> DF,    // Partial derivative:  DF/DP
+                     int &NF                // Number of flows, either 1 or 2
+    );
+
     void FACSKY(Array1A<Real64> AU,   // the upper triangle of [A] before and after factoring
                 Array1A<Real64> AD,   // the main diagonal of [A] before and after factoring
                 Array1A<Real64> AL,   // the lower triangle of [A] before and after factoring

@@ -518,6 +518,7 @@ namespace DXCoils {
         int EIRFTErrIndex;         // index/pointer to recurring error structure for EIRFT curve value <= 0.0
         bool reportCoilFinalSizes; // one time report of sizes to coil selection report
         Real64 capModFacTotal;     // current coil capacity modification factor
+        int AirLoopNum; // Airloop number
 
         // Default Constructor
         DXCoilData()
@@ -573,7 +574,8 @@ namespace DXCoils {
               // MSSecCoilRatedSHR( 0.0 )
               MSSpeedNumLS(1), MSSpeedNumHS(2), MSSpeedRatio(0.0), MSCycRatio(0.0), VRFIUPtr(0), VRFOUPtr(0), EvaporatingTemp(4.0),
               CondensingTemp(40.0), C1Te(0.0), C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), SH(0.0), SC(0.0), ActualSH(0.0), ActualSC(0.0),
-              RateBFVRFIUEvap(0.0592), RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0), reportCoilFinalSizes(true), capModFacTotal(0.0)
+              RateBFVRFIUEvap(0.0592), RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0), reportCoilFinalSizes(true), capModFacTotal(0.0),
+              AirLoopNum(0)
         {
         }
     };
@@ -969,6 +971,10 @@ namespace DXCoils {
     // *****************************************************************************
 
     void SetMSHPDXCoilHeatRecoveryFlag(int const DXCoilNum); // must match coil names for the coil type
+
+    void SetDXCoilAirLoopNumber(std::string const & CoilName,
+                                int const AirLoopNum
+    ); // must match coil names for the coil type
 
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.
