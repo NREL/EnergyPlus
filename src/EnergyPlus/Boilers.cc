@@ -862,9 +862,7 @@ namespace Boilers {
             if ((designFlowMode_ == FlowModeType::Constant) || (designFlowMode_ == FlowModeType::NotModulated)) {
                 // Then find the flow rate and outlet temp
                 operatingMassFlowRate_ = designMassFlowRate_;
-                SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
-                                     BranchNum, CompNum);
-
+                
                 if ((operatingMassFlowRate_ != 0.0) && (MyLoad > 0.0)) {
                     BoilerDeltaTemp = operatingLoad_ / operatingMassFlowRate_ / Cp;
                 } else {
@@ -898,10 +896,11 @@ namespace Boilers {
                 } else {
                     operatingMassFlowRate_ = 0.0;
                 }
-                SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
-                                     BranchNum, CompNum);
 
             } // End of Constant/Variable Flow If Block
+
+            SetComponentFlowRate(operatingMassFlowRate_, nodeHotWaterInletIndex_, nodeHotWaterOutletIndex_, LoopNum, LoopSideNum,
+                                 BranchNum, CompNum);
 
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
