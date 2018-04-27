@@ -824,7 +824,6 @@ namespace Boilers {
         Real64 operatingEfficiency;             // boiler efficiency
         Real64 operatingCapacity;          // W - boiler nominal capacity
         Real64 theoreticalFuelUse;          // Theoretical (stoichiometric) fuel use
-        Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
         Real64 EffCurveOutput;        // Output of boiler efficiency curve
         Real64 Cp;
 
@@ -885,7 +884,7 @@ namespace Boilers {
                 }
 
                 // calculate the temperature difference and initialise the mass flow rate to 0.0
-                BoilerDeltaTemp = operatingOutletTemperature_ - operatingInletTemperature_;
+                Real64 const BoilerDeltaTemp = operatingOutletTemperature_ - operatingInletTemperature_;
                 operatingMassFlowRate_ = 0.0;
 
                 if ((BoilerDeltaTemp > 0.0) && (operatingLoad_ > 0.0)) {
@@ -917,7 +916,6 @@ namespace Boilers {
 
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
         if (operatingOutletTemperature_ > designOutletTemperatureLimit_) {
-            BoilerDeltaTemp = 0.0;
             operatingLoad_ = 0.0;
             operatingOutletTemperature_ = operatingInletTemperature_;
         }
