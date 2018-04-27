@@ -839,7 +839,9 @@ namespace Boilers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == ControlType_SeriesActive) operatingMassFlowRate_ = Node(nodeHotWaterInletIndex_).MassFlowRate;
+            if (EquipFlowCtrl == ControlType_SeriesActive) {
+                operatingMassFlowRate_ = Node(nodeHotWaterInletIndex_).MassFlowRate;
+            }
             return;
         }
 
@@ -920,6 +922,7 @@ namespace Boilers {
             operatingOutletTemperature_ = operatingInletTemperature_;
         }
 
+        // calculate and clamp the part load ratio
         operatingPartLoadRatio_ = operatingLoad_ / operatingCapacity;
         operatingPartLoadRatio_ = min(operatingPartLoadRatio_, designMaxPartLoadRatio_);
         operatingPartLoadRatio_ = max(operatingPartLoadRatio_, designMinPartLoadRatio_);
@@ -1002,7 +1005,9 @@ namespace Boilers {
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
         operatingFuelUseRate_ = theoreticalFuelUse / EffCurveOutput;
-        if (operatingLoad_ > 0.0) operatingParasiticElectricalPower_ = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
+        if (operatingLoad_ > 0.0) {
+            operatingParasiticElectricalPower_ = designParasiticElectricalLoad_ * operatingPartLoadRatio_;
+        }
     }
 
     void BoilerObject::update()
