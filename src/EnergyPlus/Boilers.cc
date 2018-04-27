@@ -860,17 +860,14 @@ namespace Boilers {
         if (PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((designFlowMode_ == FlowModeType::Constant) || (designFlowMode_ == FlowModeType::NotModulated)) {
-                // Then find the flow rate and outlet temp
+                // fix the flow rate at the design level and initialise the outlet temperature to the inlet temperature
                 operatingMassFlowRate_ = designMassFlowRate_;
+                operatingOutletTemperature_ = operatingInletTemperature_;
                 
-                if ((operatingMassFlowRate_ != 0.0) && (MyLoad > 0.0)) {
-                    BoilerDeltaTemp = operatingLoad_ / operatingMassFlowRate_ / Cp;
-                } else {
-                    BoilerDeltaTemp = 0.0;
+                // update the outlet temperature if the boiler is operating
+                if ((operatingMassFlowRate_ != 0.0) && (operatingLoad_ > 0.0)) {
+                    operatingOutletTemperature_ += operatingLoad_ / (operatingMassFlowRate_ * Cp);
                 }
-
-                operatingOutletTemperature_ = BoilerDeltaTemp + operatingInletTemperature_;
-
             } else if (designFlowMode_ == FlowModeType::LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
                 // Then find the flow rate and outlet temp
