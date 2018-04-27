@@ -53,7 +53,10 @@ def parse_encost_file(encost_path):
                 # data
                 else:
 
-                    write_file.write(line)
+                    # remove indentation if present 
+                    # encost17.txt had a single leading space, encost18.txt did not
+                    data = line.lstrip()
+                    write_file.write(data)
                     counter += 1
 
     write_file.close()
@@ -81,6 +84,7 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
     idf.save()
 
     print 'Reading EnCost files from: %s' % sub_dir_path
+    encost_year = '20' + sub_dir_path[-2:]
     
     for read_file in os.listdir(sub_dir_path):
 
@@ -104,8 +108,7 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
                   
                     if file_name == line.rstrip():
                       
-                        # remove periods from file name 
-                        # 'U.S. Avg' becomes 'USAvg'
+                        # remove periods from file name, e.g. 'U.S. Avg' becomes 'USAvg'
                         region_sector = file_name.replace('. ', '.').replace('.', '')
                                                 
                     else:
@@ -118,13 +121,11 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
 
                     # split line by spaces into list
                     years = line.split(' ')
-                    
-                    # delete first item (single space indent)
-                    del years[0]
-
-                    # assign years
-                    encost_year = years[0]
                     escalation_start_year = years[1]
+                    
+                    # check length
+                    if len(years) != 31:
+                        print 'ERROR: length of years list does not equal 31'
                     
                 # fuel, non-zero even indices
                 elif idx % 2 == 0:
@@ -132,13 +133,12 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
                     # strip newline
                     nist_fuel = line.strip('\n')
 
-                    # separate region, sector, and fuel with hyphen
-                    # for obj_dict key and IDF object name
+                    # separate region, sector, and fuel with hyphen for obj_dict key and IDF object name
                     region_sector_fuel = region_sector.replace(' ', ' - ') + ' - ' + nist_fuel
 
                     # assign EnergyPlus fuels
                     if nist_fuel == 'Electricity':
-                        # https://github.com/NREL/EnergyPlus/issues/6144
+                        # TODO https://github.com/NREL/EnergyPlus/issues/6144
                         eplus_fuel = 'ElectricityPurchased'
                     elif nist_fuel == 'Distillate Oil':
                         eplus_fuel = 'FuelOil#1'
@@ -150,7 +150,7 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
                         eplus_fuel = 'FuelOil#2'
                     elif nist_fuel == 'Coal':
                         eplus_fuel = nist_fuel
-
+                        
                 # fuel prices, odd indices > 1
                 else:
 
@@ -161,7 +161,12 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
                     # strip newline and split by spaces into list
                     prices = line.strip('\n').split(' ')
                     
-                    # delete first item (single space indent)
+                    # check length
+                    if len(prices) != 31:
+                        print 'ERROR: length of price list is not equal to 31'
+                    
+                    # get year 0 price for denominator of escalation calculation and delete
+                    price_0 = float(prices[0])
                     del prices[0]
                     
                     # convert prices to floats
@@ -169,10 +174,7 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
 
                     # calculate escalation rate and add to list
                     # these should match the Annual Supplement to NIST Handbook 135, Tables Ca-1 to Ca-5
-                    [escalation.append(item / prices[0]) for item in prices]
-
-                    # delete first item, which should be 1.0 for the first year
-                    del escalation[0]
+                    [escalation.append(item / price_0) for item in prices]
   
                     # round values
                     escalation = [round(item, 4) for item in escalation]    
@@ -202,6 +204,9 @@ def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
                     year_num = idx + 1
                     attribute = 'Year_%s_Escalation' % year_num
                     setattr(obj, attribute, escalation[idx])
+                
+                # TODO remove Version object
+#                 idf.removeidfobject(idf.getobject('VERSION'), name?)
                 
                 # save as new IDF with start year appended
                 idf.saveas(os.path.join(idf_dir, idf_name.replace('.idf', '%s.idf' % encost_year)))
