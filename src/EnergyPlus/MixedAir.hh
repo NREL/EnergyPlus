@@ -573,7 +573,7 @@ namespace MixedAir {
                          int const InListNum // In-list Number
     );
 
-	int GetOAMixerNumber(std::string const &OAMixerName); // must match OA mixer names for the OA mixer type
+    int GetOAMixerNumber(std::string const &OAMixerName); // must match OA mixer names for the OA mixer type
 
     // End of Utility Section of the Module
     //******************************************************************************

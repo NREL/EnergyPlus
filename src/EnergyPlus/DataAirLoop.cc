@@ -86,8 +86,8 @@ namespace DataAirLoop {
     // MODULE VARIABLE DECLARATIONS:
 
     int NumOASystems(0);                   // Number of Outdoor Air Systems
-	Real64 LoopDXCoilRTF(0.0); // OnOff fan run time fraction in an HVAC Air Loop
-	bool AirLoopInputsFilled(false);       // Set to TRUE after first pass through air loop
+    Real64 LoopDXCoilRTF(0.0); // OnOff fan run time fraction in an HVAC Air Loop
+    bool AirLoopInputsFilled(false);       // Set to TRUE after first pass through air loop
 
     Array1D<int> LoopFanOperationMode;         // OnOff fan operation mode
     Array1D<Real64> LoopSystemOnMassFlowrate;  // Loop mass flow rate during on cycle using an OnOff fan
@@ -114,15 +114,15 @@ namespace DataAirLoop {
         NumOASystems = 0;
         LoopDXCoilRTF = 0.0;
         AirLoopInputsFilled = false;
-		LoopFanOperationMode.deallocate();
-		LoopSystemOnMassFlowrate.deallocate();
-		LoopSystemOffMassFlowrate.deallocate();
-		LoopOnOffFanPartLoadRatio.deallocate();
-		LoopCompCycRatio.deallocate();
-		AFNLoopHeatingCoilMaxRTF.deallocate();
-		AFNLoopOnOffFanRTF.deallocate();
-		AFNLoopDXCoilRTF.deallocate();
-		AirToZoneNodeInfo.deallocate();
+        LoopFanOperationMode.deallocate();
+        LoopSystemOnMassFlowrate.deallocate();
+        LoopSystemOffMassFlowrate.deallocate();
+        LoopOnOffFanPartLoadRatio.deallocate();
+        LoopCompCycRatio.deallocate();
+        AFNLoopHeatingCoilMaxRTF.deallocate();
+        AFNLoopOnOffFanRTF.deallocate();
+        AFNLoopDXCoilRTF.deallocate();
+        AirToZoneNodeInfo.deallocate();
         AirToOANodeInfo.deallocate();
         PriAirSysAvailMgr.deallocate();
         AirLoopZoneInfo.deallocate();
