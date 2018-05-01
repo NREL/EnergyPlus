@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,10 +49,10 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <HeatBalanceMovableInsulation.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataSurfaces.hh>
+#include <HeatBalanceMovableInsulation.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -60,146 +60,149 @@ namespace EnergyPlus {
 
 namespace HeatBalanceMovableInsulation {
 
-	// Module containing the routines dealing with the HeatBalanceMovableInsulation
+    // Module containing the routines dealing with the HeatBalanceMovableInsulation
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Rick Strand
-	//       DATE WRITTEN   December 2000
+    // MODULE INFORMATION:
+    //       AUTHOR         Rick Strand
+    //       DATE WRITTEN   December 2000
 
-	// PURPOSE OF THIS MODULE:
-	// The purpose of this module is to contain all of the routines associated with
-	// movable and transparent insulation.
+    // PURPOSE OF THIS MODULE:
+    // The purpose of this module is to contain all of the routines associated with
+    // movable and transparent insulation.
 
-	// USE STATEMENTS:
-	using namespace DataPrecisionGlobals;
-	using DataHeatBalance::Material;
-	using DataSurfaces::Surface;
-	using ScheduleManager::GetCurrentScheduleValue;
+    // USE STATEMENTS:
+    using namespace DataPrecisionGlobals;
+    using DataHeatBalance::Material;
+    using DataSurfaces::Surface;
+    using ScheduleManager::GetCurrentScheduleValue;
 
-	void
-	EvalOutsideMovableInsulation(
-		int const SurfNum, // DO loop counter for surfaces
-		Real64 & HMovInsul, // Resistance or "h" value of movable insulation
-		int & RoughIndexMovInsul, // Roughness index of movable insulation
-		Real64 & AbsExt // Absorptivity of outer most layer
-	)
-	{
+    void EvalOutsideMovableInsulation(int const SurfNum,       // DO loop counter for surfaces
+                                      Real64 &HMovInsul,       // Resistance or "h" value of movable insulation
+                                      int &RoughIndexMovInsul, // Roughness index of movable insulation
+                                      Real64 &AbsExt           // Absorptivity of outer most layer
+    )
+    {
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Rick Strand
-		//       DATE WRITTEN   March 1998
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Rick Strand
+        //       DATE WRITTEN   March 1998
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine determines whether or not outside movable insulation
-		// on opaque surfaces is present at the current time.
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine determines whether or not outside movable insulation
+        // on opaque surfaces is present at the current time.
 
-		// METHODOLOGY EMPLOYED:
-		// The SurfNum is passed in and then the rest of the parameters are set
-		// if movable insulation is present.  If it is not present, then
-		// HMovInsul is set to zero.
+        // METHODOLOGY EMPLOYED:
+        // The SurfNum is passed in and then the rest of the parameters are set
+        // if movable insulation is present.  If it is not present, then
+        // HMovInsul is set to zero.
 
-		// REFERENCES:
-		// (I)BLAST legacy routine OMVINS
+        // REFERENCES:
+        // (I)BLAST legacy routine OMVINS
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
-		// FLOW:
-		MovInsulSchedVal = GetCurrentScheduleValue( Surface( SurfNum ).SchedMovInsulExt );
+        // FLOW:
+        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulExt);
 
-		{ auto const MaterialIndex( Surface( SurfNum ).MaterialMovInsulExt );
-		if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
+        {
+            auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulExt);
+            if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
 
-			HMovInsul = 0.0;
-			AbsExt = 0.0;
+                HMovInsul = 0.0;
+                AbsExt = 0.0;
 
-		} else { // Movable insulation present-->calculate output parameters
+            } else { // Movable insulation present-->calculate output parameters
 
-			// Double check resistance and conductivity to avoid divide by zero problems
-			if ( ( Material( MaterialIndex ).Resistance ) <= 0.0 ) {
-				if ( ( Material( MaterialIndex ).Conductivity ) > 0.0 ) {
-					Material( MaterialIndex ).Resistance = Material( Surface( SurfNum ).MaterialMovInsulExt ).Thickness / Material( Surface( SurfNum ).MaterialMovInsulExt ).Conductivity;
-				} else {
-					ShowFatalError( "EvalOutsideMovableInsulation: No resistance or conductivity found for material " + Material( Surface( SurfNum ).MaterialMovInsulExt ).Name );
-				}
-			}
+                // Double check resistance and conductivity to avoid divide by zero problems
+                if ((Material(MaterialIndex).Resistance) <= 0.0) {
+                    if ((Material(MaterialIndex).Conductivity) > 0.0) {
+                        Material(MaterialIndex).Resistance =
+                            Material(Surface(SurfNum).MaterialMovInsulExt).Thickness / Material(Surface(SurfNum).MaterialMovInsulExt).Conductivity;
+                    } else {
+                        ShowFatalError("EvalOutsideMovableInsulation: No resistance or conductivity found for material " +
+                                       Material(Surface(SurfNum).MaterialMovInsulExt).Name);
+                    }
+                }
 
-			HMovInsul = 1.0 / ( MovInsulSchedVal * Material( MaterialIndex ).Resistance );
-			RoughIndexMovInsul = Material( MaterialIndex ).Roughness;
-			{ auto const MaterialGroupNum( Material( MaterialIndex ).Group );
-			if ( ( MaterialGroupNum == DataHeatBalance::WindowGlass ) || ( MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer ) ) {
-				AbsExt = max( 0.0, 1.0 - Material( MaterialIndex ).Trans - Material( MaterialIndex ).ReflectSolBeamFront );
-			} else {
-				AbsExt = Material( MaterialIndex ).AbsorpSolar;
-			} }
-		} }
+                HMovInsul = 1.0 / (MovInsulSchedVal * Material(MaterialIndex).Resistance);
+                RoughIndexMovInsul = Material(MaterialIndex).Roughness;
+                {
+                    auto const MaterialGroupNum(Material(MaterialIndex).Group);
+                    if ((MaterialGroupNum == DataHeatBalance::WindowGlass) || (MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer)) {
+                        AbsExt = max(0.0, 1.0 - Material(MaterialIndex).Trans - Material(MaterialIndex).ReflectSolBeamFront);
+                    } else {
+                        AbsExt = Material(MaterialIndex).AbsorpSolar;
+                    }
+                }
+            }
+        }
+    }
 
-	}
+    void EvalInsideMovableInsulation(int const SurfNum, // DO loop counter for surfaces
+                                     Real64 &HMovInsul, // Resistance or "h" value of movable insulation
+                                     Real64 &AbsInt     // Inside solar absorptance of movable insulation
+    )
+    {
 
-	void
-	EvalInsideMovableInsulation(
-		int const SurfNum, // DO loop counter for surfaces
-		Real64 & HMovInsul, // Resistance or "h" value of movable insulation
-		Real64 & AbsInt // Inside solar absorptance of movable insulation
-	)
-	{
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Rick Strand
+        //       DATE WRITTEN   March 1998
+        //       MODIFIED       Nov. 1999, FW, add AbsInt; change MaterialMovInsulExt to
+        //                      MaterialMovInsulInt
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Rick Strand
-		//       DATE WRITTEN   March 1998
-		//       MODIFIED       Nov. 1999, FW, add AbsInt; change MaterialMovInsulExt to
-		//                      MaterialMovInsulInt
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine determines whether or not inside movable insulation
+        // is present at the current time.
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine determines whether or not inside movable insulation
-		// is present at the current time.
+        // METHODOLOGY EMPLOYED:
+        // The SurfNum is passed in and then the rest of the parameters are set
+        // if movable insulation is present.  If it is not present, then
+        // HMovInsul is set to zero.
 
-		// METHODOLOGY EMPLOYED:
-		// The SurfNum is passed in and then the rest of the parameters are set
-		// if movable insulation is present.  If it is not present, then
-		// HMovInsul is set to zero.
+        // REFERENCES:
+        // (I)BLAST legacy routine IMVINS
 
-		// REFERENCES:
-		// (I)BLAST legacy routine IMVINS
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
-		
-		// FLOW:
-		MovInsulSchedVal = GetCurrentScheduleValue( Surface( SurfNum ).SchedMovInsulInt );
+        // FLOW:
+        MovInsulSchedVal = GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulInt);
 
-		{ auto const MaterialIndex( Surface( SurfNum ).MaterialMovInsulInt );
-		if ( MovInsulSchedVal <= 0.0 ) { // Movable insulation not present at current time
+        {
+            auto const MaterialIndex(Surface(SurfNum).MaterialMovInsulInt);
+            if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
 
-			Surface( SurfNum ).MovInsulIntPresent = false;
-			HMovInsul = 0.0;
-			AbsInt = 0.0;
+                Surface(SurfNum).MovInsulIntPresent = false;
+                HMovInsul = 0.0;
+                AbsInt = 0.0;
 
-		} else { // Movable insulation present-->calculate output parameters
+            } else { // Movable insulation present-->calculate output parameters
 
-			Surface( SurfNum ).MovInsulIntPresent = true;
-			int const & thisMovableInt = Surface( SurfNum ).MaterialMovInsulInt;
-			if ( ( Material( thisMovableInt ).Resistance ) <= 0.0 ) {
-				if ( Material( thisMovableInt ).Conductivity > 0.0 && Material( thisMovableInt ).Thickness > 0.0 ) {
-					Material( thisMovableInt ).Resistance = Material( thisMovableInt ).Thickness / Material( thisMovableInt ).Conductivity;
-				} else {
-					ShowFatalError( "EvalInsideMovableInsulation: No resistance found for material " + Material( MaterialIndex ).Name );
-				}
-			}
+                Surface(SurfNum).MovInsulIntPresent = true;
+                int const &thisMovableInt = Surface(SurfNum).MaterialMovInsulInt;
+                if ((Material(thisMovableInt).Resistance) <= 0.0) {
+                    if (Material(thisMovableInt).Conductivity > 0.0 && Material(thisMovableInt).Thickness > 0.0) {
+                        Material(thisMovableInt).Resistance = Material(thisMovableInt).Thickness / Material(thisMovableInt).Conductivity;
+                    } else {
+                        ShowFatalError("EvalInsideMovableInsulation: No resistance found for material " + Material(MaterialIndex).Name);
+                    }
+                }
 
-			HMovInsul = 1.0 / ( MovInsulSchedVal * Material( MaterialIndex ).Resistance );
+                HMovInsul = 1.0 / (MovInsulSchedVal * Material(MaterialIndex).Resistance);
 
-			{ auto const MaterialGroupNum( Material( MaterialIndex ).Group );
-			if ( ( MaterialGroupNum == DataHeatBalance::WindowGlass ) || ( MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer ) ) {
-				AbsInt = max( 0.0, 1.0 - Material( MaterialIndex ).Trans - Material( MaterialIndex ).ReflectSolBeamFront );
-			} else {
-				AbsInt = Material( MaterialIndex ).AbsorpSolar;
-			} }
-			
-		} }
+                {
+                    auto const MaterialGroupNum(Material(MaterialIndex).Group);
+                    if ((MaterialGroupNum == DataHeatBalance::WindowGlass) || (MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer)) {
+                        AbsInt = max(0.0, 1.0 - Material(MaterialIndex).Trans - Material(MaterialIndex).ReflectSolBeamFront);
+                    } else {
+                        AbsInt = Material(MaterialIndex).AbsorpSolar;
+                    }
+                }
+            }
+        }
+    }
 
-	}
+} // namespace HeatBalanceMovableInsulation
 
-} // HeatBalanceMovableInsulation
-
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,75 +60,67 @@ namespace EnergyPlus {
 
 namespace ConductionTransferFunctionCalc {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	//INTEGER, PRIVATE, PARAMETER :: MaxTotNodes = 75   ! Maximum total number of
-	// nodes per construction.  This limit is a compromise between faster,
-	// less accurate solutions and slower, possibly more accurate answers.
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // INTEGER, PRIVATE, PARAMETER :: MaxTotNodes = 75   ! Maximum total number of
+    // nodes per construction.  This limit is a compromise between faster,
+    // less accurate solutions and slower, possibly more accurate answers.
 
-	extern int const NumOfPerpendNodes; // Number of nodes in the direction
-	// perpendicular to the main direction of heat transfer.  This is only used
-	// when a two-dimensional solution has been requested for a construction
-	// with a heat source/sink.
+    extern int const NumOfPerpendNodes; // Number of nodes in the direction
+    // perpendicular to the main direction of heat transfer.  This is only used
+    // when a two-dimensional solution has been requested for a construction
+    // with a heat source/sink.
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array2D< Real64 > AExp; // Exponential of AMat
-	extern Array2D< Real64 > AInv; // Inverse of AMat
-	extern Array2D< Real64 > AMat; // "A" matrix from Seem's dissertation
-	// (constant coefficients of linear system)
-	extern Array1D< Real64 > BMat; // "B" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > CMat; // "C" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > DMat; // "D" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > e; // Coefficients for the surface flux history term
-	extern Array2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
-	// in Seem's dissertation
-	extern Array2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
-	// in Seem's dissertation
-	extern int NodeSource; // Node at which a source or sink is present
-	extern int NodeUserTemp; // Node where user wishes to calculate a temperature
-	// (for constructions with sources/sinks only)
-	extern int rcmax; // Total number of nodes in the construct (<= MaxTotNodes)
-	extern Array3D< Real64 > s; // Coefficients for the surface temperature history terms
-	extern Array2D< Real64 > s0; // Coefficients for the current surface temperature terms
-	extern Real64 TinyLimit;
-	extern Array2D< Real64 > IdenMatrix; // Identity Matrix
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array2D<Real64> AExp; // Exponential of AMat
+    extern Array2D<Real64> AInv; // Inverse of AMat
+    extern Array2D<Real64> AMat; // "A" matrix from Seem's dissertation
+    // (constant coefficients of linear system)
+    extern Array1D<Real64> BMat;   // "B" matrix of state space method (non-zero elements)
+    extern Array1D<Real64> CMat;   // "C" matrix of state space method (non-zero elements)
+    extern Array1D<Real64> DMat;   // "D" matrix of state space method (non-zero elements)
+    extern Array1D<Real64> e;      // Coefficients for the surface flux history term
+    extern Array2D<Real64> Gamma1; // Intermediate calculation array corresponding to a term
+    // in Seem's dissertation
+    extern Array2D<Real64> Gamma2; // Intermediate calculation array corresponding to a term
+    // in Seem's dissertation
+    extern int NodeSource;   // Node at which a source or sink is present
+    extern int NodeUserTemp; // Node where user wishes to calculate a temperature
+    // (for constructions with sources/sinks only)
+    extern int rcmax;          // Total number of nodes in the construct (<= MaxTotNodes)
+    extern Array3D<Real64> s;  // Coefficients for the surface temperature history terms
+    extern Array2D<Real64> s0; // Coefficients for the current surface temperature terms
+    extern Real64 TinyLimit;
+    extern Array2D<Real64> IdenMatrix; // Identity Matrix
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
+    // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
-	// Functions
+    // Functions
 
-	void
-	InitConductionTransferFunctions();
+    void InitConductionTransferFunctions();
 
-	void
-	CalculateExponentialMatrix( Real64 & delt ); // Time step of the resulting CTFs
+    void CalculateExponentialMatrix(Real64 &delt); // Time step of the resulting CTFs
 
-	void
-	CalculateInverseMatrix();
+    void CalculateInverseMatrix();
 
-	void
-	CalculateGammas(
-		Real64 const delt, // Time increment in fraction of an hour
-		int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-	);
+    void CalculateGammas(Real64 const delt,           // Time increment in fraction of an hour
+                         int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
+    );
 
-	void
-	CalculateCTFs(
-		int & nrf, // Number of response factor terms
-		int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-	);
+    void CalculateCTFs(int &nrf,                    // Number of response factor terms
+                       int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
+    );
 
-	void
-	ReportCTFs( bool const DoReportBecauseError );
+    void ReportCTFs(bool const DoReportBecauseError);
 
-} // ConductionTransferFunctionCalc
+} // namespace ConductionTransferFunctionCalc
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

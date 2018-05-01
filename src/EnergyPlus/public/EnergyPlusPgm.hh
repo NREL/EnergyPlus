@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,18 +53,14 @@
 // C++ Headers
 #include <string>
 
-	// Functions
+// Functions
 
-	void
-	CreateCurrentDateTimeString( std::string & CurrentDateTimeString );
+void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
 
-	void ENERGYPLUSLIB_API
-	EnergyPlusPgm( std::string const & filepath = std::string() );
+void ENERGYPLUSLIB_API EnergyPlusPgm(std::string const &filepath = std::string());
 
-	void ENERGYPLUSLIB_API
-	StoreProgressCallback( void ( *f )( int const ) );
+void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
 
-	void ENERGYPLUSLIB_API
-	StoreMessageCallback( void ( *f )( std::string const & ) );
+void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
 
 #endif

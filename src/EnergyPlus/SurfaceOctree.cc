@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/SurfaceOctree.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/SurfaceOctree.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -71,185 +71,174 @@ namespace EnergyPlus {
 //  Initial octree is for use in daylighting but should be adaptable to other use cases:
 //   Surfaces without vertices are omitted
 //   Transparent surfaces are omitted (can't obstruct light)
-//  The octree holds live references to surfaces so it must be updated if surfaces change after its construction (this doesn't occur in EnergyPlus currently)
-//  Copy and move ctors/assignment omitted for now since not needed
-//  The use of multiple octrees for faster lookups of surface type subsets may be worthwhile for performance in some uses
-//  Octree variations and parameter tuning can give better performance for specific applications
-//  This design uses "tight" cubes (no overlap) and surfaces filtering down to deepest cube they fit in completely
-//  Alternative designs that might offer somewhat better or worse performance:
-//   Loose cubes oversied by x2 or some other factor to allow surfaces to filter down further: This requires more cubes to be processed for a given operation
-//   Filter all surfaces down to leaf cubes placing a surface in any cube it intersects: More specificity but redundant surfaces in each operation so must collect them in a set
+//  The octree holds live references to surfaces so it must be updated if surfaces change after its construction (this doesn't occur in EnergyPlus
+//  currently) Copy and move ctors/assignment omitted for now since not needed The use of multiple octrees for faster lookups of surface type subsets
+//  may be worthwhile for performance in some uses Octree variations and parameter tuning can give better performance for specific applications This
+//  design uses "tight" cubes (no overlap) and surfaces filtering down to deepest cube they fit in completely Alternative designs that might offer
+//  somewhat better or worse performance:
+//   Loose cubes oversied by x2 or some other factor to allow surfaces to filter down further: This requires more cubes to be processed for a given
+//   operation Filter all surfaces down to leaf cubes placing a surface in any cube it intersects: More specificity but redundant surfaces in each
+//   operation so must collect them in a set
 
-	// Surface in Cube?
-	bool
-	SurfaceOctreeCube::
-	contains( Surface const & surface ) const
-	{
-		for ( Vertex const & v : surface.Vertex ) { // All surface vertices must be in cube
-			if ( ! contains( v ) ) return false;
-		}
-		return true;
-	}
+// Surface in Cube?
+bool SurfaceOctreeCube::contains(Surface const &surface) const
+{
+    for (Vertex const &v : surface.Vertex) { // All surface vertices must be in cube
+        if (!contains(v)) return false;
+    }
+    return true;
+}
 
-	// Surfaces Outer Cube Initilization
-	void
-	SurfaceOctreeCube::
-	init( ObjexxFCL::Array1< Surface > & surfaces )
-	{
-		assert( d_ == 0u );
-		assert( n_ == 0u );
-		surfaces_.clear();
-		surfaces_.reserve( surfaces.size() );
-		for ( Surface & surface : surfaces ) {
-			if (
-			 ( surface.Vertex.size() >= 3 ) && // Skip no-vertex "surfaces"
-			 ( ! surface.IsTransparent ) // Skip transparent surfaces
-			) {
-				surfaces_.push_back( &surface );
-			}
-		}
+// Surfaces Outer Cube Initilization
+void SurfaceOctreeCube::init(ObjexxFCL::Array1<Surface> &surfaces)
+{
+    assert(d_ == 0u);
+    assert(n_ == 0u);
+    surfaces_.clear();
+    surfaces_.reserve(surfaces.size());
+    for (Surface &surface : surfaces) {
+        if ((surface.Vertex.size() >= 3) && // Skip no-vertex "surfaces"
+            (!surface.IsTransparent)        // Skip transparent surfaces
+        ) {
+            surfaces_.push_back(&surface);
+        }
+    }
 
-		// No surfaces handler
-		if ( surfaces_.empty() ) {
-			l_ = u_ = c_ = Vertex( 0.0 );
-			w_ = r_ = 0.0;
-			return;
-		}
+    // No surfaces handler
+    if (surfaces_.empty()) {
+        l_ = u_ = c_ = Vertex(0.0);
+        w_ = r_ = 0.0;
+        return;
+    }
 
-		// Bounding box corners and center
-		Surface const & surface_0( *surfaces_[ 0 ] );
-		assert( ! surface_0.Vertex.empty() );
-		l_ = u_ = surface_0.Vertex[ 0 ]; // Initialize corners to first vertex of first surface
-		for ( Surface const * surface_p : surfaces_ ) { // Surfaces
-			auto const & vertices( surface_p->Vertex );
-			for ( auto const & vertex : vertices ) { // Expand cube to hold surface vertices
-				l_.min( vertex );
-				u_.max( vertex );
-			}
-		}
-		c_ = cen( l_, u_ ); // Center vertex
+    // Bounding box corners and center
+    Surface const &surface_0(*surfaces_[0]);
+    assert(!surface_0.Vertex.empty());
+    l_ = u_ = surface_0.Vertex[0];               // Initialize corners to first vertex of first surface
+    for (Surface const *surface_p : surfaces_) { // Surfaces
+        auto const &vertices(surface_p->Vertex);
+        for (auto const &vertex : vertices) { // Expand cube to hold surface vertices
+            l_.min(vertex);
+            u_.max(vertex);
+        }
+    }
+    c_ = cen(l_, u_); // Center vertex
 
-		// Expand bounding box to cube with uniform side width
-		Vertex const diagonal( u_ - l_ ); // Diagonal
-		w_ = ObjexxFCL::max( diagonal.x, diagonal.y, diagonal.z );
-		r_ = 0.75 * ( w_ * w_ );
-		Real const h( 0.5 * w_ ); // Half-width
-		l_ = c_ - h;
-		u_ = c_ + h;
+    // Expand bounding box to cube with uniform side width
+    Vertex const diagonal(u_ - l_); // Diagonal
+    w_ = ObjexxFCL::max(diagonal.x, diagonal.y, diagonal.z);
+    r_ = 0.75 * (w_ * w_);
+    Real const h(0.5 * w_); // Half-width
+    l_ = c_ - h;
+    u_ = c_ + h;
 
-		assert( valid() );
+    assert(valid());
 
-		// Branch sub-tree
-		branch();
-	}
+    // Branch sub-tree
+    branch();
+}
 
-	// Valid?
-	bool
-	SurfaceOctreeCube::
-	valid() const
-	{
-		if ( ( ( l_.x <= c_.x ) && ( l_.y <= c_.y ) && ( l_.z <= c_.z ) ) && ( ( c_.x <= u_.x ) && ( c_.y <= u_.y ) && ( c_.z <= u_.z ) ) ) {
-			Real const tol2( std::max( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
-			if ( ObjexxFCL::distance_squared( c_, cen( l_, u_ ) ) <= tol2 ) {
-				Real const tol( std::max( std::sqrt( std::max( ObjexxFCL::magnitude_squared( l_ ), ObjexxFCL::magnitude_squared( u_ ) ) ) * ( 4 * std::numeric_limits< Real >::epsilon() ), 2 * std::numeric_limits< Real >::min() ) );
-				Vertex const d( u_ - l_ ); // Diagonal
-				return ( std::abs( d.x - w_ ) <= tol ) && ( std::abs( d.x - d.y ) <= tol ) && ( std::abs( d.x - d.z ) <= tol ); // Uniform side widths?
-			}
-		}
-		return false;
-	}
+// Valid?
+bool SurfaceOctreeCube::valid() const
+{
+    if (((l_.x <= c_.x) && (l_.y <= c_.y) && (l_.z <= c_.z)) && ((c_.x <= u_.x) && (c_.y <= u_.y) && (c_.z <= u_.z))) {
+        Real const tol2(
+            std::max(std::max(ObjexxFCL::magnitude_squared(l_), ObjexxFCL::magnitude_squared(u_)) * (4 * std::numeric_limits<Real>::epsilon()),
+                     2 * std::numeric_limits<Real>::min()));
+        if (ObjexxFCL::distance_squared(c_, cen(l_, u_)) <= tol2) {
+            Real const tol(std::max(std::sqrt(std::max(ObjexxFCL::magnitude_squared(l_), ObjexxFCL::magnitude_squared(u_))) *
+                                        (4 * std::numeric_limits<Real>::epsilon()),
+                                    2 * std::numeric_limits<Real>::min()));
+            Vertex const d(u_ - l_);                                                                            // Diagonal
+            return (std::abs(d.x - w_) <= tol) && (std::abs(d.x - d.y) <= tol) && (std::abs(d.x - d.z) <= tol); // Uniform side widths?
+        }
+    }
+    return false;
+}
 
-	// Branch to Sub-Tree
-	void
-	SurfaceOctreeCube::
-	branch()
-	{
-		if ( ( surfaces_.size() > maxSurfaces_ ) && ( d_ < maxDepth_ ) ) {
-			// Assign Surfaces to cubes containing them
-			Surfaces surfaces_all;
-			surfaces_all.swap( surfaces_ );
-			for ( auto * surface_p : surfaces_all ) { // Surfaces
-				surfaceBranch( *surface_p );
-			}
+// Branch to Sub-Tree
+void SurfaceOctreeCube::branch()
+{
+    if ((surfaces_.size() > maxSurfaces_) && (d_ < maxDepth_)) {
+        // Assign Surfaces to cubes containing them
+        Surfaces surfaces_all;
+        surfaces_all.swap(surfaces_);
+        for (auto *surface_p : surfaces_all) { // Surfaces
+            surfaceBranch(*surface_p);
+        }
 
-			// Compact occupied cube array
-			n_ = 0u;
-			for ( std::uint8_t i = 0; i < 8; ++i ) {
-				SurfaceOctreeCube * & cube = cubes_[ i ];
-				if ( cube != nullptr ) {
-					if ( n_ < i ) {
-						cubes_[ n_ ] = cube;
-						cube = nullptr;
-					}
-					++n_;
-				}
-			}
+        // Compact occupied cube array
+        n_ = 0u;
+        for (std::uint8_t i = 0; i < 8; ++i) {
+            SurfaceOctreeCube *&cube = cubes_[i];
+            if (cube != nullptr) {
+                if (n_ < i) {
+                    cubes_[n_] = cube;
+                    cube = nullptr;
+                }
+                ++n_;
+            }
+        }
 
-			// Branch sub-tree recursively
-			for ( std::uint8_t i = 0; i < n_; ++i ) {
-				cubes_[ i ]->branch();
-			}
-		}
-	}
+        // Branch sub-tree recursively
+        for (std::uint8_t i = 0; i < n_; ++i) {
+            cubes_[i]->branch();
+        }
+    }
+}
 
-	// Surface Branch Processing
-	void
-	SurfaceOctreeCube::
-	surfaceBranch( Surface & surface )
-	{
-		Real const h( 0.5 * w_ ); // Half-width
-		Vertex sl( surface.Vertex[ 0 ] ), su( surface.Vertex[ 0 ] ); // Surface bounding box corners
-		auto const & vertices( surface.Vertex ); // Surface vertices
-		for ( auto const & vertex : vertices ) { // Expand bounding box to hold surface vertices
-			sl.min( vertex );
-			su.max( vertex );
-		}
-		Vertex const ctr( cen( sl, su ) );
-		std::uint8_t const i( ctr.x <= c_.x ? 0 : 1 );
-		std::uint8_t const j( ctr.y <= c_.y ? 0 : 1 );
-		std::uint8_t const k( ctr.z <= c_.z ? 0 : 1 );
-		SurfaceOctreeCube * & cube = cubes_[ ( i << 2 ) + ( j << 1 ) + k ];
-		if ( cube != nullptr ) { // Candidate cube exists
-			if ( ( ( cube->l_.x <= sl.x ) && ( cube->l_.y <= sl.y ) && ( cube->l_.z <= sl.z ) ) && ( ( su.x <= cube->u_.x ) && ( su.y <= cube->u_.y ) && ( su.z <= cube->u_.z ) ) ) { // Surface is contained in sub-cube
-				cube->add( surface );
-			} else { // Surface stays in this cube
-				surfaces_.push_back( &surface );
-			}
-		} else { // Create cube if surface contained
-			Real const x( i * h );
-			Real const y( j * h );
-			Real const z( k * h );
-			Vertex const l( l_.x + x, l_.y + y, l_.z + z );
-			Vertex const u( c_.x + x, c_.y + y, c_.z + z );
-			if ( ( ( l.x <= sl.x ) && ( l.y <= sl.y ) && ( l.z <= sl.z ) ) && ( ( su.x <= u.x ) && ( su.y <= u.y ) && ( su.z <= u.z ) ) ) { // Surface is contained in sub-cube
-				cube = new SurfaceOctreeCube( d_ + 1, l, u, h );
-				cube->add( surface );
-			} else { // Surface stays in this cube
-				surfaces_.push_back( &surface );
-			}
-		}
-	}
+// Surface Branch Processing
+void SurfaceOctreeCube::surfaceBranch(Surface &surface)
+{
+    Real const h(0.5 * w_);                              // Half-width
+    Vertex sl(surface.Vertex[0]), su(surface.Vertex[0]); // Surface bounding box corners
+    auto const &vertices(surface.Vertex);                // Surface vertices
+    for (auto const &vertex : vertices) {                // Expand bounding box to hold surface vertices
+        sl.min(vertex);
+        su.max(vertex);
+    }
+    Vertex const ctr(cen(sl, su));
+    std::uint8_t const i(ctr.x <= c_.x ? 0 : 1);
+    std::uint8_t const j(ctr.y <= c_.y ? 0 : 1);
+    std::uint8_t const k(ctr.z <= c_.z ? 0 : 1);
+    SurfaceOctreeCube *&cube = cubes_[(i << 2) + (j << 1) + k];
+    if (cube != nullptr) { // Candidate cube exists
+        if (((cube->l_.x <= sl.x) && (cube->l_.y <= sl.y) && (cube->l_.z <= sl.z)) &&
+            ((su.x <= cube->u_.x) && (su.y <= cube->u_.y) && (su.z <= cube->u_.z))) { // Surface is contained in sub-cube
+            cube->add(surface);
+        } else { // Surface stays in this cube
+            surfaces_.push_back(&surface);
+        }
+    } else { // Create cube if surface contained
+        Real const x(i * h);
+        Real const y(j * h);
+        Real const z(k * h);
+        Vertex const l(l_.x + x, l_.y + y, l_.z + z);
+        Vertex const u(c_.x + x, c_.y + y, c_.z + z);
+        if (((l.x <= sl.x) && (l.y <= sl.y) && (l.z <= sl.z)) &&
+            ((su.x <= u.x) && (su.y <= u.y) && (su.z <= u.z))) { // Surface is contained in sub-cube
+            cube = new SurfaceOctreeCube(d_ + 1, l, u, h);
+            cube->add(surface);
+        } else { // Surface stays in this cube
+            surfaces_.push_back(&surface);
+        }
+    }
+}
 
-	// Surface in Cube?
-	bool
-	SurfaceOctreeCube::
-	contains(
-	 Vertex const & l,
-	 Vertex const & u,
-	 Surface const & surface
-	)
-	{
-		for ( Vertex const & v : surface.Vertex ) { // All surface vertices must be in cube
-			if ( ! contains( l, u, v ) ) return false;
-		}
-		return true;
-	}
+// Surface in Cube?
+bool SurfaceOctreeCube::contains(Vertex const &l, Vertex const &u, Surface const &surface)
+{
+    for (Vertex const &v : surface.Vertex) { // All surface vertices must be in cube
+        if (!contains(l, u, v)) return false;
+    }
+    return true;
+}
 
-	// Static Data Member Definitions
-	std::uint8_t const SurfaceOctreeCube::maxDepth_ = 255u; // Max tree depth
-	SurfaceOctreeCube::size_type const SurfaceOctreeCube::maxSurfaces_ = 10u; // Max surfaces in a cube before subdividing
+// Static Data Member Definitions
+std::uint8_t const SurfaceOctreeCube::maxDepth_ = 255u;                   // Max tree depth
+SurfaceOctreeCube::size_type const SurfaceOctreeCube::maxSurfaces_ = 10u; // Max surfaces in a cube before subdividing
 
 // Globals
 SurfaceOctreeCube surfaceOctree;
 
-} // EnergyPlus
+} // namespace EnergyPlus

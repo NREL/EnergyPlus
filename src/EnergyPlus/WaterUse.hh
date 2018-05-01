@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,318 +52,220 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace WaterUse {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	extern int const HeatRecoveryHXIdeal;
-	extern int const HeatRecoveryHXCounterFlow;
-	extern int const HeatRecoveryHXCrossFlow;
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const HeatRecoveryHXIdeal;
+    extern int const HeatRecoveryHXCounterFlow;
+    extern int const HeatRecoveryHXCrossFlow;
 
-	extern int const HeatRecoveryConfigPlant;
-	extern int const HeatRecoveryConfigEquipment;
-	extern int const HeatRecoveryConfigPlantAndEquip;
+    extern int const HeatRecoveryConfigPlant;
+    extern int const HeatRecoveryConfigEquipment;
+    extern int const HeatRecoveryConfigPlantAndEquip;
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE TYPE DECLARATIONS:
+    // MODULE VARIABLE TYPE DECLARATIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumWaterEquipment;
-	extern int NumWaterConnections;
-	//INTEGER :: MaxIterationsErrorCount =0
-	extern bool GetWaterUseInputFlag;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumWaterEquipment;
+    extern int NumWaterConnections;
+    // INTEGER :: MaxIterationsErrorCount =0
+    extern bool GetWaterUseInputFlag;
 
-	extern Array1D_bool CheckEquipName;
-	extern Array1D_bool CheckPlantLoop;
+    extern Array1D_bool CheckEquipName;
+    extern Array1D_bool CheckPlantLoop;
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Types
+    // Types
 
-	struct WaterEquipmentType
-	{
-		// Members
-		std::string Name; // Name of DHW
-		std::string EndUseSubcatName;
-		int Connections; // Index for WATER USE CONNECTIONS object
-		Real64 PeakVolFlowRate; // Peak volumetric flow rate, also water consumption rate (m3/s)
-		int FlowRateFracSchedule; // Pointer to schedule object
-		Real64 ColdVolFlowRate;
-		Real64 HotVolFlowRate;
-		Real64 TotalVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
-		Real64 ColdMassFlowRate;
-		Real64 HotMassFlowRate;
-		Real64 TotalMassFlowRate; // Mass flow rate (kg/s)
-		Real64 DrainMassFlowRate;
-		int ColdTempSchedule; // Index for schedule object
-		int HotTempSchedule; // Index for schedule object
-		int TargetTempSchedule; // Index for schedule object
-		Real64 ColdTemp; // Cold supply water temperature (C)
-		Real64 HotTemp; // Hot supply water temperature (C)
-		Real64 TargetTemp; // Target (mixed) water temperature (C)
-		Real64 MixedTemp; // Actual outlet (mixed) water temperature (C)
-		Real64 DrainTemp;
-		int Zone; // Index for zone object
-		int SensibleFracSchedule; // Pointer to schedule object
-		Real64 SensibleRate;
-		Real64 SensibleEnergy;
-		Real64 SensibleRateNoMultiplier;
-		int LatentFracSchedule; // Pointer to schedule object
-		Real64 LatentRate;
-		Real64 LatentEnergy;
-		Real64 LatentRateNoMultiplier;
-		Real64 MoistureRate;
-		Real64 MoistureMass;
-		Real64 ColdVolume; // Water consumption (m3)
-		Real64 HotVolume; // Water consumption (m3)
-		Real64 TotalVolume; // Water consumption (m3)
-		Real64 Power; // Heating rate required to meet the mixed water temperature (W)
-		Real64 Energy; // Heating energy required to meet the mixed water temperature (J)
+    struct WaterEquipmentType
+    {
+        // Members
+        std::string Name; // Name of DHW
+        std::string EndUseSubcatName;
+        int Connections;          // Index for WATER USE CONNECTIONS object
+        Real64 PeakVolFlowRate;   // Peak volumetric flow rate, also water consumption rate (m3/s)
+        int FlowRateFracSchedule; // Pointer to schedule object
+        Real64 ColdVolFlowRate;
+        Real64 HotVolFlowRate;
+        Real64 TotalVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
+        Real64 ColdMassFlowRate;
+        Real64 HotMassFlowRate;
+        Real64 TotalMassFlowRate; // Mass flow rate (kg/s)
+        Real64 DrainMassFlowRate;
+        int ColdTempSchedule;   // Index for schedule object
+        int HotTempSchedule;    // Index for schedule object
+        int TargetTempSchedule; // Index for schedule object
+        Real64 ColdTemp;        // Cold supply water temperature (C)
+        Real64 HotTemp;         // Hot supply water temperature (C)
+        Real64 TargetTemp;      // Target (mixed) water temperature (C)
+        Real64 MixedTemp;       // Actual outlet (mixed) water temperature (C)
+        Real64 DrainTemp;
+        int Zone;                 // Index for zone object
+        int SensibleFracSchedule; // Pointer to schedule object
+        Real64 SensibleRate;
+        Real64 SensibleEnergy;
+        Real64 SensibleRateNoMultiplier;
+        int LatentFracSchedule; // Pointer to schedule object
+        Real64 LatentRate;
+        Real64 LatentEnergy;
+        Real64 LatentRateNoMultiplier;
+        Real64 MoistureRate;
+        Real64 MoistureMass;
+        Real64 ColdVolume;  // Water consumption (m3)
+        Real64 HotVolume;   // Water consumption (m3)
+        Real64 TotalVolume; // Water consumption (m3)
+        Real64 Power;       // Heating rate required to meet the mixed water temperature (W)
+        Real64 Energy;      // Heating energy required to meet the mixed water temperature (J)
 
-		// Default Constructor
-		WaterEquipmentType() :
-			Connections( 0 ),
-			PeakVolFlowRate( 0.0 ),
-			FlowRateFracSchedule( 0 ),
-			ColdVolFlowRate( 0.0 ),
-			HotVolFlowRate( 0.0 ),
-			TotalVolFlowRate( 0.0 ),
-			ColdMassFlowRate( 0.0 ),
-			HotMassFlowRate( 0.0 ),
-			TotalMassFlowRate( 0.0 ),
-			DrainMassFlowRate( 0.0 ),
-			ColdTempSchedule( 0 ),
-			HotTempSchedule( 0 ),
-			TargetTempSchedule( 0 ),
-			ColdTemp( 0.0 ),
-			HotTemp( 0.0 ),
-			TargetTemp( 0.0 ),
-			MixedTemp( 0.0 ),
-			DrainTemp( 0.0 ),
-			Zone( 0 ),
-			SensibleFracSchedule( 0 ),
-			SensibleRate( 0.0 ),
-			SensibleEnergy( 0.0 ),
-			SensibleRateNoMultiplier( 0.0 ),
-			LatentFracSchedule( 0 ),
-			LatentRate( 0.0 ),
-			LatentEnergy( 0.0 ),
-			LatentRateNoMultiplier( 0.0 ),
-			MoistureRate( 0.0 ),
-			MoistureMass( 0.0 ),
-			ColdVolume( 0.0 ),
-			HotVolume( 0.0 ),
-			TotalVolume( 0.0 ),
-			Power( 0.0 ),
-			Energy( 0.0 )
-		{}
+        // Default Constructor
+        WaterEquipmentType()
+            : Connections(0), PeakVolFlowRate(0.0), FlowRateFracSchedule(0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0),
+              ColdMassFlowRate(0.0), HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0),
+              TargetTempSchedule(0), ColdTemp(0.0), HotTemp(0.0), TargetTemp(0.0), MixedTemp(0.0), DrainTemp(0.0), Zone(0), SensibleFracSchedule(0),
+              SensibleRate(0.0), SensibleEnergy(0.0), SensibleRateNoMultiplier(0.0), LatentFracSchedule(0), LatentRate(0.0), LatentEnergy(0.0),
+              LatentRateNoMultiplier(0.0), MoistureRate(0.0), MoistureMass(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0),
+              Energy(0.0)
+        {
+        }
 
-		// Reset Some Values to Zeros
-		void
-		reset()
-		{
-			SensibleRate = 0.0;
-			SensibleEnergy = 0.0;
-			LatentRate = 0.0;
-			LatentEnergy = 0.0;
-			MixedTemp = 0.0;
-			TotalMassFlowRate = 0.0;
-			DrainTemp = 0.0;
-		}
+        // Reset Some Values to Zeros
+        void reset()
+        {
+            SensibleRate = 0.0;
+            SensibleEnergy = 0.0;
+            LatentRate = 0.0;
+            LatentEnergy = 0.0;
+            MixedTemp = 0.0;
+            TotalMassFlowRate = 0.0;
+            DrainTemp = 0.0;
+        }
+    };
 
-	};
+    struct WaterConnectionsType
+    {
+        // Members
+        std::string Name; // Name of DHW
+        bool Init;        // Flag for initialization:  TRUE means do the init
+        bool InitSizing;  // Flag for initialization of plant sizing
+        bool StandAlone;  // Flag for operation with no plant connections
+        int InletNode;    // Hot water demand node
+        int OutletNode;   // Cold water supply node
+        int SupplyTankNum;
+        int RecoveryTankNum;
+        int TankDemandID; // array to request flow from supply tank
+        int TankSupplyID; // array to send flow to recovery tank
+        bool HeatRecovery;
+        int HeatRecoveryHX;
+        int HeatRecoveryConfig;
+        Real64 HXUA;
+        Real64 Effectiveness;
+        Real64 RecoveryRate;
+        Real64 RecoveryEnergy;
+        Real64 MainsMassFlowRate; // Mass flow rate (kg/s)
+        Real64 TankMassFlowRate;  // Mass flow rate (kg/s)
+        Real64 ColdMassFlowRate;  // Mass flow rate (kg/s)  cold = mains + tank
+        Real64 HotMassFlowRate;   // Mass flow rate (kg/s)
+        Real64 TotalMassFlowRate; // Mass flow rate (kg/s) total = cold + hot
+        Real64 DrainMassFlowRate;
+        Real64 RecoveryMassFlowRate;
+        Real64 PeakVolFlowRate;  // Volumetric flow rate, also water consumption rate (m3/s)
+        Real64 MainsVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
+        Real64 TankVolFlowRate;  // Volumetric flow rate, also water consumption rate (m3/s)
+        Real64 ColdVolFlowRate;  // Volumetric flow rate, also water consumption rate (m3/s)
+        Real64 HotVolFlowRate;   // Volumetric flow rate, also water consumption rate (m3/s)
+        Real64 TotalVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
+        Real64 DrainVolFlowRate;
+        Real64 PeakMassFlowRate; // Peak Mass flow rate for MassFlowRateMax
+        int ColdTempSchedule;    // Index for schedule object
+        int HotTempSchedule;     // Index for schedule object
+        Real64 MainsTemp;        // Cold supply water temperature (C)
+        Real64 TankTemp;         // Cold supply water temperature (C)
+        Real64 ColdSupplyTemp;   // cold from mains, schedule, or tank, depending
+        Real64 ColdTemp;         // Cold supply water temperature (C)  actual cold (could be reheated)
+        Real64 HotTemp;          // Hot supply water temperature (C)
+        Real64 DrainTemp;
+        Real64 RecoveryTemp;
+        Real64 ReturnTemp;
+        Real64 WasteTemp;
+        Real64 TempError;
+        Real64 MainsVolume; // Water consumption (m3)
+        Real64 TankVolume;  // Water consumption (m3)
+        Real64 ColdVolume;  // Water consumption (m3)
+        Real64 HotVolume;   // Water consumption (m3)
+        Real64 TotalVolume; // Water consumption (m3)
+        Real64 Power;       // Heating rate required to raise temperature from cold to hot (W)
+        Real64 Energy;      // Heating energy required to raise temperature from cold to hot (J)
+        int NumWaterEquipment;
+        int MaxIterationsErrorIndex; // recurring error index
+        Array1D_int WaterEquipment;
+        int PlantLoopNum;
+        int PlantLoopSide;
+        int PlantLoopBranchNum;
+        int PlantLoopCompNum;
 
-	struct WaterConnectionsType
-	{
-		// Members
-		std::string Name; // Name of DHW
-		bool Init; // Flag for initialization:  TRUE means do the init
-		bool InitSizing; // Flag for initialization of plant sizing
-		bool StandAlone; // Flag for operation with no plant connections
-		int InletNode; // Hot water demand node
-		int OutletNode; // Cold water supply node
-		int SupplyTankNum;
-		int RecoveryTankNum;
-		int TankDemandID; // array to request flow from supply tank
-		int TankSupplyID; // array to send flow to recovery tank
-		bool HeatRecovery;
-		int HeatRecoveryHX;
-		int HeatRecoveryConfig;
-		Real64 HXUA;
-		Real64 Effectiveness;
-		Real64 RecoveryRate;
-		Real64 RecoveryEnergy;
-		Real64 MainsMassFlowRate; // Mass flow rate (kg/s)
-		Real64 TankMassFlowRate; // Mass flow rate (kg/s)
-		Real64 ColdMassFlowRate; // Mass flow rate (kg/s)  cold = mains + tank
-		Real64 HotMassFlowRate; // Mass flow rate (kg/s)
-		Real64 TotalMassFlowRate; // Mass flow rate (kg/s) total = cold + hot
-		Real64 DrainMassFlowRate;
-		Real64 RecoveryMassFlowRate;
-		Real64 PeakVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
-		Real64 MainsVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
-		Real64 TankVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
-		Real64 ColdVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
-		Real64 HotVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
-		Real64 TotalVolFlowRate; // Volumetric flow rate, also water consumption rate (m3/s)
-		Real64 DrainVolFlowRate;
-		Real64 PeakMassFlowRate; // Peak Mass flow rate for MassFlowRateMax
-		int ColdTempSchedule; // Index for schedule object
-		int HotTempSchedule; // Index for schedule object
-		Real64 MainsTemp; // Cold supply water temperature (C)
-		Real64 TankTemp; // Cold supply water temperature (C)
-		Real64 ColdSupplyTemp; // cold from mains, schedule, or tank, depending
-		Real64 ColdTemp; // Cold supply water temperature (C)  actual cold (could be reheated)
-		Real64 HotTemp; // Hot supply water temperature (C)
-		Real64 DrainTemp;
-		Real64 RecoveryTemp;
-		Real64 ReturnTemp;
-		Real64 WasteTemp;
-		Real64 TempError;
-		Real64 MainsVolume; // Water consumption (m3)
-		Real64 TankVolume; // Water consumption (m3)
-		Real64 ColdVolume; // Water consumption (m3)
-		Real64 HotVolume; // Water consumption (m3)
-		Real64 TotalVolume; // Water consumption (m3)
-		Real64 Power; // Heating rate required to raise temperature from cold to hot (W)
-		Real64 Energy; // Heating energy required to raise temperature from cold to hot (J)
-		int NumWaterEquipment;
-		int MaxIterationsErrorIndex; // recurring error index
-		Array1D_int WaterEquipment;
-		int PlantLoopNum;
-		int PlantLoopSide;
-		int PlantLoopBranchNum;
-		int PlantLoopCompNum;
+        // Default Constructor
+        WaterConnectionsType()
+            : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
+              TankSupplyID(0), HeatRecovery(false), HeatRecoveryHX(HeatRecoveryHXIdeal), HeatRecoveryConfig(HeatRecoveryConfigPlant), HXUA(0.0),
+              Effectiveness(0.0), RecoveryRate(0.0), RecoveryEnergy(0.0), MainsMassFlowRate(0.0), TankMassFlowRate(0.0), ColdMassFlowRate(0.0),
+              HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), RecoveryMassFlowRate(0.0), PeakVolFlowRate(0.0),
+              MainsVolFlowRate(0.0), TankVolFlowRate(0.0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0), DrainVolFlowRate(0.0),
+              PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0), ColdSupplyTemp(0.0), ColdTemp(0.0),
+              HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0), MainsVolume(0.0), TankVolume(0.0),
+              ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0), MaxIterationsErrorIndex(0),
+              PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0)
+        {
+        }
+    };
 
-		// Default Constructor
-		WaterConnectionsType() :
-			Init( true ),
-			InitSizing( true ),
-			StandAlone( false ),
-			InletNode( 0 ),
-			OutletNode( 0 ),
-			SupplyTankNum( 0 ),
-			RecoveryTankNum( 0 ),
-			TankDemandID( 0 ),
-			TankSupplyID( 0 ),
-			HeatRecovery( false ),
-			HeatRecoveryHX( HeatRecoveryHXIdeal ),
-			HeatRecoveryConfig( HeatRecoveryConfigPlant ),
-			HXUA( 0.0 ),
-			Effectiveness( 0.0 ),
-			RecoveryRate( 0.0 ),
-			RecoveryEnergy( 0.0 ),
-			MainsMassFlowRate( 0.0 ),
-			TankMassFlowRate( 0.0 ),
-			ColdMassFlowRate( 0.0 ),
-			HotMassFlowRate( 0.0 ),
-			TotalMassFlowRate( 0.0 ),
-			DrainMassFlowRate( 0.0 ),
-			RecoveryMassFlowRate( 0.0 ),
-			PeakVolFlowRate( 0.0 ),
-			MainsVolFlowRate( 0.0 ),
-			TankVolFlowRate( 0.0 ),
-			ColdVolFlowRate( 0.0 ),
-			HotVolFlowRate( 0.0 ),
-			TotalVolFlowRate( 0.0 ),
-			DrainVolFlowRate( 0.0 ),
-			PeakMassFlowRate( 0.0 ),
-			ColdTempSchedule( 0 ),
-			HotTempSchedule( 0 ),
-			MainsTemp( 0.0 ),
-			TankTemp( 0.0 ),
-			ColdSupplyTemp( 0.0 ),
-			ColdTemp( 0.0 ),
-			HotTemp( 0.0 ),
-			DrainTemp( 0.0 ),
-			RecoveryTemp( 0.0 ),
-			ReturnTemp( 0.0 ),
-			WasteTemp( 0.0 ),
-			TempError( 0.0 ),
-			MainsVolume( 0.0 ),
-			TankVolume( 0.0 ),
-			ColdVolume( 0.0 ),
-			HotVolume( 0.0 ),
-			TotalVolume( 0.0 ),
-			Power( 0.0 ),
-			Energy( 0.0 ),
-			NumWaterEquipment( 0 ),
-			MaxIterationsErrorIndex( 0 ),
-			PlantLoopNum( 0 ),
-			PlantLoopSide( 0 ),
-			PlantLoopBranchNum( 0 ),
-			PlantLoopCompNum( 0 )
-		{}
+    // Object Data
+    extern Array1D<WaterEquipmentType> WaterEquipment;
+    extern Array1D<WaterConnectionsType> WaterConnections;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< WaterEquipmentType > WaterEquipment;
-	extern Array1D< WaterConnectionsType > WaterConnections;
+    void clear_state();
 
-	// Functions
+    void SimulateWaterUse(bool const FirstHVACIteration);
 
-	void
-	clear_state();
+    void SimulateWaterUseConnection(
+        int const EquipTypeNum, std::string const &CompName, int &CompIndex, bool const InitLoopEquip, bool const FirstHVACIteration);
 
-	void
-	SimulateWaterUse( bool const FirstHVACIteration );
+    void GetWaterUseInput();
 
-	void
-	SimulateWaterUseConnection(
-		int const EquipTypeNum,
-		std::string const & CompName,
-		int & CompIndex,
-		bool const InitLoopEquip,
-		bool const FirstHVACIteration
-	);
+    void CalcEquipmentFlowRates(int const WaterEquipNum);
 
-	void
-	GetWaterUseInput();
+    void CalcEquipmentDrainTemp(int const WaterEquipNum);
 
-	void
-	CalcEquipmentFlowRates( int const WaterEquipNum );
+    void InitConnections(int const WaterConnNum);
 
-	void
-	CalcEquipmentDrainTemp( int const WaterEquipNum );
+    void CalcConnectionsFlowRates(int const WaterConnNum, bool const FirstHVACIteration);
 
-	void
-	InitConnections( int const WaterConnNum );
+    void CalcConnectionsDrainTemp(int const WaterConnNum);
 
-	void
-	CalcConnectionsFlowRates(
-		int const WaterConnNum,
-		bool const FirstHVACIteration
-	);
+    void CalcConnectionsHeatRecovery(int const WaterConnNum);
 
-	void
-	CalcConnectionsDrainTemp( int const WaterConnNum );
+    void UpdateWaterConnections(int const WaterConnNum);
 
-	void
-	CalcConnectionsHeatRecovery( int const WaterConnNum );
+    void ReportStandAloneWaterUse();
 
-	void
-	UpdateWaterConnections( int const WaterConnNum );
+    void ReportWaterUse(int const WaterConnNum);
 
-	void
-	ReportStandAloneWaterUse();
+    void CalcWaterUseZoneGains();
 
-	void
-	ReportWaterUse( int const WaterConnNum );
+} // namespace WaterUse
 
-	void
-	CalcWaterUseZoneGains();
-
-} // WaterUse
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

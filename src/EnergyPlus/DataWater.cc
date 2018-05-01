@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,89 +46,90 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataWater.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataWater.hh>
 
 namespace EnergyPlus {
 
 namespace DataWater {
 
-	// Module containing the routines dealing with the DataWater
+    // Module containing the routines dealing with the DataWater
 
-	// MODULE INFORMATION:
-	//       AUTHOR         B. Griffith
-	//       DATE WRITTEN   August 2006
-	//       MODIFIED       D. Sailor -- to add ecoroof irrigation
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         B. Griffith
+    //       DATE WRITTEN   August 2006
+    //       MODIFIED       D. Sailor -- to add ecoroof irrigation
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This data-only module is a repository for the variables that relate specifically
-	// to the management of water in the simulation
+    // PURPOSE OF THIS MODULE:
+    // This data-only module is a repository for the variables that relate specifically
+    // to the management of water in the simulation
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
+    // METHODOLOGY EMPLOYED:
+    // <description>
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// OTHER NOTES:
-	// na
+    // OTHER NOTES:
+    // na
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLI
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLI
 
-	// MODULE PARAMETER DEFINITION
+    // MODULE PARAMETER DEFINITION
 
-	int const ScheduledTankTemp( 101 ); // tank water temperature is user input via schedule
-	int const TankZoneThermalCoupled( 102 ); // tank water temperature is modeled using simple UA
+    int const ScheduledTankTemp(101);      // tank water temperature is user input via schedule
+    int const TankZoneThermalCoupled(102); // tank water temperature is modeled using simple UA
 
-	int const RainSchedDesign( 201 ); // mode of Rainfall determination is Scheduled Design
-	int const IrrSchedDesign( 202 ); // mode of Irrigation determination is Scheduled Design (DJS -PSU)
-	int const IrrSmartSched( 203 ); // mode of irrigation DJS - PSU
+    int const RainSchedDesign(201); // mode of Rainfall determination is Scheduled Design
+    int const IrrSchedDesign(202);  // mode of Irrigation determination is Scheduled Design (DJS -PSU)
+    int const IrrSmartSched(203);   // mode of irrigation DJS - PSU
 
-	int const ConstantRainLossFactor( 301 );
-	int const ScheduledRainLossFactor( 302 );
+    int const ConstantRainLossFactor(301);
+    int const ScheduledRainLossFactor(302);
 
-	int const AmbientTempSchedule( 1 ); // ambient temperature around tank (or HPWH inlet air) is scheduled
-	int const AmbientTempZone( 2 ); // tank is located in a zone or HPWH inlet air is zone air only
-	int const AmbientTempExterior( 3 ); // tank is located outdoors or HPWH inlet air is outdoor air only
+    int const AmbientTempSchedule(1); // ambient temperature around tank (or HPWH inlet air) is scheduled
+    int const AmbientTempZone(2);     // tank is located in a zone or HPWH inlet air is zone air only
+    int const AmbientTempExterior(3); // tank is located outdoors or HPWH inlet air is outdoor air only
 
-	int const ConstantWaterTable( 401 );
-	int const ScheduledWaterTable( 402 );
+    int const ConstantWaterTable(401);
+    int const ScheduledWaterTable(402);
 
-	int const NoControlLevel( 501 );
-	int const MainsFloatValve( 502 );
-	int const WellFloatValve( 503 );
-	int const WellFloatMainsBackup( 504 );
-	int const OtherTankFloatValve( 505 );
-	int const TankMainsBackup( 506 );
+    int const NoControlLevel(501);
+    int const MainsFloatValve(502);
+    int const WellFloatValve(503);
+    int const WellFloatMainsBackup(504);
+    int const OtherTankFloatValve(505);
+    int const TankMainsBackup(506);
 
-	int const OverflowDiscarded( 601 );
-	int const OverflowToTank( 602 );
+    int const OverflowDiscarded(601);
+    int const OverflowToTank(602);
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	int NumWaterStorageTanks( 0 ); // number of water Storage tanks in model
-	int NumRainCollectors( 0 ); // number of rainfall collectors in model
-	int NumGroundWaterWells( 0 ); // number of
-	int NumSiteRainFall( 0 );
-	int NumIrrigation( 0 ); // DJS PSU Dec 2006 number of irrigation descriptions (1 allowed)
-	bool AnyWaterSystemsInModel( false ); // control flag set true if any water systems
-	bool WaterSystemGetInputCalled( false ); // set true once input data gotten.
-	bool AnyIrrigationInModel( false ); // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
+    // MODULE VARIABLE DECLARATIONS:
+    int NumWaterStorageTanks(0); // number of water Storage tanks in model
+    int NumRainCollectors(0);    // number of rainfall collectors in model
+    int NumGroundWaterWells(0);  // number of
+    int NumSiteRainFall(0);
+    int NumIrrigation(0);                  // DJS PSU Dec 2006 number of irrigation descriptions (1 allowed)
+    bool AnyWaterSystemsInModel(false);    // control flag set true if any water systems
+    bool WaterSystemGetInputCalled(false); // set true once input data gotten.
+    bool AnyIrrigationInModel(false);      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
 
-	// Object Data
-	SiteRainFallDataStruct RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
-	IrrigationDataStruct Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-	Array1D< StorageTankDataStruct > WaterStorage;
-	Array1D< RainfallCollectorDataStruct > RainCollector;
-	Array1D< GroundwaterWellDataStruct > GroundwaterWell;
+    // Object Data
+    SiteRainFallDataStruct
+        RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
+    IrrigationDataStruct Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
+    Array1D<StorageTankDataStruct> WaterStorage;
+    Array1D<RainfallCollectorDataStruct> RainCollector;
+    Array1D<GroundwaterWellDataStruct> GroundwaterWell;
 
-} // DataWater
+} // namespace DataWater
 
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,75 +52,66 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace HVACDuct {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumDucts;
-	extern Array1D_bool CheckEquipName;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumDucts;
+    extern Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
-	// <name Public routines, optionally name Private routines within this module>
+    // <name Public routines, optionally name Private routines within this module>
 
-	// Types
+    // Types
 
-	struct DuctData
-	{
-		// Members
-		std::string Name; // duct unique name
-		int InletNodeNum; // inlet node number
-		int OutletNodeNum; // outlet node number
+    struct DuctData
+    {
+        // Members
+        std::string Name;  // duct unique name
+        int InletNodeNum;  // inlet node number
+        int OutletNodeNum; // outlet node number
 
-		// Default Constructor
-		DuctData() :
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 )
-		{}
+        // Default Constructor
+        DuctData() : InletNodeNum(0), OutletNodeNum(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<DuctData> Duct;
 
-	// Object Data
-	extern Array1D< DuctData > Duct;
+    // Functions
 
-	// Functions
+    void SimDuct(std::string const &CompName,   // name of the duct component
+                 bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
+                 int &CompIndex                 // index of duct component
+    );
 
-	void
-	SimDuct(
-		std::string const & CompName, // name of the duct component
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
-		int & CompIndex // index of duct component
-	);
+    void GetDuctInput();
 
-	void
-	GetDuctInput();
+    void InitDuct(int const DuctNum); // number of the current duct being simulated
 
-	void
-	InitDuct( int const DuctNum ); // number of the current duct being simulated
+    void CalcDuct(int const DuctNum); // number of the current duct being simulated !unused1208
 
-	void
-	CalcDuct( int const DuctNum ); // number of the current duct being simulated !unused1208
+    void UpdateDuct(int const DuctNum); // number of the current duct being simulated
 
-	void
-	UpdateDuct( int const DuctNum ); // number of the current duct being simulated
+    void ReportDuct(int const DuctNum); // number of the current duct being simulated !unused1208
 
-	void
-	ReportDuct( int const DuctNum ); // number of the current duct being simulated !unused1208
+} // namespace HVACDuct
 
-} // HVACDuct
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

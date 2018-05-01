@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,197 +59,142 @@ namespace EnergyPlus {
 
 namespace HeatBalanceHAMTManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	extern int const ittermax; // Maximum Number of itterations
-	extern int const adjmax; // Maximum Number of Adjacent Cells
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const ittermax; // Maximum Number of itterations
+    extern int const adjmax;   // Maximum Number of Adjacent Cells
 
-	extern Real64 const wdensity; // Density of water kg.m-3
-	extern Real64 const wspech; // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
-	extern Real64 const whv; // Evaporation enthalpy of water J.kg-1
-	extern Real64 const convt; // Temperature convergence limit
-	extern Real64 const qvplim; // Maximum latent heat W
-	extern Real64 const rhmax; // Maximum RH value
+    extern Real64 const wdensity; // Density of water kg.m-3
+    extern Real64 const wspech;   // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
+    extern Real64 const whv;      // Evaporation enthalpy of water J.kg-1
+    extern Real64 const convt;    // Temperature convergence limit
+    extern Real64 const qvplim;   // Maximum latent heat W
+    extern Real64 const rhmax;    // Maximum RH value
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D_int firstcell;
-	extern Array1D_int lastcell;
-	extern Array1D_int Extcell;
-	extern Array1D_int ExtRadcell;
-	extern Array1D_int ExtConcell;
-	extern Array1D_int ExtSkycell;
-	extern Array1D_int ExtGrncell;
-	extern Array1D_int Intcell;
-	extern Array1D_int IntConcell;
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D_int firstcell;
+    extern Array1D_int lastcell;
+    extern Array1D_int Extcell;
+    extern Array1D_int ExtRadcell;
+    extern Array1D_int ExtConcell;
+    extern Array1D_int ExtSkycell;
+    extern Array1D_int ExtGrncell;
+    extern Array1D_int Intcell;
+    extern Array1D_int IntConcell;
 
-	extern Array1D< Real64 > watertot;
-	extern Array1D< Real64 > surfrh;
-	extern Array1D< Real64 > surfextrh;
-	extern Array1D< Real64 > surftemp;
-	extern Array1D< Real64 > surfexttemp;
-	extern Array1D< Real64 > surfvp;
+    extern Array1D<Real64> watertot;
+    extern Array1D<Real64> surfrh;
+    extern Array1D<Real64> surfextrh;
+    extern Array1D<Real64> surftemp;
+    extern Array1D<Real64> surfexttemp;
+    extern Array1D<Real64> surfvp;
 
-	extern Array1D< Real64 > extvtc; // External Surface vapor transfer coefficient
-	extern Array1D< Real64 > intvtc; // Internal Surface Vapor Transfer Coefficient
-	extern Array1D_bool extvtcflag; // External Surface vapor transfer coefficient flag
-	extern Array1D_bool intvtcflag; // Internal Surface Vapor Transfer Coefficient flag
-	extern Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
+    extern Array1D<Real64> extvtc;   // External Surface vapor transfer coefficient
+    extern Array1D<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
+    extern Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
+    extern Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
+    extern Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
 
-	extern Real64 deltat; // time step in seconds
+    extern Real64 deltat; // time step in seconds
 
-	extern int TotCellsMax; // Maximum number of cells per material
+    extern int TotCellsMax; // Maximum number of cells per material
 
-	extern bool latswitch; // latent heat switch,
-	extern bool rainswitch; // rain switch,
+    extern bool latswitch;  // latent heat switch,
+    extern bool rainswitch; // rain switch,
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
 
-	// Types
+    // Types
 
-	struct subcell
-	{
-		// Members
-		int matid; // Material Id Number
-		int sid; // Surface Id Number
-		Real64 Qadds; // Additional sources of heat
-		Real64 density; // Density
-		Real64 wthermalc; // Moisture Dependant Thermal Conductivity
-		Real64 spech; // Specific Heat capacity
-		Real64 htc; // Heat Transfer Coefficient
-		Real64 vtc; // Vapor Transfer Coefficient
-		Real64 mu; // Vapor Diffusion resistance Factor
-		Real64 volume; // Cell Volume
-		Real64 temp;
-		Real64 tempp1;
-		Real64 tempp2;
-		Real64 wreport; // Water content for reporting
-		Real64 water; // Water Content of cells
-		Real64 vp; // Vapor Pressure
-		Real64 vpp1; // Vapor Pressure
-		Real64 vpsat; // Saturation Vapor Pressure
-		Real64 rh;
-		Real64 rhp1;
-		Real64 rhp2; // Relative Humidity
-		Real64 rhp; // cell relative humidity (percent - reporting)
-		Real64 dwdphi; // Moisture storage capacity
-		Real64 dw; // Liquid transport Coefficient
-		Array1D< Real64 > origin; // Cell origin. The geometric centre of the cell.
-		Array1D< Real64 > length; // Cell lengths
-		Array1D< Real64 > overlap; // Area of overlap
-		Array1D< Real64 > dist; // distance between cell origins
-		Array1D_int adjs;
-		Array1D_int adjsl;
+    struct subcell
+    {
+        // Members
+        int matid;        // Material Id Number
+        int sid;          // Surface Id Number
+        Real64 Qadds;     // Additional sources of heat
+        Real64 density;   // Density
+        Real64 wthermalc; // Moisture Dependant Thermal Conductivity
+        Real64 spech;     // Specific Heat capacity
+        Real64 htc;       // Heat Transfer Coefficient
+        Real64 vtc;       // Vapor Transfer Coefficient
+        Real64 mu;        // Vapor Diffusion resistance Factor
+        Real64 volume;    // Cell Volume
+        Real64 temp;
+        Real64 tempp1;
+        Real64 tempp2;
+        Real64 wreport; // Water content for reporting
+        Real64 water;   // Water Content of cells
+        Real64 vp;      // Vapor Pressure
+        Real64 vpp1;    // Vapor Pressure
+        Real64 vpsat;   // Saturation Vapor Pressure
+        Real64 rh;
+        Real64 rhp1;
+        Real64 rhp2;             // Relative Humidity
+        Real64 rhp;              // cell relative humidity (percent - reporting)
+        Real64 dwdphi;           // Moisture storage capacity
+        Real64 dw;               // Liquid transport Coefficient
+        Array1D<Real64> origin;  // Cell origin. The geometric centre of the cell.
+        Array1D<Real64> length;  // Cell lengths
+        Array1D<Real64> overlap; // Area of overlap
+        Array1D<Real64> dist;    // distance between cell origins
+        Array1D_int adjs;
+        Array1D_int adjsl;
 
-		// Default Constructor
-		subcell() :
-			matid( -1 ),
-			sid( -1 ),
-			Qadds( 0.0 ),
-			density( -1.0 ),
-			wthermalc( 0.0 ),
-			spech( 0.0 ),
-			htc( -1.0 ),
-			vtc( -1.0 ),
-			mu( -1.0 ),
-			volume( 0.0 ),
-			temp( 0.0 ),
-			tempp1( 0.0 ),
-			tempp2( 0.0 ),
-			wreport( 0.0 ),
-			water( 0.0 ),
-			vp( 0.0 ),
-			vpp1( 0.0 ),
-			vpsat( 0.0 ),
-			rh( 0.1 ),
-			rhp1( 0.1 ),
-			rhp2( 0.1 ),
-			rhp( 10.0 ),
-			dwdphi( -1.0 ),
-			dw( -1.0 ),
-			origin( 3, 0.0 ),
-			length( 3, 0.0 ),
-			overlap( 6, 0.0 ),
-			dist( 6, 0.0 ),
-			adjs( 6, 0 ),
-			adjsl( 6, 0 )
-		{}
+        // Default Constructor
+        subcell()
+            : matid(-1), sid(-1), Qadds(0.0), density(-1.0), wthermalc(0.0), spech(0.0), htc(-1.0), vtc(-1.0), mu(-1.0), volume(0.0), temp(0.0),
+              tempp1(0.0), tempp2(0.0), wreport(0.0), water(0.0), vp(0.0), vpp1(0.0), vpsat(0.0), rh(0.1), rhp1(0.1), rhp2(0.1), rhp(10.0),
+              dwdphi(-1.0), dw(-1.0), origin(3, 0.0), length(3, 0.0), overlap(6, 0.0), dist(6, 0.0), adjs(6, 0), adjsl(6, 0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<subcell> cells;
 
-	// Object Data
-	extern Array1D< subcell > cells;
+    // Functions
 
-	// Functions
+    void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
-	void
-	ManageHeatBalHAMT(
-		int const SurfNum,
-		Real64 & TempSurfInTmp,
-		Real64 & TempSurfOutTmp
-	);
+    void GetHeatBalHAMTInput();
 
-	void
-	GetHeatBalHAMTInput();
+    void InitHeatBalHAMT();
 
-	void
-	InitHeatBalHAMT();
+    void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
-	void
-	CalcHeatBalHAMT(
-		int const sid,
-		Real64 & TempSurfInTmp,
-		Real64 & TempSurfOutTmp
-	);
+    void UpdateHeatBalHAMT(int const sid);
 
-	void
-	UpdateHeatBalHAMT( int const sid );
+    void
+    interp(int const ndata, Array1A<Real64> const xx, Array1A<Real64> const yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
 
-	void
-	interp(
-		int const ndata,
-		Array1A< Real64 > const xx,
-		Array1A< Real64 > const yy,
-		Real64 const invalue,
-		Real64 & outvalue,
-		Optional< Real64 > outgrad = _
-	);
+    Real64 RHtoVP(Real64 const RH, Real64 const Temperature);
 
-	Real64
-	RHtoVP(
-		Real64 const RH,
-		Real64 const Temperature
-	);
+    Real64 WVDC(Real64 const Temperature, Real64 const ambp);
 
-	Real64
-	WVDC(
-		Real64 const Temperature,
-		Real64 const ambp
-	);
+    //                                 COPYRIGHT NOTICE
 
-	//                                 COPYRIGHT NOTICE
+    //     Portions Copyright (c) University College London 2007.  All rights
+    //     reserved.
 
-	//     Portions Copyright (c) University College London 2007.  All rights
-	//     reserved.
+    //     UCL LEGAL NOTICE
+    //     Neither UCL, members of UCL nor any person or organisation acting on
+    //     behalf of either:
 
-	//     UCL LEGAL NOTICE
-	//     Neither UCL, members of UCL nor any person or organisation acting on
-	//     behalf of either:
+    //     A. Makes any warranty of representation, express or implied with
+    //        respect to the accuracy, completeness, or usefulness of the
+    //        information contained in this program, including any warranty of
+    //        merchantability or fitness of any purpose with respect to the
+    //        program, or that the use of any information disclosed in this
+    //        program may not infringe privately-owned rights, or
 
-	//     A. Makes any warranty of representation, express or implied with
-	//        respect to the accuracy, completeness, or usefulness of the
-	//        information contained in this program, including any warranty of
-	//        merchantability or fitness of any purpose with respect to the
-	//        program, or that the use of any information disclosed in this
-	//        program may not infringe privately-owned rights, or
+    //     B. Assumes any liability with respect to the use of, or for any and
+    //        all damages resulting from the use of the program or any portion
+    //        thereof or any information disclosed therein.
 
-	//     B. Assumes any liability with respect to the use of, or for any and
-	//        all damages resulting from the use of the program or any portion
-	//        thereof or any information disclosed therein.
+} // namespace HeatBalanceHAMTManager
 
-} // HeatBalanceHAMTManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

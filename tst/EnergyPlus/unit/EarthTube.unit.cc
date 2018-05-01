@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,10 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/EarthTube.hh>
-#include <DataHeatBalFanSys.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <DataEnvironment.hh>
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <DataHeatBalFanSys.hh>
+#include <EnergyPlus/EarthTube.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
@@ -67,78 +66,75 @@ using namespace DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 
 namespace EnergyPlus {
-	
 
-	TEST_F( EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest )
-	{
+TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
+{
 
-	// AUTHOR: R. Strand, UIUC
-	// DATE WRITTEN: June 2017
-	
-	// Set subroutine arguments
-	int ETnum = 1;
-	int ZNnum = 1;
-	
-	// Set environmental variables for all cases
-	OutHumRat = 0.009;
-	OutBaroPress = 101400.0;
-	
-	// Allocate and set earth tube parameters necessary to run the tests
-	EarthTubeSys.allocate( ETnum );
-	EarthTubeSys( ETnum ).InsideAirTemp = 21.0;
-	EarthTubeSys( ETnum ).FanType = NaturalEarthTube;
-	EarthTubeSys( ETnum ).AirTemp = 20.0;
-	EarthTubeSys( ETnum ).FanPower = 0.05;
+    // AUTHOR: R. Strand, UIUC
+    // DATE WRITTEN: June 2017
 
-	// Allocate and set any zone variables necessary to run the tests
-	MCPE.allocate( ZNnum );
-	MCPTE.allocate( ZNnum );
-	EAMFL.allocate( ZNnum );
-	EAMFLxHumRat.allocate( ZNnum );
-	MCPE( ZNnum ) = 0.05;
-	EAMFL( ZNnum ) = 0.05;
-	
-	// First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-	CalcEarthTubeHumRat( ETnum, ZNnum );
-	EXPECT_EQ( EarthTubeSys( ETnum ).HumRat, OutHumRat );
+    // Set subroutine arguments
+    int ETnum = 1;
+    int ZNnum = 1;
 
-	// Second case--condensation so inside humidity should be less than outdoor humidity ratio
-	EarthTubeSys( ETnum ).InsideAirTemp = 10.0;
-	CalcEarthTubeHumRat( ETnum, ZNnum );
-	EXPECT_GT( OutHumRat, EarthTubeSys( ETnum ).HumRat );
-		
-	}
-	
-	TEST_F( EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest )
-	{
-			
-	// AUTHOR: R. Strand, UIUC
-	// DATE WRITTEN: June 2017
-			
-	// Set subroutine arguments
-	std::string ZoneName = "ZONE 1";
-	std::string InputName = "ZoneEarthtube";
-	bool ErrorsFound = false;
-	
-	// Allocate and set earth tube parameters necessary to run the tests
-	TotEarthTube = 3;
-	EarthTubeSys.allocate( TotEarthTube );
-	EarthTubeSys( 1 ).ZonePtr = 1;
-	EarthTubeSys( 2 ).ZonePtr = 2;
-	EarthTubeSys( 3 ).ZonePtr = 3;
-	
-	// First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
-	CheckEarthTubesInZones( ZoneName, InputName, ErrorsFound );
-	EXPECT_EQ( ErrorsFound, false );
+    // Set environmental variables for all cases
+    OutHumRat = 0.009;
+    OutBaroPress = 101400.0;
 
-	// Second case--conflict with the last earth tube and first (ErrorsFound = true)
-	EarthTubeSys( 3 ).ZonePtr = 1;
-	CheckEarthTubesInZones( ZoneName, InputName, ErrorsFound );
-	EXPECT_EQ( ErrorsFound, true );
-	
-	EarthTubeSys.deallocate();
-	TotEarthTube = 0;
-	
-	}
-	
+    // Allocate and set earth tube parameters necessary to run the tests
+    EarthTubeSys.allocate(ETnum);
+    EarthTubeSys(ETnum).InsideAirTemp = 21.0;
+    EarthTubeSys(ETnum).FanType = NaturalEarthTube;
+    EarthTubeSys(ETnum).AirTemp = 20.0;
+    EarthTubeSys(ETnum).FanPower = 0.05;
+
+    // Allocate and set any zone variables necessary to run the tests
+    MCPE.allocate(ZNnum);
+    MCPTE.allocate(ZNnum);
+    EAMFL.allocate(ZNnum);
+    EAMFLxHumRat.allocate(ZNnum);
+    MCPE(ZNnum) = 0.05;
+    EAMFL(ZNnum) = 0.05;
+
+    // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
+    CalcEarthTubeHumRat(ETnum, ZNnum);
+    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, OutHumRat);
+
+    // Second case--condensation so inside humidity should be less than outdoor humidity ratio
+    EarthTubeSys(ETnum).InsideAirTemp = 10.0;
+    CalcEarthTubeHumRat(ETnum, ZNnum);
+    EXPECT_GT(OutHumRat, EarthTubeSys(ETnum).HumRat);
 }
+
+TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
+{
+
+    // AUTHOR: R. Strand, UIUC
+    // DATE WRITTEN: June 2017
+
+    // Set subroutine arguments
+    std::string ZoneName = "ZONE 1";
+    std::string InputName = "ZoneEarthtube";
+    bool ErrorsFound = false;
+
+    // Allocate and set earth tube parameters necessary to run the tests
+    TotEarthTube = 3;
+    EarthTubeSys.allocate(TotEarthTube);
+    EarthTubeSys(1).ZonePtr = 1;
+    EarthTubeSys(2).ZonePtr = 2;
+    EarthTubeSys(3).ZonePtr = 3;
+
+    // First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
+    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    EXPECT_EQ(ErrorsFound, false);
+
+    // Second case--conflict with the last earth tube and first (ErrorsFound = true)
+    EarthTubeSys(3).ZonePtr = 1;
+    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    EXPECT_EQ(ErrorsFound, true);
+
+    EarthTubeSys.deallocate();
+    TotEarthTube = 0;
+}
+
+} // namespace EnergyPlus

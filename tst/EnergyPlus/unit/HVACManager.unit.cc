@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,80 +53,77 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <Fixtures/EnergyPlusFixture.hh>
-#include <DataHeatBalance.hh>
-#include <General.hh>
-#include <HVACManager.hh>
 #include <DataEnvironment.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataZoneEquipment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
+#include <DataHeatBalFanSys.hh>
+#include <DataHeatBalance.hh>
+#include <DataZoneEquipment.hh>
+#include <Fixtures/EnergyPlusFixture.hh>
+#include <General.hh>
+#include <HVACManager.hh>
 
 using namespace EnergyPlus;
 using namespace HVACManager;
 
+TEST_F(EnergyPlusFixture, CrossMixingReportTest)
+{
 
-TEST_F( EnergyPlusFixture, CrossMixingReportTest ) {
+    // Test for #5007
+    int NumOfZones = 2;
+    int NumOfCrossMixing = 1;
 
-	// Test for #5007
-	int NumOfZones = 2;
-	int NumOfCrossMixing = 1;
+    DataHeatBalance::Zone.allocate(NumOfZones);
+    DataHeatBalFanSys::MAT.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(NumOfZones);
+    DataHeatBalance::CrossMixing.allocate(NumOfCrossMixing);
+    DataHeatBalance::ZnAirRpt.allocate(NumOfZones);
+    DataZoneEquipment::CrossMixingReportFlag.allocate(NumOfCrossMixing);
+    DataHeatBalFanSys::MCPI.allocate(NumOfZones);
+    DataHeatBalFanSys::MCPV.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
 
-	DataHeatBalance::Zone.allocate( NumOfZones );
-	DataHeatBalFanSys::MAT.allocate( NumOfZones );
-	DataHeatBalFanSys::ZoneAirHumRat.allocate( NumOfZones );
-	DataHeatBalance::CrossMixing.allocate( NumOfCrossMixing );
-	DataHeatBalance::ZnAirRpt.allocate( NumOfZones );
-	DataZoneEquipment::CrossMixingReportFlag.allocate( NumOfCrossMixing );
-	DataHeatBalFanSys::MCPI.allocate( NumOfZones );
-	DataHeatBalFanSys::MCPV.allocate( NumOfZones );
-	DataHeatBalFanSys::ZoneAirHumRatAvg.allocate( NumOfZones );
+    DataGlobals::NumOfZones = NumOfZones;
+    DataHeatBalance::TotCrossMixing = NumOfCrossMixing;
+    DataZoneEquipment::CrossMixingReportFlag(1) = true;
+    DataHVACGlobals::TimeStepSys = 1.0;
+    DataHeatBalFanSys::MCPI = 0.0;
+    DataHeatBalFanSys::MCPV = 0.0;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataHeatBalFanSys::MAT(1) = 22.0;
+    DataHeatBalFanSys::MAT(2) = 25.0;
+    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
+    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
+    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    DataEnvironment::StdRhoAir = 1.20;
 
-	DataGlobals::NumOfZones = NumOfZones;
-	DataHeatBalance::TotCrossMixing = NumOfCrossMixing;
-	DataZoneEquipment::CrossMixingReportFlag( 1 ) = true;
-	DataHVACGlobals::TimeStepSys = 1.0;
-	DataHeatBalFanSys::MCPI = 0.0;
-	DataHeatBalFanSys::MCPV = 0.0;
-	DataEnvironment::OutBaroPress = 101325.0;
-	DataHeatBalFanSys::MAT( 1 ) = 22.0;
-	DataHeatBalFanSys::MAT( 2 ) = 25.0;
-	DataHeatBalFanSys::ZoneAirHumRat( 1 ) = 0.001;
-	DataHeatBalFanSys::ZoneAirHumRat( 2 ) = 0.0011;
-	DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-	DataEnvironment::StdRhoAir = 1.20;
+    DataHeatBalance::CrossMixing(1).ZonePtr = 1;
+    DataHeatBalance::CrossMixing(1).FromZone = 2;
+    DataHeatBalance::CrossMixing(1).DesiredAirFlowRate = 0.1;
 
-	DataHeatBalance::CrossMixing( 1 ).ZonePtr = 1;
-	DataHeatBalance::CrossMixing( 1 ).FromZone = 2;
-	DataHeatBalance::CrossMixing( 1 ).DesiredAirFlowRate = 0.1;
+    // Call HVACManager
+    ReportAirHeatBalance();
 
-	// Call HVACManager
-	ReportAirHeatBalance( );
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVolume, DataHeatBalance::ZnAirRpt(2).MixVolume, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVdotCurDensity, DataHeatBalance::ZnAirRpt(2).MixVdotCurDensity, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVdotStdDensity, DataHeatBalance::ZnAirRpt(2).MixVdotStdDensity, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixMass, DataHeatBalance::ZnAirRpt(2).MixMass, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixMdot, DataHeatBalance::ZnAirRpt(2).MixMdot, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixHeatLoss, DataHeatBalance::ZnAirRpt(2).MixHeatGain, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixHeatGain, DataHeatBalance::ZnAirRpt(2).MixHeatLoss, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixLatentLoss, DataHeatBalance::ZnAirRpt(2).MixLatentGain, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixLatentGain, DataHeatBalance::ZnAirRpt(2).MixLatentLoss, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixTotalLoss, DataHeatBalance::ZnAirRpt(2).MixTotalGain, 0.0001);
+    EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixTotalGain, DataHeatBalance::ZnAirRpt(2).MixTotalLoss, 0.0001);
 
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixVolume, DataHeatBalance::ZnAirRpt( 2 ).MixVolume, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixVdotCurDensity, DataHeatBalance::ZnAirRpt( 2 ).MixVdotCurDensity, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixVdotStdDensity, DataHeatBalance::ZnAirRpt( 2 ).MixVdotStdDensity, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixMass, DataHeatBalance::ZnAirRpt( 2 ).MixMass, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixMdot, DataHeatBalance::ZnAirRpt( 2 ).MixMdot, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixHeatLoss, DataHeatBalance::ZnAirRpt( 2 ).MixHeatGain, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixHeatGain, DataHeatBalance::ZnAirRpt( 2 ).MixHeatLoss, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixLatentLoss, DataHeatBalance::ZnAirRpt( 2 ).MixLatentGain, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixLatentGain, DataHeatBalance::ZnAirRpt( 2 ).MixLatentLoss, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixTotalLoss, DataHeatBalance::ZnAirRpt( 2 ).MixTotalGain, 0.0001 );
-	EXPECT_NEAR( DataHeatBalance::ZnAirRpt( 1 ).MixTotalGain, DataHeatBalance::ZnAirRpt( 2 ).MixTotalLoss, 0.0001 );
-
-	// Cleanup
-	DataHeatBalance::Zone.deallocate( );
-	DataHeatBalFanSys::MAT.deallocate( );
-	DataHeatBalFanSys::ZoneAirHumRat.deallocate( );
-	DataHeatBalance::CrossMixing.deallocate( );
-	DataHeatBalance::ZnAirRpt.deallocate( );
-	DataZoneEquipment::CrossMixingReportFlag.deallocate( );
-	DataHeatBalFanSys::MCPI.deallocate( );
-	DataHeatBalFanSys::MCPV.deallocate( );
-	DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate( );
-
+    // Cleanup
+    DataHeatBalance::Zone.deallocate();
+    DataHeatBalFanSys::MAT.deallocate();
+    DataHeatBalFanSys::ZoneAirHumRat.deallocate();
+    DataHeatBalance::CrossMixing.deallocate();
+    DataHeatBalance::ZnAirRpt.deallocate();
+    DataZoneEquipment::CrossMixingReportFlag.deallocate();
+    DataHeatBalFanSys::MCPI.deallocate();
+    DataHeatBalFanSys::MCPV.deallocate();
+    DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate();
 }
-
-

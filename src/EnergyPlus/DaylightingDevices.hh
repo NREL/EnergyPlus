@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,73 +58,56 @@ namespace EnergyPlus {
 
 namespace DaylightingDevices {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS: na
-	// DERIVED TYPE DEFINITIONS: na
-	// MODULE VARIABLE TYPE DECLARATIONS: na
+    // Data
+    // MODULE PARAMETER DEFINITIONS: na
+    // DERIVED TYPE DEFINITIONS: na
+    // MODULE VARIABLE TYPE DECLARATIONS: na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D< Real64 > COSAngle; // List of cosines of incident angle
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D<Real64> COSAngle; // List of cosines of incident angle
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Functions
+    // Functions
 
-	void
-	InitDaylightingDevices();
+    void InitDaylightingDevices();
 
-	void
-	GetTDDInput();
+    void GetTDDInput();
 
-	void
-	GetShelfInput();
+    void GetShelfInput();
 
-	Real64
-	CalcPipeTransBeam(
-		Real64 const R, // Reflectance of surface, constant (can be made R = f(theta) later)
-		Real64 const A, // Aspect ratio, L / d
-		Real64 const Theta // Angle of entry in radians
-	);
+    Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
+                             Real64 const A,    // Aspect ratio, L / d
+                             Real64 const Theta // Angle of entry in radians
+    );
 
-	Real64
-	CalcTDDTransSolIso( int const PipeNum ); // TDD pipe object number
+    Real64 CalcTDDTransSolIso(int const PipeNum); // TDD pipe object number
 
-	Real64
-	CalcTDDTransSolHorizon( int const PipeNum ); // TDD pipe object number
+    Real64 CalcTDDTransSolHorizon(int const PipeNum); // TDD pipe object number
 
-	Real64
-	CalcTDDTransSolAniso(
-		int const PipeNum, // TDD pipe object number
-		Real64 const COSI // Cosine of the incident angle
-	);
+    Real64 CalcTDDTransSolAniso(int const PipeNum, // TDD pipe object number
+                                Real64 const COSI  // Cosine of the incident angle
+    );
 
-	Real64
-	TransTDD(
-		int const PipeNum, // TDD pipe object number
-		Real64 const COSI, // Cosine of the incident angle
-		int const RadiationType // Radiation type flag
-	);
+    Real64 TransTDD(int const PipeNum,      // TDD pipe object number
+                    Real64 const COSI,      // Cosine of the incident angle
+                    int const RadiationType // Radiation type flag
+    );
 
-	Real64
-	InterpolatePipeTransBeam(
-		Real64 const COSI, // Cosine of the incident angle
-		Array1A< Real64 > const transBeam // Table of beam transmittance vs. cosine angle
-	);
+    Real64 InterpolatePipeTransBeam(Real64 const COSI,              // Cosine of the incident angle
+                                    Array1A<Real64> const transBeam // Table of beam transmittance vs. cosine angle
+    );
 
-	int
-	FindTDDPipe( int const WinNum );
+    int FindTDDPipe(int const WinNum);
 
-	void
-	DistributeTDDAbsorbedSolar();
+    void DistributeTDDAbsorbedSolar();
 
-	void
-	CalcViewFactorToShelf( int const ShelfNum ); // Daylighting shelf object number
+    void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
 
-	void
-	FigureTDDZoneGains();
+    void FigureTDDZoneGains();
 
-} // DaylightingDevices
+} // namespace DaylightingDevices
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,265 +54,216 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataBSDFWindow.hh>
 #include <DataVectorTypes.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace WindowComplexManager {
 
-	// Using/Aliasing
-	using DataBSDFWindow::BSDFDaylghtPosition;
-	using DataBSDFWindow::BSDFGeomDescr;
-	using DataBSDFWindow::BSDFStateDescr;
-	using DataBSDFWindow::BSDFWindowGeomDescr;
-	using DataBSDFWindow::BSDFWindowInputStruct;
-	using DataBSDFWindow::BasisElemDescr;
-	using DataBSDFWindow::BasisStruct;
-	using DataVectorTypes::Vector;
+    // Using/Aliasing
+    using DataBSDFWindow::BSDFDaylghtPosition;
+    using DataBSDFWindow::BSDFGeomDescr;
+    using DataBSDFWindow::BSDFStateDescr;
+    using DataBSDFWindow::BSDFWindowGeomDescr;
+    using DataBSDFWindow::BSDFWindowInputStruct;
+    using DataBSDFWindow::BasisElemDescr;
+    using DataBSDFWindow::BasisStruct;
+    using DataVectorTypes::Vector;
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	extern Real64 const sigma; // Stefan-Boltzmann constant
-	extern Real64 const PressureDefault;
+    extern Real64 const sigma; // Stefan-Boltzmann constant
+    extern Real64 const PressureDefault;
 
-	extern int const Calculate_Geometry;
-	extern int const Copy_Geometry;
+    extern int const Calculate_Geometry;
+    extern int const Copy_Geometry;
 
-	extern int const TmpLen; // Length increment of temporary arrays
+    extern int const TmpLen; // Length increment of temporary arrays
 
-	extern int const Front_Incident; // Ray identification types
-	extern int const Front_Transmitted;
-	extern int const Front_Reflected;
-	extern int const Back_Incident;
-	extern int const Back_Transmitted;
-	extern int const Back_Reflected;
+    extern int const Front_Incident; // Ray identification types
+    extern int const Front_Transmitted;
+    extern int const Front_Reflected;
+    extern int const Back_Incident;
+    extern int const Back_Transmitted;
+    extern int const Back_Reflected;
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern int NumComplexWind; // Total number of complex windows
+    extern int NumComplexWind; // Total number of complex windows
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE WindowComplexManager:
 
-	// Types
+    // Types
 
-	struct WindowIndex
-	{
-		// Members
-		int NumStates; // No States for this window
-		int SurfNo; // Surface number of window
-		//Real64 Azimuth; // Window surface azimuth
-		//Real64 Tilt; // Window surface tilt
+    struct WindowIndex
+    {
+        // Members
+        int NumStates; // No States for this window
+        int SurfNo;    // Surface number of window
+        // Real64 Azimuth; // Window surface azimuth
+        // Real64 Tilt; // Window surface tilt
 
-		// Default Constructor
-		WindowIndex() :
-			NumStates( 0 )
-		{}
+        // Default Constructor
+        WindowIndex() : NumStates(0)
+        {
+        }
+    };
 
-	};
+    struct WindowStateIndex
+    {
+        // Members
+        int InitInc;      // Flag indicating initialization needed on Incoming basis
+        int IncBasisIndx; // Index of basis list entry for Incoming basis
+        int CopyIncState; // Pointer to state from which geometry can be copied (Incident)
+        int InitTrn;      // Flag indicating initialization needed on Outgoing basis
+        int TrnBasisIndx; // Index of basis list entry for Outgoing basis
+        int CopyTrnState; // Pointer to state from which geometry can be copied (Outgoing)
+        int Konst;        // Index of state descript in Construct array
+        // INTEGER  ::  ThermConst  !Index of state thermal description in Construct array
 
-	struct WindowStateIndex
-	{
-		// Members
-		int InitInc; // Flag indicating initialization needed on Incoming basis
-		int IncBasisIndx; // Index of basis list entry for Incoming basis
-		int CopyIncState; // Pointer to state from which geometry can be copied (Incident)
-		int InitTrn; // Flag indicating initialization needed on Outgoing basis
-		int TrnBasisIndx; // Index of basis list entry for Outgoing basis
-		int CopyTrnState; // Pointer to state from which geometry can be copied (Outgoing)
-		int Konst; // Index of state descript in Construct array
-		//INTEGER  ::  ThermConst  !Index of state thermal description in Construct array
+        // Default Constructor
+        WindowStateIndex()
+        {
+        }
+    };
 
-		// Default Constructor
-		WindowStateIndex()
-		{}
+    // Object Data
+    extern Array1D<BasisStruct> BasisList;
+    extern Array1D<WindowIndex> WindowList;
+    extern Array2D<WindowStateIndex> WindowStateList;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< BasisStruct > BasisList;
-	extern Array1D< WindowIndex > WindowList;
-	extern Array2D< WindowStateIndex > WindowStateList;
+    void clear_state();
 
-	// Functions
+    void InitBSDFWindows();
 
-	void
-	clear_state();
+    void AllocateCFSStateHourlyData(int const iSurf, // Surface number
+                                    int const iState // Complex fenestration state number
+    );
 
-	void
-	InitBSDFWindows();
+    void ExpandComplexState(int const iSurf, // Surface number
+                            int const iConst // Construction number
+    );
 
-	void
-	AllocateCFSStateHourlyData(
-		int const iSurf, // Surface number
-		int const iState // Complex fenestration state number
-	);
+    void CheckCFSStates(int const iSurf); // Surface number
 
-	void
-	ExpandComplexState(
-		int const iSurf, // Surface number
-		int const iConst // Construction number
-	);
+    void InitComplexWindows();
 
-	void
-	CheckCFSStates( int const iSurf ); // Surface number
+    void UpdateComplexWindows();
 
-	void
-	InitComplexWindows();
+    void CFSShadeAndBeamInitialization(int const iSurf, // Window surface number
+                                       int const iState // Window state number
+    );
 
-	void
-	UpdateComplexWindows();
+    void CalculateWindowBeamProperties(int const ISurf,                   // Window surface number
+                                       int const IState,                  // Window state number
+                                       BSDFWindowGeomDescr const &Window, // Window Geometry
+                                       BSDFGeomDescr const &Geom,         // State Geometry
+                                       BSDFStateDescr &State,             // State Description
+                                       int const Hour,                    // Hour number
+                                       int const TS                       // Timestep number
+    );
 
-	void
-	CFSShadeAndBeamInitialization(
-		int const iSurf, // Window surface number
-		int const iState // Window state number
-	);
+    void CalcStaticProperties();
 
-	void
-	CalculateWindowBeamProperties(
-		int const ISurf, // Window surface number
-		int const IState, // Window state number
-		BSDFWindowGeomDescr const & Window, // Window Geometry
-		BSDFGeomDescr const & Geom, // State Geometry
-		BSDFStateDescr & State, // State Description
-		int const Hour, // Hour number
-		int const TS // Timestep number
-	);
+    void CalculateBasisLength(BSDFWindowInputStruct const &Input, // BSDF data input struct for this construction
+                              int const IConst,                   // Construction number of input
+                              int &NBasis                         // Calculated Basis length
+    );
 
-	void
-	CalcStaticProperties();
+    void DetermineMaxBackSurfaces();
 
-	void
-	CalculateBasisLength(
-		BSDFWindowInputStruct const & Input, // BSDF data input struct for this construction
-		int const IConst, // Construction number of input
-		int & NBasis // Calculated Basis length
-	);
+    void ConstructBasis(int const IConst, // Index for accessing Construct array
+                        BasisStruct &Basis);
 
-	void
-	DetermineMaxBackSurfaces();
+    void FillBasisElement(Real64 const Theta, // Central polar angle of element
+                          Real64 const Phi,   // Central azimuthal angle of element
+                          int const Elem,     // Index number of element in basis
+                          BasisElemDescr &BasisElem,
+                          Real64 const LowerTheta, // Lower edge of element (polar angle)
+                          Real64 const UpperTheta, // Upper edge of element (polar angle)
+                          Real64 const DPhi,       // Width of element (azimuthal angle)
+                          int const InputType      // Basis type
+    );
 
-	void
-	ConstructBasis(
-		int const IConst, // Index for accessing Construct array
-		BasisStruct & Basis
-	);
+    void SetupComplexWindowStateGeometry(int const ISurf,             // Surface number of the complex fenestration
+                                         int const IState,            // State number of the complex fenestration state
+                                         int const IConst,            // Pointer to construction for this state
+                                         BSDFWindowGeomDescr &Window, // Window Geometry
+                                         BSDFGeomDescr &Geom,         // State Geometry
+                                         BSDFStateDescr &State        // State Description
+    );
 
-	void
-	FillBasisElement(
-		Real64 const Theta, // Central polar angle of element
-		Real64 const Phi, // Central azimuthal angle of element
-		int const Elem, // Index number of element in basis
-		BasisElemDescr & BasisElem,
-		Real64 const LowerTheta, // Lower edge of element (polar angle)
-		Real64 const UpperTheta, // Upper edge of element (polar angle)
-		Real64 const DPhi, // Width of element (azimuthal angle)
-		int const InputType // Basis type
-	);
+    void CalcWindowStaticProperties(int const ISurf,             // Surface number of the complex fenestration
+                                    int const IState,            // State number of the complex fenestration state
+                                    BSDFWindowGeomDescr &Window, // Window Geometry
+                                    BSDFGeomDescr &Geom,         // State Geometry
+                                    BSDFStateDescr &State        // State Description
+    );
 
-	void
-	SetupComplexWindowStateGeometry(
-		int const ISurf, // Surface number of the complex fenestration
-		int const IState, // State number of the complex fenestration state
-		int const IConst, // Pointer to construction for this state
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
-	);
+    Real64 SkyWeight(Vector const &DirVec); // Direction of the element to be weighted
 
-	void
-	CalcWindowStaticProperties(
-		int const ISurf, // Surface number of the complex fenestration
-		int const IState, // State number of the complex fenestration state
-		BSDFWindowGeomDescr & Window, // Window Geometry
-		BSDFGeomDescr & Geom, // State Geometry
-		BSDFStateDescr & State // State Description
-	);
+    Real64 SkyGndWeight(Vector const &PosVec); // x,y,z(=0) of ground intersection pt
 
-	Real64
-	SkyWeight( Vector const & DirVec ); // Direction of the element to be weighted
+    BSDFDaylghtPosition DaylghtAltAndAzimuth(Vector const &UnitVect); // vector which needs to be converted
 
-	Real64
-	SkyGndWeight( Vector const & PosVec ); // x,y,z(=0) of ground intersection pt
+    Vector WorldVectFromW6(Real64 const Theta, // Polar angle in W6 Coords
+                           Real64 const Phi,   // Azimuthal angle in W6 Coords
+                           int const RadType,  // Type of radiation: Front_Incident, etc.
+                           Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
+                           Real64 const Alpha  // Surface azimuth, radians, world coordinate system
+    );
 
-	BSDFDaylghtPosition
-	DaylghtAltAndAzimuth( Vector const & UnitVect ); // vector which needs to be converted
+    int FindInBasis(Vector const &RayToFind,  // Ray vector direction in world CS
+                    int const RadType,        // Type of radiation: Front_Incident, etc.
+                    int const ISurf,          // Window Surface number
+                    int const IState,         // Complex Fenestration state number
+                    BasisStruct const &Basis, // Complex Fenestration basis root
+                    Real64 &Theta,            // Theta value for ray
+                    Real64 &Phi               // Phi value for ray
+    );
 
-	Vector
-	WorldVectFromW6(
-		Real64 const Theta, // Polar angle in W6 Coords
-		Real64 const Phi, // Azimuthal angle in W6 Coords
-		int const RadType, // Type of radiation: Front_Incident, etc.
-		Real64 const Gamma, // Surface tilt angle, radians, world coordinate system
-		Real64 const Alpha // Surface azimuth, radians, world coordinate system
-	);
+    void W6CoordsFromWorldVect(Vector const &RayVect, // Ray vector direction in world CS
+                               int const RadType,     // Type of radiation: Front_Incident, etc.
+                               Real64 const Gamma,    // Surface tilt angle, world coordinate system
+                               Real64 const Alpha,    // Surface azimuth, world coordinate system
+                               Real64 &Theta,         // Polar angle in W6 Coords
+                               Real64 &Phi            // Azimuthal angle in W6 Coords
+    );
 
-	int
-	FindInBasis(
-		Vector const & RayToFind, // Ray vector direction in world CS
-		int const RadType, // Type of radiation: Front_Incident, etc.
-		int const ISurf, // Window Surface number
-		int const IState, // Complex Fenestration state number
-		BasisStruct const & Basis, // Complex Fenestration basis root
-		Real64 & Theta, // Theta value for ray
-		Real64 & Phi // Phi value for ray
-	);
+    void CalcComplexWindowThermal(int const SurfNum,          // Surface number
+                                  int &ConstrNum,             // Construction number
+                                  Real64 const HextConvCoeff, // Outside air film conductance coefficient
+                                  Real64 &SurfInsideTemp,     // Inside window surface temperature
+                                  Real64 &SurfOutsideTemp,    // Outside surface temperature (C)
+                                  Real64 &SurfOutsideEmiss,
+                                  int const CalcCondition // Calucation condition (summer, winter or no condition)
+    );
 
-	void
-	W6CoordsFromWorldVect(
-		Vector const & RayVect, // Ray vector direction in world CS
-		int const RadType, // Type of radiation: Front_Incident, etc.
-		Real64 const Gamma, // Surface tilt angle, world coordinate system
-		Real64 const Alpha, // Surface azimuth, world coordinate system
-		Real64 & Theta, // Polar angle in W6 Coords
-		Real64 & Phi // Azimuthal angle in W6 Coords
-	);
+    // This function check if gas with molecular weight has already been feed into coefficients and
+    // feed arrays
 
-	void
-	CalcComplexWindowThermal(
-		int const SurfNum, // Surface number
-		int & ConstrNum, // Construction number
-		Real64 const HextConvCoeff, // Outside air film conductance coefficient
-		Real64 & SurfInsideTemp, // Inside window surface temperature
-		Real64 & SurfOutsideTemp, // Outside surface temperature (C)
-		Real64 & SurfOutsideEmiss,
-		int const CalcCondition // Calucation condition (summer, winter or no condition)
-	);
+    void CheckGasCoefs(Real64 const currentWeight, int &indexNumber, Array1A<Real64> wght, bool &feedData);
 
-	// This function check if gas with molecular weight has already been feed into coefficients and
-	// feed arrays
+    int SearchAscTable(Real64 const y,            // Value to be found in the table
+                       int const n,               // Number of values in the table
+                       Array1S<Real64> const ytab // Table of values, monotonic, ascending order
+    );
 
-	void
-	CheckGasCoefs(
-		Real64 const currentWeight,
-		int & indexNumber,
-		Array1A< Real64 > wght,
-		bool & feedData
-	);
+    //=================================================================================================
 
-	int
-	SearchAscTable(
-		Real64 const y, // Value to be found in the table
-		int const n, // Number of values in the table
-		Array1S< Real64 > const ytab // Table of values, monotonic, ascending order
-	);
+    void CrossProduct(Array1A<Real64> A, // Vector components: C = A X B
+                      Array1A<Real64> B,
+                      Array1A<Real64> C);
 
-	//=================================================================================================
+} // namespace WindowComplexManager
 
-	void
-	CrossProduct(
-		Array1A< Real64 > A, // Vector components: C = A X B
-		Array1A< Real64 > B,
-		Array1A< Real64 > C
-	);
-
-} // WindowComplexManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

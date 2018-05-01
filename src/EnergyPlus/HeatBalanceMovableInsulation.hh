@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,35 +55,31 @@ namespace EnergyPlus {
 
 namespace HeatBalanceMovableInsulation {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceMovableInsulation
+    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceMovableInsulation
 
-	// Functions
+    // Functions
 
-	void
-	EvalOutsideMovableInsulation(
-		int const SurfNum, // DO loop counter for surfaces
-		Real64 & HMovInsul, // Resistance or "h" value of movable insulation
-		int & RoughIndexMovInsul, // Roughness index of movable insulation
-		Real64 & AbsExt // Absorptivity of outer most layer
-	);
+    void EvalOutsideMovableInsulation(int const SurfNum,       // DO loop counter for surfaces
+                                      Real64 &HMovInsul,       // Resistance or "h" value of movable insulation
+                                      int &RoughIndexMovInsul, // Roughness index of movable insulation
+                                      Real64 &AbsExt           // Absorptivity of outer most layer
+    );
 
-	void
-	EvalInsideMovableInsulation(
-		int const SurfNum, // DO loop counter for surfaces
-		Real64 & HMovInsul, // Resistance or "h" value of movable insulation
-		Real64 & AbsInt // Inside solar absorptance of movable insulation
-	);
+    void EvalInsideMovableInsulation(int const SurfNum, // DO loop counter for surfaces
+                                     Real64 &HMovInsul, // Resistance or "h" value of movable insulation
+                                     Real64 &AbsInt     // Inside solar absorptance of movable insulation
+    );
 
-} // HeatBalanceMovableInsulation
+} // namespace HeatBalanceMovableInsulation
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -69,9 +69,10 @@
     0.65,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Cooling Coil Setpoint Reset Type
     None,                    !- Heating Coil Setpoint Reset Type
-    ,                        !- Dehumidification Control Type
+    None,                    !- Dehumidification Control Type
+    ,                        !- Dehumidification Control Zone Name
     ,                        !- Dehumidification Setpoint {percent}
-    ,                        !- Humidifier Type
+    None,                    !- Humidifier Type
     ,                        !- Humidifier Availability Schedule Name
     ,                        !- Humidifier Rated Capacity {m3/s}
     ,                        !- Humidifier Rated Electric Power {W}
@@ -425,7 +426,7 @@
 !
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Exercise 2C,             !- Name
@@ -481,7 +482,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Heating 99%, MaxDB= -18.10°C
+! CHICAGO_IL_USA Heating 99%, MaxDB= -18.10Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Heating 99% Conditions,  !- Name
@@ -511,7 +512,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-! CHICAGO_IL_USA Cooling (DB=>MWB) 1%, MaxDB=  31.30°C MWB=  22.80°C
+! CHICAGO_IL_USA Cooling (DB=>MWB) 1%, MaxDB=  31.30Â°C MWB=  22.80Â°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Cooling 1% Conditions DB=>MWB,  !- Name

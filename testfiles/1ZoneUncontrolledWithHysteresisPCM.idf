@@ -14,8 +14,8 @@
 !
 ! Location:                Denver, CO
 !
-! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5�C
-!                          Denver Centennial  Golden CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32�C MWB=15.5�C
+! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5°C
+!                          Denver Centennial  Golden CO USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
 !
 ! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
 !
@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.8;
+  Version,8.9;
 
   Timestep,20;
 
@@ -97,7 +97,7 @@
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
     0.04,                    !- Loads Convergence Tolerance Value
-    0.04,                   !- Temperature Convergence Tolerance Value {deltaC}
+    0.04,                    !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     30,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
@@ -139,7 +139,7 @@
  !  Data Source=ASHRAE 2009 Annual Design Conditions
  ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
  ! Coldest Month=DEC
- ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5�C
+ ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5°C
 
   SizingPeriod:DesignDay,
     Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name
@@ -171,7 +171,7 @@
 
  ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
  ! Hottest Month=JUL
- ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32�C MWB=15.5�C
+ ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32°C MWB=15.5°C
 
   SizingPeriod:DesignDay,
     Denver Centennial  Golden   N Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -230,7 +230,7 @@
 
   MaterialProperty:PhaseChangeHysteresis,
     C5 - 4 IN HW CONCRETE,   !- Name
-    10000,                   !- Latent Heat of Fusion {J/kg}
+    10000,                   !- Latent Heat during the Entire Phase Change Process {J/kg}
     1.5,                     !- Liquid State Thermal Conductivity {W/m-K}
     2200,                    !- Liquid State Density {kg/m3}
     2000,                    !- Liquid State Specific Heat {J/kg-K}
@@ -463,7 +463,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     352,                     !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost
@@ -476,7 +476,7 @@
     EquipmentLevel,          !- Design Level Calculation Method
     -352,                    !- Design Level {W}
     ,                        !- Power per Zone Floor Area {W/m2}
-    ,                        !- Power per Person {W/Person}
+    ,                        !- Power per Person {W/person}
     0,                       !- Fraction Latent
     0,                       !- Fraction Radiant
     0;                       !- Fraction Lost

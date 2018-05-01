@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,74 +55,61 @@ namespace EnergyPlus {
 
 namespace ZoneContaminantPredictorCorrector {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // INTERFACE BLOCK SPECIFICATIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern bool GetZoneAirContamInputFlag; // True when need to get input
-	extern int TotGCGenConstant; // Number of constant generic contaminant sources and sinks
-	extern int TotGCGenPDriven; // Number of pressure driven generic contaminant sources and sinks
-	extern int TotGCGenCutoff; // Number of cutoff model generic contaminant sources and sinks
-	extern int TotGCGenDecay; // Number of decay model generic contaminant sources and sinks
-	extern int TotGCBLDiff; // Number of boudary layer diffusion generic contaminant model
-	extern int TotGCDVS; // Number of deposition velocity sink generic contaminant model
-	extern int TotGCDRS; // Number of deposition rate sink generic contaminant model
+    extern bool GetZoneAirContamInputFlag; // True when need to get input
+    extern int TotGCGenConstant;           // Number of constant generic contaminant sources and sinks
+    extern int TotGCGenPDriven;            // Number of pressure driven generic contaminant sources and sinks
+    extern int TotGCGenCutoff;             // Number of cutoff model generic contaminant sources and sinks
+    extern int TotGCGenDecay;              // Number of decay model generic contaminant sources and sinks
+    extern int TotGCBLDiff;                // Number of boudary layer diffusion generic contaminant model
+    extern int TotGCDVS;                   // Number of deposition velocity sink generic contaminant model
+    extern int TotGCDRS;                   // Number of deposition rate sink generic contaminant model
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Functions
+    // Functions
 
-	void
-	clear_state();
+    void clear_state();
 
-	void
-	ManageZoneContaminanUpdates(
-		int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-		bool const ShortenTimeStepSys,
-		bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-		Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
-	);
+    void ManageZoneContaminanUpdates(int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                                     bool const ShortenTimeStepSys,
+                                     bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                                     Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
+    );
 
-	void
-	GetZoneContaminanInputs();
+    void GetZoneContaminanInputs();
 
-	void
-	GetZoneContaminanSetPoints();
+    void GetZoneContaminanSetPoints();
 
-	void
-	InitZoneContSetPoints();
+    void InitZoneContSetPoints();
 
-	void
-	PredictZoneContaminants(
-		bool const ShortenTimeStepSys,
-		bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-		Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
-	);
+    void PredictZoneContaminants(bool const ShortenTimeStepSys,
+                                 bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                                 Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+    );
 
-	void
-	PushZoneTimestepHistories();
+    void PushZoneTimestepHistories();
 
-	void
-	PushSystemTimestepHistories();
+    void PushSystemTimestepHistories();
 
-	void
-	RevertZoneTimestepHistories();
+    void RevertZoneTimestepHistories();
 
-	void
-	CorrectZoneContaminants(
-		bool const ShortenTimeStepSys,
-		bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
-		Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
-	);
+    void CorrectZoneContaminants(bool const ShortenTimeStepSys,
+                                 bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
+                                 Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
+    );
 
-} // ZoneContaminantPredictorCorrector
+} // namespace ZoneContaminantPredictorCorrector
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,126 +53,124 @@ namespace EnergyPlus {
 
 namespace DataPlantPipingSystems {
 
-	// Module containing the data structures dealing with the PlantPipingSystems
+    // Module containing the data structures dealing with the PlantPipingSystems
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Edwin Lee
-	//       DATE WRITTEN   Summer 2011
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Edwin Lee
+    //       DATE WRITTEN   Summer 2011
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// Contains all the data structures for PlantPipingSystems
+    // PURPOSE OF THIS MODULE:
+    // Contains all the data structures for PlantPipingSystems
 
-	// METHODOLOGY EMPLOYED:
-	// A pseudo-object-oriented approach is taken to use inheritance in the structure.
-	// For example, an abstract base cell class is defined with temperatures and other
-	//  generic properties, then different cell types inherit from this by including it
-	//  as a MyBase field within its own structure.  Not exactly OO inheritance, but
-	//  it's close, and it increases code reuse, that's for sure!
-	// Enumerations are defined first with an EnumClassName_InstanceName format
+    // METHODOLOGY EMPLOYED:
+    // A pseudo-object-oriented approach is taken to use inheritance in the structure.
+    // For example, an abstract base cell class is defined with temperatures and other
+    //  generic properties, then different cell types inherit from this by including it
+    //  as a MyBase field within its own structure.  Not exactly OO inheritance, but
+    //  it's close, and it increases code reuse, that's for sure!
+    // Enumerations are defined first with an EnumClassName_InstanceName format
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// OTHER NOTES:
-	// na
+    // OTHER NOTES:
+    // na
 
-	// Using/Aliasing
-	using DataGlobals::Pi;
+    // Using/Aliasing
+    using DataGlobals::Pi;
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	int const PartitionType_BasementWall( -1 );
-	int const PartitionType_BasementFloor( -2 );
-	int const PartitionType_Pipe( -3 );
-	int const PartitionType_Slab( -4 );
-	int const PartitionType_XSide( -5 );
-	int const PartitionType_XSideWall( -6 );
-	int const PartitionType_ZSide( -7 );
-	int const PartitionType_ZSideWall( -8 );
-	int const PartitionType_FloorInside( -9 );
-	int const PartitionType_UnderFloor( -10 );
-	int const PartitionType_HorizInsXSide( -11 );
-	int const PartitionType_VertInsLowerEdge( -12 );
-	int const PartitionType_HorizInsZSide( -13 );
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    int const PartitionType_BasementWall(-1);
+    int const PartitionType_BasementFloor(-2);
+    int const PartitionType_Pipe(-3);
+    int const PartitionType_Slab(-4);
+    int const PartitionType_XSide(-5);
+    int const PartitionType_XSideWall(-6);
+    int const PartitionType_ZSide(-7);
+    int const PartitionType_ZSideWall(-8);
+    int const PartitionType_FloorInside(-9);
+    int const PartitionType_UnderFloor(-10);
+    int const PartitionType_HorizInsXSide(-11);
+    int const PartitionType_VertInsLowerEdge(-12);
+    int const PartitionType_HorizInsZSide(-13);
 
-	int const RegionType_Pipe( -1 );
-	int const RegionType_BasementWall( -2 );
-	int const RegionType_BasementFloor( -3 );
-	int const RegionType_XDirection( -4 );
-	int const RegionType_YDirection( -5 );
-	int const RegionType_ZDirection( -6 );
-	int const RegionType_XSide( -7 );
-	int const RegionType_XSideWall( -8 );
-	int const RegionType_ZSide( -9 );
-	int const RegionType_ZSideWall( -10 );
-	int const RegionType_FloorInside( -11 );
-	int const RegionType_UnderFloor( -12 );
-	int const RegionType_HorizInsXSide( -13 );
-	int const RegionType_HorizInsZSide( -14 );
-	int const RegionType_VertInsLowerEdge( -15 );
+    int const RegionType_Pipe(-1);
+    int const RegionType_BasementWall(-2);
+    int const RegionType_BasementFloor(-3);
+    int const RegionType_XDirection(-4);
+    int const RegionType_YDirection(-5);
+    int const RegionType_ZDirection(-6);
+    int const RegionType_XSide(-7);
+    int const RegionType_XSideWall(-8);
+    int const RegionType_ZSide(-9);
+    int const RegionType_ZSideWall(-10);
+    int const RegionType_FloorInside(-11);
+    int const RegionType_UnderFloor(-12);
+    int const RegionType_HorizInsXSide(-13);
+    int const RegionType_HorizInsZSide(-14);
+    int const RegionType_VertInsLowerEdge(-15);
 
-	int const MeshDistribution_Uniform( -1 );
-	int const MeshDistribution_SymmetricGeometric( -2 );
+    int const MeshDistribution_Uniform(-1);
+    int const MeshDistribution_SymmetricGeometric(-2);
 
-	int const SegmentFlow_IncreasingZ( -1 );
-	int const SegmentFlow_DecreasingZ( -2 );
+    int const SegmentFlow_IncreasingZ(-1);
+    int const SegmentFlow_DecreasingZ(-2);
 
-	int const Direction_PositiveY( -1 );
-	int const Direction_NegativeY( -2 );
-	int const Direction_PositiveX( -3 );
-	int const Direction_NegativeX( -4 );
-	int const Direction_PositiveZ( -5 );
-	int const Direction_NegativeZ( -6 );
+    int const Direction_PositiveY(-1);
+    int const Direction_NegativeY(-2);
+    int const Direction_PositiveX(-3);
+    int const Direction_NegativeX(-4);
+    int const Direction_PositiveZ(-5);
+    int const Direction_NegativeZ(-6);
 
-	int const CellType_Unknown( -1 );
-	int const CellType_Pipe( -2 );
-	int const CellType_GeneralField( -3 );
-	int const CellType_GroundSurface( -4 );
-	int const CellType_FarfieldBoundary( -5 );
-	int const CellType_AdiabaticWall( -6 );
-	int const CellType_BasementWall( -7 );
-	int const CellType_BasementFloor( -8 );
-	int const CellType_BasementCorner( -9 );
-	int const CellType_BasementCutaway( -10 );
-	int const CellType_Slab( -11 );
-	int const CellType_HorizInsulation( -12 );
-	int const CellType_VertInsulation( -13 );
-	int const CellType_ZoneGroundInterface( -14 );
-	int const CellType_BasementWallInsu( -15 );
-	int const CellType_BasementFloorInsu( -16 );
+    int const CellType_Unknown(-1);
+    int const CellType_Pipe(-2);
+    int const CellType_GeneralField(-3);
+    int const CellType_GroundSurface(-4);
+    int const CellType_FarfieldBoundary(-5);
+    int const CellType_AdiabaticWall(-6);
+    int const CellType_BasementWall(-7);
+    int const CellType_BasementFloor(-8);
+    int const CellType_BasementCorner(-9);
+    int const CellType_BasementCutaway(-10);
+    int const CellType_Slab(-11);
+    int const CellType_HorizInsulation(-12);
+    int const CellType_VertInsulation(-13);
+    int const CellType_ZoneGroundInterface(-14);
+    int const CellType_BasementWallInsu(-15);
+    int const CellType_BasementFloorInsu(-16);
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	//Input data structure
+    // Input data structure
 
-	// Internal structure
+    // Internal structure
 
-	//Simulation data structures
+    // Simulation data structures
 
-	// 'Current' data structure for variables, this is one-per-domain
+    // 'Current' data structure for variables, this is one-per-domain
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	// Object Data
-	Array1D< FullDomainStructureInfo > PipingSystemDomains;
-	Array1D< PipeCircuitInfo > PipingSystemCircuits;
-	Array1D< PipeSegmentInfo > PipingSystemSegments;
+    // Object Data
+    Array1D<FullDomainStructureInfo> PipingSystemDomains;
+    Array1D<PipeCircuitInfo> PipingSystemCircuits;
+    Array1D<PipeSegmentInfo> PipingSystemSegments;
 
-	//*********************************************************************************************!
+    //*********************************************************************************************!
 
-	//*********************************************************************************************!
+    //*********************************************************************************************!
 
-	void
-	clear_state()
-	{
-		PipingSystemDomains.deallocate();
-		PipingSystemCircuits.deallocate();
-		PipingSystemSegments.deallocate();
-	}
+    void clear_state()
+    {
+        PipingSystemDomains.deallocate();
+        PipingSystemCircuits.deallocate();
+        PipingSystemSegments.deallocate();
+    }
 
+} // namespace DataPlantPipingSystems
 
-} // DataPlantPipingSystems
-
-} // EnergyPlus
+} // namespace EnergyPlus

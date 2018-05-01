@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,21 +56,21 @@
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, CheckThreading )
+TEST_F(EnergyPlusFixture, CheckThreading)
 {
-	std::string const idf_objects = delimited_string( {
-	"Version,8.6;",
+    std::string const idf_objects = delimited_string({
+        "Version,8.6;",
 
-	"ProgramControl,",
-	"	1;",
+        "ProgramControl,",
+        "	1;",
 
-	} );
+    });
 
-	ASSERT_TRUE( process_idf( idf_objects, false ) );
+    EXPECT_FALSE(process_idf(idf_objects, false));
 
-	std::string const error_string = delimited_string({
-		"   ** Severe  ** IP: IDF line~1 Did not find \"ProgramControl\" in list of Objects",
-	});
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** Line: 2 Index: 14 - \"ProgramControl\" is not a valid Object Type.",
+    });
 
-	EXPECT_TRUE( compare_err_stream( error_string, true ) );
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }

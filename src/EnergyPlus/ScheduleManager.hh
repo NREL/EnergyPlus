@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,341 +58,275 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace ScheduleManager {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	extern int const MaxDayTypes;
-	extern Array1D_string const ValidDayTypes;
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern int const MaxDayTypes;
+    extern Array1D_string const ValidDayTypes;
 
-	extern int const NumScheduleTypeLimitUnitTypes;
-	extern Array1D_string const ScheduleTypeLimitUnitTypes;
+    extern int const NumScheduleTypeLimitUnitTypes;
+    extern Array1D_string const ScheduleTypeLimitUnitTypes;
 
-	extern int const ScheduleInput_year;
-	extern int const ScheduleInput_compact;
-	extern int const ScheduleInput_file;
-	extern int const ScheduleInput_constant;
-	extern int const ScheduleInput_external;
+    extern int const ScheduleInput_year;
+    extern int const ScheduleInput_compact;
+    extern int const ScheduleInput_file;
+    extern int const ScheduleInput_constant;
+    extern int const ScheduleInput_external;
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// INTERFACE BLOCK SPECIFICATIONS
+    // INTERFACE BLOCK SPECIFICATIONS
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	//Integer Variables for the Module
-	extern int NumScheduleTypes;
-	extern int NumDaySchedules;
-	extern int NumWeekSchedules;
-	extern int NumSchedules;
+    // Integer Variables for the Module
+    extern int NumScheduleTypes;
+    extern int NumDaySchedules;
+    extern int NumWeekSchedules;
+    extern int NumSchedules;
 
-	//Logical Variables for Module
-	extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
-	extern bool ScheduleDSTSFileWarningIssued;
+    // Logical Variables for Module
+    extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
+    extern bool ScheduleDSTSFileWarningIssued;
 
-	//Derived Types Variables
+    extern bool ScheduleFileShadingProcessed; // This is false unless there is a Schedule:File:Shading object.
 
-	// Types
+    enum class ScheduleInterpolation
+    {
+        No,      // no interpolation
+        Average, // interpolation only to resolve time intervals not matching timestep lengths (this was previously interpolate:yes)
+        Linear   // linear interpolation from the previous time to the current time for the entire schedule
+    };
 
-	struct ScheduleTypeData
-	{
-		// Members
-		std::string Name; // Schedule Type Name
-		bool Limited; // True if this Schedule Type has limits
-		Real64 Minimum; // Minimum for limited schedule
-		Real64 Maximum; // Maximum for limited schedule
-		bool IsReal; // True if this is a "real" schedule, false if integer
-		int UnitType; // reference ScheduleTypeLimit table
+    // Derived Types Variables
 
-		// Default Constructor
-		ScheduleTypeData() :
-			Limited( false ),
-			Minimum( 0.0 ),
-			Maximum( 0.0 ),
-			IsReal( true ),
-			UnitType( 0 )
-		{}
+    // Types
 
-	};
+    struct ScheduleTypeData
+    {
+        // Members
+        std::string Name; // Schedule Type Name
+        bool Limited;     // True if this Schedule Type has limits
+        Real64 Minimum;   // Minimum for limited schedule
+        Real64 Maximum;   // Maximum for limited schedule
+        bool IsReal;      // True if this is a "real" schedule, false if integer
+        int UnitType;     // reference ScheduleTypeLimit table
 
-	struct DayScheduleData
-	{
-		// Members
-		std::string Name; // Day Schedule Name
-		int ScheduleTypePtr; // Index of Schedule Type
-		bool IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
-		bool Used; // Indicator for this schedule being "used".
-		Array2D< Real64 > TSValue; // Value array by simulation timestep
-		Real64 TSValMax; // maximum of all TSValue's
-		Real64 TSValMin; // minimum of all TSValue's
+        // Default Constructor
+        ScheduleTypeData() : Limited(false), Minimum(0.0), Maximum(0.0), IsReal(true), UnitType(0)
+        {
+        }
+    };
 
-		// Default Constructor
-		DayScheduleData() :
-			ScheduleTypePtr( 0 ),
-			IntervalInterpolated( false ),
-			Used( false ),
-			TSValMax( 0.0 ),
-			TSValMin( 0.0 )
-		{}
+    struct DayScheduleData
+    {
+        // Members
+        std::string Name;                           // Day Schedule Name
+        int ScheduleTypePtr;                        // Index of Schedule Type
+        ScheduleInterpolation IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
+        bool Used;                                  // Indicator for this schedule being "used".
+        Array2D<Real64> TSValue;                    // Value array by simulation timestep
+        Real64 TSValMax;                            // maximum of all TSValue's
+        Real64 TSValMin;                            // minimum of all TSValue's
 
-	};
+        // Default Constructor
+        DayScheduleData() : ScheduleTypePtr(0), IntervalInterpolated(ScheduleInterpolation::No), Used(false), TSValMax(0.0), TSValMin(0.0)
+        {
+        }
+    };
 
-	struct WeekScheduleData
-	{
-		// Members
-		std::string Name; // Week Schedule Name
-		bool Used; // Indicator for this schedule being "used".
-		Array1D_int DaySchedulePointer; // Index of Day Schedule
+    struct WeekScheduleData
+    {
+        // Members
+        std::string Name;               // Week Schedule Name
+        bool Used;                      // Indicator for this schedule being "used".
+        Array1D_int DaySchedulePointer; // Index of Day Schedule
 
-		// Default Constructor
-		WeekScheduleData() :
-			Used( false ),
-			DaySchedulePointer( MaxDayTypes, 0 )
-		{}
+        // Default Constructor
+        WeekScheduleData() : Used(false), DaySchedulePointer(MaxDayTypes, 0)
+        {
+        }
+    };
 
-	};
+    struct ScheduleData
+    {
+        // Members
+        std::string Name;                // Schedule Name
+        int ScheduleTypePtr;             // Index of Schedule Type
+        Array1D_int WeekSchedulePointer; // one created for each day of possible simulation
+        int SchType;                     // what kind of object has been input.
+        bool Used;                       // Indicator for this schedule being "used".
+        bool MaxMinSet;                  // Max/min values have been stored for this schedule
+        Real64 MaxValue;                 // Maximum value for this schedule
+        Real64 MinValue;                 // Minimum value for this schedule
+        Real64 CurrentValue;             // For Reporting
+        bool EMSActuatedOn;              // indicates if EMS computed
+        Real64 EMSValue;
 
-	struct ScheduleData
-	{
-		// Members
-		std::string Name; // Schedule Name
-		int ScheduleTypePtr; // Index of Schedule Type
-		Array1D_int WeekSchedulePointer; // one created for each day of possible simulation
-		int SchType; // what kind of object has been input.
-		bool Used; // Indicator for this schedule being "used".
-		bool MaxMinSet; // Max/min values have been stored for this schedule
-		Real64 MaxValue; // Maximum value for this schedule
-		Real64 MinValue; // Minimum value for this schedule
-		Real64 CurrentValue; // For Reporting
-		bool EMSActuatedOn; // indicates if EMS computed
-		Real64 EMSValue;
+        // Default Constructor
+        ScheduleData()
+            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), SchType(0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0),
+              CurrentValue(0.0), EMSActuatedOn(false), EMSValue(0.0)
+        {
+        }
+    };
 
-		// Default Constructor
-		ScheduleData() :
-			ScheduleTypePtr( 0 ),
-			WeekSchedulePointer( 366, 0 ),
-			SchType( 0 ),
-			Used( false ),
-			MaxMinSet( false ),
-			MaxValue( 0.0 ),
-			MinValue( 0.0 ),
-			CurrentValue( 0.0 ),
-			EMSActuatedOn( false ),
-			EMSValue( 0.0 )
-		{}
+    // Object Data
+    extern Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
+    extern Array1D<DayScheduleData> DaySchedule;   // Day Schedule Storage
+    extern Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
+    extern Array1D<ScheduleData> Schedule;         // Schedule Storage
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
-	extern Array1D< DayScheduleData > DaySchedule; // Day Schedule Storage
-	extern Array1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
-	extern Array1D< ScheduleData > Schedule; // Schedule Storage
+    // Clears the global data in ScheduleManager.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-	// Functions
+    void ProcessScheduleInput();
 
-	// Clears the global data in ScheduleManager.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    void ReportScheduleDetails(int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
-	void
-	ProcessScheduleInput();
+    Real64 GetCurrentScheduleValue(int const ScheduleIndex);
 
-	void
-	ReportScheduleDetails( int const LevelOfDetail ); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void UpdateScheduleValues();
 
-	Real64
-	GetCurrentScheduleValue( int const ScheduleIndex );
+    Real64 LookUpScheduleValue(int const ScheduleIndex,
+                               int const ThisHour = -1,    // Negative => unspecified
+                               int const ThisTimeStep = -1 // Negative => unspecified
+    );
 
-	void
-	UpdateScheduleValues();
+    int GetScheduleIndex(std::string const &ScheduleName);
 
-	Real64
-	LookUpScheduleValue(
-		int const ScheduleIndex,
-		int const ThisHour = -1, // Negative => unspecified
-		int const ThisTimeStep = -1 // Negative => unspecified
-	);
+    std::string GetScheduleType(int const ScheduleIndex);
 
-	int
-	GetScheduleIndex( std::string const & ScheduleName );
+    int GetDayScheduleIndex(std::string &ScheduleName);
 
-	std::string
-	GetScheduleType( int const ScheduleIndex );
+    void
+    GetScheduleValuesForDay(int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
 
-	int
-	GetDayScheduleIndex( std::string & ScheduleName );
+    void GetSingleDayScheduleValues(int const DayScheduleIndex, // Index of the DaySchedule for values
+                                    Array2S<Real64> DayValues   // Returned set of values
+    );
 
-	void
-	GetScheduleValuesForDay(
-		int const ScheduleIndex,
-		Array2S< Real64 > DayValues,
-		Optional_int_const JDay = _,
-		Optional_int_const CurDayofWeek = _
-	);
+    void ExternalInterfaceSetSchedule(int &ScheduleIndex,
+                                      Real64 &Value // The new value for the schedule
+    );
 
-	void
-	GetSingleDayScheduleValues(
-		int const DayScheduleIndex, // Index of the DaySchedule for values
-		Array2S< Real64 > DayValues // Returned set of values
-	);
+    void ProcessIntervalFields(Array1S_string const Untils,
+                               Array1S<Real64> const Numbers,
+                               int const NumUntils,
+                               int const NumNumbers,
+                               Array2A<Real64> MinuteValue,
+                               Array2A_bool SetMinuteValue,
+                               bool &ErrorsFound,
+                               std::string const &DayScheduleName,     // Name (used for errors)
+                               std::string const &ErrContext,          // Context (used for errors)
+                               ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
+    );
 
-	void
-	ExternalInterfaceSetSchedule(
-		int & ScheduleIndex,
-		Real64 & Value // The new value for the schedule
-	);
+    void DecodeHHMMField(std::string const &FieldValue,          // Input field value
+                         int &RetHH,                             // Returned "hour"
+                         int &RetMM,                             // Returned "minute"
+                         bool &ErrorsFound,                      // True if errors found in this field
+                         std::string const &DayScheduleName,     // originating day schedule name
+                         std::string const &FullFieldValue,      // Full Input field value
+                         ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
+    );
 
-	void
-	ProcessIntervalFields(
-		Array1S_string const Untils,
-		Array1S< Real64 > const Numbers,
-		int const NumUntils,
-		int const NumNumbers,
-		Array2A< Real64 > MinuteValue,
-		Array2A_bool SetMinuteValue,
-		bool & ErrorsFound,
-		std::string const & DayScheduleName, // Name (used for errors)
-		std::string const & ErrContext, // Context (used for errors)
-		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
-		);
+    bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep);
 
-	void
-	DecodeHHMMField(
-		std::string const & FieldValue, // Input field value
-		int & RetHH, // Returned "hour"
-		int & RetMM, // Returned "minute"
-		bool & ErrorsFound, // True if errors found in this field
-		std::string const & DayScheduleName, // originating day schedule name
-		std::string const & FullFieldValue, // Full Input field value
-		bool useInterpolation  // flag if interpolation is allowed and if warning is issued then if timesteps do not match up
-		);
+    void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
+                            Array1A_bool TheseDays,         // Array to contain returned "true" days
+                            Array1A_bool AlReady,           // Array of days already done
+                            bool &ErrorsFound               // Will be true if error found.
+    );
 
-	bool
-	isMinuteMultipleOfTimestep( int minute, int numMinutesPerTimestep );
+    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+                                  std::string const &MinString, // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum          // Minimum desired value
+    );
 
-	void
-	ProcessForDayTypes(
-		std::string const & ForDayField, // Field containing the "FOR:..."
-		Array1A_bool TheseDays, // Array to contain returned "true" days
-		Array1A_bool AlReady, // Array of days already done
-		bool & ErrorsFound // Will be true if error found.
-	);
+    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+                                  std::string const &MinString, // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum,         // Minimum desired value
+                                  std::string const &MaxString, // Maximum indicator ('<', ',=')
+                                  Real64 const Maximum          // Maximum desired value
+    );
 
-	bool
-	CheckScheduleValueMinMax(
-		int const ScheduleIndex, // Which Schedule being tested
-		std::string const & MinString, // Minimum indicator ('>', '>=')
-		Real64 const Minimum // Minimum desired value
-	);
+    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+                                  std::string const &MinString, // Minimum indicator ('>', '>=')
+                                  Real32 const Minimum          // Minimum desired value
+    );
 
-	bool
-	CheckScheduleValueMinMax(
-		int const ScheduleIndex, // Which Schedule being tested
-		std::string const & MinString, // Minimum indicator ('>', '>=')
-		Real64 const Minimum, // Minimum desired value
-		std::string const & MaxString, // Maximum indicator ('<', ',=')
-		Real64 const Maximum // Maximum desired value
-	);
+    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+                                  std::string const &MinString, // Minimum indicator ('>', '>=')
+                                  Real32 const Minimum,         // Minimum desired value
+                                  std::string const &MaxString, // Maximum indicator ('<', ',=')
+                                  Real32 const Maximum          // Maximum desired value
+    );
 
-	bool
-	CheckScheduleValueMinMax(
-		int const ScheduleIndex, // Which Schedule being tested
-		std::string const & MinString, // Minimum indicator ('>', '>=')
-		Real32 const Minimum // Minimum desired value
-	);
+    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
+                            Real64 const Value       // Actual desired value
+    );
 
-	bool
-	CheckScheduleValueMinMax(
-		int const ScheduleIndex, // Which Schedule being tested
-		std::string const & MinString, // Minimum indicator ('>', '>=')
-		Real32 const Minimum, // Minimum desired value
-		std::string const & MaxString, // Maximum indicator ('<', ',=')
-		Real32 const Maximum // Maximum desired value
-	);
+    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
+                            int const Value          // Actual desired value
+    );
 
-	bool
-	CheckScheduleValue(
-		int const ScheduleIndex, // Which Schedule being tested
-		Real64 const Value // Actual desired value
-	);
+    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,            // Which Day Schedule being tested
+                                     Real64 const Minimum,               // Minimum desired value
+                                     std::string const &MinString,       // Minimum indicator ('>', '>=')
+                                     Optional<Real64 const> Maximum = _, // Maximum desired value
+                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+    );
 
-	bool
-	CheckScheduleValue(
-		int const ScheduleIndex, // Which Schedule being tested
-		int const Value // Actual desired value
-	);
+    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,            // Which Day Schedule being tested
+                                     Real32 const Minimum,               // Minimum desired value
+                                     std::string const &MinString,       // Minimum indicator ('>', '>=')
+                                     Optional<Real32 const> Maximum = _, // Maximum desired value
+                                     Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
+    );
 
-	bool
-	CheckDayScheduleValueMinMax(
-		int const ScheduleIndex, // Which Day Schedule being tested
-		Real64 const Minimum, // Minimum desired value
-		std::string const & MinString, // Minimum indicator ('>', '>=')
-		Optional< Real64 const > Maximum = _, // Maximum desired value
-		Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
-	);
+    bool HasFractionalScheduleValue(int const ScheduleIndex); // Which Schedule being tested
 
-	bool
-	CheckDayScheduleValueMinMax(
-		int const ScheduleIndex, // Which Day Schedule being tested
-		Real32 const Minimum, // Minimum desired value
-		std::string const & MinString, // Minimum indicator ('>', '>=')
-		Optional< Real32 const > Maximum = _, // Maximum desired value
-		Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
-	);
+    Real64 GetScheduleMinValue(int const ScheduleIndex); // Which Schedule being tested
 
-	bool
-	HasFractionalScheduleValue( int const ScheduleIndex ); // Which Schedule being tested
+    Real64 GetScheduleMaxValue(int const ScheduleIndex); // Which Schedule being tested
 
-	Real64
-	GetScheduleMinValue( int const ScheduleIndex ); // Which Schedule being tested
+    std::string GetScheduleName(int const ScheduleIndex);
 
-	Real64
-	GetScheduleMaxValue( int const ScheduleIndex ); // Which Schedule being tested
+    void ReportScheduleValues();
 
-	std::string
-	GetScheduleName( int const ScheduleIndex );
+    void ReportOrphanSchedules();
 
-	void
-	ReportScheduleValues();
+    Real64 ScheduleAnnualFullLoadHours(int const ScheduleIndex,  // Which Schedule being tested
+                                       int const StartDayOfWeek, // Day of week for start of year
+                                       bool const isItLeapYear   // true if it is a leap year containing February 29
+    );
 
-	void
-	ReportOrphanSchedules();
+    Real64 ScheduleAverageHoursPerWeek(int const ScheduleIndex,  // Which Schedule being tested
+                                       int const StartDayOfWeek, // Day of week for start of year
+                                       bool const isItLeapYear   // true if it is a leap year containing February 29
+    );
 
-	Real64
-	ScheduleAnnualFullLoadHours(
-		int const ScheduleIndex, // Which Schedule being tested
-		int const StartDayOfWeek, // Day of week for start of year
-		bool const isItLeapYear // true if it is a leap year containing February 29
-	);
+    Real64 ScheduleHoursGT1perc(int const ScheduleIndex,  // Which Schedule being tested
+                                int const StartDayOfWeek, // Day of week for start of year
+                                bool const isItLeapYear   // true if it is a leap year containing February 29
+    );
 
-	Real64
-	ScheduleAverageHoursPerWeek(
-		int const ScheduleIndex, // Which Schedule being tested
-		int const StartDayOfWeek, // Day of week for start of year
-		bool const isItLeapYear // true if it is a leap year containing February 29
-	);
+    int GetNumberOfSchedules();
 
-	Real64
-	ScheduleHoursGT1perc(
-		int const ScheduleIndex, // Which Schedule being tested
-		int const StartDayOfWeek, // Day of week for start of year
-		bool const isItLeapYear // true if it is a leap year containing February 29
-	);
+} // namespace ScheduleManager
 
-	int
-	GetNumberOfSchedules();
-
-} // ScheduleManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

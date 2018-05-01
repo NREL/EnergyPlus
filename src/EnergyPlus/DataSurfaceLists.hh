@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,95 +52,89 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataSurfaceLists {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
+    // MODULE PARAMETER DEFINITIONS:
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern int NumOfSurfaceLists; // Number of surface lists in the user input file
-	extern int NumOfSurfListVentSlab; // Number of surface lists in the user input file
-	extern bool SurfaceListInputsFilled; // Set to TRUE after first pass through air loop
+    extern int NumOfSurfaceLists;        // Number of surface lists in the user input file
+    extern int NumOfSurfListVentSlab;    // Number of surface lists in the user input file
+    extern bool SurfaceListInputsFilled; // Set to TRUE after first pass through air loop
 
-	//  CHARACTER(len=*), PARAMETER :: CurrentModuleObject = ' '
-	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
+    //  CHARACTER(len=*), PARAMETER :: CurrentModuleObject = ' '
+    // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
 
-	// Types
+    // Types
 
-	struct SurfaceListData
-	{
-		// Members
-		std::string Name; // Name of the surface list
-		int NumOfSurfaces; // Number of surfaces in the list
-		Array1D_string SurfName; // Surfaces named in the list
-		Array1D_int SurfPtr; // Location of surfaces in Surface derived type
-		Array1D< Real64 > SurfFlowFrac; // Fraction of mass flow/length for a surface
+    struct SurfaceListData
+    {
+        // Members
+        std::string Name;             // Name of the surface list
+        int NumOfSurfaces;            // Number of surfaces in the list
+        Array1D_string SurfName;      // Surfaces named in the list
+        Array1D_int SurfPtr;          // Location of surfaces in Surface derived type
+        Array1D<Real64> SurfFlowFrac; // Fraction of mass flow/length for a surface
 
-		// Default Constructor
-		SurfaceListData() :
-			NumOfSurfaces( 0 )
-		{}
+        // Default Constructor
+        SurfaceListData() : NumOfSurfaces(0)
+        {
+        }
+    };
 
-	};
+    struct SlabListData
+    {
+        // Members
+        std::string Name;               // Name of the surface list
+        int NumOfSurfaces;              // Number of surfaces in the list
+        Array1D_string SurfName;        // Surfaces named in the list
+        Array1D_int SurfPtr;            // Location of surfaces in Surface derived type
+        Array1D_string ZoneName;        // Zone named in the list
+        Array1D_int ZonePtr;            // Location of Zone in Surface derived type
+        Array1D<Real64> CoreDiameter;   // Fraction of mass flow/length for a surface
+        Array1D<Real64> CoreLength;     // Fraction of mass flow/length for a surface
+        Array1D<Real64> CoreNumbers;    // Fraction of mass flow/length for a surface
+        Array1D_string SlabInNodeName;  // Zone named in the list
+        Array1D_string SlabOutNodeName; // Zone named in the list
 
-	struct SlabListData
-	{
-		// Members
-		std::string Name; // Name of the surface list
-		int NumOfSurfaces; // Number of surfaces in the list
-		Array1D_string SurfName; // Surfaces named in the list
-		Array1D_int SurfPtr; // Location of surfaces in Surface derived type
-		Array1D_string ZoneName; // Zone named in the list
-		Array1D_int ZonePtr; // Location of Zone in Surface derived type
-		Array1D< Real64 > CoreDiameter; // Fraction of mass flow/length for a surface
-		Array1D< Real64 > CoreLength; // Fraction of mass flow/length for a surface
-		Array1D< Real64 > CoreNumbers; // Fraction of mass flow/length for a surface
-		Array1D_string SlabInNodeName; // Zone named in the list
-		Array1D_string SlabOutNodeName; // Zone named in the list
+        // Default Constructor
+        SlabListData() : NumOfSurfaces(0)
+        {
+        }
+    };
 
-		// Default Constructor
-		SlabListData() :
-			NumOfSurfaces( 0 )
-		{}
+    // Object Data
+    extern Array1D<SurfaceListData> SurfList;
+    extern Array1D<SlabListData> SlabList;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< SurfaceListData > SurfList;
-	extern Array1D< SlabListData > SlabList;
+    void clear_state();
 
-	// Functions
+    void GetSurfaceListsInputs();
 
-	void
-	clear_state();
+    int GetNumberOfSurfaceLists();
 
-	void
-	GetSurfaceListsInputs();
+    int GetNumberOfSurfListVentSlab();
 
-	int
-	GetNumberOfSurfaceLists();
+} // namespace DataSurfaceLists
 
-	int
-	GetNumberOfSurfListVentSlab();
-
-} // DataSurfaceLists
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

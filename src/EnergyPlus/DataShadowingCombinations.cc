@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,41 +52,41 @@ namespace EnergyPlus {
 
 namespace DataShadowingCombinations {
 
-	// Module containing the data dealing with shadowing combinations
+    // Module containing the data dealing with shadowing combinations
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Linda Lawrie
-	//       DATE WRITTEN   July 2007; Moved from SolarShading
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   July 2007; Moved from SolarShading
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// <description>
+    // PURPOSE OF THIS MODULE:
+    // <description>
 
-	// METHODOLOGY EMPLOYED:
-	// <description>
+    // METHODOLOGY EMPLOYED:
+    // <description>
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// OTHER NOTES:
-	// na
+    // OTHER NOTES:
+    // na
 
-	// USE STATEMENTS:
-	// <use statements for data only modules>
-	// <use statements for access to subroutines in other modules>
+    // USE STATEMENTS:
+    // <use statements for data only modules>
+    // <use statements for access to subroutines in other modules>
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	// Object Data
-	Array1D< ShadowingCombinations > ShadowComb;
+    // Object Data
+    Array1D<ShadowingCombinations> ShadowComb;
 
-} // DataShadowingCombinations
+} // namespace DataShadowingCombinations
 
-} // EnergyPlus
+} // namespace EnergyPlus

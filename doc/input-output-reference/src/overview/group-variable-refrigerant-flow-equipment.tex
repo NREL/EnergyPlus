@@ -626,11 +626,11 @@ This output field is the cooling mode electricity consumption of the variable re
 
 \paragraph{VRF Heat Pump Heating Electric Power {[}W{]}}\label{vrf-heat-pump-heating-electric-power-w}
 
-This output field is the heating mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor (including crankcase heater), additional energy required for defrost, and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption Rate).
+This output field is the heating mode electricity consumption rate of the variable refrigerant flow heat pump in Watts. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption Rate).
 
 \paragraph{VRF Heat Pump Heating Electric Energy {[}J{]}}\label{vrf-heat-pump-heating-electric-energy-j}
 
-This output field is the heating mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), additional energy required for defrost, and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
+This output field is the heating mode electricity consumption of the variable refrigerant flow heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor and the condenser fan. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (Ref. Output:Meter objects). The choice of an alternate fuel type (see Fuel Type input) will result in a change in the output variable name (e.g., Variable Refrigerant Flow Heat Pump Heating NaturalGas Consumption). The resource type meter will also be modified to reflect the chosen fuel type (e.g., Resource Type = NaturalGas).
 
 \paragraph{\texorpdfstring{VRF Heat Pump Cooling COP{[]}}{VRF Heat Pump Cooling COP}}\label{vrf-heat-pump-cooling-cop}
 
@@ -837,17 +837,17 @@ This alpha field defines the name of a quadratic performance curve that paramete
 
 This alpha field defines the name of a quadratic performance curve that parameterizes the variation of outdoor unit condensing temperature as a function of subcooling degrees. The output of this curve is the temperature difference between the condensing temperature and the coil surface air temperature.
 
-\paragraph{Field: Diameter of Main Pipe Connecting Outdoor Unit to Indoor Units}\label{field-diameter-of-main-pipe-connecting-outdoor-unit-to-indoor-units}
+\paragraph{Field: Diameter of Main Pipe Connecting Outdoor Unit to the First Branch Joint}\label{field-diameter-of-main-pipe-connecting-outdoor-unit-to-indoor-units}
 
-This numeric field defines the diameter of main pipe connecting outdoor unit to indoor units. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0254m is used.
+This numeric field defines the diameter of main pipe connecting the outdoor unit to the first branch joint. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0254m is used.
 
-\paragraph{Field: Length of Main Pipe Connecting Outdoor Unit to Indoor Units}\label{field-length-of-main-pipe-connecting-outdoor-unit-to-indoor-units}
+\paragraph{Field: Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint}\label{field-length-of-main-pipe-connecting-outdoor-unit-to-indoor-units}
 
-This numeric field defines the length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
+This numeric field defines the length of main pipe connecting the outdoor unit to the first branch joint. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
 
-\paragraph{Field: Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units}\label{field-equivalent-length-of-main-pipe-connecting-outdoor-unit-to-indoor-units}
+\paragraph{Field: Equivalent Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint}\label{field-equivalent-length-of-main-pipe-connecting-outdoor-unit-to-indoor-units}
 
-This numeric field defines the equivalent length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
+This numeric field defines the equivalent length of main pipe connecting the outdoor unit to the first branch joint. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
 
 \paragraph{Field: Height Difference Between Outdoor Unit and Indoor Units}\label{field-height-difference-between-outdoor-unit-and-indoor-units}
 
@@ -949,9 +949,9 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl,
   7.26E-5,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
   OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
   OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
-  0.0508,                  !- Diameter of main pipe connecting outdoor unit to indoor units {m}
-  30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
-  36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
+  0.0508,                  !- Diameter of main pipe connecting outdoor unit to the first branch joint {m}
+  30,                      !- Length of main pipe connecting outdoor unit to the first branch joint {m}
+  36,                      !- Equivalent length of main pipe connecting outdoor unit to the first branch joint {m}
   5,                       !- Height difference between the outdoor unit node and indoor unit node of the main pipe {m}
   0.02,                    !- Insulation thickness of the main pipe {m}
   0.032,                   !- Thermal conductivity of the main pipe insulation material {W/m-K}
@@ -1315,13 +1315,13 @@ This numeric field defines the diameter of main pipe for Suction Gas. This value
 
 This numeric field defines the diameter of main pipe for Suction Gas. This value is used to calculate the piping loss of the refrigerant when going through the main pipe, including the heat loss and pressure drop. If this field is blank, the default value of 0.0762m is used.
 
-\paragraph{Field: Length of Main Pipe Connecting Outdoor Unit to Indoor Units}
+\paragraph{Field: Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint}
 
-This numeric field defines the length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
+This numeric field defines the length of main pipe connecting outdoor unit to the first branch joint. This value is used to calculate the heat loss of the refrigerant when going through the main pipe. The value should be greater than 0. If this field is blank, the default value of 30m is used.
 
-\paragraph{Field: Equivalent Length of Main Pipe Connecting Outdoor Unit to Indoor Units}
+\paragraph{Field: Equivalent Length of Main Pipe Connecting Outdoor Unit to the First Branch Joint}
 
-This numeric field defines the equivalent length of main pipe connecting outdoor unit to indoor units. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
+This numeric field defines the equivalent length of main pipe connecting outdoor unit to the first branch joint. This value is used to calculate the pressure drop of the refrigerant when going through the main pipe. The value should be greater than the real pipe length specified in the above field. If this field is blank, the default value of 36m is used.
 
 \paragraph{Field: Height Difference Between Outdoor Unit and Indoor Units}
 
@@ -1473,8 +1473,8 @@ AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl:HR,
   OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
   0.0349,                  !- Diameter of Main Pipe for Suction Gas {m}
   0.0286,                  !- Diameter of Main Pipe for Discharge Gas {m}
-  30,                      !- Length of main pipe connecting outdoor unit to indoor units {m}
-  36,                      !- Equivalent length of main pipe connecting outdoor unit to indoor units {m}
+  30,                      !- Length of main pipe connecting outdoor unit to the first branch joint {m}
+  36,                      !- Equivalent length of main pipe connecting outdoor unit to the first branch joint {m}
   5,                       !- Height difference between the outdoor unit node and indoor unit node of the main pipe {m}
   0.02,                    !- Insulation thickness of the main pipe {m}
   0.032,                   !- Thermal conductivity of the main pipe insulation material {W/m-K}

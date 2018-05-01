@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,76 +55,65 @@ namespace EnergyPlus {
 
 namespace HeatBalanceAirManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	//         Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
+    //         Subroutine Specifications for the Heat Balance Module
+    // Driver Routines
 
-	// Get Input routines for module
+    // Get Input routines for module
 
-	// Initialization routines for module
+    // Initialization routines for module
 
-	// Algorithms for the module
-	// Reporting routines for module
+    // Algorithms for the module
+    // Reporting routines for module
 
-	// Functions
-	void
-	clear_state();
+    // Functions
+    void clear_state();
 
-	void
-	ManageAirHeatBalance();
+    void ManageAirHeatBalance();
 
-	// Get Input Section of the Module
-	//******************************************************************************
+    // Get Input Section of the Module
+    //******************************************************************************
 
-	void
-	GetAirHeatBalanceInput();
+    void GetAirHeatBalanceInput();
 
-	void
-	GetAirFlowFlag( bool & ErrorsFound ); // Set to true if errors found
+    void GetAirFlowFlag(bool &ErrorsFound); // Set to true if errors found
 
-	void
-	SetZoneMassConservationFlag();  // sets the zone air mass flow variables
+    void SetZoneMassConservationFlag(); // sets the zone air mass flow variables
 
-	void
-	GetSimpleAirModelInputs( bool & ErrorsFound ); // IF errors found in input
+    void GetSimpleAirModelInputs(bool &ErrorsFound); // IF errors found in input
 
-	//*****************************************************************************************
-	// This subroutine was moved from 'RoomAirManager' Module
+    //*****************************************************************************************
+    // This subroutine was moved from 'RoomAirManager' Module
 
-	void
-	GetRoomAirModelParameters( bool & errFlag ); // True if errors found during this input routine
+    void GetRoomAirModelParameters(bool &errFlag); // True if errors found during this input routine
 
-	// END of Get Input subroutines for the HBAir Module
-	//******************************************************************************
+    // END of Get Input subroutines for the HBAir Module
+    //******************************************************************************
 
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
+    // Beginning Initialization Section of the Module
+    //******************************************************************************
 
-	void
-	InitAirHeatBalance();
+    void InitAirHeatBalance();
 
-	void
-	InitSimpleMixingConvectiveHeatGains();
+    void InitSimpleMixingConvectiveHeatGains();
 
-	// END Initialization Section of the Module
-	//******************************************************************************
+    // END Initialization Section of the Module
+    //******************************************************************************
 
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
+    // Begin Algorithm Section of the Module
+    //******************************************************************************
 
-	void
-	CalcHeatBalanceAir();
+    void CalcHeatBalanceAir();
 
-	// END Algorithm Section of the Module
+    // END Algorithm Section of the Module
 
-	void
-	ReportZoneMeanAirTemp();
+    void ReportZoneMeanAirTemp();
 
-} // HeatBalanceAirManager
+} // namespace HeatBalanceAirManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

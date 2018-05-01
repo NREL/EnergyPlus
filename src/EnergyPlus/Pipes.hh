@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,87 +52,77 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
-	// Forward Declarations
-	struct PlantLocation;
+// Forward Declarations
+struct PlantLocation;
 
 namespace Pipes {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern int NumLocalPipes;
-	extern bool GetPipeInputFlag;
+    extern int NumLocalPipes;
+    extern bool GetPipeInputFlag;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
+    // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
-	// Types
+    // Types
 
-	struct LocalPipeData : public PlantComponent
-	{
-		virtual
-		~LocalPipeData()
-		{}
+    struct LocalPipeData : public PlantComponent
+    {
+        virtual ~LocalPipeData()
+        {
+        }
 
-		// Members
-		std::string Name;
-		int TypeOf; // type of pipe
-		int InletNodeNum; // Node number on the inlet side of the plant
-		int OutletNodeNum; // Node number on the inlet side of the plant
-		int LoopNum; // Index of plant loop where this pipe resides
-		int LoopSide; // Index of plant loop side where this pipe resides
-		int BranchIndex; // Index of plant Branch index where this pipe resides
-		int CompIndex; // Index of plant Comp index where this pipe resides
-		bool OneTimeInit;
-		bool CheckEquipName;
-		bool EnvrnFlag;
+        // Members
+        std::string Name;
+        int TypeOf;        // type of pipe
+        int InletNodeNum;  // Node number on the inlet side of the plant
+        int OutletNodeNum; // Node number on the inlet side of the plant
+        int LoopNum;       // Index of plant loop where this pipe resides
+        int LoopSide;      // Index of plant loop side where this pipe resides
+        int BranchIndex;   // Index of plant Branch index where this pipe resides
+        int CompIndex;     // Index of plant Comp index where this pipe resides
+        bool OneTimeInit;
+        bool CheckEquipName;
+        bool EnvrnFlag;
 
-		// Default Constructor
-		LocalPipeData() :
-			TypeOf( 0 ),
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 ),
-			LoopNum( 0 ),
-			LoopSide( 0 ),
-			BranchIndex( 0 ),
-			CompIndex( 0 ),
-			OneTimeInit( true ),
-			CheckEquipName( true ),
-			EnvrnFlag( true )
-		{}
+        // Default Constructor
+        LocalPipeData()
+            : TypeOf(0), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0), OneTimeInit(true),
+              CheckEquipName(true), EnvrnFlag(true)
+        {
+        }
 
-		public:
-			static PlantComponent * factory( int objectType, std::string objectName );
+    public:
+        static PlantComponent *factory(int objectType, std::string objectName);
 
-		public:
-			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
+    public:
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+    };
 
-	};
+    // Object Data
+    extern Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
 
-	// Object Data
-	extern Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
+    // Functions
+    void clear_state();
 
-	// Functions
-	void
-	clear_state();
+    void GetPipeInput();
 
-	void
-	GetPipeInput();
+} // namespace Pipes
 
-} // Pipes
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

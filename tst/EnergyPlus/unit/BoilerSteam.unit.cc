@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataSizing.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -62,44 +62,42 @@ using namespace EnergyPlus::BoilerSteam;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataGlobalConstants;
 
-
-TEST_F( EnergyPlusFixture, BoilerSteam_GetInput )
+TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
 {
 
-	std::string const idf_objects = delimited_string( {
-		"  Boiler:Steam,                                                                                            ",
-		"    Steam Boiler Plant Boiler,  !- Name                                                                    ",
-		"    NaturalGas,                !- Fuel Type                                                                ",
-		"    160000,                    !- Maximum Operating Pressure{ Pa }                                         ",
-		"    0.8,                       !- Theoretical Efficiency                                                   ",
-		"    115,                       !- Design Outlet Steam Temperature{ C }                                     ",
-		"    autosize,                  !- Nominal Capacity{ W }                                                    ",
-		"    0.00001,                   !- Minimum Part Load Ratio                                                  ",
-		"    1.0,                       !- Maximum Part Load Ratio                                                  ",
-		"    0.2,                       !- Optimum Part Load Ratio                                                  ",
-		"    0.8,                       !- Coefficient 1 of Fuel Use Function of Part Load Ratio Curve              ",
-		"    0.1,                       !- Coefficient 2 of Fuel Use Function of Part Load Ratio Curve              ",
-		"    0.1,                       !- Coefficient 3 of Fuel Use Function of Part Load Ratio Curve              ",
-		"    Steam Boiler Plant Boiler Inlet Node,  !- Water Inlet Node Name                                        ",
-		"    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
-	} );
+    std::string const idf_objects = delimited_string({
+        "  Boiler:Steam,                                                                                            ",
+        "    Steam Boiler Plant Boiler,  !- Name                                                                    ",
+        "    NaturalGas,                !- Fuel Type                                                                ",
+        "    160000,                    !- Maximum Operating Pressure{ Pa }                                         ",
+        "    0.8,                       !- Theoretical Efficiency                                                   ",
+        "    115,                       !- Design Outlet Steam Temperature{ C }                                     ",
+        "    autosize,                  !- Nominal Capacity{ W }                                                    ",
+        "    0.00001,                   !- Minimum Part Load Ratio                                                  ",
+        "    1.0,                       !- Maximum Part Load Ratio                                                  ",
+        "    0.2,                       !- Optimum Part Load Ratio                                                  ",
+        "    0.8,                       !- Coefficient 1 of Fuel Use Function of Part Load Ratio Curve              ",
+        "    0.1,                       !- Coefficient 2 of Fuel Use Function of Part Load Ratio Curve              ",
+        "    0.1,                       !- Coefficient 3 of Fuel Use Function of Part Load Ratio Curve              ",
+        "    Steam Boiler Plant Boiler Inlet Node,  !- Water Inlet Node Name                                        ",
+        "    Steam Boiler Plant Boiler Outlet Node;  !- Steam Outlet Node Name                                      ",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects, false ) );
+    ASSERT_TRUE(process_idf(idf_objects, false));
 
-	GetBoilerInput();
+    GetBoilerInput();
 
-	EXPECT_EQ( Boiler( NumBoilers ).Name, "STEAM BOILER PLANT BOILER" );
-	EXPECT_EQ( Boiler( NumBoilers ).FuelType, AssignResourceTypeNum( "NATURALGAS" ) );
-	EXPECT_EQ( Boiler( NumBoilers ).BoilerMaxOperPress, 160000 );
-	EXPECT_EQ( Boiler( NumBoilers ).Effic, 0.8 );
-	EXPECT_EQ( Boiler( NumBoilers ).TempUpLimitBoilerOut, 115 );
-	EXPECT_EQ( Boiler( NumBoilers ).NomCap, AutoSize );
-	EXPECT_EQ( Boiler( NumBoilers ).MinPartLoadRat, 0.00001 );
-	EXPECT_EQ( Boiler( NumBoilers ).MaxPartLoadRat, 1.0 );
-	EXPECT_EQ( Boiler( NumBoilers ).OptPartLoadRat, 0.2 );
-	EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 1 ), 0.8 );
-	EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 2 ), 0.1 );
-	EXPECT_EQ( Boiler( NumBoilers ).FullLoadCoef( 3 ), 0.1 );
-	EXPECT_EQ( Boiler( NumBoilers ).SizFac, 1.0 );
-
+    EXPECT_EQ(Boiler(NumBoilers).Name, "STEAM BOILER PLANT BOILER");
+    EXPECT_EQ(Boiler(NumBoilers).FuelType, AssignResourceTypeNum("NATURALGAS"));
+    EXPECT_EQ(Boiler(NumBoilers).BoilerMaxOperPress, 160000);
+    EXPECT_EQ(Boiler(NumBoilers).Effic, 0.8);
+    EXPECT_EQ(Boiler(NumBoilers).TempUpLimitBoilerOut, 115);
+    EXPECT_EQ(Boiler(NumBoilers).NomCap, AutoSize);
+    EXPECT_EQ(Boiler(NumBoilers).MinPartLoadRat, 0.00001);
+    EXPECT_EQ(Boiler(NumBoilers).MaxPartLoadRat, 1.0);
+    EXPECT_EQ(Boiler(NumBoilers).OptPartLoadRat, 0.2);
+    EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(1), 0.8);
+    EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(2), 0.1);
+    EXPECT_EQ(Boiler(NumBoilers).FullLoadCoef(3), 0.1);
+    EXPECT_EQ(Boiler(NumBoilers).SizFac, 1.0);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,77 +54,61 @@
 namespace EnergyPlus {
 namespace SimulationManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern bool RunPeriodsInInput;
-	extern bool RunControlInInput;
+    // MODULE VARIABLE DECLARATIONS:
+    extern bool RunPeriodsInInput;
+    extern bool RunControlInInput;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
+    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
-	// Functions
-	void
-	clear_state();
+    // Functions
+    void clear_state();
 
-	void
-	ManageSimulation();
+    void ManageSimulation();
 
-	void
-	GetProjectData();
+    void GetProjectData();
 
-	void
-	CheckForMisMatchedEnvironmentSpecifications();
+    void CheckForMisMatchedEnvironmentSpecifications();
 
-	void
-	CheckForRequestedReporting();
+    void CheckForRequestedReporting();
 
-	void
-	OpenOutputFiles();
+    void OpenOutputFiles();
 
-	void
-	CloseOutputFiles();
+    void CloseOutputFiles();
 
-	void
-	SetupSimulation( bool & ErrorsFound );
+    void SetupSimulation(bool &ErrorsFound);
 
-	void
-	ReportNodeConnections();
+    void ReportNodeConnections();
 
-	void
-	ReportLoopConnections();
+    void ReportLoopConnections();
 
-	void
-	ReportParentChildren();
+    void ReportParentChildren();
 
-	void
-	ReportCompSetMeterVariables();
+    void ReportCompSetMeterVariables();
 
-	void
-	PostIPProcessing();
+    void PostIPProcessing();
 
-	void
-	CheckCachedIPErrors();
+    //	void
+    //	CheckCachedIPErrors();
 
-} // SimulationManager
+} // namespace SimulationManager
 
 // EXTERNAL SUBROUTINES:
 
-void
-Resimulate(
-	bool & ResimExt, // Flag to resimulate the exterior energy use simulation
-	bool & ResimHB, // Flag to resimulate the heat balance simulation (including HVAC)
-	bool & ResimHVAC // Flag to resimulate the HVAC simulation
+void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+                bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
+                bool &ResimHVAC // Flag to resimulate the HVAC simulation
 );
 
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

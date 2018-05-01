@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,51 +53,50 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	// Types
+    // Types
 
-	struct ZoneViewFactorInformation
-	{
-		// Members
-		std::string Name; // Zone name
-		int NumOfSurfaces; // Number of surfaces in the zone
-		Array2D< Real64 > F; // View Factors
-		Array2D< Real64 > ScriptF; // Hottel's Script F //Tuned Transposed
-		Array1D< Real64 > Area; // Surface area
-		Array1D< Real64 > Emissivity; // Surface emissivity
-		Array1D< Real64 > Azimuth; // Azimuth angle of the surface (in degrees)
-		Array1D< Real64 > Tilt; // Tilt angle of the surface (in degrees)
-		Array1D_int SurfacePtr; // Surface ALLOCATABLE (to Surface derived type)
-		Array1D_string Class; // Class of surface (Wall, Roof, etc.)
+    struct ZoneViewFactorInformation
+    {
+        // Members
+        std::string Name;           // Zone name
+        int NumOfSurfaces;          // Number of surfaces in the zone
+        Array2D<Real64> F;          // View Factors
+        Array2D<Real64> ScriptF;    // Hottel's Script F //Tuned Transposed
+        Array1D<Real64> Area;       // Surface area
+        Array1D<Real64> Emissivity; // Surface emissivity
+        Array1D<Real64> Azimuth;    // Azimuth angle of the surface (in degrees)
+        Array1D<Real64> Tilt;       // Tilt angle of the surface (in degrees)
+        Array1D_int SurfacePtr;     // Surface ALLOCATABLE (to Surface derived type)
+        Array1D_string Class;       // Class of surface (Wall, Roof, etc.)
 
-		// Default Constructor
-		ZoneViewFactorInformation() :
-			NumOfSurfaces( 0 )
-		{}
+        // Default Constructor
+        ZoneViewFactorInformation() : NumOfSurfaces(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<ZoneViewFactorInformation> ZoneInfo;
 
-	// Object Data
-	extern Array1D< ZoneViewFactorInformation > ZoneInfo;
+} // namespace DataViewFactorInformation
 
-} // DataViewFactorInformation
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

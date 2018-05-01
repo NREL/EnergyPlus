@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,10 +50,10 @@
 // Google test headers
 #include <gtest/gtest.h>
 
-#include <DataGlobals.hh>
-#include <MixedAir.hh>
-#include <DemandManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <DataGlobals.hh>
+#include <DemandManager.hh>
+#include <MixedAir.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -64,36 +64,27 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, DemandManagerGetInput)
 {
-	// Test input processing for DemandManager:Ventilation
+    // Test input processing for DemandManager:Ventilation
 
-	std::string const idf_objects = delimited_string({
-		"DemandManager:Ventilation,",
-		" Ventilation Manager,",
-		" ,",
-		" FIXEDRATE,",
-		" 60,",
-		" 0.2,",
-		" ,", // N3 left blank because Numbers was only assigned up to 2
-		" ,", // N4 left blank because Numbers was only assigned up to 2
-		" ALL,",
-		" ,",
-		" OA CONTROLLER 1;"});
+    std::string const idf_objects = delimited_string({"DemandManager:Ventilation,", " Ventilation Manager,", " ,", " FIXEDRATE,", " 60,", " 0.2,",
+                                                      " ,", // N3 left blank because Numbers was only assigned up to 2
+                                                      " ,", // N4 left blank because Numbers was only assigned up to 2
+                                                      " ALL,", " ,", " OA CONTROLLER 1;"});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	NumOAControllers = 1;
-	OAController.allocate( NumOAControllers );
-	OAController(1).Name = "OA CONTROLLER 1";
+    NumOAControllers = 1;
+    OAController.allocate(NumOAControllers);
+    OAController(1).Name = "OA CONTROLLER 1";
 
-	GetDemandManagerInput();
+    GetDemandManagerInput();
 
-	EXPECT_EQ( DataGlobals::ScheduleAlwaysOn, DemandMgr( 1 ).AvailSchedule );
-	EXPECT_EQ( ManagerLimitFixed, DemandMgr( 1 ).LimitControl );
-	EXPECT_DOUBLE_EQ( 60.0, DemandMgr( 1 ).LimitDuration );
-	EXPECT_DOUBLE_EQ( 0.2, DemandMgr( 1 ).FixedRate );
-	EXPECT_EQ( ManagerSelectionAll, DemandMgr( 1 ).SelectionControl );
-	EXPECT_EQ( 1, DemandMgr( 1 ).NumOfLoads );
-
+    EXPECT_EQ(DataGlobals::ScheduleAlwaysOn, DemandMgr(1).AvailSchedule);
+    EXPECT_EQ(ManagerLimitFixed, DemandMgr(1).LimitControl);
+    EXPECT_DOUBLE_EQ(60.0, DemandMgr(1).LimitDuration);
+    EXPECT_DOUBLE_EQ(0.2, DemandMgr(1).FixedRate);
+    EXPECT_EQ(ManagerSelectionAll, DemandMgr(1).SelectionControl);
+    EXPECT_EQ(1, DemandMgr(1).NumOfLoads);
 }
 
-}
+} // namespace EnergyPlus

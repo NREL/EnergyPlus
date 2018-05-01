@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,51 +54,49 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SortAndStringUtilities;
-using namespace EnergyPlus::InputProcessor;
 using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, SortAndStringUtilitiesTest_Basic )
+TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_Basic)
 {
-	ShowMessage( "Begin Test: SortAndStringUtilitiesTest, Basic" );
+    ShowMessage("Begin Test: SortAndStringUtilitiesTest, Basic");
 
-	Array1D_string Alphas( { "ZEBRA", "LION", "RACOON", "BOA", "LEMUR" } );
-	Array1D_int iAlphas( 5 );
-	SetupAndSort( Alphas, iAlphas );
-	EXPECT_TRUE( eq( Array1D_int( { 4, 5, 2, 3, 1 } ), iAlphas ) );
+    Array1D_string Alphas({"ZEBRA", "LION", "RACOON", "BOA", "LEMUR"});
+    Array1D_int iAlphas(5);
+    SetupAndSort(Alphas, iAlphas);
+    EXPECT_TRUE(eq(Array1D_int({4, 5, 2, 3, 1}), iAlphas));
 }
 
-TEST_F( EnergyPlusFixture, SortAndStringUtilitiesTest_findItemInSortedListUnderscoreTest)
+TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_findItemInSortedListUnderscoreTest)
 {
-	static Array1D_string ListOfObjects; // stored variable names
-	static Array1D_int iListOfObjects;
-	ListOfObjects.allocate(7);
+    static Array1D_string ListOfObjects; // stored variable names
+    static Array1D_int iListOfObjects;
+    ListOfObjects.allocate(7);
 
+    ListOfObjects = Array1D_string({
+        // list which has been incorrectly sorted
+        "SYSTEM NODE STANDARD DENSITY VOLUME FLOW RATE",
+        "SYSTEM NODE TEMPERATURE",
+        "SYSTEM NODE WETBULB TEMPERATURE",
+        "S_CCFRAC",
+        "T_TRIG",
+        "VRF HEAT PUMP CONDENSER INLET TEMPERATURE",
+        "VRF HEAT PUMP COOLING COP",
+    });
 
-	ListOfObjects = Array1D_string({			//list which has been incorrectly sorted
-		"SYSTEM NODE STANDARD DENSITY VOLUME FLOW RATE",
-		"SYSTEM NODE TEMPERATURE",
-		"SYSTEM NODE WETBULB TEMPERATURE",
-		"S_CCFRAC",
-		"T_TRIG",
-		"VRF HEAT PUMP CONDENSER INLET TEMPERATURE",
-		"VRF HEAT PUMP COOLING COP",
-	});
+    int NumObjectDefs = ListOfObjects.size();
 
-	int NumObjectDefs = ListOfObjects.size();
+    iListOfObjects.allocate(NumObjectDefs);
+    SetupAndSort(ListOfObjects, iListOfObjects); // list is resorted
 
-	iListOfObjects.allocate(NumObjectDefs);
-	SetupAndSort(ListOfObjects, iListOfObjects);		//list is resorted
+    auto index = UtilityRoutines::FindItemInSortedList("SYSTEM NODE TEMPERATURE", ListOfObjects, NumObjectDefs);
 
-	auto index = FindItemInSortedList("SYSTEM NODE TEMPERATURE", ListOfObjects, NumObjectDefs);
-
-	EXPECT_EQ(3, index);
-
+    EXPECT_EQ(3, index);
 }

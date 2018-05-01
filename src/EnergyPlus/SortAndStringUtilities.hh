@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,41 +58,34 @@ namespace EnergyPlus {
 
 namespace SortAndStringUtilities {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE SortUtilities
+    // SUBROUTINE SPECIFICATIONS FOR MODULE SortUtilities
 
-	// Functions
+    // Functions
 
-	void
-	SetupAndSort(
-		Array1S_string Alphas, // Alphas to be sorted
-		Array1S_int iAlphas // Indexes of sorted array
-	);
+    void SetupAndSort(Array1S_string Alphas, // Alphas to be sorted
+                      Array1S_int iAlphas    // Indexes of sorted array
+    );
 
-	void
-	QsortC(
-		Array1S_string Alphas, // Alphas to be sorted
-		Array1S_int iAlphas // Indexes of sorted array
-	);
+    void QsortC(Array1S_string Alphas, // Alphas to be sorted
+                Array1S_int iAlphas    // Indexes of sorted array
+    );
 
-	void
-	QsortPartition(
-		Array1S_string Alphas, // Alphas to be sorted
-		Array1S_int iAlphas, // Indexes of sorted array
-		int & marker
-	);
+    void QsortPartition(Array1S_string Alphas, // Alphas to be sorted
+                        Array1S_int iAlphas,   // Indexes of sorted array
+                        int &marker);
 
-} // SortAndStringUtilities
+} // namespace SortAndStringUtilities
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

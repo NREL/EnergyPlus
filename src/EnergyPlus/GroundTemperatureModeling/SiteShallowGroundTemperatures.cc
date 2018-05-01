@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,180 +57,169 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
-	static gio::Fmt fmtA( "(A)" );
-	static gio::Fmt fmtAN( "(A,$)" );
+static gio::Fmt fmtA("(A)");
+static gio::Fmt fmtAN("(A,$)");
 
-	//******************************************************************************
+//******************************************************************************
 
-	// Site:GroundTemperature:Shallow factory
-	std::shared_ptr< SiteShallowGroundTemps > 
-	SiteShallowGroundTemps::ShallowGTMFactory( 
-		int objectType, 
-		std::string objectName
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+// Site:GroundTemperature:Shallow factory
+std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactory(int objectType, std::string objectName)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Reads input and creates instance of Site:GroundDomain:Shallow object
+    // PURPOSE OF THIS SUBROUTINE:
+    // Reads input and creates instance of Site:GroundDomain:Shallow object
 
-		// USE STATEMENTS:
-		using DataEnvironment::GroundTemp_SurfaceObjInput;
-		using DataGlobals::OutputFileInits;
-		using namespace DataIPShortCuts;
-		using namespace GroundTemperatureManager;
-		using namespace ObjexxFCL::gio;
+    // USE STATEMENTS:
+    using DataEnvironment::GroundTemp_SurfaceObjInput;
+    using DataGlobals::OutputFileInits;
+    using namespace DataIPShortCuts;
+    using namespace GroundTemperatureManager;
+    using namespace ObjexxFCL::gio;
 
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool found = false;
-		int NumNums;
-		int NumAlphas;
-		int IOStat;
+    // Locals
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    bool found = false;
+    int NumNums;
+    int NumAlphas;
+    int IOStat;
 
-		// New shared pointer for this model object
-		std::shared_ptr< SiteShallowGroundTemps > thisModel( new SiteShallowGroundTemps() );
+    // New shared pointer for this model object
+    std::shared_ptr<SiteShallowGroundTemps> thisModel(new SiteShallowGroundTemps());
 
-		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteShallowGroundTemp );
-		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_SiteShallowGroundTemp);
+    int numCurrObjects = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-		thisModel->objectType = objectType;
-		thisModel->objectName = objectName;
+    thisModel->objectType = objectType;
+    thisModel->objectName = objectName;
 
-		if ( numCurrObjects == 1 ) {
+    if (numCurrObjects == 1) {
 
-			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+        // Get the object names for each construction from the input processor
+        inputProcessor->getObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
-			if ( NumNums < 12 ) {
-				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
-				thisModel->errorsFound = true;
-			}
+        if (NumNums < 12) {
+            ShowSevereError(cCurrentModuleObject + ": Less than 12 values entered.");
+            thisModel->errorsFound = true;
+        }
 
-			//Assign the ground temps to the variable
-			for ( int i = 1; i <= 12; ++i ) {
-				thisModel->surfaceGroundTemps( i ) = rNumericArgs( i );
-			}
+        // Assign the ground temps to the variable
+        for (int i = 1; i <= 12; ++i) {
+            thisModel->surfaceGroundTemps(i) = rNumericArgs(i);
+        }
 
-			GroundTemp_SurfaceObjInput = true;
+        GroundTemp_SurfaceObjInput = true;
 
-		} else if ( numCurrObjects > 1 ) {
-			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
-			thisModel->errorsFound = true;
-		} else {
-			thisModel->surfaceGroundTemps = 13.0;
-		}
+    } else if (numCurrObjects > 1) {
+        ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
+        thisModel->errorsFound = true;
+    } else {
+        thisModel->surfaceGroundTemps = 13.0;
+    }
 
-		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Shallow>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
-		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Shallow";
-		for ( int i = 1; i <= 12; ++i ) {
-			gio::write( OutputFileInits, "(', ',F6.2,$)" ) << thisModel->surfaceGroundTemps( i );
-		}
-		gio::write( OutputFileInits );
+    // Write Final Ground Temp Information to the initialization output file
+    gio::write(OutputFileInits, fmtA)
+        << "! <Site:GroundTemperature:Shallow>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
+    gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:Shallow";
+    for (int i = 1; i <= 12; ++i) {
+        gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->surfaceGroundTemps(i);
+    }
+    gio::write(OutputFileInits);
 
-		found = true;
+    found = true;
 
-		if ( found && !thisModel->errorsFound ) {
-			groundTempModels.push_back( thisModel );
-			return thisModel;
-		} else {
-			ShowContinueError( "Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
-			return nullptr;
-		}
-	}
+    if (found && !thisModel->errorsFound) {
+        groundTempModels.push_back(thisModel);
+        return thisModel;
+    } else {
+        ShowContinueError("Site:GroundTemperature:Shallow--Errors getting input for ground temperature model");
+        return nullptr;
+    }
+}
 
-	//******************************************************************************
+//******************************************************************************
 
-	Real64
-	SiteShallowGroundTemps::getGroundTemp()
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+Real64 SiteShallowGroundTemps::getGroundTemp()
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Return the ground temperature from Site:GroundTemperature:Shallow
+    // PURPOSE OF THIS SUBROUTINE:
+    // Return the ground temperature from Site:GroundTemperature:Shallow
 
-		return surfaceGroundTemps( timeOfSimInMonths );
-	}
+    return surfaceGroundTemps(timeOfSimInMonths);
+}
 
-	//******************************************************************************
+//******************************************************************************
 
-	Real64
-	SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(
-		Real64 const EP_UNUSED( _depth ),
-		Real64 const _seconds
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(Real64 const EP_UNUSED(_depth), Real64 const _seconds)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns the ground temperature when input time is in seconds
+    // PURPOSE OF THIS SUBROUTINE:
+    // Returns the ground temperature when input time is in seconds
 
-		// USE STATEMENTS:
-		using DataGlobals::SecsInDay;
-		using WeatherManager::NumDaysInYear;
+    // USE STATEMENTS:
+    using DataGlobals::SecsInDay;
+    using WeatherManager::NumDaysInYear;
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 secPerMonth = NumDaysInYear * SecsInDay / 12;
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 secPerMonth = NumDaysInYear * SecsInDay / 12;
 
-		// Convert secs to months
-		int month = ceil( _seconds / secPerMonth );
+    // Convert secs to months
+    int month = ceil(_seconds / secPerMonth);
 
-		if ( month >= 1 && month <= 12 ) {
-			timeOfSimInMonths = month;
-		} else {
-			timeOfSimInMonths = remainder( month, 12 );
-		}
+    if (month >= 1 && month <= 12) {
+        timeOfSimInMonths = month;
+    } else {
+        timeOfSimInMonths = remainder(month, 12);
+    }
 
-		// Get and return ground temp
-		return getGroundTemp();
-	}
+    // Get and return ground temp
+    return getGroundTemp();
+}
 
-	//******************************************************************************
+//******************************************************************************
 
-	Real64
-	SiteShallowGroundTemps::getGroundTempAtTimeInMonths(
-		Real64 const EP_UNUSED( _depth ),
-		int const _month
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths(Real64 const EP_UNUSED(_depth), int const _month)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns the ground temperature when input time is in months
+    // PURPOSE OF THIS SUBROUTINE:
+    // Returns the ground temperature when input time is in months
 
-		// Set month
-		if ( _month >= 1 && _month <= 12 ) {
-			timeOfSimInMonths = _month;
-		} else {
-			timeOfSimInMonths = remainder( _month, 12 );
-		}
+    // Set month
+    if (_month >= 1 && _month <= 12) {
+        timeOfSimInMonths = _month;
+    } else {
+        timeOfSimInMonths = remainder(_month, 12);
+    }
 
-		// Get and return ground temp
-		return getGroundTemp();
-	}
+    // Get and return ground temp
+    return getGroundTemp();
+}
 
-	//******************************************************************************
+//******************************************************************************
 
-}	// EnergyPlus
+} // namespace EnergyPlus

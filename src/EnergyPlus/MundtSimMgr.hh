@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,169 +53,148 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace MundtSimMgr {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	extern Real64 const CpAir; // Specific heat of air
-	extern Real64 const MinSlope; // Bound on result from Mundt model
-	extern Real64 const MaxSlope; // Bound on result from Mundt Model
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    extern Real64 const CpAir;    // Specific heat of air
+    extern Real64 const MinSlope; // Bound on result from Mundt model
+    extern Real64 const MaxSlope; // Bound on result from Mundt Model
 
-	// MODULE DERIVED TYPE DEFINITIONS:
+    // MODULE DERIVED TYPE DEFINITIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS:
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D_int FloorSurfSetIDs; // fixed variable for floors
-	extern Array1D_int TheseSurfIDs; // temporary working variable
-	extern int MundtCeilAirID; // air node index in AirDataManager
-	extern int MundtFootAirID; // air node index in AirDataManager
-	extern int SupplyNodeID; // air node index in AirDataManager
-	extern int TstatNodeID; // air node index in AirDataManager
-	extern int ReturnNodeID; // air node index in AirDataManager
-	extern int NumRoomNodes; // number of nodes connected to walls
-	extern int NumFloorSurfs; // total number of surfaces for floor
-	extern Array1D_int RoomNodeIDs; // ids of the first NumRoomNode Air Nodes
-	extern Array1D_int ID1dSurf; // numbers used to identify surfaces
-	extern int MundtZoneNum; // index of zones using Mundt model
-	extern Real64 ZoneHeight; // zone height
-	extern Real64 ZoneFloorArea; // zone floor area
-	extern Real64 QventCool; // heat gain due to ventilation
-	extern Real64 ConvIntGain; // heat gain due to internal gains
-	extern Real64 SupplyAirTemp; // supply air temperature
-	extern Real64 SupplyAirVolumeRate; // supply air volume flowrate
-	extern Real64 ZoneAirDensity; // zone air density
-	extern Real64 QsysCoolTot; // zone sensible cooling load
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D_int FloorSurfSetIDs; // fixed variable for floors
+    extern Array1D_int TheseSurfIDs;    // temporary working variable
+    extern int MundtCeilAirID;          // air node index in AirDataManager
+    extern int MundtFootAirID;          // air node index in AirDataManager
+    extern int SupplyNodeID;            // air node index in AirDataManager
+    extern int TstatNodeID;             // air node index in AirDataManager
+    extern int ReturnNodeID;            // air node index in AirDataManager
+    extern int NumRoomNodes;            // number of nodes connected to walls
+    extern int NumFloorSurfs;           // total number of surfaces for floor
+    extern Array1D_int RoomNodeIDs;     // ids of the first NumRoomNode Air Nodes
+    extern Array1D_int ID1dSurf;        // numbers used to identify surfaces
+    extern int MundtZoneNum;            // index of zones using Mundt model
+    extern Real64 ZoneHeight;           // zone height
+    extern Real64 ZoneFloorArea;        // zone floor area
+    extern Real64 QventCool;            // heat gain due to ventilation
+    extern Real64 ConvIntGain;          // heat gain due to internal gains
+    extern Real64 SupplyAirTemp;        // supply air temperature
+    extern Real64 SupplyAirVolumeRate;  // supply air volume flowrate
+    extern Real64 ZoneAirDensity;       // zone air density
+    extern Real64 QsysCoolTot;          // zone sensible cooling load
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE MundtSimMgr
+    // SUBROUTINE SPECIFICATIONS FOR MODULE MundtSimMgr
 
-	// main subsroutine
+    // main subsroutine
 
-	// Routines for transferring data between surface and air domains
+    // Routines for transferring data between surface and air domains
 
-	// Routines for actual calculations in Mundt model
+    // Routines for actual calculations in Mundt model
 
-	// Types
+    // Types
 
-	struct DefineLinearModelNode
-	{
-		// Members
-		std::string AirNodeName; // Name of air nodes
-		int ClassType; // Type of air nodes
-		Real64 Height; // Z coordinates [m] node's Control Vol. center
-		Real64 Temp; // Surface temperature BC
-		Array1D_bool SurfMask; // Limit of 60 surfaces at current sizing
+    struct DefineLinearModelNode
+    {
+        // Members
+        std::string AirNodeName; // Name of air nodes
+        int ClassType;           // Type of air nodes
+        Real64 Height;           // Z coordinates [m] node's Control Vol. center
+        Real64 Temp;             // Surface temperature BC
+        Array1D_bool SurfMask;   // Limit of 60 surfaces at current sizing
 
-		// Default Constructor
-		DefineLinearModelNode() :
-			ClassType( 0 ),
-			Height( 0.0 ),
-			Temp( 0.0 )
-		{}
+        // Default Constructor
+        DefineLinearModelNode() : ClassType(0), Height(0.0), Temp(0.0)
+        {
+        }
+    };
 
-	};
+    struct DefineSurfaceSettings
+    {
+        // Members
+        Real64 Area;     // m2
+        Real64 Temp;     // surface temperature BC
+        Real64 Hc;       // convective film coeff BC
+        Real64 TMeanAir; // effective near-surface air temp from air model solution
 
-	struct DefineSurfaceSettings
-	{
-		// Members
-		Real64 Area; // m2
-		Real64 Temp; // surface temperature BC
-		Real64 Hc; // convective film coeff BC
-		Real64 TMeanAir; // effective near-surface air temp from air model solution
+        // Default Constructor
+        DefineSurfaceSettings() : Area(0.0), Temp(0.0), Hc(0.0), TMeanAir(0.0)
+        {
+        }
+    };
 
-		// Default Constructor
-		DefineSurfaceSettings() :
-			Area( 0.0 ),
-			Temp( 0.0 ),
-			Hc( 0.0 ),
-			TMeanAir( 0.0 )
-		{}
+    struct DefineZoneData
+    {
+        // Members
+        int SurfFirst;      // index for first surface of the zone
+        int NumOfSurfs;     // number of surfaces in the zone
+        int MundtZoneIndex; // index for zones using Mundt model
 
-	};
+        // Default Constructor
+        DefineZoneData() : SurfFirst(0), NumOfSurfs(0), MundtZoneIndex(0)
+        {
+        }
+    };
 
-	struct DefineZoneData
-	{
-		// Members
-		int SurfFirst; // index for first surface of the zone
-		int NumOfSurfs; // number of surfaces in the zone
-		int MundtZoneIndex; // index for zones using Mundt model
+    // Object Data
+    extern Array1D<DefineZoneData> ZoneData;            // zone data
+    extern Array2D<DefineLinearModelNode> LineNode;     // air nodes
+    extern Array2D<DefineSurfaceSettings> MundtAirSurf; // surfaces
+    extern Array1D<DefineSurfaceSettings> FloorSurf;    // floor
 
-		// Default Constructor
-		DefineZoneData() :
-			SurfFirst( 0 ),
-			NumOfSurfs( 0 ),
-			MundtZoneIndex( 0 )
-		{}
+    // Functions
 
-	};
+    void ManageMundtModel(int const ZoneNum); // index number for the specified zone
 
-	// Object Data
-	extern Array1D< DefineZoneData > ZoneData; // zone data
-	extern Array2D< DefineLinearModelNode > LineNode; // air nodes
-	extern Array2D< DefineSurfaceSettings > MundtAirSurf; // surfaces
-	extern Array1D< DefineSurfaceSettings > FloorSurf; // floor
+    //*****************************************************************************************
 
-	// Functions
+    void InitMundtModel();
 
-	void
-	ManageMundtModel( int const ZoneNum ); // index number for the specified zone
+    //*****************************************************************************************
 
-	//*****************************************************************************************
+    void GetSurfHBDataForMundtModel(int const ZoneNum); // index number for the specified zone
 
-	void
-	InitMundtModel();
+    //*****************************************************************************************
 
-	//*****************************************************************************************
+    void SetupMundtModel(int const ZoneNum, // index number for the specified zone
+                         bool &ErrorsFound  // true if problems setting up model
+    );
 
-	void
-	GetSurfHBDataForMundtModel( int const ZoneNum ); // index number for the specified zone
+    //*****************************************************************************************
 
-	//*****************************************************************************************
+    void CalcMundtModel(int const ZoneNum); // index number for the specified zone
 
-	void
-	SetupMundtModel(
-		int const ZoneNum, // index number for the specified zone
-		bool & ErrorsFound // true if problems setting up model
-	);
+    //*****************************************************************************************
 
-	//*****************************************************************************************
+    void SetNodeResult(int const NodeID,       // node ID
+                       Real64 const TempResult // temperature for the specified air node
+    );
 
-	void
-	CalcMundtModel( int const ZoneNum ); // index number for the specified zone
+    //*****************************************************************************************
 
-	//*****************************************************************************************
+    void SetSurfTmeanAir(int const SurfID,    // surface ID
+                         Real64 const TeffAir // temperature of air node adjacent to the specified surface
+    );
 
-	void
-	SetNodeResult(
-		int const NodeID, // node ID
-		Real64 const TempResult // temperature for the specified air node
-	);
+    //*****************************************************************************************
 
-	//*****************************************************************************************
+    void SetSurfHBDataForMundtModel(int const ZoneNum); // index number for the specified zone
 
-	void
-	SetSurfTmeanAir(
-		int const SurfID, // surface ID
-		Real64 const TeffAir // temperature of air node adjacent to the specified surface
-	);
+    //*****************************************************************************************
 
-	//*****************************************************************************************
+} // namespace MundtSimMgr
 
-	void
-	SetSurfHBDataForMundtModel( int const ZoneNum ); // index number for the specified zone
-
-	//*****************************************************************************************
-
-} // MundtSimMgr
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

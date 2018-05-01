@@ -1,7 +1,7 @@
 ! AirflowNetwork_MULTIZONE_LocalNode.idf
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
-! Highlights:             This file does the basic test of an air distribution system in a residetial home.
+! Highlights:             This file does the basic test of an air distribution system in a residential home.
 !                         It provides forced ventilation during system on period and natural ventilation via
 !                         SIMPLE airflow model during system off period.
 !
@@ -11,9 +11,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
-
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 ! Building:                There are 3 zones (living space, garage and attic). The living zone is conditioned.
 !                          The other two zones are unconditioned.
 !                          Supply ducts are located in the attic zone and return ducts are located in the garage zone.
@@ -93,7 +92,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -135,7 +134,6 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
     41.78,                   !- Latitude {deg}
@@ -143,7 +141,7 @@
     -6.00,                   !- Time Zone {hr}
     190.00;                  !- Elevation {m}
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -173,7 +171,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -1406,23 +1404,22 @@
     WFacade_WPCValue;        !- Wind Pressure Coefficient Curve Name
 
   OutdoorAir:Node,
-    OutdoorAirNode:0001,          !- Name
-	,                             !- Height Above Ground
-	OutdoorAirNodeDryBulb:0001,   !- Drybulb Temperature Schedule Name 
-	,                             !- Wetbulb Schedule Name
-	,                             !- Wind Speed Schedule Name
-	,                             !- Wind Direction Schedule Name 
-	NFacade_WPCValue,
-	No,
-	Absolute;
-	
+    OutdoorAirNode:0001,     !- Name
+    ,                        !- Height Above Ground {m}
+    OutdoorAirNodeDryBulb:0001,  !- Drybulb Temperature Schedule Name
+    ,                        !- Wetbulb Schedule Name
+    ,                        !- Wind Speed Schedule Name
+    ,                        !- Wind Direction Schedule Name
+    NFacade_WPCValue,        !- Wind Pressure Coefficient Curve Name
+    No,                      !- Symmetric Wind Pressure Coefficient Curve
+    Absolute;                !- Wind Angle Type
+
   Schedule:Compact,
-    OutdoorAirNodeDryBulb:0001,   !- Name
-    Any Number,                   !- Schedule Type Limits Name
-    Through: 12/31,               !- Field 1
-    For: AllDays,                 !- Field 2
-    Until: 24:00,35.0;            !- Field 3
-	
+    OutdoorAirNodeDryBulb:0001,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,35.0;       !- Field 3
 
   AirflowNetwork:MultiZone:WindPressureCoefficientArray,
     Every 30 Degrees,        !- Name
@@ -1831,10 +1828,11 @@
     ZoneInlets,              !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone Node,               !- Zone Air Node Name
-    Zone Outlet Node;        !- Zone Return Air Node Name
+    Zone Outlet Node;        !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1981,7 +1979,7 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep,ReportSch;
 
-  Output:Variable,*,Heating Coil Air Heating Energy,TimeStep,ReportSch;
+  Output:Variable,*,Heating Coil Heating Energy,TimeStep,ReportSch;
 
   Output:Variable,*,Zone Air Temperature,TimeStep,ReportSch;
 

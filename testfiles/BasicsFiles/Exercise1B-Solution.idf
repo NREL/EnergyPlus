@@ -77,7 +77,7 @@
 !
 !
 
-  Version,8.8;
+  Version,8.9;
 
   Building,
     Exercise 1B,             !- Name
@@ -412,10 +412,11 @@
     ZONE ONE Supply Inlet,   !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     ZONE ONE Zone Air Node,  !- Zone Air Node Name
-    ZONE ONE Return Outlet;  !- Zone Return Air Node Name
+    ZONE ONE Return Outlet;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     ZONE ONE Equipment,      !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE ONE Purchased Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

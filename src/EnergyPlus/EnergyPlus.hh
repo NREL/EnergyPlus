@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,20 +57,20 @@
 
 // macro to supress unused parameter
 // UNUSED( foo );
-#define EP_UNUSED( expr )
+#define EP_UNUSED(expr)
 
 // ObjexxFCL
 namespace ObjexxFCL {
 namespace fmt {
-} // fmt
-} // ObjexxFCL
+} // namespace fmt
+} // namespace ObjexxFCL
 using namespace ObjexxFCL;
 using namespace ObjexxFCL::fmt;
 
 // Types
-typedef  std::int32_t  Int32;
-typedef  std::int64_t  Int64;
-typedef  float         Real32; // Platform-specific: C++ has no defined precision floating point types
-typedef  double        Real64; // Platform-specific: C++ has no defined precision floating point types
+typedef std::int32_t Int32;
+typedef std::int64_t Int64;
+typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
+typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
 
 #endif

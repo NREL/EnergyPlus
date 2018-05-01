@@ -30,8 +30,8 @@
 !
 ! Location:                Miami, FL USA
 !
-! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8.7캜
-!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8.7째C
+!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_FL_Miami.Intl.AP_722020_TMY3
 !
@@ -43,7 +43,7 @@
 !           block covered with gypsum board on each surface. The roof is a built up roof with 1/2 in slag over 3/8 in
 !           felt and membrane with R-11 insulation over 6 in lightweight concrete, an air gap separates the interior
 !           acoustical tiles. The windows are single pane 6mm clear and double pane 6mm clear with 6mm air gap.
-!           The window to wall ratio is approxomately 0.0016.
+!           The window to wall ratio is approximately 0.0016.
 !
 !           The building is oriented due north with front of building facing east.
 !
@@ -124,7 +124,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.8;
+  Version,8.9;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -175,10 +175,10 @@
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
  ! Miami Intl Ap_FL_USA Extreme Annual Wind Speeds, 1%=9.2m/s, 2.5%=8.4m/s, 5%=7.7m/s
- ! Miami Intl Ap_FL_USA Extreme Annual Temperatures, Max Drybulb=5.1캜 Min Drybulb=35캜
+ ! Miami Intl Ap_FL_USA Extreme Annual Temperatures, Max Drybulb=5.1째C Min Drybulb=35째C
  ! Miami Intl Ap_FL_USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
  ! Coldest Month=JAN
- ! Miami Intl Ap_FL_USA Annual Heating 99.6%, MaxDB=8.7캜
+ ! Miami Intl Ap_FL_USA Annual Heating 99.6%, MaxDB=8.7째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
@@ -210,7 +210,7 @@
 
  ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
  ! Hottest Month=JUL
- ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2캜 MWB=25.3캜
+ ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2째C MWB=25.3째C
 
   SizingPeriod:DesignDay,
     Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
@@ -600,7 +600,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:17,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -612,7 +612,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 4:00,0,           !- Field 4
     Until: 4:22,1,           !- Field 6
     Until: 14:00,0,          !- Field 8
@@ -624,7 +624,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:17,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -636,7 +636,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 08:00,0,          !- Field 4
     Until: 08:22,1,          !- Field 6
     Until: 18:00,0,          !- Field 8
@@ -648,7 +648,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:20,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -660,7 +660,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 11:00,0,          !- Field 4
     Until: 11:30,1,          !- Field 6
     Until: 23:00,0,          !- Field 8
@@ -672,7 +672,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 07:00,0,          !- Field 4
     Until: 07:17,1,          !- Field 6
     Until: 17:00,0,          !- Field 8
@@ -684,7 +684,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 07:00,0,          !- Field 4
     Until: 07:22,1,          !- Field 6
     Until: 17:00,0,          !- Field 8
@@ -696,7 +696,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 06:00,0,          !- Field 4
     Until: 06:17,1,          !- Field 6
     Until: 16:00,0,          !- Field 8
@@ -708,7 +708,7 @@
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Interpolate:Yes,         !- Field 3
+    Interpolate:Average,         !- Field 3
     Until: 06:00,0,          !- Field 4
     Until: 06:22,1,          !- Field 6
     Until: 16:00,0,          !- Field 8
@@ -1403,6 +1403,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1410,6 +1411,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1423,7 +1425,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SalesFloor Node,         !- Zone Air Node Name
-    SalesFloor Outlet Node;  !- Zone Return Air Node Name
+    SalesFloor Outlet Node;  !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     BackRoom,                !- Zone Name
@@ -1431,7 +1433,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     BackRoom Node,           !- Zone Air Node Name
-    BackRoom Outlet Node;    !- Zone Return Air Node Name
+    BackRoom Outlet Node;    !- Zone Return Air Node or NodeList Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
 
@@ -2476,13 +2478,13 @@
 ! Capacity Curve for Bitzer 2GSL-3K-4SU (R-744) - Subcritical Operation
 ! Frequency:  60 Hz
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  13110 W (-30캜 SST, -5캜 SDT)
-! Rated Subcooling:  0캜
-! Rated Suction Gas Superheat:  10캜
-! Minimum SST:  -50캜
-! Maximum SST:  -15캜
-! Minimum SDT:  -20캜
-! Maximum SDT:   15캜
+! Nominal Capacity:  13110 W (-30째C SST, -5째C SDT)
+! Rated Subcooling:  0째C
+! Rated Suction Gas Superheat:  10째C
+! Minimum SST:  -50째C
+! Maximum SST:  -15째C
+! Minimum SDT:  -20째C
+! Maximum SDT:   15째C
 !
 
   Curve:Bicubic,
@@ -2505,13 +2507,13 @@
 ! Power Curve for Bitzer 2GSL-3K-4SU (R-744) - Subcritical Operation
 ! Frequency:  60 Hz
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  2660 W (-30캜 SST, -5캜 SDT)
-! Rated Subcooling:  0캜
-! Rated Suction Gas Superheat:  10캜
-! Minimum SST:  -50캜
-! Maximum SST:  -15캜
-! Minimum SDT:  -20캜
-! Maximum SDT:   15캜
+! Nominal Power:  2660 W (-30째C SST, -5째C SDT)
+! Rated Subcooling:  0째C
+! Rated Suction Gas Superheat:  10째C
+! Minimum SST:  -50째C
+! Maximum SST:  -15째C
+! Minimum SDT:  -20째C
+! Maximum SDT:   15째C
 !
 
   Curve:Bicubic,
@@ -2534,13 +2536,13 @@
 ! Capacity Curve for Bitzer 4FTC-20K (R-744) - Subcritical Operation
 ! Frequency:  60 Hz (estimated performance)
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Capacity:  59340 W (-15캜 SST, 15캜 SDT)
-! Rated Subcooling:  0캜
-! Rated Suction Gas Superheat:  10캜
-! Minimum SST:  -20캜
-! Maximum SST:    0캜
-! Minimum SDT:    5캜
-! Maximum SDT:   25캜
+! Nominal Capacity:  59340 W (-15째C SST, 15째C SDT)
+! Rated Subcooling:  0째C
+! Rated Suction Gas Superheat:  10째C
+! Minimum SST:  -20째C
+! Maximum SST:    0째C
+! Minimum SDT:    5째C
+! Maximum SDT:   25째C
 !
 
   Curve:Bicubic,
@@ -2563,13 +2565,13 @@
 ! Power Curve for Bitzer 4FTC-20K (R-744) - Subcritical Operation
 ! Frequency:  60 Hz (estimated performance)
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Sat Discharge Temp (C)
-! Nominal Power:  14890 W (-15캜 SST, 15캜 SDT)
-! Rated Subcooling:  0캜
-! Rated Suction Gas Superheat:  10캜
-! Minimum SST:  -20캜
-! Maximum SST:    0캜
-! Minimum SDT:    5캜
-! Maximum SDT:   25캜
+! Nominal Power:  14890 W (-15째C SST, 15째C SDT)
+! Rated Subcooling:  0째C
+! Rated Suction Gas Superheat:  10째C
+! Minimum SST:  -20째C
+! Maximum SST:    0째C
+! Minimum SDT:    5째C
+! Maximum SDT:   25째C
 !
 
   Curve:Bicubic,
@@ -2592,10 +2594,10 @@
 ! Capacity Curve for Bitzer 4FTC-20K (R-744) - Transcritical Operation
 ! Frequency:  60 Hz (estimated performance)
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Outlet Enthalpy (J/kg)
-! Nominal Capacity:  43090 W (-10캜 SST, Tgo = 35캜, Pgc = 9000000 Pa)
-! Rated Suction Gas Superheat:  10캜
-! Minimum SST:  -20캜
-! Maximum SST:    0캜
+! Nominal Capacity:  43090 W (-10째C SST, Tgo = 35째C, Pgc = 9000000 Pa)
+! Rated Suction Gas Superheat:  10째C
+! Minimum SST:  -20째C
+! Maximum SST:    0째C
 ! Minimum Gas Cooler Outlet Enthalpy:  291650 J/kg
 ! Maximum Gas Cooler Outlet Enthalpy:  313040 J/kg
 !
@@ -2620,10 +2622,10 @@
 ! Power Curve for Bitzer 4FTC-20K (R-744) - Transcritical Operation
 ! Frequency:  60 Hz (estimated performance)
 ! Results in Watts, Inputs:  Sat Suction Temp (C), Gas Cooler Pressure (Pa)
-! Nominal Power:  25360 W (-10캜 SST, Tgo = 35캜, Pgc = 9000000 Pa)
-! Rated Suction Gas Superheat:  10캜
-! Minimum SST:  -20캜
-! Maximum SST:    0캜
+! Nominal Power:  25360 W (-10째C SST, Tgo = 35째C, Pgc = 9000000 Pa)
+! Rated Suction Gas Superheat:  10째C
+! Minimum SST:  -20째C
+! Maximum SST:    0째C
 ! Minimum Gas Cooler Pressure:  7500000 Pa
 ! Maximum Gas Cooler Pressure:  10000000 Pa
 !
@@ -2692,7 +2694,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:SATURATED ===========
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Pressure,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -2706,7 +2708,7 @@
     7.3640E+6,7.3773E+6;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -2720,7 +2722,7 @@
     3.2032E+5,3.3225E+5;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Enthalpy,                !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -2734,7 +2736,7 @@
     3.4541E+5,3.3225E+5;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Density,                 !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -2748,7 +2750,7 @@
     5.2118E+2,4.6760E+2;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     Density,                 !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -2762,7 +2764,7 @@
     4.1579E+2,4.6760E+2;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     Fluid,                   !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -2776,7 +2778,7 @@
     6.8973E+5,1.0207E+14;
 
   FluidProperties:Saturated,
-    R744,                    !- Name
+    R744,                    !- Fluid Name
     SpecificHeat,            !- Fluid Property Type
     FluidGas,                !- Fluid Phase
     R744SaturatedTemperatures,  !- Temperature Values Name
@@ -7317,7 +7319,7 @@
 
   Output:Variable,*,Cooling Coil Electric Energy,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 

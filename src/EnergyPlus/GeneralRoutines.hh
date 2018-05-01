@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,119 +58,99 @@
 
 namespace EnergyPlus {
 
-void
-ControlCompOutput(
-	std::string const & CompName, // the component Name
-	std::string const & CompType, // Type of component
-	int & CompNum, // Index of component in component array
-	bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-	Real64 const QZnReq, // zone load to be met
-	int const ActuatedNode, // node that controls unit output
-	Real64 const MaxFlow, // maximum water flow
-	Real64 const MinFlow, // minimum water flow
-	Real64 const ControlOffset, // really the tolerance
-	int & ControlCompTypeNum, // Internal type num for CompType
-	int & CompErrIndex, // for Recurring error call
-	Optional_int_const TempInNode = _, // inlet node for output calculation
-	Optional_int_const TempOutNode = _, // outlet node for output calculation
-	Optional< Real64 const > AirMassFlow = _, // air mass flow rate
-	Optional_int_const Action = _, // 1=reverse; 2=normal
-	Optional_int_const EquipIndex = _, // Identifier for equipment of Outdoor Air Unit "ONLY"
-	Optional_int_const LoopNum = _, // for plant components, plant loop index
-	Optional_int_const LoopSide = _, // for plant components, plant loop side index
-	Optional_int_const BranchIndex = _, // for plant components, plant branch index
-	Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
+void ControlCompOutput(std::string const &CompName,               // the component Name
+                       std::string const &CompType,               // Type of component
+                       int &CompNum,                              // Index of component in component array
+                       bool const FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
+                       Real64 const QZnReq,                       // zone load to be met
+                       int const ActuatedNode,                    // node that controls unit output
+                       Real64 const MaxFlow,                      // maximum water flow
+                       Real64 const MinFlow,                      // minimum water flow
+                       Real64 const ControlOffset,                // really the tolerance
+                       int &ControlCompTypeNum,                   // Internal type num for CompType
+                       int &CompErrIndex,                         // for Recurring error call
+                       Optional_int_const TempInNode = _,         // inlet node for output calculation
+                       Optional_int_const TempOutNode = _,        // outlet node for output calculation
+                       Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
+                       Optional_int_const Action = _,             // 1=reverse; 2=normal
+                       Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
+                       Optional_int_const LoopNum = _,            // for plant components, plant loop index
+                       Optional_int_const LoopSide = _,           // for plant components, plant loop side index
+                       Optional_int_const BranchIndex = _,        // for plant components, plant branch index
+                       Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
 );
 
-void
-CheckSysSizing(
-	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
-	std::string const & CompName // Component Name (e.g. Big Chiller)
+bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const MinFlow);
+
+void CheckSysSizing(std::string const &CompType, // Component Type (e.g. Chiller:Electric)
+                    std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void
-CheckThisAirSystemForSizing(
-	int const AirLoopNum,
-	bool & AirLoopWasSized
+void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized);
+
+void CheckZoneSizing(std::string const &CompType, // Component Type (e.g. Chiller:Electric)
+                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void
-CheckZoneSizing(
-	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
-	std::string const & CompName // Component Name (e.g. Big Chiller)
+void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
+                            bool &ZoneWasSized);
+
+void ValidateComponent(std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
+                       std::string const &CompName,  // Component Name (e.g. Big Chiller)
+                       bool &IsNotOK,                // .TRUE. if this component pair is invalid
+                       std::string const &CallString // Context of this pair -- for error message
 );
 
-void
-CheckThisZoneForSizing(
-	int const ZoneNum, // zone index to be checked
-	bool & ZoneWasSized
+void ValidateComponent(std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
+                       std::string const &CompValType, // Component "name" field type
+                       std::string const &CompName,    // Component Name (e.g. Big Chiller)
+                       bool &IsNotOK,                  // .TRUE. if this component pair is invalid
+                       std::string const &CallString   // Context of this pair -- for error message
 );
 
-void
-ValidateComponent(
-	std::string const & CompType, // Component Type (e.g. Chiller:Electric)
-	std::string const & CompName, // Component Name (e.g. Big Chiller)
-	bool & IsNotOK, // .TRUE. if this component pair is invalid
-	std::string const & CallString // Context of this pair -- for error message
-);
-
-void
-CalcPassiveExteriorBaffleGap(
-	Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
-	Real64 const VentArea, // Area available for venting the gap [m2]
-	Real64 const Cv, // Oriface coefficient for volume-based discharge, wind-driven [--]
-	Real64 const Cd, // oriface coefficient for discharge,  bouyancy-driven [--]
-	Real64 const HdeltaNPL, // Height difference from neutral pressure level [m]
-	Real64 const SolAbs, // solar absorptivity of baffle [--]
-	Real64 const AbsExt, // thermal absorptance/emittance of baffle material [--]
-	Real64 const Tilt, // Tilt of gap [Degrees]
-	Real64 const AspRat, // aspect ratio of gap  Height/gap [--]
-	Real64 const GapThick, // Thickness of air space between baffle and underlying heat transfer surface
-	int const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-	Real64 const QdotSource, // Source/sink term, e.g. electricity exported from solar cell [W]
-	Real64 & TsBaffle, // Temperature of baffle (both sides) use lagged value on input [C]
-	Real64 & TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
-	Optional< Real64 > HcGapRpt = _,
-	Optional< Real64 > HrGapRpt = _,
-	Optional< Real64 > IscRpt = _,
-	Optional< Real64 > MdotVentRpt = _,
-	Optional< Real64 > VdotWindRpt = _,
-	Optional< Real64 > VdotBouyRpt = _
-);
+void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+                                  Real64 const VentArea,        // Area available for venting the gap [m2]
+                                  Real64 const Cv,              // Oriface coefficient for volume-based discharge, wind-driven [--]
+                                  Real64 const Cd,              // oriface coefficient for discharge,  bouyancy-driven [--]
+                                  Real64 const HdeltaNPL,       // Height difference from neutral pressure level [m]
+                                  Real64 const SolAbs,          // solar absorptivity of baffle [--]
+                                  Real64 const AbsExt,          // thermal absorptance/emittance of baffle material [--]
+                                  Real64 const Tilt,            // Tilt of gap [Degrees]
+                                  Real64 const AspRat,          // aspect ratio of gap  Height/gap [--]
+                                  Real64 const GapThick,        // Thickness of air space between baffle and underlying heat transfer surface
+                                  int const Roughness,          // Roughness index (1-6), see DataHeatBalance parameters
+                                  Real64 const QdotSource,      // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,             // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap,                // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  Optional<Real64> HcGapRpt = _,
+                                  Optional<Real64> HrGapRpt = _,
+                                  Optional<Real64> IscRpt = _,
+                                  Optional<Real64> MdotVentRpt = _,
+                                  Optional<Real64> VdotWindRpt = _,
+                                  Optional<Real64> VdotBouyRpt = _);
 
 //****************************************************************************
 
-void
-PassiveGapNusseltNumber(
-	Real64 const AspRat, // Aspect Ratio of Gap height to gap width
-	Real64 const Tilt, // Tilt of gap, degrees
-	Real64 const Tso, // Temperature of gap surface closest to outside (K)
-	Real64 const Tsi, // Temperature of gap surface closest to zone (K)
-	Real64 const Gr, // Gap gas Grashof number
-	Real64 & gNu // Gap gas Nusselt number
+void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height to gap width
+                             Real64 const Tilt,   // Tilt of gap, degrees
+                             Real64 const Tso,    // Temperature of gap surface closest to outside (K)
+                             Real64 const Tsi,    // Temperature of gap surface closest to zone (K)
+                             Real64 const Gr,     // Gap gas Grashof number
+                             Real64 &gNu          // Gap gas Nusselt number
 );
 
-void
-CalcBasinHeaterPower(
-	Real64 const Capacity, // Basin heater capacity per degree C below setpoint (W/C)
-	int const SchedulePtr, // Pointer to basin heater schedule
-	Real64 const SetPointTemp, // setpoint temperature for basin heater operation (C)
-	Real64 & Power // Basin heater power (W)
+void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity per degree C below setpoint (W/C)
+                          int const SchedulePtr,     // Pointer to basin heater schedule
+                          Real64 const SetPointTemp, // setpoint temperature for basin heater operation (C)
+                          Real64 &Power              // Basin heater power (W)
 );
 
-void
-TestAirPathIntegrity( bool & ErrFound );
+void TestAirPathIntegrity(bool &ErrFound);
 
-void
-TestSupplyAirPathIntegrity( bool & ErrFound );
+void TestSupplyAirPathIntegrity(bool &ErrFound);
 
-void
-TestReturnAirPathIntegrity(
-	bool & ErrFound,
-	Array2S_int ValRetAPaths
-);
+void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths);
 
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif
