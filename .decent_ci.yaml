@@ -1,6 +1,7 @@
 results_repository : FSEC/decent_ci_results
 results_path : _posts
 results_base_url : https://fsec.github.io/decent_ci_results
+# add url for repository
 regression_repository : ""
 regression_branch : master
 regression_baseline_default : develop
