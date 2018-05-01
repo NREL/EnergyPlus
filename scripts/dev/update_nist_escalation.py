@@ -4,8 +4,8 @@ from eppy.modeleditor import IDF
 
 
 def parse_encost_file(encost_path):
-    '''Parses the NIST encostYY.txt file into individual files by region-sector.
-    Files are saved to a sub-directory with the same name as the file.'''
+    """Parses the NIST encostYY.txt file into individual files by region-sector.
+    Files are saved to a sub-directory with the same name as the file."""
     
     read_dir = os.path.dirname(encost_path)
     read_name = os.path.basename(encost_path)
@@ -66,8 +66,8 @@ def parse_encost_file(encost_path):
 
   
 def encost_to_idf(idd_dir, sub_dir_path, del_dir=None):
-    '''Read parsed encost files and make an IDF of 
-    LifeCycleCost:UsePriceEscalation objects for each region-sector-fuel.'''
+    """Read parsed encost files and make an IDF of 
+    LifeCycleCost:UsePriceEscalation objects for each region-sector-fuel."""
 
     # eppy setup
     idd_name = r'Energy+.idd'
