@@ -1122,7 +1122,8 @@ namespace HeatBalanceIntRadExchange {
         LargestArea = maxval(A);
 
         // set up eigen maps to existing arrays, copy matrices to column major
-        MatrixXd fixedAF = Map<Matrix<Real64, Dynamic, Dynamic, Eigen::RowMajor>>(F.data(), N, N);
+        Map<Matrix<Real64, Dynamic, Dynamic, Eigen::RowMajor>> viewFactors(F.data(), N, N);
+        MatrixXd fixedAF = viewFactors;
         Map<const VectorXd> areas(A.data(), N);
 
         Eigen::Index largestAreaIndex;
