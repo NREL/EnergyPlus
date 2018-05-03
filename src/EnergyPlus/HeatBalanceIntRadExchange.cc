@@ -1135,19 +1135,14 @@ namespace HeatBalanceIntRadExchange {
             fixedAF(largestAreaIndex, largestAreaIndex) = min(0.9, 1.2 * largestArea / totalArea); // Give self view to big surface
         }
 
-        //  Set up AF matrix.
-        Array2D<Real64> AF(N, N); // = (AREA * DIRECT VIEW FACTOR) MATRIX
-        for (i = 1; i <= N; ++i) {
-            for (j = 1; j <= N; ++j) {
-                AF(j, i) = FixedAF(j, i) * A(i);
-            }
-        }
+        // multiple view factors by area
+        fixedAF.array().colwise() *= areas.array();
 
-        //  Enforce reciprocity by averaging AiFij and AjFji
-        FixedAF = 0.5 * (AF + transpose(AF)); // Performance Slow way to average with transpose (heap use)
+        // Enforce reciprocity by averaging AiFij and AjFji
+        fixedAF += fixedAF.transpose().eval();
+        fixedAF *= 0.5;
 
-        AF.deallocate();
-
+        MatrixXd fixedF(N, N);
         Array2D<Real64> FixedF(N, N); // CORRECTED MATRIX OF VIEW FACTORS (N X N)
 
         NumIterations = 0;
@@ -1155,11 +1150,7 @@ namespace HeatBalanceIntRadExchange {
         //  Check for physically unreasonable enclosures.
 
         if (N <= 3) {
-            for (i = 1; i <= N; ++i) {
-                for (j = 1; j <= N; ++j) {
-                    FixedF(j, i) = FixedAF(j, i) / A(i);
-                }
-            }
+            fixedF = fixedAF.array().colwise() / areas.array();
 
             ShowWarningError("Surfaces in Zone=\"" + Zone(ZoneNum).Name + "\" do not define an enclosure.");
             ShowContinueError("Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
@@ -1169,37 +1160,26 @@ namespace HeatBalanceIntRadExchange {
             ShowContinueError(
                 "it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed enclosure.");
 
-            RowSum = sum(FixedF);
+            RowSum = fixedF.sum();
             if (RowSum > (N + 0.01)) {
                 // Reciprocity enforced but there is more radiation than possible somewhere since the sum of one of the rows
                 // is now greater than unity.  This should not be allowed as it can cause issues with the heat balance.
                 // Correct this by finding the largest row summation and dividing all of the elements in the F matrix by
                 // this max summation.  This will provide a cap on radiation so that no row has a sum greater than unity
                 // and will still maintain reciprocity.
-                Array1D<Real64> sumFixedF;
-                Real64 MaxFixedFRowSum;
-                sumFixedF.allocate(N);
-                sumFixedF = 0.0;
-                for (i = 1; i <= N; ++i) {
-                    for (j = 1; j <= N; ++j) {
-                        sumFixedF(i) += FixedF(i, j);
-                    }
-                    if (i == 1) {
-                        MaxFixedFRowSum = sumFixedF(i);
-                    } else {
-                        if (sumFixedF(i) > MaxFixedFRowSum) MaxFixedFRowSum = sumFixedF(i);
-                    }
-                }
-                sumFixedF.deallocate();
-                if (MaxFixedFRowSum < 1.0) {
+
+                Real64 maxFixedFRowSum;
+                maxFixedFRowSum = fixedF.array().rowwise().sum().maxCoeff();
+
+                if (maxFixedFRowSum < 1.0) {
                     ShowFatalError(" FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
                 } else {
-                    FixedF *= (1.0 / MaxFixedFRowSum);
+                    fixedF *= (1.0 / maxFixedFRowSum);
                 }
-                RowSum = sum(FixedF); // needs to be recalculated
+                RowSum = fixedF.sum(); // needs to be recalculated
             }
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
-            F = FixedF;
+            viewFactors = fixedF;
             Zone(ZoneNum).EnforcedReciprocity = true;
             return; // Do not iterate, stop with reciprocity satisfied.
 
