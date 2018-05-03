@@ -1143,12 +1143,11 @@ namespace HeatBalanceIntRadExchange {
         fixedAF *= 0.5;
 
         MatrixXd fixedF(N, N);
-        Array2D<Real64> FixedF(N, N); // CORRECTED MATRIX OF VIEW FACTORS (N X N)
 
         NumIterations = 0;
         RowSum = 0.0;
-        //  Check for physically unreasonable enclosures.
 
+        //  Check for physically unreasonable enclosures.
         if (N <= 3) {
             fixedF = fixedAF.array().colwise() / areas.array();
 
