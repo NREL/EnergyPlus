@@ -49,6 +49,9 @@
 #include <cassert>
 #include <cmath>
 
+// Eigen Headers
+#include<Eigen\Dense>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
@@ -117,6 +120,11 @@ namespace HeatBalanceIntRadExchange {
     using namespace DataSystemVariables;
     using namespace DataViewFactorInformation;
     using namespace DataTimings;
+    using Eigen::Matrix;
+    using Eigen::MatrixXd;
+    using Eigen::VectorXd;
+    using Eigen::Map;
+    using Eigen::Dynamic;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
