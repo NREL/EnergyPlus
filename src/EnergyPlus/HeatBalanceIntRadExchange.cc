@@ -1114,18 +1114,18 @@ namespace HeatBalanceIntRadExchange {
         // FLOW:
         OriginalCheckValue = std::abs(sum(F) - N);
 
-        //  Allocate and zero arrays
-        Array2D<Real64> FixedAF(F); // store for largest area check
-
         Accelerator = 1.0;
         ConvrgOld = 10.0;
         LargestArea = maxval(A);
 
-        // set up eigen maps to existing arrays, copy matrices to column major
-        Map<Matrix<Real64, Dynamic, Dynamic, Eigen::RowMajor>> viewFactors(F.data(), N, N);
-        MatrixXd fixedAF = viewFactors;
+        // set up eigen maps to existing arrays
+        Map<MatrixXd> viewFactors(F.data(), N, N);
         Map<const VectorXd> areas(A.data(), N);
 
+        // copy the current view factors for modification
+        MatrixXd fixedAF = viewFactors;
+
+        // find the largest area and its index
         Eigen::Index largestAreaIndex;
         Real64 const largestArea(areas.maxCoeff(&largestAreaIndex));
         Real64 const totalArea(areas.sum());
