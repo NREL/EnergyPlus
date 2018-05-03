@@ -1121,14 +1121,17 @@ namespace HeatBalanceIntRadExchange {
         ConvrgOld = 10.0;
         LargestArea = maxval(A);
 
+        // set up eigen maps to existing arrays, copy matrices to column major
+        Map<Matrix<Real64, Dynamic, Dynamic, Eigen::RowMajor>> fixedAF(FixedAF.data(), N, N);
+        Map<const VectorXd> areas(A.data(), N);
+
+        Eigen::Index largestAreaIndex;
+        Real64 const largestArea(areas.maxCoeff(&largestAreaIndex));
+        Real64 const totalArea(areas.sum());
+
         //  Check for Strange Geometry
-        if (LargestArea > (sum(A) - LargestArea)) {
-            for (i = 1; i <= N; ++i) {
-                if (LargestArea != A(i)) continue;
-                LargestSurf = i;
-                break;
-            }
-            FixedAF(LargestSurf, LargestSurf) = min(0.9, 1.2 * LargestArea / sum(A)); // Give self view to big surface
+        if (largestArea > 0.5 * totalArea) {
+            fixedAF(largestAreaIndex, largestAreaIndex) = min(0.9, 1.2 * largestArea / totalArea); // Give self view to big surface
         }
 
         //  Set up AF matrix.
