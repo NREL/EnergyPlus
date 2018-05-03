@@ -1239,7 +1239,7 @@ namespace HeatBalanceIntRadExchange {
                     ShowContinueError("If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
-                    F = FixedF;
+                    viewFactors = fixedF;
                     FinalCheckValue = FixedCheckValue;
                 }
                 RowSum = sum_FixedF;
@@ -1248,13 +1248,13 @@ namespace HeatBalanceIntRadExchange {
         }
         FixedCheckValue = ConvrgNew;
         if (FixedCheckValue < OriginalCheckValue) {
-            F = FixedF;
+            viewFactors = fixedF;
             FinalCheckValue = FixedCheckValue;
         } else {
             FinalCheckValue = OriginalCheckValue;
-            RowSum = sum(FixedF);
+            RowSum = fixedF.sum();
             if (std::abs(RowSum - N) < PrimaryConvergence) {
-                F = FixedF;
+                viewFactors = fixedF;
                 FinalCheckValue = FixedCheckValue;
             } else {
                 ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
