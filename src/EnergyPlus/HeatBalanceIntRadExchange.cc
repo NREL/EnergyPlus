@@ -1185,51 +1185,42 @@ namespace HeatBalanceIntRadExchange {
         } //  N <= 3 Case
 
         //  Regular fix cases
+        Eigen::ArrayXd rowCoefficient(N);
         Array1D<Real64> RowCoefficient(N);
         Converged = false;
         while (!Converged) {
             ++NumIterations;
-            for (i = 1; i <= N; ++i) {
-                // Determine row coefficients which will enforce closure.
-                Real64 const sum_FixedAF_i(sum(FixedAF(_, i)));
-                if (std::abs(sum_FixedAF_i) > 1.0e-10) {
-                    RowCoefficient(i) = A(i) / sum_FixedAF_i;
-                } else {
-                    RowCoefficient(i) = 1.0;
-                }
-                FixedAF(_, i) *= RowCoefficient(i);
-            }
+
+            rowCoefficient = fixedAF.array().rowwise().sum();
+            rowCoefficient = (rowCoefficient.abs() > 1.0e-10).select(areas.array() / rowCoefficient, 1.0);
+
+            // multiple each row by its coefficient
+            fixedAF.array().rowwise() *= rowCoefficient.transpose();
 
             //  Enforce reciprocity by averaging AiFij and AjFji
-            FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
+            fixedAF += fixedAF.transpose().eval();
+            fixedAF *= 0.5;
 
             //  Form FixedF matrix
-            for (i = 1; i <= N; ++i) {
-                for (j = 1; j <= N; ++j) {
-                    FixedF(j, i) = FixedAF(j, i) / A(i);
-                    if (std::abs(FixedF(j, i)) < 1.e-10) {
-                        FixedF(j, i) = 0.0;
-                        FixedAF(j, i) = 0.0;
-                    }
-                }
-            }
+            fixedF = fixedAF.array().colwise() / areas.array();
 
-            ConvrgNew = std::abs(sum(FixedF) - N);
+            // set fixedAF first using fixedF
+            fixedAF = (fixedF.array().abs() < 1.0e-10).select(0.0, fixedAF);
+            fixedF = (fixedF.array().abs() < 1.0e-10).select(0.0, fixedF);
+
+            ConvrgNew = std::abs(fixedF.sum() - N);
             if (std::abs(ConvrgOld - ConvrgNew) < DifferenceConvergence || ConvrgNew <= PrimaryConvergence) { //  Change in sum of Fs must be small.
                 Converged = true;
             }
             ConvrgOld = ConvrgNew;
             if (NumIterations > 400) { //  If everything goes bad,enforce reciprocity and go home.
                 //  Enforce reciprocity by averaging AiFij and AjFji
-                FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
+                fixedAF += fixedAF.transpose().eval();
+                fixedAF *= 0.5;
 
-                //  Form FixedF matrix
-                for (i = 1; i <= N; ++i) {
-                    for (j = 1; j <= N; ++j) {
-                        FixedF(j, i) = FixedAF(j, i) / A(i);
-                    }
-                }
-                Real64 const sum_FixedF(sum(FixedF));
+                fixedF = fixedAF.array().colwise() / areas.array();
+
+                Real64 const sum_FixedF(fixedF.sum());
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 if (CheckConvergeTolerance > 0.005) {
                     ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
