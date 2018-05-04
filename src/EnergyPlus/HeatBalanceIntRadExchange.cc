@@ -1167,13 +1167,13 @@ namespace HeatBalanceIntRadExchange {
                 // this max summation.  This will provide a cap on radiation so that no row has a sum greater than unity
                 // and will still maintain reciprocity.
 
-                Real64 maxFixedFRowSum;
-                maxFixedFRowSum = fixedF.array().rowwise().sum().maxCoeff();
+                Real64 maxFixedFColSum;
+                maxFixedFColSum = fixedF.array().colwise().sum().maxCoeff();
 
-                if (maxFixedFRowSum < 1.0) {
+                if (maxFixedFColSum < 1.0) {
                     ShowFatalError(" FixViewFactors: Three surface or less zone failing ViewFactorFix correction which should never happen.");
                 } else {
-                    fixedF *= (1.0 / maxFixedFRowSum);
+                    fixedF *= (1.0 / maxFixedFColSum);
                 }
                 RowSum = fixedF.sum(); // needs to be recalculated
             }
