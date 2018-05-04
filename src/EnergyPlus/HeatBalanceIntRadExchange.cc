@@ -1318,16 +1318,6 @@ namespace HeatBalanceIntRadExchange {
         CMatrix = Map<const MatrixXd>(F.data(), N, N);
         CMatrix.array().colwise() *= areas.array();
 
-        /*
-        Array2D<Real64> Cmatrix(N, N);        // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
-        assert(equal_dimensions(Cmatrix, F)); // For linear indexing
-        Array2D<Real64>::size_type l(0u);
-        for (int j = 1; j <= N; ++j) {
-            for (int i = 1; i <= N; ++i, ++l) {
-                Cmatrix[l] = A(i) * F[l]; // [ l ] == ( i, j )
-            }
-        }
-        */
         // Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
         Map<ArrayXd> emissivity(EMISS.data(), N);
 
@@ -1344,67 +1334,17 @@ namespace HeatBalanceIntRadExchange {
         // modify CMatrix
         CMatrix -= excitation.matrix().asDiagonal();
 
-        // set the excitation matrix correctly
+        // finalise the calculation of the excitation array
         excitation *= -emissivity;
 
-        /*
-        Array1D<Real64> Excite(N); // Excitation vector = A*EMISS/REFLECTANCE
-        l = 0u;
-        for (int i = 1; i <= N; ++i, l += N + 1) {
-            Real64 EMISS_i(EMISS(i));
-            if (EMISS_i > MaxEmissLimit) { // Check/limit EMISS for this surface to avoid divide by zero below
-                EMISS_i = EMISS(i) = MaxEmissLimit;
-                ShowWarningError("A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999");
-            }
-            Real64 const EMISS_i_fac(A(i) / (1.0 - EMISS_i));
-            Excite(i) = -EMISS_i * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
-            Cmatrix[l] -= EMISS_i_fac;          // Coefficient matrix for partial radiosity calculation // [ l ] == ( i, i )
-        }*/
-
+        // map the scriptF matrix so it can be assigned to
         Map<MatrixXd> scriptF(ScriptF.data(), N, N);
         scriptF = CMatrix.inverse();
 
-        /*
-        Array2D<Real64> Cinverse(N, N);       // Inverse of Cmatrix
-        CalcMatrixInverse(Cmatrix, Cinverse); // SOLVE THE LINEAR SYSTEM
-        Cmatrix.clear();                      // Release memory ASAP
-        
-
-        // Scale Cinverse colums by excitation to get partial radiosity matrix
-        l = 0u;
-        for (int j = 1; j <= N; ++j) {
-            Real64 const e_j(Excite(j));
-            for (int i = 1; i <= N; ++i, ++l) {
-                Cinverse[l] *= e_j; // [ l ] == ( i, j )
-            }
-        }
-        Excite.clear(); // Release memory ASAP
-        */
+        // calculate the scriptF values
         scriptF.array().colwise() *= excitation;
-
         scriptF -= emissivity.matrix().asDiagonal();
         scriptF.array().rowwise() *= (emissivity / (1.0 - emissivity)).transpose();
-
-        /*
-        // Form Script F matrix transposed
-        assert(equal_dimensions(Cinverse, ScriptF)); // For linear indexing
-        Array2D<Real64>::size_type m(0u);
-        for (int i = 1; i <= N; ++i) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
-            Real64 const EMISS_i(EMISS(i));
-            Real64 const EMISS_fac(EMISS_i / (1.0 - EMISS_i));
-            l = static_cast<Array2D<Real64>::size_type>(i - 1);
-            for (int j = 1; j <= N; ++j, l += N, ++m) {
-                if (i == j) {
-                    //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
-                    ScriptF[m] = EMISS_fac * (Cinverse[l] - EMISS_i); // [ l ] = ( i, j ), [ m ] == ( j, i )
-                } else {
-                    //        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
-                    ScriptF[m] = EMISS_fac * Cinverse[l]; // [ l ] == ( i, j ), [ m ] == ( j, i )
-                }
-            }
-        }
-        */
-    }
     }
 
 } // namespace HeatBalanceIntRadExchange
