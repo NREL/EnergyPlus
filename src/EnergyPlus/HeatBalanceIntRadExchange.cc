@@ -50,7 +50,7 @@
 #include <cmath>
 
 // Eigen Headers
-#include<Eigen\Dense>
+#include <Eigen/Dense>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
