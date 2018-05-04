@@ -132,10 +132,6 @@ namespace HeatBalanceIntRadExchange {
                      Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     );
 
-    void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
-                           Array2<Real64> &I  // Returned as inverse matrix
-    );
-
 } // namespace HeatBalanceIntRadExchange
 
 } // EnergyPlus
