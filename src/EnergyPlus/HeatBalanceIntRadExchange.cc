@@ -120,12 +120,9 @@ namespace HeatBalanceIntRadExchange {
     using namespace DataSystemVariables;
     using namespace DataViewFactorInformation;
     using namespace DataTimings;
-    using Eigen::Matrix;
     using Eigen::MatrixXd;
-    using Eigen::VectorXd;
     using Eigen::ArrayXd;
     using Eigen::Map;
-    using Eigen::Dynamic;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -1121,7 +1118,7 @@ namespace HeatBalanceIntRadExchange {
 
         // set up eigen maps to existing arrays
         Map<MatrixXd> viewFactors(F.data(), N, N);
-        Map<const VectorXd> areas(A.data(), N);
+        Map<const ArrayXd> areas(A.data(), N);
 
         // copy the current view factors for modification
         MatrixXd fixedAF = viewFactors;
@@ -1137,7 +1134,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         // multiple view factors by area, each column is a single surface
-        fixedAF.array().colwise() *= areas.array();
+        fixedAF.array().colwise() *= areas;
 
         // Enforce reciprocity by averaging AiFij and AjFji
         fixedAF += fixedAF.transpose().eval();
@@ -1150,7 +1147,7 @@ namespace HeatBalanceIntRadExchange {
 
         //  Check for physically unreasonable enclosures.
         if (N <= 3) {
-            fixedF = fixedAF.array().colwise() / areas.array();
+            fixedF = fixedAF.array().colwise() / areas;
 
             ShowWarningError("Surfaces in Zone=\"" + Zone(ZoneNum).Name + "\" do not define an enclosure.");
             ShowContinueError("Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
@@ -1186,13 +1183,13 @@ namespace HeatBalanceIntRadExchange {
         } //  N <= 3 Case
 
         //  Regular fix cases
-        Eigen::ArrayXd colCoefficient(N);
+        ArrayXd colCoefficient(N);
         Converged = false;
         while (!Converged) {
             ++NumIterations;
             // correct the A*F value by ensuring the i-th column sums to Ai
             colCoefficient = fixedAF.array().colwise().sum();
-            colCoefficient = (colCoefficient.abs() > 1.0e-10).select(areas.array() / colCoefficient, 1.0);
+            colCoefficient = (colCoefficient.abs() > 1.0e-10).select(areas / colCoefficient, 1.0);
             fixedAF.array().colwise() *= colCoefficient;
 
             //  Enforce reciprocity by averaging AiFij and AjFji
@@ -1200,7 +1197,7 @@ namespace HeatBalanceIntRadExchange {
             fixedAF *= 0.5;
 
             //  Form FixedF matrix
-            fixedF = fixedAF.array().colwise() / areas.array();
+            fixedF = fixedAF.array().colwise() / areas;
 
             // set fixedAF first using fixedF
             fixedAF = (fixedF.array().abs() < 1.0e-10).select(0.0, fixedAF);
@@ -1216,7 +1213,7 @@ namespace HeatBalanceIntRadExchange {
                 fixedAF += fixedAF.transpose().eval();
                 fixedAF *= 0.5;
 
-                fixedF = fixedAF.array().colwise() / areas.array();
+                fixedF = fixedAF.array().colwise() / areas;
 
                 Real64 const sum_FixedF(fixedF.sum());
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
