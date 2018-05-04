@@ -1186,16 +1186,14 @@ namespace HeatBalanceIntRadExchange {
         } //  N <= 3 Case
 
         //  Regular fix cases
-        Eigen::ArrayXd rowCoefficient(N);
+        Eigen::ArrayXd colCoefficient(N);
         Converged = false;
         while (!Converged) {
             ++NumIterations;
-            // TODO: this is summed row-wise (resulting in no diffs) however column-wise should also work also since it's symmetric
-            // TODO: column-wise should be quicker due to eigen matrices being column major by default
             // correct the A*F value by ensuring the i-th column sums to Ai
-            rowCoefficient = fixedAF.array().rowwise().sum();
-            rowCoefficient = (rowCoefficient.abs() > 1.0e-10).select(areas.array() / rowCoefficient, 1.0);
-            fixedAF.array().rowwise() *= rowCoefficient.transpose();
+            colCoefficient = fixedAF.array().colwise().sum();
+            colCoefficient = (colCoefficient.abs() > 1.0e-10).select(areas.array() / colCoefficient, 1.0);
+            fixedAF.array().colwise() *= colCoefficient;
 
             //  Enforce reciprocity by averaging AiFij and AjFji
             fixedAF += fixedAF.transpose().eval();
