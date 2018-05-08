@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,9 +68,11 @@ TEST_F( EnergyPlusFixture, CheckThreading )
 
 	ASSERT_TRUE( process_idf( idf_objects, false ) );
 
-	std::string const error_string = delimited_string({
-		"   ** Severe  ** IP: IDF line~1 Did not find \"ProgramControl\" in list of Objects",
-	});
+// This is no longer valid with the JSON input processor, a similar message is printed out during idf parsing but it does not go to the
+// error stream, it instead goes to cout (maybe should redirect?)
+//	std::string const error_string = delimited_string({
+//		"   ** Severe  ** IP: IDF line~1 Did not find \"ProgramControl\" in list of Objects",
+//	});
 
-	EXPECT_TRUE( compare_err_stream( error_string, true ) );
+//	EXPECT_TRUE( compare_err_stream( error_string, true ) );
 }

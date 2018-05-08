@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -222,6 +222,9 @@ namespace DataHeatBalSurface {
 	Array1D< Real64 > QRadSWInAbs; // Short wave radiation absorbed on inside of opaque surface
 	Array1D< Real64 > QRadLWOutSrdSurfs;  // Long wave radiation absorbed on outside of exterior surface
 
+	Array1D< Real64 > QAdditionalHeatSourceOutside; // Additional heat source term on boundary conditions at outside surface
+	Array1D< Real64 > QAdditionalHeatSourceInside; // Additional heat source term on boundary conditions at inside surface
+
 	Array1D< Real64 > InitialDifSolInAbs; // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
 	Array1D< Real64 > InitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
 
@@ -325,6 +328,8 @@ namespace DataHeatBalSurface {
 		QRadSWOutAbs.deallocate();
 		QRadSWInAbs.deallocate();
 		QRadLWOutSrdSurfs.deallocate();
+		QAdditionalHeatSourceOutside.deallocate();
+		QAdditionalHeatSourceInside.deallocate();
 		InitialDifSolInAbs.deallocate();
 		InitialDifSolInTrans.deallocate();
 		TH.deallocate();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -183,7 +183,7 @@ TEST_F( EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	UpdateUtilityBills();
 
@@ -225,6 +225,184 @@ TEST_F( EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
 
 }
+
+/** Test that if a meter is a water meter, and no conversion choice is give, it defaults to m3 **/
+TEST_F( EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
+{
+	std::string const idf_objects = delimited_string( {
+		"  UtilityCost:Tariff,                                                       ",
+		"    ExampleWaterTariff,      !- Name                                        ",
+		"    Water:Facility,          !- Output Meter Name                           ",
+		"    ,                        !- Conversion Factor Choice                    ",
+		"    ,                        !- Energy Conversion Factor                    ",
+		"    ,                        !- Demand Conversion Factor                    ",
+		"    ,                        !- Time of Use Period Schedule Name            ",
+		"    ,                        !- Season Schedule Name                        ",
+		"    ,                        !- Month Schedule Name                         ",
+		"    ,                        !- Demand Window Length                        ",
+		"    10;                      !- Monthly Charge or Variable Name             ",
+		"                                                                            ",
+		"  UtilityCost:Charge:Simple,                                                ",
+		"    FlatWaterChargePerm3,    !- Name                                        ",
+		"    ExampleWaterTariff,      !- Tariff Name                                 ",
+		"    totalEnergy,             !- Source Variable                             ",
+		"    Annual,                  !- Season                                      ",
+		"    EnergyCharges,           !- Category Variable Name                      ",
+		"    3.3076;                  !- Cost per Unit Value or Variable Name        ",
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	// Create a water meter
+	NumEnergyMeters = 1;
+	EnergyMeters.allocate( NumEnergyMeters );
+	EnergyMeters( 1 ).Name = "WATER:FACILITY";
+	EnergyMeters( 1 ).ResourceType = "WATER";
+
+	UpdateUtilityBills();
+
+	// tariff
+	EXPECT_EQ( 1, numTariff );
+	EXPECT_EQ( "EXAMPLEWATERTARIFF", tariff( 1 ).tariffName );
+
+	// Check that it correctly assesses the meter type
+	EXPECT_EQ( kindMeterWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_EQ( kindMeterNotElectric, tariff( 1 ).kindElectricMtr);
+	EXPECT_EQ( kindMeterNotGas, tariff( 1 ).kindGasMtr);
+
+	// Check that if defaults the conversion choice correctly
+	EXPECT_EQ( conversionM3, tariff( 1 ).convChoice );
+	EXPECT_EQ( 1, tariff( 1 ).energyConv );
+	EXPECT_EQ( 3600, tariff( 1 ).demandConv );
+	EXPECT_EQ( 10, tariff( 1 ).monthChgVal );
+}
+
+/** Test that if a meter is a water meter, and CCF is used, it uses the right conversion (not the gas one) **/
+TEST_F( EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
+{
+	std::string const idf_objects = delimited_string( {
+		"  UtilityCost:Tariff,                                                       ",
+		"    ExampleWaterTariff,      !- Name                                        ",
+		"    Water:Facility,          !- Output Meter Name                           ",
+		"    CCF,                     !- Conversion Factor Choice                    ",
+		"    ,                        !- Energy Conversion Factor                    ",
+		"    ,                        !- Demand Conversion Factor                    ",
+		"    ,                        !- Time of Use Period Schedule Name            ",
+		"    ,                        !- Season Schedule Name                        ",
+		"    ,                        !- Month Schedule Name                         ",
+		"    ,                        !- Demand Window Length                        ",
+		"    10;                      !- Monthly Charge or Variable Name             ",
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	// Create a water meter
+	NumEnergyMeters = 1;
+	EnergyMeters.allocate( NumEnergyMeters );
+	EnergyMeters( 1 ).Name = "WATER:FACILITY";
+	EnergyMeters( 1 ).ResourceType = "WATER";
+
+	UpdateUtilityBills();
+
+	// tariff
+	EXPECT_EQ( 1, numTariff );
+
+	// Check that it correctly assesses the meter type (water)
+	EXPECT_EQ( kindMeterWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_EQ( kindMeterNotElectric, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterNotGas, tariff( 1 ).kindGasMtr );
+
+	// Check conversion choice
+	EXPECT_EQ( conversionCCF, tariff( 1 ).convChoice );
+	ASSERT_FLOAT_EQ( 0.35314666721488586, tariff( 1 ).energyConv );
+}
+
+/** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
+TEST_F( EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
+{
+	std::string const idf_objects = delimited_string( {
+		"  UtilityCost:Tariff,                                                       ",
+		"    ExampleTariff,           !- Name                                        ",
+		"    Gas:Facility,            !- Output Meter Name                           ",
+		"    CCF,                     !- Conversion Factor Choice                    ",
+		"    ,                        !- Energy Conversion Factor                    ",
+		"    ,                        !- Demand Conversion Factor                    ",
+		"    ,                        !- Time of Use Period Schedule Name            ",
+		"    ,                        !- Season Schedule Name                        ",
+		"    ,                        !- Month Schedule Name                         ",
+		"    ,                        !- Demand Window Length                        ",
+		"    10;                      !- Monthly Charge or Variable Name             ",
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	// Create a water meter
+	NumEnergyMeters = 1;
+	EnergyMeters.allocate( NumEnergyMeters );
+	EnergyMeters( 1 ).Name = "GAS:FACILITY";
+	EnergyMeters( 1 ).ResourceType = "GAS";
+
+	UpdateUtilityBills();
+
+	// tariff
+	EXPECT_EQ( 1, numTariff );
+
+	// Check that it correctly assesses the meter type (gas)
+	EXPECT_EQ( kindMeterNotWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_EQ( kindMeterNotElectric, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterGas, tariff( 1 ).kindGasMtr );
+
+	// Check conversion choice
+
+	EXPECT_EQ( conversionCCF, tariff( 1 ).convChoice );
+	ASSERT_FLOAT_EQ( 9.4781712e-9, tariff( 1 ).energyConv );
+}
+
+
+/** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
+TEST_F( EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
+{
+	std::string const idf_objects = delimited_string( {
+		"  UtilityCost:Tariff,                                                       ",
+		"    ExampleTariff,           !- Name                                        ",
+		"    Electricity:Facility,    !- Output Meter Name                           ",
+		"    CCF,                     !- Conversion Factor Choice                    ",
+		"    ,                        !- Energy Conversion Factor                    ",
+		"    ,                        !- Demand Conversion Factor                    ",
+		"    ,                        !- Time of Use Period Schedule Name            ",
+		"    ,                        !- Season Schedule Name                        ",
+		"    ,                        !- Month Schedule Name                         ",
+		"    ,                        !- Demand Window Length                        ",
+		"    10;                      !- Monthly Charge or Variable Name             ",
+	} );
+
+	ASSERT_TRUE( process_idf( idf_objects ) );
+
+	// Create a water meter
+	NumEnergyMeters = 1;
+	EnergyMeters.allocate( NumEnergyMeters );
+	EnergyMeters( 1 ).Name = "ELECTRICITY:FACILITY";
+	EnergyMeters( 1 ).ResourceType = "ELECTRICITY";
+
+	UpdateUtilityBills();
+
+	// tariff
+	EXPECT_EQ( 1, numTariff );
+
+	// Check that it correctly assesses the meter type (electricity, and electric simple in particular)
+	EXPECT_EQ( kindMeterNotWater, tariff( 1 ).kindWaterMtr );
+	EXPECT_NE( kindMeterNotElectric, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterElecSimple, tariff( 1 ).kindElectricMtr );
+	EXPECT_EQ( kindMeterNotGas, tariff( 1 ).kindGasMtr );
+
+	// Check conversion choice, should force back to kWh
+	EXPECT_EQ( conversionKWH, tariff( 1 ).convChoice );
+	ASSERT_FLOAT_EQ( 0.0000002778, tariff( 1 ).energyConv );
+	ASSERT_FLOAT_EQ( 0.001, tariff( 1 ).demandConv );
+}
+
+
+
 
 TEST_F( EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test )
 {

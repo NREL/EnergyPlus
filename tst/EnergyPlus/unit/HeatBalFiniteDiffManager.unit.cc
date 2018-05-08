@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -203,7 +203,7 @@ namespace EnergyPlus {
 			"    23,                      !- Peak Freezing Temperature {C}",
 			"    1;                       !- Low Temperature Difference of Freezing Curve {deltaC}"
 		} );
-		ASSERT_FALSE( process_idf( idf_objects, false ) );
+		ASSERT_TRUE( process_idf( idf_objects, false ) );
 		
 		// allocate a finite difference surface object and needed member variables
 		int const surfaceIndex = 1;

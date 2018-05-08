@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -75,8 +75,8 @@ using General::RoundSigDigits;
 
 TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir )
 {
-	// This unit test is intended to check if supply air Humidity ratio used in the cooling sizing calculation is 
-	// reset to the minimum of entering mixed air humidity ratio and the user specified supply air design Humidity  
+	// This unit test is intended to check if supply air Humidity ratio used in the cooling sizing calculation is
+	// reset to the minimum of entering mixed air humidity ratio and the user specified supply air design Humidity
 	// ratio such that the total cooling capacity is always greater than or equal to the sensible cooling capacity.
 	// This test was added to test bug issue #4893 fix, a defect that resulted in SHR greater than 1.0.
 
@@ -140,7 +140,7 @@ TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir )
 
 	if ( SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal != 0.0 ) {
 		ShowMessage( "SizeHVACWaterToAir: Rated Sensible Heat Ratio = " + RoundSigDigits( SimpleWatertoAirHP( HPNum ).RatedCapCoolSens / SimpleWatertoAirHP( HPNum ).RatedCapCoolTotal, 2 ) + " [-]" );
-	} 
+	}
 
 }
 
@@ -202,7 +202,7 @@ TEST_F( EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	GetSimpleWatertoAirHPInput();
 

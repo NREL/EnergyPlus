@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,7 +67,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
@@ -438,27 +438,16 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
 		using namespace DataIPShortCuts;
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using General::RoundSigDigits;
 		using General::SafeDivide;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//unused1208  CHARACTER(len=MaxNameLength), &
 		//                   DIMENSION(20) :: Alphas                ! Alpha items for object
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		//unused1208  REAL(r64), DIMENSION(9)             :: Numbers               ! Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -470,25 +459,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Tubular";
-		NumOfTDDPipes = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfTDDPipes = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfTDDPipes > 0 ) {
 			TDDPipe.allocate( NumOfTDDPipes );
 
 			for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
-				GetObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject, PipeNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Pipe name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), TDDPipe, PipeNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				TDDPipe( PipeNum ).Name = cAlphaArgs( 1 );
 
 				// Get TDD:DOME object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " not found." );
@@ -533,7 +516,7 @@ namespace DaylightingDevices {
 				}
 
 				// Get TDD:DIFFUSER object
-				SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " not found." );
@@ -592,7 +575,7 @@ namespace DaylightingDevices {
 				}
 
 				// Construction
-				TDDPipe( PipeNum ).Construction = FindItemInList( cAlphaArgs( 4 ), Construct );
+				TDDPipe( PipeNum ).Construction = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), Construct );
 
 				if ( TDDPipe( PipeNum ).Construction == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe construction " + cAlphaArgs( 4 ) + " not found." );
@@ -653,7 +636,7 @@ namespace DaylightingDevices {
 
 					for ( TZoneNum = 1; TZoneNum <= TDDPipe( PipeNum ).NumOfTZones; ++TZoneNum ) {
 						TZoneName = cAlphaArgs( TZoneNum + 4 );
-						TDDPipe( PipeNum ).TZone( TZoneNum ) = FindItemInList( TZoneName, Zone );
+						TDDPipe( PipeNum ).TZone( TZoneNum ) = UtilityRoutines::FindItemInList( TZoneName, Zone );
 						if ( TDDPipe( PipeNum ).TZone( TZoneNum ) == 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Transition zone " + TZoneName + " not found." );
 							ErrorsFound = true;
@@ -690,23 +673,12 @@ namespace DaylightingDevices {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES: na
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::FindItemInList;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int IOStatus; // Used in GetObjectItem
-		bool IsBlank; // TRUE if the name is blank
-		bool IsNotOK; // TRUE if there was a problem with a list name
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int ShelfNum; // Daylighting shelf object number
@@ -715,25 +687,19 @@ namespace DaylightingDevices {
 
 		// FLOW:
 		cCurrentModuleObject = "DaylightingDevice:Shelf";
-		NumOfShelf = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfShelf = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		if ( NumOfShelf > 0 ) {
 			Shelf.allocate( NumOfShelf );
 
 			for ( ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum ) {
-				GetObjectItem( "DaylightingDevice:Shelf", ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				inputProcessor->getObjectItem( cCurrentModuleObject , ShelfNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				UtilityRoutines::IsNameEmpty(cAlphaArgs( 1 ), cCurrentModuleObject, ErrorsFound);
 				// Shelf name
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), Shelf, ShelfNum - 1, IsNotOK, IsBlank, "DaylightingDevice:Shelf" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
 				Shelf( ShelfNum ).Name = cAlphaArgs( 1 );
 
 				// Get window object
-				SurfNum = FindItemInList( cAlphaArgs( 2 ), Surface );
+				SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Surface );
 
 				if ( SurfNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " not found." );
@@ -774,7 +740,7 @@ namespace DaylightingDevices {
 
 				// Get inside shelf heat transfer surface (optional)
 				if ( cAlphaArgs( 3 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 3 ), Surface );
+					SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 3 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Inside shelf " + cAlphaArgs( 3 ) + " not found." );
@@ -798,7 +764,7 @@ namespace DaylightingDevices {
 
 				// Get outside shelf attached shading surface (optional)
 				if ( cAlphaArgs( 4 ) != "" ) {
-					SurfNum = FindItemInList( cAlphaArgs( 4 ), Surface );
+					SurfNum = UtilityRoutines::FindItemInList( cAlphaArgs( 4 ), Surface );
 
 					if ( SurfNum == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf " + cAlphaArgs( 4 ) + " not found." );
@@ -823,7 +789,7 @@ namespace DaylightingDevices {
 
 						// Get outside shelf construction (required if outside shelf is specified)
 						if ( cAlphaArgs( 5 ) != "" ) {
-							ConstrNum = FindItemInList( cAlphaArgs( 5 ), Construct );
+							ConstrNum = UtilityRoutines::FindItemInList( cAlphaArgs( 5 ), Construct );
 
 							if ( ConstrNum == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " not found." );
@@ -1337,7 +1303,7 @@ namespace DaylightingDevices {
 		// Given the TDD:DOME or TDD:DIFFUSER object number, returns TDD pipe number.
 
 		// METHODOLOGY EMPLOYED:
-		// Similar to FindItemInList defined in InputProcessor.
+		// Similar to UtilityRoutines::FindItemInList( defined in InputProcessor.
 
 		// REFERENCES: na
 		// Using/Aliasing

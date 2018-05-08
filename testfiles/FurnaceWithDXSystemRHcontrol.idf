@@ -1655,7 +1655,7 @@
 
   Output:Variable,*,Cooling Coil Electric Power,timestep;
 
-  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 

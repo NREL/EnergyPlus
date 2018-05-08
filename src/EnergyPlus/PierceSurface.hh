@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -138,19 +138,40 @@ PierceSurface_Convex(
 	assert( n >= 3u );
 	switch ( n ) {
 	case 8:
-		if ( es[ 7 ].cross( h2d - vs[ 7 ] ) < 0.0 ) return;
+		if ( es[ 7 ].cross( h2d - vs[ 7 ] ) < 0.0 ) {
+			return;
+		}
+		// [[fallthrough]];
 	case 7:
-		if ( es[ 6 ].cross( h2d - vs[ 6 ] ) < 0.0 ) return;
+		if ( es[ 6 ].cross( h2d - vs[ 6 ] ) < 0.0 ) {
+			return; 
+		}
+		// [[fallthrough]];
 	case 6:
-		if ( es[ 5 ].cross( h2d - vs[ 5 ] ) < 0.0 ) return;
+		if ( es[ 5 ].cross( h2d - vs[ 5 ] ) < 0.0 ) {
+			return; 
+		}
+		// [[fallthrough]];
 	case 5:
-		if ( es[ 4 ].cross( h2d - vs[ 4 ] ) < 0.0 ) return;
+		if ( es[ 4 ].cross( h2d - vs[ 4 ] ) < 0.0 ) {
+			return; 
+		}
+		// [[fallthrough]];
 	case 4:
-		if ( es[ 3 ].cross( h2d - vs[ 3 ] ) < 0.0 ) return;
+		if ( es[ 3 ].cross( h2d - vs[ 3 ] ) < 0.0 ) {
+			return; 
+		}
+		// [[fallthrough]];
 	case 3:
-		if ( es[ 2 ].cross( h2d - vs[ 2 ] ) < 0.0 ) return;
-		if ( es[ 1 ].cross( h2d - vs[ 1 ] ) < 0.0 ) return;
-		if ( es[ 0 ].cross( h2d - vs[ 0 ] ) < 0.0 ) return;
+		if ( es[ 2 ].cross( h2d - vs[ 2 ] ) < 0.0 ) {
+			return;
+		}
+		if ( es[ 1 ].cross( h2d - vs[ 1 ] ) < 0.0 ) {
+			return;
+		}
+		if ( es[ 0 ].cross( h2d - vs[ 0 ] ) < 0.0 ) {
+			return;
+		}
 		hit = true;
 		return;
 	default:

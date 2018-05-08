@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,8 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -68,9 +69,9 @@ namespace EnergyPlus {
 	//******************************************************************************
 
 	// Site:GroundTemperature:FCFactorMethod factory
-	std::shared_ptr< SiteFCFactorMethodGroundTemps > 
-	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory( 
-		int objectType, 
+	std::shared_ptr< SiteFCFactorMethodGroundTemps >
+	SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(
+		int objectType,
 		std::string objectName
 	)
 	{
@@ -103,7 +104,7 @@ namespace EnergyPlus {
 		std::shared_ptr< SiteFCFactorMethodGroundTemps > thisModel( new SiteFCFactorMethodGroundTemps() );
 
 		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp );
-		int numCurrObjects = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+		int numCurrObjects = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 
 		thisModel->objectType = objectType;
 		thisModel->objectName = objectName;
@@ -111,7 +112,7 @@ namespace EnergyPlus {
 		if ( numCurrObjects == 1 ) {
 
 			//Get the object names for each construction from the input processor
-			InputProcessor::GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+			inputProcessor->getObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
 
 			if ( NumNums < 12 ) {
 				ShowSevereError( cCurrentModuleObject + ": Less than 12 values entered." );
@@ -131,7 +132,7 @@ namespace EnergyPlus {
 			thisModel->errorsFound = true;
 
 		} else if ( wthFCGroundTemps ) {
-			
+
 			for ( int i = 1; i <= 12; ++i ) {
 				thisModel->fcFactorGroundTemps( i ) = GroundTempsFCFromEPWHeader( i );
 			}

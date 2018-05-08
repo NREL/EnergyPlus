@@ -4298,8 +4298,8 @@
     FURNACE_PACU_CAV:2_OADirect Evap Cooler,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     0.7,                     !- Cooler Design Effectiveness
-    autosize,                !- Effectiveness Flow Ratio Modifier Curve Name
-    ,                        !- Primary Air Design Flow Rate {m3/s}
+    ,                        !- Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                !- Primary Air Design Flow Rate {m3/s}
     30.0,                    !- Recirculating Water Pump Design Power {W}
     ,                        !- Water Pump Power Sizing Factor {W/(m3/s)}
     ,                        !- Water Pump Power Modifier Curve Name

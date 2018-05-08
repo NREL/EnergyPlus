@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -138,13 +138,13 @@ TEST_F( EnergyPlusFixture, ScheduleAnnualFullLoadHours_test )
 		" ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
 
 	int onSchedIndex = GetScheduleIndex("ONSCHED");
-	EXPECT_EQ( 8760., ScheduleAnnualFullLoadHours( onSchedIndex, 1, false ) ); 
+	EXPECT_EQ( 8760., ScheduleAnnualFullLoadHours( onSchedIndex, 1, false ) );
 
 	int offSchedIndex = GetScheduleIndex( "OFFSCHED" );
 	EXPECT_EQ( 0., ScheduleAnnualFullLoadHours( offSchedIndex, 1, false ) );
@@ -212,7 +212,7 @@ TEST_F( EnergyPlusFixture, ScheduleAverageHoursPerWeek_test )
 		" ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -294,7 +294,7 @@ TEST_F( EnergyPlusFixture, ScheduleHoursGT1perc_test )
 		" ",
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -369,7 +369,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_SimpLinearInterp )
 		"  0.001;      !- Value Until Time 14",
 		"", } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -483,7 +483,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp )
 		"  0.001;      !- Value Until Time 14",
 		"", } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;
@@ -558,7 +558,7 @@ TEST_F( EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep )
 		"  0.0;        !- Value Until Time 14",
 		"", } );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 4;
 	DataGlobals::MinutesPerTimeStep = 15;

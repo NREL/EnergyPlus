@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,7 +72,7 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1 )
 		"	1;			!- Phase Shift of Minimum Surface Temperature",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
 
@@ -115,7 +115,7 @@ TEST_F( EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2 ) // lNumericFiel
 		"	17.00;	!- December",
 	});
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	std::string const CurrentModuleObject = CurrentModuleObjects( objectType_KusudaGroundTemp );
 

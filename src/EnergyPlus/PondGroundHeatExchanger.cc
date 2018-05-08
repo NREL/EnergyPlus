@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <PlantUtilities.hh>
@@ -210,15 +210,7 @@ namespace PondGroundHeatExchanger {
 		// METHODOLOGY EMPLOYED:
 		// Standard EnergyPlus methodology.
 
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
 		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::FindItemInList;
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::TestCompSet;
@@ -228,19 +220,6 @@ namespace PondGroundHeatExchanger {
 		using DataEnvironment::GroundTemp_DeepObjInput;
 		using General::RoundSigDigits;
 		using namespace DataLoopNode;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input,
@@ -252,7 +231,7 @@ namespace PondGroundHeatExchanger {
 
 		// Initializations and allocations
 		cCurrentModuleObject = "GroundHeatExchanger:Pond";
-		NumOfPondGHEs = GetNumObjectsFound( cCurrentModuleObject );
+		NumOfPondGHEs = inputProcessor->getNumObjectsFound( cCurrentModuleObject );
 		// allocate data structures
 		if ( allocated( PondGHE ) ) PondGHE.deallocate();
 
@@ -262,7 +241,7 @@ namespace PondGroundHeatExchanger {
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
 
 			// get the input data
-			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			inputProcessor->getObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 
 			PondGHE( Item ).WaterIndex = FindGlycol( fluidNameWater );
 

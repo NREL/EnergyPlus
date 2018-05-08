@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,7 +131,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataHeatBalance::NumOfZoneLists = 1;
 	DataHeatBalance::ZoneList.allocate( DataHeatBalance::NumOfZoneLists );
@@ -200,7 +200,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	DataHeatBalance::Zone( 4).Name = "ZONE 4";
 	DataHeatBalance::Zone( 5).Name = "ZONE 5";
 
-	DataZoneEquipment::ZoneEquipConfig.allocate( DataZoneEquipment::NumOfZones ); 
+	DataZoneEquipment::ZoneEquipConfig.allocate( DataZoneEquipment::NumOfZones );
 
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	DataZoneEquipment::ZoneEquipConfig( 1 ).ActualZoneNum = 1;
@@ -245,7 +245,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_OptimumStart )
 	DataZoneControls::OccRoomTSetPointCool = 24.0;
 
 	SystemAvailabilityManager::	ManageSystemAvailability(); // 1st time through just gets input
-	
+
 	DataGlobals::WarmupFlag = true;
 	DataGlobals::BeginDayFlag = true; // initialize optimum start data to beginning of day data
 	DataGlobals::CurrentTime = 1.0; // set the current time to 1 AM
@@ -471,7 +471,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control )
 	DataAirLoop::PriAirSysAvailMgr.deallocate( );
 	SystemAvailabilityManager::SchedSysAvailMgrData.deallocate( );
 	ScheduleManager::Schedule.deallocate( );
-	DataHVACGlobals::ZoneComp.deallocate( ); 
+	DataHVACGlobals::ZoneComp.deallocate( );
 	DataHeatBalFanSys::TempControlType.deallocate( );
 	DataHeatBalFanSys::TempZoneThermostatSetPoint.deallocate( );
 
@@ -526,7 +526,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleGetInput )
 
 	} );
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+	ASSERT_TRUE( process_idf( idf_objects ) );
 
 	DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
 	DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -550,7 +550,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr )
 	int AvailStatus;
 	int const ZoneEquipType = 1;
 	int const CompNum = 1;
-	
+
 	DataGlobals::NumOfZones = 1;
 	DataHeatBalance::Zone.allocate( NumZones );
 	DataHeatBalance::Zone( 1 ).Name = "SPACE1-1";
@@ -584,7 +584,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr )
 	ScheduleManager::Schedule( 1 ).CurrentValue = 1;
 	ScheduleManager::Schedule( 2 ).CurrentValue = 0;
 
-	// Cycling Run Time Control Type = FixedRunTime 
+	// Cycling Run Time Control Type = FixedRunTime
 	// and current time is within the run time period, starting time is less than stopping time
 	DataGlobals::SimTimeSteps = 0;
 	DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).StartTime = 0.0;
@@ -603,7 +603,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr )
 	// check that the system is no action mode
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
 
-	// Cycling Run Time Control Type = Thermostat,  Run Time has no effect 
+	// Cycling Run Time Control Type = Thermostat,  Run Time has no effect
 	// starting time is less than stopping time, control is driven by temp differential
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).CtrlType = SystemAvailabilityManager::CycleOnControlZone;
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).CycRunTimeCntrlType = SystemAvailabilityManager::Thermostat;
@@ -614,7 +614,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr )
 	SystemAvailabilityManager::CalcNCycSysAvailMgr( SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum );
 	// check that the system is cycling On, 25.1 > 25.0 + 0.05
 	EXPECT_EQ( DataHVACGlobals::CycleOn, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
-	// Cycling Run Time Control Type = Thermostat, Run Time has no effect 
+	// Cycling Run Time Control Type = Thermostat, Run Time has no effect
 	// starting time and stopping time are the same, control is driven by temp differential
 	DataGlobals::SimTimeSteps = 4;
 	DataHVACGlobals::ZoneComp( 1 ).ZoneCompAvailMgrs( 1 ).StartTime = 4.0;
@@ -716,7 +716,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	ScheduleManager::Schedule( 1 ).CurrentValue = 1;
 	ScheduleManager::Schedule( 2 ).CurrentValue = 0;
 
-	// Cycling Run Time Control Type = FixedRunTime 
+	// Cycling Run Time Control Type = FixedRunTime
 	// and current time is within the run time period, starting time is less than stopping time
 	DataGlobals::SimTimeSteps = 0;
 	DataAirLoop::PriAirSysAvailMgr( PriAirSysNum ).StartTime = 0.0;
@@ -737,7 +737,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	// Check that the system is no action mode because of run time limit
 	EXPECT_EQ( DataHVACGlobals::NoAction, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
 
-	// Cycling Run Time Control Type = Thermostat,  Run Time has no effect 
+	// Cycling Run Time Control Type = Thermostat,  Run Time has no effect
 	// starting time is less than stopping time, control is driven by temp differential
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).CtrlType = SystemAvailabilityManager::CycleOnControlZone;
 	SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).CycRunTimeCntrlType = SystemAvailabilityManager::Thermostat;
@@ -749,7 +749,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	// Check that the system is cycling On, 25.1 > 25.0 + 0.05
 	EXPECT_EQ( DataHVACGlobals::CycleOn, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
 
-	// Cycling Run Time Control Type = Thermostat, Run Time has no effect 
+	// Cycling Run Time Control Type = Thermostat, Run Time has no effect
 	// starting time and stopping time are the same, control is driven by temp differential
 	DataGlobals::SimTimeSteps = 4;
 	DataAirLoop::PriAirSysAvailMgr( PriAirSysNum ).StartTime = 4.0;
@@ -761,7 +761,7 @@ TEST_F( EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr )
 	// Check that the system is cycling On, run time has no effect, // 25.1 > 25.0 + 0.05
 	EXPECT_EQ( DataHVACGlobals::CycleOn, SystemAvailabilityManager::NCycSysAvailMgrData( 1 ).AvailStatus );
 
-	// Cycling Run Time Control Type = Thermostat, Run Time has no effect 
+	// Cycling Run Time Control Type = Thermostat, Run Time has no effect
 	// starting time and stopping time are the same, control is driven by temp differential
 	DataGlobals::SimTimeSteps = 4;
 	DataAirLoop::PriAirSysAvailMgr( PriAirSysNum ).StartTime = 4.0;

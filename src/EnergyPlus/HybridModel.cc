@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,7 @@
 #include <DataRoomAirModel.hh>
 #include <General.hh>
 #include <HeatBalanceManager.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
@@ -65,7 +65,7 @@ namespace EnergyPlus {
 namespace HybridModel {
 
 	// MODULE INFORMATION:
-	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL 
+	//       AUTHOR         Sang Hoon Lee, Tianzhen Hong, Rongpeng Zhang. LBNL
 	//       DATE WRITTEN   Oct 2015
 
 	// PURPOSE OF THIS MODULE:
@@ -81,10 +81,9 @@ namespace HybridModel {
 	using namespace DataHeatBalance;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRoomAirModel;
-	using namespace InputProcessor;
 	using DataGlobals::ScheduleAlwaysOn;
 	using General::CheckCreatedZoneItemName;
-	
+
 	bool FlagHybridModel( false ); // True if hybrid model is activated
 	int NumOfHybridModelZones( 0 ); // Number of hybrid model zones in the model
 	std::string CurrentModuleObject; // to assist in getting input
@@ -115,31 +114,31 @@ namespace HybridModel {
 		Array1D_string cAlphaFieldNames( 10 );
 		Array1D_string cNumericFieldNames( 10 );
 		Array1D< Real64 > rNumericArgs( 10 ); // Numeric input items for object
-		int HybridModelStartMonth( 0 ); // Hybrid model start month 
-		int HybridModelStartDate( 0 ); // Hybrid model start date of month 
-		int HybridModelEndMonth( 0 ); // Hybrid model end month 
-		int HybridModelEndDate( 0 ); // Hybrid model end date of month 
+		int HybridModelStartMonth( 0 ); // Hybrid model start month
+		int HybridModelStartDate( 0 ); // Hybrid model start date of month
+		int HybridModelEndMonth( 0 ); // Hybrid model end month
+		int HybridModelEndDate( 0 ); // Hybrid model end date of month
 		int HMStartDay( 0 );
 		int HMEndDay( 0 );
 
 		// Read hybrid model input
 		CurrentModuleObject = "HybridModel:Zone";
-		NumOfHybridModelZones = GetNumObjectsFound( CurrentModuleObject );
+		NumOfHybridModelZones = inputProcessor->getNumObjectsFound( CurrentModuleObject );
 		HybridModelZone.allocate( NumOfZones );
 
 		if ( NumOfHybridModelZones > 0 ) {
 
 			for ( int HybridModelNum = 1; HybridModelNum <= NumOfHybridModelZones; ++HybridModelNum ) {
 
-				GetObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				
+				inputProcessor->getObjectItem( CurrentModuleObject, HybridModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 				ZoneListPtr = 0;
-				ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone );
-				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = FindItemInList( cAlphaArgs( 2 ), ZoneList );
+				ZonePtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), Zone );
+				if ( ZonePtr == 0 && NumOfZoneLists > 0 ) ZoneListPtr = UtilityRoutines::FindItemInList( cAlphaArgs( 2 ), ZoneList );
 				if ( ZonePtr > 0 ) {
 					HybridModelZone( ZonePtr ).Name = cAlphaArgs( 1 );
-					HybridModelZone( ZonePtr ).InternalThermalMassCalc = SameString( cAlphaArgs( 3 ), "Yes" );
-					HybridModelZone( ZonePtr ).InfiltrationCalc = SameString( cAlphaArgs( 4 ), "Yes" );
+					HybridModelZone( ZonePtr ).InternalThermalMassCalc = UtilityRoutines::SameString( cAlphaArgs( 3 ), "Yes" );
+					HybridModelZone( ZonePtr ).InfiltrationCalc = UtilityRoutines::SameString( cAlphaArgs( 4 ), "Yes" );
 
 					// Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
 					if ( HybridModelZone( ZonePtr ).InternalThermalMassCalc && HybridModelZone( ZonePtr ).InfiltrationCalc ){

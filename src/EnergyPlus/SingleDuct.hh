@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,10 +68,11 @@ namespace SingleDuct {
 	extern int const ReverseAction;
 	extern int const ReverseActionWithLimits;
 	extern int const HeatingActionNotUsed;
-	extern int const NormalEnforceVavMinForHtg; //TRANE, special version of Normal where (re)heating flow rates are enforced.
+
 	// SysTypes represented here
 	extern int const SingleDuctVAVReheat;
 	extern int const SingleDuctConstVolReheat;
+	extern int const SingleDuctConstVolNoReheat;
 	extern int const SingleDuctVAVNoReheat;
 	extern int const SingleDuctVAVReheatVSFan;
 	extern int const SingleDuctCBVAVReheat;
@@ -200,6 +201,13 @@ namespace SingleDuct {
 		// warning variables
 		int IterationLimit; // Used for RegulaFalsi error -1
 		int IterationFailed; // Used for RegulaFalsi error -2
+		int OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
+		bool EMSOverrideAirFlow; // if true, EMS is calling to override flow rate
+		Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
+		Real64 HeatRate; // zone air terminal sensible heating rate
+		Real64 CoolRate; // zone air terminal sensible cooling rate
+		Real64 HeatEnergy; // zone air terminal sensible heating energy
+		Real64 CoolEnergy; // zone air terminal sensible cooling energy
 
 		// Default Constructor
 		SysDesignParams() :
@@ -267,8 +275,23 @@ namespace SingleDuct {
 			HWCompIndex( 0 ),
 			SecInNode( 0 ),
 			IterationLimit( 0 ),
-			IterationFailed( 0 )
+			IterationFailed( 0 ),
+			OAPerPersonMode( 0 ),
+			EMSOverrideAirFlow( false ),
+			EMSMassFlowRateValue( 0.0 ),
+			HeatRate( 0.0 ),
+			CoolRate( 0.0 ),
+			HeatEnergy( 0.0 ),
+			CoolEnergy( 0.0 )
 		{}
+
+		void 
+		SimConstVolNoReheat(
+			int const SysNum,
+			bool const EP_UNUSED( FirstHVACIteration ),
+			int const EP_UNUSED( ZoneNum ),
+			int const ZoneNodeNum
+		);
 
 	};
 
