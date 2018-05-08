@@ -141,27 +141,27 @@ PierceSurface_Convex(
 		if ( es[ 7 ].cross( h2d - vs[ 7 ] ) < 0.0 ) {
 			return;
 		}
-		// [[fallthrough]];
+		// fallthrough
 	case 7:
 		if ( es[ 6 ].cross( h2d - vs[ 6 ] ) < 0.0 ) {
-			return; 
+			return;
 		}
-		// [[fallthrough]];
+		// fallthrough
 	case 6:
 		if ( es[ 5 ].cross( h2d - vs[ 5 ] ) < 0.0 ) {
-			return; 
+			return;
 		}
-		// [[fallthrough]];
+		// fallthrough
 	case 5:
 		if ( es[ 4 ].cross( h2d - vs[ 4 ] ) < 0.0 ) {
-			return; 
+			return;
 		}
-		// [[fallthrough]];
+		// fallthrough
 	case 4:
 		if ( es[ 3 ].cross( h2d - vs[ 3 ] ) < 0.0 ) {
-			return; 
+			return;
 		}
-		// [[fallthrough]];
+		// fallthrough
 	case 3:
 		if ( es[ 2 ].cross( h2d - vs[ 2 ] ) < 0.0 ) {
 			return;
