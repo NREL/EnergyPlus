@@ -716,6 +716,7 @@ namespace Boilers {
 
         if (PltSizNum > 0) {
             if (PlantSizData(PltSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+                // TODO: should this be calculated before design capacity and then used in that calculation?
                 tmpBoilerVolFlowRate = PlantSizData(PltSizNum).DesVolFlowRate * designSizingFactor_;
             } else {
                 if (designVolumeFlowRateWasAutoSized_) tmpBoilerVolFlowRate = 0.0;
