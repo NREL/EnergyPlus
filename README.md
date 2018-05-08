@@ -24,3 +24,5 @@ EnergyPlus is available under a BSD-3-like license.  For more information, check
 Commits to EnergyPlus are built by our team of robots (@nrel-bot, @nrel-bot-2, and @nrel-bot-3), using the [Decent CI](https://github.com/lefticus/decent_ci) continuous integration system.
 
 A detailed description of compiling EnergyPlus on multiple platforms is available on the [wiki](https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus).
+
+...
