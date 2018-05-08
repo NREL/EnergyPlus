@@ -52,155 +52,122 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace SizingManager {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS: none
+    // Data
+    // MODULE PARAMETER DEFINITIONS: none
 
-	// DERIVED TYPE DEFINITIONS: none
+    // DERIVED TYPE DEFINITIONS: none
 
-	// INTERFACE BLOCK SPECIFICATIONS: none
+    // INTERFACE BLOCK SPECIFICATIONS: none
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumAirLoops;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumAirLoops;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
+    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
-	// Types
+    // Types
 
-	struct ZoneListData
-	{
-		// Members
-		std::string Name;
-		int NumOfZones;
-		Array1D_int Zones;
+    struct ZoneListData
+    {
+        // Members
+        std::string Name;
+        int NumOfZones;
+        Array1D_int Zones;
 
-		// Default Constructor
-		ZoneListData() :
-			NumOfZones( 0 )
-		{}
+        // Default Constructor
+        ZoneListData() : NumOfZones(0)
+        {
+        }
+    };
 
-	};
+    // Functions
+    void clear_state();
 
-	// Functions
-	void
-	clear_state();
+    void ManageSizing();
 
-	void
-	ManageSizing();
+    void ManageSystemSizingAdjustments();
 
-	void
-	ManageSystemSizingAdjustments();
+    void ManageSystemVentilationAdjustments();
 
-	void
-	ManageSystemVentilationAdjustments();
+    void DetermineSystemPopulationDiversity();
 
-	void
-	DetermineSystemPopulationDiversity();
+    void GetOARequirements();
 
-	void
-	GetOARequirements();
+    void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
+                                    int const OAIndex,
+                                    Array1_string const &cAlphaArgs,
+                                    int &NumAlphas,
+                                    Array1<Real64> const &rNumericArgs,
+                                    int &NumNumbers,
+                                    Array1_bool const &lNumericFieldBlanks, // Unused
+                                    Array1_bool const &lAlphaFieldBlanks,
+                                    Array1_string const &cAlphaFieldNames,
+                                    Array1_string const &cNumericFieldNames, // Unused
+                                    bool &ErrorsFound                        // If errors found in input
+    );
 
-	void
-	ProcessInputOARequirements(
-		std::string const & cCurrentModuleObject,
-		int const OAIndex,
-		Array1_string const & cAlphaArgs,
-		int & NumAlphas,
-		Array1< Real64 > const & rNumericArgs,
-		int & NumNumbers,
-		Array1_bool const & lNumericFieldBlanks, //Unused
-		Array1_bool const & lAlphaFieldBlanks,
-		Array1_string const & cAlphaFieldNames,
-		Array1_string const & cNumericFieldNames, //Unused
-		bool & ErrorsFound // If errors found in input
-	);
+    void GetZoneAirDistribution();
 
-	void
-	GetZoneAirDistribution();
+    void GetZoneHVACSizing();
 
-	void
-	GetZoneHVACSizing();
+    void GetAirTerminalSizing();
 
-	void
-	GetAirTerminalSizing();
+    void GetSizingParams();
 
-	void
-	GetSizingParams();
+    void GetZoneSizingInput();
 
-	void
-	GetZoneSizingInput();
+    void
+    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 
-	void
-	GetZoneAndZoneListNames(
-		bool & ErrorsFound,
-		int & NumZones,
-		Array1D_string & ZoneNames,
-		int & NumZoneLists,
-		Array1D< ZoneListData > & ZoneListNames
-	);
+    void GetSystemSizingInput();
 
-	void
-	GetSystemSizingInput();
+    void GetPlantSizingInput();
 
-	void
-	GetPlantSizingInput();
+    void SetupZoneSizing(bool &ErrorsFound);
 
-	void
-	SetupZoneSizing( bool & ErrorsFound );
+    void ReportZoneSizing(std::string const &ZoneName,   // the name of the zone
+                          std::string const &LoadType,   // the description of the input variable
+                          Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
+                          Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
+                          Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
+                          Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
+                          std::string const &DesDayName, // the name of the design day that produced the peak
+                          std::string const &PeakHrMin,  // time stamp of the peak
+                          Real64 const PeakTemp,         // temperature at peak [C]
+                          Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
+                          Real64 const FloorArea,        // zone floor area [m2]
+                          Real64 const TotOccs,          // design number of occupants for the zone
+                          Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
+                          Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
+    );
 
-	void
-	ReportZoneSizing(
-		std::string const & ZoneName, // the name of the zone
-		std::string const & LoadType, // the description of the input variable
-		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
-		Real64 const UserDesLoad, // the value from the sizing calculation modified by user input [W]
-		Real64 const CalcDesFlow, // calculated design air flow rate [m3/s]
-		Real64 const UserDesFlow, // user input or modified design air flow rate [m3/s]
-		std::string const & DesDayName, // the name of the design day that produced the peak
-		std::string const & PeakHrMin, // time stamp of the peak
-		Real64 const PeakTemp, // temperature at peak [C]
-		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
-		Real64 const FloorArea, // zone floor area [m2]
-		Real64 const TotOccs, // design number of occupants for the zone
-		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
-		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
-	);
+    void ReportSysSizing(std::string const &SysName,      // the name of the zone
+                         std::string const &LoadType,     // either "Cooling" or "Heating"
+                         std::string const &PeakLoadType, // either "Sensible" or "Total"
+                         Real64 const &UserDesCap,        // User  Design Capacity
+                         Real64 const &CalcDesVolFlow,    // Calculated  Design Air Flow Rate
+                         Real64 const &UserDesVolFlow,    // User Design Air Flow Rate
+                         std::string const &DesDayName,   // the name of the design day that produced the peak
+                         std::string const &DesDayDate,   // the date that produced the peak
+                         int const &TimeStepIndex         // time step of the peak
+    );
 
-	void
-	ReportSysSizing(
-		std::string const & SysName, // the name of the zone
-		std::string const & LoadType, // either "Cooling" or "Heating"
-		std::string const & PeakLoadType, // either "Sensible" or "Total"
-		Real64 const & UserDesCap, // User  Design Capacity
-		Real64 const & CalcDesVolFlow, // Calculated  Design Air Flow Rate
-		Real64 const & UserDesVolFlow, // User Design Air Flow Rate
-		std::string const & DesDayName, // the name of the design day that produced the peak
-		std::string const & DesDayDate, // the date that produced the peak
-		int const & TimeStepIndex // time step of the peak
-	);
+    std::string TimeIndexToHrMinString(int timeIndex);
 
-	std::string TimeIndexToHrMinString (
-		int timeIndex
-	);
+    void UpdateFacilitySizing(int const CallIndicator);
 
-	void
-	UpdateFacilitySizing(
-		int const CallIndicator
-	);
+    void UpdateTermUnitFinalZoneSizing();
 
-	void
-	UpdateTermUnitFinalZoneSizing();
+} // namespace SizingManager
 
-} // SizingManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -60,28 +60,30 @@
 
 namespace EnergyPlus {
 
-enum class ShapeType {
-	Unknown,
-	Triangle,
-	Quadrilateral,
-	Rectangle,
-	RectangularDoorWindow,
-	RectangularOverhang,
-	RectangularLeftFin,
-	RectangularRightFin,
-	TriangularWindow,
-	Convex,
-	Nonconvex
+enum class ShapeType
+{
+    Unknown,
+    Triangle,
+    Quadrilateral,
+    Rectangle,
+    RectangularDoorWindow,
+    RectangularOverhang,
+    RectangularLeftFin,
+    RectangularRightFin,
+    TriangularWindow,
+    Convex,
+    Nonconvex
 };
 
-enum class ShapeCat {
-	Unknown,
-	Triangular,
-	Rectangular,
-	Convex,
-	Nonconvex
+enum class ShapeCat
+{
+    Unknown,
+    Triangular,
+    Rectangular,
+    Convex,
+    Nonconvex
 };
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

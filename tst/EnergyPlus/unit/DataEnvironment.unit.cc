@@ -58,25 +58,24 @@
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 
-TEST_F( EnergyPlusFixture, DataEnvironment_WindSpeedAt )
+TEST_F(EnergyPlusFixture, DataEnvironment_WindSpeedAt)
 {
-	DataEnvironment::WindSpeed = 10;
-	DataEnvironment::WeatherFileWindModCoeff = 0.3;
-	DataEnvironment::SiteWindBLHeight = 20;
+    DataEnvironment::WindSpeed = 10;
+    DataEnvironment::WeatherFileWindModCoeff = 0.3;
+    DataEnvironment::SiteWindBLHeight = 20;
 
-	// Start with normal mode
-	DataEnvironment::SiteWindExp = 0.1;
-	EXPECT_NEAR( 0.000, DataEnvironment::WindSpeedAt( -1.0 ), 0.001 );
-	EXPECT_NEAR( 0.000, DataEnvironment::WindSpeedAt( 0.0 ), 0.001 );
-	EXPECT_NEAR( 2.223, DataEnvironment::WindSpeedAt( 1.0 ), 0.001 );
-	EXPECT_NEAR( 2.612, DataEnvironment::WindSpeedAt( 5.0 ), 0.001 );
-	EXPECT_NEAR( 2.799, DataEnvironment::WindSpeedAt( 10.0 ), 0.001 );
-	EXPECT_NEAR( 3.000, DataEnvironment::WindSpeedAt( 20.0 ), 0.001 );
-	
-	// If the site wind exponent is zero, the wind speed is either zero or the actual wind speed
-	DataEnvironment::SiteWindExp = 0.0;
-	EXPECT_NEAR( 0.0, DataEnvironment::WindSpeedAt( -1.0 ), 0.001 );
-	EXPECT_NEAR( 0.0, DataEnvironment::WindSpeedAt( 0.0 ), 0.001 );
-	EXPECT_NEAR( 10.0, DataEnvironment::WindSpeedAt( 1.0 ), 0.001 );
+    // Start with normal mode
+    DataEnvironment::SiteWindExp = 0.1;
+    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(-1.0), 0.001);
+    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(0.0), 0.001);
+    EXPECT_NEAR(2.223, DataEnvironment::WindSpeedAt(1.0), 0.001);
+    EXPECT_NEAR(2.612, DataEnvironment::WindSpeedAt(5.0), 0.001);
+    EXPECT_NEAR(2.799, DataEnvironment::WindSpeedAt(10.0), 0.001);
+    EXPECT_NEAR(3.000, DataEnvironment::WindSpeedAt(20.0), 0.001);
+
+    // If the site wind exponent is zero, the wind speed is either zero or the actual wind speed
+    DataEnvironment::SiteWindExp = 0.0;
+    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(-1.0), 0.001);
+    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(0.0), 0.001);
+    EXPECT_NEAR(10.0, DataEnvironment::WindSpeedAt(1.0), 0.001);
 }
-

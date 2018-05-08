@@ -62,7 +62,7 @@
 
 // Force inlining
 #ifndef ALWAYS_INLINE
-#if defined(__GNUC__) || ( defined(__clang__) && __has_attribute(always_inline) )
+#if defined(__GNUC__) || (defined(__clang__) && __has_attribute(always_inline))
 #define ALWAYS_INLINE inline __attribute__((__always_inline__))
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
 #define ALWAYS_INLINE __forceinline

@@ -50,80 +50,61 @@
 #include <exception>
 
 // Google Test Headers
-#include <gtest/gtest.h>
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <gtest/gtest.h>
 
 namespace EnergyPlus {
 
-	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypeInput ) {
-		std::string const idf_objects = delimited_string({
-			"Coil:Heating:Fuel,",
-			"  Furnace Coil,            !- Name",
-			"  ,    !- Availability Schedule Name",
-			"  OtherFuel1,              !- FuelType",
-			"  0.8,                     !- Gas Burner Efficiency",
-			"  20000,                   !- Nominal Capacity {W}",
-			"  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
-			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
-		});
+TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
+{
+    std::string const idf_objects = delimited_string(
+        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  OtherFuel1,              !- FuelType",
+         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
+         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
-		ASSERT_TRUE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
 
-		EXPECT_EQ( HeatingCoils::HeatingCoil( 1 ).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
-
-	}
-
-	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypeInputError ) {
-		std::string const idf_objects = delimited_string({
-			"Coil:Heating:Fuel,",
-			"  Furnace Coil,            !- Name",
-			"  ,    !- Availability Schedule Name",
-			"  Electric,              !- FuelType",
-			"  0.8,                     !- Gas Burner Efficiency",
-			"  20000,                   !- Nominal Capacity {W}",
-			"  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
-			"  Air Loop Outlet Node;    !- Air Outlet Node Name"
-		});
-
-		ASSERT_TRUE( process_idf( idf_objects ) );
-		ASSERT_THROW( HeatingCoils::GetHeatingCoilInput(), std::runtime_error );
-
-		std::string const error_string = delimited_string( {
-			"   ** Severe  ** GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
-			"   **  Fatal  ** GetHeatingCoilInput: Errors found in input.  Program terminates.",
-			"   ...Summary of Errors that led to program termination:",
-			"   ..... Reference severe error count=1",
-			"   ..... Last severe error=GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
-		} );
-
-
-
-		EXPECT_TRUE( compare_err_stream( error_string, true ) );
-
-	}
-
-	TEST_F( EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas ) {
-		std::string const idf_objects = delimited_string({
-			 "Coil:Heating:Fuel,",
-			 "  Furnace Coil,            !- Name",
-			 "  ,    !- Availability Schedule Name",
-			 "  Propane,                 !- FuelType",
-			 "  0.8,                     !- Gas Burner Efficiency",
-			 "  20000,                   !- Nominal Capacity {W}",
-			 "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
-			 "  Air Loop Outlet Node;    !- Air Outlet Node Name"
-														 });
-
-		ASSERT_TRUE( process_idf( idf_objects ) );
-
-		ASSERT_NO_THROW( HeatingCoils::GetHeatingCoilInput() );
-
-		EXPECT_EQ( HeatingCoils::HeatingCoil( 1 ).FuelType_Num, DataGlobalConstants::iRT_Propane);
-
-	}
-
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
 }
+
+TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
+{
+    std::string const idf_objects = delimited_string(
+        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  Electric,              !- FuelType",
+         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
+         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
+
+    EXPECT_FALSE(process_idf(idf_objects, false));
+    ASSERT_THROW(HeatingCoils::GetHeatingCoilInput(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** <root>[Coil:Heating:Fuel][Furnace Coil][fuel_type] - \"Electric\" - Failed to match against any enum values.",
+        "   ** Severe  ** GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
+        "   **  Fatal  ** GetHeatingCoilInput: Errors found in input.  Program terminates.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=GetHeatingCoilInput: Coil:Heating:Fuel: Invalid Fuel Type entered =ELECTRIC for Name=FURNACE COIL",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
+{
+    std::string const idf_objects = delimited_string(
+        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  Propane,                 !- FuelType",
+         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
+         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
+
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Propane);
+}
+
+} // namespace EnergyPlus
