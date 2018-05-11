@@ -57,7 +57,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#define EIGEN_USE_MKL_ALL
 #include <Eigen/Dense>
 #include <Eigen/LU>
 
