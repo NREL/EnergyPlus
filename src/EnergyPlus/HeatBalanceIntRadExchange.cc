@@ -376,20 +376,59 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
 
+            // std::cout << "surface_temp\n";
+            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+            // {
+            //     std::cout << surface_temp(i) << ",";
+            // }
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+
             surface_temp += KelvinConv;
+
+            // std::cout << "surface_temp + KelvinConv\n";
+            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+            // {
+            //     std::cout << surface_temp(i) << ",";
+            // }
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+
             surface_temp *= surface_temp; // pow_2
+
+            // std::cout << "surface_temp pow2\n";
+            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+            // {
+            //     std::cout << surface_temp(i) << ",";
+            // }
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+
             surface_temp *= surface_temp; // pow_4
 
+            // std::cout << "surface_temp pow4\n";
+            // for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
+            // {
+            //     std::cout << surface_temp(i) << ",";
+            // }
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+
+            // std::cout << "surface_temp_interactions\n";
             for (int i = 0; i < n_zone_Surfaces; ++i) { // receiving surface
                 for (int j = 0; j < n_zone_Surfaces; ++j) { // sending surface
-                    surface_temp_interactions(i, j) = (i == j) ? 0 : surface_temp(j) - surface_temp(i); /// send - receive
+                    surface_temp_interactions(i, j) = scriptF(i, j) * (surface_temp(j) - surface_temp(i)); /// send - receive
                    // std::cout << surface_temp_interactions(i, j) << ",";
                 }
                // std::cout << std::endl;
             }
-            std::cout << std::endl;
-            std::cout << std::endl;
+            for (int i = 0; i < n_zone_Surfaces; ++i) {
+                surface_temp_interactions(i, i) = 0;
+            }
+            // std::cout << std::endl;
+            // std::cout << std::endl;
 
+           //  std::cout << "scriptF\n";
            // for (int i = 0; i < n_zone_Surfaces; ++i) { // receiving surface
            //     for (int j = 0; j < n_zone_Surfaces; ++j) { // sending surface
            //         std::cout << scriptF(i, j) << ",";
@@ -400,23 +439,43 @@ namespace HeatBalanceIntRadExchange {
            // std::cout << std::endl;
            // std::cout << std::endl;
 
+           // std::cout << "manual mult\n";
+           // for (int i = 0; i < n_zone_Surfaces; ++i) { // receiving surface
+           //     for (int j = 0; j < n_zone_Surfaces; ++j) { // sending surface
+           //         std::cout << surface_temp_interactions(i, j) * scriptF(i, j) << ",";
+           //     }
+           //     std::cout << std::endl;
+           // }
 
-            MatrixXd NetLWRadToSurfMatrix(n_zone_Surfaces, n_zone_Surfaces);
+           // std::cout << std::endl;
+           // std::cout << std::endl;
 
-            // if no windows
-            NetLWRadToSurfMatrix = scriptF * surface_temp_interactions; // TODO: Fix
+           //  // if no windows
+           //  surface_temp_interactions = (surface_temp_interactions * scriptF).eval(); // TODO: Fix
+            // surface_temp_interactions = surface_temp_interactions.cwiseProduct(scriptF);
 
-            auto const NetLWRadToSurf_acc = NetLWRadToSurfMatrix.colwise().sum();
+           //  std::cout << "surface_temp_interactions\n";
+           // for (int i = 0; i < n_zone_Surfaces; ++i) { // receiving surface
+           //     for (int j = 0; j < n_zone_Surfaces; ++j) { // sending surface
+           //         std::cout << surface_temp_interactions(i, j) << ",";
+           //     }
+           //     std::cout << std::endl;
+           // }
 
+           // std::cout << std::endl;
+           // std::cout << std::endl;
 
+            auto const NetLWRadToSurf_acc = surface_temp_interactions.rowwise().sum();
+
+            // std::cout << "NetLWRadToSurf_acc\n";
             for (int i = 0; i < n_zone_Surfaces; ++i) // receiving surface
             {
                 auto const surface_num = zone_SurfacePtr[i];
                 NetLWRadToSurf(surface_num) += NetLWRadToSurf_acc(i);
-                std::cout << NetLWRadToSurf_acc(i) << ",";
+                // std::cout << NetLWRadToSurf_acc(i) << ",";
             }
-            std::cout << std::endl;
-            std::cout << std::endl;
+            // std::cout << std::endl;
+            // std::cout << std::endl;
 
 
 
@@ -448,8 +507,18 @@ namespace HeatBalanceIntRadExchange {
 // #endif
 //             }
 
+//             std::cout << "SendSurfaceTempInKto4thPrecalc\n";
+//             for (size_type i = 0; i < s_zone_Surfaces; ++i) {
+//                 std::cout << SendSurfaceTempInKto4thPrecalc[i] << ",";
+//             }
+//             std::cout << std::endl;
+//             std::cout << std::endl;
+
 //             // These are the money loops
 //             size_type lSR(0u);
+//             std::cout << "netLWRadToRecSurf_acc\n";
+//             // std::cout << "RecSurfTempInKTo4th\n";
+//             // std::cout << "testing\n";
 //             for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
 //                 RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
 //                 ConstrNumRec = Surface(RecSurfNum).Construction;
@@ -485,6 +554,7 @@ namespace HeatBalanceIntRadExchange {
 //                 }
 //                 // precalculate the fourth power of surface temperature as part of strategy to reduce calculation time - Glazer 2011-04-22
 //                 RecSurfTempInKTo4th = pow_4(RecSurfTemp + KelvinConv);
+//                 // std::cout << RecSurfTempInKTo4th << ",";
 //                 //      IF (ABS(RecSurfTempInKTo4th) > 1.d100) THEN
 //                 //        SendZoneSurfNum=0
 //                 //      ENDIF
@@ -529,6 +599,9 @@ namespace HeatBalanceIntRadExchange {
 //                     for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum, ++lSR) {
 //                         if (RecZoneSurfNum != SendZoneSurfNum) {
 // #ifdef EP_HBIRE_SEQ
+//                             // auto const testing = zone_ScriptF[lSR] * (SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] -
+//                             //                                               RecSurfTempInKTo4th); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
+//                             // std::cout << testing << ",";
 //                             netLWRadToRecSurf_acc += zone_ScriptF[lSR] * (SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] -
 //                                                                           RecSurfTempInKTo4th); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
 // #else
@@ -536,13 +609,20 @@ namespace HeatBalanceIntRadExchange {
 //                             netLWRadToRecSurf_acc += zone_ScriptF[lSR] * (SendSurfaceTempInKto4thPrecalc[SendSurfNum] -
 //                                                                           RecSurfTempInKTo4th); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
 // #endif
+//                         } else {
+//                             // std::cout << "0,";
 //                         }
 //                     }
 //                     netLWRadToRecSurf += netLWRadToRecSurf_acc;
 //                     std::cout << netLWRadToRecSurf_acc << ",";
+//                     // std::cout << std::endl;
 //                 }
 //            }
 //            std::cout << std::endl;
+//            std::cout << std::endl;
+
+
+
         }
 
 #ifdef EP_Detailed_Timings
