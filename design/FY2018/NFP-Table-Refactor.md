@@ -28,6 +28,16 @@ The general proposal is to collapse the existing three table objects:
 
 into a single new object: *Table:Lookup*.
 
+## Discussion
+
+### Abandoning curve-fitting capability
+
+The current capability to fit curves to tables is limited to only some two-dimensional curve types. This feature allowed curve coefficients to be generated and used for tables (when using the "EvaluateCurveToLimits" extrapolation method). As manufacturers are already uneasy about the use of curve fits to represent their equipment, and the limited implementation of this feature, we are proposing dropping this feature from the new *Table:Lookup* objects. This also means that tables can be used anywhere where the dimensionality of the curve input matches that of the table.
+
+### Using CSV imports for independent variables
+
+When performance data is provided in tabular form, often times it accompanies the values of independent variables used to generate the data. Although this data is often repetitive (as it repeats each value for all possible combinations of the other independent variables), it may be convenient to include a way to read these values from the same file. This will be supported in the design of this feature, though the extent of error checking will be limited (e.g., correct order and cycling of independent values will not be validated).
+
 ## Input Output Reference Documentation
 
 ### Group Performance Tables
@@ -45,20 +55,6 @@ Input for tables representing data with one or more independent variables.
 ##### Field: Name
 
 A unique user-assigned name for an instance of a lookup table. When a table is used, it is referenced by this name. The name of this table object may be used anywhere a valid performance curve object is allowed.
-
-##### Field: Curve Type
-
-The type of curve this table is representing. Choices are:
-
-- *Linear*
-- *Quadratic*
-- *Cubic*
-- *Quartic*
-- *BiQuadratic*
-- *QuadraticLinear*
-- *Bicubic*
-
-This field is used to determine if this table object is representative of the type of curve allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects).
 
 ##### Field: Independent Variable List Name
 
@@ -86,34 +82,35 @@ This field is used to indicate the kind of units that may be associated with the
 
 ##### Field: External File Name
 
-The name of an external CSV file that represents the tabular data. This file should be formatted such that the data for this particular output is ordered according to the order of the corresponding independent variables. For example, for three independent variables (iv1, iv2, iv3) with 3, 2, and 4 values respectively. The output values (out[iv1][iv2][iv3]) should be ordered as:
+The name of an external CSV file that represents the tabular data. This file should be formatted such that the data for this particular output is ordered according to the order of the corresponding independent variables. For example, for three independent variables (`iv1`, `iv2`, `iv3`) with 3, 2, and 4 values respectively. The output values (`out[iv1][iv2][iv3]`) should be ordered as:
 
-```
-out[1][1][1]
-out[1][1][2]
-out[1][1][3]
-out[1][1][4]
-out[1][2][1]
-out[1][2][2]
-out[1][2][3]
-out[1][2][4]
-out[2][1][1]
-out[2][1][2]
-out[2][1][3]
-out[2][1][4]
-out[2][2][1]
-out[2][2][2]
-out[2][2][3]
-out[2][2][4]
-out[3][1][1]
-out[3][1][2]
-out[3][1][3]
-out[3][1][4]
-out[3][2][1]
-out[3][2][2]
-out[3][2][3]
-out[3][2][4]
-```
+
+`iv1` | `iv2` | `iv3` | `output`
+--- | --- | --- | ---
+`iv1[1]` | `iv2[1]` | `iv3[1]` | `out[1][1][1]`
+`iv1[1]` | `iv2[1]` | `iv3[2]` | `out[1][1][2]`
+`iv1[1]` | `iv2[1]` | `iv3[3]` | `out[1][1][3]`
+`iv1[1]` | `iv2[1]` | `iv3[4]` | `out[1][1][4]`
+`iv1[1]` | `iv2[2]` | `iv3[1]` | `out[1][2][1]`
+`iv1[1]` | `iv2[2]` | `iv3[2]` | `out[1][2][2]`
+`iv1[1]` | `iv2[2]` | `iv3[3]` | `out[1][2][3]`
+`iv1[1]` | `iv2[2]` | `iv3[4]` | `out[1][2][4]`
+`iv1[2]` | `iv2[1]` | `iv3[1]` | `out[2][1][1]`
+`iv1[2]` | `iv2[1]` | `iv3[2]` | `out[2][1][2]`
+`iv1[2]` | `iv2[1]` | `iv3[3]` | `out[2][1][3]`
+`iv1[2]` | `iv2[1]` | `iv3[4]` | `out[2][1][4]`
+`iv1[2]` | `iv2[2]` | `iv3[1]` | `out[2][2][1]`
+`iv1[2]` | `iv2[2]` | `iv3[2]` | `out[2][2][2]`
+`iv1[2]` | `iv2[2]` | `iv3[3]` | `out[2][2][3]`
+`iv1[2]` | `iv2[2]` | `iv3[4]` | `out[2][2][4]`
+`iv1[3]` | `iv2[1]` | `iv3[1]` | `out[3][1][1]`
+`iv1[3]` | `iv2[1]` | `iv3[2]` | `out[3][1][2]`
+`iv1[3]` | `iv2[1]` | `iv3[3]` | `out[3][1][3]`
+`iv1[3]` | `iv2[1]` | `iv3[4]` | `out[3][1][4]`
+`iv1[3]` | `iv2[2]` | `iv3[1]` | `out[3][2][1]`
+`iv1[3]` | `iv2[2]` | `iv3[2]` | `out[3][2][2]`
+`iv1[3]` | `iv2[2]` | `iv3[3]` | `out[3][2][3]`
+`iv1[3]` | `iv2[2]` | `iv3[4]` | `out[3][2][4]`
 
 ##### Field: External File Column Number
 
@@ -125,34 +122,35 @@ The row number (starting at 1) in the CSV file where the data for this output be
 
 ##### Output Value \<x\>
 
-This field is repeated to capture the full set of output data in the table (if not otherwise defined in an external file). The data for this particular output is ordered according to the order of the corresponding independent variables. For example, for three independent variables (iv1, iv2, iv3) with 3, 2, and 4 values respectively. The output values (out[iv1][iv2][iv3]) should be ordered as:
+This field is repeated to capture the full set of output data in the table (if not otherwise defined in an external file). The data for this particular output is ordered according to the order of the corresponding independent variables. For example, for three independent variables (`iv1`, `iv2`, `iv3`) with 3, 2, and 4 values respectively. The output values (`out[iv1][iv2][iv3]`) should be ordered as:
 
-```
-out[1][1][1]
-out[1][1][2]
-out[1][1][3]
-out[1][1][4]
-out[1][2][1]
-out[1][2][2]
-out[1][2][3]
-out[1][2][4]
-out[2][1][1]
-out[2][1][2]
-out[2][1][3]
-out[2][1][4]
-out[2][2][1]
-out[2][2][2]
-out[2][2][3]
-out[2][2][4]
-out[3][1][1]
-out[3][1][2]
-out[3][1][3]
-out[3][1][4]
-out[3][2][1]
-out[3][2][2]
-out[3][2][3]
-out[3][2][4]
-```
+
+`iv1` | `iv2` | `iv3` | `output`
+--- | --- | --- | ---
+`iv1[1]` | `iv2[1]` | `iv3[1]` | `out[1][1][1]`
+`iv1[1]` | `iv2[1]` | `iv3[2]` | `out[1][1][2]`
+`iv1[1]` | `iv2[1]` | `iv3[3]` | `out[1][1][3]`
+`iv1[1]` | `iv2[1]` | `iv3[4]` | `out[1][1][4]`
+`iv1[1]` | `iv2[2]` | `iv3[1]` | `out[1][2][1]`
+`iv1[1]` | `iv2[2]` | `iv3[2]` | `out[1][2][2]`
+`iv1[1]` | `iv2[2]` | `iv3[3]` | `out[1][2][3]`
+`iv1[1]` | `iv2[2]` | `iv3[4]` | `out[1][2][4]`
+`iv1[2]` | `iv2[1]` | `iv3[1]` | `out[2][1][1]`
+`iv1[2]` | `iv2[1]` | `iv3[2]` | `out[2][1][2]`
+`iv1[2]` | `iv2[1]` | `iv3[3]` | `out[2][1][3]`
+`iv1[2]` | `iv2[1]` | `iv3[4]` | `out[2][1][4]`
+`iv1[2]` | `iv2[2]` | `iv3[1]` | `out[2][2][1]`
+`iv1[2]` | `iv2[2]` | `iv3[2]` | `out[2][2][2]`
+`iv1[2]` | `iv2[2]` | `iv3[3]` | `out[2][2][3]`
+`iv1[2]` | `iv2[2]` | `iv3[4]` | `out[2][2][4]`
+`iv1[3]` | `iv2[1]` | `iv3[1]` | `out[3][1][1]`
+`iv1[3]` | `iv2[1]` | `iv3[2]` | `out[3][1][2]`
+`iv1[3]` | `iv2[1]` | `iv3[3]` | `out[3][1][3]`
+`iv1[3]` | `iv2[1]` | `iv3[4]` | `out[3][1][4]`
+`iv1[3]` | `iv2[2]` | `iv3[1]` | `out[3][2][1]`
+`iv1[3]` | `iv2[2]` | `iv3[2]` | `out[3][2][2]`
+`iv1[3]` | `iv2[2]` | `iv3[3]` | `out[3][2][3]`
+`iv1[3]` | `iv2[2]` | `iv3[4]` | `out[3][2][4]`
 
 #### Example IDF
 
@@ -185,34 +183,35 @@ The current value of the performance table. Performance curves and tables use th
 
 ### Table:IndependentVariableList
 
-A list of Table:IndependentVariable references that define the size and dimensions of the data for one or more Table:Lookup objects. The order of this list defines the order that the tabular data must be defined. The output values in the Table:Lookup associated with this list will list the output in an order cycling through the last item in the list first, and then the second to last, and so on with the the first item cycling last. For example, for three independent variables (iv1, iv2, iv3) with 3, 2, and 4 values respectively. The output values (out[iv1][iv2][iv3]) should be ordered as:
+A list of Table:IndependentVariable references that define the size and dimensions of the data for one or more Table:Lookup objects. The order of this list defines the order that the tabular data must be defined. The output values in the Table:Lookup associated with this list will list the output in an order cycling through the last item in the list first, and then the second to last, and so on with the the first item cycling last. For example, for three independent variables (`iv1`, `iv2`, `iv3`) with 3, 2, and 4 values respectively. The output values (`out[iv1][iv2][iv3]`) should be ordered as:
 
-```
-out[1][1][1]
-out[1][1][2]
-out[1][1][3]
-out[1][1][4]
-out[1][2][1]
-out[1][2][2]
-out[1][2][3]
-out[1][2][4]
-out[2][1][1]
-out[2][1][2]
-out[2][1][3]
-out[2][1][4]
-out[2][2][1]
-out[2][2][2]
-out[2][2][3]
-out[2][2][4]
-out[3][1][1]
-out[3][1][2]
-out[3][1][3]
-out[3][1][4]
-out[3][2][1]
-out[3][2][2]
-out[3][2][3]
-out[3][2][4]
-```
+
+`iv1` | `iv2` | `iv3` | `output`
+--- | --- | --- | ---
+`iv1[1]` | `iv2[1]` | `iv3[1]` | `out[1][1][1]`
+`iv1[1]` | `iv2[1]` | `iv3[2]` | `out[1][1][2]`
+`iv1[1]` | `iv2[1]` | `iv3[3]` | `out[1][1][3]`
+`iv1[1]` | `iv2[1]` | `iv3[4]` | `out[1][1][4]`
+`iv1[1]` | `iv2[2]` | `iv3[1]` | `out[1][2][1]`
+`iv1[1]` | `iv2[2]` | `iv3[2]` | `out[1][2][2]`
+`iv1[1]` | `iv2[2]` | `iv3[3]` | `out[1][2][3]`
+`iv1[1]` | `iv2[2]` | `iv3[4]` | `out[1][2][4]`
+`iv1[2]` | `iv2[1]` | `iv3[1]` | `out[2][1][1]`
+`iv1[2]` | `iv2[1]` | `iv3[2]` | `out[2][1][2]`
+`iv1[2]` | `iv2[1]` | `iv3[3]` | `out[2][1][3]`
+`iv1[2]` | `iv2[1]` | `iv3[4]` | `out[2][1][4]`
+`iv1[2]` | `iv2[2]` | `iv3[1]` | `out[2][2][1]`
+`iv1[2]` | `iv2[2]` | `iv3[2]` | `out[2][2][2]`
+`iv1[2]` | `iv2[2]` | `iv3[3]` | `out[2][2][3]`
+`iv1[2]` | `iv2[2]` | `iv3[4]` | `out[2][2][4]`
+`iv1[3]` | `iv2[1]` | `iv3[1]` | `out[3][1][1]`
+`iv1[3]` | `iv2[1]` | `iv3[2]` | `out[3][1][2]`
+`iv1[3]` | `iv2[1]` | `iv3[3]` | `out[3][1][3]`
+`iv1[3]` | `iv2[1]` | `iv3[4]` | `out[3][1][4]`
+`iv1[3]` | `iv2[2]` | `iv3[1]` | `out[3][2][1]`
+`iv1[3]` | `iv2[2]` | `iv3[2]` | `out[3][2][2]`
+`iv1[3]` | `iv2[2]` | `iv3[3]` | `out[3][2][3]`
+`iv1[3]` | `iv2[2]` | `iv3[4]` | `out[3][2][4]`
 
 #### Inputs
 
@@ -282,6 +281,75 @@ This field is used to indicate the kind of units that may be associated with thi
 ##### Field: Normalization Value
 
 The value of this independent variable where nominal or rated output is defined. This will be used to normalize the data so that the outputs of any Table:Lookup at this value (and the corresponding Normalization Values of the other independent variables described in the same Table:IndependentVariableList object) are equal to 1.0.
+
+##### Field: External File Name
+
+The name of an external CSV file that represents the tabular data. This file should be formatted such that the data for any output is ordered according to the order of the corresponding independent variables. For example, for three independent variables (`iv1`, `iv2`, `iv3`) with 3, 2, and 4 values respectively. The output values (`out[iv1][iv2][iv3]`) should be ordered as:
+
+
+`iv1` | `iv2` | `iv3` | `output`
+--- | --- | --- | ---
+`iv1[1]` | `iv2[1]` | `iv3[1]` | `out[1][1][1]`
+`iv1[1]` | `iv2[1]` | `iv3[2]` | `out[1][1][2]`
+`iv1[1]` | `iv2[1]` | `iv3[3]` | `out[1][1][3]`
+`iv1[1]` | `iv2[1]` | `iv3[4]` | `out[1][1][4]`
+`iv1[1]` | `iv2[2]` | `iv3[1]` | `out[1][2][1]`
+`iv1[1]` | `iv2[2]` | `iv3[2]` | `out[1][2][2]`
+`iv1[1]` | `iv2[2]` | `iv3[3]` | `out[1][2][3]`
+`iv1[1]` | `iv2[2]` | `iv3[4]` | `out[1][2][4]`
+`iv1[2]` | `iv2[1]` | `iv3[1]` | `out[2][1][1]`
+`iv1[2]` | `iv2[1]` | `iv3[2]` | `out[2][1][2]`
+`iv1[2]` | `iv2[1]` | `iv3[3]` | `out[2][1][3]`
+`iv1[2]` | `iv2[1]` | `iv3[4]` | `out[2][1][4]`
+`iv1[2]` | `iv2[2]` | `iv3[1]` | `out[2][2][1]`
+`iv1[2]` | `iv2[2]` | `iv3[2]` | `out[2][2][2]`
+`iv1[2]` | `iv2[2]` | `iv3[3]` | `out[2][2][3]`
+`iv1[2]` | `iv2[2]` | `iv3[4]` | `out[2][2][4]`
+`iv1[3]` | `iv2[1]` | `iv3[1]` | `out[3][1][1]`
+`iv1[3]` | `iv2[1]` | `iv3[2]` | `out[3][1][2]`
+`iv1[3]` | `iv2[1]` | `iv3[3]` | `out[3][1][3]`
+`iv1[3]` | `iv2[1]` | `iv3[4]` | `out[3][1][4]`
+`iv1[3]` | `iv2[2]` | `iv3[1]` | `out[3][2][1]`
+`iv1[3]` | `iv2[2]` | `iv3[2]` | `out[3][2][2]`
+`iv1[3]` | `iv2[2]` | `iv3[3]` | `out[3][2][3]`
+`iv1[3]` | `iv2[2]` | `iv3[4]` | `out[3][2][4]`
+
+Independent variable values must appear in **ascending** order (an error will be issued if this is not the case).
+
+##### Field: External File Column Number
+
+The column number (starting at 1) in the CSV file corresponding to this independent variable. As the values of the independent variables each repeat over a defined cycle, EnergyPlus will only read unique values from this column. EnergyPlus does not validate that the cycles are repeating correctly. In fact, the same data can be read by only defining each value once as it is first encountered:
+
+`iv1` | `iv2` | `iv3` | `output`
+--- | --- | --- | ---
+`iv1[1]` | `iv2[1]` | `iv3[1]` | `out[1][1][1]`
+| |  | `iv3[2]` | `out[1][1][2]`
+| |  | `iv3[3]` | `out[1][1][3]`
+| |  | `iv3[4]` | `out[1][1][4]`
+| | `iv2[2]` | | `out[1][2][1]`
+| | | | `out[1][2][2]`
+| | | | `out[1][2][3]`
+| | | | `out[1][2][4]`
+`iv1[2]` | | | `out[2][1][1]`
+| | | | `out[2][1][2]`
+| | | | `out[2][1][3]`
+| | | | `out[2][1][4]`
+| | | | `out[2][2][1]`
+| | | | `out[2][2][2]`
+| | | | `out[2][2][3]`
+| | | | `out[2][2][4]`
+`iv1[3]` | | | `out[3][1][1]`
+| | | | `out[3][1][2]`
+| | | | `out[3][1][3]`
+| | | | `out[3][1][4]`
+| | | | `out[3][2][1]`
+| | | | `out[3][2][2]`
+| | | | `out[3][2][3]`
+| | | | `out[3][2][4]`
+
+##### Field: External File First Row Number
+
+The row number (starting at 1) in the CSV file where the data for this independent variable begins. Any values in the same column below this row are considered part of the range.
 
 ##### Field: Value \<x\>
 
@@ -649,23 +717,11 @@ Table:Lookup,
        \reference BiVariateTables
        \reference MultiVariateTables
        \type alpha
-  A2,  \field Curve Type
-       \type choice
-       \key Linear
-       \key Quadratic
-       \key Cubic
-       \key Quartic
-       \key Exponent
-       \key BiQuadratic
-       \key QuadraticLinear
-       \key BiCubic
-       \key TriQuadratic
-       \key Other
-  A3,  \field Independent Variable List Name
+  A2,  \field Independent Variable List Name
        \required-field
        \type object-list
        \object-list IndependentVariableListName
-  A4,  \field Normalize Output
+  A3,  \field Normalize Output
        \type choice
        \key Yes
        \key No
@@ -688,7 +744,7 @@ Table:Lookup,
   N3,  \field External File Column Number
        \type integer
        \minimum 1
-  N4,  \field External File Column Number
+  N4,  \field External File Row Number
        \type integer
        \minimum 1
   N5;  \field Output Value 1
@@ -748,7 +804,16 @@ Table:IndependentVariable,
        \key Distance
        \key Angle
        \default Dimensionless
-  N4;  \field Value 1
+  A5,  \field External File Name
+       \type alpha
+       \retaincase
+  N4,  \field External File Column Number
+       \type integer
+       \minimum 1
+  N5,  \field External File Row Number
+       \type integer
+       \minimum 1
+  N6;  \field Value 1
        \type real
        \begin-extensible
 ```
