@@ -1366,8 +1366,8 @@ namespace ZoneContaminantPredictorCorrector {
         if (allocated(ZoneEquipConfig) && MyConfigOneTimeFlag) {
             for (ContZoneNum = 1; ContZoneNum <= NumContControlledZones; ++ContZoneNum) {
                 ZoneNum = ContaminantControlledZone(ContZoneNum).ActualZoneNum;
-                for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ContZoneNum).NumInletNodes; ++zoneInNode) {
-                    int AirLoopNum = ZoneEquipConfig(ContZoneNum).InletNodeAirLoopNum(zoneInNode);
+                for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
+                    int AirLoopNum = ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(zoneInNode);
                     ContaminantControlledZone(ContZoneNum).NumOfZones = 0;
                     for (Loop = 1; Loop <= NumOfZones; ++Loop) {
                         if (!ZoneEquipConfig(Loop).IsControlled) continue;
@@ -1755,23 +1755,37 @@ namespace ZoneContaminantPredictorCorrector {
                 ControlledGCZoneFlag = false;
                 // Check all the controlled zones to see if it matches the zone simulated
                 for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
-                    if (GetCurrentScheduleValue(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
-                        ZoneAirGCSetPoint = ZoneGCSetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
-                        if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointOn) {
-                            ZoneAirGCSetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
+                    if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == ZoneNum) {
+                        if (GetCurrentScheduleValue(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                            ZoneAirGCSetPoint = ZoneGCSetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
+                            if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
+                                ZoneAirGCSetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
+                            }
+                            ControlledGCZoneFlag = true;
+                            break;
                         }
-                        if (ContaminantControlledZone(ContControlledZoneNum).NumOfZones >= 1) {
-                            if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum != ZoneNum) {
-                                for (I = 1; I <= ContaminantControlledZone(ContControlledZoneNum).NumOfZones; ++I) {
-                                    if (ContaminantControlledZone(ContControlledZoneNum).ControlZoneNum(I) == ZoneNum) {
-                                        ControlledGCZoneFlag = true;
-                                        break;
+                    }
+                }
+                if (!ControlledGCZoneFlag) {
+                    for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
+                        if (GetCurrentScheduleValue(ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr) > 0.0) {
+                            ZoneAirGCSetPoint = ZoneGCSetPoint(ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum);
+                            if (ContaminantControlledZone(ContControlledZoneNum).EMSOverrideCO2SetPointOn) {
+                                ZoneAirGCSetPoint = ContaminantControlledZone(ContControlledZoneNum).EMSOverrideGCSetPointValue;
+                            }
+                            if (ContaminantControlledZone(ContControlledZoneNum).NumOfZones >= 1) {
+                                if (ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum != ZoneNum) {
+                                    for (I = 1; I <= ContaminantControlledZone(ContControlledZoneNum).NumOfZones; ++I) {
+                                        if (ContaminantControlledZone(ContControlledZoneNum).ControlZoneNum(I) == ZoneNum) {
+                                            ControlledGCZoneFlag = true;
+                                            break;
+                                        }
                                     }
+                                    if (ControlledGCZoneFlag) break;
+                                } else {
+                                    ControlledGCZoneFlag = true;
+                                    break;
                                 }
-                                if (ControlledGCZoneFlag) break;
-                            } else {
-                                ControlledGCZoneFlag = true;
-                                break;
                             }
                         }
                     }
