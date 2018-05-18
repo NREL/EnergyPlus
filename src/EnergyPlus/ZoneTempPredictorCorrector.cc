@@ -3608,7 +3608,10 @@ namespace ZoneTempPredictorCorrector {
                 if (TempCtrlFound && TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
                     TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
                     ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
-                    if (ZoneAirSolutionAlgo == Use3rdOrder) Tprev = ZTM1(ZoneNum);
+                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                        Tprev = MAT(ZoneNum);
+                        if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
+                    }
                     if (ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod) Tprev = ZoneT1(ZoneNum);
                     if (Tprev < TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempTole) {
                         TempZoneThermostatSetPoint(ZoneNum) =
@@ -3663,7 +3666,10 @@ namespace ZoneTempPredictorCorrector {
                 if (TempCtrlFound && TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
                     TempZoneThermostatSetPoint(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
                     ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
-                    if (ZoneAirSolutionAlgo == Use3rdOrder) Tprev = ZTM1(ZoneNum);
+                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                        Tprev = MAT(ZoneNum);
+                        if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
+                    }
                     if (ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod) Tprev = ZoneT1(ZoneNum);
                     if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
                         TempZoneThermostatSetPoint(ZoneNum) =
@@ -3800,7 +3806,10 @@ namespace ZoneTempPredictorCorrector {
                 if (TempCtrlFound && TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
                     ZoneThermostatSetPointHi(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
                     ZoneThermostatSetPointLo(ZoneNum) = TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
-                    if (ZoneAirSolutionAlgo == Use3rdOrder) Tprev = ZTM1(ZoneNum);
+                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                        Tprev = MAT(ZoneNum);
+                        if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
+                    }
                     if (ZoneAirSolutionAlgo == UseAnalyticalSolution || ZoneAirSolutionAlgo == UseEulerMethod) Tprev = ZoneT1(ZoneNum);
 
                     if (Tprev > TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
