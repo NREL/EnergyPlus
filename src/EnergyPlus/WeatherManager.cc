@@ -830,7 +830,7 @@ namespace WeatherManager {
 
             ReportOutputFileHeaders(); // Write the output file header information
 
-            // SetupOutputVariables, CurrentModuleObject='All Simulations'
+            // Setup Output Variables, CurrentModuleObject='All Simulations'
 
             SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, OutDryBulbTemp, "Zone", "Average", "Environment");
             SetupOutputVariable("Site Outdoor Air Dewpoint Temperature", OutputProcessor::Unit::C, OutDewPointTemp, "Zone", "Average", "Environment");
