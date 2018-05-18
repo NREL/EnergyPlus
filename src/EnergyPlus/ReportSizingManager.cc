@@ -1612,7 +1612,7 @@ namespace ReportSizingManager {
                                 CoilOutTemp = -999.0;
                             }
                         }
-                        if (DataFanEnumType > 0 && DataFanIndex > 0) {
+                        if (DataFanEnumType > 0) {
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
                                 FanCoolLoad = FanDesHeatGain(DataFanIndex, DesVolFlow);
