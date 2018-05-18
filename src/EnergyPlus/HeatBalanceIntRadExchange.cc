@@ -1137,7 +1137,7 @@ namespace HeatBalanceIntRadExchange {
         fixedAF.array().colwise() *= areas;
 
         // Enforce reciprocity by averaging AiFij and AjFji
-        fixedAF += fixedAF.transpose().eval();
+        fixedAF += fixedAF.transpose().eval(); // use eval to prevent aliasing since fixedAF appears on both sides
         fixedAF *= 0.5;
 
         MatrixXd fixedF(N, N);
