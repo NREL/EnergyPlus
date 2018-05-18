@@ -1612,6 +1612,23 @@ namespace ReportSizingManager {
                                 CoilOutTemp = -999.0;
                             }
                         }
+                        if (DataFanEnumType > 0 && DataFanIndex > 0) {
+                            switch (DataFanEnumType) {
+                            case DataAirSystems::structArrayLegacyFanModels: {
+                                FanCoolLoad = FanDesHeatGain(DataFanIndex, DesVolFlow);
+                                break;
+                            }
+                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(DesVolFlow);
+                                break;
+                            }
+                            case DataAirSystems::fanModelTypeNotYetSet: {
+                                // do nothing
+                                break;
+                            }
+                            } // end switch
+                        }
+                        AutosizeDes += FanCoolLoad;
                     }
                     AutosizeDes = AutosizeDes * DataFracOfAutosizedCoolingCapacity;
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {

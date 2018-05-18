@@ -4303,6 +4303,12 @@ namespace PackagedTerminalHeatPump {
         CompType = PTUnit(PTUnitNum).UnitType;
         CompName = PTUnit(PTUnitNum).Name;
         DataZoneNumber = PTUnit(PTUnitNum).ZonePtr;
+        if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataFanIndex = PTUnit(PTUnitNum).FanIndex;
 
         if (CurZoneEqNum > 0) {
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
@@ -5952,6 +5958,8 @@ namespace PackagedTerminalHeatPump {
                     ZoneEqSizing(CurZoneEqNum).Capacity = false;
                     ZoneEqSizing(CurZoneEqNum).CoolingCapacity = false;
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = false;
+                    DataFanEnumType = 0;
+                    DataFanIndex = 0;
                 }
                 PTUnit(PTUnitNum).FirstPass = false;
             }

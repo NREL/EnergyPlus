@@ -301,6 +301,8 @@ namespace DataSizing {
     Real64 DataWaterCoilSizCoolDeltaT(0.0);         // used for sizing cooling coil water design flow rate
     Real64 DataWaterCoilSizHeatDeltaT(0.0);         // used for sizing heating coil water design flow rate
     bool DataNomCapInpMeth(false);                  // True if heating coil is sized by CoilPerfInpMeth == NomCa
+    int DataFanEnumType(0);                         // Fan type used during sizing
+    int DataFanIndex(0);                            // Fan index used during sizing
 
     // Object Data
     Array1D<OARequirementsData> OARequirements;
@@ -446,6 +448,8 @@ namespace DataSizing {
         DataFractionUsedForSizing = 0.0;
         DataNonZoneNonAirloopValue = 0.0;
         DataZoneNumber = 0;
+        DataFanEnumType = 0;
+        DataFanIndex = 0;
         NumZoneHVACSizing = 0;
         NumAirTerminalSizingSpec = 0;
         NumAirTerminalUnits = 0;
