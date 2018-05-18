@@ -1,4 +1,4 @@
-EnergyPlus [![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg)]()
+EnergyPlus [![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg?colorB=FF7300)]()
 =====================================================================================
 
 This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.
