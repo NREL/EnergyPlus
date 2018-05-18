@@ -30,7 +30,8 @@ The EnergyPlus team accepts contributions to EnergyPlus source, utilities, test 
 The current EnergyPlus contribution policy is now available on the EnergyPlus [contribution policy page](https://www.energyplus.net/contributing).
 If you are interested in contributing, please start there, but feel free to reach out to the team.
 
-## Building EnergyPlus [![](https://img.shields.io/badge/dashboard-online-green.svg)](http://nrel.github.io/EnergyPlusBuildResults/)
+## Building EnergyPlus
 
 Commits to EnergyPlus are built by our team of robots ([Tik-Tok](https://github.com/nrel-bot), [Gort](https://github.com/nrel-bot-2), and [Marvin](https://github.com/nrel-bot-3)), using the [Decent CI](https://github.com/lefticus/decent_ci) continuous integration system.
+The testing [dashboard](http://nrel.github.io/EnergyPlusBuildResults/) gives a continually updated view of the status of all active branches, pull requests, and tags.
 A detailed description of compiling EnergyPlus on multiple platforms is available on the [wiki](https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus).
