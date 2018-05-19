@@ -5958,8 +5958,8 @@ namespace PackagedTerminalHeatPump {
                     ZoneEqSizing(CurZoneEqNum).Capacity = false;
                     ZoneEqSizing(CurZoneEqNum).CoolingCapacity = false;
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = false;
-                    DataFanEnumType = 0;
-                    DataFanIndex = 0;
+                    DataFanEnumType = -1;
+                    DataFanIndex = -1;
                 }
                 PTUnit(PTUnitNum).FirstPass = false;
             }

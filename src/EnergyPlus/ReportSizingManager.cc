@@ -254,8 +254,8 @@ namespace ReportSizingManager {
         // int DataWaterLoopNum( 0 ); // index to plant water loop
         // int DataCoilNum( 0 ); // index to coil object
         // int DataFanOpMode( 0 ); // fan operating mode (ContFanCycCoil or CycFanCycCoil)
-        // int DataFanEnumType(0); // Fan type used during sizing
-        // int DataFanIndex(0); // Fan index used during sizing
+        // int DataFanEnumType( -1 ); // Fan type used during sizing
+        // int DataFanIndex( -1 ); // Fan index used during sizing
         // bool DataCoilIsSuppHeater( false ); // TRUE if heating coil used as supplemental heater
         // bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
         // bool DataAutosizable( true ); // TRUE if component is autosizable
@@ -1604,7 +1604,7 @@ namespace ReportSizingManager {
                                 } else {
                                     PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                                 }
-                                if (DataFanEnumType > 0) { // add fan heat to coil load
+                                if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                                     switch (DataFanEnumType) {
                                     case DataAirSystems::structArrayLegacyFanModels: {
                                         FanCoolLoad = FanDesHeatGain(DataFanIndex, DesVolFlow);
