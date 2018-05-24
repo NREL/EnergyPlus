@@ -1313,7 +1313,7 @@ namespace FanCoilUnits {
 
                 zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
                 FieldNum = 1;
-                PrintFlag = true;
+                PrintFlag = false;
                 SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
                 if (ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
                     SizingMethod = CoolingAirflowSizing;
@@ -1344,7 +1344,7 @@ namespace FanCoilUnits {
                     } else if (SAFMethod == FlowPerCoolingCapacity) {
                         SizingMethod = CoolingCapacitySizing;
                         TempSize = AutoSize;
-                        PrintFlag = false;
+                        //						PrintFlag = false;
                         RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                             DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
@@ -1352,13 +1352,14 @@ namespace FanCoilUnits {
                         DataAutosizedCoolingCapacity = TempSize;
                         DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         SizingMethod = CoolingAirflowSizing;
-                        PrintFlag = true;
+                        //						PrintFlag = true;
                         TempSize = AutoSize;
                         DataScalableSizingON = true;
                         RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         CoolingAirVolFlowDes = TempSize;
                     }
-                } else if (ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
+                }
+                if (ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
                     // now do heating supply air flow rate sizing
                     SizingMethod = HeatingAirflowSizing;
                     SAFMethod = ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
@@ -1374,6 +1375,7 @@ namespace FanCoilUnits {
                             ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
                             ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
                             TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                            TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
                             DataScalableSizingON = true;
                         } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
                             DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
@@ -1387,7 +1389,7 @@ namespace FanCoilUnits {
                     } else if (SAFMethod == FlowPerHeatingCapacity) {
                         SizingMethod = HeatingCapacitySizing;
                         TempSize = AutoSize;
-                        PrintFlag = false;
+                        //						PrintFlag = false;
                         DataScalableSizingON = true;
                         RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
@@ -1396,7 +1398,7 @@ namespace FanCoilUnits {
                         DataAutosizedHeatingCapacity = TempSize;
                         DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                         SizingMethod = HeatingAirflowSizing;
-                        PrintFlag = true;
+                        //						PrintFlag = true;
                         TempSize = AutoSize;
                         RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         HeatingAirVolFlowDes = TempSize;
@@ -1411,21 +1413,26 @@ namespace FanCoilUnits {
                     FanCoil(FanCoilNum).MaxAirVolFlow = max(CoolingAirVolFlowDes, HeatingAirVolFlowDes);
                     MaxAirVolFlowDes = 0.0;
                 }
-            } else {
-                // SizingString = "Supply Air Maximum Flow Rate [m3/s]";
-                SizingMethod = SystemAirflowSizing;
-                FieldNum = 1;
-                SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
-                TempSize = FanCoil(FanCoilNum).MaxAirVolFlow;
-                PrintFlag = true;
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                if (FanCoil(FanCoilNum).MaxAirVolFlow == AutoSize) {
-                    IsAutoSize = true;
-                    MaxAirVolFlowDes = TempSize;
-                } else {
-                    MaxAirVolFlowDes = 0.0;
-                }
+                // pass these values to sizing
+                ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                ZoneEqSizing(CurZoneEqNum).AirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
             }
+            // else {
+            // SizingString = "Supply Air Maximum Flow Rate [m3/s]";
+            SizingMethod = SystemAirflowSizing;
+            FieldNum = 1;
+            SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
+            TempSize = FanCoil(FanCoilNum).MaxAirVolFlow;
+            PrintFlag = true;
+            RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            if (FanCoil(FanCoilNum).MaxAirVolFlow == AutoSize) {
+                IsAutoSize = true;
+                MaxAirVolFlowDes = TempSize;
+            } else {
+                MaxAirVolFlowDes = 0.0;
+            }
+
+            //			}
         }
 
         if (CurZoneEqNum > 0) {
@@ -1438,6 +1445,7 @@ namespace FanCoilUnits {
                 }
 
                 //     If fan is autosized, get fan volumetric flow rate
+                // this call to fan trips sizing so ZoneEqSizing.SystemAirFlow and magnitude need to be set
                 if (FanCoil(FanCoilNum).FanAirVolFlow == AutoSize) {
                     if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                         Fans::SimulateFanComponents(FanCoil(FanCoilNum).FanName, true, FanCoil(FanCoilNum).FanIndex);
@@ -1887,18 +1895,23 @@ namespace FanCoilUnits {
             CoolingCoilName = FanCoil(FanCoilNum).CCoilName;
             CoolingCoilType = FanCoil(FanCoilNum).CCoilType;
         }
-        if (ZoneSizingRunDone) {
-            SetCoilDesFlow(CoolingCoilType, CoolingCoilName, FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, ErrorsFound);
-            SetCoilDesFlow(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow, ErrorsFound);
-        } else {
-            SetCoilDesFlow(CoolingCoilType, CoolingCoilName, FanCoil(FanCoilNum).MaxAirVolFlow, ErrorsFound);
-            SetCoilDesFlow(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, FanCoil(FanCoilNum).MaxAirVolFlow, ErrorsFound);
-        }
+        //		if ( ZoneSizingRunDone ) {
+        //			SetCoilDesFlow( CoolingCoilType, CoolingCoilName, FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, ErrorsFound );
+        //			SetCoilDesFlow( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, FinalZoneSizing( CurZoneEqNum
+        //).DesHeatVolFlow, ErrorsFound ); 		} else { 			SetCoilDesFlow( CoolingCoilType, CoolingCoilName, FanCoil(
+        // FanCoilNum ).MaxAirVolFlow, ErrorsFound );
+        //			SetCoilDesFlow( FanCoil( FanCoilNum ).HCoilType, FanCoil( FanCoilNum ).HCoilName, FanCoil( FanCoilNum ).MaxAirVolFlow,
+        // ErrorsFound );
+        //		}
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = FanCoil(FanCoilNum).MaxHotWaterVolFlow;
             ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow = FanCoil(FanCoilNum).MaxColdWaterVolFlow;
             ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).AirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
+            ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
+            ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
+            ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
+            ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FanCoil(FanCoilNum).DesCoolingLoad;
             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad;
         }

@@ -3024,13 +3024,16 @@ namespace ZoneEquipmentManager {
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak = *std::min_element(
                                     ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.begin(), ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.end());
+                                FinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak = *std::min_element(
+                                    ZoneSizing(DDNumF, CtrlZoneNum).CoolOutTempSeq.begin(), ZoneSizing(DDNumF, CtrlZoneNum).CoolOutTempSeq.end());
                             }
                             FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak = ZoneSizing(DDNumF, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepAtPeakF);
+                            FinalZoneSizing(CtrlZoneNum).OutHumRatAtCoolPeak = ZoneSizing(DDNumF, CtrlZoneNum).CoolOutHumRatSeq(TimeStepAtPeakF);
                             if (FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak > 0.0) {
+                                // should use max here for cooling and min for heating ?
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak =
-                                    min(FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak,
+                                    max(FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak,
                                         PsyWFnTdpPb(FinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak, StdBaroPress, RoutineName));
-
                             } else {
                                 FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak = ZoneSizing(DDNumF, CtrlZoneNum).CoolDesHumRat;
                             }
@@ -3515,8 +3518,8 @@ namespace ZoneEquipmentManager {
 
                     } else if ((SELECT_CASE_var == PkgTermHPAirToAir_Num) || (SELECT_CASE_var == PkgTermACAirToAir_Num) ||
                                (SELECT_CASE_var == PkgTermHPWaterToAir_Num)) { // 'ZoneHVAC:PackagedTerminalHeatPump'
-                        // 'ZoneHVAC:PackagedTerminalAirConditioner'
-                        // 'ZoneHVAC:WaterToAirHeatPump'
+                                                                               // 'ZoneHVAC:PackagedTerminalAirConditioner'
+                                                                               // 'ZoneHVAC:WaterToAirHeatPump'
                         SimPackagedTerminalUnit(PrioritySimOrder(EquipTypeNum).EquipName, ActualZoneNum, FirstHVACIteration, SysOutputProvided,
                                                 LatOutputProvided, ZoneEquipTypeNum, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
@@ -3593,7 +3596,7 @@ namespace ZoneEquipmentManager {
 
                     } else if (SELECT_CASE_var ==
                                LoTempRadiant_Num) { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow', 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
-                        // 'ZoneHVAC:LowTemperatureRadiant:Electric'
+                                                    // 'ZoneHVAC:LowTemperatureRadiant:Electric'
                         SimLowTempRadiantSystem(PrioritySimOrder(EquipTypeNum).EquipName, FirstHVACIteration, SysOutputProvided,
                                                 ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                         LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
@@ -3867,7 +3870,7 @@ namespace ZoneEquipmentManager {
             if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
                 ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
                     ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
-            // init each sequenced demand to the full output
+                                                                            // init each sequenced demand to the full output
             if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
                 ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
             if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
@@ -3887,7 +3890,7 @@ namespace ZoneEquipmentManager {
             if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
                 ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
                     ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
-            // init each sequenced demand to the full output
+                                                                            // init each sequenced demand to the full output
             if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
                 ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
             if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))

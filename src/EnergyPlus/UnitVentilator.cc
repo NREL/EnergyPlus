@@ -994,7 +994,7 @@ namespace UnitVentilator {
             {
                 auto const SELECT_CASE_var(UnitVent(UnitVentNum).CoilOption);
                 if (SELECT_CASE_var == BothOption) { // 'HeatingAndCooling'
-                    // Add cooling coil to component sets array when present
+                                                     // Add cooling coil to component sets array when present
                     SetUpCompSets(CurrentModuleObject, UnitVent(UnitVentNum).Name, cCoolingCoilType, UnitVent(UnitVentNum).CCoilName,
                                   NodeID(UnitVent(UnitVentNum).FanOutletNode), "UNDEFINED");
 
@@ -1003,12 +1003,12 @@ namespace UnitVentilator {
                                   NodeID(UnitVent(UnitVentNum).AirOutNode));
 
                 } else if (SELECT_CASE_var == HeatingOption) { // 'Heating'
-                    // Add heating coil to component sets array when no cooling coil present
+                                                               // Add heating coil to component sets array when no cooling coil present
                     SetUpCompSets(CurrentModuleObject, UnitVent(UnitVentNum).Name, cHeatingCoilType, UnitVent(UnitVentNum).HCoilName,
                                   NodeID(UnitVent(UnitVentNum).FanOutletNode), NodeID(UnitVent(UnitVentNum).AirOutNode));
 
                 } else if (SELECT_CASE_var == CoolingOption) { // 'Cooling'
-                    // Add cooling coil to component sets array when no heating coil present
+                                                               // Add cooling coil to component sets array when no heating coil present
                     SetUpCompSets(CurrentModuleObject, UnitVent(UnitVentNum).Name, cCoolingCoilType, UnitVent(UnitVentNum).CCoilName,
                                   NodeID(UnitVent(UnitVentNum).FanOutletNode), NodeID(UnitVent(UnitVentNum).AirOutNode));
 
@@ -2249,6 +2249,11 @@ namespace UnitVentilator {
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = UnitVent(UnitVentNum).MaxVolHotWaterFlow;
             ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow = UnitVent(UnitVentNum).MaxVolColdWaterFlow;
+            ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
+            ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = UnitVent(UnitVentNum).MaxAirVolFlow;
+            ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
+            ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = UnitVent(UnitVentNum).MaxAirVolFlow;
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = UnitVent(UnitVentNum).OutAirVolFlow;
         }
 
         if (ErrorsFound) {
@@ -2623,10 +2628,10 @@ namespace UnitVentilator {
                     }
 
                 } else { //  Coil/no coil block
-                    // There is a heating load and there is a heating coil present (presumably).
-                    // Variable percent will throttle outside air back to the minimum while
-                    // fixed temperature will still try to vary the outside air amount to meet
-                    // the desired mixed air temperature.
+                         // There is a heating load and there is a heating coil present (presumably).
+                         // Variable percent will throttle outside air back to the minimum while
+                         // fixed temperature will still try to vary the outside air amount to meet
+                         // the desired mixed air temperature.
 
                     {
                         auto const SELECT_CASE_var(UnitVent(UnitVentNum).OAControlType);

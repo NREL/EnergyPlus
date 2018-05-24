@@ -1263,6 +1263,10 @@ namespace UnitHeater {
         SetCoilDesFlow(UnitHeat(UnitHeatNum).HCoilTypeCh, UnitHeat(UnitHeatNum).HCoilName, UnitHeat(UnitHeatNum).MaxAirVolFlow, ErrorsFound);
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = UnitHeat(UnitHeatNum).MaxVolHotWaterFlow;
+            ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
+            ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = UnitHeat(UnitHeatNum).MaxAirVolFlow;
+            ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
+            ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = UnitHeat(UnitHeatNum).MaxAirVolFlow;
         }
 
         if (ErrorsFound) {
