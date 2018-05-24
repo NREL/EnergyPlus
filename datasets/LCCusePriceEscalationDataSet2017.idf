@@ -16,8 +16,8 @@
 ! or by running the Python script update_nist_escalation.py (also available from the development team).
 ! The escalation rates below should match the values in Tables Ca-1 to Ca-5 of the Annual Supplement.
 
-VERSION,
-    8.8;                      !- Version Identifier
+!  VERSION,
+!    8.8;                      !- Version Identifier
 
 LIFECYCLECOST:USEPRICEESCALATION,
     MidWest - Commercial - Electricity,    !- LCC Price Escalation Name
