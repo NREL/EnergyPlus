@@ -9,11 +9,13 @@
 ! Joshua D. Kneifel
 ! Eric G. O’Rear
 !
-! The escalation rates below are calculated from the file encostYY.txt, which is available from NIST or from:
-! https://energy.gov/eere/femp/building-life-cycle-cost-programs
-! The file is converted to EnergyPlus objects using a spreadsheet called
-! ConvertENCOSTtoEnergyPlusLifeCycleCost.xls (available from the development team), 
-! or by running the Python script update_nist_escalation.py (also available from the development team).
+! These are factors for the United States and regions of the United States.
+!
+! The factors are from a file available upon request from NIST called ENCOSTxx.TXT and are
+! converted into EnergyPlus objects using a spreadsheet called ConvertENCOSTtoEnergyPlusLifeCycleCost.xls
+! which is available upon request. 
+!
+! The ENCOSTxx.TXT file is also available from: https://energy.gov/eere/femp/building-life-cycle-cost-programs. 
 ! The escalation rates below should match the values in Tables Ca-1 to Ca-5 of the Annual Supplement.
 
 !  VERSION,
