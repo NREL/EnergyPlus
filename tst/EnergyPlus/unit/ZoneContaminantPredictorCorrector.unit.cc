@@ -604,6 +604,4 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     EXPECT_NEAR(1.0434496257, DataContaminantBalance::CO2PredictedRate(2), 0.00001);
     EXPECT_NEAR(1.0399406399, DataContaminantBalance::CO2PredictedRate(3), 0.00001);
 
-    DataContaminantBalance::Contaminant.CO2Simulation = false;
-    DataContaminantBalance::Contaminant.GenericContamSimulation = false;
 }
