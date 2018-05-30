@@ -1502,8 +1502,11 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         }
         // coil entering conditions depend on the type of zone equipment involved
         // set typeof_Coil integer
-        if (DataSizing::TermUnitIU) { // an unpowered induction terminal unit
-            // should be picked up by HeatingWaterDesAirInletTempSizing and HeatingWaterDesAirInletHumRatSizing
+        if (DataSizing::TermUnitIU) {          // an unpowered induction terminal unit
+            if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
+                c->coilDesEntTemp = DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInTempTU;
+                c->coilDesEntHumRat = DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInHumRatTU;
+            }
         } else if (DataSizing::TermUnitSingDuct) {
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                 c->coilDesEntTemp = DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInTempTU;
@@ -1582,7 +1585,6 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     if (c->coilDesVolFlow <= 0.0) {
         if (DataSizing::DataFlowUsedForSizing > 0.0) { // flow has been set in global, so use it
             c->coilDesVolFlow = DataSizing::DataFlowUsedForSizing;
-            c->coilDesMassFlow = c->coilDesVolFlow * DataEnvironment::StdRhoAir;
         } else if ((curZoneEqNum > 0) && allocated(DataSizing::FinalZoneSizing) &&
                    (DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow)) {
             c->coilDesMassFlow = DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatMassFlow;
@@ -1636,7 +1638,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     // this is not generally correct but okay for heating coils
     c->coilSensCapAtPeak = abs(c->cpMoistAir * c->coilDesMassFlow * (c->coilDesLvgTemp - c->coilDesEntTemp));
     c->coilSensCapAtPeak = min(c->coilSensCapAtPeak, c->coilTotCapAtPeak);
-} // namespace EnergyPlus
+}
 
 void ReportCoilSelection::setCoilWaterCoolingCapacity(std::string const &coilName,  // user-defined name of the coil
                                                       std::string const &coilType,  // idf input object class name of coil
