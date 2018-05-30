@@ -683,6 +683,7 @@ namespace SwimmingPool {
                 if (Pool(PoolNum).WaterInletNode > 0) {
                     InitComponentNodes(0.0, Pool(PoolNum).WaterMassFlowRateMax, Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterOutletNode,
                                        Pool(PoolNum).HWLoopNum, Pool(PoolNum).HWLoopSide, Pool(PoolNum).HWBranchNum, Pool(PoolNum).HWCompNum);
+                    PlantUtilities::RegisterPlantCompDesignFlow(Pool(PoolNum).WaterInletNode, Pool(PoolNum).WaterVolFlowMax);
                 }
             }
         }
