@@ -120,12 +120,12 @@ namespace UnitHeater {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
+    using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
-    using DataHVACGlobals::cFanTypes;
     using namespace ScheduleManager;
     using Psychrometrics::PsyCpAirFnWTdb;
     using Psychrometrics::PsyHFnTdbW;
@@ -341,8 +341,17 @@ namespace UnitHeater {
 
         for (UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum) { // Begin looping over all of the unit heaters found in the input file...
 
-            inputProcessor->getObjectItem(CurrentModuleObject, UnitHeatNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          UnitHeatNum,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
 
             UnitHeatNumericFields(UnitHeatNum).FieldNames.allocate(NumNumbers);
             UnitHeatNumericFields(UnitHeatNum).FieldNames = "";
@@ -381,8 +390,8 @@ namespace UnitHeater {
                 ErrorsFound = true;
             } else {
                 if (!UtilityRoutines::SameString(UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
-                    GetFanType(UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).FanType_Num, errFlag, CurrentModuleObject,
-                               UnitHeat(UnitHeatNum).Name);
+                    GetFanType(
+                        UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).FanType_Num, errFlag, CurrentModuleObject, UnitHeat(UnitHeatNum).Name);
 
                     {
                         auto const SELECT_CASE_var(UnitHeat(UnitHeatNum).FanType_Num);
@@ -605,12 +614,20 @@ namespace UnitHeater {
             }
 
             // Add fan to component sets array
-            SetUpCompSets(CurrentModuleObject, UnitHeat(UnitHeatNum).Name, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName,
-                          NodeID(UnitHeat(UnitHeatNum).AirInNode), NodeID(UnitHeat(UnitHeatNum).FanOutletNode));
+            SetUpCompSets(CurrentModuleObject,
+                          UnitHeat(UnitHeatNum).Name,
+                          UnitHeat(UnitHeatNum).FanType,
+                          UnitHeat(UnitHeatNum).FanName,
+                          NodeID(UnitHeat(UnitHeatNum).AirInNode),
+                          NodeID(UnitHeat(UnitHeatNum).FanOutletNode));
 
             // Add heating coil to component sets array
-            SetUpCompSets(CurrentModuleObject, UnitHeat(UnitHeatNum).Name, UnitHeat(UnitHeatNum).HCoilTypeCh, UnitHeat(UnitHeatNum).HCoilName,
-                          NodeID(UnitHeat(UnitHeatNum).FanOutletNode), NodeID(UnitHeat(UnitHeatNum).AirOutNode));
+            SetUpCompSets(CurrentModuleObject,
+                          UnitHeat(UnitHeatNum).Name,
+                          UnitHeat(UnitHeatNum).HCoilTypeCh,
+                          UnitHeat(UnitHeatNum).HCoilName,
+                          NodeID(UnitHeat(UnitHeatNum).FanOutletNode),
+                          NodeID(UnitHeat(UnitHeatNum).AirOutNode));
 
         } // ...loop over all of the unit heaters found in the input file
 
@@ -625,31 +642,59 @@ namespace UnitHeater {
 
         // Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
         for (UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum) {
-            SetupOutputVariable("Zone Unit Heater Heating Rate", OutputProcessor::Unit::W, UnitHeat(UnitHeatNum).HeatPower, "System", "Average",
+            SetupOutputVariable("Zone Unit Heater Heating Rate",
+                                OutputProcessor::Unit::W,
+                                UnitHeat(UnitHeatNum).HeatPower,
+                                "System",
+                                "Average",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Heating Energy", OutputProcessor::Unit::J, UnitHeat(UnitHeatNum).HeatEnergy, "System", "Sum",
+            SetupOutputVariable("Zone Unit Heater Heating Energy",
+                                OutputProcessor::Unit::J,
+                                UnitHeat(UnitHeatNum).HeatEnergy,
+                                "System",
+                                "Sum",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Fan Electric Power", OutputProcessor::Unit::W, UnitHeat(UnitHeatNum).ElecPower, "System", "Average",
+            SetupOutputVariable("Zone Unit Heater Fan Electric Power",
+                                OutputProcessor::Unit::W,
+                                UnitHeat(UnitHeatNum).ElecPower,
+                                "System",
+                                "Average",
                                 UnitHeat(UnitHeatNum).Name);
             // Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Unit Heater Fan Electric Energy", OutputProcessor::Unit::J, UnitHeat(UnitHeatNum).ElecEnergy, "System", "Sum",
+            SetupOutputVariable("Zone Unit Heater Fan Electric Energy",
+                                OutputProcessor::Unit::J,
+                                UnitHeat(UnitHeatNum).ElecEnergy,
+                                "System",
+                                "Sum",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Fan Availability Status", OutputProcessor::Unit::None, UnitHeat(UnitHeatNum).AvailStatus, "System",
-                                "Average", UnitHeat(UnitHeatNum).Name);
+            SetupOutputVariable("Zone Unit Heater Fan Availability Status",
+                                OutputProcessor::Unit::None,
+                                UnitHeat(UnitHeatNum).AvailStatus,
+                                "System",
+                                "Average",
+                                UnitHeat(UnitHeatNum).Name);
             if (UnitHeat(UnitHeatNum).FanType_Num == FanType_SimpleOnOff) {
-                SetupOutputVariable("Zone Unit Heater Fan Part Load Ratio", OutputProcessor::Unit::None, UnitHeat(UnitHeatNum).FanPartLoadRatio,
-                                    "System", "Average", UnitHeat(UnitHeatNum).Name);
+                SetupOutputVariable("Zone Unit Heater Fan Part Load Ratio",
+                                    OutputProcessor::Unit::None,
+                                    UnitHeat(UnitHeatNum).FanPartLoadRatio,
+                                    "System",
+                                    "Average",
+                                    UnitHeat(UnitHeatNum).Name);
             }
         }
 
         for (UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum) {
             if (UnitHeat(UnitHeatNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(UnitHeat(UnitHeatNum).HCoilName, UnitHeat(UnitHeatNum).HCoilTypeCh,
-                                                             UnitHeat(UnitHeatNum).FanName, DataAirSystems::objectVectorOOFanSystemModel,
+                coilSelectionReportObj->setCoilSupplyFanInfo(UnitHeat(UnitHeatNum).HCoilName,
+                                                             UnitHeat(UnitHeatNum).HCoilTypeCh,
+                                                             UnitHeat(UnitHeatNum).FanName,
+                                                             DataAirSystems::objectVectorOOFanSystemModel,
                                                              UnitHeat(UnitHeatNum).Fan_Index);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(UnitHeat(UnitHeatNum).HCoilName, UnitHeat(UnitHeatNum).HCoilTypeCh,
-                                                             UnitHeat(UnitHeatNum).FanName, DataAirSystems::structArrayLegacyFanModels,
+                coilSelectionReportObj->setCoilSupplyFanInfo(UnitHeat(UnitHeatNum).HCoilName,
+                                                             UnitHeat(UnitHeatNum).HCoilTypeCh,
+                                                             UnitHeat(UnitHeatNum).FanName,
+                                                             DataAirSystems::structArrayLegacyFanModels,
                                                              UnitHeat(UnitHeatNum).Fan_Index);
             }
         }
@@ -741,9 +786,18 @@ namespace UnitHeater {
             if ((UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(UnitHeat(UnitHeatNum).HCoilName, UnitHeat(UnitHeatNum).HCoil_PlantTypeNum, UnitHeat(UnitHeatNum).HWLoopNum,
-                                        UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum, UnitHeat(UnitHeatNum).HWCompNum, _, _, _,
-                                        _, _, errFlag);
+                ScanPlantLoopsForObject(UnitHeat(UnitHeatNum).HCoilName,
+                                        UnitHeat(UnitHeatNum).HCoil_PlantTypeNum,
+                                        UnitHeat(UnitHeatNum).HWLoopNum,
+                                        UnitHeat(UnitHeatNum).HWLoopSide,
+                                        UnitHeat(UnitHeatNum).HWBranchNum,
+                                        UnitHeat(UnitHeatNum).HWCompNum,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        errFlag);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitHeat(UnitHeatNum).Name + "\", type=ZoneHVAC:UnitHeater");
                     ShowFatalError("InitUnitHeater: Program terminated due to previous condition(s).");
@@ -793,14 +847,21 @@ namespace UnitHeater {
             Node(InNode).MassFlowRateMin = 0.0;
 
             if (UnitHeat(UnitHeatNum).HCoilType == WaterHeatingCoil) {
-                rho = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                       PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, RoutineName);
+                rho = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                       DataGlobals::HWInitConvTemp,
+                                       PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                       RoutineName);
 
                 UnitHeat(UnitHeatNum).MaxHotWaterFlow = rho * UnitHeat(UnitHeatNum).MaxVolHotWaterFlow;
                 UnitHeat(UnitHeatNum).MinHotWaterFlow = rho * UnitHeat(UnitHeatNum).MinVolHotWaterFlow;
-                InitComponentNodes(UnitHeat(UnitHeatNum).MinHotWaterFlow, UnitHeat(UnitHeatNum).MaxHotWaterFlow, UnitHeat(UnitHeatNum).HotControlNode,
-                                   UnitHeat(UnitHeatNum).HotCoilOutNodeNum, UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide,
-                                   UnitHeat(UnitHeatNum).HWBranchNum, UnitHeat(UnitHeatNum).HWCompNum);
+                InitComponentNodes(UnitHeat(UnitHeatNum).MinHotWaterFlow,
+                                   UnitHeat(UnitHeatNum).MaxHotWaterFlow,
+                                   UnitHeat(UnitHeatNum).HotControlNode,
+                                   UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                   UnitHeat(UnitHeatNum).HWLoopNum,
+                                   UnitHeat(UnitHeatNum).HWLoopSide,
+                                   UnitHeat(UnitHeatNum).HWBranchNum,
+                                   UnitHeat(UnitHeatNum).HWCompNum);
             }
             if (UnitHeat(UnitHeatNum).HCoilType == SteamCoil) {
                 TempSteamIn = 100.00;
@@ -808,9 +869,14 @@ namespace UnitHeater {
                 UnitHeat(UnitHeatNum).MaxHotSteamFlow = SteamDensity * UnitHeat(UnitHeatNum).MaxVolHotSteamFlow;
                 UnitHeat(UnitHeatNum).MinHotSteamFlow = SteamDensity * UnitHeat(UnitHeatNum).MinVolHotSteamFlow;
 
-                InitComponentNodes(UnitHeat(UnitHeatNum).MinHotSteamFlow, UnitHeat(UnitHeatNum).MaxHotSteamFlow, UnitHeat(UnitHeatNum).HotControlNode,
-                                   UnitHeat(UnitHeatNum).HotCoilOutNodeNum, UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide,
-                                   UnitHeat(UnitHeatNum).HWBranchNum, UnitHeat(UnitHeatNum).HWCompNum);
+                InitComponentNodes(UnitHeat(UnitHeatNum).MinHotSteamFlow,
+                                   UnitHeat(UnitHeatNum).MaxHotSteamFlow,
+                                   UnitHeat(UnitHeatNum).HotControlNode,
+                                   UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                   UnitHeat(UnitHeatNum).HWLoopNum,
+                                   UnitHeat(UnitHeatNum).HWLoopSide,
+                                   UnitHeat(UnitHeatNum).HWBranchNum,
+                                   UnitHeat(UnitHeatNum).HWCompNum);
             }
 
             MyEnvrnFlag(UnitHeatNum) = false;
@@ -895,9 +961,9 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using namespace DataSizing;
+        using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using DataHeatBalance::Zone;
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using PlantUtilities::MyPlantSizingIndex;
@@ -971,6 +1037,12 @@ namespace UnitHeater {
         CompType = "ZoneHVAC:UnitHeater";
         CompName = UnitHeat(UnitHeatNum).Name;
         DataZoneNumber = UnitHeat(UnitHeatNum).ZonePtr;
+        if (UnitHeat(UnitHeatNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        } else {
+            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        }
+        DataFanIndex = UnitHeat(UnitHeatNum).Fan_Index;
 
         if (CurZoneEqNum > 0) {
             if (UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
@@ -1046,7 +1118,9 @@ namespace UnitHeater {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (UnitHeat(UnitHeatNum).MaxVolHotWaterFlow > 0.0) {
-                        ReportSizingOutput("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "User-Specified Maximum Hot Water Flow [m3/s]",
+                        ReportSizingOutput("ZoneHVAC:UnitHeater",
+                                           UnitHeat(UnitHeatNum).Name,
+                                           "User-Specified Maximum Hot Water Flow [m3/s]",
                                            UnitHeat(UnitHeatNum).MaxVolHotWaterFlow);
                     }
                 } else {
@@ -1055,8 +1129,8 @@ namespace UnitHeater {
                     CoilWaterInletNode = GetCoilWaterInletNode("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     CoilWaterOutletNode = GetCoilWaterOutletNode("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
-                        PltSizHeatNum = MyPlantSizingIndex("Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, CoilWaterInletNode,
-                                                           CoilWaterOutletNode, ErrorsFound);
+                        PltSizHeatNum = MyPlantSizingIndex(
+                            "Coil:Heating:Water", UnitHeat(UnitHeatNum).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         CoilNum = GetWaterCoilIndex("COIL:HEATING:WATER", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                         if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -1116,10 +1190,14 @@ namespace UnitHeater {
                             }
 
                             if (DesCoilLoad >= SmallLoad) {
-                                rho = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                       PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, RoutineName);
-                                Cp = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName, DataGlobals::HWInitConvTemp,
-                                                           PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex, RoutineName);
+                                rho = GetDensityGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                                       DataGlobals::HWInitConvTemp,
+                                                       PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                                       RoutineName);
+                                Cp = GetSpecificHeatGlycol(PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
+                                                           DataGlobals::HWInitConvTemp,
+                                                           PlantLoop(UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
+                                                           RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                             } else {
                                 MaxVolHotWaterFlowDes = 0.0;
@@ -1128,13 +1206,17 @@ namespace UnitHeater {
                     }
                     if (IsAutoSize) {
                         UnitHeat(UnitHeatNum).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        ReportSizingOutput("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "Design Size Maximum Hot Water Flow [m3/s]",
-                                           MaxVolHotWaterFlowDes);
+                        ReportSizingOutput(
+                            "ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes);
                     } else {
                         if (UnitHeat(UnitHeatNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = UnitHeat(UnitHeatNum).MaxVolHotWaterFlow;
-                            ReportSizingOutput("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "Design Size Maximum Hot Water Flow [m3/s]",
-                                               MaxVolHotWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowUser);
+                            ReportSizingOutput("ZoneHVAC:UnitHeater",
+                                               UnitHeat(UnitHeatNum).Name,
+                                               "Design Size Maximum Hot Water Flow [m3/s]",
+                                               MaxVolHotWaterFlowDes,
+                                               "User-Specified Maximum Hot Water Flow [m3/s]",
+                                               MaxVolHotWaterFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " +
@@ -1165,7 +1247,9 @@ namespace UnitHeater {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (UnitHeat(UnitHeatNum).MaxVolHotSteamFlow > 0.0) {
-                        ReportSizingOutput("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "User-Specified Maximum Steam Flow [m3/s]",
+                        ReportSizingOutput("ZoneHVAC:UnitHeater",
+                                           UnitHeat(UnitHeatNum).Name,
+                                           "User-Specified Maximum Steam Flow [m3/s]",
                                            UnitHeat(UnitHeatNum).MaxVolHotSteamFlow);
                     }
                 } else {
@@ -1174,8 +1258,8 @@ namespace UnitHeater {
                     CoilSteamInletNode = GetCoilSteamInletNode("Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     CoilSteamOutletNode = GetCoilSteamInletNode("Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
-                        PltSizHeatNum = MyPlantSizingIndex("Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, CoilSteamInletNode,
-                                                           CoilSteamOutletNode, ErrorsFound);
+                        PltSizHeatNum = MyPlantSizingIndex(
+                            "Coil:Heating:Steam", UnitHeat(UnitHeatNum).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
                             if (UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
                                 zoneHVACIndex = UnitHeat(UnitHeatNum).HVACSizingIndex;
@@ -1231,13 +1315,17 @@ namespace UnitHeater {
                     }
                     if (IsAutoSize) {
                         UnitHeat(UnitHeatNum).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
-                        ReportSizingOutput("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "Design Size Maximum Steam Flow [m3/s]",
-                                           MaxVolHotSteamFlowDes);
+                        ReportSizingOutput(
+                            "ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
                     } else {
                         if (UnitHeat(UnitHeatNum).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
                             MaxVolHotSteamFlowUser = UnitHeat(UnitHeatNum).MaxVolHotSteamFlow;
-                            ReportSizingOutput("ZoneHVAC:UnitHeater", UnitHeat(UnitHeatNum).Name, "Design Size Maximum Steam Flow [m3/s]",
-                                               MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser);
+                            ReportSizingOutput("ZoneHVAC:UnitHeater",
+                                               UnitHeat(UnitHeatNum).Name,
+                                               "Design Size Maximum Steam Flow [m3/s]",
+                                               MaxVolHotSteamFlowDes,
+                                               "User-Specified Maximum Steam Flow [m3/s]",
+                                               MaxVolHotSteamFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " +
@@ -1377,15 +1465,23 @@ namespace UnitHeater {
                 if (UnitHeat(UnitHeatNum).HCoilType == WaterHeatingCoil) {
                     mdot = 0.0; // try to turn off
 
-                    SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         UnitHeat(UnitHeatNum).HotControlNode,
+                                         UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                         UnitHeat(UnitHeatNum).HWLoopNum,
+                                         UnitHeat(UnitHeatNum).HWLoopSide,
+                                         UnitHeat(UnitHeatNum).HWBranchNum,
                                          UnitHeat(UnitHeatNum).HWCompNum);
                 }
                 if (UnitHeat(UnitHeatNum).HCoilType == SteamCoil) {
                     mdot = 0.0; // try to turn off
 
-                    SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         UnitHeat(UnitHeatNum).HotControlNode,
+                                         UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                         UnitHeat(UnitHeatNum).HWLoopNum,
+                                         UnitHeat(UnitHeatNum).HWLoopSide,
+                                         UnitHeat(UnitHeatNum).HWBranchNum,
                                          UnitHeat(UnitHeatNum).HWCompNum);
                 }
                 CalcUnitHeaterComponents(UnitHeatNum, FirstHVACIteration, QUnitOut);
@@ -1400,15 +1496,23 @@ namespace UnitHeater {
                     if (UnitHeat(UnitHeatNum).HCoilType == WaterHeatingCoil) {
                         mdot = 0.0; // try to turn off
 
-                        SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                             UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                        SetComponentFlowRate(mdot,
+                                             UnitHeat(UnitHeatNum).HotControlNode,
+                                             UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                             UnitHeat(UnitHeatNum).HWLoopNum,
+                                             UnitHeat(UnitHeatNum).HWLoopSide,
+                                             UnitHeat(UnitHeatNum).HWBranchNum,
                                              UnitHeat(UnitHeatNum).HWCompNum);
                     }
                     if (UnitHeat(UnitHeatNum).HCoilType == SteamCoil) {
                         mdot = 0.0; // try to turn off
 
-                        SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                             UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                        SetComponentFlowRate(mdot,
+                                             UnitHeat(UnitHeatNum).HotControlNode,
+                                             UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                             UnitHeat(UnitHeatNum).HWLoopNum,
+                                             UnitHeat(UnitHeatNum).HWLoopSide,
+                                             UnitHeat(UnitHeatNum).HWBranchNum,
                                              UnitHeat(UnitHeatNum).HWCompNum);
                     }
                     CalcUnitHeaterComponents(UnitHeatNum, FirstHVACIteration, QUnitOut);
@@ -1424,16 +1528,24 @@ namespace UnitHeater {
                         mdot = 0.0; // try to turn off
 
                         if (UnitHeat(UnitHeatNum).HWLoopNum > 0) {
-                            SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                                 UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                            SetComponentFlowRate(mdot,
+                                                 UnitHeat(UnitHeatNum).HotControlNode,
+                                                 UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                                 UnitHeat(UnitHeatNum).HWLoopNum,
+                                                 UnitHeat(UnitHeatNum).HWLoopSide,
+                                                 UnitHeat(UnitHeatNum).HWBranchNum,
                                                  UnitHeat(UnitHeatNum).HWCompNum);
                         }
                     }
                     if (UnitHeat(UnitHeatNum).HCoilType == SteamCoil) {
                         mdot = 0.0; // try to turn off
                         if (UnitHeat(UnitHeatNum).HWLoopNum > 0) {
-                            SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                                 UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                            SetComponentFlowRate(mdot,
+                                                 UnitHeat(UnitHeatNum).HotControlNode,
+                                                 UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                                 UnitHeat(UnitHeatNum).HWLoopNum,
+                                                 UnitHeat(UnitHeatNum).HWLoopSide,
+                                                 UnitHeat(UnitHeatNum).HWBranchNum,
                                                  UnitHeat(UnitHeatNum).HWCompNum);
                         }
                     }
@@ -1458,10 +1570,25 @@ namespace UnitHeater {
                             MinWaterFlow = Node(ControlNode).MassFlowRateMinAvail;
                         }
                         // control water flow to obtain output matching QZnReq
-                        ControlCompOutput(UnitHeat(UnitHeatNum).Name, cMO_UnitHeater, UnitHeatNum, FirstHVACIteration, QZnReq, ControlNode,
-                                          MaxWaterFlow, MinWaterFlow, ControlOffset, UnitHeat(UnitHeatNum).ControlCompTypeNum,
-                                          UnitHeat(UnitHeatNum).CompErrIndex, _, _, _, _, _, UnitHeat(UnitHeatNum).HWLoopNum,
-                                          UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum);
+                        ControlCompOutput(UnitHeat(UnitHeatNum).Name,
+                                          cMO_UnitHeater,
+                                          UnitHeatNum,
+                                          FirstHVACIteration,
+                                          QZnReq,
+                                          ControlNode,
+                                          MaxWaterFlow,
+                                          MinWaterFlow,
+                                          ControlOffset,
+                                          UnitHeat(UnitHeatNum).ControlCompTypeNum,
+                                          UnitHeat(UnitHeatNum).CompErrIndex,
+                                          _,
+                                          _,
+                                          _,
+                                          _,
+                                          _,
+                                          UnitHeat(UnitHeatNum).HWLoopNum,
+                                          UnitHeat(UnitHeatNum).HWLoopSide,
+                                          UnitHeat(UnitHeatNum).HWBranchNum);
 
                     } else if ((SELECT_CASE_var == ElectricCoil) || (SELECT_CASE_var == GasCoil) || (SELECT_CASE_var == SteamCoil)) {
                         HCoilOn = true;
@@ -1615,8 +1742,8 @@ namespace UnitHeater {
         }
         if (FanOpMode != CycFanCycCoil) {
             if (UnitHeat(UnitHeatNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(UnitHeat(UnitHeatNum).FanName, FirstHVACIteration, UnitHeat(UnitHeatNum).Fan_Index, _, ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(
+                    UnitHeat(UnitHeatNum).FanName, FirstHVACIteration, UnitHeat(UnitHeatNum).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
                 HVACFan::fanObjs[UnitHeat(UnitHeatNum).Fan_Index]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
@@ -1668,8 +1795,8 @@ namespace UnitHeater {
 
             if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
             if (UnitHeat(UnitHeatNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(UnitHeat(UnitHeatNum).FanName, FirstHVACIteration, UnitHeat(UnitHeatNum).Fan_Index, _, ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(
+                    UnitHeat(UnitHeatNum).FanName, FirstHVACIteration, UnitHeat(UnitHeatNum).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
                 HVACFan::fanObjs[UnitHeat(UnitHeatNum).Fan_Index]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
@@ -1689,11 +1816,15 @@ namespace UnitHeater {
                         mdot = UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadFrac;
                     }
                     if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         UnitHeat(UnitHeatNum).HotControlNode,
+                                         UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                         UnitHeat(UnitHeatNum).HWLoopNum,
+                                         UnitHeat(UnitHeatNum).HWLoopSide,
+                                         UnitHeat(UnitHeatNum).HWBranchNum,
                                          UnitHeat(UnitHeatNum).HWCompNum);
-                    SimulateWaterCoilComponents(UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq,
-                                                FanOpMode, PartLoadFrac);
+                    SimulateWaterCoilComponents(
+                        UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq, FanOpMode, PartLoadFrac);
                 } else if (SELECT_CASE_var == SteamCoil) {
                     if (!HCoilOn) {
                         mdot = 0.0;
@@ -1706,11 +1837,15 @@ namespace UnitHeater {
                         mdot = UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadFrac;
                     }
                     if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SetComponentFlowRate(mdot, UnitHeat(UnitHeatNum).HotControlNode, UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         UnitHeat(UnitHeatNum).HWLoopNum, UnitHeat(UnitHeatNum).HWLoopSide, UnitHeat(UnitHeatNum).HWBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         UnitHeat(UnitHeatNum).HotControlNode,
+                                         UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                         UnitHeat(UnitHeatNum).HWLoopNum,
+                                         UnitHeat(UnitHeatNum).HWLoopSide,
+                                         UnitHeat(UnitHeatNum).HWBranchNum,
                                          UnitHeat(UnitHeatNum).HWCompNum);
-                    SimulateSteamCoilComponents(UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq, _,
-                                                FanOpMode, PartLoadFrac);
+                    SimulateSteamCoilComponents(
+                        UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq, _, FanOpMode, PartLoadFrac);
                 } else if ((SELECT_CASE_var == ElectricCoil) || (SELECT_CASE_var == GasCoil)) {
 
                     if (!HCoilOn) {
@@ -1722,8 +1857,14 @@ namespace UnitHeater {
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }
                     if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SimulateHeatingCoilComponents(UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, QCoilReq, UnitHeat(UnitHeatNum).HCoil_Index, _,
-                                                  _, FanOpMode, PartLoadFrac);
+                    SimulateHeatingCoilComponents(UnitHeat(UnitHeatNum).HCoilName,
+                                                  FirstHVACIteration,
+                                                  QCoilReq,
+                                                  UnitHeat(UnitHeatNum).HCoil_Index,
+                                                  _,
+                                                  _,
+                                                  FanOpMode,
+                                                  PartLoadFrac);
                 }
             }
             Node(OutletNode).MassFlowRate = Node(InletNode).MassFlowRate; // maintain continuity through unit heater
@@ -1779,6 +1920,12 @@ namespace UnitHeater {
         // FLOW:
         UnitHeat(UnitHeatNum).HeatEnergy = UnitHeat(UnitHeatNum).HeatPower * TimeStepSys * SecInHour;
         UnitHeat(UnitHeatNum).ElecEnergy = UnitHeat(UnitHeatNum).ElecPower * TimeStepSys * SecInHour;
+
+        if (UnitHeat(UnitHeatNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+            if (!DataGlobals::SysSizingCalc) {
+                DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, UnitHeat(UnitHeatNum).FirstPass);
+            }
+        }
     }
 
     Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio

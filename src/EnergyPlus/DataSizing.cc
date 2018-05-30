@@ -92,8 +92,14 @@ namespace DataSizing {
     int const OAFlowMax(6);
 
     Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
-                                            {"Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum",
-                                             "IndoorAirQualityProcedure", "ProportionalControlBasedonOccupancySchedule",
+                                            {"Flow/Person",
+                                             "Flow/Zone",
+                                             "Flow/Area",
+                                             "AirChanges/Hour",
+                                             "Sum",
+                                             "Maximum",
+                                             "IndoorAirQualityProcedure",
+                                             "ProportionalControlBasedonOccupancySchedule",
                                              "ProportionalControlBasedOnDesignOccupancy"});
 
     // parameters for outside air
@@ -597,6 +603,49 @@ namespace DataSizing {
         this->DesHeatLoad = this->DesHeatLoad * ratio;
         this->HeatFlowSeq = this->HeatFlowSeq * ratio;
         this->HeatLoadSeq = this->HeatLoadSeq * ratio;
+    }
+
+    void resetZoneSizingGlobals(int const &curZoneEqNum, bool &firstPassFlag) // called in zone equipment Report function
+    {
+        if (curZoneEqNum == 0 || ZoneEqSizing.size() == 0) {
+            firstPassFlag = false;
+            return;
+        }
+        ZoneEqSizing(curZoneEqNum).AirFlow = false;
+        ZoneEqSizing(curZoneEqNum).CoolingAirFlow = false;
+        ZoneEqSizing(curZoneEqNum).HeatingAirFlow = false;
+        ZoneEqSizing(curZoneEqNum).SystemAirFlow = false;
+        ZoneEqSizing(curZoneEqNum).Capacity = false;
+        ZoneEqSizing(curZoneEqNum).CoolingCapacity = false;
+        ZoneEqSizing(curZoneEqNum).HeatingCapacity = false;
+        DataDesInletWaterTemp = 0.0;
+        DataDesInletAirHumRat = 0.0;
+        DataDesInletAirTemp = 0.0;
+        DataDesOutletAirTemp = 0.0;
+        DataDesOutletAirHumRat = 0.0;
+        DataCoolCoilCap = 0.0;
+        DataFlowUsedForSizing = 0.0;
+        DataAirFlowUsedForSizing = 0.0;
+        DataWaterFlowUsedForSizing = 0.0;
+        DataCapacityUsedForSizing = 0.0;
+        DataDesignCoilCapacity = 0.0;
+        DataHeatSizeRatio = 1.0;
+        DataEMSOverride = 0.0;
+        DataBypassFrac = 0.0;
+        DataFracOfAutosizedCoolingAirflow = 1.0;
+        DataFracOfAutosizedHeatingAirflow = 1.0;
+        DataFlowPerCoolingCapacity = 0.0;
+        DataFlowPerHeatingCapacity = 0.0;
+        DataFracOfAutosizedCoolingCapacity = 1.0;
+        DataFracOfAutosizedHeatingCapacity = 1.0;
+        DataAutosizedCoolingCapacity = 0.0;
+        DataAutosizedHeatingCapacity = 0.0;
+        DataConstantUsedForSizing = 0.0;
+        DataFractionUsedForSizing = 0.0;
+        DataZoneNumber = 0;
+        DataFanEnumType = -1;
+        DataFanIndex = -1;
+        firstPassFlag = false;
     }
 
 } // namespace DataSizing

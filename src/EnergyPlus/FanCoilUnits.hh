@@ -236,6 +236,7 @@ namespace FanCoilUnits {
         Real64 DesZoneCoolingLoad; // used for reporting in watts
         Real64 DesZoneHeatingLoad; // used for reporting in watts
         int DSOAPtr;               // design specification outdoor air object index
+        bool FirstPass;            // detects first time through for resetting sizing data
 
         // Default Constructor
         FanCoilData()
@@ -252,7 +253,7 @@ namespace FanCoilUnits {
               FanOpModeSchedPtr(0), FanOpMode(1), MinSATempCooling(0.0), MaxSATempHeating(0.0), ASHRAETempControl(false), QUnitOutNoHC(0.0),
               QUnitOutMaxH(0.0), QUnitOutMaxC(0.0), LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0), HeatPower(0.0),
               HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0),
-              DesCoolingLoad(0.0), DesHeatingLoad(0.0), DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0)
+              DesCoolingLoad(0.0), DesHeatingLoad(0.0), DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0), FirstPass(true)
         {
         }
     };
