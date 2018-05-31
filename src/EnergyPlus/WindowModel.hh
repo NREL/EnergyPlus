@@ -50,6 +50,7 @@
 
 #include <map>
 #include <memory>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -63,7 +64,9 @@ public:
     T StringToEnum(const std::string &value)
     {
         auto iValue = m_Map.find(value);
-        if (iValue == m_Map.end()) throw std::runtime_error("Incorrect enumerator assigned.");
+        if (iValue == m_Map.end()) {
+            ShowFatalError("Incorrect enumerator assigned.");
+        }
         return iValue->second;
     }
 };

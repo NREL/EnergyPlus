@@ -50,6 +50,7 @@
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalance.hh>
 #include <General.hh>
+#include <UtilityRoutines.hh>
 #include <WindowManager.hh>
 
 // Windows library headers
@@ -117,8 +118,13 @@ namespace WindowManager {
         for (auto k = 1; k <= 2 * totSolidLayers; ++k) {
             Guess.push_back(SurfaceWindow(SurfNum).ThetaFace(k));
         }
-        aSystem->setInitialGuess(Guess);
-        aSystem->solve();
+        try {
+            aSystem->setInitialGuess(Guess);
+            aSystem->solve();
+        } catch(const std::exception& ex) {
+            ShowSevereError("Error in Windows Calculation Engine Exterior Module.");
+            ShowContinueError(ex.what());
+        }
 
         auto aLayers = aSystem->getSolidLayers();
         auto i = 1;

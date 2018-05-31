@@ -51,6 +51,7 @@
 #include <DataHeatBalance.hh>
 #include <WindowComplexManager.hh>
 #include <WindowManager.hh>
+#include <UtilityRoutines.hh>
 
 #include <WCEMultiLayerOptics.hpp>
 
@@ -323,12 +324,13 @@ namespace WindowManager {
 
     std::shared_ptr<IGU_Layers> CWindowConstructionsSimplified::getLayers(WavelengthRange const t_Range, int const t_ConstrNum) const
     {
-        Layers_Map aMap = *m_Layers.at(t_Range);
-        auto it = aMap.find(t_ConstrNum);
-        if (it == aMap.end()) {
-            throw std::runtime_error("Incorrect construction selection.");
+        std::shared_ptr< Layers_Map > aMap = m_Layers.at(t_Range);
+        auto it = aMap->find(t_ConstrNum);
+        if (it == aMap->end()) {
+            ShowFatalError("Incorrect construction selection.");
+            //throw std::runtime_error("Incorrect construction selection.");
         }
-        return aMap.at(t_ConstrNum);
+        return aMap->at(t_ConstrNum);
     }
 
 } // namespace WindowManager
