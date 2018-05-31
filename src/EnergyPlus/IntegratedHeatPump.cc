@@ -876,7 +876,7 @@ namespace IntegratedHeatPump {
             // set up output variables, not reported in the individual coil models
 
             //				TODO: Figure out how to get enum class to work with SetupOutputVariable
-            //				SetupOutputVariable( "Operation Mode []",
+            //				Setup Output Variable( "Operation Mode []",
             //				                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
             //				                     "System", "Average",
             //				                     IntegratedHeatPumps( DXCoilNum ).Name );
