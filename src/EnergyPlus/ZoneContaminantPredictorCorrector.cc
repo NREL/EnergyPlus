@@ -156,6 +156,8 @@ namespace ZoneContaminantPredictorCorrector {
         TotGCBLDiff = 0;
         TotGCDVS = 0;
         TotGCDRS = 0;
+        Contaminant.CO2Simulation = false;
+        Contaminant.GenericContamSimulation = false;
     }
 
     void ManageZoneContaminanUpdates(int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
