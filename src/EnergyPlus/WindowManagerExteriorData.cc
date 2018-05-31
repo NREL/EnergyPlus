@@ -286,17 +286,16 @@ namespace WindowManager {
         m_Layers[WavelengthRange::Visible] = std::make_shared<Layers_Map>();
     }
 
-    void
-    CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, std::shared_ptr<CScatteringLayer> const &t_Layer)
+    void CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, std::shared_ptr<CScatteringLayer> const &t_Layer)
     {
-        Layers_Map &aMap = *m_Layers.at(t_Range);
-        auto it = aMap.find(t_ConstrNum);
+        std::shared_ptr<Layers_Map> aMap = m_Layers.at(t_Range);
+        auto it = aMap->find(t_ConstrNum);
         std::shared_ptr<IGU_Layers> iguLayers = nullptr;
-        if (it != aMap.end()) {
+        if (it != aMap->end()) {
             iguLayers = it->second;
         } else {
             iguLayers = std::make_shared<IGU_Layers>();
-            aMap[t_ConstrNum] = iguLayers;
+            (*aMap)[t_ConstrNum] = iguLayers;
         }
 
         iguLayers->push_back(t_Layer);

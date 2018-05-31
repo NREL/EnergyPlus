@@ -89,7 +89,7 @@ namespace WindowManager {
     class CWCEIntegrator;
 
     // Initialize window optical properties with Windows-CalcEngine routines that are BSDF based
-    void InitWCE_BSDFOpticalData();
+    //void InitWCE_BSDFOpticalData();
 
     void InitWCE_SimplifiedOpticalData();
 
@@ -105,6 +105,7 @@ namespace WindowManager {
     class CWCEMaterialFactory
     {
     public:
+        virtual ~CWCEMaterialFactory() = default;
         CWCEMaterialFactory(const std::shared_ptr<DataHeatBalance::MaterialProperties> &t_Material,
                             const FenestrationCommon::WavelengthRange t_Range);
 
@@ -128,7 +129,7 @@ namespace WindowManager {
                                      const FenestrationCommon::WavelengthRange t_Range);
 
     private:
-        void init();
+        void init() override;
     };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -143,7 +144,7 @@ namespace WindowManager {
                                     const FenestrationCommon::WavelengthRange t_Range);
 
     protected:
-        void init();
+        void init() override;
         virtual std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createVisibleRangeMaterial() = 0;
         virtual std::shared_ptr<SingleLayerOptics::CMaterialSingleBand> createSolarRangeMaterial() = 0;
     };
@@ -196,6 +197,7 @@ namespace WindowManager {
     class IWCECellDescriptionFactory
     {
     public:
+        virtual ~IWCECellDescriptionFactory() = default;
         IWCECellDescriptionFactory(const std::shared_ptr<DataHeatBalance::MaterialProperties> &t_Material);
 
         virtual std::shared_ptr<SingleLayerOptics::ICellDescription> getCellDescription() = 0;
@@ -254,6 +256,7 @@ namespace WindowManager {
     class CWCELayerFactory
     {
     public:
+        virtual ~CWCELayerFactory() = default;
         CWCELayerFactory(const std::shared_ptr<DataHeatBalance::MaterialProperties> &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
         std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer();

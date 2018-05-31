@@ -7732,7 +7732,11 @@ namespace SolarShading {
                 Real64 Tdiff = aLayer->getPropertySimple(PropertySimple::T, Side::Front, Scattering::DiffuseDiffuse, Theta, Phi);
                 Construct(ConstrNum).TransDiff = Tdiff;
                 Real64 DSZoneWin = window.SkySolarInc * Tdiff * Surface(SurfNum2).Area;
-                (DifSolarRad != 0) ? DSZoneWin /= DifSolarRad : DSZoneWin /= 1e-8;
+                if ((DifSolarRad != 0)) {
+                    DSZoneWin /= DifSolarRad;
+                } else {
+                    DSZoneWin /= 1e-8;
+                }
 
                 Real64 DGZoneWin = window.GndSolarInc * Tdiff * Surface(SurfNum2).Area;
                 (GndSolarRad != 0) ? DGZoneWin /= GndSolarRad : DGZoneWin /= 1e-8;
