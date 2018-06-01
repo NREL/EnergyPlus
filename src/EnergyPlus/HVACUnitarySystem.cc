@@ -1012,6 +1012,32 @@ namespace HVACUnitarySystem {
             if (FirstHVACIteration) {
                 UnitarySystem(UnitarySysNum).iterationCounter = 0;
                 UnitarySystem(UnitarySysNum).iterationMode = 0;
+                if (UnitarySystem(UnitarySysNum).ControlType == SetPointBased) {
+                    if (GetCurrentScheduleValue(UnitarySystem(UnitarySysNum).SysAvailSchedPtr) > 0.0) {
+                        if (UnitarySystem(UnitarySysNum).LastMode == CoolingMode) {
+                            if (MultiOrVarSpeedCoolCoil(UnitarySysNum)) {
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).CoolMassFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedCooling);
+                            } else {
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).MaxCoolAirMassFlow;
+                            }
+                        } else if (UnitarySystem(UnitarySysNum).LastMode == CoolingMode) {
+                            if (MultiOrVarSpeedCoolCoil(UnitarySysNum)) {
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).HeatMassFlowRate(UnitarySystem(UnitarySysNum).NumOfSpeedHeating);
+                            } else {
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).MaxHeatAirMassFlow;
+                            }
+                        } else {
+                            if (MultiOrVarSpeedCoolCoil(UnitarySysNum)) {
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).IdleMassFlowRate;
+                            } else {
+                                Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = UnitarySystem(UnitarySysNum).MaxNoCoolHeatAirMassFlow;
+                            }
+                        }
+                    }
+                    else {
+                        Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate = 0.0;
+                    }
+                }
             }
             if (UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWater ||
                 UnitarySystem(UnitarySysNum).CoolingCoilType_Num == Coil_CoolingWaterDetailed) {
@@ -3723,17 +3749,18 @@ namespace HVACUnitarySystem {
                         UnitarySystem(UnitarySysNum).DehumidControlType_Num = DehumidControl_None;
                         UnitarySystem(UnitarySysNum).Humidistat = false;
                     }
-                    if (UnitarySystem(UnitarySysNum).Humidistat && UnitarySystem(UnitarySysNum).ControlType == LoadBased) {
-                        for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
-                            if (UnitarySystem(UnitarySysNum).ControlZoneNum == 0) continue;
-                            if (HumidityControlZone(HStatZoneNum).ActualZoneNum != UnitarySystem(UnitarySysNum).ControlZoneNum) continue;
-                            AirNodeFound = true;
-                        }
-                        if (!AirNodeFound) {
-                            ShowSevereError(CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
-                            ShowContinueError("Did not find Air Node (Zone with Humidistat).");
-                            ShowContinueError("specified " + cAlphaFields(iControlZoneAlphaNum) + " = " + Alphas(iControlZoneAlphaNum));
-                            ErrorsFound = true;
+                    if (UnitarySystem(UnitarySysNum).ControlZoneNum == 0) {
+                        if (UnitarySystem(UnitarySysNum).Humidistat && UnitarySystem(UnitarySysNum).ControlType == LoadBased) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                                if (HumidityControlZone(HStatZoneNum).ActualZoneNum != UnitarySystem(UnitarySysNum).ControlZoneNum) continue;
+                                AirNodeFound = true;
+                            }
+                            if (!AirNodeFound) {
+                                ShowSevereError(CurrentModuleObject + " = " + UnitarySystem(UnitarySysNum).Name);
+                                ShowContinueError("Did not find Air Node (Zone with Humidistat).");
+                                ShowContinueError("specified " + cAlphaFields(iControlZoneAlphaNum) + " = " + Alphas(iControlZoneAlphaNum));
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 } else { // invalid input
@@ -3869,10 +3896,8 @@ namespace HVACUnitarySystem {
                         for (ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
                             if (ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != UnitarySystem(UnitarySysNum).ATMixerSecNode) continue;
                             ZoneEquipmentFound = true;
-                            //               Find the controlled zone number for the specified thermostat location
+                            // Find the controlled zone number for the specified thermostat location
                             UnitarySystem(UnitarySysNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                            // TotalZonesOnAirLoop doesn't appear to be used anywhere
-                            //++TotalZonesOnAirLoop;
                             TotalFloorAreaOnAirLoop = Zone(ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                             UnitarySystem(UnitarySysNum).AirLoopEquipment = false;
                             UnitarySystem(UnitarySysNum).ZoneInletNode = UnitarySystem(UnitarySysNum).AirOutNode;
@@ -3890,7 +3915,7 @@ namespace HVACUnitarySystem {
                                         ZoneEquipList(ZoneEquipConfig(ControlledZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                 }
                             }
-                            UnitarySystem(UnitarySysNum).ControlZoneNum = ControlledZoneNum;
+ //                           UnitarySystem(UnitarySysNum).ControlZoneNum = ControlledZoneNum;
                             break;
                         }
                         if (ZoneEquipmentFound) {
@@ -3919,13 +3944,6 @@ namespace HVACUnitarySystem {
                             ErrorsFound = true;
                         }
                     }
-                    // Need to move this to the end - just comment out for now
-                    // if ( !ZoneEquipmentFound ) {
-                    //	ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-                    //	ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas(
-                    // iAirInletNodeNameAlphaNum ) ); 	ShowContinueError( "Node name does not match air terminal mixer secondary air node. Check
-                    // AirTerminal:SingleDuct:Mixer object inputs." ); 	ErrorsFound = true;
-                    //}
                 }
             }
 
@@ -3936,10 +3954,8 @@ namespace HVACUnitarySystem {
                         for (ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
                             if (ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != UnitarySystem(UnitarySysNum).AirInNode) continue;
                             ZoneEquipmentFound = true;
-                            //               Find the controlled zone number for the specified thermostat location
+                            // Find the controlled zone number for the specified thermostat location
                             UnitarySystem(UnitarySysNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-                            // TotalZonesOnAirLoop doesn't appear to be used anywhere
-                            //++TotalZonesOnAirLoop;
                             TotalFloorAreaOnAirLoop = Zone(ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                             UnitarySystem(UnitarySysNum).AirLoopEquipment = false;
                             UnitarySystem(UnitarySysNum).ZoneInletNode = UnitarySystem(UnitarySysNum).ATMixerOutNode;
@@ -3957,7 +3973,7 @@ namespace HVACUnitarySystem {
                                         ZoneEquipList(ZoneEquipConfig(ControlledZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                 }
                             }
-                            UnitarySystem(UnitarySysNum).ControlZoneNum = ControlledZoneNum;
+ //                           UnitarySystem(UnitarySysNum).ControlZoneNum = ControlledZoneNum;
                             break;
                         }
                         if (ZoneEquipmentFound) {
@@ -3988,13 +4004,6 @@ namespace HVACUnitarySystem {
                             ErrorsFound = true;
                         }
                     }
-                    // Need to move this to the end - just comment out for now
-                    // if ( !ZoneEquipmentFound ) {
-                    //	ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-                    //	ShowContinueError( "Incorrect or misspelled " + cAlphaFields( iAirInletNodeNameAlphaNum ) + " = " + Alphas(
-                    // iAirInletNodeNameAlphaNum ) ); 	ShowContinueError( "Node name does not match any controlled zone exhaust node name. Check
-                    // ZoneHVAC:EquipmentConnections object inputs." ); 	ErrorsFound = true;
-                    //}
                 }
             }
 
@@ -7672,12 +7681,23 @@ namespace HVACUnitarySystem {
         OnOffAirFlowRatio = 1.0;
         CoilCoolHeatRat = 1.0;
 
+        // Call the series of components that simulate a Unitary System
+        if (UnitarySystem(UnitarySysNum).ATMixerExists) {
+            // There is an air terminal mixer
+            if (UnitarySystem(UnitarySysNum).ATMixerType == ATMixer_InletSide) { // if there is an inlet side air terminal mixer
+                                                                                 // set the primary air inlet mass flow rate
+                Node(UnitarySystem(UnitarySysNum).ATMixerPriNode).MassFlowRate =
+                    min(Node(UnitarySystem(UnitarySysNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(UnitarySystem(UnitarySysNum).AirInNode).MassFlowRate);
+                // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
+                // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
+                SingleDuct::SimATMixer(UnitarySystem(UnitarySysNum).ATMixerName, FirstHVACIteration, UnitarySystem(UnitarySysNum).ATMixerIndex);
+            }
+        }
+
         // CALL the series of components that simulate a Unitary System
         if (UnitarySystem(UnitarySysNum).FanExists && UnitarySystem(UnitarySysNum).FanPlace == BlowThru) {
             if (UnitarySystem(UnitarySysNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-
-                HVACFan::fanObjs[UnitarySystem(UnitarySysNum).FanIndex]->simulate(
-                    _, _, _, _, m_massFlow1, m_runTimeFraction1, m_massFlow2, m_runTimeFraction2, _);
+                HVACFan::fanObjs[UnitarySystem(UnitarySysNum).FanIndex]->simulate(_, _, _, _);
             } else {
                 Fans::SimulateFanComponents(BlankString, FirstHVACIteration, UnitarySystem(UnitarySysNum).FanIndex, FanSpeedRatio);
             }
@@ -7696,7 +7716,10 @@ namespace HVACUnitarySystem {
                 ControlCoolingSystemToSP(UnitarySysNum, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
                 PartLoadRatio = UnitarySystem(UnitarySysNum).CoolingPartLoadFrac;
                 CompOn = 0;
-                if (PartLoadRatio > 0.0) CompOn = 1;
+                if (PartLoadRatio > 0.0) {
+                    CompOn = 1;
+                    UnitarySystem(UnitarySysNum).LastMode = CoolingMode;
+                }
                 CalcUnitaryCoolingSystem(
                     UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
             }
@@ -7713,7 +7736,10 @@ namespace HVACUnitarySystem {
                 ControlHeatingSystemToSP(UnitarySysNum, AirLoopNum, FirstHVACIteration, CompOn);
                 PartLoadRatio = UnitarySystem(UnitarySysNum).HeatingPartLoadFrac;
                 CompOn = 0;
-                if (PartLoadRatio > 0.0) CompOn = 1;
+                if (PartLoadRatio > 0.0) {
+                    CompOn = 1;
+                    UnitarySystem(UnitarySysNum).LastMode = HeatingMode;
+                }
                 CalcUnitaryHeatingSystem(UnitarySysNum, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio);
             }
 
@@ -7754,8 +7780,7 @@ namespace HVACUnitarySystem {
 
         if (UnitarySystem(UnitarySysNum).FanExists && UnitarySystem(UnitarySysNum).FanPlace == DrawThru) {
             if (UnitarySystem(UnitarySysNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[UnitarySystem(UnitarySysNum).FanIndex]->simulate(
-                    _, _, _, _, m_massFlow1, m_runTimeFraction1, m_massFlow2, m_runTimeFraction2, _);
+                HVACFan::fanObjs[UnitarySystem(UnitarySysNum).FanIndex]->simulate(_, _, _, _);
             } else {
                 Fans::SimulateFanComponents(BlankString, FirstHVACIteration, UnitarySystem(UnitarySysNum).FanIndex, FanSpeedRatio);
             }
@@ -7775,6 +7800,13 @@ namespace HVACUnitarySystem {
             ControlSuppHeatSystem(UnitarySysNum, AirLoopNum, FirstHVACIteration);
             CalcUnitarySuppSystemToSP(UnitarySysNum, FirstHVACIteration);
             SuppHeatingCoilFlag = false;
+        }
+
+        // If there is a supply side air terminal mixer, calculate its output
+        if (UnitarySystem(UnitarySysNum).ATMixerExists) {
+            if (UnitarySystem(UnitarySysNum).ATMixerType == ATMixer_SupplySide) {
+                SingleDuct::SimATMixer(UnitarySystem(UnitarySysNum).ATMixerName, FirstHVACIteration, UnitarySystem(UnitarySysNum).ATMixerIndex);
+            }
         }
 
         UnitarySystem(UnitarySysNum).InitHeatPump = false;
