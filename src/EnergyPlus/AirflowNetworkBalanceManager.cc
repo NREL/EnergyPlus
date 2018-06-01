@@ -8541,10 +8541,6 @@ namespace AirflowNetworkBalanceManager {
         static bool errFlag(false);
         Array1D_int NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
-        int BranchNum;
-        int CompNum;
-        int NumOfFans;
-        std::string FanNames;
 
         // Validate supply and return connections
         if (OneTimeFlag) {
@@ -8990,6 +8986,10 @@ namespace AirflowNetworkBalanceManager {
             }
 
             // Check number of fans specified in an AirLoop #6748
+            int BranchNum;
+            int CompNum;
+            int NumOfFans;
+            std::string FanNames;
             for (BranchNum = 1; BranchNum <= PrimaryAirSystem(1).NumBranches; ++BranchNum) {
                 NumOfFans = 0;
                 FanNames = "";

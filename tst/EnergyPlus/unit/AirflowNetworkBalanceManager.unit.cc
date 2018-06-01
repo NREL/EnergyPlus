@@ -8214,7 +8214,6 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 
 TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
 {
-    // #6748
     DataAirSystems::PrimaryAirSystem.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
     DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
@@ -8239,7 +8238,6 @@ TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    DataAirSystems::PrimaryAirSystem.deallocate();
 }
 
 } // namespace EnergyPlus
