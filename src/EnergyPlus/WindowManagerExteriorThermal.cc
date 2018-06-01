@@ -118,6 +118,7 @@ namespace WindowManager {
         for (auto k = 1; k <= 2 * totSolidLayers; ++k) {
             Guess.push_back(SurfaceWindow(SurfNum).ThetaFace(k));
         }
+
         try {
             aSystem->setInitialGuess(Guess);
             aSystem->solve();
