@@ -9432,7 +9432,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerInlet)
     EXPECT_TRUE(UnitarySystem(1).ATMixerExists);
     EXPECT_EQ(ATMixer_InletSide, UnitarySystem(1).ATMixerType);
     EXPECT_FALSE(UnitarySystem(1).AirLoopEquipment);
-    EXPECT_EQ(1, UnitarySystem(1).ControlZoneNum);
+    EXPECT_EQ(0, UnitarySystem(1).ControlZoneNum); // control zone name/index not required for setpoint control
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
@@ -9565,7 +9565,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInputATMixerSupply)
     EXPECT_TRUE(UnitarySystem(1).ATMixerExists);
     EXPECT_EQ(ATMixer_SupplySide, UnitarySystem(1).ATMixerType);
     EXPECT_FALSE(UnitarySystem(1).AirLoopEquipment);
-    EXPECT_EQ(1, UnitarySystem(1).ControlZoneNum);
+    EXPECT_EQ(0, UnitarySystem(1).ControlZoneNum); // control zone name/index not required for setpoint control
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystem_GetInputZoneEquipment)
