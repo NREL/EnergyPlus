@@ -978,7 +978,7 @@
       write(auditunit,*) 'line 904 variable =',tracknum(ij),' not found'
     endif
   enddo
-  write(csvunit,inoutformat) ' ' !  final..trim(outline)
+  write(csvunit,inoutformat)     !  final..trim(outline)
   read(esounit,inoutformat) line ! first environment line
   curdate=blank
   curmonday=blank
@@ -1368,24 +1368,24 @@
     stop
 
 906 write(*,*) 'Output file='//trim(outputfilename)
-    write(*,*) 'error occured during processing.'
+    write(*,*) 'error occurred during processing.'
     write(*,*) 'Apparent line in error (1st 50 characters):'
     write(*,*) trim(line(1:50))
     write(*,*) 'ReadVarsESO program terminated.'
     write(auditunit,*) 'Output file='//trim(outputfilename)
-    write(auditunit,*) 'error occured during processing.'
+    write(auditunit,*) 'error occurred during processing.'
     write(auditunit,*) 'Apparent line in error (1st 50 characters):'
     write(auditunit,*) trim(line(1:50))
     write(auditunit,*) 'ReadVarsESO program terminated.'
     stop
 
 907 write(*,*) 'Output file='//trim(outputfilename)
-    write(*,*) 'error occured during processing.'
+    write(*,*) 'error occurred during processing.'
     write(*,*) 'Blank line in middle of processing.'
     write(*,*) 'Likely fatal error during EnergyPlus execution.'
     write(*,*) 'ReadVarsESO program terminated.'
     write(auditunit,*) 'Output file='//trim(outputfilename)
-    write(auditunit,*) 'error occured during processing.'
+    write(auditunit,*) 'error occurred during processing.'
     write(auditunit,*) 'Blank line in middle of processing.'
     write(auditunit,*) 'Likely fatal error during EnergyPlus execution.'
     write(auditunit,*) 'ReadVarsESO program terminated.'
