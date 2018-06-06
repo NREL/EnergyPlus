@@ -1688,7 +1688,7 @@ Water mains temperatures are a function of outdoor climate conditions and vary w
   maximum difference in monthly average outdoor air temperatures
 \end{itemize}
 
-These values can be easily calculated from annual weather data using a spreadsheet or from the ``.stat'' file available with the EnergyPlus weather files at \href{https://energyplus.net/weather}{www.energyplus.net}. Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
+These values can be easily calculated from annual weather data using a spreadsheet or from the ``.stat'' file available with the EnergyPlus weather files at \href{https://energyplus.net/weather}{www.energyplus.net}. Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. If the calculation method selected is "\textbf{CorrelationFromWeatherFile}", energyplus calculates these two values internally from either ``.stat'' or weather file. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
 
 Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
 
@@ -1698,23 +1698,23 @@ If there is no Site:WaterMainsTemperature object in the input file, a default co
 
 \paragraph{Field: Calculation Method}\label{field-calculation-method}
 
-This field selects the calculation method and must have the keyword Schedule or Correlation.
+This field selects the calculation method and must have the keyword Schedule, Correlation or CorrelationFromWeatherFile. If calculation method is CorrelationFromWeatherFile, the two numeric input fields below are ignored. Instead, Instead, EnergyPlus calculates them from weather file.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-003}
 
-If the calculation method is Schedule, the water mains temperatures are read from the schedule referenced by this field. If the calculation method is Correlation, this field is ignored.
+If the calculation method is Schedule, the water mains temperatures are read from the schedule referenced by this field. If the calculation method is Correlation or CorrelationFromWeatherFile, this field is ignored.
 
 \paragraph{Field: Annual Average Outdoor Air Temperature}\label{field-annual-average-outdoor-air-temperature}
 
-If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) {[}C{]}. If the calculation method is Schedule, this field is ignored.
+If the calculation method is Correlation, this field is used in the calculation as the annual average outdoor air temperature (dry-bulb) {[}C{]}. If the calculation method is Schedule or CorrelationFromWeatherFile, this field is ignored. 
 
 \paragraph{Field: Maximum Difference In Monthly Average Outdoor Air Temperatures}\label{field-maximum-difference-in-monthly-average-outdoor-air-temperatures}
 
-If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures {[}\(\Delta\)C{]}. If the calculation method is Schedule, this field is ignored.
+If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures {[}\(\Delta\)C{]}. If the calculation method is Schedule or CorrelationFromWeatherFile, this field is ignored.
 
 \begin{lstlisting}
 Site:WaterMainsTemperature,
-  Correlation,  !- Calculation Method {SCHEDULE | CORRELATION}
+  Correlation,  !- Calculation Method {SCHEDULE | CORRELATION | CORRELATIONFROMWEATHERFILE}
   ,             !- Schedule Name
   9.69,         !- Annual Average Outdoor Air Temperature {C}
   28.1;         !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
