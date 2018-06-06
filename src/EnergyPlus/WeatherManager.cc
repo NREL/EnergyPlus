@@ -10513,6 +10513,33 @@ namespace WeatherManager {
                 // ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
             }
         }
+        // if the weather or stat file is processed, report
+        if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
+            ReportWaterMainsTempParameters();
+        }
+    }
+
+    void ReportWaterMainsTempParameters()
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // report SITE water mains temperature object input parameters calculated
+        // from weather or stat file
+
+        // USE STATEMENTS:
+        using DataGlobals::OutputFileInits;
+        using WeatherManager::OADryBulbAverage;
+        using namespace ObjexxFCL::gio;
+
+        // Locals
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // na
+
+        // Write annual average OA temperature and maximum difference in monthly-daily average outdoor air temperatures
+        gio::write(OutputFileInits, fmtA) << "! <Site Water Mains Temperature Object Parameters>,Annual Average Outdoor Air Temperature{C}"
+                                             ", Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}";
+        gio::write(OutputFileInits, fmtAN) << " Site Water Mains Temperature Object Parameters";
+        gio::write(OutputFileInits, "(', ',F5.2,', ',F5.2,)")
+            << OADryBulbAverage.AnnualAvgOADryBulbTemp << OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff;
     }
 
 } // namespace WeatherManager

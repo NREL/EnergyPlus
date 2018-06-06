@@ -76,8 +76,8 @@ namespace WeatherManager {
     extern int const NthDayInMonth;
     extern int const LastDayInMonth;
 
-    extern int const ScheduleMethod;    // Constant for water mains temperatures calculation methods
-    extern int const CorrelationMethod; // Constant for water mains temperatures calculation methods
+    extern int const ScheduleMethod;                   // Constant for water mains temperatures calculation methods
+    extern int const CorrelationMethod;                // Constant for water mains temperatures calculation methods
     extern int const CorrelationFromWeatherFileMethod; // Constant for water mains temperatures calculation methods
 
     extern int const InvalidWeatherFile;
@@ -841,8 +841,9 @@ namespace WeatherManager {
 
     void CalcWaterMainsTemp();
 
-    Real64 WaterMainsTempFromCorrelation(Real64 const AnnualOAAvgDryBulbTemp, // annual average OA drybulb temperature
-                                         Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
+    Real64
+    WaterMainsTempFromCorrelation(Real64 const AnnualOAAvgDryBulbTemp,        // annual average OA drybulb temperature
+                                  Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
     void GetWeatherStation(bool &ErrorsFound);
@@ -886,13 +887,16 @@ namespace WeatherManager {
 
         // Default Constructor
         AnnualMonthlyDryBulbWeatherData()
-            : OADryBulbWeatherDataProcessed(false), AnnualAvgOADryBulbTemp(0.0), MonthlyAvgOADryBulbTempMaxDiff(0.0), MonthlyDailyAverageDryBulbTemp(12, 0.0)
+            : OADryBulbWeatherDataProcessed(false), AnnualAvgOADryBulbTemp(0.0), MonthlyAvgOADryBulbTempMaxDiff(0.0),
+              MonthlyDailyAverageDryBulbTemp(12, 0.0)
         {
         }
         void CalcAnnualAndMonthlyDryBulbTemp(); // true if this is CorrelationFromWeatherFile
     };
 
     extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
+
+    void ReportWaterMainsTempParameters();
 
 } // namespace WeatherManager
 
