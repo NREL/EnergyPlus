@@ -8290,8 +8290,6 @@ namespace WeatherManager {
                 }
             } else if (UtilityRoutines::SameString(AlphArray(1), "CorrelationFromWeatherFile")) {
                 WaterMainsTempsMethod = CorrelationFromWeatherFileMethod;
-                // WaterMainsTempsAnnualAvgAirTemp = DataSizing::AutoSize;
-                // WaterMainsTempsMaxDiffAirTemp = DataSizing::AutoSize;
                 // OADryBulbAverage.OADryBulbWeatherDataProcessed = false;
             } else {
                 ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + '=' + AlphArray(1));
@@ -8310,7 +8308,7 @@ namespace WeatherManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
-        //       MODIFIED       na
+        //       MODIFIED       June 2018, B. Nigusse
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -8322,10 +8320,7 @@ namespace WeatherManager {
         // is calculated and converted back to C.
 
         // REFERENCES:
-        // Correlation developed by Jay Burch and Craig Christensen at NREL, described in:
-        // Hendron, R., Anderson, R., Christensen, C., Eastment, M., and Reeves, P.  2004.  "Development of an Energy
-        // Savings Benchmark for All Residential End-Uses", Proceedings of SimBuild 2004, IBPSA-USA National Conference,
-        // Boulder, CO, August 4 - 6, 2004.
+        // na
 
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
@@ -8343,7 +8338,8 @@ namespace WeatherManager {
                 WaterMainsTemp = WaterMainsTempFromCorrelation(WaterMainsTempsAnnualAvgAirTemp, WaterMainsTempsMaxDiffAirTemp);
             } else if (SELECT_CASE_var == CorrelationFromWeatherFileMethod) {
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-                    WaterMainsTemp = WaterMainsTempFromCorrelation(OADryBulbAverage.AnnualAvgOADryBulbTemp, OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff);
+                    WaterMainsTemp =
+                        WaterMainsTempFromCorrelation(OADryBulbAverage.AnnualAvgOADryBulbTemp, OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff);
                 } else {
                     WaterMainsTemp = 10.0; // 50 F
                 }
@@ -10398,7 +10394,7 @@ namespace WeatherManager {
                 }
                 if (readStat != 0) {
                     ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + DataStringGlobals::inStatFileName +
-                                   " for input (read).");
+                                    " for input (read).");
                     ShowContinueError("Water Mains Temperature will be set to a fixed deafult value of 10 C.");
                     return;
                 }
@@ -10462,7 +10458,7 @@ namespace WeatherManager {
                         pos = index(epwLine, ',');
                         epwLine.erase(0, pos + 1);
                         pos = index(epwLine, ',');
-                        std::string LeapYear = uppercase(epwLine.substr(0, pos));
+                        std::string LeapYear = UtilityRoutines::MakeUPPERCase(epwLine.substr(0, pos));
                         if (LeapYear[0] == 'Y') {
                             epwHasLeapYear = true;
                         }
@@ -10511,10 +10507,10 @@ namespace WeatherManager {
                 OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDailyAverageDryBulbTemp;
                 OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
             } else {
-                ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exit.");
-                ShowContinueError("weather file: " + DataStringGlobals::inputWeatherFileName + ".");
-                ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
-                ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
+                // ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exit.");
+                // ShowContinueError("Weather file: " + DataStringGlobals::inputWeatherFileName + ".");
+                // ShowContinueError("Stat file: " + DataStringGlobals::inStatFileName + ".");
+                // ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
             }
         }
     }
