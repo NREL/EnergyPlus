@@ -78,6 +78,7 @@ namespace WeatherManager {
 
     extern int const ScheduleMethod;    // Constant for water mains temperatures calculation methods
     extern int const CorrelationMethod; // Constant for water mains temperatures calculation methods
+    extern int const CorrelationFromWeatherFileMethod; // Constant for water mains temperatures calculation methods
 
     extern int const InvalidWeatherFile;
     extern int const EPlusWeatherFile;
@@ -116,6 +117,8 @@ namespace WeatherManager {
     extern Array1D_string const DaysOfWeek;
 
     extern bool Debugout;
+
+    extern Real64 CalcWaterMainsTempCurrent; // current water main temperature from correlation
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -838,6 +841,10 @@ namespace WeatherManager {
 
     void CalcWaterMainsTemp();
 
+    Real64 WaterMainsTempFromCorrelation(Real64 const AnnualOAAvgDryBulbTemp, // annual average OA drybulb temperature
+                                         Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
+    );
+
     void GetWeatherStation(bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
@@ -868,6 +875,24 @@ namespace WeatherManager {
     );
 
     int CalculateDayOfWeek(int const JulianDate); // from JGDate calculation
+
+    struct AnnualMonthlyDryBulbWeatherData // derived type for processing and storing Dry-bulb weather or stat file
+    {
+        // Members
+        bool OADryBulbWeatherDataProcessed;             // if false stat or weather file OA Dry-bulb temp is not processed yet
+        Real64 AnnualAvgOADryBulbTemp;                  // annual average outdoor air temperature (C)
+        Real64 MonthlyAvgOADryBulbTempMaxDiff;          // monthly daily average OA drybulb temperature maximum difference (deltaC)
+        Array1D<Real64> MonthlyDailyAverageDryBulbTemp; // monthly-daily average outdoor air temperatures (C)
+
+        // Default Constructor
+        AnnualMonthlyDryBulbWeatherData()
+            : OADryBulbWeatherDataProcessed(false), AnnualAvgOADryBulbTemp(0.0), MonthlyAvgOADryBulbTempMaxDiff(0.0), MonthlyDailyAverageDryBulbTemp(12, 0.0)
+        {
+        }
+        void CalcAnnualAndMonthlyDryBulbTemp(); // true if this is CorrelationFromWeatherFile
+    };
+
+    extern AnnualMonthlyDryBulbWeatherData OADryBulbAverage;
 
 } // namespace WeatherManager
 
