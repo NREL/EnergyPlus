@@ -3177,6 +3177,14 @@ namespace SurfaceGeometry {
                 }
 
                 CheckConvexity(SurfNum, SurfaceTmp(SurfNum).Sides);
+                if (UtilityRoutines::SameString(cAlphaArgs(5), "Surface")) {
+                    if (SurfaceTmp(SurfNum).Sides != SurfaceTmp(SurfNum).Vertex.size()) {
+                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
+                            "\", After CheckConvexity, mismatch between Sides (" + TrimSigDigits(SurfaceTmp(SurfNum).Sides) + ") and size of Vertex (" + TrimSigDigits(SurfaceTmp(SurfNum).Vertex.size()) + ").");
+                        ShowContinueError("CheckConvexity is used to verify the convexity of a surface and detect collinear points." );
+                        ErrorsFound = true;
+                    }
+                }
                 if (SurfaceTmp(SurfNum).Construction > 0) {
                     // Check wall height for the CFactor walls
                     if (SurfaceTmp(SurfNum).Class == SurfaceClass_Wall && Construct(SurfaceTmp(SurfNum).Construction).TypeIsCfactorWall) {
@@ -3203,6 +3211,20 @@ namespace SurfaceGeometry {
                 }
             }
         } // Item Looop
+        // Check number of Vertex between base surface and Outside Boundary surface
+        int ExtSurfNum;
+        for (int i = 1; i <= SurfNum; i++) {
+            if (SurfaceTmp(i).ExtBoundCond == UnreconciledZoneSurface && SurfaceTmp(i).ExtBoundCondName != "") {
+                 ExtSurfNum = UtilityRoutines::FindItemInList(SurfaceTmp(i).ExtBoundCondName, SurfaceTmp);
+                 if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
+                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name +
+                         "\", Vertex size mismatch between base surface :" + SurfaceTmp(i).Name + " and exterior boundary surface: " + SurfaceTmp(ExtSurfNum).Name);
+                     ShowContinueError("The vertex sizes are "+ TrimSigDigits(SurfaceTmp(i).Vertex.size()) + " for base surface and "+ TrimSigDigits(SurfaceTmp(ExtSurfNum).Vertex.size()) + " for exterior boundary surface. Please check inputs.");
+                     ErrorsFound = true;
+                 }
+            }
+
+        }
     }
 
     void GetRectSurfaces(bool &ErrorsFound,             // Error flag indicator (true if errors found)
