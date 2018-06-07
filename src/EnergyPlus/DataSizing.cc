@@ -399,6 +399,23 @@ namespace DataSizing {
         CurOverallSimDay = 0;
         NumTimeStepsInAvg = 0;
         SaveNumPlantComps = 0;
+        SysSizingRunDone = false;
+        TermUnitSingDuct = false;
+        TermUnitPIU = false;
+        TermUnitIU = false;
+        ZoneEqFanCoil = false;
+        ZoneEqUnitHeater = false;
+        ZoneEqUnitVent = false;
+        ZoneEqVentedSlab = false;
+        ZoneEqDXCoil = false;
+        ZoneCoolingOnlyFan = false;
+        ZoneHeatingOnlyFan = false;
+        ZoneSizingRunDone = false;
+        DataErrorsFound = false; // used to flag fatal errors in water coils
+        AutoVsHardSizingThreshold = 0.1;
+        AutoVsHardSizingDeltaTempThreshold = 1.5;
+
+        // Data globals used for sizing
         DataTotCapCurveIndex = 0;
         DataPltSizCoolNum = 0;
         DataPltSizHeatNum = 0;
@@ -413,21 +430,6 @@ namespace DataSizing {
         DataScalableCapSizingON = false;
         DataSysScalableFlowSizingON = false;
         DataSysScalableCapSizingON = false;
-        SysSizingRunDone = false;
-        TermUnitSingDuct = false;
-        TermUnitPIU = false;
-        TermUnitIU = false;
-        ZoneEqFanCoil = false;
-        ZoneEqUnitHeater = false;
-        ZoneEqUnitVent = false;
-        ZoneEqVentedSlab = false;
-        ZoneEqDXCoil = false;
-        ZoneCoolingOnlyFan = false;
-        ZoneHeatingOnlyFan = false;
-        ZoneSizingRunDone = false;
-        DataErrorsFound = false;
-        AutoVsHardSizingThreshold = 0.1;
-        AutoVsHardSizingDeltaTempThreshold = 1.5;
         DataDesInletWaterTemp = 0.0;
         DataDesInletAirHumRat = 0.0;
         DataDesInletAirTemp = 0.0;
@@ -456,6 +458,10 @@ namespace DataSizing {
         DataZoneNumber = 0;
         DataFanEnumType = -1;
         DataFanIndex = -1;
+        DataWaterCoilSizCoolDeltaT = 0.0;
+        DataWaterCoilSizHeatDeltaT = 0.0;
+        DataNomCapInpMeth = false;
+
         NumZoneHVACSizing = 0;
         NumAirTerminalSizingSpec = 0;
         NumAirTerminalUnits = 0;
@@ -507,9 +513,6 @@ namespace DataSizing {
         CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
         CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
 
-        DataWaterCoilSizCoolDeltaT = 0.0;
-        DataWaterCoilSizHeatDeltaT = 0.0;
-        DataNomCapInpMeth = false;
         VbzByZone.deallocate();
         VdzClgByZone.deallocate();
         VdzMinClgByZone.deallocate();
@@ -607,17 +610,22 @@ namespace DataSizing {
 
     void resetZoneSizingGlobals(int const &curZoneEqNum, bool &firstPassFlag) // called in zone equipment Report function
     {
-        if (curZoneEqNum == 0 || ZoneEqSizing.size() == 0) {
-            firstPassFlag = false;
-            return;
-        }
-        ZoneEqSizing(curZoneEqNum).AirFlow = false;
-        ZoneEqSizing(curZoneEqNum).CoolingAirFlow = false;
-        ZoneEqSizing(curZoneEqNum).HeatingAirFlow = false;
-        ZoneEqSizing(curZoneEqNum).SystemAirFlow = false;
-        ZoneEqSizing(curZoneEqNum).Capacity = false;
-        ZoneEqSizing(curZoneEqNum).CoolingCapacity = false;
-        ZoneEqSizing(curZoneEqNum).HeatingCapacity = false;
+        // reset Data globals so that prevoiusly set variables are not used in other equipment models
+        DataTotCapCurveIndex = 0;
+        DataPltSizCoolNum = 0;
+        DataPltSizHeatNum = 0;
+        DataWaterLoopNum = 0;
+        DataCoilNum = 0;
+        DataFanOpMode = 0;
+        DataCoilIsSuppHeater = false;
+        DataIsDXCoil = false;
+        DataAutosizable = true;
+        DataEMSOverrideON = false;
+        DataScalableSizingON = false;
+        DataScalableCapSizingON = false;
+        DataSysScalableFlowSizingON = false;
+        DataSysScalableCapSizingON = false;
+
         DataDesInletWaterTemp = 0.0;
         DataDesInletAirHumRat = 0.0;
         DataDesInletAirTemp = 0.0;
@@ -642,9 +650,38 @@ namespace DataSizing {
         DataAutosizedHeatingCapacity = 0.0;
         DataConstantUsedForSizing = 0.0;
         DataFractionUsedForSizing = 0.0;
+        DataNonZoneNonAirloopValue = 0.0;
         DataZoneNumber = 0;
         DataFanEnumType = -1;
         DataFanIndex = -1;
+        DataWaterCoilSizCoolDeltaT = 0.0;
+        DataWaterCoilSizHeatDeltaT = 0.0;
+        DataNomCapInpMeth = false;
+
+        if (curZoneEqNum == 0 || ZoneEqSizing.size() == 0) {
+            firstPassFlag = false;
+            return;
+        }
+
+        // These zone specific sizing variables are set in zone equipment to use for sizing.
+        // Reset to avoid chance that second zone equipment will size using these variables set by first zone equipment to be sized
+        ZoneEqSizing(curZoneEqNum).AirFlow = false;
+        ZoneEqSizing(curZoneEqNum).CoolingAirFlow = false;
+        ZoneEqSizing(curZoneEqNum).HeatingAirFlow = false;
+        ZoneEqSizing(curZoneEqNum).SystemAirFlow = false;
+        ZoneEqSizing(curZoneEqNum).Capacity = false;
+        ZoneEqSizing(curZoneEqNum).CoolingCapacity = false;
+        ZoneEqSizing(curZoneEqNum).HeatingCapacity = false;
+        ZoneEqSizing(curZoneEqNum).AirVolFlow = 0.0;
+        ZoneEqSizing(curZoneEqNum).MaxHWVolFlow = 0.0;
+        ZoneEqSizing(curZoneEqNum).MaxCWVolFlow = 0.0;
+        ZoneEqSizing(curZoneEqNum).OAVolFlow = 0.0;
+        ZoneEqSizing(curZoneEqNum).DesCoolingLoad = 0.0;
+        ZoneEqSizing(curZoneEqNum).DesHeatingLoad = 0.0;
+        ZoneEqSizing(curZoneEqNum).CoolingAirVolFlow = 0.0;
+        ZoneEqSizing(curZoneEqNum).HeatingAirVolFlow = 0.0;
+        ZoneEqSizing(curZoneEqNum).SystemAirVolFlow = 0.0;
+
         firstPassFlag = false;
     }
 
