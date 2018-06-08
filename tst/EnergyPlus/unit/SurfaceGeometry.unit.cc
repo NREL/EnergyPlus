@@ -3049,10 +3049,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
         "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", After CheckConvexity, mismatch between Sides (4) and size of Vertex (5).",
         "   **   ~~~   ** CheckConvexity is used to verify the convexity of a surface and detect collinear points.",
         "   ** Severe  ** BuildingSurface:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", invalid Construction Name=\"TYPICAL\".",
-        "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface :016W88_WATERMETER - FLOOR : A and exterior boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
-        "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for exterior boundary surface. Please check inputs.",
-        "   ** Severe  ** RoofCeiling:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", Vertex size mismatch between base surface :006W27_RESTROOMS - ROOFCEILING : A and exterior boundary surface: 016W88_WATERMETER - FLOOR : A",
-        "   **   ~~~   ** The vertex sizes are 4 for base surface and 5 for exterior boundary surface. Please check inputs."
+        "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface :016W88_WATERMETER - FLOOR : A and outside boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
+        "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for outside boundary surface. Please check inputs.",
+        "   ** Severe  ** RoofCeiling:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", Vertex size mismatch between base surface :006W27_RESTROOMS - ROOFCEILING : A and outside boundary surface: 016W88_WATERMETER - FLOOR : A",
+        "   **   ~~~   ** The vertex sizes are 4 for base surface and 5 for outside boundary surface. Please check inputs."
         });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 

@@ -3178,7 +3178,7 @@ namespace SurfaceGeometry {
 
                 CheckConvexity(SurfNum, SurfaceTmp(SurfNum).Sides);
                 if (UtilityRoutines::SameString(cAlphaArgs(5), "Surface")) {
-                    if (SurfaceTmp(SurfNum).Sides != SurfaceTmp(SurfNum).Vertex.size()) {
+                    if (SurfaceTmp(SurfNum).Sides != static_cast<int>(SurfaceTmp(SurfNum).Vertex.size())) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                             "\", After CheckConvexity, mismatch between Sides (" + TrimSigDigits(SurfaceTmp(SurfNum).Sides) + ") and size of Vertex (" + TrimSigDigits(SurfaceTmp(SurfNum).Vertex.size()) + ").");
                         ShowContinueError("CheckConvexity is used to verify the convexity of a surface and detect collinear points." );
@@ -3218,8 +3218,8 @@ namespace SurfaceGeometry {
                  ExtSurfNum = UtilityRoutines::FindItemInList(SurfaceTmp(i).ExtBoundCondName, SurfaceTmp);
                  if (SurfaceTmp(i).Vertex.size() != SurfaceTmp(ExtSurfNum).Vertex.size()) {
                      ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(i).Name +
-                         "\", Vertex size mismatch between base surface :" + SurfaceTmp(i).Name + " and exterior boundary surface: " + SurfaceTmp(ExtSurfNum).Name);
-                     ShowContinueError("The vertex sizes are "+ TrimSigDigits(SurfaceTmp(i).Vertex.size()) + " for base surface and "+ TrimSigDigits(SurfaceTmp(ExtSurfNum).Vertex.size()) + " for exterior boundary surface. Please check inputs.");
+                         "\", Vertex size mismatch between base surface :" + SurfaceTmp(i).Name + " and outside boundary surface: " + SurfaceTmp(ExtSurfNum).Name);
+                     ShowContinueError("The vertex sizes are "+ TrimSigDigits(SurfaceTmp(i).Vertex.size()) + " for base surface and "+ TrimSigDigits(SurfaceTmp(ExtSurfNum).Vertex.size()) + " for outside boundary surface. Please check inputs.");
                      ErrorsFound = true;
                  }
             }
