@@ -1633,7 +1633,7 @@ TEST_F(ZoneUnitarySystemTest, UnitarySystem_MultispeedPerformance)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     // test that DataFan variables have been reset.
-    // These are reset in ReportUnitarySystem via call to DataSizing::resetZoneSizingGlobals (for zone equipment)
+    // These are reset in ReportUnitarySystem via call to DataSizing::resetHVACSizingGlobals (for zone equipment)
     EXPECT_EQ(DataSizing::DataFanEnumType, -1);
     EXPECT_EQ(DataSizing::DataFanIndex, -1);
 

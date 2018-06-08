@@ -1199,7 +1199,7 @@ namespace DataSizing {
     // Clears the global data in DataSizing.
     // Needed for unit tests, should not be normally called.
     void clear_state();
-    void resetZoneSizingGlobals(int const &curZoneEqNum, bool &firstPassFlag);
+    void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag);
 
 } // namespace DataSizing
 

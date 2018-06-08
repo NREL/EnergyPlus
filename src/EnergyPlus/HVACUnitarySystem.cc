@@ -13953,18 +13953,15 @@ namespace HVACUnitarySystem {
                     OASysEqSizing(CurOASysNum).Capacity = false;
                     OASysEqSizing(CurOASysNum).CoolingCapacity = false;
                     OASysEqSizing(CurOASysNum).HeatingCapacity = false;
+                    UnitarySystem(UnitarySysNum).FirstPass = false;
                 } else if (CurSysNum > 0) {
-                    UnitarySysEqSizing(CurSysNum).AirFlow = false;
-                    UnitarySysEqSizing(CurSysNum).CoolingAirFlow = false;
-                    UnitarySysEqSizing(CurSysNum).HeatingAirFlow = false;
-                    UnitarySysEqSizing(CurSysNum).Capacity = false;
-                    UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
-                    UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
                     AirLoopControlInfo(CurSysNum).UnitarySysSimulating = false;
+                    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, UnitarySystem(UnitarySysNum).FirstPass);
                 } else if (CurZoneEqNum > 0) {
-                    DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, UnitarySystem(UnitarySysNum).FirstPass);
+                    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, UnitarySystem(UnitarySysNum).FirstPass);
+                } else {
+                    UnitarySystem(UnitarySysNum).FirstPass = false;
                 }
-                UnitarySystem(UnitarySysNum).FirstPass = false;
             }
         }
 

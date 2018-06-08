@@ -58,7 +58,7 @@
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 
-TEST_F(EnergyPlusFixture, DataSizingTest_resetZoneSizingGlobals)
+TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
 {
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::CurZoneEqNum = 1;
@@ -107,8 +107,8 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetZoneSizingGlobals)
     DataSizing::DataZoneNumber = 1;
     DataSizing::DataFanEnumType = 1;
     DataSizing::DataFanIndex = 1;
-    DataSizing::DataWaterCoilSizCoolDeltaT, 1.0;
-    DataSizing::DataWaterCoilSizHeatDeltaT, 1.0;
+    DataSizing::DataWaterCoilSizCoolDeltaT = 1.0;
+    DataSizing::DataWaterCoilSizHeatDeltaT = 1.0;
     DataSizing::DataNomCapInpMeth = true;
 
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).AirFlow = true;
@@ -128,18 +128,21 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetZoneSizingGlobals)
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).HeatingAirVolFlow = 1.0;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SystemAirVolFlow = 1.0;
 
-    // test a few to ensure not equal to initial state or true
+    // test a few to ensure not equal to initial state
     EXPECT_NE(DataSizing::DataTotCapCurveIndex, 0);
     EXPECT_NE(DataSizing::DataDesInletWaterTemp, 0.0);
     EXPECT_NE(DataSizing::DataHeatSizeRatio, 1.0);
     EXPECT_NE(DataSizing::DataFanEnumType, -1);
     EXPECT_TRUE(DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).AirFlow);
+    EXPECT_FALSE(DataSizing::DataAutosizable);
+
+    // function argument initialized to true at beginning of simulation
     EXPECT_TRUE(FirstPass);
 
     // call reset function
-    DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, FirstPass);
+    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FirstPass);
 
-    // expect call flag to be false after calling resetZoneSizingGlobals
+    // expect function argument to be false after calling resetHVACSizingGlobals
     EXPECT_FALSE(FirstPass);
 
     // expect these to be reset to the initial state as defined in DataSizing.cc and DataSizing.hh
@@ -207,16 +210,17 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetZoneSizingGlobals)
     EXPECT_EQ(DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).HeatingAirVolFlow, 0.0);
     EXPECT_EQ(DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SystemAirVolFlow, 0.0);
 
-    // now deallocate ZoneEqSizing and test clean return
-    DataSizing::ZoneEqSizing.deallocate();
-    FirstPass = true;
-    // call reset function
-    DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, FirstPass);
-    EXPECT_FALSE(FirstPass);
-
-    // and finally if CurZoneEqNum = 0, also should have a clean return
+    // Test clean return if CurZoneEqNum = 0
     FirstPass = true;
     DataSizing::CurZoneEqNum = 0;
-    DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, FirstPass);
+    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FirstPass);
+    EXPECT_FALSE(FirstPass);
+
+    // Test clean return if ZoneEqSizing is not allocated
+    DataSizing::ZoneEqSizing.deallocate();
+    DataSizing::CurZoneEqNum = 1;
+    FirstPass = true;
+    // call reset function
+    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FirstPass);
     EXPECT_FALSE(FirstPass);
 }

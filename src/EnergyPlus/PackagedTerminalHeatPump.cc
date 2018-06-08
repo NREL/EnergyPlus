@@ -6727,7 +6727,7 @@ namespace PackagedTerminalHeatPump {
 
         if (PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {
-                DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, PTUnit(PTUnitNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, PTUnit(PTUnitNum).FirstPass);
             }
         }
 

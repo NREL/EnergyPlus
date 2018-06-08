@@ -608,7 +608,7 @@ namespace DataSizing {
         this->HeatLoadSeq = this->HeatLoadSeq * ratio;
     }
 
-    void resetZoneSizingGlobals(int const &curZoneEqNum, bool &firstPassFlag) // called in zone equipment Report function
+    void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag) // called in zone equipment Report function
     {
         // reset Data globals so that prevoiusly set variables are not used in other equipment models
         DataTotCapCurveIndex = 0;
@@ -658,29 +658,47 @@ namespace DataSizing {
         DataWaterCoilSizHeatDeltaT = 0.0;
         DataNomCapInpMeth = false;
 
-        if (curZoneEqNum == 0 || ZoneEqSizing.size() == 0) {
-            firstPassFlag = false;
-            return;
-        }
-
         // These zone specific sizing variables are set in zone equipment to use for sizing.
         // Reset to avoid chance that second zone equipment will size using these variables set by first zone equipment to be sized
-        ZoneEqSizing(curZoneEqNum).AirFlow = false;
-        ZoneEqSizing(curZoneEqNum).CoolingAirFlow = false;
-        ZoneEqSizing(curZoneEqNum).HeatingAirFlow = false;
-        ZoneEqSizing(curZoneEqNum).SystemAirFlow = false;
-        ZoneEqSizing(curZoneEqNum).Capacity = false;
-        ZoneEqSizing(curZoneEqNum).CoolingCapacity = false;
-        ZoneEqSizing(curZoneEqNum).HeatingCapacity = false;
-        ZoneEqSizing(curZoneEqNum).AirVolFlow = 0.0;
-        ZoneEqSizing(curZoneEqNum).MaxHWVolFlow = 0.0;
-        ZoneEqSizing(curZoneEqNum).MaxCWVolFlow = 0.0;
-        ZoneEqSizing(curZoneEqNum).OAVolFlow = 0.0;
-        ZoneEqSizing(curZoneEqNum).DesCoolingLoad = 0.0;
-        ZoneEqSizing(curZoneEqNum).DesHeatingLoad = 0.0;
-        ZoneEqSizing(curZoneEqNum).CoolingAirVolFlow = 0.0;
-        ZoneEqSizing(curZoneEqNum).HeatingAirVolFlow = 0.0;
-        ZoneEqSizing(curZoneEqNum).SystemAirVolFlow = 0.0;
+        if (curZoneEqNum > 0) {
+
+            if (ZoneEqSizing.size() == 0) {
+                firstPassFlag = false;
+                return;
+            }
+
+            ZoneEqSizing(curZoneEqNum).AirFlow = false;
+            ZoneEqSizing(curZoneEqNum).CoolingAirFlow = false;
+            ZoneEqSizing(curZoneEqNum).HeatingAirFlow = false;
+            ZoneEqSizing(curZoneEqNum).SystemAirFlow = false;
+            ZoneEqSizing(curZoneEqNum).Capacity = false;
+            ZoneEqSizing(curZoneEqNum).CoolingCapacity = false;
+            ZoneEqSizing(curZoneEqNum).HeatingCapacity = false;
+            ZoneEqSizing(curZoneEqNum).AirVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).MaxHWVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).MaxCWVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).OAVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).DesCoolingLoad = 0.0;
+            ZoneEqSizing(curZoneEqNum).DesHeatingLoad = 0.0;
+            ZoneEqSizing(curZoneEqNum).CoolingAirVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).HeatingAirVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).SystemAirVolFlow = 0.0;
+        }
+
+        if (curSysNum > 0) {
+
+            if (UnitarySysEqSizing.size() == 0) {
+                firstPassFlag = false;
+                return;
+            }
+
+            UnitarySysEqSizing(curSysNum).AirFlow = false;
+            UnitarySysEqSizing(curSysNum).CoolingAirFlow = false;
+            UnitarySysEqSizing(curSysNum).HeatingAirFlow = false;
+            UnitarySysEqSizing(curSysNum).Capacity = false;
+            UnitarySysEqSizing(curSysNum).CoolingCapacity = false;
+            UnitarySysEqSizing(curSysNum).HeatingCapacity = false;
+        }
 
         firstPassFlag = false;
     }

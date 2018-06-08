@@ -4995,7 +4995,7 @@ namespace FanCoilUnits {
 
         if (FanCoil(FanCoilNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {
-                DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, FanCoil(FanCoilNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, FanCoil(FanCoilNum).FirstPass);
             }
         }
     }

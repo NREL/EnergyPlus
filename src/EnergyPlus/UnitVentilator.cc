@@ -3709,7 +3709,7 @@ namespace UnitVentilator {
 
         if (UnitVent(UnitVentNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {
-                DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, UnitVent(UnitVentNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, UnitVent(UnitVentNum).FirstPass);
             }
         }
     }

@@ -4700,7 +4700,7 @@ namespace VentilatedSlab {
 
         if (VentSlab(Item).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {
-                DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, VentSlab(Item).FirstPass);
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, VentSlab(Item).FirstPass);
             }
         }
     }

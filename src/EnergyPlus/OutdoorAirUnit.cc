@@ -2624,7 +2624,7 @@ namespace OutdoorAirUnit {
 
         if (OutAirUnit(OAUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {
-                DataSizing::resetZoneSizingGlobals(DataSizing::CurZoneEqNum, OutAirUnit(OAUnitNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, OutAirUnit(OAUnitNum).FirstPass);
             }
         }
     }
