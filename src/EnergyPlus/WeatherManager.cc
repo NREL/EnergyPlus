@@ -62,6 +62,7 @@
 // EnergyPlus Headers
 #include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
+#include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
@@ -220,10 +221,10 @@ namespace WeatherManager {
     int WaterMainsTempsSchedule(0);                      // Water mains temperature schedule
     Real64 WaterMainsTempsAnnualAvgAirTemp(0.0);         // Annual average outdoor air temperature (C)
     Real64 WaterMainsTempsMaxDiffAirTemp(0.0);           // Maximum difference in monthly average outdoor air temperatures (deltaC)
+    std::string WaterMainsTempsScheduleName;             // water mains tempeature schedule name
     bool wthFCGroundTemps(false);
     Real64 RainAmount(0.0);
     Real64 SnowAmount(0.0);
-    Array1D<Real64> MonthlyDailyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
 
     int TotRunPers(0);    // Total number of Run Periods (Weather data) to Setup
     int TotRunDesPers(0); // Total number of Run Design Periods (Weather data) to Setup
@@ -409,6 +410,7 @@ namespace WeatherManager {
         WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
         WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
         WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
+        WaterMainsTempsScheduleName = "";      // water mains tempeature schedule name
         wthFCGroundTemps = false;
         RainAmount = 0.0;
         SnowAmount = 0.0;
@@ -2060,8 +2062,8 @@ namespace WeatherManager {
         int Loop;
         int FirstSimDayofYear; // Variable which tells when to skip the day in a multi year simulation.
 
-        static bool FirstCall(true);    // Some things should only be done once
-        static bool EPWFirstCall(true); // Some things should only be done once
+        static bool FirstCall(true);                 // Some things should only be done once
+        static bool WaterMainsParameterReport(true); // should only be done once
         //  LOGICAL, SAVE :: SetYear=.TRUE.
         int JDay5Start;
         int JDay5End;
@@ -2331,15 +2333,18 @@ namespace WeatherManager {
             }
         }
 
-        if (EPWFirstCall) {
+        if (WaterMainsParameterReport) {
             // this is done only once
             if (DoWeathSim || DoDesDaySim) {
-                // this must be called only once
-                if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-                    OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
+                if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod) {
+                    if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
+                        OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
+                    }
                 }
-                EPWFirstCall = false;
+                WaterMainsParameterReport = false;
             }
+            // reports to eio file
+            ReportWaterMainsTempParameters();
         }
     }
 
@@ -8268,7 +8273,7 @@ namespace WeatherManager {
 
             if (UtilityRoutines::SameString(AlphArray(1), "Schedule")) {
                 WaterMainsTempsMethod = ScheduleMethod;
-
+                WaterMainsTempsScheduleName = AlphArray(2);
                 WaterMainsTempsSchedule = GetScheduleIndex(AlphArray(2));
                 if (WaterMainsTempsSchedule == 0) {
                     ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + '=' + AlphArray(2));
@@ -10347,13 +10352,14 @@ namespace WeatherManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Real64 HourlyDryBulbTemp;                      // hourly outside air dry-bulb temperature read from weather file
-        Real64 MonthlyDailyDryBulbMin(200.0);          // monthly-daily minimum outside air dry-bulb temperature
-        Real64 MonthlyDailyDryBulbMax(-200.0);         // monthly-daily maximum outside air dry-bulb temperature
-        Real64 MonthlyDailyDryBulbAvg(0.0);            // monthly-daily average outside air dry-bulb temperature
-        Real64 AnnualDailyAverageDryBulbTempSum(0.0);  // annual sum of daily average outside air dry-bulb temperature
-        static Real64 DailyAverageDryBulbTemp(0.0);    // daily average outside air dry-bulb temperature
-        static Array1D<int> EndDayOfMonthLocal(12, 0); // number of days in each month
+        Real64 HourlyDryBulbTemp;                                  // hourly outside air dry-bulb temperature read from weather file
+        Real64 MonthlyDailyDryBulbMin(200.0);                      // monthly-daily minimum outside air dry-bulb temperature
+        Real64 MonthlyDailyDryBulbMax(-200.0);                     // monthly-daily maximum outside air dry-bulb temperature
+        Real64 MonthlyDailyDryBulbAvg(0.0);                        // monthly-daily average outside air dry-bulb temperature
+        Real64 AnnualDailyAverageDryBulbTempSum(0.0);              // annual sum of daily average outside air dry-bulb temperature
+        static Real64 DailyAverageDryBulbTemp(0.0);                // daily average outside air dry-bulb temperature
+        static Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
+        static Array1D<int> EndDayOfMonthLocal(12, 0);             // number of days in each month
         std::string lineIn;
         std::string lineAvg;
         std::string epwLine;
@@ -10423,15 +10429,15 @@ namespace WeatherManager {
                 gio::close(statFile);
                 AnnualNumberOfDays = 0;
                 for (i = 1; i <= 12; ++i) {
-                    MonthlyDailyAverageDryBulbTemp(i) = StrToReal(GetColumnUsingTabs(lineAvg, i + 2));
-                    AnnualDailyAverageDryBulbTempSum += MonthlyDailyAverageDryBulbTemp(i) * EndDayOfMonth(i);
-                    MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyDailyAverageDryBulbTemp(i));
-                    MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyDailyAverageDryBulbTemp(i));
+                    MonthlyAverageDryBulbTemp(i) = StrToReal(GetColumnUsingTabs(lineAvg, i + 2));
+                    AnnualDailyAverageDryBulbTempSum += MonthlyAverageDryBulbTemp(i) * EndDayOfMonth(i);
+                    MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyAverageDryBulbTemp(i));
+                    MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyAverageDryBulbTemp(i));
                     AnnualNumberOfDays += EndDayOfMonth(i);
                 }
                 OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
                 OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
-                OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDailyAverageDryBulbTemp;
+                OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
             } else if (epwFileExists) {
                 epwFile = GetNewUnitNumber();
@@ -10493,7 +10499,7 @@ namespace WeatherManager {
                         AnnualDailyAverageDryBulbTempSum += DailyAverageDryBulbTemp;
                         MonthlyDailyDryBulbAvg += (DailyAverageDryBulbTemp / DaysCountOfMonth);
                     }
-                    MonthlyDailyAverageDryBulbTemp(i) = MonthlyDailyDryBulbAvg;
+                    MonthlyAverageDryBulbTemp(i) = MonthlyDailyDryBulbAvg;
                     MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, MonthlyDailyDryBulbAvg);
                     MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, MonthlyDailyDryBulbAvg);
                 }
@@ -10504,7 +10510,7 @@ namespace WeatherManager {
                 if (epwHasLeapYear) AnnualNumberOfDays = AnnualNumberOfDays + 1;
                 OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
                 OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
-                OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDailyAverageDryBulbTemp;
+                OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
             } else {
                 // ShowSevereError("CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exit.");
@@ -10513,35 +10519,57 @@ namespace WeatherManager {
                 // ShowContinueError("Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
             }
         }
-        // if the weather or stat file is processed, report
-        if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-            ReportWaterMainsTempParameters();
-        }
     }
 
     void ReportWaterMainsTempParameters()
     {
         // PURPOSE OF THIS SUBROUTINE:
-        // report SITE water mains temperature object input parameters calculated
+        // report site water mains temperature object user inputs and/or parameters calculated
         // from weather or stat file
 
         // USE STATEMENTS:
-        using DataGlobals::OutputFileInits;
+        // using DataGlobals::OutputFileInits;
+        using General::RoundSigDigits;
         using WeatherManager::OADryBulbAverage;
         using namespace ObjexxFCL::gio;
 
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
+        Array1D_string const cCalculationMethod({1, 3}, {"Schedule", "Correlation", "CorrelationFromWeatherFile"});
 
-        // Write annual average OA temperature and maximum difference in monthly-daily average outdoor air temperatures
-        gio::write(OutputFileInits, fmtA) << "! <Site Water Mains Temperature Object Parameters>,Annual Average Outdoor Air Temperature{C}"
-                                             ", Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}";
-        gio::write(OutputFileInits, fmtAN) << " Site Water Mains Temperature Object Parameters";
-        gio::write(OutputFileInits, "(', ',F5.2,', ',F5.2,)")
-            << OADryBulbAverage.AnnualAvgOADryBulbTemp << OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff;
+        if (!DataGlobals::eio_stream) return;
+        std::ostream *eiostream = DataGlobals::eio_stream;
+
+        // Write annual average OA temperature and maximum difference in monthly-daily average outdoor air temperature
+        *eiostream << "! <Site Water Mains Temperature Information>"
+                      ",Calculation Method{}"
+                      ",Water Mains Temperature Schedule Name{}"
+                      ",Annual Average Outdoor Air Temperature{C}"
+                      ",Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}" +
+                          DataStringGlobals::NL;
+
+        {
+            auto const SELECT_CASE_var(WaterMainsTempsMethod);
+            if (SELECT_CASE_var == ScheduleMethod) {
+                *eiostream << "Site Water Mains Temperature Information,";
+                *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
+                *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2)
+                           << DataStringGlobals::NL;
+            } else if (SELECT_CASE_var == CorrelationMethod) {
+                *eiostream << "Site Water Mains Temperature Information,";
+                *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
+                *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2)
+                           << DataStringGlobals::NL;
+            } else if (SELECT_CASE_var == CorrelationFromWeatherFileMethod) {
+                if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
+                    *eiostream << "Site Water Mains Temperature Information,";
+                    *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
+                    *eiostream << RoundSigDigits(OADryBulbAverage.AnnualAvgOADryBulbTemp, 2) << ","
+                               << RoundSigDigits(OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 2) << DataStringGlobals::NL;
+                }
+            }
+        }
     }
-
 } // namespace WeatherManager
 
 } // namespace EnergyPlus

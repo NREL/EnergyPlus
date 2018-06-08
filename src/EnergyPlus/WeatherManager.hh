@@ -151,6 +151,7 @@ namespace WeatherManager {
     extern int WaterMainsTempsSchedule;                // Water mains temperature schedule
     extern Real64 WaterMainsTempsAnnualAvgAirTemp;     // Annual average outdoor air temperature (C)
     extern Real64 WaterMainsTempsMaxDiffAirTemp;       // Maximum difference in monthly average outdoor air temperatures (deltaC)
+    extern std::string WaterMainsTempsScheduleName;    // water mains tempeature schedule name
     extern bool wthFCGroundTemps;
     extern Real64 RainAmount;
     extern Real64 SnowAmount;

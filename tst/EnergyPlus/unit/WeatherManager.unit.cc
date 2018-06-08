@@ -58,6 +58,7 @@
 #include <DataGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataSurfaces.hh>
+#include <OutputReports.hh>
 #include <ScheduleManager.hh>
 #include <SurfaceGeometry.hh>
 #include <WeatherManager.hh>
@@ -341,4 +342,150 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
     EXPECT_NEAR(1993.771, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 90.0), 0.01);
     EXPECT_NEAR(1882.294, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 120.0), 0.01);
     EXPECT_NEAR(1800.136, WeatherManager::calculateWaterBoundaryConvectionCoefficient(30.0, 3.0, 150.0), 0.01);
+}
+
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
+{
+    using DataEnvironment::DayOfYear;
+    using DataEnvironment::Latitude;
+    using DataEnvironment::WaterMainsTemp;
+    using WeatherManager::OADryBulbAverage;
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    // set water mains parameters for CorrelationFromWeatherFile method
+    OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
+    OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
+    OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+
+    // January 15th water mains temperature test
+    DataEnvironment::DayOfYear = 15; // January 15th
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.5145, 0.0001);
+
+    // July 15th water mains temperature test
+    DataEnvironment::DayOfYear = 196; // July 15th
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.0452, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
+{
+    using DataEnvironment::DayOfYear;
+    using DataEnvironment::Latitude;
+    using DataEnvironment::WaterMainsTemp;
+    using WeatherManager::OADryBulbAverage;
+
+    int AnnualNumberOfDays(0);
+    Real64 MonthlyDailyDryBulbMin(0.0);
+    Real64 MonthlyDailyDryBulbMax(0.0);
+    Real64 AnnualDailyAverageDryBulbTempSum(0.0);
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    // for calculation method CorrelationFromWeatherFile these parameters are ignored
+    EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    Array1D<Real64> MonthlyDryBulbTempFromStatFile(12, {-4.60, -2.50, 3.80, 10.00, 15.30, 21.10, 24.10, 21.80, 18.10, 11.00, 4.70, -3.70});
+    OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDryBulbTempFromStatFile;
+
+    // calc water mains parameters for CorrelationFromWeatherFile method
+    for (int i = 1; i <= 12; ++i) {
+        AnnualDailyAverageDryBulbTempSum += OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i) * EndDayOfMonth(i);
+        MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
+        MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
+        AnnualNumberOfDays += EndDayOfMonth(i);
+    }
+    OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
+    OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
+    // check results
+    EXPECT_NEAR(OADryBulbAverage.AnnualAvgOADryBulbTemp, 9.9882, 0.0001);
+    EXPECT_NEAR(OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 28.7000, 0.0001);
+
+    // test water mains temperature
+    // WeatherManager::WaterMainsTempsMethod = WeatherManager::CorrelationFromWeatherFileMethod;
+    OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+    DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
+
+    // January 21st water mains temperature test
+    DataEnvironment::DayOfYear = 21; // January 21st
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 7.23463, 0.00001);
+
+    // July 21st water mains temperature test
+    DataEnvironment::DayOfYear = 202; // July 21st
+    WeatherManager::CalcWaterMainsTemp();
+    EXPECT_NEAR(DataEnvironment::WaterMainsTemp, 19.33812, 0.00001);
+}
+TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest)
+{
+
+    using DataEnvironment::WaterMainsTemp;
+    using WeatherManager::OADryBulbAverage;
+
+    std::string const idf_objects = delimited_string({
+        "   Site:WaterMainsTemperature,",
+        "   CorrelationFromWeatherFile,  !- Calculation Method",
+        "   ,                            !- Temperature Schedule Name",
+        "   9.99,                        !- Annual Average Outdoor Air Temperature {C}",
+        "  28.78;                        !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool foundErrors(false);
+    WeatherManager::GetWaterMainsTemperatures(foundErrors);
+    EXPECT_FALSE(foundErrors); // expect no errors
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    // for calculation method CorrelationFromWeatherFile these two parameters are ignored
+    EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
+
+    DataGlobals::OutputFileInits = GetNewUnitNumber();
+    // set water mains temp parameters for CorrelationFromWeatherFile method
+    OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
+    OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
+    OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+
+    // report water mains parameters to eio file
+    WeatherManager::ReportWaterMainsTempParameters();
+
+    std::string const eiooutput = delimited_string({"! <Site Water Mains Temperature Information>,"
+                                                    "Calculation Method{},"
+                                                    "Water Mains Temperature Schedule Name{},"
+                                                    "Annual Average Outdoor Air Temperature{C},"
+                                                    "Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}",
+                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,,9.99,28.78"});
+
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

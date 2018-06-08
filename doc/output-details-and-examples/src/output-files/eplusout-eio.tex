@@ -1,6 +1,6 @@
 \section{eplusout.eio}\label{eplusout.eio}
 
-This file contains some standard and some optional ``reports''. It is intended to be a somewhat intelligent report of input conditions when they don't fit well in other places or when they aren't substantial enough for their own ``file''. (e.g. \textbf{eplusout.bnd})~ Contents of the file are somewhat documented in various places in the \href{file:///E:/Docs4PDFs/InputOutputReference.pdf}{Input Output Reference document} -- as results of objects. This file or portions of it can be easily imported into spreadsheet programs and more analysis done there. Contents of this file include construction details, location information, ``environment'' information, number of ``warmup'' days required in each environment.
+This file contains some standard and some optional ``reports''. It is intended to be a somewhat intelligent report of input conditions when they don't fit well in other places or when they aren't substantial enough for their own ``file''. (e.g. \textbf{eplusout.bnd})~ Contents of the file are somewhat documented in various places in the \href{file:///E:/Docs4PDFs/InputOutputReference.pdf}{Input Output Reference document} -- as results of objects. This file or portions of it can be easily imported into spreadsheet programs and more analysis done there. Contents of this file include construction details, location information, site water mains temperature information, ``environment'' information, number of ``warmup'' days required in each environment.
 
 The form of the file is a data dictionary line followed by the data. In this case, the data dictionary line precedes the first ``data'' line though there may be several defining ``dictionary lines''. Each dictionary line will show the field as \textless{}field name\textgreater{} followed by other fields that will be in the data lines. Data will be displayed similarly. Each field of dictionary or data will be separated from the next by a comma ``,'' -- and produce a comma delimited file. However, the lines for data will not be contiguous -- some follow a stream of consciousness of the EnergyPlus execution.
 
@@ -53,6 +53,10 @@ Note that the lines in the eplusout.eio file can be extremely long (current limi
 ! \textless{}Location\textgreater{}, Location Name, Latitude \{N+/S- Deg\}, Longitude \{E+/W- Deg\},~ Time Zone Number \{GMT+/-\}, Elevation \{m\},~ Standard Pressure at Elevation \{Pa\}
 
 Location,CHICAGO IL USA TMY2-94846 WMO\# = 725300,41.78,-87.75,-6.00,190.00,99063.
+
+! \textless{}Site Water Mains Temperature Information\textgreater{}, Calculation Method\{\}, Water Mains Temperature Schedule Name\{\}, Annual Average Outdoor Air Temperature\{C\}, Maximum Difference In Monthly Average Outdoor Air Temperatures\{deltaC\}
+
+~Site Water Mains Temperature Information, ,CorrelationFromWeatherFile,~ 9.99,~ 28.78
 
 ! \textless{}Building Information\textgreater{}, Building Name,North Axis \{deg\},Terrain,~ Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value,~ Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days
 
@@ -286,6 +290,10 @@ Environment:Site Atmospheric Variation,~~ 0.220, 370.000, 0.006500
 
 ~Location, DENVER COLORADO,~~ 39.75, -104.87,~~ -7.00,~~~~~ 1610.26
 
+! \textless{}Site Water Mains Temperature Information\textgreater{}, Calculation Method\{\}, Water Mains Temperature Schedule Name\{\}, Annual Average Outdoor Air Temperature\{C\}, Maximum Difference In Monthly Average Outdoor Air Temperatures\{deltaC\}
+
+~Site Water Mains Temperature Information, ,~CorrelationFromWeatherFile,~ 9.99,~ 28.78
+
 In addition for each ``environment'' simulated, information about the environment is shown:
 
 ! \textless{}Environment\textgreater{},Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration \{\#days\}, Source:Start DayOfWeek,~ Use Daylight Savings, Use Holidays, Apply Weekend Holiday Rule
@@ -367,6 +375,26 @@ This is the time zone of the site, expressed decimally. Convention uses positive
 \subsubsection{Field: Elevation \{m\}}\label{field-elevation-m}
 
 This is the elevation of the site. Units are m.
+
+\subsection{Site Water Mains Temperature}\label{site-water-mains-temperature}
+
+This data field will contain the object ``Site:WaterMainsTemperature''.
+
+\subsubsection{Calculation Method}\label{calculation-method}
+
+This is calculation method used to determine site water mains temperature at each time step. Valid choices are: ``Schedule'', ``Correlation'' or ``CorrelationFromWeatherFile''.
+
+\subsubsection{Water Mains Temperature Schedule Name}\label{water-mains-temperature-schedule-name}
+
+This is name of a schedule that contains site water mains temperature for each time step. 
+
+\subsubsection{Annual Average Outdoor Air Temperature}\label{annual-average-outdoor-air-temperature} 
+
+This is the annual average outdoor air dry-bulb temperature for the site.
+
+\subsubsection{Maximum Difference In Monthly Average Outdoor Air Temperatures}\label{maximum-difference-in-monthly-average-outdoor-air-temperatures} 
+
+This is the maximum difference in monthly-daily average of the outdoor air dry-bulb temperature for the site.
 
 \subsection{Weather Station}\label{weather-station}
 
