@@ -857,14 +857,12 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType, // Object Type 
     // Get the occurrence number of an object of type ObjType and name ObjName
 
     json *obj;
-    bool objectTypeFound = false;
     auto obj_iter = epJSON.find(ObjType);
     if (obj_iter == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            return -1;
+            return -1; // means object type not found, see function GeneralRoutines::ValidateComponent
         }
-        objectTypeFound = true;
         obj = &epJSON[tmp_umit->second];
     } else {
         obj = &(obj_iter.value());
@@ -882,11 +880,7 @@ int InputProcessor::getObjectItemNum(std::string const &ObjType, // Object Type 
     }
 
     if (!found) {
-        if (objectTypeFound) {
-            return 0;
-        } else {
-            return -1;
-        }
+        return 0; // means object name not found, see function GeneralRoutines::ValidateComponent
     }
     return getIDFObjNum(ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
