@@ -6098,7 +6098,6 @@ namespace HVACVariableRefrigerantFlow {
         using namespace DataSizing;
         using CurveManager::CurveValue;
         auto &GetDXCoilCap(DXCoils::GetCoilCapacityByIndexType);
-        using DataAirSystems::PrimaryAirSystem;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::CoolingAirflowSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
