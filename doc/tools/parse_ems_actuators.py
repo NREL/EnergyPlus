@@ -102,9 +102,8 @@ def parse_ems_var(source_dir, verbose=False):
             # create a copy of line to work on
             working_line = line
 
-            # trim off comments first
-            if "//" in working_line:
-                working_line = working_line[0:working_line.index("//")]
+            # trim off in-line comments first, then strip
+            working_line = working_line.split('//')[0].strip()
 
             m = pat_cModule_Objects.match(working_line)
             if m:
@@ -115,22 +114,43 @@ def parse_ems_var(source_dir, verbose=False):
                     print('\nPROBLEM')
                     print(n, cModuleObjects)
 
-            if (working_line.strip()[:len('cCurrentModuleObject')]
+            if (working_line[:len('cCurrentModuleObject')]
                     == 'cCurrentModuleObject'):
-                cCurrentModuleObject = (working_line.split("=")[1]
-                                        .replace('"', '')
-                                        .replace(';', '').strip())
+                if "=" in working_line:
+                    cCurrentModuleObject = (working_line.split("=")[1]
+                                            .replace('"', '')
+                                            .replace(';', '').strip())
                 if 'cModuleObjects' not in cCurrentModuleObject:
                     cModuleObjects = [cCurrentModuleObject]
 
+
+            # If we have either of these two function calls, we concat as many
+            # lines as needed by counting the opening and closing parentheses
+            # so we get the full function call
+            if (('SetupEMSActuator' in working_line) |
+                ('SetupEMSInternalVariable' in working_line)):
+                match_braces = (working_line.count('(') -
+                                working_line.count(')'))
+                j = i+1
+                while match_braces != 0:
+                    _line = lines[j].split('//')[0].strip()
+                    match_braces += _line.count('(')
+                    match_braces -= _line.count(')')
+                    working_line += _line
+                    j += 1
+
+
             if 'SetupEMSActuator' in working_line:
+                # Try naively, that is assume it's all on one line
                 # print("{}: {}".format(cModuleObjects, working_line))
                 c_l = [x.replace('"', '').strip() for x in
                        working_line.replace('SetupEMSActuator(', '')
                                    .replace(');', '').split(',')]
 
                 if len(c_l) != 6:
-                    print(working_line)
+                    print("Problem: In file {}, Line {}: "
+                          "{}".format(file_name, i, working_line))
+                    continue
 
                 (cComponentTypeName,
                  cUniqueIDName,
@@ -159,9 +179,10 @@ def parse_ems_var(source_dir, verbose=False):
                 c_l = [x.replace('"', '').strip() for x in
                        working_line.replace('SetupEMSInternalVariable(', '')
                                    .replace(');', '').split(',')]
-
-                if len(c_l) != 4:
-                    print(working_line)
+                if len(c_l) != 4 :
+                    print("Problem: In file {}, Line {}: "
+                          "{}".format(file_name, i, working_line))
+                    continue
 
                 (cDataTypeName,
                  cUniqueIDName,
@@ -241,7 +262,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    print()
+    print(args)
 
     if args.source_dir:
         source_dir = args.source_dir
