@@ -2336,15 +2336,17 @@ namespace WeatherManager {
         if (WaterMainsParameterReport) {
             // this is done only once
             if (DoWeathSim || DoDesDaySim) {
-                if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod) {
-                    if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
-                        OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
+                if (WaterMainsTempsMethod != 0) {
+                    if (WaterMainsTempsMethod == CorrelationFromWeatherFileMethod) {
+                        if (!OADryBulbAverage.OADryBulbWeatherDataProcessed) {
+                            OADryBulbAverage.CalcAnnualAndMonthlyDryBulbTemp();
+                        }
                     }
                 }
-                WaterMainsParameterReport = false;
             }
             // reports to eio file
             ReportWaterMainsTempParameters();
+            WaterMainsParameterReport = false;
         }
     }
 
@@ -10528,7 +10530,6 @@ namespace WeatherManager {
         // from weather or stat file
 
         // USE STATEMENTS:
-        // using DataGlobals::OutputFileInits;
         using General::RoundSigDigits;
         using WeatherManager::OADryBulbAverage;
         using namespace ObjexxFCL::gio;
