@@ -1730,7 +1730,8 @@ namespace PlantHeatExchangerFluidToFluid {
                         } else {
                             Effectiveness = 1.0;
                         }
-
+                    } else if (ExpCheckValue2 < EXP_LowerLimit) {
+                        Effectiveness = 1.0;
                     } else if ((std::exp(-NTU) == 1.0) || (NTU == 0.0) || (std::exp(-CapRatio * NTU) == 1.0)) { // don't div by zero
 
                         Effectiveness = 0.0;
