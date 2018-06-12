@@ -275,6 +275,8 @@ namespace MixedAir {
         bool CoolCoilFreezeCheck;          // if true, cooling coil freezing is prevented by recalculating the amount of OA
         bool EconoActive;                  // if true economizer is active
         bool HighHumCtrlActive;            // if true high humidity control is active
+        Array1D_int EconmizerFaultNum;     // index to economizer fault
+        int NumEconmizerFaults;            // total number of economizer faults
 
         // Default Constructor
         OAControllerProps()
@@ -287,7 +289,8 @@ namespace MixedAir {
               MaxOAflowSchPtr(0), EconomizerStatus(0), HeatRecoveryBypassStatus(0), HRHeatingCoilActive(0), MixedAirTempAtMinOAFlow(0.0),
               HighHumCtrlStatus(0), OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false),
               EMSOARateValue(0.0), HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0),
-              MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false)
+              MaxOAFracBySetPoint(0), MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false),
+              EconmizerFaultNum(0), NumEconmizerFaults(0)
         {
         }
 

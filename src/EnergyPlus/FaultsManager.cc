@@ -147,6 +147,8 @@ namespace FaultsManager {
     int const iFault_Fouling_Chiller(115);
     int const iFault_Fouling_EvapCooler(116);
 
+    bool GetFaultsInputFlag(true); // Flag set to make sure you get input once
+
     // Types of faults under Group Operational Faults in IDD
     //  1. Temperature sensor offset (FY14)
     //  2. Humidity sensor offset (FY14)
@@ -169,13 +171,22 @@ namespace FaultsManager {
     //  more
 
     Array1D_string const cFaults(NumFaultTypes,
-                                 {"FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir",
-                                  "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir",
-                                  "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset",
-                                  "FaultModel:HumidistatOffset", "FaultModel:Fouling:AirFilter",
-                                  "FaultModel:TemperatureSensorOffset:ChillerSupplyWater", "FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
-                                  "FaultModel:Fouling:CoolingTower", "FaultModel:TemperatureSensorOffset:CoilSupplyAir", "FaultModel:Fouling:Boiler",
-                                  "FaultModel:Fouling:Chiller", "FaultModel:Fouling:EvaporativeCooler"});
+                                 {"FaultModel:TemperatureSensorOffset:OutdoorAir",
+                                  "FaultModel:HumiditySensorOffset:OutdoorAir",
+                                  "FaultModel:EnthalpySensorOffset:OutdoorAir",
+                                  "FaultModel:TemperatureSensorOffset:ReturnAir",
+                                  "FaultModel:EnthalpySensorOffset:ReturnAir",
+                                  "FaultModel:Fouling:Coil",
+                                  "FaultModel:ThermostatOffset",
+                                  "FaultModel:HumidistatOffset",
+                                  "FaultModel:Fouling:AirFilter",
+                                  "FaultModel:TemperatureSensorOffset:ChillerSupplyWater",
+                                  "FaultModel:TemperatureSensorOffset:CondenserSupplyWater",
+                                  "FaultModel:Fouling:CoolingTower",
+                                  "FaultModel:TemperatureSensorOffset:CoilSupplyAir",
+                                  "FaultModel:Fouling:Boiler",
+                                  "FaultModel:Fouling:Chiller",
+                                  "FaultModel:Fouling:EvaporativeCooler"});
     //      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
     //      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
     //      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -185,13 +196,23 @@ namespace FaultsManager {
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-    Array1D_int const
-        iFaultTypeEnums(NumFaultTypes,
-                        {iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir,
-                         iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil,
-                         iFault_ThermostatOffset, iFault_HumidistatOffset, iFault_Fouling_AirFilter,
-                         iFault_TemperatureSensorOffset_ChillerSupplyWater, iFault_TemperatureSensorOffset_CondenserSupplyWater, iFault_Fouling_Tower,
-                         iFault_TemperatureSensorOffset_CoilSupplyAir, iFault_Fouling_Boiler, iFault_Fouling_Chiller, iFault_Fouling_EvapCooler});
+    Array1D_int const iFaultTypeEnums(NumFaultTypes,
+                                      {iFault_TemperatureSensorOffset_OutdoorAir,
+                                       iFault_HumiditySensorOffset_OutdoorAir,
+                                       iFault_EnthalpySensorOffset_OutdoorAir,
+                                       iFault_TemperatureSensorOffset_ReturnAir,
+                                       iFault_EnthalpySensorOffset_ReturnAir,
+                                       iFault_Fouling_Coil,
+                                       iFault_ThermostatOffset,
+                                       iFault_HumidistatOffset,
+                                       iFault_Fouling_AirFilter,
+                                       iFault_TemperatureSensorOffset_ChillerSupplyWater,
+                                       iFault_TemperatureSensorOffset_CondenserSupplyWater,
+                                       iFault_Fouling_Tower,
+                                       iFault_TemperatureSensorOffset_CoilSupplyAir,
+                                       iFault_Fouling_Boiler,
+                                       iFault_Fouling_Chiller,
+                                       iFault_Fouling_EvapCooler});
 
     bool AnyFaultsInModel(false); // True if there are operational faults in the model
     int NumFaults(0);             // Number of faults (include multiple faults of same type) in the model
@@ -363,8 +384,17 @@ namespace FaultsManager {
         for (int jFault_EvapCoolerFouling = 1; jFault_EvapCoolerFouling <= NumFaultyEvapCoolerFouling; ++jFault_EvapCoolerFouling) {
 
             cFaultCurrentObject = cFaults(16); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_EvapCoolerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_EvapCoolerFouling,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).FaultType = cFaultCurrentObject;
             FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).FaultTypeEnum = iFault_Fouling_EvapCooler;
@@ -429,9 +459,9 @@ namespace FaultsManager {
                     }
 
                     // Check whether the evaporative cooler  name and type match each other;
-                    EvapCoolerNum =
-                        UtilityRoutines::FindItemInList(FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
-                                                        EvaporativeCoolers::EvapCond, &EvaporativeCoolers::EvapConditions::EvapCoolerName);
+                    EvapCoolerNum = UtilityRoutines::FindItemInList(FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
+                                                                    EvaporativeCoolers::EvapCond,
+                                                                    &EvaporativeCoolers::EvapConditions::EvapCoolerName);
                     if (EvapCoolerNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
@@ -449,8 +479,17 @@ namespace FaultsManager {
         for (int jFault_ChillerFouling = 1; jFault_ChillerFouling <= NumFaultyChillerFouling; ++jFault_ChillerFouling) {
 
             cFaultCurrentObject = cFaults(15); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_ChillerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_ChillerFouling,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsChillerFouling(jFault_ChillerFouling).FaultType = cFaultCurrentObject;
             FaultsChillerFouling(jFault_ChillerFouling).FaultTypeEnum = iFault_Fouling_Chiller;
@@ -689,8 +728,17 @@ namespace FaultsManager {
         for (int jFault_BoilerFouling = 1; jFault_BoilerFouling <= NumFaultyBoilerFouling; ++jFault_BoilerFouling) {
 
             cFaultCurrentObject = cFaults(14); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_BoilerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_BoilerFouling,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsBoilerFouling(jFault_BoilerFouling).FaultType = cFaultCurrentObject;
             FaultsBoilerFouling(jFault_BoilerFouling).FaultTypeEnum = iFault_Fouling_Boiler;
@@ -761,8 +809,17 @@ namespace FaultsManager {
         for (int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
 
             cFaultCurrentObject = cFaults(13); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_CoilSAT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_CoilSAT,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsCoilSATSensor(jFault_CoilSAT).FaultType = cFaultCurrentObject;
             FaultsCoilSATSensor(jFault_CoilSAT).FaultTypeEnum = iFault_TemperatureSensorOffset_CoilSupplyAir;
@@ -894,9 +951,9 @@ namespace FaultsManager {
                         HVACControllers::GetControllerInputFlag = false;
                     }
                     // Check the controller name
-                    int ControlNum =
-                        UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).WaterCoilControllerName, HVACControllers::ControllerProps,
-                                                        &HVACControllers::ControllerPropsType::ControllerName);
+                    int ControlNum = UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).WaterCoilControllerName,
+                                                                     HVACControllers::ControllerProps,
+                                                                     &HVACControllers::ControllerPropsType::ControllerName);
                     if (ControlNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" +
                                         cAlphaArgs(6) + "\" not found.");
@@ -987,8 +1044,17 @@ namespace FaultsManager {
         for (int jFault_TowerFouling = 1; jFault_TowerFouling <= NumFaultyTowerFouling; ++jFault_TowerFouling) {
 
             cFaultCurrentObject = cFaults(12); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_TowerFouling, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_TowerFouling,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsTowerFouling(jFault_TowerFouling).FaultType = cFaultCurrentObject;
             FaultsTowerFouling(jFault_TowerFouling).FaultTypeEnum = iFault_Fouling_Tower;
@@ -1082,8 +1148,17 @@ namespace FaultsManager {
         for (int jFault_CondenserSWT = 1; jFault_CondenserSWT <= NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT) {
 
             cFaultCurrentObject = cFaults(11); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_CondenserSWT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_CondenserSWT,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsCondenserSWTSensor(jFault_CondenserSWT).FaultType = cFaultCurrentObject;
             FaultsCondenserSWTSensor(jFault_CondenserSWT).FaultTypeEnum = iFault_TemperatureSensorOffset_CondenserSupplyWater;
@@ -1168,8 +1243,17 @@ namespace FaultsManager {
         for (int jFault_ChillerSWT = 1; jFault_ChillerSWT <= NumFaultyChillerSWTSensor; ++jFault_ChillerSWT) {
 
             cFaultCurrentObject = cFaults(10); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_ChillerSWT, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_ChillerSWT,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsChillerSWTSensor(jFault_ChillerSWT).FaultType = cFaultCurrentObject;
             FaultsChillerSWTSensor(jFault_ChillerSWT).FaultTypeEnum = iFault_TemperatureSensorOffset_ChillerSupplyWater;
@@ -1385,8 +1469,17 @@ namespace FaultsManager {
         for (int jFault_AirFilter = 1; jFault_AirFilter <= NumFaultyAirFilter; ++jFault_AirFilter) {
 
             cFaultCurrentObject = cFaults(9); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_AirFilter, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_AirFilter,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsFouledAirFilters(jFault_AirFilter).FaultType = cFaultCurrentObject;
             FaultsFouledAirFilters(jFault_AirFilter).FaultTypeEnum = iFault_Fouling_AirFilter;
@@ -1462,8 +1555,17 @@ namespace FaultsManager {
         for (int jFault_Humidistat = 1; jFault_Humidistat <= NumFaultyHumidistat; ++jFault_Humidistat) {
 
             cFaultCurrentObject = cFaults(8); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_Humidistat, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_Humidistat,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsHumidistatOffset(jFault_Humidistat).FaultType = cFaultCurrentObject;
             FaultsHumidistatOffset(jFault_Humidistat).FaultTypeEnum = iFault_HumidistatOffset;
@@ -1527,8 +1629,17 @@ namespace FaultsManager {
         for (int jFault_Thermostat = 1; jFault_Thermostat <= NumFaultyThermostat; ++jFault_Thermostat) {
 
             cFaultCurrentObject = cFaults(7); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_Thermostat, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_Thermostat,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FaultsThermostatOffset(jFault_Thermostat).FaultType = cFaultCurrentObject;
             FaultsThermostatOffset(jFault_Thermostat).FaultTypeEnum = iFault_ThermostatOffset;
@@ -1574,8 +1685,17 @@ namespace FaultsManager {
         for (int jFault_FoulingCoil = 1; jFault_FoulingCoil <= NumFouledCoil; ++jFault_FoulingCoil) {
 
             cFaultCurrentObject = cFaults(6); // fault object string
-            inputProcessor->getObjectItem(cFaultCurrentObject, jFault_FoulingCoil, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cFaultCurrentObject,
+                                          jFault_FoulingCoil,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             FouledCoils(jFault_FoulingCoil).FaultType = cFaultCurrentObject;
             FouledCoils(jFault_FoulingCoil).FaultTypeEnum = iFault_Fouling_Coil;
@@ -1634,8 +1754,17 @@ namespace FaultsManager {
             int NumFaultsTemp = inputProcessor->getNumObjectsFound(cFaultCurrentObject);
 
             for (int jj = 1; jj <= NumFaultsTemp; ++jj) {
-                inputProcessor->getObjectItem(cFaultCurrentObject, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cFaultCurrentObject,
+                                              jj,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 ++j;
                 FaultsEconomizer(j).FaultType = cFaultCurrentObject;

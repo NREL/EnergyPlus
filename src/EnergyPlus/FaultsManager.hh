@@ -147,6 +147,7 @@ namespace FaultsManager {
     extern int NumFaultyChillerFouling;     // Total number of faulty Chillers with Fouling
     extern int NumFaultyEvapCoolerFouling;  // Total number of faulty Evaporative Coolers with Fouling
 
+    extern bool GetFaultsInputFlag; // Flag set to make sure you get input once
     // SUBROUTINE SPECIFICATIONS:
 
     // Types
