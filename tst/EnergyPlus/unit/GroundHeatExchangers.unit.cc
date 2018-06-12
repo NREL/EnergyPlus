@@ -199,19 +199,23 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
     thisGLHE.pipe.k = 0.4;
 
     // Re < 2300 mass flow rate
-    EXPECT_NEAR(0.13487, thisGLHE.calcHXResistance(), 0.0001);
+    thisGLHE.calcHXResistance();
+    EXPECT_NEAR(0.13487, thisGLHE.HXResistance, 0.0001);
 
     // 4000 > Re > 2300 mass flow rate
     thisGLHE.massFlowRate = 0.07;
-    EXPECT_NEAR(0.08582, thisGLHE.calcHXResistance(), 0.0001);
+    thisGLHE.calcHXResistance();
+    EXPECT_NEAR(0.08582, thisGLHE.HXResistance, 0.0001);
 
     // Re > 4000 mass flow rate
     thisGLHE.massFlowRate = 0.1;
-    EXPECT_NEAR(0.077185, thisGLHE.calcHXResistance(), 0.0001);
+    thisGLHE.calcHXResistance();
+    EXPECT_NEAR(0.077185, thisGLHE.HXResistance, 0.0001);
 
     // Zero mass flow rate
     thisGLHE.massFlowRate = 0.0;
-    EXPECT_NEAR(0.07094, thisGLHE.calcHXResistance(), 0.0001);
+    thisGLHE.calcHXResistance();
+    EXPECT_NEAR(0.07094, thisGLHE.HXResistance, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger)
