@@ -66,6 +66,8 @@
 #include <Fans.hh>
 #include <FaultsManager.hh>
 #include <HVACControllers.hh>
+#include <MixedAir.hh>
+#include <ScheduleManager.hh>
 #include <SetPointManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -75,6 +77,7 @@ using namespace CurveManager;
 using namespace DataLoopNode;
 using namespace Fans;
 using namespace FaultsManager;
+using namespace EnergyPlus::ScheduleManager;
 
 namespace EnergyPlus {
 
@@ -184,8 +187,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     Fan(FanNum).DeltaPress = 1017.59;
 
     // Run and Check
-    FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(Fan(FanNum).FanName, Fan(FanNum).MaxAirFlowRate, Fan(FanNum).DeltaPress,
-                                                        FanFaultyDeltaPressInc * Fan(FanNum).DeltaPress, CurveNum);
+    FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
+        Fan(FanNum).FanName, Fan(FanNum).MaxAirFlowRate, Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * Fan(FanNum).DeltaPress, CurveNum);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 
@@ -312,4 +315,142 @@ TEST_F(EnergyPlusFixture, FaultsManager_CalFaultOffsetAct)
     EXPECT_EQ(10, OffsetAct);
 }
 
+TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
+{
+    // PURPOSE OF THIS SUBROUTINE:
+    // checks GetOAControllerInputs also fills economizer fault info to OA controller
+
+    std::string const idf_objects = delimited_string({
+        "  Version,8.9;",
+
+        "  Controller:OutdoorAir,",
+        "    VAV_1_OA_Controller,     !- Name",
+        "    VAV_1_OARelief Node,     !- Relief Air Outlet Node Name",
+        "    VAV_1 Supply Equipment Inlet Node,  !- Return Air Node Name",
+        "    VAV_1_OA-VAV_1_CoolCNode,!- Mixed Air Node Name",
+        "    VAV_1_OAInlet Node,      !- Actuator Node Name",
+        "    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    DifferentialDryBulb,     !- Economizer Control Type",
+        "    ModulateFlow,            !- Economizer Control Action Type",
+        "    28.0,                    !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    64000.0,                 !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                        !- Electronic Enthalpy Limit Curve Name",
+        "    -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,               !- Lockout Type",
+        "    FixedMinimum,            !- Minimum Limit Type",
+        "    MinOA_MotorizedDamper_Sched;  !- Minimum Outdoor Air Schedule Name",
+
+        "  Controller:OutdoorAir,",
+        "    VAV_2_OA_Controller,     !- Name",
+        "    VAV_2_OARelief Node,     !- Relief Air Outlet Node Name",
+        "    VAV_2 Supply Equipment Inlet Node,  !- Return Air Node Name",
+        "    VAV_2_OA-VAV_2_CoolCNode,!- Mixed Air Node Name",
+        "    VAV_2_OAInlet Node,      !- Actuator Node Name",
+        "    AUTOSIZE,                !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    AUTOSIZE,                !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    DifferentialDryBulb,     !- Economizer Control Type",
+        "    ModulateFlow,            !- Economizer Control Action Type",
+        "    28.0,                    !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    64000.0,                 !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                        !- Electronic Enthalpy Limit Curve Name",
+        "    -100.0,                  !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,               !- Lockout Type",
+        "    FixedMinimum,            !- Minimum Limit Type",
+        "    MinOA_MotorizedDamper_Sched;  !- Minimum Outdoor Air Schedule Name",
+
+        "  Schedule:Compact,",
+        "    MinOA_MotorizedDamper_Sched,  !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 07:00,0.0,        !- Field 3",
+        "    Until: 22:00,1.0,        !- Field 4",
+        "    Until: 24:00,0.0;        !- Field 5",
+
+        "  Schedule:Compact,",
+        "    ALWAYS_ON,               !- Name",
+        "    On/Off,                  !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1;          !- Field 3",
+
+        "  Schedule:Compact,",
+        "    OATSeveritySch,          !- Name",
+        "    On/Off,                  !- Schedule Type Limits Name",
+        "    Through: 6/30,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,0,          !- Field 3",
+        "    Through: 12/31,          !- Field 5",
+        "    For: AllDays,            !- Field 6",
+        "    Until: 24:00,1;          !- Field 7",
+
+        "  FaultModel:TemperatureSensorOffset:OutdoorAir,",
+        "    OATFault,                !- Name",
+        "    ALWAYS_ON,               !- Availability Schedule Name",
+        "    OATSeveritySch,          !- Severity Schedule Name",
+        "    Controller:OutdoorAir,   !- Controller Object Type",
+        "    VAV_1_OA_Controller,     !- Controller Object Name",
+        "    2.0;                     !- Temperature Sensor Offset {deltaC}",
+
+        "  FaultModel:HumiditySensorOffset:OutdoorAir,",
+        "    OAWFault,                !- Name",
+        "    ALWAYS_ON,               !- Availability Schedule Name",
+        "    ,                        !- Severity Schedule Name",
+        "    Controller:OutdoorAir,   !- Controller Object Type",
+        "    VAV_1_OA_Controller,     !- Controller Object Name",
+        "    -0.002;                  !- Humidity Sensor Offset {kgWater/kgDryAir}",
+
+        "  FaultModel:EnthalpySensorOffset:OutdoorAir,",
+        "    OAHFault,                !- Name",
+        "    ALWAYS_ON,               !- Availability Schedule Name",
+        "    ,                        !- Severity Schedule Name",
+        "    Controller:OutdoorAir,   !- Controller Object Type",
+        "    VAV_1_OA_Controller,     !- Controller Object Name",
+        "    5000;                    !- Enthalpy Sensor Offset {J/kg}",
+
+        "  FaultModel:TemperatureSensorOffset:ReturnAir,",
+        "    RATFault,                !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    ,                        !- Severity Schedule Name",
+        "    Controller:OutdoorAir,   !- Controller Object Type",
+        "    VAV_2_OA_Controller,     !- Controller Object Name",
+        "    -2.0;                    !- Temperature Sensor Offset {deltaC}",
+
+        "  FaultModel:EnthalpySensorOffset:ReturnAir,",
+        "    RAHFault,                !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    ,                        !- Severity Schedule Name",
+        "    Controller:OutdoorAir,   !- Controller Object Type",
+        "    VAV_2_OA_Controller,     !- Controller Object Name",
+        "    -2000;                   !- Enthalpy Sensor Offset {J/kg}",
+    });
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ScheduleManager::ProcessScheduleInput(); // read schedules
+
+    EXPECT_TRUE(FaultsManager::GetFaultsInputFlag);
+    MixedAir::GetOAControllerInputs();
+    EXPECT_FALSE(FaultsManager::GetFaultsInputFlag);
+
+    // there are two OA controller objects
+    EXPECT_EQ(MixedAir::NumOAControllers, 2);
+    // there are five economizer faults
+    EXPECT_EQ(FaultsManager::NumFaultyEconomizer, 5);
+
+    // there are three economizer faults in the 1st OA controller
+    EXPECT_EQ(MixedAir::OAController(1).NumFaultyEconomizer, 3);
+    EXPECT_EQ(MixedAir::OAController(1).EconmizerFaultNum(1), 1);
+    EXPECT_EQ(MixedAir::OAController(1).EconmizerFaultNum(2), 2);
+    EXPECT_EQ(MixedAir::OAController(1).EconmizerFaultNum(3), 3);
+
+    // there are two economizer faults in the 2nd OA controller
+    EXPECT_EQ(MixedAir::OAController(2).NumFaultyEconomizer, 2);
+    EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(1), 4);
+    EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(2), 5);
+}
 } // namespace EnergyPlus

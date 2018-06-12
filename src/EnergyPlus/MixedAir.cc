@@ -1357,9 +1357,10 @@ namespace MixedAir {
         }
 
         if (FaultsManager::GetFaultsInputFlag) {
-            CheckAndReadFaults();
+            FaultsManager::CheckAndReadFaults();
             FaultsManager::GetFaultsInputFlag = false;
         }
+
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
         MaxAlphas = NumAlphas;
         MaxNums = NumNums;
@@ -1412,17 +1413,17 @@ namespace MixedAir {
                                           ErrorsFound);
 
                 // add applicable faults identifier to avoid string comparison at each time step
-                //  loop through each fault for each OA controller
-                for (j = 0, i = 1; i <= NumFaultyEconomizer; ++i) {
+                //  loop through each fault for each OA controller and determine economizer faultys
+                for (i = 1; i <= NumFaultyEconomizer; ++i) {
                     if (FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
                     if (UtilityRoutines::SameString(OAController(OutAirNum).Name, FaultsEconomizer(i).ControllerName)) {
                         FaultsEconomizer(i).ControllerID = OutAirNum;
-                        ++OAController(OutAirNum).NumEconmizerFaults;
+                        ++OAController(OutAirNum).NumFaultyEconomizer;
                     }
                 }
-
-                OAController(OutAirNum).EconmizerFaultNum.allocate(OAController(OutAirNum).NumEconmizerFaults);
-                if (OAController(OutAirNum).NumEconmizerFaults > 0) {
+                //  loop through each fault for each OA controller to determine faulty counts
+                OAController(OutAirNum).EconmizerFaultNum.allocate(OAController(OutAirNum).NumFaultyEconomizer);
+                if (OAController(OutAirNum).NumFaultyEconomizer > 0) {
                     for (j = 0, i = 1; i <= NumFaultyEconomizer; ++i) {
                         if (FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
                         if (UtilityRoutines::SameString(OAController(OutAirNum).Name, FaultsEconomizer(i).ControllerName)) {
@@ -3321,10 +3322,8 @@ namespace MixedAir {
         // Check sensors faults for the air economizer
         iEco = thisOAController.Econo;
         if (AnyFaultsInModel && (iEco > NoEconomizer)) {
-            int j;
-            for (i = 1; i <= thisOAController.NumEconmizerFaults; ++i) {
-                /// if ((FaultsEconomizer(i).ControllerTypeEnum == iController_AirEconomizer) && (FaultsEconomizer(i).ControllerID ==
-                /// OAControllerNum)) {
+            int j; // index to economizer faults
+            for (i = 1; i <= thisOAController.NumFaultyEconomizer; ++i) {
                 j = thisOAController.EconmizerFaultNum(i);
                 if (GetCurrentScheduleValue(FaultsEconomizer(j).AvaiSchedPtr) > 0.0) {
                     rSchVal = 1.0;
@@ -3405,8 +3404,7 @@ namespace MixedAir {
                     } else {
                     }
                 }
-                ///} ///
-            } //
+            }
         }
 
         if (ErrorsFound) {

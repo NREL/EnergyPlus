@@ -95,6 +95,7 @@ namespace Boilers {
     extern Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
     extern Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
     extern Real64 BoilerPLR;          // Boiler operating part-load ratio
+    extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
     extern Array1D_bool CheckEquipName;
 

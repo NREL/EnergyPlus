@@ -791,6 +791,10 @@ namespace FaultsManager {
 
             // Boiler check and link
             {
+                if (Boilers::GetBoilerInputFlag) {
+                    Boilers::GetBoilerInput();
+                    Boilers::GetBoilerInputFlag = false;
+                }
                 // Check the boiler name and boiler type
                 int BoilerNum = UtilityRoutines::FindItemInList(FaultsBoilerFouling(jFault_BoilerFouling).BoilerName, Boilers::Boiler);
                 if (BoilerNum <= 0) {
@@ -2060,6 +2064,7 @@ namespace FaultsManager {
         RunFaultMgrOnceFlag = false;
         ErrorsFound = false;
         AnyFaultsInModel = false;
+        GetFaultsInputFlag = true;
 
         NumFaults = 0;
         NumFaultyEconomizer = 0;
