@@ -1766,7 +1766,6 @@ namespace GroundHeatExchangers {
         Real64 RQMonth;
         Real64 RQHour;
         Real64 RQSubHr;
-        int I;
         Real64 tmpQnSubHourly;              // current Qn sub-hourly value
         int hourlyLimit;                    // number of hours to be taken into account in superposition
         int subHourlyLimit;                 // number of sub-hourly to be taken into account in sub-hourly superposition
@@ -1776,7 +1775,6 @@ namespace GroundHeatExchangers {
         Real64 C2;                          // **in explicit  calculation of the
         Real64 C3;                          // **temperature at the U tube outlet.
         static int PrevN(1);                // The saved value of N at previous time step
-        int IndexN;                         // Used to index the LastHourN array
         static bool updateCurSimTime(true); // Used to reset the CurSimTime to reset after WarmupFlag
         static bool triggerDesignDayReset(false);
         static bool firstTime(true);
@@ -1871,46 +1869,47 @@ namespace GroundHeatExchangers {
                 // Calculate the Sub Hourly Superposition
 
                 sumQnSubHourly = 0.0;
+                int indexN;  // Used to index the LastHourN array
                 if (int(currentSimTime) < SubAGG) {
-                    IndexN = int(currentSimTime) + 1;
+                    indexN = int(currentSimTime) + 1;
                 } else {
-                    IndexN = SubAGG + 1;
+                    indexN = SubAGG + 1;
                 }
-                subHourlyLimit = N - LastHourN(IndexN); // Check this when running simulation
+                subHourlyLimit = N - LastHourN(indexN); // Check this when running simulation
 
-                for (I = 1; I <= subHourlyLimit; ++I) {
-                    if (I == subHourlyLimit) {
+                for (int i = 1; i <= subHourlyLimit; ++i) {
+                    if (i == subHourlyLimit) {
                         if (int(currentSimTime) >= SubAGG) {
-                            gFuncVal = getGFunc((currentSimTime - prevTimeSteps(I + 1)) / timeSSFactor);
+                            gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
                             RQSubHr = gFuncVal / kGroundFactor;
-                            sumQnSubHourly += (QnSubHr(I) - QnHr(IndexN)) * RQSubHr;
+                            sumQnSubHourly += (QnSubHr(i) - QnHr(indexN)) * RQSubHr;
                         } else {
-                            gFuncVal = getGFunc((currentSimTime - prevTimeSteps(I + 1)) / timeSSFactor);
+                            gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
                             RQSubHr = gFuncVal / kGroundFactor;
-                            sumQnSubHourly += QnSubHr(I) * RQSubHr;
+                            sumQnSubHourly += QnSubHr(i) * RQSubHr;
                         }
                         break;
                     }
-                    // prevTimeSteps(I+1) This is "I+1" because prevTimeSteps(1) = CurrentTimestep
-                    gFuncVal = getGFunc((currentSimTime - prevTimeSteps(I + 1)) / timeSSFactor);
+                    // prevTimeSteps(i+1) This is "i+1" because prevTimeSteps(1) = CurrentTimestep
+                    gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
                     RQSubHr = gFuncVal / kGroundFactor;
-                    sumQnSubHourly += (QnSubHr(I) - QnSubHr(I + 1)) * RQSubHr;
+                    sumQnSubHourly += (QnSubHr(i) - QnSubHr(i + 1)) * RQSubHr;
                 }
 
                 // Calculate the Hourly Superposition
 
                 hourlyLimit = int(currentSimTime);
                 sumQnHourly = 0.0;
-                for (I = SubAGG + 1; I <= hourlyLimit; ++I) {
-                    if (I == hourlyLimit) {
+                for (int i = SubAGG + 1; i <= hourlyLimit; ++i) {
+                    if (i == hourlyLimit) {
                         gFuncVal = getGFunc(currentSimTime / timeSSFactor);
                         RQHour = gFuncVal / kGroundFactor;
-                        sumQnHourly += QnHr(I) * RQHour;
+                        sumQnHourly += QnHr(i) * RQHour;
                         break;
                     }
-                    gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + I) / timeSSFactor);
+                    gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + i) / timeSSFactor);
                     RQHour = gFuncVal / kGroundFactor;
-                    sumQnHourly += (QnHr(I) - QnHr(I + 1)) * RQHour;
+                    sumQnHourly += (QnHr(i) - QnHr(i + 1)) * RQHour;
                 }
 
                 // Find the total Sum of the Temperature difference due to all load blocks
@@ -1939,7 +1938,7 @@ namespace GroundHeatExchangers {
 
                 numOfMonths = (currentSimTime + 1) / hrsPerMonth;
 
-                if (currentSimTime < ((numOfMonths)*hrsPerMonth) + AGG + SubAGG) {
+                if (currentSimTime < (numOfMonths * hrsPerMonth) + AGG + SubAGG) {
                     currentMonth = numOfMonths - 1;
                 } else {
                     currentMonth = numOfMonths;
@@ -1947,46 +1946,46 @@ namespace GroundHeatExchangers {
 
                 // Monthly superposition
                 sumQnMonthly = 0.0;
-                for (I = 1; I <= currentMonth; ++I) {
-                    if (I == 1) {
+                for (int i = 1; i <= currentMonth; ++i) {
+                    if (i == 1) {
                         gFuncVal = getGFunc(currentSimTime / timeSSFactor);
                         RQMonth = gFuncVal / kGroundFactor;
-                        sumQnMonthly += QnMonthlyAgg(I) * RQMonth;
+                        sumQnMonthly += QnMonthlyAgg(i) * RQMonth;
                         continue;
                     }
-                    gFuncVal = getGFunc((currentSimTime - (I - 1) * hrsPerMonth) / timeSSFactor);
+                    gFuncVal = getGFunc((currentSimTime - (i - 1) * hrsPerMonth) / timeSSFactor);
                     RQMonth = gFuncVal / kGroundFactor;
-                    sumQnMonthly += (QnMonthlyAgg(I) - QnMonthlyAgg(I - 1)) * RQMonth;
+                    sumQnMonthly += (QnMonthlyAgg(i) - QnMonthlyAgg(i - 1)) * RQMonth;
                 }
 
                 // Hourly Superposition
                 hourlyLimit = int(currentSimTime - currentMonth * hrsPerMonth);
                 sumQnHourly = 0.0;
-                for (I = 1 + SubAGG; I <= hourlyLimit; ++I) {
-                    if (I == hourlyLimit) {
-                        gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + I) / timeSSFactor);
+                for (int i = 1 + SubAGG; i <= hourlyLimit; ++i) {
+                    if (i == hourlyLimit) {
+                        gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + i) / timeSSFactor);
                         RQHour = gFuncVal / kGroundFactor;
-                        sumQnHourly += (QnHr(I) - QnMonthlyAgg(currentMonth)) * RQHour;
+                        sumQnHourly += (QnHr(i) - QnMonthlyAgg(currentMonth)) * RQHour;
                         break;
                     }
-                    gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + I) / timeSSFactor);
+                    gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + i) / timeSSFactor);
                     RQHour = gFuncVal / kGroundFactor;
-                    sumQnHourly += (QnHr(I) - QnHr(I + 1)) * RQHour;
+                    sumQnHourly += (QnHr(i) - QnHr(i + 1)) * RQHour;
                 }
 
                 // sub-hourly Superposition
                 subHourlyLimit = N - LastHourN(SubAGG + 1);
                 sumQnSubHourly = 0.0;
-                for (I = 1; I <= subHourlyLimit; ++I) {
-                    if (I == subHourlyLimit) {
-                        gFuncVal = getGFunc((currentSimTime - prevTimeSteps(I + 1)) / timeSSFactor);
+                for (int i = 1; i <= subHourlyLimit; ++i) {
+                    if (i == subHourlyLimit) {
+                        gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
                         RQSubHr = gFuncVal / kGroundFactor;
-                        sumQnSubHourly += (QnSubHr(I) - QnHr(SubAGG + 1)) * RQSubHr;
+                        sumQnSubHourly += (QnSubHr(i) - QnHr(SubAGG + 1)) * RQSubHr;
                         break;
                     }
-                    gFuncVal = getGFunc((currentSimTime - prevTimeSteps(I + 1)) / timeSSFactor);
+                    gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
                     RQSubHr = gFuncVal / kGroundFactor;
-                    sumQnSubHourly += (QnSubHr(I) - QnSubHr(I + 1)) * RQSubHr;
+                    sumQnSubHourly += (QnSubHr(i) - QnSubHr(i + 1)) * RQSubHr;
                 }
 
                 sumTotal = sumQnMonthly + sumQnHourly + sumQnSubHourly;
@@ -2198,9 +2197,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, propNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              propNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2259,9 +2265,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, rfNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              rfNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2332,9 +2345,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, arrayNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              arrayNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2375,9 +2395,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, bhNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              bhNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2418,9 +2445,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, GLHENum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              GLHENum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2443,19 +2477,32 @@ namespace GroundHeatExchangers {
                 thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
 
                 // get inlet node num
-                thisGLHE.inletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                thisGLHE.inletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+                                                          errorsFound,
+                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          NodeType_Water,
+                                                          NodeConnectionType_Inlet,
+                                                          1,
+                                                          ObjectIsNotParent);
 
                 // get outlet node num
-                thisGLHE.outletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                thisGLHE.outletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                           errorsFound,
+                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                           NodeType_Water,
+                                                           NodeConnectionType_Outlet,
+                                                           1,
+                                                           ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3), "Condenser Water Nodes");
+                TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                            DataIPShortCuts::cAlphaArgs(1),
+                            DataIPShortCuts::cAlphaArgs(2),
+                            DataIPShortCuts::cAlphaArgs(3),
+                            "Condenser Water Nodes");
 
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
                 RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
@@ -2576,20 +2623,32 @@ namespace GroundHeatExchangers {
             // Set up report variables
             for (int GLHENum = 0; GLHENum < numVerticalGLHEs; ++GLHENum) {
                 auto &thisGLHE(verticalGLHE[GLHENum]);
-                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, thisGLHE.bhTemp, "System",
-                                    "Average", thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.bhTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average",
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.aveFluidTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Farfield Ground Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.tempGround,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, thisGLHE.aveFluidTemp, "System",
-                                    "Average", thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Farfield Ground Temperature", OutputProcessor::Unit::C, thisGLHE.tempGround, "System",
-                                    "Average", thisGLHE.name);
             }
         }
 
@@ -2607,9 +2666,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, GLHENum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              GLHENum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2632,19 +2698,32 @@ namespace GroundHeatExchangers {
                 thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
 
                 // get inlet node num
-                thisGLHE.inletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                thisGLHE.inletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+                                                          errorsFound,
+                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          NodeType_Water,
+                                                          NodeConnectionType_Inlet,
+                                                          1,
+                                                          ObjectIsNotParent);
 
                 // get outlet node num
-                thisGLHE.outletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                thisGLHE.outletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                           errorsFound,
+                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                           NodeType_Water,
+                                                           NodeConnectionType_Outlet,
+                                                           1,
+                                                           ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3), "Condenser Water Nodes");
+                TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                            DataIPShortCuts::cAlphaArgs(1),
+                            DataIPShortCuts::cAlphaArgs(2),
+                            DataIPShortCuts::cAlphaArgs(3),
+                            "Condenser Water Nodes");
 
                 // load data
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
@@ -2740,18 +2819,26 @@ namespace GroundHeatExchangers {
             // Set up report variables
             for (int GLHENum = 0; GLHENum < numSlinkyGLHEs; ++GLHENum) {
                 auto &thisGLHE(slinkyGLHE[GLHENum]);
-                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, thisGLHE.bhTemp, "System",
-                                    "Average", thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.bhTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average",
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.aveFluidTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, thisGLHE.aveFluidTemp, "System",
-                                    "Average", thisGLHE.name);
             }
         }
     }
