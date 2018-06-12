@@ -1678,35 +1678,31 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::getAnnualTimeConstant()
+    void GLHESlinky::calcExFT()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
-        //       DATE WRITTEN:    February, 2015
+        //       DATE WRITTEN:    June, 2018
         //       MODIFIED         na
         //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // calculate annual time constant for ground conduction
-
-        timeSS = (pow_2(bhLength) / (9.0 * soil.diffusivity)) / SecInHour / 8760.0;
-        timeSSFactor = timeSS * 8760.0;
+        // calculate exiting fluid temperature
     }
 
     //******************************************************************************
 
-    void GLHESlinky::getAnnualTimeConstant()
+    void GLHEVert::calcExFT()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
-        //       DATE WRITTEN:    February, 2015
+        //       DATE WRITTEN:    June, 2018
         //       MODIFIED         na
         //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // calculate annual time constant for ground conduction
+        // calculate exiting fluid temperature
 
-        timeSSFactor = 1.0;
     }
 
     //******************************************************************************
@@ -1798,9 +1794,6 @@ namespace GroundHeatExchangers {
 
         kGroundFactor = 2.0 * Pi * soil.k;
 
-        // Get time constants
-        getAnnualTimeConstant();
-
         if (triggerDesignDayReset && WarmupFlag) updateCurSimTime = true;
         if (DayOfSim == 1 && updateCurSimTime) {
             currentSimTime = 0.0;
@@ -1847,7 +1840,7 @@ namespace GroundHeatExchangers {
         calcAggregateLoad();
 
         // Update the heat exchanger resistance each time
-        HXResistance = calcHXResistance();
+        calcHXResistance();
 
         if (N == 1) {
             if (massFlowRate <= 0.0) {
@@ -1869,7 +1862,7 @@ namespace GroundHeatExchangers {
                 // Calculate the Sub Hourly Superposition
 
                 sumQnSubHourly = 0.0;
-                int indexN;  // Used to index the LastHourN array
+                int indexN; // Used to index the LastHourN array
                 if (int(currentSimTime) < SubAGG) {
                     indexN = int(currentSimTime) + 1;
                 } else {
@@ -2594,6 +2587,9 @@ namespace GroundHeatExchangers {
                 thisGLHE.theta_3 = 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2);
                 thisGLHE.sigma = (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k);
 
+                Real64 timeSS = (pow_2(thisGLHE.bhLength) / (9.0 * thisGLHE.soil.diffusivity)) / SecInHour / 8760.0;
+                thisGLHE.timeSSFactor = timeSS * 8760.0;
+
                 thisGLHE.SubAGG = 15;
                 thisGLHE.AGG = 192;
 
@@ -2629,14 +2625,30 @@ namespace GroundHeatExchangers {
                                     "System",
                                     "Average",
                                     thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average", thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average", thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    thisGLHE.QGLHE,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.inletTemp,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.outletTemp,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    thisGLHE.massFlowRate,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
                 SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
                                     OutputProcessor::Unit::C,
                                     thisGLHE.aveFluidTemp,
@@ -2791,6 +2803,8 @@ namespace GroundHeatExchangers {
                 // Thermal diffusivity of the ground
                 thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
 
+                thisGLHE.timeSSFactor = 1.0;
+
                 prevTimeSteps.allocate((thisGLHE.SubAGG + 1) * maxTSinHr + 1);
                 prevTimeSteps = 0.0;
 
@@ -2825,14 +2839,30 @@ namespace GroundHeatExchangers {
                                     "System",
                                     "Average",
                                     thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average", thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average", thisGLHE.name);
-                SetupOutputVariable(
-                    "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    thisGLHE.QGLHE,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.inletTemp,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.outletTemp,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    thisGLHE.massFlowRate,
+                                    "System",
+                                    "Average",
+                                    thisGLHE.name);
                 SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
                                     OutputProcessor::Unit::C,
                                     thisGLHE.aveFluidTemp,
@@ -2906,7 +2936,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    Real64 GLHEVert::calcHXResistance()
+    void GLHEVert::calcHXResistance()
     {
         // Calculates the effective thermal resistance of the borehole assuming a uniform heat flux.
 
@@ -2922,10 +2952,10 @@ namespace GroundHeatExchangers {
         static std::string const RoutineName("calcBHResistance");
 
         if (massFlowRate <= 0.0) {
-            return 0;
+            HXResistance = 0;
         } else {
             Real64 const cpFluid = GetSpecificHeatGlycol(PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-            return calcBHAverageResistance() + 1 / (3 * calcBHTotalInternalResistance()) * pow_2(bhLength / (massFlowRate * cpFluid));
+            HXResistance = calcBHAverageResistance() + 1 / (3 * calcBHTotalInternalResistance()) * pow_2(bhLength / (massFlowRate * cpFluid));
         }
     }
 
@@ -3037,7 +3067,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    Real64 GLHESlinky::calcHXResistance()
+    void GLHESlinky::calcHXResistance()
     {
 
         // SUBROUTINE INFORMATION:
@@ -3116,7 +3146,7 @@ namespace GroundHeatExchangers {
         //   Conduction Resistance
         Rcond = std::log(pipeOuterRad / pipeInnerRad) / (2.0 * Pi * pipe.k) / 2.0; // pipe in parallel so /2
 
-        return Rcond + Rconv;
+        HXResistance = Rcond + Rconv;
     }
 
     //******************************************************************************

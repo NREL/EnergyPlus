@@ -306,9 +306,9 @@ namespace GroundHeatExchangers {
 
         virtual void initGLHESimVars() = 0;
 
-        virtual Real64 calcHXResistance() = 0;
+        virtual void calcHXResistance() = 0;
 
-        virtual void getAnnualTimeConstant() = 0;
+        virtual void calcExFT() = 0;
     };
 
     struct GLHEVert : GLHEBase
@@ -354,11 +354,9 @@ namespace GroundHeatExchangers {
 
         void calcGFunctions();
 
-        Real64 calcHXResistance();
+        void calcHXResistance();
 
         void initGLHESimVars();
-
-        void getAnnualTimeConstant();
 
         Real64 getGFunc(Real64 const time);
 
@@ -383,6 +381,8 @@ namespace GroundHeatExchangers {
         Real64 calcPipeResistance();
 
         void combineShortAndLongTimestepGFunctions();
+
+        void calcExFT();
     };
 
     struct GLHESlinky : GLHEBase
@@ -416,13 +416,11 @@ namespace GroundHeatExchangers {
         {
         }
 
-        Real64 calcHXResistance();
+        void calcHXResistance();
 
         void calcGFunctions();
 
         void initGLHESimVars();
-
-        void getAnnualTimeConstant();
 
         Real64 doubleIntegral(int const m, int const n, int const m1, int const n1, Real64 const t, int const I0, int const J0);
 
@@ -443,6 +441,8 @@ namespace GroundHeatExchangers {
         void makeThisGLHECacheStruct();
 
         void readCacheFileAndCompareWithThisGLHECache();
+
+        void calcExFT();
     };
 
     void clear_state();
