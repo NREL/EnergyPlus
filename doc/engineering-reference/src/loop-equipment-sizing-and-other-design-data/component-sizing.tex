@@ -59,12 +59,18 @@ and:
 \item
   \(e_{tot,des}\) : fan total efficiency
 \item
-  \(\dot{Q}_{fan,heat,des}\) : fan heat to air stream (W)
+  \(\dot{Q}_{fan,heat,des}\) : design fan heat to air stream (W)
 \item
   \(e_{motor,des}\) : fan motor efficiency
 \item
   \(f_{motor\ in\ air}\) : motor in air stream fraction
 \end{itemize} 
+
+The design fan temperature rise (\emph{C}) due to fan heat is added to the air steam during sizing calculations when appropriate and is typically used for water cooling coil sizing. The calculation uses a straight-forward inversion of the classic \(Q = \dot{m}*Cp*\Delta{T}\) equation as:
+
+\begin{equation}
+T_{fan,heat,des} = \dot{Q}_{fan,heat,des} / ( {C}_{p,air} * \rho_{air} * \dot{V}_{fan,des} )
+\end{equation}
 
 \subsection{Coil:Cooling:Water}\label{coilcoolingwater}
 
@@ -188,7 +194,7 @@ To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperat
 
 \begin{itemize}
 \item
-  \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the design cooling peak)
+  \(T_{air,in,des} = T_{mix,cool,at-peak} + T_{fan,heat,des}\) (the mixed air temperature at the design cooling peak plus the design fan temperature rise due to fan heat - see Section \ref{design-fan-heat})
 \item
   \(W_{air,in,des} = W_{mix,cool,at-peak}\) (the mixed humidity ratio at the design cooling peak)
 \item
@@ -205,7 +211,7 @@ The oustide air fraction is calculated as (where V\(_{cc,air}\) is calculated as
 \item
   \(f_{oa} = \frac{\dot V_{air,out,des}}{\dot{V}_{cc,air}}\)
 \item
-  \(T_{air,in,des} = f_{oa}T_{precool} + \left(1-f_{oa}\right)T_{ret,cool,at-peak}\) (Precool temperature is the specified Precool Design Temperature from System:Sizing Manager; T\_ret\_cool\_at-peak is the return temperature at the system cooling peak load)
+  \(T_{air,in,des} = f_{oa}T_{precool} + \left(1-f_{oa}\right)T_{ret,cool,at-peak} + T_{fan,heat,des}\) (Precool temperature is the specified Precool Design Temperature from System:Sizing Manager; T\_ret\_cool\_at-peak is the return temperature at the system cooling peak load and \(T_{fan,heat,des}\) is the design fan temperature rise due to fan heat - see Section \ref{design-fan-heat})
 \item
   \(W_{air,in,des} = f_{oa}W_{precool} + \left(1-f_{oa}\right)W_{ret,cool,at-peak}\) (Precool humidity ratio is the specified Precool Design Humidity Ratio from System:Sizing Manager; W\_ret\_cool\_at-peak is the return humidity ratio at the system cooling peak load)
 \item
@@ -302,23 +308,23 @@ The inlet air temperature depends on whether the coil is in the outside air stre
 \item
   Coil in outside air stream: \(T_{air,in,des} = T_{out,cool,at-peak}\) (the outside air temperature set at the design cooling peak).
 \item
-  Coil in main air stream, no preconditioning of outside air: \(T_{air,in,des} = T_{mix,cool,at-peak}\) (the mixed air temperature at the cooling design peak).
+  Coil in main air stream, no preconditioning of outside air: \(T_{air,in,des} = T_{mix,cool,at-peak} + T_{fan,heat,des}\) (the mixed air temperature at the cooling design peak plus the design fan temperature rise due to fan heat - see Section \ref{design-fan-heat}).
 \item
-  Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as \(f_{oa} = \dot V_{air,out,des}/\dot V_{cc,air}\) , where \(\dot V_{cc,air}\) is calculated above. Then \(T_{air,in,des} = f_{oa}T_{precool}+\left(1-f_{oa}\right)T_{ret,cool,at-peak}\) , where \(T_{precool}\) is the specified \emph{Precool Design Temperature} from \emph{System:Sizing}, and \(T_{ret,cool,at-peak}\) is the return temperature at the system cooling peak load.
+  Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as \(f_{oa} = \dot V_{air,out,des}/\dot V_{cc,air}\) , where \(\dot V_{cc,air}\) is calculated above. Then \(T_{air,in,des} = f_{oa}T_{precool}+\left(1-f_{oa}\right)T_{ret,cool,at-peak} + T_{fan,heat,des}\) , where \(T_{precool}\) is the specified \emph{Precool Design Temperature} from \emph{System:Sizing}, \(T_{ret,cool,at-peak}\) is the return temperature at the system cooling peak load and \(T_{fan,heat,des}\) is the design fan temperature rise due to fan heat - see Section \ref{design-fan-heat}.
 \end{itemize}
 
 \subsubsection{Design Air Inlet Temperature - Zone Coils}\label{design-air-inlet-temperature---zone-coils}
 
-The design inlet temperature depends on whether the coil is in a terminal unit or a zonal unit, and where the coil is positioned within the unit.
+The design inlet temperature depends on whether the coil is in a terminal unit or a zonal unit, and where the coil is positioned within the unit. In each case, the design fan temperature rise is added to coil inlet temperature regardless of configuration (e.g., blow-through or draw-through) since fan heat in either case results in a higher design coil load - see Section \ref{design-fan-heat}.  
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  For the AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction terminal unit the design inlet temperature is set to the zone temperature at the time of the zone cooling peak, since the coil is located in the induced air stream.
+  For the AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction terminal unit the design inlet temperature is set to the zone temperature at the time of the zone cooling peak, since the coil is located in the induced air stream: \(T_{air,in,des} = T_{zone,cool,peak} + T_{fan,heat,des}\)
 \item
-  For fan coil units the design inlet temperature is set to the mixed air temperature: \(T_{air,in,des} = f_{oa}T_{oa,coolpeak} + \left(1-f_{oa}\right)T_{z,coolpeak}\) , where \(f_{oa} = \rho_a \dot V_{z,oa,des} / \dot m_{z,cool,des}\)
+  For fan coil units the design inlet temperature is set to the mixed air temperature: \(T_{air,in,des} = f_{oa}T_{oa,coolpeak} + \left(1-f_{oa}\right)T_{z,coolpeak} + T_{fan,heat,des}\) , where \(f_{oa} = \rho_a \dot V_{z,oa,des} / \dot m_{z,cool,des}\)
 \item
-  In all other cases the design inlet temperature is set to the zone design cooling coil inlet temperature which is calculated in the zone sizing simulation and is basically the same calculation as the fan coil unit.
+  In all other cases the design inlet temperature is set to the zone design cooling coil inlet temperature which is calculated in the zone sizing simulation and is basically the same calculation as the fan coil unit. The design fan temperature rise due to fan heat is also included.
 \end{enumerate}
 
 \subsubsection{Design Air Outlet Temperature - System Coils}\label{design-air-outlet-temperature---system-coils}

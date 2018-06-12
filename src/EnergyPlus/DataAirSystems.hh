@@ -413,6 +413,8 @@ namespace DataAirSystems {
     // Functions
     void clear_state();
 
+    Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
+
 } // namespace DataAirSystems
 
 } // namespace EnergyPlus
