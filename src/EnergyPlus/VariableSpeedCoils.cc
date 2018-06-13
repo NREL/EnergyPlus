@@ -4374,6 +4374,8 @@ namespace VariableSpeedCoils {
                             break;
                         }
                         } // end switch
+                        Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                        MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -4451,6 +4453,8 @@ namespace VariableSpeedCoils {
                             break;
                         }
                         } // end switch
+                        Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                        MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
@@ -7541,26 +7545,27 @@ namespace VariableSpeedCoils {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
 
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing &&
-            VarSpeedCoil(DXCoilNum).reportCoilFinalSizes) {
-            if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
-                VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) { // cooling coil
-                coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
-                                                          VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapCoolTotal,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapCoolSens,
-                                                          VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
-                                                          VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
-            } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ||
-                       VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) { // heating coil
-                coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
-                                                          VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapHeat,
-                                                          VarSpeedCoil(DXCoilNum).RatedCapHeat,
-                                                          VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
-                                                          VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
+        if (VarSpeedCoil(DXCoilNum).reportCoilFinalSizes) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
+                    VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) { // cooling coil
+                    coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
+                                                              VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapCoolTotal,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapCoolSens,
+                                                              VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
+                                                              VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
+                } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit ||
+                           VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) { // heating coil
+                    coilSelectionReportObj->setCoilFinalSizes(VarSpeedCoil(DXCoilNum).Name,
+                                                              VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapHeat,
+                                                              VarSpeedCoil(DXCoilNum).RatedCapHeat,
+                                                              VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate,
+                                                              VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate);
+                }
+                VarSpeedCoil(DXCoilNum).reportCoilFinalSizes = false;
             }
-            VarSpeedCoil(DXCoilNum).reportCoilFinalSizes = false;
         }
     }
 

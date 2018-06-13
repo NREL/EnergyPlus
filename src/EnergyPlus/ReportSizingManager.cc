@@ -1640,7 +1640,11 @@ namespace ReportSizingManager {
                                     PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                                 }
                                 // add fan heat to coil load
-                                PeakCoilLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
+                                FanCoolLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
+                                PeakCoilLoad += FanCoolLoad;
+                                // adjust coil inlet temp with fan temperature rise
+                                CpAir = PsyCpAirFnWTdb(CoilInHumRat, CoilInTemp);
+                                CoilInTemp += FanCoolLoad / (CpAir * StdRhoAir * DesVolFlow);
                                 if (TotCapTempModFac > 0.0) {
                                     AutosizeDes = PeakCoilLoad / TotCapTempModFac;
                                 } else {
@@ -2683,6 +2687,9 @@ namespace ReportSizingManager {
 
                             PrimaryAirSystem(CurSysNum).FanDesCoolLoad = FanCoolLoad;
                             PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
+                            // adjust coil inlet temp with fan temperature rise
+                            CpAir = PsyCpAirFnWTdb(CoilInHumRat, CoilInTemp);
+                            CoilInTemp += FanCoolLoad / (CpAir * StdRhoAir * DesVolFlow);
                             if (TotCapTempModFac > 0.0) {
                                 NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;
                             } else {
@@ -3448,6 +3455,10 @@ namespace ReportSizingManager {
 
         } else if (SizingType == CoolingCapacitySizing) {
             if (coilSelectionReportObj->isCompTypeCoil(CompType)) {
+                if (CoilInTemp > 0.0) { // set inlet air properties used during capacity sizing if available
+                    coilSelectionReportObj->setCoilEntAirTemp(CompName, CompType, CoilInTemp, CurSysNum, CurZoneEqNum);
+                    coilSelectionReportObj->setCoilEntAirHumRat(CompName, CompType, CoilInHumRat);
+                }
                 coilSelectionReportObj->setCoilCoolingCapacity(CompName,
                                                                CompType,
                                                                SizingResult,

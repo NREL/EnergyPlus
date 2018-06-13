@@ -1183,7 +1183,7 @@ namespace WaterToAirHeatPumpSimple {
         Real64 OutAirFrac;
         Real64 VolFlowRate;
         Real64 CoolCapAtPeak;
-        Real64 TotCapTempModFac;
+        Real64 TotCapTempModFac = 1.0;
         Real64 SensCapAtPeak;
         Real64 SensCapTempModFac;
         Real64 TotalCapCoeff1; // 1st coefficient of the total cooling capacity performance curve
@@ -1249,6 +1249,7 @@ namespace WaterToAirHeatPumpSimple {
         RatedCapHeatUser = 0.0;
         RatedWaterVolFlowRateDes = 0.0;
         RatedWaterVolFlowRateUser = 0.0;
+        std::string CompType = "COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT";
 
         if (SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate == AutoSize) {
             IsAutoSize = true;
@@ -1325,6 +1326,7 @@ namespace WaterToAirHeatPumpSimple {
         RatedCapCoolTotalAutoSized = false;
         RatedCapCoolSensAutoSized = false;
 
+        Real64 FanCoolLoad = 0.0;
         if (SimpleWatertoAirHP(HPNum).WatertoAirHPType == "COOLING") {
             // size rated total cooling capacity
             if (SimpleWatertoAirHP(HPNum).RatedCapCoolTotal == AutoSize && SimpleWatertoAirHP(HPNum).WatertoAirHPType == "COOLING") {
@@ -1403,6 +1405,8 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                         }
                         CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
                         CoolCapAtPeak = max(0.0, CoolCapAtPeak);
@@ -1411,6 +1415,10 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             RatedCapCoolTotalDes = CoolCapAtPeak;
                         }
+                        coilSelectionReportObj->setCoilEntAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
+                        coilSelectionReportObj->setCoilEntAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, MixHumRat);
+                        coilSelectionReportObj->setCoilLvgAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, SupTemp);
+                        coilSelectionReportObj->setCoilLvgAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, SupHumRat);
                     } else {
                         RatedCapCoolTotalDes = 0.0;
                     }
@@ -1467,7 +1475,6 @@ namespace WaterToAirHeatPumpSimple {
                         ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
                         TotCapTempModFac = TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (1.0 * TotalCapCoeff4) +
                                            (1.0 * TotalCapCoeff5);
-                        Real64 FanCoolLoad = 0.0;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
@@ -1491,6 +1498,10 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             RatedCapCoolTotalDes = CoolCapAtPeak;
                         }
+                        coilSelectionReportObj->setCoilEntAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
+                        coilSelectionReportObj->setCoilEntAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, MixHumRat);
+                        coilSelectionReportObj->setCoilLvgAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, SupTemp);
+                        coilSelectionReportObj->setCoilLvgAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, SupHumRat);
                     } else {
                         RatedCapCoolTotalDes = 0.0;
                     }
@@ -1578,6 +1589,8 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             } // end switch
+                            Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                            MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                         }
                         // Sensible capacity is calculated from enthalpy difference with constant humidity ratio, i.e.,
                         // there is only temperature difference between entering and leaving air enthalpy. Previously
@@ -1730,6 +1743,17 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 }
             }
+            coilSelectionReportObj->setCoilCoolingCapacity(SimpleWatertoAirHP(HPNum).Name,
+                                                           CompType,
+                                                           SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
+                                                           RatedCapCoolTotalAutoSized,
+                                                           CurSysNum,
+                                                           CurZoneEqNum,
+                                                           CurOASysNum,
+                                                           FanCoolLoad,
+                                                           TotCapTempModFac,
+                                                           -999.0,
+                                                           -999.0);
             if (!HardSizeNoDesRun) {
                 if (RatedCapCoolSensAutoSized) {
                     SimpleWatertoAirHP(HPNum).RatedCapCoolSens = RatedCapCoolSensDes;
@@ -1911,6 +1935,17 @@ namespace WaterToAirHeatPumpSimple {
                 }
             }
 
+            coilSelectionReportObj->setCoilHeatingCapacity(SimpleWatertoAirHP(HPNum).Name,
+                                                           CompType,
+                                                           SimpleWatertoAirHP(HPNum).RatedCapHeat,
+                                                           IsAutoSize,
+                                                           CurSysNum,
+                                                           CurZoneEqNum,
+                                                           CurOASysNum,
+                                                           FanCoolLoad,
+                                                           TotCapTempModFac,
+                                                           -999.0,
+                                                           -999.0);
         } // Heating
 
         // size rated power
@@ -2712,23 +2747,27 @@ namespace WaterToAirHeatPumpSimple {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
 
-        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing &&
-            SimpleWatertoAirHP(HPNum).reportCoilFinalSizes) {
+        if (SimpleWatertoAirHP(HPNum).reportCoilFinalSizes) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
 
-            if (UtilityRoutines::SameString(SimpleWatertoAirHP(HPNum).WatertoAirHPType, "COOLING")) { // cooling
-                coilSelectionReportObj->setCoilFinalSizes(SimpleWatertoAirHP(HPNum).Name,
-                                                          "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",
-                                                          SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
-                                                          SimpleWatertoAirHP(HPNum).RatedCapCoolSens,
-                                                          SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate,
-                                                          SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
-            } else if (UtilityRoutines::SameString(SimpleWatertoAirHP(HPNum).WatertoAirHPType, "HEATING")) { // heating
-                coilSelectionReportObj->setCoilFinalSizes(SimpleWatertoAirHP(HPNum).Name,
-                                                          "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WaterToAirHeatPump:EquationFit",
-                                                          SimpleWatertoAirHP(HPNum).RatedCapHeat,
-                                                          SimpleWatertoAirHP(HPNum).RatedCapHeat,
-                                                          SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate,
-                                                          SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
+                if (UtilityRoutines::SameString(SimpleWatertoAirHP(HPNum).WatertoAirHPType, "COOLING")) { // cooling
+                    coilSelectionReportObj->setCoilFinalSizes(SimpleWatertoAirHP(HPNum).Name,
+                                                              "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType +
+                                                                  ":WaterToAirHeatPump:EquationFit",
+                                                              SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
+                                                              SimpleWatertoAirHP(HPNum).RatedCapCoolSens,
+                                                              SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate,
+                                                              SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
+                } else if (UtilityRoutines::SameString(SimpleWatertoAirHP(HPNum).WatertoAirHPType, "HEATING")) { // heating
+                    coilSelectionReportObj->setCoilFinalSizes(SimpleWatertoAirHP(HPNum).Name,
+                                                              "Coil:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType +
+                                                                  ":WaterToAirHeatPump:EquationFit",
+                                                              SimpleWatertoAirHP(HPNum).RatedCapHeat,
+                                                              SimpleWatertoAirHP(HPNum).RatedCapHeat,
+                                                              SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate,
+                                                              SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate);
+                }
+                SimpleWatertoAirHP(HPNum).reportCoilFinalSizes = false;
             }
         }
     }
