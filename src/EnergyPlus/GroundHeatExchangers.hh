@@ -266,15 +266,13 @@ namespace GroundHeatExchangers {
         Real64 lastQnSubHr;
         Real64 HXResistance;    // The thermal resistance of the GHX, (K per W/m)
         Real64 totalTubeLength; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
-        Real64 timeSS;          // Steady state time
-        Real64 timeSSFactor;    // Steady state time factor for calculation
+        Real64 timeSS;    // Steady state time factor for calculation
         std::shared_ptr<BaseGroundTempsModel> groundTempModel;
 
         GLHEBase()
             : available(false), on(false), loopNum(0), loopSideNum(0), branchNum(0), compNum(0), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
               designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
-              aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0),
-              timeSS(0.0), timeSSFactor(0.0)
+              aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0), timeSS(0.0)
         {
         }
 

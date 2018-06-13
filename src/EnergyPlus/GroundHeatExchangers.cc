@@ -1702,7 +1702,6 @@ namespace GroundHeatExchangers {
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate exiting fluid temperature
-
     }
 
     //******************************************************************************
@@ -2584,8 +2583,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.theta_3 = 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2);
                 thisGLHE.sigma = (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k);
 
-                Real64 timeSS = (pow_2(thisGLHE.bhLength) / (9.0 * thisGLHE.soil.diffusivity)) / SecInHour / 8760.0;
-                thisGLHE.timeSSFactor = timeSS * 8760.0;
+                thisGLHE.timeSS = (pow_2(thisGLHE.bhLength) / (9.0 * thisGLHE.soil.diffusivity)) / SecInHour;
 
                 thisGLHE.SubAGG = 15;
                 thisGLHE.AGG = 192;
@@ -2800,7 +2798,7 @@ namespace GroundHeatExchangers {
                 // Thermal diffusivity of the ground
                 thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
 
-                thisGLHE.timeSSFactor = 1.0;
+                thisGLHE.timeSS = 1.0;
 
                 prevTimeSteps.allocate((thisGLHE.SubAGG + 1) * maxTSinHr + 1);
                 prevTimeSteps = 0.0;
@@ -3148,7 +3146,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+    Real64 GLHEBase::interpGFunc(Real64 const LnTTsVal // The value of LN(t/ts) that a g-function
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3160,7 +3158,7 @@ namespace GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         //    To interpolate or extrapolate data in GFILE
         //    to find the correct g-function value for a
-        //    known value of the natural log of (T/Ts)
+        //    known value of the natural log of (t/ts)
 
         // METHODOLOGY EMPLOYED:
 
@@ -3275,7 +3273,7 @@ namespace GroundHeatExchangers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LNTTS;
 
-        LNTTS = std::log10(time / timeSSFactor);
+        LNTTS = std::log10(time / timeSS);
 
         return interpGFunc(LNTTS);
     }
@@ -3299,7 +3297,7 @@ namespace GroundHeatExchangers {
         Real64 gFuncVal;
         Real64 LNTTS;
 
-        LNTTS = std::log(time / timeSSFactor);
+        LNTTS = std::log(time / timeSS);
 
         gFuncVal = interpGFunc(LNTTS);
 

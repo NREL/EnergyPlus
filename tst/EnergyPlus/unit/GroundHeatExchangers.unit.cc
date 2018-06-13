@@ -136,6 +136,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_GetGFunc)
     thisGLHE.myRespFactors->GFNC(1) = 0.0;
     thisGLHE.myRespFactors->GFNC(2) = 5.0;
 
+    thisGLHE.timeSS = 1;
+
     time = std::pow(10.0, 2.5);
 
     thisGFunc = thisGLHE.getGFunc(time);
@@ -163,6 +165,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc)
     thisGLHE.myRespFactors->LNTTS(2) = 5.0;
     thisGLHE.myRespFactors->GFNC(1) = 0.0;
     thisGLHE.myRespFactors->GFNC(2) = 5.0;
+
+    thisGLHE.timeSS = 1;
 
     time = std::pow(2.7182818284590452353602874, 2.5);
 
