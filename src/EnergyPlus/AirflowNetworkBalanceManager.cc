@@ -8507,6 +8507,7 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using BranchNodeConnections::GetNodeConnectionType;
         using DataAirLoop::AirToZoneNodeInfo;
+        using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using MixedAir::GetNumOAMixers;
         using MixedAir::GetOAMixerInletNodeNumber;
@@ -8982,6 +8983,35 @@ namespace AirflowNetworkBalanceManager {
                         if (AirflowNetworkNodeData(i).EPlusTypeNum == 0) AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_SPO;
                     }
                 }
+            }
+
+            // Check number of fans specified in an AirLoop #6748
+            int BranchNum;
+            int CompNum;
+            int NumOfFans;
+            std::string FanNames;
+            for (BranchNum = 1; BranchNum <= PrimaryAirSystem(1).NumBranches; ++BranchNum) {
+                NumOfFans = 0;
+                FanNames = "";
+                for (CompNum = 1; CompNum <= PrimaryAirSystem(1).Branch(BranchNum).TotalComponents; ++CompNum) {
+                    if (UtilityRoutines::SameString(PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:ConstantVolume") ||
+                        UtilityRoutines::SameString(PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:OnOff") ||
+                        UtilityRoutines::SameString(PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:VariableVolume")) {
+                        NumOfFans++;
+                        if (NumOfFans > 1) {
+                            FanNames += PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).Name;
+                            break;
+                        } else {
+                            FanNames += PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).Name + ",";
+                        }
+                    }
+                }
+                if (NumOfFans > 1) break;
+            }
+            if (NumOfFans > 1) {
+                ShowSevereError(RoutineName + "An AirLoop branch, " + PrimaryAirSystem(1).Branch(BranchNum).Name + ", has two or more fans: " + FanNames);
+                ShowContinueError("The AirflowNetwork model allows a single supply fan in an AirLoop only. Please make changes in the input file accordingly.");
+                ErrorsFound = true;
             }
 
             OneTimeFlag = false;
