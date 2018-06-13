@@ -5875,7 +5875,7 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                 }
                 tmpHc = CalcFisherPedersenCeilDiffuserFloor(AirChangeRate);
-				Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -5890,7 +5890,7 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                 }
                 tmpHc = CalcFisherPedersenCeilDiffuserCeiling(AirChangeRate);
-				Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
                 ZoneNum = Surface(SurfNum).Zone;
@@ -5905,7 +5905,7 @@ namespace ConvectionCoefficients {
                     AirChangeRate = 0.0;
                 }
                 tmpHc = CalcFisherPedersenCeilDiffuserWalls(AirChangeRate);
-				Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
+                Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
 
             } else if (SELECT_CASE_var == HcInt_AlamdariHammondStableHorizontal) {
                 ZoneNum = Surface(SurfNum).Zone;
