@@ -1242,7 +1242,7 @@ namespace GroundHeatExchangers {
         // Allocate and setup g-function arrays
         myRespFactors->GFNC.allocate(NPairs);
         myRespFactors->LNTTS.allocate(NPairs);
-        QnMonthlyAgg.allocate(maxSimYears * 12);
+        QnMonth.allocate(maxSimYears * 12);
         QnHr.allocate(730 + AGG + SubAGG);
         QnSubHr.allocate((SubAGG + 1) * maxTSinHr + 1);
         LastHourN.allocate(SubAGG + 1);
@@ -1748,10 +1748,8 @@ namespace GroundHeatExchangers {
 
         // LOCAL PARAMETERS
         Real64 fluidDensity;
-        Real64 kGroundFactor;
         Real64 cpFluid;
         Real64 gFuncVal; // Interpolated G function value at a sub-hour
-        static Real64 ToutNew(19.375);
         Real64 fluidAveTemp;
         Real64 C_1;
         int numOfMonths;       // the number of months of simulation elapsed
@@ -1775,6 +1773,8 @@ namespace GroundHeatExchangers {
         static bool triggerDesignDayReset(false);
         static bool firstTime(true);
 
+        static Real64 kGroundFactor = 2.0 * Pi * soil.k;
+
         // Calculate G-Functions
         if (firstTime) {
             if (!gFunctionsExist) {
@@ -1792,15 +1792,13 @@ namespace GroundHeatExchangers {
         cpFluid = GetSpecificHeatGlycol(PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
         fluidDensity = GetDensityGlycol(PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
 
-        kGroundFactor = 2.0 * Pi * soil.k;
-
         if (triggerDesignDayReset && WarmupFlag) updateCurSimTime = true;
         if (DayOfSim == 1 && updateCurSimTime) {
             currentSimTime = 0.0;
             prevTimeSteps = 0.0;
-            QnHr = 0.0;
-            QnMonthlyAgg = 0.0;
             QnSubHr = 0.0;
+            QnHr = 0.0;
+            QnMonth = 0.0;
             LastHourN = 1;
             N = 1;
             updateCurSimTime = false;
@@ -1846,14 +1844,14 @@ namespace GroundHeatExchangers {
             if (massFlowRate <= 0.0) {
                 tmpQnSubHourly = 0.0;
                 fluidAveTemp = tempGround;
-                ToutNew = inletTemp;
+                outletTemp = inletTemp;
             } else {
-                gFuncVal = getGFunc(currentSimTime / timeSSFactor);
+                gFuncVal = getGFunc(currentSimTime);
 
                 C_1 = totalTubeLength / (2.0 * massFlowRate * cpFluid);
                 tmpQnSubHourly = (tempGround - inletTemp) / (gFuncVal / kGroundFactor + HXResistance + C_1);
                 fluidAveTemp = tempGround - tmpQnSubHourly * HXResistance;
-                ToutNew = tempGround - tmpQnSubHourly * (gFuncVal / kGroundFactor + HXResistance - C_1);
+                outletTemp = tempGround - tmpQnSubHourly * (gFuncVal / kGroundFactor + HXResistance - C_1);
             }
         } else {
             // no monthly super position
@@ -1873,18 +1871,18 @@ namespace GroundHeatExchangers {
                 for (int i = 1; i <= subHourlyLimit; ++i) {
                     if (i == subHourlyLimit) {
                         if (int(currentSimTime) >= SubAGG) {
-                            gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
+                            gFuncVal = getGFunc(currentSimTime - prevTimeSteps(i + 1));
                             RQSubHr = gFuncVal / kGroundFactor;
                             sumQnSubHourly += (QnSubHr(i) - QnHr(indexN)) * RQSubHr;
                         } else {
-                            gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
+                            gFuncVal = getGFunc(currentSimTime - prevTimeSteps(i + 1));
                             RQSubHr = gFuncVal / kGroundFactor;
                             sumQnSubHourly += QnSubHr(i) * RQSubHr;
                         }
                         break;
                     }
                     // prevTimeSteps(i+1) This is "i+1" because prevTimeSteps(1) = CurrentTimestep
-                    gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
+                    gFuncVal = getGFunc(currentSimTime - prevTimeSteps(i + 1));
                     RQSubHr = gFuncVal / kGroundFactor;
                     sumQnSubHourly += (QnSubHr(i) - QnSubHr(i + 1)) * RQSubHr;
                 }
@@ -1895,12 +1893,12 @@ namespace GroundHeatExchangers {
                 sumQnHourly = 0.0;
                 for (int i = SubAGG + 1; i <= hourlyLimit; ++i) {
                     if (i == hourlyLimit) {
-                        gFuncVal = getGFunc(currentSimTime / timeSSFactor);
+                        gFuncVal = getGFunc(currentSimTime);
                         RQHour = gFuncVal / kGroundFactor;
                         sumQnHourly += QnHr(i) * RQHour;
                         break;
                     }
-                    gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + i) / timeSSFactor);
+                    gFuncVal = getGFunc(currentSimTime - int(currentSimTime) + i);
                     RQHour = gFuncVal / kGroundFactor;
                     sumQnHourly += (QnHr(i) - QnHr(i + 1)) * RQHour;
                 }
@@ -1909,13 +1907,13 @@ namespace GroundHeatExchangers {
                 sumTotal = sumQnSubHourly + sumQnHourly;
 
                 // Calculate the sub-hourly temperature due the Last Time steps Load
-                gFuncVal = getGFunc((currentSimTime - prevTimeSteps(2)) / timeSSFactor);
+                gFuncVal = getGFunc(currentSimTime - prevTimeSteps(2));
                 RQSubHr = gFuncVal / kGroundFactor;
 
                 if (massFlowRate <= 0.0) {
                     tmpQnSubHourly = 0.0;
                     fluidAveTemp = tempGround - sumTotal; // Q(N)*RB = 0
-                    ToutNew = inletTemp;
+                    outletTemp = inletTemp;
                 } else {
                     // Dr.Spitler's Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
                     C0 = RQSubHr;
@@ -1924,7 +1922,7 @@ namespace GroundHeatExchangers {
                     C3 = massFlowRate * cpFluid / totalTubeLength;
                     tmpQnSubHourly = (C1 - inletTemp) / (HXResistance + C0 - C2 + (1 / C3));
                     fluidAveTemp = C1 - (C0 + HXResistance) * tmpQnSubHourly;
-                    ToutNew = C1 + (C2 - C0 - HXResistance) * tmpQnSubHourly;
+                    outletTemp = C1 + (C2 - C0 - HXResistance) * tmpQnSubHourly;
                 }
 
             } else { // Monthly Aggregation and super position
@@ -1941,14 +1939,14 @@ namespace GroundHeatExchangers {
                 sumQnMonthly = 0.0;
                 for (int i = 1; i <= currentMonth; ++i) {
                     if (i == 1) {
-                        gFuncVal = getGFunc(currentSimTime / timeSSFactor);
+                        gFuncVal = getGFunc(currentSimTime);
                         RQMonth = gFuncVal / kGroundFactor;
-                        sumQnMonthly += QnMonthlyAgg(i) * RQMonth;
+                        sumQnMonthly += QnMonth(i) * RQMonth;
                         continue;
                     }
-                    gFuncVal = getGFunc((currentSimTime - (i - 1) * hrsPerMonth) / timeSSFactor);
+                    gFuncVal = getGFunc(currentSimTime - (i - 1) * hrsPerMonth);
                     RQMonth = gFuncVal / kGroundFactor;
-                    sumQnMonthly += (QnMonthlyAgg(i) - QnMonthlyAgg(i - 1)) * RQMonth;
+                    sumQnMonthly += (QnMonth(i) - QnMonth(i - 1)) * RQMonth;
                 }
 
                 // Hourly Superposition
@@ -1956,12 +1954,12 @@ namespace GroundHeatExchangers {
                 sumQnHourly = 0.0;
                 for (int i = 1 + SubAGG; i <= hourlyLimit; ++i) {
                     if (i == hourlyLimit) {
-                        gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + i) / timeSSFactor);
+                        gFuncVal = getGFunc(currentSimTime - int(currentSimTime) + i);
                         RQHour = gFuncVal / kGroundFactor;
-                        sumQnHourly += (QnHr(i) - QnMonthlyAgg(currentMonth)) * RQHour;
+                        sumQnHourly += (QnHr(i) - QnMonth(currentMonth)) * RQHour;
                         break;
                     }
-                    gFuncVal = getGFunc((currentSimTime - int(currentSimTime) + i) / timeSSFactor);
+                    gFuncVal = getGFunc(currentSimTime - int(currentSimTime) + i);
                     RQHour = gFuncVal / kGroundFactor;
                     sumQnHourly += (QnHr(i) - QnHr(i + 1)) * RQHour;
                 }
@@ -1971,12 +1969,12 @@ namespace GroundHeatExchangers {
                 sumQnSubHourly = 0.0;
                 for (int i = 1; i <= subHourlyLimit; ++i) {
                     if (i == subHourlyLimit) {
-                        gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
+                        gFuncVal = getGFunc(currentSimTime - prevTimeSteps(i + 1));
                         RQSubHr = gFuncVal / kGroundFactor;
                         sumQnSubHourly += (QnSubHr(i) - QnHr(SubAGG + 1)) * RQSubHr;
                         break;
                     }
-                    gFuncVal = getGFunc((currentSimTime - prevTimeSteps(i + 1)) / timeSSFactor);
+                    gFuncVal = getGFunc(currentSimTime - prevTimeSteps(i + 1));
                     RQSubHr = gFuncVal / kGroundFactor;
                     sumQnSubHourly += (QnSubHr(i) - QnSubHr(i + 1)) * RQSubHr;
                 }
@@ -1985,13 +1983,13 @@ namespace GroundHeatExchangers {
 
                 // Calculate the sub-hourly temperature due the Last Time steps Load
 
-                gFuncVal = getGFunc((currentSimTime - prevTimeSteps(2)) / timeSSFactor);
+                gFuncVal = getGFunc(currentSimTime - prevTimeSteps(2));
                 RQSubHr = gFuncVal / kGroundFactor;
 
                 if (massFlowRate <= 0.0) {
                     tmpQnSubHourly = 0.0;
                     fluidAveTemp = tempGround - sumTotal; // Q(N)*RB = 0
-                    ToutNew = inletTemp;
+                    outletTemp = inletTemp;
                 } else {
                     // Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
                     C0 = RQSubHr;
@@ -2000,7 +1998,7 @@ namespace GroundHeatExchangers {
                     C3 = massFlowRate * cpFluid / totalTubeLength;
                     tmpQnSubHourly = (C1 - inletTemp) / (HXResistance + C0 - C2 + (1 / C3));
                     fluidAveTemp = C1 - (C0 + HXResistance) * tmpQnSubHourly;
-                    ToutNew = C1 + (C2 - C0 - HXResistance) * tmpQnSubHourly;
+                    outletTemp = C1 + (C2 - C0 - HXResistance) * tmpQnSubHourly;
                 }
             } //  end of AGG OR NO AGG
         }     // end of N  = 1 branch
@@ -2008,7 +2006,6 @@ namespace GroundHeatExchangers {
         // Load the QnSubHourly Array with a new value at end of every timestep
 
         lastQnSubHr = tmpQnSubHourly;
-        outletTemp = ToutNew;
         QGLHE = tmpQnSubHourly * totalTubeLength;
         aveFluidTemp = fluidAveTemp;
     }
@@ -2127,7 +2124,7 @@ namespace GroundHeatExchangers {
                 SumQnMonth += QnHr(J);
             }
             SumQnMonth /= hrsPerMonth;
-            QnMonthlyAgg(MonthNum) = SumQnMonth;
+            QnMonth(MonthNum) = SumQnMonth;
         }
         if (prevHour != locHourOfDay) {
             prevHour = locHourOfDay;
@@ -2594,7 +2591,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.AGG = 192;
 
                 // Allocation of all the dynamic arrays
-                thisGLHE.QnMonthlyAgg.dimension(thisGLHE.myRespFactors->maxSimYears * 12, 0.0);
+                thisGLHE.QnMonth.dimension(thisGLHE.myRespFactors->maxSimYears * 12, 0.0);
                 thisGLHE.QnHr.dimension(730 + thisGLHE.AGG + thisGLHE.SubAGG, 0.0);
                 thisGLHE.QnSubHr.dimension((thisGLHE.SubAGG + 1) * maxTSinHr + 1, 0.0);
                 thisGLHE.LastHourN.dimension(thisGLHE.SubAGG + 1, 0);
@@ -3278,7 +3275,7 @@ namespace GroundHeatExchangers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LNTTS;
 
-        LNTTS = std::log10(time);
+        LNTTS = std::log10(time / timeSSFactor);
 
         return interpGFunc(LNTTS);
     }
@@ -3302,7 +3299,7 @@ namespace GroundHeatExchangers {
         Real64 gFuncVal;
         Real64 LNTTS;
 
-        LNTTS = std::log(time);
+        LNTTS = std::log(time / timeSSFactor);
 
         gFuncVal = interpGFunc(LNTTS);
 
@@ -3387,7 +3384,7 @@ namespace GroundHeatExchangers {
             // zero out all history arrays
 
             QnHr = 0.0;
-            QnMonthlyAgg = 0.0;
+            QnMonth = 0.0;
             QnSubHr = 0.0;
             LastHourN = 0;
             prevTimeSteps = 0.0;
@@ -3496,7 +3493,7 @@ namespace GroundHeatExchangers {
             // zero out all history arrays
 
             QnHr = 0.0;
-            QnMonthlyAgg = 0.0;
+            QnMonth = 0.0;
             QnSubHr = 0.0;
             LastHourN = 0;
             prevTimeSteps = 0.0;

@@ -1443,7 +1443,7 @@ namespace HybridEvapCoolingModel {
                 return -2;
             }
             // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air
-            // Temperature(�C)
+            // Temperature(C)
             if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) {
                 EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
             } else {
