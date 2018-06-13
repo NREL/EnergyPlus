@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus {
 
@@ -253,6 +254,18 @@ Real64 Residual(Real64 const Frac)
     return Residual;
 }
 
+Real64 ResidualTest(Real64 const Frac, Array1<Real64> const &Par)
+{
+    Real64 ResidualTest;
+    Real64 Request = 1.0+1.0e-12;
+    Real64 Actual;
+
+    Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
+
+    ResidualTest = (Actual - Request) / Request;
+
+    return ResidualTest;
+}
 TEST_F(EnergyPlusFixture, General_SolveRootTest)
 {
     // New feature: Multiple solvers
@@ -288,6 +301,20 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
     General::SolveRoot(ErrorToler, 40, SolFla, Frac, Residual, 0.0, 1.0);
     EXPECT_EQ(15, SolFla);
     EXPECT_NEAR(0.041420287, Frac, ErrorToler);
+
+    // Add a unit test to deal with vary small X value for #6515
+    HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+    Real64 small = 1.0e-11;
+    Array1D<Real64> Par; // Function parameters
+    Par.allocate(2);
+    Par(1) = 1.0;
+    Par(2) = 1.0;
+    
+    General::SolveRoot(ErrorToler, 40, SolFla, Frac, ResidualTest, 0.0, small, Par);
+    EXPECT_EQ(-1, SolFla);
+
+    Par.deallocate();
+
 }
 
 TEST(General, nthDayOfWeekOfMonth_test)
