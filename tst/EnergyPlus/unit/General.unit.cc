@@ -263,7 +263,7 @@ Real64 ResidualTest(Real64 const Frac, Array1<Real64> const &Par)
     Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
 
     ResidualTest = (Actual - Request) / Request;
-
+    Request = Par(1) + 1.0e-12;
     return ResidualTest;
 }
 TEST_F(EnergyPlusFixture, General_SolveRootTest)
