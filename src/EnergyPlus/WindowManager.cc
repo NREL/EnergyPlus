@@ -942,8 +942,16 @@ namespace WindowManager {
                     LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
                     if (!Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= numpt(IGlass); ++ILam) {
-                            TransAndReflAtPhi(CosPhi, t(IGlass, ILam), rff(IGlass, ILam), rbb(IGlass, ILam), tPhi(IGlass, ILam), rfPhi(IGlass, ILam),
-                                              rbPhi(IGlass, ILam), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
+                            TransAndReflAtPhi(CosPhi,
+                                              t(IGlass, ILam),
+                                              rff(IGlass, ILam),
+                                              rbb(IGlass, ILam),
+                                              tPhi(IGlass, ILam),
+                                              rfPhi(IGlass, ILam),
+                                              rbPhi(IGlass, ILam),
+                                              lSimpleGlazingSystem,
+                                              SimpleGlazingSHGC,
+                                              SimpleGlazingU);
                         }
                     } else {
                         int NumX2 = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
@@ -1138,8 +1146,16 @@ namespace WindowManager {
                     if (!Material(LayPtr).GlassSpectralAndAngle) {
                         for (ILam = 1; ILam <= numpt(IGlass); ++ILam) {
 
-                            TransAndReflAtPhi(CosPhi, t(IGlass, ILam), rff(IGlass, ILam), rbb(IGlass, ILam), tPhi(IGlass, ILam), rfPhi(IGlass, ILam),
-                                              rbPhi(IGlass, ILam), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
+                            TransAndReflAtPhi(CosPhi,
+                                              t(IGlass, ILam),
+                                              rff(IGlass, ILam),
+                                              rbb(IGlass, ILam),
+                                              tPhi(IGlass, ILam),
+                                              rfPhi(IGlass, ILam),
+                                              rbPhi(IGlass, ILam),
+                                              lSimpleGlazingSystem,
+                                              SimpleGlazingSHGC,
+                                              SimpleGlazingU);
                         }
                     } else {
                         int NumX2 = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
@@ -2484,12 +2500,12 @@ namespace WindowManager {
         // Using/Aliasing
         using namespace DataBSDFWindow;
         using DataHeatBalSurface::QConvOutReport;
-        using DataHeatBalSurface::QRadLWOutSrdSurfs;
-        using DataHeatBalSurface::QRadOutReport;
         using DataHeatBalSurface::QdotConvOutRep;
         using DataHeatBalSurface::QdotConvOutRepPerArea;
         using DataHeatBalSurface::QdotRadOutRep;
         using DataHeatBalSurface::QdotRadOutRepPerArea;
+        using DataHeatBalSurface::QRadLWOutSrdSurfs;
+        using DataHeatBalSurface::QRadOutReport;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSlatAng; // Function for slat angle interpolation
@@ -5619,10 +5635,10 @@ namespace WindowManager {
                     // cell # 5
                     // 4 way interpolation between Curve E , Curve E, Curve E and Curve FGHI
 
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, TransCurveE, TransCurveE,
-                                                            TransCurveFGHI, TransCurveE);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, ReflectCurveE,
-                                                              ReflectCurveE, ReflectCurveFGHI, ReflectCurveE);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, TransCurveE, TransCurveE, TransCurveFGHI, TransCurveE);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.50, 0.55, ReflectCurveE, ReflectCurveE, ReflectCurveFGHI, ReflectCurveE);
 
                 } else if ((0.45 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.5)) {
                     // cell # 6
@@ -5633,10 +5649,18 @@ namespace WindowManager {
                 } else if ((0.35 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.45)) {
                     // cell # 7
                     // 4 way interpolation between Curve E , Curve FGHI, Curve J and Curve FGHI
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.35, 0.45, TransCurveJ, TransCurveE,
-                                                            TransCurveFGHI, TransCurveFGHI);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.35, 0.45, ReflectCurveJ,
-                                                              ReflectCurveE, ReflectCurveFGHI, ReflectCurveFGHI);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.35, 0.45, TransCurveJ, TransCurveE, TransCurveFGHI, TransCurveFGHI);
+                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU,
+                                                              SimpleGlazingSHGC,
+                                                              1.4195,
+                                                              1.7034,
+                                                              0.35,
+                                                              0.45,
+                                                              ReflectCurveJ,
+                                                              ReflectCurveE,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveFGHI);
 
                 } else if ((0.3 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.35)) {
                     // cell # 8
@@ -5647,10 +5671,10 @@ namespace WindowManager {
                 } else if ((0.25 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.3)) {
                     // cell # 9
                     // 4 way interpolation between Curve J, Curve FGHI, Curve J and Curve FH
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, TransCurveJ, TransCurveJ,
-                                                            TransCurveFH, TransCurveFGHI);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, ReflectCurveJ,
-                                                              ReflectCurveJ, ReflectCurveFH, ReflectCurveFGHI);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, TransCurveJ, TransCurveJ, TransCurveFH, TransCurveFGHI);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 1.4195, 1.7034, 0.25, 0.3, ReflectCurveJ, ReflectCurveJ, ReflectCurveFH, ReflectCurveFGHI);
 
                 } else if (SimpleGlazingSHGC <= 0.25) {
                     // cell # 10
@@ -5700,10 +5724,10 @@ namespace WindowManager {
                 } else if ((0.6 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.65)) {
                     // cell # 17
                     // 4 way interpolation between Curve E , Curve E, Curve A, and Curve BDCD
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, TransCurveE, TransCurveE,
-                                                            TransCurveBDCD, TransCurveA);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, ReflectCurveE,
-                                                              ReflectCurveE, ReflectCurveBDCD, ReflectCurveA);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, TransCurveE, TransCurveE, TransCurveBDCD, TransCurveA);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.6, 0.65, ReflectCurveE, ReflectCurveE, ReflectCurveBDCD, ReflectCurveA);
 
                 } else if ((0.55 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.6)) {
                     // cell # 18
@@ -5714,10 +5738,18 @@ namespace WindowManager {
                 } else if ((0.5 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.55)) {
                     // cell # 19
                     // 4 way interpolation between Curve E , Curve FGHI, Curve BDCD and Curve BDCD
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.5, 0.55, TransCurveFGHI, TransCurveE,
-                                                            TransCurveBDCD, TransCurveBDCD);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.5, 0.55, ReflectCurveFGHI,
-                                                              ReflectCurveE, ReflectCurveBDCD, ReflectCurveBDCD);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.5, 0.55, TransCurveFGHI, TransCurveE, TransCurveBDCD, TransCurveBDCD);
+                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU,
+                                                              SimpleGlazingSHGC,
+                                                              3.4068,
+                                                              4.5424,
+                                                              0.5,
+                                                              0.55,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveE,
+                                                              ReflectCurveBDCD,
+                                                              ReflectCurveBDCD);
 
                 } else if ((0.45 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.5)) {
                     // cell # 20
@@ -5728,18 +5760,26 @@ namespace WindowManager {
                 } else if ((0.3 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.45)) {
                     // cell # 21
                     // 4 way interpolation between Curve FGHI, Curve FGHI, Curve BDCD, and Curve D
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.3, 0.45, TransCurveFGHI,
-                                                            TransCurveFGHI, TransCurveD, TransCurveBDCD);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.3, 0.45, ReflectCurveFGHI,
-                                                              ReflectCurveFGHI, ReflectCurveD, ReflectCurveBDCD);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.3, 0.45, TransCurveFGHI, TransCurveFGHI, TransCurveD, TransCurveBDCD);
+                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU,
+                                                              SimpleGlazingSHGC,
+                                                              3.4068,
+                                                              4.5424,
+                                                              0.3,
+                                                              0.45,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveFGHI,
+                                                              ReflectCurveD,
+                                                              ReflectCurveBDCD);
 
                 } else if ((0.25 < SimpleGlazingSHGC) && (SimpleGlazingSHGC <= 0.3)) {
                     // cell # 22
                     // 4 way interpolation between Curve FGHI, Curve FH, Curve D, and Curve D
-                    TransTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, TransCurveFH,
-                                                            TransCurveFGHI, TransCurveD, TransCurveD);
-                    ReflectTmp = InterpolateBetweenFourValues(SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, ReflectCurveFH,
-                                                              ReflectCurveFGHI, ReflectCurveD, ReflectCurveD);
+                    TransTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, TransCurveFH, TransCurveFGHI, TransCurveD, TransCurveD);
+                    ReflectTmp = InterpolateBetweenFourValues(
+                        SimpleGlazingU, SimpleGlazingSHGC, 3.4068, 4.5424, 0.25, 0.3, ReflectCurveFH, ReflectCurveFGHI, ReflectCurveD, ReflectCurveD);
 
                 } else if (SimpleGlazingSHGC <= 0.25) {
                     // cell # 23
