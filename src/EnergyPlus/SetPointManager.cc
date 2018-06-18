@@ -3319,14 +3319,20 @@ namespace SetPointManager {
                         ShowContinueError("Node=\"" + NodeID(SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum) + "\", not found in any controlled Zone");
                         ErrorsFound = true;
                     } else {
+                        bool found = false;
                         for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
                             if (SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                                found = true;
                                 AirLoopNum = ZoneEquipConfig(ConZoneNum).InletNodeAirLoopNum(zoneInNode);
                             }
                         }
+                        if (!found) {
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of "+NodeID(SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName +". Please check inputs.");
+                            ErrorsFound = true;
+                        }
                         if (AirLoopNum == 0) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", Zone not on air loop:");
-                            ShowContinueError("Controlled Zone not on air loop, Zone=" + ZoneEquipConfig(ConZoneNum).ZoneName);
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node is not connected to an air loop.");
                             ErrorsFound = true;
                             continue;
                         }
@@ -3901,6 +3907,7 @@ namespace SetPointManager {
             InitSetPointManagersOneTimeFlag = false;
 
             if (ErrorsFound) {
+                ErrorsFound = false;
                 ShowFatalError("InitSetPointManagers: Errors found in getting SetPointManager input.");
             }
         }
