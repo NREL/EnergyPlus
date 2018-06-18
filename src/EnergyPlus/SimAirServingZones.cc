@@ -297,8 +297,8 @@ namespace SimAirServingZones {
 
         // This flag could be used to resimulate only the air loops that needed additional iterations.
         // This flag would have to be moved inside SimAirLoops to gain this flexibility.
-        SimAir = std::any_of(AirLoopControlInfo.begin(), AirLoopControlInfo.end(),
-                             [](DataAirLoop::AirLoopControlData const &e) { return e.ResimAirLoopFlag; });
+        SimAir = std::any_of(
+            AirLoopControlInfo.begin(), AirLoopControlInfo.end(), [](DataAirLoop::AirLoopControlData const &e) { return e.ResimAirLoopFlag; });
     }
 
     // Get Input Section of the Module
@@ -383,8 +383,8 @@ namespace SimAirServingZones {
         using MixedAir::GetOAMixerInletNodeNumber;
         using MixedAir::GetOASysControllerListIndex;
         using MixedAir::GetOASysNumCoolingCoils;
-        using MixedAir::GetOASysNumHXs;
         using MixedAir::GetOASysNumHeatingCoils;
+        using MixedAir::GetOASysNumHXs;
         using MixedAir::GetOASysNumSimpControllers;
         using MixedAir::GetOASystemNumber;
         using NodeInputManager::GetNodeNums;
@@ -548,8 +548,17 @@ namespace SimAirServingZones {
 
             CurrentModuleObject = "AirLoopHVAC";
 
-            inputProcessor->getObjectItem(CurrentModuleObject, AirSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields); // get all the input data for the air system
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          AirSysNum,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields); // get all the input data for the air system
 
             // Assign the air system data to the simulation variables.
             // Data needed to simulate the system goes into PrimaryAirSystem.
@@ -673,8 +682,18 @@ namespace SimAirServingZones {
             }
             // Get the supply nodes
             ErrInList = false;
-            GetNodeNums(Alphas(8), NumNodes, NodeNums, ErrInList, NodeType_Air, CurrentModuleObject, PrimaryAirSystem(AirSysNum).Name,
-                        NodeConnectionType_Inlet, 1, ObjectIsParent, _, cAlphaFields(8));
+            GetNodeNums(Alphas(8),
+                        NumNodes,
+                        NodeNums,
+                        ErrInList,
+                        NodeType_Air,
+                        CurrentModuleObject,
+                        PrimaryAirSystem(AirSysNum).Name,
+                        NodeConnectionType_Inlet,
+                        1,
+                        ObjectIsParent,
+                        _,
+                        cAlphaFields(8));
             if (ErrInList) {
                 //      CALL ShowContinueError(RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
                 //                         '", invalid '//TRIM(cAlphaFields(8))//'.')
@@ -702,8 +721,18 @@ namespace SimAirServingZones {
                 AirToZoneNodeInfo(AirSysNum).SupplyDuctType(I) = 0;
             }
             ErrInList = false;
-            GetNodeNums(Alphas(9), NumNodes, NodeNums, ErrInList, NodeType_Air, CurrentModuleObject, PrimaryAirSystem(AirSysNum).Name,
-                        NodeConnectionType_Outlet, 1, ObjectIsParent, _, cAlphaFields(9));
+            GetNodeNums(Alphas(9),
+                        NumNodes,
+                        NodeNums,
+                        ErrInList,
+                        NodeType_Air,
+                        CurrentModuleObject,
+                        PrimaryAirSystem(AirSysNum).Name,
+                        NodeConnectionType_Outlet,
+                        1,
+                        ObjectIsParent,
+                        _,
+                        cAlphaFields(9));
             if (ErrInList) {
                 //      CALL ShowContinueError(RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
                 //                         '", invalid '//TRIM(cAlphaFields(9))//'.')
@@ -754,8 +783,17 @@ namespace SimAirServingZones {
                 OutletNodeNames.allocate(NumCompsOnBranch);
                 OutletNodeNumbers.dimension(NumCompsOnBranch, 0);
 
-                GetBranchData(PrimaryAirSystem(AirSysNum).Name, BranchNames(BranchNum), DummyInteger(1), DummyInteger(2), NumCompsOnBranch, CompTypes,
-                              CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers,
+                GetBranchData(PrimaryAirSystem(AirSysNum).Name,
+                              BranchNames(BranchNum),
+                              DummyInteger(1),
+                              DummyInteger(2),
+                              NumCompsOnBranch,
+                              CompTypes,
+                              CompNames,
+                              InletNodeNames,
+                              InletNodeNumbers,
+                              OutletNodeNames,
+                              OutletNodeNumbers,
                               ErrorsFound); // Placeholders for plant branch pressure data (not used in air loops)
                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp.allocate(NumCompsOnBranch);
                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).TotalComponents = NumCompsOnBranch;
@@ -939,10 +977,16 @@ namespace SimAirServingZones {
                 inputProcessor->getObjectDefMaxArgs("Connector:Splitter", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
-                GetLoopSplitter(PrimaryAirSystem(AirSysNum).Name, ConnectorListName, PrimaryAirSystem(AirSysNum).Splitter.Name,
-                                PrimaryAirSystem(AirSysNum).Splitter.Exists, PrimaryAirSystem(AirSysNum).Splitter.NodeNameIn,
-                                PrimaryAirSystem(AirSysNum).Splitter.NodeNumIn, PrimaryAirSystem(AirSysNum).Splitter.TotalOutletNodes, NodeNames,
-                                NodeNumbers, ErrorsFound);
+                GetLoopSplitter(PrimaryAirSystem(AirSysNum).Name,
+                                ConnectorListName,
+                                PrimaryAirSystem(AirSysNum).Splitter.Name,
+                                PrimaryAirSystem(AirSysNum).Splitter.Exists,
+                                PrimaryAirSystem(AirSysNum).Splitter.NodeNameIn,
+                                PrimaryAirSystem(AirSysNum).Splitter.NodeNumIn,
+                                PrimaryAirSystem(AirSysNum).Splitter.TotalOutletNodes,
+                                NodeNames,
+                                NodeNumbers,
+                                ErrorsFound);
 
                 PrimaryAirSystem(AirSysNum).Splitter.NodeNameOut.allocate(PrimaryAirSystem(AirSysNum).Splitter.TotalOutletNodes);
                 PrimaryAirSystem(AirSysNum).Splitter.NodeNumOut.allocate(PrimaryAirSystem(AirSysNum).Splitter.TotalOutletNodes);
@@ -993,9 +1037,15 @@ namespace SimAirServingZones {
                 inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNodes);
                 NodeNames.allocate(NumAlphas);
                 NodeNumbers.allocate(NumAlphas);
-                GetLoopMixer(PrimaryAirSystem(AirSysNum).Name, ConnectorListName, PrimaryAirSystem(AirSysNum).Mixer.Name,
-                             PrimaryAirSystem(AirSysNum).Mixer.Exists, PrimaryAirSystem(AirSysNum).Mixer.NodeNameOut,
-                             PrimaryAirSystem(AirSysNum).Mixer.NodeNumOut, PrimaryAirSystem(AirSysNum).Mixer.TotalInletNodes, NodeNames, NodeNumbers,
+                GetLoopMixer(PrimaryAirSystem(AirSysNum).Name,
+                             ConnectorListName,
+                             PrimaryAirSystem(AirSysNum).Mixer.Name,
+                             PrimaryAirSystem(AirSysNum).Mixer.Exists,
+                             PrimaryAirSystem(AirSysNum).Mixer.NodeNameOut,
+                             PrimaryAirSystem(AirSysNum).Mixer.NodeNumOut,
+                             PrimaryAirSystem(AirSysNum).Mixer.TotalInletNodes,
+                             NodeNames,
+                             NodeNumbers,
                              ErrorsFound);
 
                 PrimaryAirSystem(AirSysNum).Mixer.NodeNameIn.allocate(PrimaryAirSystem(AirSysNum).Mixer.TotalInletNodes);
@@ -1332,7 +1382,8 @@ namespace SimAirServingZones {
                     CompType_Num = PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
                         WaterCoilNodeNum = GetCoilWaterInletNode(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                                                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
+                                                                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                                 ErrorsFound);
                         CheckCoilWaterInletNode(WaterCoilNodeNum, NodeNotFound);
                         if (NodeNotFound) {
                             ErrorsFound = true;
@@ -1369,8 +1420,12 @@ namespace SimAirServingZones {
         }
 
         for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
-            SetupOutputVariable("Air System Simulation Cycle On Off Status", OutputProcessor::Unit::None, PriAirSysAvailMgr(AirSysNum).AvailStatus,
-                                "HVAC", "Average", PrimaryAirSystem(AirSysNum).Name);
+            SetupOutputVariable("Air System Simulation Cycle On Off Status",
+                                OutputProcessor::Unit::None,
+                                PriAirSysAvailMgr(AirSysNum).AvailStatus,
+                                "HVAC",
+                                "Average",
+                                PrimaryAirSystem(AirSysNum).Name);
         }
     }
 
@@ -1525,8 +1580,8 @@ namespace SimAirServingZones {
                 // all nodes (including duplicates)
                 for (CompNum = 1; CompNum <= SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
                     if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:ZoneSplitter")) {
-                        SplitterNum = UtilityRoutines::FindItemInList(SupplyAirPath(SupAirPath).ComponentName(CompNum), SplitterCond,
-                                                                      &SplitterConditions::SplitterName);
+                        SplitterNum = UtilityRoutines::FindItemInList(
+                            SupplyAirPath(SupAirPath).ComponentName(CompNum), SplitterCond, &SplitterConditions::SplitterName);
                         if (SplitterNum == 0) {
                             ShowSevereError("AirLoopHVAC:ZoneSplitter not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
                             ShowContinueError("Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath(SupAirPath).Name);
@@ -1535,8 +1590,8 @@ namespace SimAirServingZones {
                         SupplyAirPath(SupAirPath).SplitterIndex(CompNum) = SplitterNum;
                         NumAllSupAirPathNodes += SplitterCond(SplitterNum).NumOutletNodes + 1;
                     } else if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
-                        PlenumNum = UtilityRoutines::FindItemInList(SupplyAirPath(SupAirPath).ComponentName(CompNum), ZoneSupPlenCond,
-                                                                    &ZoneSupplyPlenumConditions::ZonePlenumName);
+                        PlenumNum = UtilityRoutines::FindItemInList(
+                            SupplyAirPath(SupAirPath).ComponentName(CompNum), ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
                         if (PlenumNum == 0) {
                             ShowSevereError("AirLoopHVAC:SupplyPlenum not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
                             ShowContinueError("Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath(SupAirPath).Name);
@@ -2498,8 +2553,11 @@ namespace SimAirServingZones {
             for (AirSysOutNum = 1; AirSysOutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
                 if (AirSysOutNum == 1) CalledFrom = CalledFromAirSystemSupplySideDeck1;
                 if (AirSysOutNum == 2) CalledFrom = CalledFromAirSystemSupplySideDeck2;
-                UpdateHVACInterface(AirLoopNum, CalledFrom, AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(AirSysOutNum),
-                                    AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(AirSysOutNum), SimZoneEquipment);
+                UpdateHVACInterface(AirLoopNum,
+                                    CalledFrom,
+                                    AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(AirSysOutNum),
+                                    AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(AirSysOutNum),
+                                    SimZoneEquipment);
             } // ...end of DO loop over supply air paths for this air loop.
 
         } // End of Air Loop iteration
@@ -2756,8 +2814,14 @@ namespace SimAirServingZones {
             // BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA system
             // ControllerConvergedFlag is returned true here for water coils in OA system
             ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
-                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum), FirstHVACIteration, AirLoopNum, iControllerOpColdStart,
-                              ControllerConvergedFlag, IsUpToDateFlag, BypassOAController, AllowWarmRestartFlag);
+                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
+                              FirstHVACIteration,
+                              AirLoopNum,
+                              iControllerOpColdStart,
+                              ControllerConvergedFlag,
+                              IsUpToDateFlag,
+                              BypassOAController,
+                              AllowWarmRestartFlag);
             // Detect whether the speculative warm restart feature is supported by each controller
             // on this air loop.
             AirLoopControlInfo(AirLoopNum).AllowWarmRestartFlag = AirLoopControlInfo(AirLoopNum).AllowWarmRestartFlag && AllowWarmRestartFlag;
@@ -2788,8 +2852,13 @@ namespace SimAirServingZones {
                 ++Iter;
 
                 ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
-                                  PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum), FirstHVACIteration, AirLoopNum,
-                                  iControllerOpIterate, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController);
+                                  PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
+                                  FirstHVACIteration,
+                                  AirLoopNum,
+                                  iControllerOpIterate,
+                                  ControllerConvergedFlag,
+                                  IsUpToDateFlag,
+                                  BypassOAController);
 
                 PrimaryAirSystem(AirLoopNum).ControlConverged(AirLoopControlNum) = ControllerConvergedFlag;
 
@@ -2864,8 +2933,13 @@ namespace SimAirServingZones {
             ControllerConvergedFlag = false;
 
             ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
-                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum), FirstHVACIteration, AirLoopNum, iControllerOpEnd,
-                              ControllerConvergedFlag, IsUpToDateFlag, BypassOAController);
+                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
+                              FirstHVACIteration,
+                              AirLoopNum,
+                              iControllerOpEnd,
+                              ControllerConvergedFlag,
+                              IsUpToDateFlag,
+                              BypassOAController);
 
             PrimaryAirSystem(AirLoopNum).ControlConverged(AirLoopControlNum) = ControllerConvergedFlag;
 
@@ -2954,8 +3028,15 @@ namespace SimAirServingZones {
         // This call to ManageControllers reinitializes the controllers actuated variables to zero
 
         // BypassOAController is false here since we want to simulate the controller
-        ManageControllers(ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpColdStart, ControllerConvergedFlag,
-                          IsUpToDateFlag, BypassOAController, AllowWarmRestartFlag);
+        ManageControllers(ControllerName,
+                          ControllerIndex,
+                          FirstHVACIteration,
+                          AirLoopNum,
+                          iControllerOpColdStart,
+                          ControllerConvergedFlag,
+                          IsUpToDateFlag,
+                          BypassOAController,
+                          AllowWarmRestartFlag);
 
         // Detect whether the speculative warm restart feature is supported by each controller on this air loop.
         AirLoopControlInfo(AirLoopNum).AllowWarmRestartFlag = AirLoopControlInfo(AirLoopNum).AllowWarmRestartFlag && AllowWarmRestartFlag;
@@ -2983,8 +3064,14 @@ namespace SimAirServingZones {
 
             ++Iter;
 
-            ManageControllers(ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpIterate, ControllerConvergedFlag,
-                              IsUpToDateFlag, BypassOAController);
+            ManageControllers(ControllerName,
+                              ControllerIndex,
+                              FirstHVACIteration,
+                              AirLoopNum,
+                              iControllerOpIterate,
+                              ControllerConvergedFlag,
+                              IsUpToDateFlag,
+                              BypassOAController);
 
             PrimaryAirSystem(AirLoopNum).ControlConverged(HVACControllers::ControllerProps(ControllerIndex).AirLoopControllerIndex) =
                 ControllerConvergedFlag;
@@ -3037,7 +3124,13 @@ namespace SimAirServingZones {
 
         ControllerConvergedFlag = false;
 
-        ManageControllers(ControllerName, ControllerIndex, FirstHVACIteration, AirLoopNum, iControllerOpEnd, ControllerConvergedFlag, IsUpToDateFlag,
+        ManageControllers(ControllerName,
+                          ControllerIndex,
+                          FirstHVACIteration,
+                          AirLoopNum,
+                          iControllerOpEnd,
+                          ControllerConvergedFlag,
+                          IsUpToDateFlag,
                           BypassOAController);
 
         // pass convergence of OA system water coils back to SolveAirLoopControllers via PrimaryAirSystem().ControlConverged flag
@@ -3121,8 +3214,13 @@ namespace SimAirServingZones {
 
             // BypassOAController is false here since we want to simulate the controller during ReSolveAirLoopControllers calls ?
             ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
-                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum), FirstHVACIteration, AirLoopNum,
-                              iControllerOpWarmRestart, ControllerConvergedFlag, IsUpToDateFlag, BypassOAController);
+                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
+                              FirstHVACIteration,
+                              AirLoopNum,
+                              iControllerOpWarmRestart,
+                              ControllerConvergedFlag,
+                              IsUpToDateFlag,
+                              BypassOAController);
         }
 
         // Evaluate air loop components with new actuated variables
@@ -3137,8 +3235,13 @@ namespace SimAirServingZones {
             ControllerConvergedFlag = false;
 
             ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
-                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum), FirstHVACIteration, AirLoopNum, iControllerOpEnd,
-                              ControllerConvergedFlag, IsUpToDateFlag, BypassOAController);
+                              PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
+                              FirstHVACIteration,
+                              AirLoopNum,
+                              iControllerOpEnd,
+                              ControllerConvergedFlag,
+                              IsUpToDateFlag,
+                              BypassOAController);
 
             PrimaryAirSystem(AirLoopNum).ControlConverged(AirLoopControlNum) = ControllerConvergedFlag;
 
@@ -3210,7 +3313,10 @@ namespace SimAirServingZones {
                 CompType_Num = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
 
                 // Simulate each component on PrimaryAirSystem(AirLoopNum)%Branch(BranchNum)%Name
-                SimAirLoopComponent(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, CompType_Num, FirstHVACIteration, AirLoopNum,
+                SimAirLoopComponent(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                    CompType_Num,
+                                    FirstHVACIteration,
+                                    AirLoopNum,
                                     PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompIndex);
             } // End of component loop
 
@@ -3250,16 +3356,16 @@ namespace SimAirServingZones {
         using EvaporativeCoolers::SimEvapCooler;
         using Fans::SimulateFanComponents;
         using Furnaces::SimFurnace;
+        using HeatingCoils::SimulateHeatingCoilComponents;
+        using HeatRecovery::SimHeatRecovery;
+        using Humidifiers::SimHumidifier;
+        using HVACDuct::SimDuct;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
-        using HVACDuct::SimDuct;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using HVACMultiSpeedHeatPump::SimMSHeatPump;
         using HVACUnitaryBypassVAV::SimUnitaryBypassVAV;
         using HVACUnitarySystem::SimUnitarySystem;
-        using HeatRecovery::SimHeatRecovery;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using Humidifiers::SimHumidifier;
         using MixedAir::ManageOutsideAirSystem;
         using SteamCoils::SimulateSteamCoilComponents;
         using UserDefinedComponents::SimCoilUserDefined;
@@ -3389,8 +3495,16 @@ namespace SimAirServingZones {
                 // Heat recovery
             } else if (SELECT_CASE_var == HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent'
                 // 'HeatExchanger:Desiccant:BalancedFlow'
-                SimHeatRecovery(CompName, FirstHVACIteration, CompIndex, AirLoopControlInfo(AirLoopNum).FanOpMode, AirLoopFlow(AirLoopNum).FanPLR, _,
-                                _, _, AirLoopControlInfo(AirLoopNum).EconoActive, AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
+                SimHeatRecovery(CompName,
+                                FirstHVACIteration,
+                                CompIndex,
+                                AirLoopControlInfo(AirLoopNum).FanOpMode,
+                                AirLoopFlow(AirLoopNum).FanPLR,
+                                _,
+                                _,
+                                _,
+                                AirLoopControlInfo(AirLoopNum).EconoActive,
+                                AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
 
                 // Ducts
             } else if (SELECT_CASE_var == Duct) { // 'Duct'
@@ -3833,7 +3947,9 @@ namespace SimAirServingZones {
                         ScalableSM = "Design ";
                     }
                 }
-                ReportSizingOutput("AirLoopHVAC", PrimaryAirSystem(AirLoopNum).Name, ScalableSM + "Supply Air Flow Rate [m3/s]",
+                ReportSizingOutput("AirLoopHVAC",
+                                   PrimaryAirSystem(AirLoopNum).Name,
+                                   ScalableSM + "Supply Air Flow Rate [m3/s]",
                                    PrimaryAirSystem(AirLoopNum).DesignVolFlowRate);
                 // Initialize MaxOutAir for DOAS loops with no actual OASys, systems with an OA controller will overwrite this is CalcOAController
                 if (PrimaryAirSystem(AirLoopNum).OASysExists)
@@ -3841,7 +3957,9 @@ namespace SimAirServingZones {
             }
 
             if (allocated(FinalSysSizing) && FinalSysSizing(AirLoopNum).SysAirMinFlowRatWasAutoSized) {
-                ReportSizingOutput("AirLoopHVAC", PrimaryAirSystem(AirLoopNum).Name, "Central Heating Maximum System Air Flow Ratio",
+                ReportSizingOutput("AirLoopHVAC",
+                                   PrimaryAirSystem(AirLoopNum).Name,
+                                   "Central Heating Maximum System Air Flow Ratio",
                                    FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
             }
 
@@ -3942,8 +4060,8 @@ namespace SimAirServingZones {
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
                 SysSizing(DesDayEnvrnNum, AirLoopNum).AirPriLoopName = PrimaryAirSystem(AirLoopNum).Name;
-                int SysSizNum = UtilityRoutines::FindItemInList(SysSizing(DesDayEnvrnNum, AirLoopNum).AirPriLoopName, SysSizInput,
-                                                                &SystemSizingInputData::AirPriLoopName);
+                int SysSizNum = UtilityRoutines::FindItemInList(
+                    SysSizing(DesDayEnvrnNum, AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
                 if (SysSizNum > 0) { // move data from system sizing input
                     SysSizing(DesDayEnvrnNum, AirLoopNum).LoadSizeType = SysSizInput(SysSizNum).LoadSizeType;
                     SysSizing(DesDayEnvrnNum, AirLoopNum).CoolingPeakLoadType = SysSizInput(SysSizNum).CoolingPeakLoadType;
@@ -4316,81 +4434,153 @@ namespace SimAirServingZones {
 
             if (AnyEnergyManagementSystemInModel) {
 
-                SetupEMSInternalVariable("Intermediate Air System Main Supply Volume Flow Rate", FinalSysSizing(AirLoopNum).AirPriLoopName, "[m3/s]",
+                SetupEMSInternalVariable("Intermediate Air System Main Supply Volume Flow Rate",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesMainVolFlow);
-                SetupEMSActuator("Sizing:System", FinalSysSizing(AirLoopNum).AirPriLoopName, "Main Supply Volume Flow Rate", "[m3/s]",
-                                 FinalSysSizing(AirLoopNum).EMSOverrideDesMainVolFlowOn, FinalSysSizing(AirLoopNum).EMSValueDesMainVolFlow);
+                SetupEMSActuator("Sizing:System",
+                                 FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                 "Main Supply Volume Flow Rate",
+                                 "[m3/s]",
+                                 FinalSysSizing(AirLoopNum).EMSOverrideDesMainVolFlowOn,
+                                 FinalSysSizing(AirLoopNum).EMSValueDesMainVolFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Coincident Peak Cooling Mass Flow Rate", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kg/s]", FinalSysSizing(AirLoopNum).CoinCoolMassFlow);
-                SetupEMSActuator("Sizing:System", FinalSysSizing(AirLoopNum).AirPriLoopName, "Main Supply Coincident Peak Cooling Mass Flow Rate",
-                                 "[kg/s]", FinalSysSizing(AirLoopNum).EMSOverrideCoinCoolMassFlowOn,
+                SetupEMSInternalVariable("Intermediate Air System Coincident Peak Cooling Mass Flow Rate",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kg/s]",
+                                         FinalSysSizing(AirLoopNum).CoinCoolMassFlow);
+                SetupEMSActuator("Sizing:System",
+                                 FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                 "Main Supply Coincident Peak Cooling Mass Flow Rate",
+                                 "[kg/s]",
+                                 FinalSysSizing(AirLoopNum).EMSOverrideCoinCoolMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueCoinCoolMassFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Coincident Peak Heating Mass Flow Rate", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kg/s]", FinalSysSizing(AirLoopNum).CoinHeatMassFlow);
-                SetupEMSActuator("Sizing:System", FinalSysSizing(AirLoopNum).AirPriLoopName, "Main Supply Coincident Peak Heating Mass Flow Rate",
-                                 "[kg/s]", FinalSysSizing(AirLoopNum).EMSOverrideCoinHeatMassFlowOn,
+                SetupEMSInternalVariable("Intermediate Air System Coincident Peak Heating Mass Flow Rate",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kg/s]",
+                                         FinalSysSizing(AirLoopNum).CoinHeatMassFlow);
+                SetupEMSActuator("Sizing:System",
+                                 FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                 "Main Supply Coincident Peak Heating Mass Flow Rate",
+                                 "[kg/s]",
+                                 FinalSysSizing(AirLoopNum).EMSOverrideCoinHeatMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueCoinHeatMassFlow);
 
                 SetupEMSInternalVariable("Intermediate Air System Noncoincident Peak Cooling Mass Flow Rate",
-                                         FinalSysSizing(AirLoopNum).AirPriLoopName, "[kg/s]", FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow);
-                SetupEMSActuator("Sizing:System", FinalSysSizing(AirLoopNum).AirPriLoopName, "Main Supply Noncoincident Peak Cooling Mass Flow Rate",
-                                 "[kg/s]", FinalSysSizing(AirLoopNum).EMSOverrideNonCoinCoolMassFlowOn,
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kg/s]",
+                                         FinalSysSizing(AirLoopNum).NonCoinCoolMassFlow);
+                SetupEMSActuator("Sizing:System",
+                                 FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                 "Main Supply Noncoincident Peak Cooling Mass Flow Rate",
+                                 "[kg/s]",
+                                 FinalSysSizing(AirLoopNum).EMSOverrideNonCoinCoolMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueNonCoinCoolMassFlow);
                 SetupEMSInternalVariable("Intermediate Air System Noncoincident Peak Heating Mass Flow Rate",
-                                         FinalSysSizing(AirLoopNum).AirPriLoopName, "[kg/s]", FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow);
-                SetupEMSActuator("Sizing:System", FinalSysSizing(AirLoopNum).AirPriLoopName, "Main Supply Noncoincident Peak Heating Mass Flow Rate",
-                                 "[kg/s]", FinalSysSizing(AirLoopNum).EMSOverrideNonCoinHeatMassFlowOn,
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kg/s]",
+                                         FinalSysSizing(AirLoopNum).NonCoinHeatMassFlow);
+                SetupEMSActuator("Sizing:System",
+                                 FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                 "Main Supply Noncoincident Peak Heating Mass Flow Rate",
+                                 "[kg/s]",
+                                 FinalSysSizing(AirLoopNum).EMSOverrideNonCoinHeatMassFlowOn,
                                  FinalSysSizing(AirLoopNum).EMSValueNonCoinHeatMassFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Heating Volume Flow Rate", FinalSysSizing(AirLoopNum).AirPriLoopName, "[m3/s]",
+                SetupEMSInternalVariable("Intermediate Air System Heating Volume Flow Rate",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesHeatVolFlow);
-                SetupEMSActuator("Sizing:System", FinalSysSizing(AirLoopNum).AirPriLoopName, "Main Heating Volume Flow Rate", "[m3/s]",
-                                 FinalSysSizing(AirLoopNum).EMSOverrideDesHeatVolFlowOn, FinalSysSizing(AirLoopNum).EMSValueDesHeatVolFlow);
+                SetupEMSActuator("Sizing:System",
+                                 FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                 "Main Heating Volume Flow Rate",
+                                 "[m3/s]",
+                                 FinalSysSizing(AirLoopNum).EMSOverrideDesHeatVolFlowOn,
+                                 FinalSysSizing(AirLoopNum).EMSValueDesHeatVolFlow);
 
-                SetupEMSInternalVariable("Intermediate Air System Cooling Volume Flow Rate", FinalSysSizing(AirLoopNum).AirPriLoopName, "[m3/s]",
+                SetupEMSInternalVariable("Intermediate Air System Cooling Volume Flow Rate",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesCoolVolFlow);
-                SetupEMSActuator("Sizing:System", FinalSysSizing(AirLoopNum).AirPriLoopName, "Main Cooling Volume Flow Rate", "[m3/s]",
-                                 FinalSysSizing(AirLoopNum).EMSOverrideDesCoolVolFlowOn, FinalSysSizing(AirLoopNum).EMSValueDesCoolVolFlow);
+                SetupEMSActuator("Sizing:System",
+                                 FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                 "Main Cooling Volume Flow Rate",
+                                 "[m3/s]",
+                                 FinalSysSizing(AirLoopNum).EMSOverrideDesCoolVolFlowOn,
+                                 FinalSysSizing(AirLoopNum).EMSValueDesCoolVolFlow);
                 // internal variables useful for sizing air system component models
-                SetupEMSInternalVariable("Air System Cooling Design Sensible Capacity", FinalSysSizing(AirLoopNum).AirPriLoopName, "[W]",
+                SetupEMSInternalVariable("Air System Cooling Design Sensible Capacity",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[W]",
                                          FinalSysSizing(AirLoopNum).SensCoolCap);
-                SetupEMSInternalVariable("Air System Cooling Design Total Capacity", FinalSysSizing(AirLoopNum).AirPriLoopName, "[W]",
+                SetupEMSInternalVariable("Air System Cooling Design Total Capacity",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[W]",
                                          FinalSysSizing(AirLoopNum).TotCoolCap);
-                SetupEMSInternalVariable("Air System Heating Design Sensible Capacity", FinalSysSizing(AirLoopNum).AirPriLoopName, "[W]",
+                SetupEMSInternalVariable("Air System Heating Design Sensible Capacity",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[W]",
                                          FinalSysSizing(AirLoopNum).HeatCap);
-                SetupEMSInternalVariable("Air System Preheating Design Sensible Capacity", FinalSysSizing(AirLoopNum).AirPriLoopName, "[W]",
+                SetupEMSInternalVariable("Air System Preheating Design Sensible Capacity",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[W]",
                                          FinalSysSizing(AirLoopNum).PreheatCap);
 
-                SetupEMSInternalVariable("Air System Outdoor Air Design Volume Flow Rate", FinalSysSizing(AirLoopNum).AirPriLoopName, "[m3/s]",
+                SetupEMSInternalVariable("Air System Outdoor Air Design Volume Flow Rate",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[m3/s]",
                                          FinalSysSizing(AirLoopNum).DesOutAirVolFlow);
 
-                SetupEMSInternalVariable("Air System Cooling Design Mixed Air Temperature", FinalSysSizing(AirLoopNum).AirPriLoopName, "[C]",
+                SetupEMSInternalVariable("Air System Cooling Design Mixed Air Temperature",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[C]",
                                          FinalSysSizing(AirLoopNum).MixTempAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Mixed Air Humidity Ratio", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kgWater/kgDryAir]", FinalSysSizing(AirLoopNum).MixHumRatAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Return Air Temperature", FinalSysSizing(AirLoopNum).AirPriLoopName, "[C]",
+                SetupEMSInternalVariable("Air System Cooling Design Mixed Air Humidity Ratio",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kgWater/kgDryAir]",
+                                         FinalSysSizing(AirLoopNum).MixHumRatAtCoolPeak);
+                SetupEMSInternalVariable("Air System Cooling Design Return Air Temperature",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[C]",
                                          FinalSysSizing(AirLoopNum).RetTempAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Return Air Humidity Ratio", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kgWater/kgDryAir]", FinalSysSizing(AirLoopNum).RetHumRatAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Outdoor Air Temperature", FinalSysSizing(AirLoopNum).AirPriLoopName, "[C]",
+                SetupEMSInternalVariable("Air System Cooling Design Return Air Humidity Ratio",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kgWater/kgDryAir]",
+                                         FinalSysSizing(AirLoopNum).RetHumRatAtCoolPeak);
+                SetupEMSInternalVariable("Air System Cooling Design Outdoor Air Temperature",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[C]",
                                          FinalSysSizing(AirLoopNum).OutTempAtCoolPeak);
-                SetupEMSInternalVariable("Air System Cooling Design Outdoor Air Humidity Ratio", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kgWater/kgDryAir]", FinalSysSizing(AirLoopNum).OutHumRatAtCoolPeak);
+                SetupEMSInternalVariable("Air System Cooling Design Outdoor Air Humidity Ratio",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kgWater/kgDryAir]",
+                                         FinalSysSizing(AirLoopNum).OutHumRatAtCoolPeak);
 
-                SetupEMSInternalVariable("Air System Heating Design Mixed Air Temperature", FinalSysSizing(AirLoopNum).AirPriLoopName, "[C]",
+                SetupEMSInternalVariable("Air System Heating Design Mixed Air Temperature",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[C]",
                                          FinalSysSizing(AirLoopNum).HeatMixTemp);
-                SetupEMSInternalVariable("Air System Heating Design Mixed Air Humidity Ratio", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kgWater/kgDryAir]", FinalSysSizing(AirLoopNum).HeatMixHumRat);
-                SetupEMSInternalVariable("Air System Heating Design Return Air Temperature", FinalSysSizing(AirLoopNum).AirPriLoopName, "[C]",
+                SetupEMSInternalVariable("Air System Heating Design Mixed Air Humidity Ratio",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kgWater/kgDryAir]",
+                                         FinalSysSizing(AirLoopNum).HeatMixHumRat);
+                SetupEMSInternalVariable("Air System Heating Design Return Air Temperature",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[C]",
                                          FinalSysSizing(AirLoopNum).HeatRetTemp);
-                SetupEMSInternalVariable("Air System Heating Design Return Air Humidity Ratio", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kgWater/kgDryAir]", FinalSysSizing(AirLoopNum).HeatRetHumRat);
-                SetupEMSInternalVariable("Air System Heating Design Outdoor Air Temperature", FinalSysSizing(AirLoopNum).AirPriLoopName, "[C]",
+                SetupEMSInternalVariable("Air System Heating Design Return Air Humidity Ratio",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kgWater/kgDryAir]",
+                                         FinalSysSizing(AirLoopNum).HeatRetHumRat);
+                SetupEMSInternalVariable("Air System Heating Design Outdoor Air Temperature",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[C]",
                                          FinalSysSizing(AirLoopNum).HeatOutTemp);
-                SetupEMSInternalVariable("Air System Heating Design Outdoor Air Humidity Ratio", FinalSysSizing(AirLoopNum).AirPriLoopName,
-                                         "[kgWater/kgDryAir]", FinalSysSizing(AirLoopNum).HeatOutHumRat);
+                SetupEMSInternalVariable("Air System Heating Design Outdoor Air Humidity Ratio",
+                                         FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                         "[kgWater/kgDryAir]",
+                                         FinalSysSizing(AirLoopNum).HeatOutHumRat);
             }
 
         } // end the primary air system loop
@@ -5596,8 +5786,9 @@ namespace SimAirServingZones {
                                 if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
                                     // SysSizing(AirLoopNum,CurOverallSimDay)%DesHeatVolFlow may be out of sync with
                                     // FinalZoneSizing(CtrlZoneNum)%DesHeatVolFlow
-                                    Xs = min(1.0, FinalSysSizing(AirLoopNum).SysUncOA /
-                                                      max(SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow, SysHtgPeakAirflow));
+                                    Xs = min(1.0,
+                                             FinalSysSizing(AirLoopNum).SysUncOA /
+                                                 max(SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow, SysHtgPeakAirflow));
                                 } else {
                                     Xs = 0.0;
                                 }
@@ -7270,10 +7461,14 @@ namespace SimAirServingZones {
             // Update VRP table entries:
             PreDefTableEntry(pdchS62zcdVpz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VpzClgByZone, 4); // Vpz
             PreDefTableEntry(pdchS62zcdVdz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName, VdzClgByZone, 4); // Vdz
-            PreDefTableEntry(pdchS62zcdVpzmin, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
-                             TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin, 4); // Vpz-min
-            PreDefTableEntry(pdchS62zcdZpz, TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
-                             TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone, 3); // Zpz = Voz/Vpz		}
+            PreDefTableEntry(pdchS62zcdVpzmin,
+                             TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
+                             TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin,
+                             4); // Vpz-min
+            PreDefTableEntry(pdchS62zcdZpz,
+                             TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
+                             TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone,
+                             3); // Zpz = Voz/Vpz		}
         }
     }
 

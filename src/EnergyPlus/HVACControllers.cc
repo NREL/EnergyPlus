@@ -559,10 +559,10 @@ namespace HVACControllers {
         using EMSManager::iTemperatureSetPoint;
         using MixedAir::CheckForControllerWaterCoil;
         using NodeInputManager::GetOnlySingleNode;
-        using SetPointManager::NodeHasSPMCtrlVarType;
-        using SetPointManager::ResetHumidityRatioCtrlVarType;
         using SetPointManager::iCtrlVarType_MaxHumRat;
         using SetPointManager::iCtrlVarType_Temp;
+        using SetPointManager::NodeHasSPMCtrlVarType;
+        using SetPointManager::ResetHumidityRatioCtrlVarType;
         using WaterCoils::CheckActuatorNode;
         using WaterCoils::CheckForSensorAndSetPointNode;
 
@@ -629,8 +629,17 @@ namespace HVACControllers {
         // Now find and load all of the simple controllers.
         if (NumSimpleControllers > 0) {
             for (Num = 1; Num <= NumSimpleControllers; ++Num) {
-                inputProcessor->getObjectItem(CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
-                                              cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              Num,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
                 UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
 
                 ControllerProps(Num).ControllerName = AlphArray(1);
@@ -670,10 +679,16 @@ namespace HVACControllers {
                     ShowContinueError("...Invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\", only FLOW is allowed.");
                     ErrorsFound = true;
                 }
-                ControllerProps(Num).SensedNode = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Unknown,
-                                                                    NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-                ControllerProps(Num).ActuatedNode = GetOnlySingleNode(AlphArray(6), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Unknown,
-                                                                      NodeConnectionType_Actuator, 1, ObjectIsNotParent);
+                ControllerProps(Num).SensedNode = GetOnlySingleNode(
+                    AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                ControllerProps(Num).ActuatedNode = GetOnlySingleNode(AlphArray(6),
+                                                                      ErrorsFound,
+                                                                      CurrentModuleObject,
+                                                                      AlphArray(1),
+                                                                      NodeType_Unknown,
+                                                                      NodeConnectionType_Actuator,
+                                                                      1,
+                                                                      ObjectIsNotParent);
                 ControllerProps(Num).Offset = NumArray(1);
                 ControllerProps(Num).MaxVolFlowActuated = NumArray(2);
                 ControllerProps(Num).MinVolFlowActuated = NumArray(3);
@@ -847,8 +862,11 @@ namespace HVACControllers {
         //  IF (FirstHVACIteration) THEN
         // DSU3    Node(ActuatedNode)%MassFlowRate = 0.0d0
         NoFlowResetValue = 0.0;
-        SetActuatedBranchFlowRate(NoFlowResetValue, ControllerProps(ControlNum).ActuatedNode, ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
-                                  ControllerProps(ControlNum).ActuatedNodePlantLoopSide, ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
+        SetActuatedBranchFlowRate(NoFlowResetValue,
+                                  ControllerProps(ControlNum).ActuatedNode,
+                                  ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
+                                  ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
+                                  ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
                                   true);
 
         //  ENDIF
@@ -1149,8 +1167,10 @@ namespace HVACControllers {
         }
 
         if (allocated(PlantLoop) && MyPlantIndexsFlag(ControlNum)) {
-            ScanPlantLoopsForNodeNum(ControllerProps(ControlNum).ControllerName, ControllerProps(ControlNum).ActuatedNode,
-                                     ControllerProps(ControlNum).ActuatedNodePlantLoopNum, ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
+            ScanPlantLoopsForNodeNum(ControllerProps(ControlNum).ControllerName,
+                                     ControllerProps(ControlNum).ActuatedNode,
+                                     ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
+                                     ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
                                      ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum);
             MyPlantIndexsFlag(ControlNum) = false;
         }
@@ -1171,13 +1191,21 @@ namespace HVACControllers {
             {
                 auto const SELECT_CASE_var(ControllerProps(ControlNum).Action);
                 if (SELECT_CASE_var == iNormalAction) {
-                    SetupRootFinder(RootFinders(ControlNum), iSlopeIncreasing, iMethodBrent, constant_zero, 1.0e-6,
+                    SetupRootFinder(RootFinders(ControlNum),
+                                    iSlopeIncreasing,
+                                    iMethodBrent,
+                                    constant_zero,
+                                    1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
                                                                          // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
                                                                          // Y variables
 
                 } else if (SELECT_CASE_var == iReverseAction) {
-                    SetupRootFinder(RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6,
+                    SetupRootFinder(RootFinders(ControlNum),
+                                    iSlopeDecreasing,
+                                    iMethodBrent,
+                                    constant_zero,
+                                    1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
                                                                          // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
                                                                          // Y variables
@@ -1196,8 +1224,10 @@ namespace HVACControllers {
         // Do the Begin Environment initializations
         if (BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
-            rho = GetDensityGlycol(PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName, CWInitConvTemp,
-                                   PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
+                                   CWInitConvTemp,
+                                   PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
+                                   RoutineName);
 
             ControllerProps(ControlNum).MinActuated = rho * ControllerProps(ControlNum).MinVolFlowActuated;
             ControllerProps(ControlNum).MaxActuated = rho * ControllerProps(ControlNum).MaxVolFlowActuated;
@@ -1218,8 +1248,11 @@ namespace HVACControllers {
             MyEnvrnFlag(ControlNum) = true;
         }
 
-        SetActuatedBranchFlowRate(ControllerProps(ControlNum).NextActuatedValue, ActuatedNode, ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
-                                  ControllerProps(ControlNum).ActuatedNodePlantLoopSide, ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
+        SetActuatedBranchFlowRate(ControllerProps(ControlNum).NextActuatedValue,
+                                  ActuatedNode,
+                                  ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
+                                  ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
+                                  ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
                                   false);
 
         // Do the following initializations (every time step): This should be the info from
@@ -1414,7 +1447,9 @@ namespace HVACControllers {
             if (ControllerProps(ControlNum).MaxVolFlowActuated < SmallWaterVolFlow) {
                 ControllerProps(ControlNum).MaxVolFlowActuated = 0.0;
             }
-            ReportSizingOutput(ControllerProps(ControlNum).ControllerType, ControllerProps(ControlNum).ControllerName, "Maximum Actuated Flow [m3/s]",
+            ReportSizingOutput(ControllerProps(ControlNum).ControllerType,
+                               ControllerProps(ControlNum).ControllerName,
+                               "Maximum Actuated Flow [m3/s]",
                                ControllerProps(ControlNum).MaxVolFlowActuated);
         }
 
@@ -1430,8 +1465,10 @@ namespace HVACControllers {
                 (0.001 / (2100.0 * max(ControllerProps(ControlNum).MaxVolFlowActuated, SmallWaterVolFlow))) * (HVACEnergyToler / 10.0);
             // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
             ControllerProps(ControlNum).Offset = min(0.1 * HVACTemperatureToler, ControllerProps(ControlNum).Offset);
-            ReportSizingOutput(ControllerProps(ControlNum).ControllerType, ControllerProps(ControlNum).ControllerName,
-                               "Controller Convergence Tolerance", ControllerProps(ControlNum).Offset);
+            ReportSizingOutput(ControllerProps(ControlNum).ControllerType,
+                               ControllerProps(ControlNum).ControllerName,
+                               "Controller Convergence Tolerance",
+                               ControllerProps(ControlNum).Offset);
         }
     }
 
@@ -1529,7 +1566,8 @@ namespace HVACControllers {
         // Intialize root finder
         if (ControllerProps(ControlNum).NumCalcCalls == 1) {
             // Set min/max boundaries for root finder on first iteration
-            InitializeRootFinder(RootFinders(ControlNum), ControllerProps(ControlNum).MinAvailActuated,
+            InitializeRootFinder(RootFinders(ControlNum),
+                                 ControllerProps(ControlNum).MinAvailActuated,
                                  ControllerProps(ControlNum).MaxAvailActuated); // XMin | XMax
 
             // Only allow to reuse initial evaluation if the air loop is up-to-date.
@@ -1676,7 +1714,9 @@ namespace HVACControllers {
         // Update root finder with latest solution point
         // Check for unconstrained/constrained convergence
         // Compute next candidate if not converged yet.
-        IterateRootFinder(RootFinders(ControlNum), ControllerProps(ControlNum).ActuatedValue, ControllerProps(ControlNum).DeltaSensed,
+        IterateRootFinder(RootFinders(ControlNum),
+                          ControllerProps(ControlNum).ActuatedValue,
+                          ControllerProps(ControlNum).DeltaSensed,
                           IsDoneFlag); // root finder's data | X | Y | not used
 
         // Process root finder if converged or error
@@ -2267,9 +2307,12 @@ namespace HVACControllers {
         {
             auto const SELECT_CASE_var(ControllerProps(ControlNum).ActuatorVar);
             if (SELECT_CASE_var == iFlow) { // 'Flow'
-                SetActuatedBranchFlowRate(ControllerProps(ControlNum).NextActuatedValue, ControllerProps(ControlNum).ActuatedNode,
-                                          ControllerProps(ControlNum).ActuatedNodePlantLoopNum, ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
-                                          ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum, false);
+                SetActuatedBranchFlowRate(ControllerProps(ControlNum).NextActuatedValue,
+                                          ControllerProps(ControlNum).ActuatedNode,
+                                          ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
+                                          ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
+                                          ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
+                                          false);
                 //     Node(ActuatedNode)%MassFlowRate = ControllerProps(ControlNum)%NextActuatedValue
 
             } else {
@@ -3494,8 +3537,8 @@ namespace HVACControllers {
                     for (ContrlNum = 1; ContrlNum <= PrimaryAirSystem(AirSysNum).NumControllers; ++ContrlNum) {
                         if (UtilityRoutines::SameString(PrimaryAirSystem(AirSysNum).ControllerType(ContrlNum), "CONTROLLER:WATERCOIL")) {
                             ++SensedNodeIndex;
-                            foundControl = UtilityRoutines::FindItemInList(PrimaryAirSystem(AirSysNum).ControllerName(ContrlNum), ControllerProps,
-                                                                           &ControllerPropsType::ControllerName);
+                            foundControl = UtilityRoutines::FindItemInList(
+                                PrimaryAirSystem(AirSysNum).ControllerName(ContrlNum), ControllerProps, &ControllerPropsType::ControllerName);
                             if (foundControl > 0) {
                                 ContrlSensedNodeNums(1, SensedNodeIndex) = ControllerProps(foundControl).SensedNode;
                             }

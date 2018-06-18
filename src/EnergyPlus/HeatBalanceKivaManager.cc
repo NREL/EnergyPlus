@@ -403,8 +403,15 @@ namespace HeatBalanceKivaManager {
         }
 
         // Read in Header Information
-        static Array1D_string const Header(8, {"LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES",
-                                               "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS"});
+        static Array1D_string const Header(8,
+                                           {"LOCATION",
+                                            "DESIGN CONDITIONS",
+                                            "TYPICAL/EXTREME PERIODS",
+                                            "GROUND TEMPERATURES",
+                                            "HOLIDAYS/DAYLIGHT SAVING",
+                                            "COMMENTS 1",
+                                            "COMMENTS 2",
+                                            "DATA PERIODS"});
 
         std::string Line;
         int HdLine = 1; // Look for first Header
@@ -534,11 +541,41 @@ namespace HeatBalanceKivaManager {
             if (ReadStatus < 0) {
                 break;
             }
-            WeatherManager::InterpretWeatherDataLine(WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum,
-                                                     AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum,
-                                                     DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover,
-                                                     Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth,
-                                                     DaysSinceLastSnow, Albedo, LiquidPrecip);
+            WeatherManager::InterpretWeatherDataLine(WeatherDataLine,
+                                                     ErrorFound,
+                                                     WYear,
+                                                     WMonth,
+                                                     WDay,
+                                                     WHour,
+                                                     WMinute,
+                                                     DryBulb,
+                                                     DewPoint,
+                                                     RelHum,
+                                                     AtmPress,
+                                                     ETHoriz,
+                                                     ETDirect,
+                                                     IRHoriz,
+                                                     GLBHoriz,
+                                                     DirectRad,
+                                                     DiffuseRad,
+                                                     GLBHorizIllum,
+                                                     DirectNrmIllum,
+                                                     DiffuseHorizIllum,
+                                                     ZenLum,
+                                                     WindDir,
+                                                     WindSpeed,
+                                                     TotalSkyCover,
+                                                     OpaqueSkyCover,
+                                                     Visibility,
+                                                     CeilHeight,
+                                                     PresWeathObs,
+                                                     PresWeathConds,
+                                                     PrecipWater,
+                                                     AerosolOptDepth,
+                                                     SnowDepth,
+                                                     DaysSinceLastSnow,
+                                                     Albedo,
+                                                     LiquidPrecip);
 
             kivaWeather.dryBulb.push_back(DryBulb);
             kivaWeather.windSpeed.push_back(WindSpeed);
@@ -886,18 +923,18 @@ namespace HeatBalanceKivaManager {
                     outputMap[Kiva::Surface::ST_SLAB_CORE] = {Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP, Kiva::GroundOutput::OT_CONV};
 
                     if (fnd.hasPerimeterSurface) {
-                        outputMap[Kiva::Surface::ST_SLAB_PERIM] = {Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP,
-                                                                   Kiva::GroundOutput::OT_CONV};
+                        outputMap[Kiva::Surface::ST_SLAB_PERIM] = {
+                            Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP, Kiva::GroundOutput::OT_CONV};
                     }
 
                     if (fnd.foundationDepth > 0.0) {
-                        outputMap[Kiva::Surface::ST_WALL_INT] = {Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP,
-                                                                 Kiva::GroundOutput::OT_CONV};
+                        outputMap[Kiva::Surface::ST_WALL_INT] = {
+                            Kiva::GroundOutput::OT_FLUX, Kiva::GroundOutput::OT_TEMP, Kiva::GroundOutput::OT_CONV};
                     }
 
                     // point surface to associated ground intance(s)
-                    kivaInstances.emplace_back(foundationInstances[inst], outputMap, surfNum, wallIDs, surface.Zone, weightedPerimeter,
-                                               constructionNum);
+                    kivaInstances.emplace_back(
+                        foundationInstances[inst], outputMap, surfNum, wallIDs, surface.Zone, weightedPerimeter, constructionNum);
 
                     // Floors can point to any number of foundaiton surfaces
                     floorSurfaceMaps.emplace_back(inst, Kiva::Surface::ST_SLAB_CORE);
