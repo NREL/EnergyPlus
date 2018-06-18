@@ -8841,6 +8841,7 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using BranchNodeConnections::GetNodeConnectionType;
         using DataAirLoop::AirToZoneNodeInfo;
+        using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using MixedAir::GetNumOAMixers;
         using MixedAir::GetOAMixerInletNodeNumber;
@@ -9526,8 +9527,7 @@ namespace AirflowNetworkBalanceManager {
                         if (NumOfFans > 1) {
                             FanNames += PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).Name;
                             break;
-                        }
-                        else {
+                        } else {
                             FanNames += PrimaryAirSystem(1).Branch(BranchNum).Comp(CompNum).Name + ",";
                         }
                     }

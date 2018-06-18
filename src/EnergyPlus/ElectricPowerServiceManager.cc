@@ -853,7 +853,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
             // check to make sure the user didn't input zeros for thermalToElectricControlRatio
             for (auto &g : elecGenCntrlObj) {
                 if (g->nominalThermElectRatio <= 0.0) {
-                    ShowErrorMessage("Generator operation need to be based on following thermal loads and needs values for Rated Thermal to "
+                    ShowWarningError("Generator operation needs to be based on following thermal loads and needs values for Rated Thermal to "
                                      "Electrical Power Ratio in " +
                                      DataIPShortCuts::cCurrentModuleObject + " named " + DataIPShortCuts::cAlphaArgs(1));
                 }
