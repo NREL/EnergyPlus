@@ -238,37 +238,37 @@ namespace DataTimings {
     )
     {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   January 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   January 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Implement a timing scheme using start-stop (ref: epStartTime) that will help
-    // developers pinpoint problems.
+        // PURPOSE OF THIS SUBROUTINE:
+        // Implement a timing scheme using start-stop (ref: epStartTime) that will help
+        // developers pinpoint problems.
 
-    // METHODOLOGY EMPLOYED:
-    // structure similar to recurring error structure.
+        // METHODOLOGY EMPLOYED:
+        // structure similar to recurring error structure.
 
-    // REFERENCES:
-    // na
+        // REFERENCES:
+        // na
 
-    // USE STATEMENTS:
+        // USE STATEMENTS:
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
 
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+        // DERIVED TYPE DEFINITIONS:
+        // na
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_NO_Timings
         return;
@@ -618,4 +618,4 @@ namespace DataTimings {
 
 } // namespace DataTimings
 
-} // EnergyPlus
+} // namespace EnergyPlus
