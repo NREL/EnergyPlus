@@ -9495,7 +9495,11 @@ namespace Furnaces {
             }
         }
 
-        DataSizing::resetHVACSizingGlobals(0, DataSizing::CurSysNum, Furnace(FurnaceNum).FirstPass);
+        if (Furnace(FurnaceNum).FirstPass) {
+            if (!SysSizingCalc) {
+                DataSizing::resetHVACSizingGlobals(0, DataSizing::CurSysNum, Furnace(FurnaceNum).FirstPass);
+            }
+        }
         DataHVACGlobals::OnOffFanPartLoadFraction =
             1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
     }

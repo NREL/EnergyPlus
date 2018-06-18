@@ -4358,25 +4358,12 @@ namespace VariableSpeedCoils {
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
 
-                    Real64 FanCoolLoad = 0.0;
-                    if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
-                        switch (DataFanEnumType) {
-                        case DataAirSystems::structArrayLegacyFanModels: {
-                            FanCoolLoad = Fans::FanDesHeatGain(DataFanIndex, VolFlowRate);
-                            break;
-                        }
-                        case DataAirSystems::objectVectorOOFanSystemModel: {
-                            FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
-                            break;
-                        }
-                        case DataAirSystems::fanModelTypeNotYetSet: {
-                            // do nothing
-                            break;
-                        }
-                        } // end switch
-                        Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
-                        MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                    }
+                    // design fan heat will be added to coil load
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
+                    // inlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
+                    Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                    MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
                     if (MixEnth > SupEnth) {
@@ -4437,25 +4424,12 @@ namespace VariableSpeedCoils {
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
 
-                    Real64 FanCoolLoad = 0.0;
-                    if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
-                        switch (DataFanEnumType) {
-                        case DataAirSystems::structArrayLegacyFanModels: {
-                            FanCoolLoad = Fans::FanDesHeatGain(DataFanIndex, VolFlowRate);
-                            break;
-                        }
-                        case DataAirSystems::objectVectorOOFanSystemModel: {
-                            FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
-                            break;
-                        }
-                        case DataAirSystems::fanModelTypeNotYetSet: {
-                            // do nothing
-                            break;
-                        }
-                        } // end switch
-                        Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
-                        MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                    }
+                    // design fan heat will be added to coil load
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
+                    // inlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
+                    Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                    MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+
                     //       The mixed air temp for zone equipment without an OA mixer is 0.
                     //       This test avoids a negative capacity until a solution can be found.
                     if (MixEnth > SupEnth) {
