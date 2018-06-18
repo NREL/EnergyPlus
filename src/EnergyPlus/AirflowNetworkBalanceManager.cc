@@ -6489,7 +6489,6 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        int k;
         // Assign node value to distribution nodes with fan off
         for (i = 1 + NumOfNodesMultiZone; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
@@ -6500,22 +6499,6 @@ namespace AirflowNetworkBalanceManager {
             if (j == 0 && i > NumOfNodesMultiZone && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum)) {
                 MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 MV(i) = AirflowNetworkNodeSimu(i).TZlast * 1.0e10;
-                // for ( k = 1; k <= AirflowNetworkNumOfLinks; ++k ) {
-                // if ( AirflowNetworkNodeData( AirflowNetworkLinkageData( k ).NodeNums( 1 ) ).EPlusNodeNum == AirToZoneNodeInfo(
-                // AirflowNetworkNodeData( i ).AirLoopNum ).ZoneEquipSupplyNodeNum( 1 ) && 	AirflowNetworkLinkageData( k ).NodeNums( 2 ) == i ) { 	MA( (
-                //i - 1 ) * AirflowNetworkNumOfNodes + i ) = 1.0e10; 	MV( i ) = AirflowNetworkNodeSimu( i ).TZ * 1.0e10;
-                //}
-                // if ( AirflowNetworkLinkageData( k ).NodeNums( 2 ) == i && AirflowNetworkNodeData( AirflowNetworkLinkageData( k ).NodeNums( 1 )
-                // ).EPlusTypeNum == EPlusTypeNum_OAN ) { 	MA( ( AirflowNetworkLinkageData( k ).NodeNums( 1 ) - 1 ) * AirflowNetworkNumOfNodes +
-                //AirflowNetworkLinkageData( k ).NodeNums( 1 ) ) = 1.0e10; 	MV( AirflowNetworkLinkageData( k ).NodeNums( 1 ) ) =
-                //AirflowNetworkNodeSimu( i ).TZ * 1.0e10;
-                //}
-                // if ( AirflowNetworkLinkageData( k ).NodeNums( 2 ) == i && AirflowNetworkNodeData( AirflowNetworkLinkageData( k ).NodeNums( 2 )
-                // ).EPlusTypeNum == EPlusTypeNum_MIX ) { 	MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) = 1.0e10; 	MV( i ) = AirflowNetworkNodeSimu( i
-                //).TZlast * 1.0e10; 	MA( ( AirflowNetworkLinkageData( k ).NodeNums( 1 ) - 1 ) * AirflowNetworkNumOfNodes + AirflowNetworkLinkageData(
-                //k ).NodeNums( 1 ) ) = 1.0e10; 	MV( AirflowNetworkLinkageData( k ).NodeNums( 1 ) ) = AirflowNetworkNodeSimu( i ).TZlast * 1.0e10;
-                //}
-                //}
             }
         }
 
@@ -6828,7 +6811,6 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // Assign node value to distribution nodes with fan off
-        int k;
         for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
             j = AirflowNetworkNodeData(i).EPlusNodeNum;
             if (j > 0 && !LoopOnOffFlag(AirflowNetworkNodeData(i).AirLoopNum) && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 1.0e9) {

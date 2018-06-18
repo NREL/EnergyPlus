@@ -2514,10 +2514,10 @@ namespace Fans {
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-			if (Fan(FanNum).AirLoopNum > 0) {
-				AFNLoopOnOffFanRTF(Fan(FanNum).AirLoopNum) = Fan(FanNum).FanRuntimeFraction;
-			}
-		}
+            if (Fan(FanNum).AirLoopNum > 0) {
+               AFNLoopOnOffFanRTF(Fan(FanNum).AirLoopNum) = Fan(FanNum).FanRuntimeFraction;
+            }
+        }
     }
 
     //        End of Reporting subroutines for the Fan Module

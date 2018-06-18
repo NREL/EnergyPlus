@@ -165,9 +165,8 @@ namespace HeatingCoils {
         bool FaultyCoilSATFlag;              // True if the coil has SAT sensor fault
         int FaultyCoilSATIndex;              // Index of the fault object corresponding to the coil
         Real64 FaultyCoilSATOffset;          // Coil SAT sensor offset
-        int AirLoopNum;                      // Airloop number
-
         bool reportCoilFinalSizes; // one time report of sizes to coil report
+        int AirLoopNum;                      // Airloop number
         // Default Constructor
         HeatingCoilEquipConditions()
             : HCoilType_Num(0), FuelType_Num(0), SchedPtr(0), InsuffTemperatureWarn(0), InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0),

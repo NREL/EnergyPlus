@@ -12572,7 +12572,7 @@ namespace DXCoils {
         using DataHVACGlobals::TimeStepSys;
         using DataWater::WaterStorage;
         using Psychrometrics::RhoH2O;
-		using DataAirLoop::AFNLoopDXCoilRTF;
+        using DataAirLoop::AFNLoopDXCoilRTF;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoWater;
@@ -12676,10 +12676,10 @@ namespace DXCoils {
         }
 
         LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
-		if (DXCoil(DXCoilNum).AirLoopNum > 0) {
-			AFNLoopDXCoilRTF(DXCoil(DXCoilNum).AirLoopNum) = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
-		}
-	}
+        if (DXCoil(DXCoilNum).AirLoopNum > 0) {
+            AFNLoopDXCoilRTF(DXCoil(DXCoilNum).AirLoopNum) = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+        }
+    }
 
     void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum)
     {
