@@ -140,12 +140,20 @@ namespace DataZoneEquipment {
 
     int const NumValidSysAvailZoneComponents(14);
     Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponents,
-                                                        {"ZoneHVAC:FourPipeFanCoil", "ZoneHVAC:PackagedTerminalHeatPump",
-                                                         "ZoneHVAC:PackagedTerminalAirConditioner", "ZoneHVAC:WaterToAirHeatPump",
-                                                         "ZoneHVAC:WindowAirConditioner", "ZoneHVAC:UnitHeater", "ZoneHVAC:UnitVentilator",
-                                                         "ZoneHVAC:EnergyRecoveryVentilator", "ZoneHVAC:VentilatedSlab", "ZoneHVAC:OutdoorAirUnit",
-                                                         "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow", "ZoneHVAC:IdealLoadsAirSystem",
-                                                         "ZoneHVAC:EvaporativeCoolerUnit", "ZoneHVAC:HybridUnitaryHVAC"});
+                                                        {"ZoneHVAC:FourPipeFanCoil",
+                                                         "ZoneHVAC:PackagedTerminalHeatPump",
+                                                         "ZoneHVAC:PackagedTerminalAirConditioner",
+                                                         "ZoneHVAC:WaterToAirHeatPump",
+                                                         "ZoneHVAC:WindowAirConditioner",
+                                                         "ZoneHVAC:UnitHeater",
+                                                         "ZoneHVAC:UnitVentilator",
+                                                         "ZoneHVAC:EnergyRecoveryVentilator",
+                                                         "ZoneHVAC:VentilatedSlab",
+                                                         "ZoneHVAC:OutdoorAirUnit",
+                                                         "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
+                                                         "ZoneHVAC:IdealLoadsAirSystem",
+                                                         "ZoneHVAC:EvaporativeCoolerUnit",
+                                                         "ZoneHVAC:HybridUnitaryHVAC"});
 
     // Per Person Ventilation Rate Mode
     int const PerPersonDCVByCurrentLevel(1);
@@ -417,8 +425,17 @@ namespace DataZoneEquipment {
 
             CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
-            inputProcessor->getObjectItem(CurrentModuleObject, ControlledZoneLoop, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields); // Get Equipment | data for one zone
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          ControlledZoneLoop,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields); // Get Equipment | data for one zone
 
             ControlledZoneNum = UtilityRoutines::FindItemInList(AlphArray(1), Zone);
 
@@ -451,9 +468,14 @@ namespace DataZoneEquipment {
             ZoneEquipConfig(ControlledZoneNum).EquipListName = AlphArray(2); // the name of the list containing all the zone eq.
             InletNodeListName = AlphArray(3);
             ExhaustNodeListName = AlphArray(4);
-            ZoneEquipConfig(ControlledZoneNum).ZoneNode =
-                GetOnlySingleNode(AlphArray(5), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air,
-                                  NodeConnectionType_ZoneNode, 1, ObjectIsNotParent); // all zone air state variables are
+            ZoneEquipConfig(ControlledZoneNum).ZoneNode = GetOnlySingleNode(AlphArray(5),
+                                                                            GetZoneEquipmentDataErrorsFound,
+                                                                            CurrentModuleObject,
+                                                                            AlphArray(1),
+                                                                            NodeType_Air,
+                                                                            NodeConnectionType_ZoneNode,
+                                                                            1,
+                                                                            ObjectIsNotParent); // all zone air state variables are
             if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
                 ShowContinueError(cAlphaFields(5) + " must be present.");
@@ -492,8 +514,17 @@ namespace DataZoneEquipment {
             ZoneEquipListNum = inputProcessor->getObjectItemNum(CurrentModuleObject, ZoneEquipConfig(ControlledZoneNum).EquipListName);
             if (ZoneEquipListNum > 0) {
 
-                inputProcessor->getObjectItem(CurrentModuleObject, ZoneEquipListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks,
-                                              lAlphaBlanks, cAlphaFields, cNumericFields); //  data for one zone
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              ZoneEquipListNum,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields); //  data for one zone
                 UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
                 ZoneEquipList(ControlledZoneNum).Name = AlphArray(1);
 
@@ -552,7 +583,9 @@ namespace DataZoneEquipment {
                     ZoneEquipList(ControlledZoneNum).EquipType(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 1);
                     ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 2);
                     ValidateComponent(ZoneEquipList(ControlledZoneNum).EquipType(ZoneEquipTypeNum),
-                                      ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum), IsNotOK, CurrentModuleObject);
+                                      ZoneEquipList(ControlledZoneNum).EquipName(ZoneEquipTypeNum),
+                                      IsNotOK,
+                                      CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError("In " + CurrentModuleObject + '=' + ZoneEquipList(ControlledZoneNum).Name);
                         GetZoneEquipmentDataErrorsFound = true;
@@ -737,8 +770,16 @@ namespace DataZoneEquipment {
             // End ZoneHVAC:EquipmentList
 
             NodeListError = false;
-            GetNodeNums(InletNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName, NodeConnectionType_ZoneInlet, 1, ObjectIsNotParent);
+            GetNodeNums(InletNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        "ZoneHVAC:EquipmentConnections",
+                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        NodeConnectionType_ZoneInlet,
+                        1,
+                        ObjectIsNotParent);
 
             if (!NodeListError) {
                 ZoneEquipConfig(ControlledZoneNum).NumInletNodes = NumNodes;
@@ -753,8 +794,8 @@ namespace DataZoneEquipment {
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                     ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
-                    CheckUniqueNodes("Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum),
-                                     ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    CheckUniqueNodes(
+                        "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         GetZoneEquipmentDataErrorsFound = true;
                     }
@@ -776,8 +817,16 @@ namespace DataZoneEquipment {
             }
 
             NodeListError = false;
-            GetNodeNums(ExhaustNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName, NodeConnectionType_ZoneExhaust, 1, ObjectIsNotParent);
+            GetNodeNums(ExhaustNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        "ZoneHVAC:EquipmentConnections",
+                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        NodeConnectionType_ZoneExhaust,
+                        1,
+                        ObjectIsNotParent);
 
             if (!NodeListError) {
                 ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes = NumNodes;
@@ -787,8 +836,8 @@ namespace DataZoneEquipment {
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                     ZoneEquipConfig(ControlledZoneNum).ExhaustNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
-                    CheckUniqueNodes("Zone Air Exhaust Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum),
-                                     ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    CheckUniqueNodes(
+                        "Zone Air Exhaust Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         // ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                         GetZoneEquipmentDataErrorsFound = true;
@@ -801,8 +850,16 @@ namespace DataZoneEquipment {
             }
 
             NodeListError = false;
-            GetNodeNums(ReturnNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName, NodeConnectionType_ZoneReturn, 1, ObjectIsNotParent);
+            GetNodeNums(ReturnNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        "ZoneHVAC:EquipmentConnections",
+                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        NodeConnectionType_ZoneReturn,
+                        1,
+                        ObjectIsNotParent);
 
             if (!NodeListError) {
                 ZoneEquipConfig(ControlledZoneNum).NumReturnNodes = NumNodes;
@@ -819,8 +876,8 @@ namespace DataZoneEquipment {
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                     ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
-                    CheckUniqueNodes("Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum),
-                                     ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    CheckUniqueNodes(
+                        "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         // ShowContinueError( "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                         GetZoneEquipmentDataErrorsFound = true;
@@ -833,8 +890,16 @@ namespace DataZoneEquipment {
             }
 
             NodeListError = false;
-            GetNodeNums(ReturnFlowBasisNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Air, "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            GetNodeNums(ReturnFlowBasisNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        "ZoneHVAC:EquipmentConnections",
+                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        NodeConnectionType_Sensor,
+                        1,
+                        ObjectIsNotParent);
 
             if (!NodeListError) {
                 ZoneEquipConfig(ControlledZoneNum).NumReturnFlowBasisNodes = NumNodes;
@@ -911,14 +976,29 @@ namespace DataZoneEquipment {
         CurrentModuleObject = "AirLoopHVAC:SupplyPath";
         for (PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields); //  data for one zone
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          PathNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields); //  data for one zone
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
             SupplyAirPath(PathNum).Name = AlphArray(1);
             SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
-            SupplyAirPath(PathNum).InletNodeNum = GetOnlySingleNode(AlphArray(2), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray(1),
-                                                                    NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+            SupplyAirPath(PathNum).InletNodeNum = GetOnlySingleNode(AlphArray(2),
+                                                                    GetZoneEquipmentDataErrorsFound,
+                                                                    CurrentModuleObject,
+                                                                    AlphArray(1),
+                                                                    NodeType_Air,
+                                                                    NodeConnectionType_Inlet,
+                                                                    1,
+                                                                    ObjectIsParent);
 
             SupplyAirPath(PathNum).ComponentType.allocate(SupplyAirPath(PathNum).NumOfComponents);
             SupplyAirPath(PathNum).ComponentType_Num.allocate(SupplyAirPath(PathNum).NumOfComponents);
@@ -936,8 +1016,8 @@ namespace DataZoneEquipment {
 
                     SupplyAirPath(PathNum).ComponentType(CompNum) = AlphArray(Counter);
                     SupplyAirPath(PathNum).ComponentName(CompNum) = AlphArray(Counter + 1);
-                    ValidateComponent(SupplyAirPath(PathNum).ComponentType(CompNum), SupplyAirPath(PathNum).ComponentName(CompNum), IsNotOK,
-                                      CurrentModuleObject);
+                    ValidateComponent(
+                        SupplyAirPath(PathNum).ComponentType(CompNum), SupplyAirPath(PathNum).ComponentName(CompNum), IsNotOK, CurrentModuleObject);
                     SupplyAirPath(PathNum).ComponentIndex(CompNum) = 0;
                     SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                     SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
@@ -962,14 +1042,29 @@ namespace DataZoneEquipment {
         CurrentModuleObject = "AirLoopHVAC:ReturnPath";
         for (PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, PathNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks,
-                                          cAlphaFields, cNumericFields); //  data for one zone
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          PathNum,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields); //  data for one zone
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
             ReturnAirPath(PathNum).Name = AlphArray(1);
             ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
-            ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(AlphArray(2), GetZoneEquipmentDataErrorsFound, CurrentModuleObject, AlphArray(1),
-                                                                     NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+            ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(AlphArray(2),
+                                                                     GetZoneEquipmentDataErrorsFound,
+                                                                     CurrentModuleObject,
+                                                                     AlphArray(1),
+                                                                     NodeType_Air,
+                                                                     NodeConnectionType_Outlet,
+                                                                     1,
+                                                                     ObjectIsParent);
 
             ReturnAirPath(PathNum).ComponentType.allocate(ReturnAirPath(PathNum).NumOfComponents);
             ReturnAirPath(PathNum).ComponentType_Num.allocate(ReturnAirPath(PathNum).NumOfComponents);
@@ -986,8 +1081,8 @@ namespace DataZoneEquipment {
                     ReturnAirPath(PathNum).ComponentType(CompNum) = AlphArray(Counter);
                     ReturnAirPath(PathNum).ComponentName(CompNum) = AlphArray(Counter + 1);
                     ReturnAirPath(PathNum).ComponentIndex(CompNum) = 0;
-                    ValidateComponent(ReturnAirPath(PathNum).ComponentType(CompNum), ReturnAirPath(PathNum).ComponentName(CompNum), IsNotOK,
-                                      CurrentModuleObject);
+                    ValidateComponent(
+                        ReturnAirPath(PathNum).ComponentType(CompNum), ReturnAirPath(PathNum).ComponentName(CompNum), IsNotOK, CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError("In " + CurrentModuleObject + " = " + ReturnAirPath(PathNum).Name);
                         GetZoneEquipmentDataErrorsFound = true;
@@ -1348,8 +1443,8 @@ namespace DataZoneEquipment {
         using DataSizing::OAFlowACH;
         using DataSizing::OAFlowMax;
         using DataSizing::OAFlowNone;
-        using DataSizing::OAFlowPPer;
         using DataSizing::OAFlowPerArea;
+        using DataSizing::OAFlowPPer;
         using DataSizing::OAFlowSum;
         using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
         using DataSizing::ZOAM_IAQP;

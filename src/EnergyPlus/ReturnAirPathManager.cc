@@ -199,8 +199,8 @@ namespace ReturnAirPathManager {
                 ReturnAirPath(PathNum).Name = cAlphaArgs(1);
                 ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
 
-                ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                         NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(
+                    cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
                 ReturnAirPath(PathNum).ComponentType.allocate(ReturnAirPath(PathNum).NumOfComponents);
                 ReturnAirPath(PathNum).ComponentType = "";
@@ -219,7 +219,9 @@ namespace ReturnAirPathManager {
 
                         ReturnAirPath(PathNum).ComponentType(CompNum) = cAlphaArgs(Counter);
                         ReturnAirPath(PathNum).ComponentName(CompNum) = cAlphaArgs(Counter + 1);
-                        ValidateComponent(ReturnAirPath(PathNum).ComponentType(CompNum), ReturnAirPath(PathNum).ComponentName(CompNum), IsNotOK,
+                        ValidateComponent(ReturnAirPath(PathNum).ComponentType(CompNum),
+                                          ReturnAirPath(PathNum).ComponentName(CompNum),
+                                          IsNotOK,
                                           "AirLoopHVAC:ReturnPath");
                         if (IsNotOK) {
                             ShowContinueError("In AirLoopHVAC:ReturnPath =" + ReturnAirPath(PathNum).Name);
@@ -299,7 +301,8 @@ namespace ReturnAirPathManager {
 
                 } else if (SELECT_CASE_var == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
 
-                    SimAirZonePlenum(ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum), ZoneReturnPlenum_Type,
+                    SimAirZonePlenum(ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                     ZoneReturnPlenum_Type,
                                      ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
 
                 } else {

@@ -180,8 +180,15 @@ namespace SetPointManager {
 
     int const NumValidCtrlTypes(9);
     Array1D_string const cValidCtrlTypes(NumValidCtrlTypes,
-                                         {"Temperature", "MaximumTemperature", "MinimumTemperature", "HumidityRatio", "MaximumHumidityRatio",
-                                          "MinimumHumidityRatio", "MassFlowRate", "MaximumMassFlowRate", "MinimumMassFlowRate"});
+                                         {"Temperature",
+                                          "MaximumTemperature",
+                                          "MinimumTemperature",
+                                          "HumidityRatio",
+                                          "MaximumHumidityRatio",
+                                          "MinimumHumidityRatio",
+                                          "MassFlowRate",
+                                          "MaximumMassFlowRate",
+                                          "MinimumMassFlowRate"});
 
     // following are used to reduce string comparisons related to CtrlVarType
     int const iSPMType_Scheduled(1);
@@ -550,12 +557,12 @@ namespace SetPointManager {
         // Using/Aliasing
         using DataEnvironment::FCGroundTemps;
         using DataEnvironment::GroundTemp;
-        using DataEnvironment::GroundTempFC;
-        using DataEnvironment::GroundTempObjInput;
         using DataEnvironment::GroundTemp_Deep;
         using DataEnvironment::GroundTemp_DeepObjInput;
         using DataEnvironment::GroundTemp_Surface;
         using DataEnvironment::GroundTemp_SurfaceObjInput;
+        using DataEnvironment::GroundTempFC;
+        using DataEnvironment::GroundTempObjInput;
         using DataHeatBalance::Zone;
         using DataZoneControls::StageZoneLogic;
         using DataZoneEquipment::GetSystemNodeNumberForZone;
@@ -813,8 +820,17 @@ namespace SetPointManager {
         cCurrentModuleObject = "SetpointManager:Scheduled";
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSchSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SchSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -861,8 +877,18 @@ namespace SetPointManager {
             }
             SchSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(4);
             NodeListError = false;
-            GetNodeNums(SchSetPtMgr(SetPtMgrNum).CtrlNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject,
-                        cAlphaArgs(1), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(4));
+            GetNodeNums(SchSetPtMgr(SetPtMgrNum).CtrlNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(4));
 
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
@@ -900,8 +926,17 @@ namespace SetPointManager {
         cCurrentModuleObject = "SetpointManager:Scheduled:DualSetpoint";
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumDualSchSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             DualSchSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -941,8 +976,18 @@ namespace SetPointManager {
             }
             DualSchSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(5);
             NodeListError = false;
-            GetNodeNums(DualSchSetPtMgr(SetPtMgrNum).CtrlNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject,
-                        cAlphaArgs(1), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(5));
+            GetNodeNums(DualSchSetPtMgr(SetPtMgrNum).CtrlNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(5));
 
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
@@ -981,8 +1026,17 @@ namespace SetPointManager {
         cCurrentModuleObject = "SetpointManager:OutdoorAirReset";
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumOutAirSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             OutAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1034,8 +1088,18 @@ namespace SetPointManager {
                 OutAirSetPtMgr(SetPtMgrNum).OutHigh2 = 0.0;
             }
             NodeListError = false;
-            GetNodeNums(OutAirSetPtMgr(SetPtMgrNum).CtrlNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject,
-                        cAlphaArgs(1), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3));
+            GetNodeNums(OutAirSetPtMgr(SetPtMgrNum).CtrlNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3));
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 OutAirSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1072,8 +1136,17 @@ namespace SetPointManager {
         cCurrentModuleObject = "SetpointManager:SingleZone:Reheat";
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZRhSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SingZoneRhSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1096,13 +1169,23 @@ namespace SetPointManager {
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
             }
-            SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                            NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                                 NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(6), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(6)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(6),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(6)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 SingZoneRhSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1148,8 +1231,17 @@ namespace SetPointManager {
         cCurrentModuleObject = "SetpointManager:SingleZone:Heating";
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZHtSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SingZoneHtSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1172,13 +1264,23 @@ namespace SetPointManager {
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
             }
-            SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                            NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                                 NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(6), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(6)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(6),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(6)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 SingZoneHtSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1223,8 +1325,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:SingleZone:Cooling";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZClSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SingZoneClSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1247,13 +1358,23 @@ namespace SetPointManager {
                                   "] is less than " + cNumericFieldNames(1) + "=[" + RoundSigDigits(SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp, 1) +
                                   "].");
             }
-            SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                            NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                                 NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(6), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(6)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(6),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(6)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 SingZoneClSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1298,8 +1419,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Minimum";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SZMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1307,8 +1437,18 @@ namespace SetPointManager {
             SZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MinHumRat;
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(2), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(4)); // nodes whose min humidity ratio will be set
+            GetNodeNums(cAlphaArgs(2),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(4)); // nodes whose min humidity ratio will be set
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 SZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1326,8 +1466,18 @@ namespace SetPointManager {
             }
 
             ErrInList = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, ErrInList, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1), NodeConnectionType_Sensor, 1,
-                        ObjectIsNotParent, _, cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        ErrInList,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_Sensor,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
             if (ErrInList) {
                 //    CALL ShowSevereError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
                 //       '", invalid field.')
@@ -1373,8 +1523,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:SingleZone:Humidity:Maximum";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SZMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1382,8 +1541,18 @@ namespace SetPointManager {
             SZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode = iCtrlVarType_MaxHumRat;
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(2), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(2)); // nodes whose max humidity ratio will be set
+            GetNodeNums(cAlphaArgs(2),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(2)); // nodes whose max humidity ratio will be set
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 SZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1401,8 +1570,18 @@ namespace SetPointManager {
             }
 
             ErrInList = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, ErrInList, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1), NodeConnectionType_Sensor, 1,
-                        ObjectIsNotParent, _, cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        ErrInList,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_Sensor,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // nodes of zones whose humidity is being controlled
             if (ErrInList) {
                 //    CALL ShowSevereError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//  &
                 //       '", invalid field.')
@@ -1449,8 +1628,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:MixedAir";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumMixedAirSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MixedAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1464,15 +1652,25 @@ namespace SetPointManager {
                 ShowContinueError("..Valid value is \"Temperature\".");
                 ErrorsFound = true;
             }
-            MixedAirSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air,
-                                                                      NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            MixedAirSetPtMgr(SetPtMgrNum).FanInNode = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air,
-                                                                        NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            MixedAirSetPtMgr(SetPtMgrNum).FanOutNode = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                         NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            MixedAirSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            MixedAirSetPtMgr(SetPtMgrNum).FanInNode = GetOnlySingleNode(
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            MixedAirSetPtMgr(SetPtMgrNum).FanOutNode = GetOnlySingleNode(
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(6), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(6)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(6),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(6)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1489,8 +1687,8 @@ namespace SetPointManager {
                 ErrorsFound = true;
             }
 
-            Found = FindNumberInList(MixedAirSetPtMgr(SetPtMgrNum).RefNode, MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes,
-                                     MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes);
+            Found = FindNumberInList(
+                MixedAirSetPtMgr(SetPtMgrNum).RefNode, MixedAirSetPtMgr(SetPtMgrNum).CtrlNodes, MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes);
             if (Found > 0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", reference node.");
                 if (MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes > 1) {
@@ -1506,10 +1704,10 @@ namespace SetPointManager {
                              NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs;
 
             if (NumAlphas > 7) {
-                MixedAirSetPtMgr(SetPtMgrNum).CoolCoilInNode = GetOnlySingleNode(cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                                 NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-                MixedAirSetPtMgr(SetPtMgrNum).CoolCoilOutNode = GetOnlySingleNode(cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                                  NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                MixedAirSetPtMgr(SetPtMgrNum).CoolCoilInNode = GetOnlySingleNode(
+                    cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                MixedAirSetPtMgr(SetPtMgrNum).CoolCoilOutNode = GetOnlySingleNode(
+                    cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 if (NumNums == 1) {
                     MixedAirSetPtMgr(SetPtMgrNum).MinCoolCoilOutTemp = rNumericArgs(1);
                 }
@@ -1532,8 +1730,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:OutdoorAirPretreat";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumOAPretreatSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             OAPretreatSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1589,17 +1796,27 @@ namespace SetPointManager {
                 OAPretreatSetPtMgr(SetPtMgrNum).MaxSetHumRat = 0.00001;
             }
 
-            OAPretreatSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air,
-                                                                        NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                             NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            OAPretreatSetPtMgr(SetPtMgrNum).OAInNode = GetOnlySingleNode(cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                         NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
-            OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode = GetOnlySingleNode(cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                             NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            OAPretreatSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode = GetOnlySingleNode(
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            OAPretreatSetPtMgr(SetPtMgrNum).OAInNode = GetOnlySingleNode(
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode = GetOnlySingleNode(
+                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(7), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(7)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(7),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(7)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1616,8 +1833,8 @@ namespace SetPointManager {
                 ErrorsFound = true;
             }
 
-            Found = FindNumberInList(OAPretreatSetPtMgr(SetPtMgrNum).RefNode, OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes,
-                                     OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes);
+            Found = FindNumberInList(
+                OAPretreatSetPtMgr(SetPtMgrNum).RefNode, OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes, OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes);
             if (Found > 0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", reference node.");
                 if (OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes > 1) {
@@ -1649,8 +1866,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:Warmest";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             WarmestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1688,8 +1914,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(5), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(5)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(5),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(5)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 WarmestSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1726,8 +1962,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:Coldest";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             ColdestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1765,8 +2010,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(5), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(5)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(5),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(5)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 ColdestSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1804,8 +2059,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:WarmestTemperatureFlow";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             WarmestSetPtMgrTempFlow(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1851,8 +2115,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(5), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(5)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(5),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(5)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -1890,8 +2164,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:ReturnAirBypassFlow";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             RABFlowSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1945,8 +2228,17 @@ namespace SetPointManager {
         // Input the data for each setpoint manager
         cCurrentModuleObject = "SetpointManager:MultiZone:Cooling:Average";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MZAverageCoolingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -1965,8 +2257,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2003,8 +2305,17 @@ namespace SetPointManager {
         // Input the data for each setpoint manager
         cCurrentModuleObject = "SetpointManager:MultiZone:Heating:Average";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MZAverageHeatingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2023,8 +2334,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2061,8 +2382,17 @@ namespace SetPointManager {
         // Input the data for each setpoint manager
         cCurrentModuleObject = "SetpointManager:MultiZone:MinimumHumidity:Average";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MZAverageMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2081,8 +2411,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2120,8 +2460,17 @@ namespace SetPointManager {
         // Input the data for each setpoint manager
         cCurrentModuleObject = "SetpointManager:MultiZone:MaximumHumidity:Average";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2140,8 +2489,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2179,8 +2538,17 @@ namespace SetPointManager {
         // Input the data for each setpoint manager
         cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Minimum";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MZMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2199,8 +2567,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 MZMinHumSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2238,8 +2616,17 @@ namespace SetPointManager {
         // Input the data for each setpoint manager
         cCurrentModuleObject = "SetpointManager:MultiZone:Humidity:Maximum";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             MZMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2258,8 +2645,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Air, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Air,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 MZMaxHumSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2299,8 +2696,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:FollowOutdoorAirTemperature";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumFollowOATempSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             FollowOATempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2340,8 +2746,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(4), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(4)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(4),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(4)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 FollowOATempSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2381,8 +2797,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:FollowSystemNodeTemperature";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumFollowSysNodeTempSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2400,8 +2825,8 @@ namespace SetPointManager {
                 ShowContinueError("..Valid values are \"Temperature\",\"MaximumTemperature\" or \"MinimumTemperature\".");
                 ErrorsFound = true;
             }
-            FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                                  NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+            FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(4);
             if (UtilityRoutines::SameString(FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeWetBulb")) {
                 FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = iRefTempType_WetBulb;
@@ -2425,8 +2850,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(5), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(5)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(5),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(5)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2466,8 +2901,17 @@ namespace SetPointManager {
         // Input the data for each Setpoint Manager
         cCurrentModuleObject = "SetpointManager:FollowGroundTemperature";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumGroundTempSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             GroundTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2545,8 +2989,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(4), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(4)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(4),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(4)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 GroundTempSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2580,10 +3034,18 @@ namespace SetPointManager {
         }
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
-            SetupOutputVariable("Setpoint Manager Warmest Temperature Critical Zone Number", OutputProcessor::Unit::None,
-                                WarmestSetPtMgrTempFlow(SetPtMgrNum).CritZoneNum, "System", "Average", WarmestSetPtMgrTempFlow(SetPtMgrNum).Name);
-            SetupOutputVariable("Setpoint Manager Warmest Temperature Turndown Flow Fraction", OutputProcessor::Unit::None,
-                                WarmestSetPtMgrTempFlow(SetPtMgrNum).Turndown, "System", "Average", WarmestSetPtMgrTempFlow(SetPtMgrNum).Name);
+            SetupOutputVariable("Setpoint Manager Warmest Temperature Critical Zone Number",
+                                OutputProcessor::Unit::None,
+                                WarmestSetPtMgrTempFlow(SetPtMgrNum).CritZoneNum,
+                                "System",
+                                "Average",
+                                WarmestSetPtMgrTempFlow(SetPtMgrNum).Name);
+            SetupOutputVariable("Setpoint Manager Warmest Temperature Turndown Flow Fraction",
+                                OutputProcessor::Unit::None,
+                                WarmestSetPtMgrTempFlow(SetPtMgrNum).Turndown,
+                                "System",
+                                "Average",
+                                WarmestSetPtMgrTempFlow(SetPtMgrNum).Name);
         }
 
         // Input the Condenser Entering Set Point Managers
@@ -2594,8 +3056,17 @@ namespace SetPointManager {
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset";
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             CondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2624,8 +3095,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(CondEntSetPtMgr(SetPtMgrNum).CtrlNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject,
-                        cAlphaArgs(1), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(7));
+            GetNodeNums(CondEntSetPtMgr(SetPtMgrNum).CtrlNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(7));
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 CondEntSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2667,8 +3148,17 @@ namespace SetPointManager {
         cCurrentModuleObject = "SetpointManager:CondenserEnteringReset:Ideal";
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumIdealCondEntSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             IdealCondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2684,8 +3174,18 @@ namespace SetPointManager {
             IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodeListName = cAlphaArgs(3);
 
             NodeListError = false;
-            GetNodeNums(IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodeListName, NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject,
-                        cAlphaArgs(1), NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3));
+            GetNodeNums(IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodeListName,
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3));
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2722,8 +3222,17 @@ namespace SetPointManager {
 
         cCurrentModuleObject = "SetpointManager:SingleZone:OneStageCooling";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SZOneStageCoolingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2760,8 +3269,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2795,8 +3314,17 @@ namespace SetPointManager {
 
         cCurrentModuleObject = "SetpointManager:SingleZone:OneStageHeating";
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             SZOneStageHeatingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
@@ -2833,8 +3361,18 @@ namespace SetPointManager {
             }
 
             NodeListError = false;
-            GetNodeNums(cAlphaArgs(3), NumNodes, NodeNums, NodeListError, NodeType_Unknown, cCurrentModuleObject, cAlphaArgs(1),
-                        NodeConnectionType_SetPoint, 1, ObjectIsNotParent, _, cAlphaFieldNames(3)); // setpoint nodes
+            GetNodeNums(cAlphaArgs(3),
+                        NumNodes,
+                        NodeNums,
+                        NodeListError,
+                        NodeType_Unknown,
+                        cCurrentModuleObject,
+                        cAlphaArgs(1),
+                        NodeConnectionType_SetPoint,
+                        1,
+                        ObjectIsNotParent,
+                        _,
+                        cAlphaFieldNames(3)); // setpoint nodes
             if (!NodeListError) {
                 NumNodesCtrld = NumNodes;
                 SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlNodes.allocate(NumNodesCtrld);
@@ -2870,20 +3408,41 @@ namespace SetPointManager {
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetChWSetPtMgrs; ++SetPtMgrNum) {
 
             // get the object inputs
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             ReturnWaterResetChWSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
 
             // process the sense and actuate nodes
             bool errFlag = false;
-            ReturnWaterResetChWSetPtMgr(SetPtMgrNum).supplyNodeIndex =
-                GetOnlySingleNode(cAlphaArgs(2), errFlag, cCurrentModuleObject, cAlphaArgs(1), NodeType_Unknown, NodeConnectionType_SetPoint, 1,
-                                  ObjectIsNotParent, cAlphaFieldNames(2)); // setpoint nodes
-            ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnNodeIndex =
-                GetOnlySingleNode(cAlphaArgs(3), errFlag, cCurrentModuleObject, cAlphaArgs(1), NodeType_Unknown, NodeConnectionType_Sensor, 1,
-                                  ObjectIsNotParent, cAlphaFieldNames(3)); // setpoint nodes
+            ReturnWaterResetChWSetPtMgr(SetPtMgrNum).supplyNodeIndex = GetOnlySingleNode(cAlphaArgs(2),
+                                                                                         errFlag,
+                                                                                         cCurrentModuleObject,
+                                                                                         cAlphaArgs(1),
+                                                                                         NodeType_Unknown,
+                                                                                         NodeConnectionType_SetPoint,
+                                                                                         1,
+                                                                                         ObjectIsNotParent,
+                                                                                         cAlphaFieldNames(2)); // setpoint nodes
+            ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnNodeIndex = GetOnlySingleNode(cAlphaArgs(3),
+                                                                                         errFlag,
+                                                                                         cCurrentModuleObject,
+                                                                                         cAlphaArgs(1),
+                                                                                         NodeType_Unknown,
+                                                                                         NodeConnectionType_Sensor,
+                                                                                         1,
+                                                                                         ObjectIsNotParent,
+                                                                                         cAlphaFieldNames(3)); // setpoint nodes
 
             // process the setpoint inputs
             ReturnWaterResetChWSetPtMgr(SetPtMgrNum).minimumChilledWaterSetpoint = rNumericArgs(1);
@@ -2930,20 +3489,41 @@ namespace SetPointManager {
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumReturnWaterResetHWSetPtMgrs; ++SetPtMgrNum) {
 
             // get the object inputs
-            inputProcessor->getObjectItem(cCurrentModuleObject, SetPtMgrNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SetPtMgrNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             ReturnWaterResetHWSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
 
             // process the sense and actuate nodes
             bool errFlag = false;
-            ReturnWaterResetHWSetPtMgr(SetPtMgrNum).supplyNodeIndex =
-                GetOnlySingleNode(cAlphaArgs(2), errFlag, cCurrentModuleObject, cAlphaArgs(1), NodeType_Unknown, NodeConnectionType_SetPoint, 1,
-                                  ObjectIsNotParent, cAlphaFieldNames(2)); // setpoint nodes
-            ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnNodeIndex =
-                GetOnlySingleNode(cAlphaArgs(3), errFlag, cCurrentModuleObject, cAlphaArgs(1), NodeType_Unknown, NodeConnectionType_Sensor, 1,
-                                  ObjectIsNotParent, cAlphaFieldNames(3)); // setpoint nodes
+            ReturnWaterResetHWSetPtMgr(SetPtMgrNum).supplyNodeIndex = GetOnlySingleNode(cAlphaArgs(2),
+                                                                                        errFlag,
+                                                                                        cCurrentModuleObject,
+                                                                                        cAlphaArgs(1),
+                                                                                        NodeType_Unknown,
+                                                                                        NodeConnectionType_SetPoint,
+                                                                                        1,
+                                                                                        ObjectIsNotParent,
+                                                                                        cAlphaFieldNames(2)); // setpoint nodes
+            ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnNodeIndex = GetOnlySingleNode(cAlphaArgs(3),
+                                                                                        errFlag,
+                                                                                        cCurrentModuleObject,
+                                                                                        cAlphaArgs(1),
+                                                                                        NodeType_Unknown,
+                                                                                        NodeConnectionType_Sensor,
+                                                                                        1,
+                                                                                        ObjectIsNotParent,
+                                                                                        cAlphaFieldNames(3)); // setpoint nodes
 
             // process the setpoint inputs
             ReturnWaterResetHWSetPtMgr(SetPtMgrNum).minimumHotWaterSetpoint = rNumericArgs(1);
@@ -3163,18 +3743,18 @@ namespace SetPointManager {
 
         // Using/Aliasing
         using DataAirSystems::PrimaryAirSystem;
+        using DataHeatBalance::Zone;
         using DataHVACGlobals::NumCondLoops;
         using DataHVACGlobals::NumPlantLoops;
-        using DataHeatBalance::Zone;
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using namespace DataPlant;
         using DataEnvironment::GroundTemp;
-        using DataEnvironment::GroundTempFC;
         using DataEnvironment::GroundTemp_Deep;
         using DataEnvironment::GroundTemp_Surface;
+        using DataEnvironment::GroundTempFC;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3392,8 +3972,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_Warmest);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(WarmestSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            WarmestSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + WarmestSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + WarmestSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -3417,8 +3997,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_Coldest);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(ColdestSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            ColdestSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + ColdestSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + ColdestSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -3446,8 +4026,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_WarmestTempFlow);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + WarmestSetPtMgrTempFlow(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -3475,8 +4055,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_RAB);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(RABFlowSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            RABFlowSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         AllSetPtMgr(RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).AirLoopNum = AirLoopNum;
                         AllSetPtMgr(RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).AirLoopName = RABFlowSetPtMgr(SetPtMgrNum).AirLoopName;
                         if (AirLoopNum == 0) {
@@ -3511,8 +4091,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_MZCoolingAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageCoolingSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -3540,8 +4120,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_MZHeatingAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageHeatingSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -3569,8 +4149,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_MZMinHumAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageMinHumSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -3611,8 +4191,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_MZMaxHumAverage);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -3653,8 +4233,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_MZMinHum);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZMinHumSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -3693,8 +4273,8 @@ namespace SetPointManager {
                 cSetPointManagerType = cValidSPMTypes(iSPMType_MZMaxHum);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
-                        AirLoopNum = UtilityRoutines::FindItemInList(MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo,
-                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
+                        AirLoopNum = UtilityRoutines::FindItemInList(
+                            MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZMaxHumSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -6521,9 +7101,9 @@ namespace SetPointManager {
 
         // Using/Aliasing
         using DataEnvironment::GroundTemp;
-        using DataEnvironment::GroundTempFC;
         using DataEnvironment::GroundTemp_Deep;
         using DataEnvironment::GroundTemp_Surface;
+        using DataEnvironment::GroundTempFC;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6835,8 +7415,8 @@ namespace SetPointManager {
 
                 TotEnergy = this->calculateCurrentEnergyUsage();
 
-                this->setupSetPointAndFlags(TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, RunOptCondEntTemp, RunSubOptCondEntTemp,
-                                            RunFinalOptCondEntTemp);
+                this->setupSetPointAndFlags(
+                    TotEnergy, TotEnergyPre, CondWaterSetPoint, CondTempLimit, RunOptCondEntTemp, RunSubOptCondEntTemp, RunFinalOptCondEntTemp);
 
             } else {
                 CondWaterSetPoint = this->MaxCondEntTemp;
@@ -7226,8 +7806,8 @@ namespace SetPointManager {
             Groups.allocate(NumVariables);
             Names.allocate(NumVariables);
 
-            GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names,
-                                NumFound);
+            GetMeteredVariables(
+                TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
             this->ClTowerVarType.push_back(VarTypes(1));
             this->ClTowerVarIndex.push_back(VarIndexes(1));
         }

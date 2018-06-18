@@ -432,8 +432,8 @@ namespace RoomAirModelUserTempPattern {
 
         for (i = 1; i <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++i) {
             // cycle through zone surfaces and look for match
-            found = FindNumberInList(AirPatternZoneInfo(ZoneNum).Surf(i).SurfID, RoomAirPattern(PattrnID).MapPatrn.SurfID,
-                                     RoomAirPattern(PattrnID).MapPatrn.NumSurfs);
+            found = FindNumberInList(
+                AirPatternZoneInfo(ZoneNum).Surf(i).SurfID, RoomAirPattern(PattrnID).MapPatrn.SurfID, RoomAirPattern(PattrnID).MapPatrn.NumSurfs);
             if (found != 0) { // if surf is in map then assign, else give it MAT
                 AirPatternZoneInfo(ZoneNum).Surf(i).TadjacentAir = RoomAirPattern(PattrnID).MapPatrn.DeltaTai(found) + Tmean;
             } else {
@@ -588,8 +588,12 @@ namespace RoomAirModelUserTempPattern {
         }
 
         if (SetupOutputFlag(ZoneNum)) {
-            SetupOutputVariable("Room Air Zone Vertical Temperature Gradient", OutputProcessor::Unit::K_m, AirPatternZoneInfo(ZoneNum).Gradient,
-                                "HVAC", "State", AirPatternZoneInfo(ZoneNum).ZoneName);
+            SetupOutputVariable("Room Air Zone Vertical Temperature Gradient",
+                                OutputProcessor::Unit::K_m,
+                                AirPatternZoneInfo(ZoneNum).Gradient,
+                                "HVAC",
+                                "State",
+                                AirPatternZoneInfo(ZoneNum).ZoneName);
 
             SetupOutputFlag(ZoneNum) = false;
         }
@@ -602,8 +606,10 @@ namespace RoomAirModelUserTempPattern {
 
             if (SELECT_CASE_var == OutdoorDryBulbMode) {
 
-                Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp, RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
-                                          RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient, RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
+                Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp,
+                                          RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
+                                          RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient,
+                                          RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
                                           RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
 
             } else if (SELECT_CASE_var == ZoneAirTempMode) {
@@ -972,17 +978,17 @@ namespace RoomAirModelUserTempPattern {
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
         using DataGlobals::ZoneSizingCalc;
-        using DataHVACGlobals::RetTempMax;
-        using DataHVACGlobals::RetTempMin;
+        using DataHeatBalance::RefrigCaseCredit;
+        using DataHeatBalance::TempEffBulkAir;
+        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
-        using DataHeatBalFanSys::ZT;
         using DataHeatBalFanSys::ZoneLatentGain;
-        using DataHeatBalance::RefrigCaseCredit;
-        using DataHeatBalance::TempEffBulkAir;
-        using DataHeatBalance::Zone;
+        using DataHeatBalFanSys::ZT;
+        using DataHVACGlobals::RetTempMax;
+        using DataHVACGlobals::RetTempMin;
         using DataLoopNode::Node;
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;

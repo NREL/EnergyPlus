@@ -2198,9 +2198,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, propNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              propNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2259,9 +2266,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, rfNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              rfNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2332,9 +2346,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, arrayNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              arrayNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2375,9 +2396,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, bhNum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              bhNum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2418,9 +2446,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, GLHENum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              GLHENum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2443,19 +2478,32 @@ namespace GroundHeatExchangers {
                 thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
 
                 // get inlet node num
-                thisGLHE.inletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                thisGLHE.inletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+                                                          errorsFound,
+                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          NodeType_Water,
+                                                          NodeConnectionType_Inlet,
+                                                          1,
+                                                          ObjectIsNotParent);
 
                 // get outlet node num
-                thisGLHE.outletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                thisGLHE.outletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                           errorsFound,
+                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                           NodeType_Water,
+                                                           NodeConnectionType_Outlet,
+                                                           1,
+                                                           ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3), "Condenser Water Nodes");
+                TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                            DataIPShortCuts::cAlphaArgs(1),
+                            DataIPShortCuts::cAlphaArgs(2),
+                            DataIPShortCuts::cAlphaArgs(3),
+                            "Condenser Water Nodes");
 
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
                 RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
@@ -2576,20 +2624,32 @@ namespace GroundHeatExchangers {
             // Set up report variables
             for (int GLHENum = 0; GLHENum < numVerticalGLHEs; ++GLHENum) {
                 auto &thisGLHE(verticalGLHE[GLHENum]);
-                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, thisGLHE.bhTemp, "System",
-                                    "Average", thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.bhTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average",
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.aveFluidTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Farfield Ground Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.tempGround,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, thisGLHE.aveFluidTemp, "System",
-                                    "Average", thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Farfield Ground Temperature", OutputProcessor::Unit::C, thisGLHE.tempGround, "System",
-                                    "Average", thisGLHE.name);
             }
         }
 
@@ -2607,9 +2667,16 @@ namespace GroundHeatExchangers {
                 int numNumbers;
 
                 // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject, GLHENum, DataIPShortCuts::cAlphaArgs, numAlphas,
-                                              DataIPShortCuts::rNumericArgs, numNumbers, ioStatus, DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames,
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              GLHENum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
                 // the input processor validates the numeric inputs based on the IDD definition
@@ -2632,19 +2699,32 @@ namespace GroundHeatExchangers {
                 thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
 
                 // get inlet node num
-                thisGLHE.inletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                thisGLHE.inletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+                                                          errorsFound,
+                                                          DataIPShortCuts::cCurrentModuleObject,
+                                                          DataIPShortCuts::cAlphaArgs(1),
+                                                          NodeType_Water,
+                                                          NodeConnectionType_Inlet,
+                                                          1,
+                                                          ObjectIsNotParent);
 
                 // get outlet node num
-                thisGLHE.outletNodeNum =
-                    GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3), errorsFound, DataIPShortCuts::cCurrentModuleObject,
-                                      DataIPShortCuts::cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                thisGLHE.outletNodeNum = GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                           errorsFound,
+                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                           NodeType_Water,
+                                                           NodeConnectionType_Outlet,
+                                                           1,
+                                                           ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3), "Condenser Water Nodes");
+                TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                            DataIPShortCuts::cAlphaArgs(1),
+                            DataIPShortCuts::cAlphaArgs(2),
+                            DataIPShortCuts::cAlphaArgs(3),
+                            "Condenser Water Nodes");
 
                 // load data
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
@@ -2740,18 +2820,26 @@ namespace GroundHeatExchangers {
             // Set up report variables
             for (int GLHENum = 0; GLHENum < numSlinkyGLHEs; ++GLHENum) {
                 auto &thisGLHE(slinkyGLHE[GLHENum]);
-                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, thisGLHE.bhTemp, "System",
-                                    "Average", thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average",
+                SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.bhTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average",
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, thisGLHE.inletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(
+                    "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average", thisGLHE.name);
+                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature",
+                                    OutputProcessor::Unit::C,
+                                    thisGLHE.aveFluidTemp,
+                                    "System",
+                                    "Average",
                                     thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, thisGLHE.outletTemp, "System", "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, thisGLHE.massFlowRate, "System", "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable("Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, thisGLHE.aveFluidTemp, "System",
-                                    "Average", thisGLHE.name);
             }
         }
     }

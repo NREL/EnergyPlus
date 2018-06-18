@@ -260,27 +260,30 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat = Node(InletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy = Node(InletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure = Node(InletNode).Press;
-        ZoneHybridUnitaryAirConditioner(UnitNum).InletRH =
-            PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat,
-                          ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure, "InitZoneHybridUnitaryAirConditioners");
+        ZoneHybridUnitaryAirConditioner(UnitNum).InletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp,
+                                                                         ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat,
+                                                                         ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure,
+                                                                         "InitZoneHybridUnitaryAirConditioners");
 
         // Set default outlet state to inlet states, just to be safe
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure = ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure;
-        ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH =
-            PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat,
-                          ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure, "InitZoneHybridUnitaryAirConditioners");
+        ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp,
+                                                                          ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat,
+                                                                          ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure,
+                                                                          "InitZoneHybridUnitaryAirConditioners");
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
 
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
-        ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH =
-            PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp, ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
-                          ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure, "InitZoneHybridUnitaryAirConditioners");
+        ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH = PsyRhFnTdbWPb(ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
+                                                                            ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
+                                                                            ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
+                                                                            "InitZoneHybridUnitaryAirConditioners");
     }
 
     void CalcZoneHybridUnitaryAirConditioners(int const UnitNum,              // unit number
@@ -337,7 +340,9 @@ namespace HybridUnitaryAirConditioners {
         bool UseMinOASchFlag = 1;
 
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-        DesignMinVR = CalcDesignSpecificationOutdoorAir(ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr, ZoneNum, UseOccSchFlag,
+        DesignMinVR = CalcDesignSpecificationOutdoorAir(ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+                                                        ZoneNum,
+                                                        UseOccSchFlag,
                                                         UseMinOASchFlag); //[m3/s]
         Real64 DesignMinVRMassFlow = 0;
         if (StdRhoAir > 1) {
@@ -345,8 +350,8 @@ namespace HybridUnitaryAirConditioners {
         } else {
             DesignMinVRMassFlow = DesignMinVR * 1.225;
         }
-        ZoneHybridUnitaryAirConditioner(UnitNum).doStep(ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify,
-                                                        DesignMinVRMassFlow);
+        ZoneHybridUnitaryAirConditioner(UnitNum).doStep(
+            ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
         SensibleOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut; // cooling negative
 
         LatentOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOutMass; // dehumidification negative kg/s
@@ -448,13 +453,22 @@ namespace HybridUnitaryAirConditioners {
             ZoneHybridUnitaryAirConditioner.allocate(NumZoneHybridEvap);
 
             for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
-                inputProcessor->getObjectItem(CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                              lAlphaBlanks, cAlphaFields, cNumericFields);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              UnitLoop,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericBlanks,
+                                              lAlphaBlanks,
+                                              cAlphaFields,
+                                              cNumericFields);
 
                 IsNotOK = false;
                 IsBlank = false;
-                UtilityRoutines::VerifyName(Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank,
-                                            CurrentModuleObject + " Name");
+                UtilityRoutines::VerifyName(
+                    Alphas(1), ZoneHybridUnitaryAirConditioner, UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
 
                 // A1, \field Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name = Alphas(1);
@@ -507,11 +521,16 @@ namespace HybridUnitaryAirConditioners {
                 // A10, \field Outdoor Air Node Name
                 // A11, \field Supply Air Node Name
                 // A12, \field Relief Node Name
-                ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1),
-                                                                                        NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode =
-                    GetOnlySingleNode(Alphas(10), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_OutsideAirReference,
-                                      1, ObjectIsNotParent);
+                ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode = GetOnlySingleNode(
+                    Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode = GetOnlySingleNode(Alphas(10),
+                                                                                                 ErrorsFound,
+                                                                                                 CurrentModuleObject,
+                                                                                                 Alphas(1),
+                                                                                                 NodeType_Air,
+                                                                                                 NodeConnectionType_OutsideAirReference,
+                                                                                                 1,
+                                                                                                 ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode = GetOnlySingleNode(
                     Alphas(11), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode = GetOnlySingleNode(
@@ -564,8 +583,8 @@ namespace HybridUnitaryAirConditioners {
                 }
 
                 for (int modeIter = 0; modeIter <= Numberofoperatingmodes; ++modeIter) {
-                    ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks,
-                                                                                      cCurrentModuleObject);
+                    ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
+                        Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                     if (ErrorsFound) {
                         ShowFatalError(RoutineName + "Errors found parsing modes");
                         ShowContinueError("... Preceding condition causes termination.");
@@ -577,222 +596,496 @@ namespace HybridUnitaryAirConditioners {
         // setup output variables
         for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
 
-            SetUpCompSets(CurrentModuleObject, ZoneHybridUnitaryAirConditioner(UnitLoop).Name, CurrentModuleObject,
-                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name, NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode),
+            SetUpCompSets(CurrentModuleObject,
+                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                          CurrentModuleObject,
+                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                          NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode));
-            SetUpCompSets(CurrentModuleObject, ZoneHybridUnitaryAirConditioner(UnitLoop).Name, CurrentModuleObject,
-                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name, NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode),
+            SetUpCompSets(CurrentModuleObject,
+                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                          CurrentModuleObject,
+                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                          NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode));
 
-            SetUpCompSets(CurrentModuleObject, ZoneHybridUnitaryAirConditioner(UnitLoop).Name, CurrentModuleObject,
-                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name, NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode),
+            SetUpCompSets(CurrentModuleObject,
+                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                          CurrentModuleObject,
+                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                          NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode));
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Cooling Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalCoolingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalCoolingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Cooling Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalCoolingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Cooling Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleCoolingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalCoolingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleCoolingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Cooling Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleCoolingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Cooling Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentCoolingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleCoolingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentCoolingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Cooling Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentCoolingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentCoolingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Cooling Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalCoolingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalCoolingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Cooling Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalCoolingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Cooling Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalCoolingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Cooling Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Cooling Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentCoolingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentCoolingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Cooling Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentCoolingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentCoolingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Heating Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalHeatingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalHeatingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Heating Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalHeatingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "HeatingCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Heating Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleHeatingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemTotalHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HeatingCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleHeatingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Heating Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleHeatingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "HeatingCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Heating Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentHeatingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HeatingCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentHeatingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Heating Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentHeatingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "HeatingCOILS", _, "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HeatingCOILS",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Heating Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalHeatingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalHeatingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Heating Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalHeatingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "HeatingCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Heating Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleHeatingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HeatingCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleHeatingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Heating Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleHeatingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "HeatingCOILS", _, "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Heating Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HeatingCOILS",
+                                _,
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Heating Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Heating Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "ENERGYTRANSFER", "COOLINGCOILS", _, "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Heating Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "COOLINGCOILS",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedLoadToCoolingSetpoint, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedLoadToCoolingSetpoint,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Error Code", OutputProcessor::Unit::None,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).ErrorCode, "System", "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Temperature", OutputProcessor::Unit::C,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletTemp, "System", "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Temperature", OutputProcessor::Unit::C,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletTemp, "System", "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Temperature", OutputProcessor::Unit::C,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecInletTemp, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Error Code",
+                                OutputProcessor::Unit::None,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).ErrorCode,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletHumRat, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Temperature",
+                                OutputProcessor::Unit::C,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletTemp,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletHumRat, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Temperature",
+                                OutputProcessor::Unit::C,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletTemp,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Humidity Ratio", OutputProcessor::Unit::kgWater_kgDryAir,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecInletHumRat, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Temperature",
+                                OutputProcessor::Unit::C,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecInletTemp,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Relative Humidity", OutputProcessor::Unit::Perc,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletRH, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Humidity Ratio",
+                                OutputProcessor::Unit::kgWater_kgDryAir,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletHumRat,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Relative Humidity", OutputProcessor::Unit::Perc,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletRH, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Humidity Ratio",
+                                OutputProcessor::Unit::kgWater_kgDryAir,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletHumRat,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Relative Humidity", OutputProcessor::Unit::Perc,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecInletRH, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Humidity Ratio",
+                                OutputProcessor::Unit::kgWater_kgDryAir,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecInletHumRat,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletMassFlowRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Relative Humidity",
+                                OutputProcessor::Unit::Perc,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletRH,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletVolumetricFlowRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Relative Humidity",
+                                OutputProcessor::Unit::Perc,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletRH,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyVentilationVolume, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Relative Humidity",
+                                OutputProcessor::Unit::Perc,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecInletRH,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Electric Power", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).FinalElectricalPower, "System", "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Electric Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).FinalElectricalEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "Electric", "Cooling", "Hybrid HVAC Cooling", "System");
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).MinOA_Msa, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletMassFlowRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyVentilationAir, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).OutletVolumetricFlowRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Availability Status", OutputProcessor::Unit::None,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitOn, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyVentilationVolume,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Fraction", OutputProcessor::Unit::None,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).averageOSAF, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Electric Power",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).FinalElectricalPower,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Electric Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).FinalElectricalEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "Electric",
+                                "Cooling",
+                                "Hybrid HVAC Cooling",
+                                "System");
+
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).MinOA_Msa,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyVentilationAir,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Availability Status",
+                                OutputProcessor::Unit::None,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).UnitOn,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Fraction",
+                                OutputProcessor::Unit::None,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).averageOSAF,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
             SetupOutputVariable("Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Moisture Transfer Rate",
-                                OutputProcessor::Unit::kg_s, ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedDeHumdificationMass, "System",
-                                "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Heat Transfer Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedDeHumdificationLoad, "System", "Average",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedDeHumdificationMass,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC DehumidificationLoad to Humidistat Setpoint Heat Tansfer Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedDeHumdificationEnergy, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Dehumidification Load to Humidistat Setpoint Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedDeHumdificationLoad,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC DehumidificationLoad to Humidistat Setpoint Heat Tansfer Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedDeHumdificationEnergy,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
             SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Moisture Transfer Rate",
-                                OutputProcessor::Unit::kg_s, ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationMass, "System",
-                                "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationLoad, "System", "Average",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationMass,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Tansfer Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationEnergy, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationLoad,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Humidification Load to Humidistat Setpoint Heat Tansfer Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).RequestedHumdificationEnergy,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electric Power", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyFanElectricPower, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electric Power",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyFanElectricPower,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electric Energy", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyFanElectricEnergy, "System", "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name, _, "Electric", "Fans", "Hybrid HVAC Fans", "System");
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Secondary Fuel Consumption Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumptionRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Fan Electric Energy",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SupplyFanElectricEnergy,
+                                "System",
+                                "Sum",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                "Electric",
+                                "Fans",
+                                "Hybrid HVAC Fans",
+                                "System");
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Secondary Fuel Consumption Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumptionRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Secondary Fuel Consumption", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumption, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Secondary Fuel Consumption",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumption,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption Rate", OutputProcessor::Unit::W,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumptionRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption Rate",
+                                OutputProcessor::Unit::W,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumptionRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption", OutputProcessor::Unit::J,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumption, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption",
+                                OutputProcessor::Unit::J,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumption,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption Rate", OutputProcessor::Unit::kgWater_s,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumptionRate, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption Rate",
+                                OutputProcessor::Unit::kgWater_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumptionRate,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
             // make sure units above are right.
-            SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption", OutputProcessor::Unit::m3,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumption, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption",
+                                OutputProcessor::Unit::m3,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumption,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-            SetupOutputVariable("Zone Hybrid Unitary HVAC External Static Pressure", OutputProcessor::Unit::Pa,
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).ExternalStaticPressure, "System", "Average",
+            SetupOutputVariable("Zone Hybrid Unitary HVAC External Static Pressure",
+                                OutputProcessor::Unit::Pa,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).ExternalStaticPressure,
+                                "System",
+                                "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
             int index = 0;
 
             for (auto &thisSetting : ZoneHybridUnitaryAirConditioner(UnitLoop).CurrentOperatingSettings) {
-                SetupOutputVariable("Zone Hybrid Unitary HVAC Runtime Fraction in Setting " + std::to_string(index), OutputProcessor::Unit::None,
-                                    thisSetting.Runtime_Fraction, "Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                SetupOutputVariable("Zone Hybrid Unitary HVAC Mode in Setting " + std::to_string(index), OutputProcessor::Unit::None,
-                                    thisSetting.Mode, "Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
-                SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting " + std::to_string(index), OutputProcessor::Unit::kg_s,
-                                    thisSetting.Outdoor_Air_Fraction, "Zone", "Average", ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                SetupOutputVariable("Zone Hybrid Unitary HVAC Runtime Fraction in Setting " + std::to_string(index),
+                                    OutputProcessor::Unit::None,
+                                    thisSetting.Runtime_Fraction,
+                                    "Zone",
+                                    "Average",
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                SetupOutputVariable("Zone Hybrid Unitary HVAC Mode in Setting " + std::to_string(index),
+                                    OutputProcessor::Unit::None,
+                                    thisSetting.Mode,
+                                    "Zone",
+                                    "Average",
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                SetupOutputVariable("Zone Hybrid Unitary HVAC Outdoor Air Fraction in Setting " + std::to_string(index),
+                                    OutputProcessor::Unit::kg_s,
+                                    thisSetting.Outdoor_Air_Fraction,
+                                    "Zone",
+                                    "Average",
+                                    ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
                 SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate in Setting " + std::to_string(index),
-                                    OutputProcessor::Unit::kg_s, thisSetting.Unscaled_Supply_Air_Mass_Flow_Rate, "Zone", "Average",
+                                    OutputProcessor::Unit::kg_s,
+                                    thisSetting.Unscaled_Supply_Air_Mass_Flow_Rate,
+                                    "Zone",
+                                    "Average",
                                     ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
                 SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate Ratio in Setting " + std::to_string(index),
-                                    OutputProcessor::Unit::None, thisSetting.Supply_Air_Mass_Flow_Rate_Ratio, "Zone", "Average",
+                                    OutputProcessor::Unit::None,
+                                    thisSetting.Supply_Air_Mass_Flow_Rate_Ratio,
+                                    "Zone",
+                                    "Average",
                                     ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
                 index++;
             }

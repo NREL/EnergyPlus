@@ -428,8 +428,20 @@ namespace PackagedTerminalHeatPump {
             OnOffAirFlowRatio = 1.0;
             SupHeaterLoad = 0.0;
             if (PTUnit(PTUnitNum).NumOfSpeedCooling > 0) {
-                CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, 0, 1, 0.0, PartLoadFrac, QSensUnitOutMul, QLatUnitOutMul, 0.0, 0.0,
-                                     OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+                CalcVarSpeedHeatPump(PTUnitNum,
+                                     ZoneNum,
+                                     FirstHVACIteration,
+                                     0,
+                                     1,
+                                     0.0,
+                                     PartLoadFrac,
+                                     QSensUnitOutMul,
+                                     QLatUnitOutMul,
+                                     0.0,
+                                     0.0,
+                                     OnOffAirFlowRatio,
+                                     SupHeaterLoad,
+                                     HXUnitOn);
             }
         }
 
@@ -687,8 +699,17 @@ namespace PackagedTerminalHeatPump {
             OANodeNums = 0;
 
             CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-            inputProcessor->getObjectItem(CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          PTUnitIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
 
             PTUnitNum = PTUnitIndex;
             PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;
@@ -905,12 +926,15 @@ namespace PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
                     errFlag = false;
                     GetDXCoilIndex(GetHXDXCoilName(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
-                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag, "Coil:Cooling:DX:SingleSpeed");
+                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                   errFlag,
+                                   "Coil:Cooling:DX:SingleSpeed");
                     CoolCoilInletNodeNum = GetHXDXCoilInletNode(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     CoolCoilOutletNodeNum = GetHXDXCoilOutletNode(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
-                    PTUnit(PTUnitNum).CondenserNodeNum = GetCoilCondenserInletNode(
-                        "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
-                        errFlag);
+                    PTUnit(PTUnitNum).CondenserNodeNum =
+                        GetCoilCondenserInletNode("Coil:Cooling:DX:SingleSpeed",
+                                                  GetHXDXCoilName(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
+                                                  errFlag);
                     if (errFlag) ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                 }
             } else if (UtilityRoutines::SameString(Alphas(11), "COIL:COOLING:DX:VARIABLESPEED")) {
@@ -952,8 +976,14 @@ namespace PackagedTerminalHeatPump {
             }
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(PTUnitNum, PTUnit(PTUnitNum).Name, CurrentModuleObject, PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, ErrorsFound);
+            SetMinOATCompressor(PTUnitNum,
+                                PTUnit(PTUnitNum).Name,
+                                CurrentModuleObject,
+                                PTUnit(PTUnitNum).DXCoolCoilType,
+                                PTUnit(PTUnitNum).DXCoolCoilName,
+                                PTUnit(PTUnitNum).DXHeatCoilType,
+                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                ErrorsFound);
 
             SuppHeatCoilType = Alphas(13);
             SuppHeatCoilName = Alphas(14);
@@ -1061,8 +1091,13 @@ namespace PackagedTerminalHeatPump {
             }
 
             // Get AirTerminal mixer data
-            GetATMixer(PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).ATMixerName, PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ATMixerType,
-                       PTUnit(PTUnitNum).ATMixerPriNode, PTUnit(PTUnitNum).ATMixerSecNode, PTUnit(PTUnitNum).ATMixerOutNode,
+            GetATMixer(PTUnit(PTUnitNum).Name,
+                       PTUnit(PTUnitNum).ATMixerName,
+                       PTUnit(PTUnitNum).ATMixerIndex,
+                       PTUnit(PTUnitNum).ATMixerType,
+                       PTUnit(PTUnitNum).ATMixerPriNode,
+                       PTUnit(PTUnitNum).ATMixerSecNode,
+                       PTUnit(PTUnitNum).ATMixerOutNode,
                        PTUnit(PTUnitNum).AirOutNode);
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 PTUnit(PTUnitNum).ATMixerExists = true;
@@ -1465,36 +1500,68 @@ namespace PackagedTerminalHeatPump {
             CompSetSupHeatOutlet = NodeID(SuppHeatOutletNodeNum);
 
             // Add fan to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, CompSetFanInlet,
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).FanType,
+                          PTUnit(PTUnitNum).FanName,
+                          CompSetFanInlet,
                           CompSetFanOutlet);
 
             // Add cooling coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName,
-                          CompSetCoolInlet, CompSetCoolOutlet);
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).DXCoolCoilType,
+                          PTUnit(PTUnitNum).DXCoolCoilName,
+                          CompSetCoolInlet,
+                          CompSetCoolOutlet);
 
             // Add heating coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName,
-                          CompSetHeatInlet, CompSetHeatOutlet);
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).DXHeatCoilType,
+                          PTUnit(PTUnitNum).DXHeatCoilName,
+                          CompSetHeatInlet,
+                          CompSetHeatOutlet);
 
             // Add supplemental heating coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, SuppHeatCoilType, PTUnit(PTUnitNum).SuppHeatCoilName,
-                          CompSetSupHeatInlet, CompSetSupHeatOutlet);
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          SuppHeatCoilType,
+                          PTUnit(PTUnitNum).SuppHeatCoilName,
+                          CompSetSupHeatInlet,
+                          CompSetSupHeatOutlet);
 
             if (PTUnit(PTUnitNum).UnitType_Num == PTHPUnit) {
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
-                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode), ErrorsFound, PTUnit(PTUnitNum).UnitType,
-                                                    PTUnit(PTUnitNum).Name, NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent);
+                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                                                    ErrorsFound,
+                                                    PTUnit(PTUnitNum).UnitType,
+                                                    PTUnit(PTUnitNum).Name,
+                                                    NodeType_Water,
+                                                    NodeConnectionType_Actuator,
+                                                    1,
+                                                    ObjectIsParent);
                 } else if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     // Add heating coil steam inlet node as actualtor node for coil
-                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode), ErrorsFound, PTUnit(PTUnitNum).UnitType,
-                                                    PTUnit(PTUnitNum).Name, NodeType_Steam, NodeConnectionType_Actuator, 1, ObjectIsParent);
+                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                                                    ErrorsFound,
+                                                    PTUnit(PTUnitNum).UnitType,
+                                                    PTUnit(PTUnitNum).Name,
+                                                    NodeType_Steam,
+                                                    NodeConnectionType_Actuator,
+                                                    1,
+                                                    ObjectIsParent);
                 }
             }
             if (OANodeNums(1) > 0) {
                 // Set up component set for OA mixer - use OA node and Mixed air node
-                SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).OAMixType, PTUnit(PTUnitNum).OAMixName,
-                              NodeID(OANodeNums(1)), NodeID(OANodeNums(4)));
+                SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                              PTUnit(PTUnitNum).Name,
+                              PTUnit(PTUnitNum).OAMixType,
+                              PTUnit(PTUnitNum).OAMixName,
+                              NodeID(OANodeNums(1)),
+                              NodeID(OANodeNums(4)));
             }
         }
 
@@ -1511,8 +1578,17 @@ namespace PackagedTerminalHeatPump {
             OANodeNums = 0;
 
             CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-            inputProcessor->getObjectItem(CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          PTUnitIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
 
             PTUnitNum = PTUnitIndex + NumPTHP;
             PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;
@@ -1770,12 +1846,15 @@ namespace PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_CoolingHXAssisted;
                     errFlag = false;
                     GetDXCoilIndex(GetHXDXCoilName(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
-                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag, "Coil:Cooling:DX:SingleSpeed");
+                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                   errFlag,
+                                   "Coil:Cooling:DX:SingleSpeed");
                     CoolCoilInletNodeNum = GetHXDXCoilInletNode(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     CoolCoilOutletNodeNum = GetHXDXCoilOutletNode(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
-                    PTUnit(PTUnitNum).CondenserNodeNum = GetCoilCondenserInletNode(
-                        "Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
-                        errFlag);
+                    PTUnit(PTUnitNum).CondenserNodeNum =
+                        GetCoilCondenserInletNode("Coil:Cooling:DX:SingleSpeed",
+                                                  GetHXDXCoilName(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
+                                                  errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                         ErrorsFound = true;
@@ -1823,12 +1902,23 @@ namespace PackagedTerminalHeatPump {
             }
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(PTUnitNum, PTUnit(PTUnitNum).Name, CurrentModuleObject, PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, ErrorsFound);
+            SetMinOATCompressor(PTUnitNum,
+                                PTUnit(PTUnitNum).Name,
+                                CurrentModuleObject,
+                                PTUnit(PTUnitNum).DXCoolCoilType,
+                                PTUnit(PTUnitNum).DXCoolCoilName,
+                                PTUnit(PTUnitNum).DXHeatCoilType,
+                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                ErrorsFound);
 
             // Get AirTerminal mixer data
-            GetATMixer(PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).ATMixerName, PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ATMixerType,
-                       PTUnit(PTUnitNum).ATMixerPriNode, PTUnit(PTUnitNum).ATMixerSecNode, PTUnit(PTUnitNum).ATMixerOutNode,
+            GetATMixer(PTUnit(PTUnitNum).Name,
+                       PTUnit(PTUnitNum).ATMixerName,
+                       PTUnit(PTUnitNum).ATMixerIndex,
+                       PTUnit(PTUnitNum).ATMixerType,
+                       PTUnit(PTUnitNum).ATMixerPriNode,
+                       PTUnit(PTUnitNum).ATMixerSecNode,
+                       PTUnit(PTUnitNum).ATMixerOutNode,
                        PTUnit(PTUnitNum).AirOutNode);
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 PTUnit(PTUnitNum).ATMixerExists = true;
@@ -2206,33 +2296,61 @@ namespace PackagedTerminalHeatPump {
             CompSetHeatOutlet = NodeID(HeatCoilOutletNodeNum);
 
             // Add fan to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName,
-                          NodeID(FanInletNodeNum), NodeID(FanOutletNodeNum));
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).FanType,
+                          PTUnit(PTUnitNum).FanName,
+                          NodeID(FanInletNodeNum),
+                          NodeID(FanOutletNodeNum));
 
             // Add cooling coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName,
-                          NodeID(CoolCoilInletNodeNum), NodeID(CoolCoilOutletNodeNum));
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).DXCoolCoilType,
+                          PTUnit(PTUnitNum).DXCoolCoilName,
+                          NodeID(CoolCoilInletNodeNum),
+                          NodeID(CoolCoilOutletNodeNum));
 
             // Add heating coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).ACHeatCoilType, ACHeatCoilName,
-                          NodeID(HeatCoilInletNodeNum), NodeID(HeatCoilOutletNodeNum));
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).ACHeatCoilType,
+                          ACHeatCoilName,
+                          NodeID(HeatCoilInletNodeNum),
+                          NodeID(HeatCoilOutletNodeNum));
 
             if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
-                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).HeatCoilFluidInletNode), ErrorsFound, PTUnit(PTUnitNum).UnitType,
-                                                    PTUnit(PTUnitNum).Name, NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent);
+                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).HeatCoilFluidInletNode),
+                                                    ErrorsFound,
+                                                    PTUnit(PTUnitNum).UnitType,
+                                                    PTUnit(PTUnitNum).Name,
+                                                    NodeType_Water,
+                                                    NodeConnectionType_Actuator,
+                                                    1,
+                                                    ObjectIsParent);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                     // Add heating coil steam inlet node as actualtor node for coil
-                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).HeatCoilFluidInletNode), ErrorsFound, PTUnit(PTUnitNum).UnitType,
-                                                    PTUnit(PTUnitNum).Name, NodeType_Steam, NodeConnectionType_Actuator, 1, ObjectIsParent);
+                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).HeatCoilFluidInletNode),
+                                                    ErrorsFound,
+                                                    PTUnit(PTUnitNum).UnitType,
+                                                    PTUnit(PTUnitNum).Name,
+                                                    NodeType_Steam,
+                                                    NodeConnectionType_Actuator,
+                                                    1,
+                                                    ObjectIsParent);
                 }
             }
 
             if (OANodeNums(1) > 0) {
                 // Set up component set for OA mixer - use OA node and Mixed air node
-                SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).OAMixType, PTUnit(PTUnitNum).OAMixName,
-                              NodeID(OANodeNums(1)), NodeID(OANodeNums(4)));
+                SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                              PTUnit(PTUnitNum).Name,
+                              PTUnit(PTUnitNum).OAMixType,
+                              PTUnit(PTUnitNum).OAMixName,
+                              NodeID(OANodeNums(1)),
+                              NodeID(OANodeNums(4)));
             }
         }
 
@@ -2253,8 +2371,17 @@ namespace PackagedTerminalHeatPump {
             OANodeNums = 0;
 
             CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-            inputProcessor->getObjectItem(CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          PTUnitIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
 
             PTUnitNum = PTUnitIndex + NumPTHP + NumPTAC;
             PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;
@@ -2485,7 +2612,10 @@ namespace PackagedTerminalHeatPump {
             // end get water flow mode info
             if (Alphas(9) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" && Alphas(11) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
                 if (PTUnit(PTUnitNum).DXHeatCoilIndexNum > 0 && PTUnit(PTUnitNum).DXCoolCoilIndexNum > 0) {
-                    SetSimpleWSHPData(PTUnit(PTUnitNum).DXCoolCoilIndexNum, ErrorsFound, PTUnit(PTUnitNum).WaterCyclingMode, _,
+                    SetSimpleWSHPData(PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                      ErrorsFound,
+                                      PTUnit(PTUnitNum).WaterCyclingMode,
+                                      _,
                                       PTUnit(PTUnitNum).DXHeatCoilIndexNum);
                 }
             } else if (Alphas(9) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" &&
@@ -2501,8 +2631,14 @@ namespace PackagedTerminalHeatPump {
             }
 
             // set minimum outdoor temperature for compressor operation
-            SetMinOATCompressor(PTUnitNum, PTUnit(PTUnitNum).Name, CurrentModuleObject, PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, ErrorsFound);
+            SetMinOATCompressor(PTUnitNum,
+                                PTUnit(PTUnitNum).Name,
+                                CurrentModuleObject,
+                                PTUnit(PTUnitNum).DXCoolCoilType,
+                                PTUnit(PTUnitNum).DXCoolCoilName,
+                                PTUnit(PTUnitNum).DXHeatCoilType,
+                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                ErrorsFound);
 
             // Get supplemental heating coil information
 
@@ -2597,8 +2733,14 @@ namespace PackagedTerminalHeatPump {
             if (lAlphaBlanks(15)) {
                 PTUnit(PTUnitNum).CondenserNodeNum = 0;
             } else {
-                PTUnit(PTUnitNum).CondenserNodeNum = GetOnlySingleNode(Alphas(15), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air,
-                                                                       NodeConnectionType_OutsideAirReference, 1, ObjectIsNotParent);
+                PTUnit(PTUnitNum).CondenserNodeNum = GetOnlySingleNode(Alphas(15),
+                                                                       ErrorsFound,
+                                                                       CurrentModuleObject,
+                                                                       Alphas(1),
+                                                                       NodeType_Air,
+                                                                       NodeConnectionType_OutsideAirReference,
+                                                                       1,
+                                                                       ObjectIsNotParent);
                 // need better verification.
                 if (!CheckOutAirNodeNumber(PTUnit(PTUnitNum).CondenserNodeNum)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
@@ -2640,8 +2782,13 @@ namespace PackagedTerminalHeatPump {
             }
 
             // Get AirTerminal mixer data
-            GetATMixer(PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).ATMixerName, PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ATMixerType,
-                       PTUnit(PTUnitNum).ATMixerPriNode, PTUnit(PTUnitNum).ATMixerSecNode, PTUnit(PTUnitNum).ATMixerOutNode,
+            GetATMixer(PTUnit(PTUnitNum).Name,
+                       PTUnit(PTUnitNum).ATMixerName,
+                       PTUnit(PTUnitNum).ATMixerIndex,
+                       PTUnit(PTUnitNum).ATMixerType,
+                       PTUnit(PTUnitNum).ATMixerPriNode,
+                       PTUnit(PTUnitNum).ATMixerSecNode,
+                       PTUnit(PTUnitNum).ATMixerOutNode,
                        PTUnit(PTUnitNum).AirOutNode);
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 PTUnit(PTUnitNum).ATMixerExists = true;
@@ -2872,36 +3019,64 @@ namespace PackagedTerminalHeatPump {
             CompSetSupHeatOutlet = NodeID(SuppHeatOutletNodeNum);
 
             // Add fan to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, CompSetFanInlet,
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).FanType,
+                          PTUnit(PTUnitNum).FanName,
+                          CompSetFanInlet,
                           CompSetFanOutlet);
 
             // Add cooling coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName,
-                          CompSetCoolInlet, CompSetCoolOutlet);
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).DXCoolCoilType,
+                          PTUnit(PTUnitNum).DXCoolCoilName,
+                          CompSetCoolInlet,
+                          CompSetCoolOutlet);
 
             // Add heating coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName,
-                          CompSetHeatInlet, CompSetHeatOutlet);
+            SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                          PTUnit(PTUnitNum).Name,
+                          PTUnit(PTUnitNum).DXHeatCoilType,
+                          PTUnit(PTUnitNum).DXHeatCoilName,
+                          CompSetHeatInlet,
+                          CompSetHeatOutlet);
 
             // Add supplemental heating coil to component sets array
-            SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, SuppHeatCoilType, SuppHeatCoilName, CompSetSupHeatInlet,
-                          CompSetSupHeatOutlet);
+            SetUpCompSets(
+                PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, SuppHeatCoilType, SuppHeatCoilName, CompSetSupHeatInlet, CompSetSupHeatOutlet);
 
             if (PTUnit(PTUnitNum).UnitType_Num == PTWSHPUnit) {
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
-                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode), ErrorsFound, PTUnit(PTUnitNum).UnitType,
-                                                    PTUnit(PTUnitNum).Name, NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent);
+                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                                                    ErrorsFound,
+                                                    PTUnit(PTUnitNum).UnitType,
+                                                    PTUnit(PTUnitNum).Name,
+                                                    NodeType_Water,
+                                                    NodeConnectionType_Actuator,
+                                                    1,
+                                                    ObjectIsParent);
                 } else if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     // Add heating coil steam inlet node as actualtor node for coil
-                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode), ErrorsFound, PTUnit(PTUnitNum).UnitType,
-                                                    PTUnit(PTUnitNum).Name, NodeType_Steam, NodeConnectionType_Actuator, 1, ObjectIsParent);
+                    TempNodeNum = GetOnlySingleNode(NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode),
+                                                    ErrorsFound,
+                                                    PTUnit(PTUnitNum).UnitType,
+                                                    PTUnit(PTUnitNum).Name,
+                                                    NodeType_Steam,
+                                                    NodeConnectionType_Actuator,
+                                                    1,
+                                                    ObjectIsParent);
                 }
             }
             if (OANodeNums(1) > 0) {
                 // Set up component set for OA mixer - use OA node and Mixed air node
-                SetUpCompSets(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, PTUnit(PTUnitNum).OAMixType, PTUnit(PTUnitNum).OAMixName,
-                              NodeID(OANodeNums(1)), NodeID(OANodeNums(4)));
+                SetUpCompSets(PTUnit(PTUnitNum).UnitType,
+                              PTUnit(PTUnitNum).Name,
+                              PTUnit(PTUnitNum).OAMixType,
+                              PTUnit(PTUnitNum).OAMixName,
+                              NodeID(OANodeNums(1)),
+                              NodeID(OANodeNums(4)));
             }
 
             // Set the Design Fan Volume Flow Rate
@@ -3124,159 +3299,379 @@ namespace PackagedTerminalHeatPump {
 
         for (PTUnitNum = 1; PTUnitNum <= NumPTHP; ++PTUnitNum) {
             // Setup Report variables for the Packaged Terminal Heat Psmps,   CurrentModuleObject = 'ZoneHVAC:PackagedTerminalHeatPump'
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Heating Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).TotHeatEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Heating Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).TotHeatEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Cooling Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).TotCoolEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Cooling Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).TotCoolEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Heating Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).SensHeatEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Heating Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).SensHeatEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Cooling Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).SensCoolEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Cooling Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).SensCoolEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Heating Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).LatHeatEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Heating Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).LatHeatEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).LatCoolEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).LatCoolEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Electric Power", OutputProcessor::Unit::W, PTUnit(PTUnitNum).ElecPower, "System",
-                                "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Electric Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).ElecConsumption,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Fan Part Load Ratio", OutputProcessor::Unit::None,
-                                PTUnit(PTUnitNum).FanPartLoadRatio, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Compressor Part Load Ratio", OutputProcessor::Unit::None,
-                                PTUnit(PTUnitNum).CompPartLoadRatio, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Heat Pump Fan Availability Status", OutputProcessor::Unit::None,
-                                PTUnit(PTUnitNum).AvailStatus, "System", "Average", PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).TotHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).TotHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).TotCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Total Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).TotCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).SensHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).SensHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).SensCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).SensCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).LatHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).LatHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).LatCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).LatCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Electric Power",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).ElecPower,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Electric Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).ElecConsumption,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Fan Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).FanPartLoadRatio,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Compressor Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).CompPartLoadRatio,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Heat Pump Fan Availability Status",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).AvailStatus,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
         }
 
         for (PTUnitNum = 1 + NumPTHP; PTUnitNum <= NumPTHP + NumPTAC; ++PTUnitNum) {
             // Setup Report variables for the Packaged Terminal Air Conditioners,
             // CurrentModuleObject = 'ZoneHVAC:PackagedTerminalAirConditioner'
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Heating Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).TotHeatEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Heating Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).TotHeatEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Cooling Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).TotCoolEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Cooling Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).TotCoolEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Heating Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).SensHeatEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Heating Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).SensHeatEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Cooling Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).SensCoolEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Cooling Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).SensCoolEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Heating Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).LatHeatEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Heating Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).LatHeatEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Cooling Rate", OutputProcessor::Unit::W,
-                                PTUnit(PTUnitNum).LatCoolEnergyRate, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Cooling Energy", OutputProcessor::Unit::J,
-                                PTUnit(PTUnitNum).LatCoolEnergy, "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Electric Power", OutputProcessor::Unit::W, PTUnit(PTUnitNum).ElecPower,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Electric Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).ElecConsumption,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Fan Part Load Ratio", OutputProcessor::Unit::None,
-                                PTUnit(PTUnitNum).FanPartLoadRatio, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio", OutputProcessor::Unit::None,
-                                PTUnit(PTUnitNum).CompPartLoadRatio, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Fan Availability Status", OutputProcessor::Unit::None,
-                                PTUnit(PTUnitNum).AvailStatus, "System", "Average", PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).TotHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).TotHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).TotCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Total Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).TotCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).SensHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).SensHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).SensCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).SensCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).LatHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).LatHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).LatCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).LatCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Electric Power",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).ElecPower,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Electric Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).ElecConsumption,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Fan Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).FanPartLoadRatio,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).CompPartLoadRatio,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Packaged Terminal Air Conditioner Fan Availability Status",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).AvailStatus,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
         }
 
         for (PTUnitNum = 1 + NumPTHP + NumPTAC; PTUnitNum <= NumPTUs; ++PTUnitNum) {
             // Setup Report variables for the Zone Water Source Heat Pumps, CurrentModuleObject='ZoneHVAC:WaterToAirHeatPump'
-            SetupOutputVariable("Zone Water to Air Heat Pump Total Heating Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).TotHeatEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Total Heating Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).TotHeatEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Total Cooling Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).TotCoolEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Total Cooling Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).TotCoolEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Heating Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).SensHeatEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Heating Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).SensHeatEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Cooling Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).SensCoolEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Cooling Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).SensCoolEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Latent Heating Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).LatHeatEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Latent Heating Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).LatHeatEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Latent Cooling Rate", OutputProcessor::Unit::W, PTUnit(PTUnitNum).LatCoolEnergyRate,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Latent Cooling Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).LatCoolEnergy,
-                                "System", "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Electric Power", OutputProcessor::Unit::W, PTUnit(PTUnitNum).ElecPower, "System",
-                                "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Electric Energy", OutputProcessor::Unit::J, PTUnit(PTUnitNum).ElecConsumption, "System",
-                                "Sum", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Fan Part Load Ratio", OutputProcessor::Unit::None, PTUnit(PTUnitNum).FanPartLoadRatio,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Compressor Part Load Ratio", OutputProcessor::Unit::None,
-                                PTUnit(PTUnitNum).CompPartLoadRatio, "System", "Average", PTUnit(PTUnitNum).Name);
-            SetupOutputVariable("Zone Water to Air Heat Pump Fan Availability Status", OutputProcessor::Unit::None, PTUnit(PTUnitNum).AvailStatus,
-                                "System", "Average", PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).TotHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).TotHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).TotCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Total Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).TotCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).SensHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).SensHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).SensCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).SensCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Latent Heating Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).LatHeatEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Latent Heating Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).LatHeatEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).LatCoolEnergyRate,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).LatCoolEnergy,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Electric Power",
+                                OutputProcessor::Unit::W,
+                                PTUnit(PTUnitNum).ElecPower,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Electric Energy",
+                                OutputProcessor::Unit::J,
+                                PTUnit(PTUnitNum).ElecConsumption,
+                                "System",
+                                "Sum",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Fan Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).FanPartLoadRatio,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Compressor Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).CompPartLoadRatio,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
+            SetupOutputVariable("Zone Water to Air Heat Pump Fan Availability Status",
+                                OutputProcessor::Unit::None,
+                                PTUnit(PTUnitNum).AvailStatus,
+                                "System",
+                                "Average",
+                                PTUnit(PTUnitNum).Name);
         }
         for (PTUnitNum = 1; PTUnitNum <= NumPTUs; ++PTUnitNum) {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXCoolCoilName, PTUnit(PTUnitNum).DXCoolCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::objectVectorOOFanSystemModel,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXCoolCoilName,
+                                                                 PTUnit(PTUnitNum).DXCoolCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::objectVectorOOFanSystemModel,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
                 if (PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXHeatCoilName, PTUnit(PTUnitNum).DXHeatCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::objectVectorOOFanSystemModel,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXHeatCoilName,
+                                                                 PTUnit(PTUnitNum).DXHeatCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::objectVectorOOFanSystemModel,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).ACHeatCoilName, PTUnit(PTUnitNum).ACHeatCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::objectVectorOOFanSystemModel,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                                 PTUnit(PTUnitNum).ACHeatCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::objectVectorOOFanSystemModel,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).SuppHeatCoilName, PTUnit(PTUnitNum).SuppHeatCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::objectVectorOOFanSystemModel,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                                 PTUnit(PTUnitNum).SuppHeatCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::objectVectorOOFanSystemModel,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
             } else {
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXCoolCoilName, PTUnit(PTUnitNum).DXCoolCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::structArrayLegacyFanModels,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXCoolCoilName,
+                                                                 PTUnit(PTUnitNum).DXCoolCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::structArrayLegacyFanModels,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
                 if (PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXHeatCoilName, PTUnit(PTUnitNum).DXHeatCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::structArrayLegacyFanModels,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).DXHeatCoilName,
+                                                                 PTUnit(PTUnitNum).DXHeatCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::structArrayLegacyFanModels,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).ACHeatCoilName, PTUnit(PTUnitNum).ACHeatCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::structArrayLegacyFanModels,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                                 PTUnit(PTUnitNum).ACHeatCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::structArrayLegacyFanModels,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).SuppHeatCoilName, PTUnit(PTUnitNum).SuppHeatCoilType,
-                                                                 PTUnit(PTUnitNum).FanName, DataAirSystems::structArrayLegacyFanModels,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                                 PTUnit(PTUnitNum).SuppHeatCoilType,
+                                                                 PTUnit(PTUnitNum).FanName,
+                                                                 DataAirSystems::structArrayLegacyFanModels,
                                                                  PTUnit(PTUnitNum).FanIndex);
                 }
             }
@@ -3408,9 +3803,18 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).ACHeatCoilName, TypeOf_CoilWaterSimpleHeating, PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                            PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                            PTUnit(PTUnitNum).HeatCoilCompNum, _, _, _, _, _, errFlag);
+                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).ACHeatCoilName,
+                                            TypeOf_CoilWaterSimpleHeating,
+                                            PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                            PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                            PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                            PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            errFlag);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3420,8 +3824,10 @@ namespace PackagedTerminalHeatPump {
                         GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
 
                     if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow > 0.0) {
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex, RoutineName);
+                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
+                                               DataGlobals::CWInitConvTemp,
+                                               PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
+                                               RoutineName);
 
                         PTUnit(PTUnitNum).MaxHeatCoilFluidFlow =
                             GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound) * rho;
@@ -3430,9 +3836,18 @@ namespace PackagedTerminalHeatPump {
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).ACHeatCoilName, TypeOf_CoilSteamAirHeating, PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                            PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                            PTUnit(PTUnitNum).HeatCoilCompNum, _, _, _, _, _, errFlag);
+                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).ACHeatCoilName,
+                                            TypeOf_CoilSteamAirHeating,
+                                            PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                            PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                            PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                            PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            errFlag);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3461,9 +3876,18 @@ namespace PackagedTerminalHeatPump {
                        (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam)) {
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).SuppHeatCoilName, TypeOf_CoilWaterSimpleHeating, PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                            PTUnit(PTUnitNum).SuppCoilLoopSide, PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                            PTUnit(PTUnitNum).SuppCoilCompNum, _, _, _, _, _, errFlag);
+                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            TypeOf_CoilWaterSimpleHeating,
+                                            PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                            PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                            PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                            PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            errFlag);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }
@@ -3471,16 +3895,27 @@ namespace PackagedTerminalHeatPump {
                         GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
 
                     if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex, RoutineName);
+                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                               DataGlobals::CWInitConvTemp,
+                                               PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                               RoutineName);
                         PTUnit(PTUnitNum).MaxSuppCoilFluidFlow =
                             GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound) * rho;
                     }
                 } else if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).SuppHeatCoilName, TypeOf_CoilSteamAirHeating, PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                            PTUnit(PTUnitNum).SuppCoilLoopSide, PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                            PTUnit(PTUnitNum).SuppCoilCompNum, _, _, _, _, _, errFlag);
+                    ScanPlantLoopsForObject(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            TypeOf_CoilSteamAirHeating,
+                                            PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                            PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                            PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                            PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            _,
+                                            errFlag);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }
@@ -3539,8 +3974,18 @@ namespace PackagedTerminalHeatPump {
 
             if (PTUnit(PTUnitNum).useVSCoilModel && PTUnit(PTUnitNum).NumOfSpeedCooling == 0) {
 
-                SimVariableSpeedCoils("", PTUnit(PTUnitNum).DXCoolCoilIndexNum, 0, PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                      PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0,
+                SimVariableSpeedCoils("",
+                                      PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                      0,
+                                      PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      PTUnit(PTUnitNum).HPTimeConstant,
+                                      PTUnit(PTUnitNum).FanDelayTime,
+                                      0,
+                                      0.0,
+                                      1,
+                                      0.0,
+                                      0.0,
+                                      0.0,
                                       0.0); // conduct the sizing operation in the VS WSHP
                 PTUnit(PTUnitNum).NumOfSpeedCooling = VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).NumOfSpeeds;
 
@@ -3555,8 +4000,18 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit ||
                     PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
 
-                    SimVariableSpeedCoils("", PTUnit(PTUnitNum).DXHeatCoilIndexNum, 0, PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                          PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0,
+                    SimVariableSpeedCoils("",
+                                          PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                          0,
+                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                          PTUnit(PTUnitNum).HPTimeConstant,
+                                          PTUnit(PTUnitNum).FanDelayTime,
+                                          0,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
                                           0.0); // conduct the sizing operation in the VS WSHP
 
                     PTUnit(PTUnitNum).NumOfSpeedHeating = VarSpeedCoil(PTUnit(PTUnitNum).DXHeatCoilIndexNum).NumOfSpeeds;
@@ -3794,14 +4249,21 @@ namespace PackagedTerminalHeatPump {
                     CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
                     if (CoilMaxVolFlowRate != AutoSize) {
 
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex, RoutineNameSpace);
+                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
+                                               DataGlobals::CWInitConvTemp,
+                                               PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
+                                               RoutineNameSpace);
                         PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                     }
                 }
-                InitComponentNodes(0.0, PTUnit(PTUnitNum).MaxHeatCoilFluidFlow, PTUnit(PTUnitNum).HeatCoilFluidInletNode,
-                                   PTUnit(PTUnitNum).PlantCoilOutletNode, PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                   PTUnit(PTUnitNum).HeatCoilBranchNum, PTUnit(PTUnitNum).HeatCoilCompNum);
+                InitComponentNodes(0.0,
+                                   PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
+                                   PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                   PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                   PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                   PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                   PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                   PTUnit(PTUnitNum).HeatCoilCompNum);
             }
 
             if (PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
@@ -3810,19 +4272,29 @@ namespace PackagedTerminalHeatPump {
                     SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                     CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
                     if (CoilMaxVolFlowRate != AutoSize) {
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName, DataGlobals::CWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex, RoutineNameSpace);
+                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                               DataGlobals::CWInitConvTemp,
+                                               PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                               RoutineNameSpace);
                         PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                     }
                 }
-                InitComponentNodes(0.0, PTUnit(PTUnitNum).MaxSuppCoilFluidFlow, PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                   PTUnit(PTUnitNum).PlantCoilOutletNode, PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                   PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
+                InitComponentNodes(0.0,
+                                   PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
+                                   PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                   PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                   PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                   PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                   PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                   PTUnit(PTUnitNum).SuppCoilCompNum);
             }
             if (PTUnit(PTUnitNum).HeatCoilFluidInletNode > 0) {
                 //     If steam coil max steam flow rate is autosized, simulate once in order to mine max steam flow rate
                 if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow == AutoSize) {
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, 1.0,
+                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                FirstHVACIteration,
+                                                PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                1.0,
                                                 QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                     CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound);
 
@@ -3832,14 +4304,22 @@ namespace PackagedTerminalHeatPump {
                         PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
                     }
                     // why is this inside the autosize IF block? Shouldn't the fluid flow rate be initialized all the time?
-                    InitComponentNodes(0.0, PTUnit(PTUnitNum).MaxHeatCoilFluidFlow, PTUnit(PTUnitNum).HeatCoilFluidInletNode,
-                                       PTUnit(PTUnitNum).PlantCoilOutletNode, PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                       PTUnit(PTUnitNum).HeatCoilBranchNum, PTUnit(PTUnitNum).HeatCoilCompNum);
+                    InitComponentNodes(0.0,
+                                       PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
+                                       PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                       PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                       PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                       PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                       PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                       PTUnit(PTUnitNum).HeatCoilCompNum);
                 }
             }
             if (PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
                 if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow == AutoSize) {
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex, 1.0,
+                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                FirstHVACIteration,
+                                                PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                1.0,
                                                 QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                     CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound);
 
@@ -3849,9 +4329,14 @@ namespace PackagedTerminalHeatPump {
                         PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
                     }
                     // why is this inside the autosize IF block? Shouldn't the fluid flow rate be initialized all the time?
-                    InitComponentNodes(0.0, PTUnit(PTUnitNum).MaxSuppCoilFluidFlow, PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                       PTUnit(PTUnitNum).PlantCoilOutletNode, PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                       PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
+                    InitComponentNodes(0.0,
+                                       PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
+                                       PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                       PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                       PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                       PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                       PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                       PTUnit(PTUnitNum).SuppCoilCompNum);
                 }
             }
         } // end one time inits
@@ -3890,8 +4375,20 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).simASHRAEModel) PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // check unit output at low fan speed
             SupHeaterLoad = 0.0;
             if (PTUnit(PTUnitNum).useVSCoilModel) {
-                CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0,
-                                     OnOffAirFlowRatio, SupHeaterLoad, false);
+                CalcVarSpeedHeatPump(PTUnitNum,
+                                     ZoneNum,
+                                     FirstHVACIteration,
+                                     Off,
+                                     1,
+                                     0.0,
+                                     0.0,
+                                     NoCompOutput,
+                                     LatentOutput,
+                                     QZnReq,
+                                     0.0,
+                                     OnOffAirFlowRatio,
+                                     SupHeaterLoad,
+                                     false);
             } else {
                 CalcPTUnit(PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false);
             }
@@ -3917,8 +4414,20 @@ namespace PackagedTerminalHeatPump {
                         // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
                         //      ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
-                        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0,
-                                             OnOffAirFlowRatio, SupHeaterLoad, false);
+                        CalcVarSpeedHeatPump(PTUnitNum,
+                                             ZoneNum,
+                                             FirstHVACIteration,
+                                             Off,
+                                             1,
+                                             0.0,
+                                             0.0,
+                                             NoCompOutput,
+                                             LatentOutput,
+                                             QZnReq,
+                                             0.0,
+                                             OnOffAirFlowRatio,
+                                             SupHeaterLoad,
+                                             false);
                     } else {
                         SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         CalcPTUnit(PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false);
@@ -3966,8 +4475,20 @@ namespace PackagedTerminalHeatPump {
                         SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
                         //     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
-                        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, Off, 1, 0.0, 0.0, NoCompOutput, LatentOutput, QZnReq, 0.0,
-                                             OnOffAirFlowRatio, SupHeaterLoad, false);
+                        CalcVarSpeedHeatPump(PTUnitNum,
+                                             ZoneNum,
+                                             FirstHVACIteration,
+                                             Off,
+                                             1,
+                                             0.0,
+                                             0.0,
+                                             NoCompOutput,
+                                             LatentOutput,
+                                             QZnReq,
+                                             0.0,
+                                             OnOffAirFlowRatio,
+                                             SupHeaterLoad,
+                                             false);
                     } else {
                         SetOnOffMassFlowRate(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         CalcPTUnit(PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false);
@@ -4024,8 +4545,12 @@ namespace PackagedTerminalHeatPump {
 
                 mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
 
-                SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
+                SetComponentFlowRate(mdot,
+                                     PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                     PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                     PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                     PTUnit(PTUnitNum).HeatCoilBranchNum,
                                      PTUnit(PTUnitNum).HeatCoilCompNum);
 
                 //     simulate water coil to find operating capacity
@@ -4040,12 +4565,19 @@ namespace PackagedTerminalHeatPump {
                 Node(PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = CompOnMassFlow;
 
                 mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
-                SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
+                SetComponentFlowRate(mdot,
+                                     PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                     PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                     PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                     PTUnit(PTUnitNum).HeatCoilBranchNum,
                                      PTUnit(PTUnitNum).HeatCoilCompNum);
 
                 //     simulate steam coil to find operating capacity
-                SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, 1.0,
+                SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                            FirstHVACIteration,
+                                            PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                            1.0,
                                             QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                 PTUnit(PTUnitNum).ACHeatCoilCap =
                     GetSteamCoilCapacity(PTUnit(PTUnitNum).ACHeatCoilType, PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
@@ -4057,8 +4589,12 @@ namespace PackagedTerminalHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide, PTUnit(PTUnitNum).SuppCoilBranchNum,
+                SetComponentFlowRate(mdot,
+                                     PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                     PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                     PTUnit(PTUnitNum).SuppCoilBranchNum,
                                      PTUnit(PTUnitNum).SuppCoilCompNum);
 
                 //     simulate water coil to find operating capacity
@@ -4071,12 +4607,19 @@ namespace PackagedTerminalHeatPump {
                 //     set air-side and steam-side mass flow rates
                 Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = CompOnMassFlow;
                 mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide, PTUnit(PTUnitNum).SuppCoilBranchNum,
+                SetComponentFlowRate(mdot,
+                                     PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                     PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                     PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                     PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                     PTUnit(PTUnitNum).SuppCoilBranchNum,
                                      PTUnit(PTUnitNum).SuppCoilCompNum);
 
                 //     simulate steam coil to find operating capacity
-                SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex, 1.0,
+                SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                            FirstHVACIteration,
+                                            PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                            1.0,
                                             QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                 PTUnit(PTUnitNum).SupHeatCoilCap =
                     GetSteamCoilCapacity(PTUnit(PTUnitNum).SuppHeatCoilType, PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
@@ -4212,12 +4755,12 @@ namespace PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using namespace DataSizing;
+        using DataHeatBalance::Zone;
         using DataHVACGlobals::CoolingAirflowSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
         using DataHVACGlobals::SystemAirflowSizing;
-        using DataHeatBalance::Zone;
         using DataZoneEquipment::PkgTermACAirToAir_Num;
         using DataZoneEquipment::PkgTermHPAirToAir_Num;
         using DataZoneEquipment::PkgTermHPWaterToAir_Num;
@@ -4486,9 +5029,19 @@ namespace PackagedTerminalHeatPump {
                 SizingString = PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = PTUnit(PTUnitNum).MaxCoolAirVolFlow;
                 if (PTUnit(PTUnitNum).useVSCoilModel) {
-                    SimVariableSpeedCoils(BlankString, PTUnit(PTUnitNum).DXCoolCoilIndexNum, PTUnit(PTUnitNum).OpMode,
-                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime,
-                                          1, 0.0, 1, 0.0, 0.0, 0.0, 1.0);
+                    SimVariableSpeedCoils(BlankString,
+                                          PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                          PTUnit(PTUnitNum).OpMode,
+                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                          PTUnit(PTUnitNum).HPTimeConstant,
+                                          PTUnit(PTUnitNum).FanDelayTime,
+                                          1,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          1.0);
                     ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
                     ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow =
                         GetCoilAirFlowRateVariableSpeed(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, ErrorsFound);
@@ -4507,9 +5060,19 @@ namespace PackagedTerminalHeatPump {
                 SizingString = PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = PTUnit(PTUnitNum).MaxHeatAirVolFlow;
                 if (PTUnit(PTUnitNum).useVSCoilModel && PTUnit(PTUnitNum).DXHeatCoilIndexNum > 0) {
-                    SimVariableSpeedCoils(PTUnit(PTUnitNum).DXHeatCoilName, PTUnit(PTUnitNum).DXHeatCoilIndexNum, PTUnit(PTUnitNum).OpMode,
-                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime,
-                                          1, 0.0, 1, 0.0, 0.0, 0.0, 1.0);
+                    SimVariableSpeedCoils(PTUnit(PTUnitNum).DXHeatCoilName,
+                                          PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                          PTUnit(PTUnitNum).OpMode,
+                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                          PTUnit(PTUnitNum).HPTimeConstant,
+                                          PTUnit(PTUnitNum).FanDelayTime,
+                                          1,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          1.0);
                     ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
                     ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow =
                         GetCoilAirFlowRateVariableSpeed(PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, ErrorsFound);
@@ -4563,8 +5126,10 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).CoolOutAirVolFlow > 0.0) {
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                       "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]", PTUnit(PTUnitNum).CoolOutAirVolFlow);
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
+                                       "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
+                                       PTUnit(PTUnitNum).CoolOutAirVolFlow);
                 }
             } else {
                 CheckZoneSizing(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
@@ -4574,14 +5139,19 @@ namespace PackagedTerminalHeatPump {
                 }
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).CoolOutAirVolFlow = CoolOutAirVolFlowDes;
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                       "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]", CoolOutAirVolFlowDes);
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
+                                       "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
+                                       CoolOutAirVolFlowDes);
                 } else {
                     if (PTUnit(PTUnitNum).CoolOutAirVolFlow > 0.0 && CoolOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
                         CoolOutAirVolFlowUser = PTUnit(PTUnitNum).CoolOutAirVolFlow;
-                        ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                           "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]", CoolOutAirVolFlowDes,
-                                           "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]", CoolOutAirVolFlowUser);
+                        ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                           PTUnit(PTUnitNum).Name,
+                                           "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
+                                           CoolOutAirVolFlowDes,
+                                           "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
+                                           CoolOutAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
@@ -4607,8 +5177,10 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).HeatOutAirVolFlow > 0.0) {
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                       "User-Specified Supply Air Flow Rate During Heating Operation [m3/s]", PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
+                                       "User-Specified Supply Air Flow Rate During Heating Operation [m3/s]",
+                                       PTUnit(PTUnitNum).HeatOutAirVolFlow);
                 }
             } else {
                 CheckZoneSizing(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
@@ -4618,14 +5190,19 @@ namespace PackagedTerminalHeatPump {
                 }
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).HeatOutAirVolFlow = HeatOutAirVolFlowDes;
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                       "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]", HeatOutAirVolFlowDes);
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
+                                       "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
+                                       HeatOutAirVolFlowDes);
                 } else {
                     if (PTUnit(PTUnitNum).HeatOutAirVolFlow > 0.0 && HeatOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
                         HeatOutAirVolFlowUser = PTUnit(PTUnitNum).HeatOutAirVolFlow;
-                        ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                           "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]", HeatOutAirVolFlowDes,
-                                           "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]", HeatOutAirVolFlowUser);
+                        ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                           PTUnit(PTUnitNum).Name,
+                                           "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
+                                           HeatOutAirVolFlowDes,
+                                           "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
+                                           HeatOutAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
@@ -4651,7 +5228,8 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow > 0.0) {
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
                                        "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                        PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow);
                 }
@@ -4663,15 +5241,19 @@ namespace PackagedTerminalHeatPump {
                 }
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow = NoCoolHeatOutAirVolFlowDes;
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                       "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]", NoCoolHeatOutAirVolFlowDes);
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
+                                       "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
+                                       NoCoolHeatOutAirVolFlowDes);
                 } else {
                     if (PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow > 0.0 && NoCoolHeatOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
                         NoCoolHeatOutAirVolFlowUser = PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow;
-                        ReportSizingOutput(
-                            PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                            "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]", NoCoolHeatOutAirVolFlowDes,
-                            "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]", NoCoolHeatOutAirVolFlowUser);
+                        ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                           PTUnit(PTUnitNum).Name,
+                                           "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
+                                           NoCoolHeatOutAirVolFlowDes,
+                                           "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
+                                           NoCoolHeatOutAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(NoCoolHeatOutAirVolFlowDes - NoCoolHeatOutAirVolFlowUser) / NoCoolHeatOutAirVolFlowUser) >
                                 AutoVsHardSizingThreshold) {
@@ -4698,22 +5280,29 @@ namespace PackagedTerminalHeatPump {
             CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (PTUnit(PTUnitNum).MaxSATSupHeat > 0.0) {
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                       "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]", PTUnit(PTUnitNum).MaxSATSupHeat);
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
+                                       "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                       PTUnit(PTUnitNum).MaxSATSupHeat);
                 }
             } else {
                 CheckZoneSizing(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name);
                 MaxSATSupHeatDes = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
                 if (IsAutoSize) {
                     PTUnit(PTUnitNum).MaxSATSupHeat = MaxSATSupHeatDes;
-                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                       "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]", MaxSATSupHeatDes);
+                    ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                       PTUnit(PTUnitNum).Name,
+                                       "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                       MaxSATSupHeatDes);
                 } else {
                     if (PTUnit(PTUnitNum).MaxSATSupHeat > 0.0 && MaxSATSupHeatDes > 0.0 && SizingDesRunThisZone) {
                         MaxSATSupHeatUser = PTUnit(PTUnitNum).MaxSATSupHeat;
-                        ReportSizingOutput(PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name,
-                                           "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]", MaxSATSupHeatDes,
-                                           "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]", MaxSATSupHeatUser);
+                        ReportSizingOutput(PTUnit(PTUnitNum).UnitType,
+                                           PTUnit(PTUnitNum).Name,
+                                           "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                           MaxSATSupHeatDes,
+                                           "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                           MaxSATSupHeatUser);
                         if (DisplayExtraWarnings) {
                             if (std::abs(MaxSATSupHeatDes - MaxSATSupHeatUser) > (4.0 * AutoVsHardSizingDeltaTempThreshold)) {
                                 ShowMessage("SizePTUnit: Potential issue with equipment sizing for " + PTUnit(PTUnitNum).UnitType + ' ' +
@@ -4915,8 +5504,17 @@ namespace PackagedTerminalHeatPump {
                     int CompressorOnFlag = 0;
                     auto &SZVAVModel(PTUnit(PTUnitNum));
                     // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different models
-                    SZVAVModel::calcSZVAVModel(SZVAVModel, PTUnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio,
-                                               HXUnitOn, AirLoopNum, PartLoadFrac, CompressorOnFlag);
+                    SZVAVModel::calcSZVAVModel(SZVAVModel,
+                                               PTUnitNum,
+                                               FirstHVACIteration,
+                                               CoolingLoad,
+                                               HeatingLoad,
+                                               QZnReq,
+                                               OnOffAirFlowRatio,
+                                               HXUnitOn,
+                                               AirLoopNum,
+                                               PartLoadFrac,
+                                               CompressorOnFlag);
                 }
             }
 
@@ -5011,7 +5609,12 @@ namespace PackagedTerminalHeatPump {
                             }
                             ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name +
                                                                "\" - Iteration limit exceeded error continues...",
-                                                           PTUnit(PTUnitNum).IterErrIndex, TempOutput, TempOutput, _, "{W}", "{W}");
+                                                           PTUnit(PTUnitNum).IterErrIndex,
+                                                           TempOutput,
+                                                           TempOutput,
+                                                           _,
+                                                           "{W}",
+                                                           "{W}");
                         }
                     } else if (SolFla == -2) {
                         if (!FirstHVACIteration) {
@@ -5057,22 +5660,34 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad,
-                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                        SimulateHeatingCoilComponents(
+                            PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    PTUnit(PTUnitNum).OpMode,
+                                                    PartLoadFrac);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateSteamCoilComponents(
+                            PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex, SupHeaterLoad);
                     }
                 }
 
@@ -5117,13 +5732,13 @@ namespace PackagedTerminalHeatPump {
         // Simulates the unit components sequentially in the air flow direction.
 
         // Using/Aliasing
-        using DXCoils::SimDXCoil;
         using DataEnvironment::OutDryBulbTemp;
         using DataZoneEquipment::ZoneEquipConfig;
+        using DXCoils::SimDXCoil;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
+        using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnWTdb;
@@ -5211,8 +5826,12 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName, FirstHVACIteration, PTUnit(PTUnitNum).FanIndex, FanSpeedRatio,
-                                            ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                                            FirstHVACIteration,
+                                            PTUnit(PTUnitNum).FanIndex,
+                                            FanSpeedRatio,
+                                            ZoneCompTurnFansOn,
+                                            ZoneCompTurnFansOff);
             }
         }
 
@@ -5221,18 +5840,38 @@ namespace PackagedTerminalHeatPump {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                 if ((SELECT_CASE_var == PTACUnit) || (SELECT_CASE_var == PTHPUnit)) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                        SimHXAssistedCoolingCoil(PTUnit(PTUnitNum).DXCoolCoilName, FirstHVACIteration, On, PartLoadFrac,
-                                                 PTUnit(PTUnitNum).CoolCoilCompIndex, PTUnit(PTUnitNum).OpMode, HXUnitOn);
+                        SimHXAssistedCoolingCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                                                 FirstHVACIteration,
+                                                 On,
+                                                 PartLoadFrac,
+                                                 PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                                 PTUnit(PTUnitNum).OpMode,
+                                                 HXUnitOn);
                     } else {
-                        SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName, On, FirstHVACIteration, PTUnit(PTUnitNum).CoolCoilCompIndex,
-                                  PTUnit(PTUnitNum).OpMode, PartLoadFrac, OnOffAirFlowRatio);
+                        SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                                  On,
+                                  FirstHVACIteration,
+                                  PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  PartLoadFrac,
+                                  OnOffAirFlowRatio);
                     }
                     SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                 } else if (SELECT_CASE_var == PTWSHPUnit) {
                     HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
-                    SimWatertoAirHPSimple(BlankString, PTUnit(PTUnitNum).DXCoolCoilIndexNum, QZnReq, dOne, OpMode, WSHPRuntimeFrac,
-                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime,
-                                          iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio);
+                    SimWatertoAirHPSimple(BlankString,
+                                          PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                          QZnReq,
+                                          dOne,
+                                          OpMode,
+                                          WSHPRuntimeFrac,
+                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                          PTUnit(PTUnitNum).HPTimeConstant,
+                                          PTUnit(PTUnitNum).FanDelayTime,
+                                          iOne,
+                                          PartLoadFrac,
+                                          FirstHVACIteration,
+                                          OnOffAirFlowRatio);
                     SaveCompressorPLR = PartLoadFrac;
                 } else {
                 }
@@ -5242,16 +5881,35 @@ namespace PackagedTerminalHeatPump {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                 if ((SELECT_CASE_var == PTACUnit) || (SELECT_CASE_var == PTHPUnit)) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                        SimHXAssistedCoolingCoil(PTUnit(PTUnitNum).DXCoolCoilName, FirstHVACIteration, Off, dZero,
-                                                 PTUnit(PTUnitNum).CoolCoilCompIndex, PTUnit(PTUnitNum).OpMode, HXUnitOn);
+                        SimHXAssistedCoolingCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                                                 FirstHVACIteration,
+                                                 Off,
+                                                 dZero,
+                                                 PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                                 PTUnit(PTUnitNum).OpMode,
+                                                 HXUnitOn);
                     } else {
-                        SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName, Off, FirstHVACIteration, PTUnit(PTUnitNum).CoolCoilCompIndex,
-                                  PTUnit(PTUnitNum).OpMode, dZero, OnOffAirFlowRatio);
+                        SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                                  Off,
+                                  FirstHVACIteration,
+                                  PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  dZero,
+                                  OnOffAirFlowRatio);
                     }
                 } else if (SELECT_CASE_var == PTWSHPUnit) {
-                    SimWatertoAirHPSimple(BlankString, PTUnit(PTUnitNum).DXCoolCoilIndexNum, dZero, dZero, OpMode, dZero,
-                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime,
-                                          iZero, dZero, FirstHVACIteration);
+                    SimWatertoAirHPSimple(BlankString,
+                                          PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                          dZero,
+                                          dZero,
+                                          OpMode,
+                                          dZero,
+                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                          PTUnit(PTUnitNum).HPTimeConstant,
+                                          PTUnit(PTUnitNum).FanDelayTime,
+                                          iZero,
+                                          dZero,
+                                          FirstHVACIteration);
                 } else {
                 }
             }
@@ -5261,8 +5919,14 @@ namespace PackagedTerminalHeatPump {
                 QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                     PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
-                    SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex,
-                                                  QActual, False, OpMode, PartLoadFrac);
+                    SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                  FirstHVACIteration,
+                                                  QCoilReq,
+                                                  PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                  QActual,
+                                                  False,
+                                                  OpMode,
+                                                  PartLoadFrac);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                     //       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
                     if (PTUnit(PTUnitNum).HeatCoilWaterFlowRatio == 0.0) {
@@ -5271,34 +5935,66 @@ namespace PackagedTerminalHeatPump {
                         mdot = PTUnit(PTUnitNum).HeatCoilWaterFlowRatio * PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
                     }
 
-                    SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                         PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                         PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                         PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                         PTUnit(PTUnitNum).HeatCoilBranchNum,
                                          PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QActual,
-                                                PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                FirstHVACIteration,
+                                                PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                QActual,
+                                                PTUnit(PTUnitNum).OpMode,
+                                                PartLoadFrac);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                     //       set steam inlet node mass flow rate proportional to PLR. Limit steam flow rate based on "available" upper limit.
                     mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow * PartLoadFrac;
-                    SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                         PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                         PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                         PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                         PTUnit(PTUnitNum).HeatCoilBranchNum,
                                          PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QCoilReq,
-                                                QActual, PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                FirstHVACIteration,
+                                                PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                QCoilReq,
+                                                QActual,
+                                                PTUnit(PTUnitNum).OpMode,
+                                                PartLoadFrac);
                 }
             } else {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                     if (SELECT_CASE_var == PTHPUnit) {
-                        SimDXCoil(PTUnit(PTUnitNum).DXHeatCoilName, On, FirstHVACIteration, PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                                  PTUnit(PTUnitNum).OpMode, PartLoadFrac, OnOffAirFlowRatio);
+                        SimDXCoil(PTUnit(PTUnitNum).DXHeatCoilName,
+                                  On,
+                                  FirstHVACIteration,
+                                  PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  PartLoadFrac,
+                                  OnOffAirFlowRatio);
                         SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
                     } else if (SELECT_CASE_var == PTWSHPUnit) {
                         HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
-                        SimWatertoAirHPSimple(BlankString, PTUnit(PTUnitNum).DXHeatCoilIndexNum, QZnReq, dZero, OpMode, WSHPRuntimeFrac,
-                                              PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant,
-                                              PTUnit(PTUnitNum).FanDelayTime, iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio);
+                        SimWatertoAirHPSimple(BlankString,
+                                              PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                              QZnReq,
+                                              dZero,
+                                              OpMode,
+                                              WSHPRuntimeFrac,
+                                              PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                              PTUnit(PTUnitNum).HPTimeConstant,
+                                              PTUnit(PTUnitNum).FanDelayTime,
+                                              iOne,
+                                              PartLoadFrac,
+                                              FirstHVACIteration,
+                                              OnOffAirFlowRatio);
                         SaveCompressorPLR = PartLoadFrac;
                     } else {
                     }
@@ -5313,30 +6009,57 @@ namespace PackagedTerminalHeatPump {
                     SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                         PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                         PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                         PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                         PTUnit(PTUnitNum).HeatCoilBranchNum,
                                          PTUnit(PTUnitNum).HeatCoilCompNum);
 
                     SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                     mdot = 0.0;
-                    SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide, PTUnit(PTUnitNum).HeatCoilBranchNum,
+                    SetComponentFlowRate(mdot,
+                                         PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                         PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                         PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                         PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                         PTUnit(PTUnitNum).HeatCoilBranchNum,
                                          PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QCoilReq,
-                                                QActual, PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                FirstHVACIteration,
+                                                PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                QCoilReq,
+                                                QActual,
+                                                PTUnit(PTUnitNum).OpMode,
+                                                PartLoadFrac);
                 }
             } else {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                     if (SELECT_CASE_var == PTHPUnit) {
-                        SimDXCoil(PTUnit(PTUnitNum).DXHeatCoilName, Off, FirstHVACIteration, PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                                  PTUnit(PTUnitNum).OpMode, dZero, OnOffAirFlowRatio);
+                        SimDXCoil(PTUnit(PTUnitNum).DXHeatCoilName,
+                                  Off,
+                                  FirstHVACIteration,
+                                  PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  dZero,
+                                  OnOffAirFlowRatio);
                     } else if (SELECT_CASE_var == PTWSHPUnit) {
-                        SimWatertoAirHPSimple(BlankString, PTUnit(PTUnitNum).DXHeatCoilIndexNum, dZero, dZero, OpMode, dZero,
-                                              PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant,
-                                              PTUnit(PTUnitNum).FanDelayTime, iZero, dZero, FirstHVACIteration);
+                        SimWatertoAirHPSimple(BlankString,
+                                              PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                              dZero,
+                                              dZero,
+                                              OpMode,
+                                              dZero,
+                                              PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                              PTUnit(PTUnitNum).HPTimeConstant,
+                                              PTUnit(PTUnitNum).FanDelayTime,
+                                              iZero,
+                                              dZero,
+                                              FirstHVACIteration);
 
                     } else {
                     }
@@ -5349,8 +6072,12 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName, FirstHVACIteration, PTUnit(PTUnitNum).FanIndex, FanSpeedRatio,
-                                            ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                                            FirstHVACIteration,
+                                            PTUnit(PTUnitNum).FanIndex,
+                                            FanSpeedRatio,
+                                            ZoneCompTurnFansOn,
+                                            ZoneCompTurnFansOff);
             }
         }
         if (PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
@@ -5358,39 +6085,71 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad,
-                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex, QActual, True, PTUnit(PTUnitNum).OpMode);
+                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                      FirstHVACIteration,
+                                                      SupHeaterLoad,
+                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                      QActual,
+                                                      True,
+                                                      PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, PTUnit(PTUnitNum).OpMode);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, QActual, PTUnit(PTUnitNum).OpMode);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode);
                     }
                 }
             } else {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad,
-                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex, QActual, True, PTUnit(PTUnitNum).OpMode);
+                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                      FirstHVACIteration,
+                                                      SupHeaterLoad,
+                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                      QActual,
+                                                      True,
+                                                      PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         MaxHotWaterFlow = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(MaxHotWaterFlow, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SetComponentFlowRate(MaxHotWaterFlow,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
                         QActual = SupHeaterLoad;
                         // simulate the hot water supplemental heating coil
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    QActual, PTUnit(PTUnitNum).OpMode);
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode);
                         if (QActual > (SupHeaterLoad + SmallLoad)) {
                             // control water flow to obtain output matching SupHeaterLoad
                             SolFlag = 0;
@@ -5427,23 +6186,38 @@ namespace PackagedTerminalHeatPump {
                                 }
                                 ShowRecurringWarningErrorAtEnd("CalcPTUnit: Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
-                                                               PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2, MaxHotWaterFlow, MinWaterFlow, _,
-                                                               "[kg/s]", "[kg/s]");
+                                                               PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
+                                                               MaxHotWaterFlow,
+                                                               MinWaterFlow,
+                                                               _,
+                                                               "[kg/s]",
+                                                               "[kg/s]");
                             }
                             QActual = SupHeaterLoad;
                             // simulate the hot water supplemental heating coil
-                            SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                        QActual, PTUnit(PTUnitNum).OpMode);
+                            SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                        FirstHVACIteration,
+                                                        PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                        QActual,
+                                                        PTUnit(PTUnitNum).OpMode);
                         }
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
 
                         // simulate the steam supplemental heating coil
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, QActual, PTUnit(PTUnitNum).OpMode);
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode);
                     }
                 }
             }
@@ -5654,11 +6428,16 @@ namespace PackagedTerminalHeatPump {
         QCoilActual = SupHeaterLoad;
         mdot = HWFlow;
 
-        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode, PTUnit(PTUnitNum).SuppCoilLoopNum,
-                             PTUnit(PTUnitNum).SuppCoilLoopSide, PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
+        SetComponentFlowRate(mdot,
+                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                             PTUnit(PTUnitNum).SuppCoilCompNum);
         // simulate the hot water supplemental heating coil
-        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACSoln, PTUnit(PTUnitNum).SuppHeatCoilIndex, QCoilActual,
-                                    PTUnit(PTUnitNum).OpMode);
+        SimulateWaterCoilComponents(
+            PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACSoln, PTUnit(PTUnitNum).SuppHeatCoilIndex, QCoilActual, PTUnit(PTUnitNum).OpMode);
 
         if (SupHeaterLoad != 0.0) {
             Residuum = (QCoilActual - SupHeaterLoad) / SupHeaterLoad;
@@ -6380,8 +7159,19 @@ namespace PackagedTerminalHeatPump {
 
         // compressor on
         CompOp = On;
-        ControlVSHPOutput(PTUnitNum, FirstHVACIteration, CompOp, OpMode, QZnReq, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac,
-                          OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+        ControlVSHPOutput(PTUnitNum,
+                          FirstHVACIteration,
+                          CompOp,
+                          OpMode,
+                          QZnReq,
+                          TotalZoneLatentLoad,
+                          ZoneNum,
+                          SpeedNum,
+                          SpeedRatio,
+                          PartLoadFrac,
+                          OnOffAirFlowRatio,
+                          SupHeaterLoad,
+                          HXUnitOn);
 
         if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
             SaveCompressorPLR = PartLoadFrac;
@@ -6395,8 +7185,20 @@ namespace PackagedTerminalHeatPump {
             }
         }
 
-        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, QSensUnitOut, QLatUnitOut, QZnReq,
-                             TotalZoneLatentLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+        CalcVarSpeedHeatPump(PTUnitNum,
+                             ZoneNum,
+                             FirstHVACIteration,
+                             CompOp,
+                             SpeedNum,
+                             SpeedRatio,
+                             PartLoadFrac,
+                             QSensUnitOut,
+                             QLatUnitOut,
+                             QZnReq,
+                             TotalZoneLatentLoad,
+                             OnOffAirFlowRatio,
+                             SupHeaterLoad,
+                             HXUnitOn);
 
         // calculate delivered capacity
         AirMassFlow = Node(InletNode).MassFlowRate;
@@ -6516,8 +7318,20 @@ namespace PackagedTerminalHeatPump {
         if (GetCurrentScheduleValue(PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
 
         // Get result when DX coil is off
-        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, NoCompOutput, LatOutput, QZnReq,
-                             QLatReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+        CalcVarSpeedHeatPump(PTUnitNum,
+                             ZoneNum,
+                             FirstHVACIteration,
+                             CompOp,
+                             SpeedNum,
+                             SpeedRatio,
+                             PartLoadFrac,
+                             NoCompOutput,
+                             LatOutput,
+                             QZnReq,
+                             QLatReq,
+                             OnOffAirFlowRatio,
+                             SupHeaterLoad,
+                             HXUnitOn);
 
         // If cooling and NoCompOutput < QZnReq, the coil needs to be off
         // If heating and NoCompOutput > QZnReq, the coil needs to be off
@@ -6542,8 +7356,20 @@ namespace PackagedTerminalHeatPump {
             PartLoadFrac = 0.0;
         }
 
-        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, FullOutput, LatOutput, QZnReq,
-                             QLatReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+        CalcVarSpeedHeatPump(PTUnitNum,
+                             ZoneNum,
+                             FirstHVACIteration,
+                             CompOp,
+                             SpeedNum,
+                             SpeedRatio,
+                             PartLoadFrac,
+                             FullOutput,
+                             LatOutput,
+                             QZnReq,
+                             QLatReq,
+                             OnOffAirFlowRatio,
+                             SupHeaterLoad,
+                             HXUnitOn);
 
         if (QLatReq < 0.0) { // dehumidification mode
             //  ! If the QLatReq <= LatOutput the unit needs to run full out
@@ -6619,8 +7445,20 @@ namespace PackagedTerminalHeatPump {
                 Par(11) = 0.0;
             }
             // Check whether the low speed coil can meet the load or not
-            CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, LatOutput, QZnReq, QLatReq,
-                                 OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+            CalcVarSpeedHeatPump(PTUnitNum,
+                                 ZoneNum,
+                                 FirstHVACIteration,
+                                 CompOp,
+                                 1,
+                                 0.0,
+                                 1.0,
+                                 LowOutput,
+                                 LatOutput,
+                                 QZnReq,
+                                 QLatReq,
+                                 OnOffAirFlowRatio,
+                                 SupHeaterLoad,
+                                 HXUnitOn);
             if (((QZnReq > SmallLoad && QZnReq <= LowOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq >= LowOutput) ||
                  (QLatReq < (-1.0 * SmallLoad) && QLatReq > LatOutput)) &&
                 !CurDeadBandOrSetback(ZoneNum)) {
@@ -6643,7 +7481,9 @@ namespace PackagedTerminalHeatPump {
                             ++ErrCountCyc;
                             ShowRecurringWarningErrorAtEnd(
                                 PTUnit(PTUnitNum).Name + "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
-                                PTUnit(PTUnitNum).ErrIndexCyc, PartLoadFrac, PartLoadFrac);
+                                PTUnit(PTUnitNum).ErrIndexCyc,
+                                PartLoadFrac,
+                                PartLoadFrac);
                         }
                     }
                 } else if (SolFla == -2) {
@@ -6656,8 +7496,20 @@ namespace PackagedTerminalHeatPump {
                 // Cooling
                 if (((QZnReq < (-1.0 * SmallLoad)) || (QLatReq < (-1.0 * SmallLoad))) && !CurDeadBandOrSetback(ZoneNum)) {
                     for (i = 2; i <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++i) {
-                        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, i, SpeedRatio, PartLoadFrac, TempOutput, LatOutput,
-                                             QZnReq, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+                        CalcVarSpeedHeatPump(PTUnitNum,
+                                             ZoneNum,
+                                             FirstHVACIteration,
+                                             CompOp,
+                                             i,
+                                             SpeedRatio,
+                                             PartLoadFrac,
+                                             TempOutput,
+                                             LatOutput,
+                                             QZnReq,
+                                             QLatReq,
+                                             OnOffAirFlowRatio,
+                                             SupHeaterLoad,
+                                             HXUnitOn);
 
                         if (QLatReq < 0.0) {
                             if (QLatReq > LatOutput) {
@@ -6671,8 +7523,20 @@ namespace PackagedTerminalHeatPump {
                     }
                 } else {
                     for (i = 2; i <= PTUnit(PTUnitNum).NumOfSpeedHeating; ++i) {
-                        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, i, SpeedRatio, PartLoadFrac, TempOutput, LatOutput,
-                                             QZnReq, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+                        CalcVarSpeedHeatPump(PTUnitNum,
+                                             ZoneNum,
+                                             FirstHVACIteration,
+                                             CompOp,
+                                             i,
+                                             SpeedRatio,
+                                             PartLoadFrac,
+                                             TempOutput,
+                                             LatOutput,
+                                             QZnReq,
+                                             QLatReq,
+                                             OnOffAirFlowRatio,
+                                             SupHeaterLoad,
+                                             HXUnitOn);
                         if (QZnReq <= TempOutput) {
                             SpeedNum = i;
                             break;
@@ -6698,7 +7562,9 @@ namespace PackagedTerminalHeatPump {
                             ++ErrCountVar;
                             ShowRecurringWarningErrorAtEnd(PTUnit(PTUnitNum).Name +
                                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
-                                                           PTUnit(PTUnitNum).ErrIndexVar, SpeedRatio, SpeedRatio);
+                                                           PTUnit(PTUnitNum).ErrIndexVar,
+                                                           SpeedRatio,
+                                                           SpeedRatio);
                         }
                     }
                 } else if (SolFla == -2) {
@@ -6721,8 +7587,20 @@ namespace PackagedTerminalHeatPump {
             } else {
                 SupHeaterLoad = 0.0;
             }
-            CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, PartLoadFrac, TempOutput, LatOutput, QZnReq,
-                                 QLatReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+            CalcVarSpeedHeatPump(PTUnitNum,
+                                 ZoneNum,
+                                 FirstHVACIteration,
+                                 CompOp,
+                                 SpeedNum,
+                                 SpeedRatio,
+                                 PartLoadFrac,
+                                 TempOutput,
+                                 LatOutput,
+                                 QZnReq,
+                                 QLatReq,
+                                 OnOffAirFlowRatio,
+                                 SupHeaterLoad,
+                                 HXUnitOn);
         }
 
         // check the outlet of the supplemental heater to be lower than the maximum supplemental heater supply air temperature
@@ -6734,22 +7612,34 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad,
-                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                        SimulateHeatingCoilComponents(
+                            PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    PTUnit(PTUnitNum).OpMode,
+                                                    PartLoadFrac);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateSteamCoilComponents(
+                            PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex, SupHeaterLoad);
                     }
                 }
 
@@ -6865,8 +7755,20 @@ namespace PackagedTerminalHeatPump {
 
         HXUnitOn = (Par(11) > 0.0);
 
-        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, 1, 0.0, PartLoadFrac, ZoneSensLoadMet, ZoneLatLoadMet, QZnReq, QZnLat,
-                             OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+        CalcVarSpeedHeatPump(PTUnitNum,
+                             ZoneNum,
+                             FirstHVACIteration,
+                             CompOp,
+                             1,
+                             0.0,
+                             PartLoadFrac,
+                             ZoneSensLoadMet,
+                             ZoneLatLoadMet,
+                             QZnReq,
+                             QZnLat,
+                             OnOffAirFlowRatio,
+                             SupHeaterLoad,
+                             HXUnitOn);
 
         ResScale = std::abs(LoadToBeMet);
         if (ResScale < 100.0) {
@@ -6975,8 +7877,20 @@ namespace PackagedTerminalHeatPump {
 
         HXUnitOn = (Par(11) > 0.0);
 
-        CalcVarSpeedHeatPump(PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, 1.0, ZoneSensLoadMet, ZoneLatLoadMet, QZnReq,
-                             QZnLat, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+        CalcVarSpeedHeatPump(PTUnitNum,
+                             ZoneNum,
+                             FirstHVACIteration,
+                             CompOp,
+                             SpeedNum,
+                             SpeedRatio,
+                             1.0,
+                             ZoneSensLoadMet,
+                             ZoneLatLoadMet,
+                             QZnReq,
+                             QZnLat,
+                             OnOffAirFlowRatio,
+                             SupHeaterLoad,
+                             HXUnitOn);
 
         ResScale = std::abs(LoadToBeMet);
         if (ResScale < 100.0) {
@@ -7021,13 +7935,13 @@ namespace PackagedTerminalHeatPump {
         //  This routine will calcultes MSHP performance based on given system load
 
         // Using/Aliasing
-        using DXCoils::SimDXCoil;
         using DataEnvironment::OutDryBulbTemp;
         using DataZoneEquipment::ZoneEquipConfig;
+        using DXCoils::SimDXCoil;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
+        using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnWTdb;
@@ -7100,35 +8014,79 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName, FirstHVACIteration, PTUnit(PTUnitNum).FanIndex, FanSpeedRatio,
-                                            ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                                            FirstHVACIteration,
+                                            PTUnit(PTUnitNum).FanIndex,
+                                            FanSpeedRatio,
+                                            ZoneCompTurnFansOn,
+                                            ZoneCompTurnFansOff);
             }
         }
 
         if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
-            SimVariableSpeedCoils(BlankString, PTUnit(PTUnitNum).DXCoolCoilIndexNum, PTUnit(PTUnitNum).OpMode,
-                                  PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime, CompOp,
-                                  PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio);
+            SimVariableSpeedCoils(BlankString,
+                                  PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  PTUnit(PTUnitNum).HPTimeConstant,
+                                  PTUnit(PTUnitNum).FanDelayTime,
+                                  CompOp,
+                                  PartLoadFrac,
+                                  SpeedNum,
+                                  SpeedRatio,
+                                  QZnReq,
+                                  QLatReq,
+                                  OnOffAirFlowRatio);
 
             SaveCompressorPLR = PartLoadFrac;
         } else { // cooling coil is off
-            SimVariableSpeedCoils(BlankString, PTUnit(PTUnitNum).DXCoolCoilIndexNum, PTUnit(PTUnitNum).OpMode,
-                                  PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime, CompOp,
-                                  0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
+            SimVariableSpeedCoils(BlankString,
+                                  PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  PTUnit(PTUnitNum).HPTimeConstant,
+                                  PTUnit(PTUnitNum).FanDelayTime,
+                                  CompOp,
+                                  0.0,
+                                  1,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                  OnOffAirFlowRatio);
         }
 
         if (PTUnit(PTUnitNum).UnitType_Num != PTACUnit) { // PTHP
             if (HeatingLoad) {
-                SimVariableSpeedCoils(BlankString, PTUnit(PTUnitNum).DXHeatCoilIndexNum, PTUnit(PTUnitNum).OpMode,
-                                      PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime,
-                                      CompOp, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio);
+                SimVariableSpeedCoils(BlankString,
+                                      PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                      PTUnit(PTUnitNum).OpMode,
+                                      PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      PTUnit(PTUnitNum).HPTimeConstant,
+                                      PTUnit(PTUnitNum).FanDelayTime,
+                                      CompOp,
+                                      PartLoadFrac,
+                                      SpeedNum,
+                                      SpeedRatio,
+                                      QZnReq,
+                                      QLatReq,
+                                      OnOffAirFlowRatio);
 
                 SaveCompressorPLR = PartLoadFrac;
             } else {
                 //   heating coil is off
-                SimVariableSpeedCoils(BlankString, PTUnit(PTUnitNum).DXHeatCoilIndexNum, PTUnit(PTUnitNum).OpMode,
-                                      PTUnit(PTUnitNum).MaxONOFFCyclesperHour, PTUnit(PTUnitNum).HPTimeConstant, PTUnit(PTUnitNum).FanDelayTime,
-                                      CompOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
+                SimVariableSpeedCoils(BlankString,
+                                      PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                      PTUnit(PTUnitNum).OpMode,
+                                      PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      PTUnit(PTUnitNum).HPTimeConstant,
+                                      PTUnit(PTUnitNum).FanDelayTime,
+                                      CompOp,
+                                      0.0,
+                                      1,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      OnOffAirFlowRatio);
             }
         } else { // PTAC
             if (HeatingLoad) {
@@ -7136,27 +8094,50 @@ namespace PackagedTerminalHeatPump {
                     QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                         PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq,
-                                                      PTUnit(PTUnitNum).ACHeatCoilIndex, QActual, false, OpMode, PartLoadFrac);
+                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                      FirstHVACIteration,
+                                                      QCoilReq,
+                                                      PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                      QActual,
+                                                      false,
+                                                      OpMode,
+                                                      PartLoadFrac);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                         //       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
                         mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow * PartLoadFrac;
 
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                             PTUnit(PTUnitNum).HeatCoilBranchNum, PTUnit(PTUnitNum).HeatCoilCompNum);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                             PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QActual,
-                                                    PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode,
+                                                    PartLoadFrac);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                         //       set steam inlet node mass flow rate proportional to PLR. Limit steam flow rate based on "available" upper limit.
                         mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow * PartLoadFrac;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                             PTUnit(PTUnitNum).HeatCoilBranchNum, PTUnit(PTUnitNum).HeatCoilCompNum);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                             PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QCoilReq,
-                                                    QActual, PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                    QCoilReq,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode,
+                                                    PartLoadFrac);
                     }
                 }
             } else {
@@ -7165,23 +8146,36 @@ namespace PackagedTerminalHeatPump {
                     QCoilReq = 0.0;
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                         PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq,
-                                                      PTUnit(PTUnitNum).ACHeatCoilIndex);
+                        SimulateHeatingCoilComponents(
+                            PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                             PTUnit(PTUnitNum).HeatCoilBranchNum, PTUnit(PTUnitNum).HeatCoilCompNum);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                             PTUnit(PTUnitNum).HeatCoilCompNum);
 
                         SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).HeatCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).HeatCoilLoopNum, PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                             PTUnit(PTUnitNum).HeatCoilBranchNum, PTUnit(PTUnitNum).HeatCoilCompNum);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).HeatCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
+                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
+                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
+                                             PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QCoilReq,
-                                                    QActual, PTUnit(PTUnitNum).OpMode, PartLoadFrac);
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                    QCoilReq,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode,
+                                                    PartLoadFrac);
                     }
                 }
             }
@@ -7192,8 +8186,12 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName, FirstHVACIteration, PTUnit(PTUnitNum).FanIndex, FanSpeedRatio,
-                                            ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                                            FirstHVACIteration,
+                                            PTUnit(PTUnitNum).FanIndex,
+                                            FanSpeedRatio,
+                                            ZoneCompTurnFansOn,
+                                            ZoneCompTurnFansOff);
             }
         }
 
@@ -7202,39 +8200,71 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad,
-                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex, QActual, true, PTUnit(PTUnitNum).OpMode);
+                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                      FirstHVACIteration,
+                                                      SupHeaterLoad,
+                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                      QActual,
+                                                      true,
+                                                      PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, PTUnit(PTUnitNum).OpMode);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = 0.0;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, QActual, PTUnit(PTUnitNum).OpMode);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode);
                     }
                 }
             } else {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad,
-                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex, QActual, true, PTUnit(PTUnitNum).OpMode);
+                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                      FirstHVACIteration,
+                                                      SupHeaterLoad,
+                                                      PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                      QActual,
+                                                      true,
+                                                      PTUnit(PTUnitNum).OpMode);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         MaxHotWaterFlow = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(MaxHotWaterFlow, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SetComponentFlowRate(MaxHotWaterFlow,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
                         QActual = SupHeaterLoad;
                         // simulate the hot water supplemental heating coil
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    QActual, PTUnit(PTUnitNum).OpMode);
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode);
                         if (QActual > (SupHeaterLoad + SmallLoad)) {
                             // control water flow to obtain output matching SupHeaterLoad
                             SolFlag = 0;
@@ -7272,23 +8302,38 @@ namespace PackagedTerminalHeatPump {
                                 }
                                 ShowRecurringWarningErrorAtEnd("RoutineName//Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
-                                                               PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2, MaxHotWaterFlow, MinWaterFlow, _,
-                                                               "[kg/s]", "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
+                                                               PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
+                                                               MaxHotWaterFlow,
+                                                               MinWaterFlow,
+                                                               _,
+                                                               "[kg/s]",
+                                                               "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
                             }
                             QActual = SupHeaterLoad;
                             // simulate the hot water supplemental heating coil
-                            SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                        QActual, PTUnit(PTUnitNum).OpMode);
+                            SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                        FirstHVACIteration,
+                                                        PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                        QActual,
+                                                        PTUnit(PTUnitNum).OpMode);
                         }
                     } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                         mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
-                        SetComponentFlowRate(mdot, PTUnit(PTUnitNum).SuppCoilFluidInletNode, PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                             PTUnit(PTUnitNum).SuppCoilLoopNum, PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                             PTUnit(PTUnitNum).SuppCoilBranchNum, PTUnit(PTUnitNum).SuppCoilCompNum);
+                        SetComponentFlowRate(mdot,
+                                             PTUnit(PTUnitNum).SuppCoilFluidInletNode,
+                                             PTUnit(PTUnitNum).PlantCoilOutletNode,
+                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
+                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
+                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
+                                             PTUnit(PTUnitNum).SuppCoilCompNum);
 
                         // simulate the steam supplemental heating coil
-                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                    SupHeaterLoad, QActual, PTUnit(PTUnitNum).OpMode);
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    SupHeaterLoad,
+                                                    QActual,
+                                                    PTUnit(PTUnitNum).OpMode);
                     }
                 }
             }
