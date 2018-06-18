@@ -17,6 +17,8 @@ def isInt(s):
         return False
 
 extension_renaming = {
+    'LifeCycleCost:UseAdjustment': 'multipliers',
+    'LifeCycleCost:UsePriceEscalation': 'escalations',
     'ElectricLoadCenter:Transformer': 'meters',
     'ElectricLoadCenter:Generators': 'generator_outputs',
     'Generator:FuelCell:AirSupply': 'constituent_fractions',
