@@ -1108,10 +1108,13 @@ namespace PVWatts {
             // coded originally by intern M.Kasberg summer 2011
             if (en_backtrack) {
                 // find backtracking rotation angle
-                double backrot = backtrack(azm * 180 / DataGlobals::Pi, zen * 180 / DataGlobals::Pi, // solar azimuth, zenith (deg)
-                                           tilt, sazm,                                               // axis tilt, axis azimuth (deg)
-                                           rlim * 180 / DataGlobals::Pi, gcr,                        // rotation limit, GCR
-                                           rot * 180 / DataGlobals::Pi);                             // ideal rotation angle
+                double backrot = backtrack(azm * 180 / DataGlobals::Pi,
+                                           zen * 180 / DataGlobals::Pi, // solar azimuth, zenith (deg)
+                                           tilt,
+                                           sazm, // axis tilt, axis azimuth (deg)
+                                           rlim * 180 / DataGlobals::Pi,
+                                           gcr,                          // rotation limit, GCR
+                                           rot * 180 / DataGlobals::Pi); // ideal rotation angle
 
                 btdiff = backrot - rot * 180 / DataGlobals::Pi; // log the difference (degrees)
                 btdiff *= DataGlobals::Pi / 180;                // convert output to radians

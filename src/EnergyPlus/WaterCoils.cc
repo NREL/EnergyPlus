@@ -4635,38 +4635,34 @@ namespace WaterCoils {
         Real64 ReportingConstant;
 
         if (WaterCoil(CoilNum).reportCoilFinalSizes) {
-            std::string coilObjClassName;
-            if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
-                coilObjClassName = "Coil:Heating:Water";
-                if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                std::string coilObjClassName;
+                if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
+                    coilObjClassName = "Coil:Heating:Water";
                     coilSelectionReportObj->setCoilFinalSizes(WaterCoil(CoilNum).Name,
-                                                              coilObjClassName,
-                                                              WaterCoil(CoilNum).DesWaterHeatingCoilRate,
-                                                              WaterCoil(CoilNum).DesWaterHeatingCoilRate,
-                                                              WaterCoil(CoilNum).DesAirVolFlowRate,
-                                                              WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                        coilObjClassName,
+                        WaterCoil(CoilNum).DesWaterHeatingCoilRate,
+                        WaterCoil(CoilNum).DesWaterHeatingCoilRate,
+                        WaterCoil(CoilNum).DesAirVolFlowRate,
+                        WaterCoil(CoilNum).MaxWaterVolFlowRate);
                     WaterCoil(CoilNum).reportCoilFinalSizes = false;
-                }
-            } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_DetFlatFinCooling) {
-                coilObjClassName = "Coil:Cooling:Water:DetailedGeometry";
-                if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_DetFlatFinCooling) {
+                    coilObjClassName = "Coil:Cooling:Water:DetailedGeometry";
                     coilSelectionReportObj->setCoilFinalSizes(WaterCoil(CoilNum).Name,
-                                                              coilObjClassName,
-                                                              WaterCoil(CoilNum).DesWaterCoolingCoilRate,
-                                                              -999.0,
-                                                              WaterCoil(CoilNum).DesAirVolFlowRate,
-                                                              WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                        coilObjClassName,
+                        WaterCoil(CoilNum).DesWaterCoolingCoilRate,
+                        -999.0,
+                        WaterCoil(CoilNum).DesAirVolFlowRate,
+                        WaterCoil(CoilNum).MaxWaterVolFlowRate);
                     WaterCoil(CoilNum).reportCoilFinalSizes = false;
-                }
-            } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling) {
-                coilObjClassName = "Coil:Cooling:Water";
-                if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+                } else if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling) {
+                    coilObjClassName = "Coil:Cooling:Water";
                     coilSelectionReportObj->setCoilFinalSizes(WaterCoil(CoilNum).Name,
-                                                              coilObjClassName,
-                                                              WaterCoil(CoilNum).DesWaterCoolingCoilRate,
-                                                              -999.0,
-                                                              WaterCoil(CoilNum).DesAirVolFlowRate,
-                                                              WaterCoil(CoilNum).MaxWaterVolFlowRate);
+                        coilObjClassName,
+                        WaterCoil(CoilNum).DesWaterCoolingCoilRate,
+                        -999.0,
+                        WaterCoil(CoilNum).DesAirVolFlowRate,
+                        WaterCoil(CoilNum).MaxWaterVolFlowRate);
                     WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 }
             }

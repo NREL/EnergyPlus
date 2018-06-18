@@ -116,8 +116,8 @@ void DisplayString(char const *String) // String to be displayed
     // na
 
     // Using/Aliasing
-    using DataGlobals::KickOffSimulation;
     using DataGlobals::fMessagePtr;
+    using DataGlobals::KickOffSimulation;
     using DataSystemVariables::DeveloperFlag;
 
     // Locals
@@ -162,8 +162,8 @@ void DisplayNumberAndString(int const Number,         // number to be displayed
     // na
 
     // Using/Aliasing
-    using DataGlobals::KickOffSimulation;
     using DataGlobals::fMessagePtr;
+    using DataGlobals::KickOffSimulation;
     using DataSystemVariables::DeveloperFlag;
 
     // Locals
@@ -209,8 +209,8 @@ void DisplaySimDaysProgress( // This doesn't do anything!
     // na
 
     // Using/Aliasing
-    using DataGlobals::KickOffSimulation;
     using DataGlobals::fProgressPtr;
+    using DataGlobals::KickOffSimulation;
     using DataSystemVariables::DeveloperFlag;
 
     // Locals

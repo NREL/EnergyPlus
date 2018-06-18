@@ -500,11 +500,10 @@ namespace DataHVACGlobals {
     struct HVACSystemRootFindingAlgorithm
     {
         // Members
-        std::string Algorithm; // Choice of algorithm
-        int NumOfIter;         // Number of Iteration Before Algorith Switch
-        HVACSystemRootSolverAlgorithm
-            HVACSystemRootSolver; // 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5 Alternation
-                                  // Default Constructor
+        std::string Algorithm;                              // Choice of algorithm
+        int NumOfIter;                                      // Number of Iteration Before Algorith Switch
+        HVACSystemRootSolverAlgorithm HVACSystemRootSolver; // 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5
+                                                            // Alternation Default Constructor
         HVACSystemRootFindingAlgorithm() : NumOfIter(5), HVACSystemRootSolver(HVACSystemRootSolverAlgorithm::RegulaFalsi)
         {
         }
