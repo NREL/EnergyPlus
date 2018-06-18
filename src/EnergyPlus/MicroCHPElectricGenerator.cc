@@ -277,8 +277,17 @@ namespace MicroCHPElectricGenerator {
             CheckEquipName.dimension(NumMicroCHPParams, true);
 
             for (CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              CHPParamNum,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 // Can't validate this name
                 // UtilityRoutines::IsNameEmpty(AlphArray(1),cCurrentModuleObject, ErrorsFound);
 
@@ -378,8 +387,17 @@ namespace MicroCHPElectricGenerator {
 
             // load in Micro CHPs
             for (GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, GeneratorNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              GeneratorNum,
+                                              AlphArray,
+                                              NumAlphas,
+                                              NumArray,
+                                              NumNums,
+                                              IOStat,
+                                              _,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 // GENERATOR:MICRO CHP,
@@ -410,20 +428,20 @@ namespace MicroCHPElectricGenerator {
                 MicroCHP(GeneratorNum).PlantInletNodeName = AlphArray(4);  //  A4 Cooling Water Inlet Node Name
                 MicroCHP(GeneratorNum).PlantOutletNodeName = AlphArray(5); //  A5 Cooling Water Outlet Node Name
                 // find node ids for water path
-                MicroCHP(GeneratorNum).PlantInletNodeID = GetOnlySingleNode(AlphArray(4), ErrorsFound, cCurrentModuleObject, AlphArray(1),
-                                                                            NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-                MicroCHP(GeneratorNum).PlantOutletNodeID = GetOnlySingleNode(AlphArray(5), ErrorsFound, cCurrentModuleObject, AlphArray(1),
-                                                                             NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                MicroCHP(GeneratorNum).PlantInletNodeID = GetOnlySingleNode(
+                    AlphArray(4), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                MicroCHP(GeneratorNum).PlantOutletNodeID = GetOnlySingleNode(
+                    AlphArray(5), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Heat Recovery Nodes");
 
                 MicroCHP(GeneratorNum).AirInletNodeName = AlphArray(6); //  A6 Air Inlet Node Name
                 // check the node connections
-                MicroCHP(GeneratorNum).AirInletNodeID = GetOnlySingleNode(AlphArray(6), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air,
-                                                                          NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                MicroCHP(GeneratorNum).AirInletNodeID = GetOnlySingleNode(
+                    AlphArray(6), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
                 MicroCHP(GeneratorNum).AirOutletNodeName = AlphArray(7); //  A7 Air Outlet Node Name
-                MicroCHP(GeneratorNum).AirOutletNodeID = GetOnlySingleNode(AlphArray(7), ErrorsFound, cCurrentModuleObject, AlphArray(1),
-                                                                           NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                MicroCHP(GeneratorNum).AirOutletNodeID = GetOnlySingleNode(
+                    AlphArray(7), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
                 MicroCHP(GeneratorNum).FuelSupplyID = UtilityRoutines::FindItemInList(AlphArray(8), FuelSupply); // Fuel Supply ID
                 if (MicroCHP(GeneratorNum).FuelSupplyID == 0) {
@@ -453,83 +471,226 @@ namespace MicroCHPElectricGenerator {
             // setup report variables
             for (GeneratorNum = 1; GeneratorNum <= NumMicroCHPs; ++GeneratorNum) {
 
-                SetupOutputVariable("Generator Off Mode Time", OutputProcessor::Unit::s, MicroCHP(GeneratorNum).Report.OffModeTime, "System", "Sum",
+                SetupOutputVariable("Generator Off Mode Time",
+                                    OutputProcessor::Unit::s,
+                                    MicroCHP(GeneratorNum).Report.OffModeTime,
+                                    "System",
+                                    "Sum",
                                     MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Standby Mode Time", OutputProcessor::Unit::s, MicroCHP(GeneratorNum).Report.StandyByModeTime, "System",
-                                    "Sum", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Warm Up Mode Time", OutputProcessor::Unit::s, MicroCHP(GeneratorNum).Report.WarmUpModeTime, "System",
-                                    "Sum", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Normal Operating Mode Time", OutputProcessor::Unit::s, MicroCHP(GeneratorNum).Report.NormalModeTime,
-                                    "System", "Sum", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Cool Down Mode Time", OutputProcessor::Unit::s, MicroCHP(GeneratorNum).Report.CoolDownModeTime,
-                                    "System", "Sum", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Standby Mode Time",
+                                    OutputProcessor::Unit::s,
+                                    MicroCHP(GeneratorNum).Report.StandyByModeTime,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Warm Up Mode Time",
+                                    OutputProcessor::Unit::s,
+                                    MicroCHP(GeneratorNum).Report.WarmUpModeTime,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Normal Operating Mode Time",
+                                    OutputProcessor::Unit::s,
+                                    MicroCHP(GeneratorNum).Report.NormalModeTime,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Cool Down Mode Time",
+                                    OutputProcessor::Unit::s,
+                                    MicroCHP(GeneratorNum).Report.CoolDownModeTime,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, MicroCHP(GeneratorNum).Report.ACPowerGen, "System",
-                                    "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Produced Electric Energy", OutputProcessor::Unit::J, MicroCHP(GeneratorNum).Report.ACEnergyGen,
-                                    "System", "Sum", MicroCHP(GeneratorNum).Name, _, "ElectricityProduced", "COGENERATION", _, "Plant");
-                SetupOutputVariable("Generator Produced Thermal Rate", OutputProcessor::Unit::W, MicroCHP(GeneratorNum).Report.QdotHR, "system",
-                                    "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Produced Thermal Energy", OutputProcessor::Unit::J, MicroCHP(GeneratorNum).Report.TotalHeatEnergyRec,
-                                    "system", "Sum", MicroCHP(GeneratorNum).Name, _, "ENERGYTRANSFER", "COGENERATION", _, "Plant");
+                SetupOutputVariable("Generator Produced Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.ACPowerGen,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Produced Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    MicroCHP(GeneratorNum).Report.ACEnergyGen,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name,
+                                    _,
+                                    "ElectricityProduced",
+                                    "COGENERATION",
+                                    _,
+                                    "Plant");
+                SetupOutputVariable("Generator Produced Thermal Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.QdotHR,
+                                    "system",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Produced Thermal Energy",
+                                    OutputProcessor::Unit::J,
+                                    MicroCHP(GeneratorNum).Report.TotalHeatEnergyRec,
+                                    "system",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name,
+                                    _,
+                                    "ENERGYTRANSFER",
+                                    "COGENERATION",
+                                    _,
+                                    "Plant");
 
-                SetupOutputVariable("Generator Electric Efficiency", OutputProcessor::Unit::None, MicroCHP(GeneratorNum).Report.ElectEfficiency,
-                                    "System", "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Thermal Efficiency", OutputProcessor::Unit::None, MicroCHP(GeneratorNum).Report.ThermalEfficiency,
-                                    "System", "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Gross Input Heat Rate", OutputProcessor::Unit::W, MicroCHP(GeneratorNum).Report.QdotGross, "system",
-                                    "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Steady State Engine Heat Generation Rate", OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).Report.Qgenss, "system", "Average", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Electric Efficiency",
+                                    OutputProcessor::Unit::None,
+                                    MicroCHP(GeneratorNum).Report.ElectEfficiency,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Thermal Efficiency",
+                                    OutputProcessor::Unit::None,
+                                    MicroCHP(GeneratorNum).Report.ThermalEfficiency,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Gross Input Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.QdotGross,
+                                    "system",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Steady State Engine Heat Generation Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.Qgenss,
+                                    "system",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Engine Heat Exchange Rate", OutputProcessor::Unit::W, MicroCHP(GeneratorNum).Report.QdotHX, "system",
-                                    "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Air Mass Flow Rate", OutputProcessor::Unit::kg_s, MicroCHP(GeneratorNum).Report.MdotAir, "System",
-                                    "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Molar Flow Rate", OutputProcessor::Unit::kmol_s, MicroCHP(GeneratorNum).Report.NdotFuel, "System",
-                                    "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Mass Flow Rate", OutputProcessor::Unit::kg_s, MicroCHP(GeneratorNum).Report.MdotFuel, "System",
-                                    "Average", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Engine Heat Exchange Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.QdotHX,
+                                    "system",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Air Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    MicroCHP(GeneratorNum).Report.MdotAir,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel Molar Flow Rate",
+                                    OutputProcessor::Unit::kmol_s,
+                                    MicroCHP(GeneratorNum).Report.NdotFuel,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    MicroCHP(GeneratorNum).Report.MdotFuel,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Engine Temperature", OutputProcessor::Unit::C, MicroCHP(GeneratorNum).Report.Tengine, "System",
-                                    "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Coolant Inlet Temperature", OutputProcessor::Unit::C, MicroCHP(GeneratorNum).Report.HeatRecInletTemp,
-                                    "System", "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Coolant Outlet Temperature", OutputProcessor::Unit::C, MicroCHP(GeneratorNum).Report.HeatRecOutletTemp,
-                                    "System", "Average", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Engine Temperature",
+                                    OutputProcessor::Unit::C,
+                                    MicroCHP(GeneratorNum).Report.Tengine,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Coolant Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    MicroCHP(GeneratorNum).Report.HeatRecInletTemp,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Coolant Outlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    MicroCHP(GeneratorNum).Report.HeatRecOutletTemp,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
 
                 // this next one needs to be reconciled with non-gas fuel constituents.
                 //   need custom resourceTypeKey or something for user defined fuel compositions.
-                SetupOutputVariable("Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, MicroCHP(GeneratorNum).Report.FuelEnergyHHV,
-                                    "System", "Sum", MicroCHP(GeneratorNum).Name, _, "Gas", "COGENERATION", _, "Plant");
+                SetupOutputVariable("Generator Fuel HHV Basis Energy",
+                                    OutputProcessor::Unit::J,
+                                    MicroCHP(GeneratorNum).Report.FuelEnergyHHV,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name,
+                                    _,
+                                    "Gas",
+                                    "COGENERATION",
+                                    _,
+                                    "Plant");
 
-                SetupOutputVariable("Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, MicroCHP(GeneratorNum).Report.FuelEnergyUseRateHHV,
-                                    "System", "Average", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel HHV Basis Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.FuelEnergyUseRateHHV,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Fuel LHV Basis Energy", OutputProcessor::Unit::J, MicroCHP(GeneratorNum).Report.FuelEnergyLHV,
-                                    "System", "Sum", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel LHV Basis Rate", OutputProcessor::Unit::W, MicroCHP(GeneratorNum).Report.FuelEnergyUseRateLHV,
-                                    "System", "Average", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel LHV Basis Energy",
+                                    OutputProcessor::Unit::J,
+                                    MicroCHP(GeneratorNum).Report.FuelEnergyLHV,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel LHV Basis Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.FuelEnergyUseRateLHV,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Fuel Compressor Electric Power", OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).Report.FuelCompressPower, "System", "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).Report.FuelCompressEnergy, "System", "Sum", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate", OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).Report.FuelCompressSkinLoss, "System", "Average", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel Compressor Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.FuelCompressPower,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel Compressor Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    MicroCHP(GeneratorNum).Report.FuelCompressEnergy,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.FuelCompressSkinLoss,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
 
-                SetupOutputVariable("Generator Zone Sensible Heat Transfer Rate", OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).Report.SkinLossPower, "System", "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Zone Sensible Heat Transfer Energy", OutputProcessor::Unit::J,
-                                    MicroCHP(GeneratorNum).Report.SkinLossEnergy, "System", "Sum", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Zone Convection Heat Transfer Rate", OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).Report.SkinLossConvect, "System", "Average", MicroCHP(GeneratorNum).Name);
-                SetupOutputVariable("Generator Zone Radiation Heat Transfer Rate", OutputProcessor::Unit::W,
-                                    MicroCHP(GeneratorNum).Report.SkinLossRadiat, "System", "Average", MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Zone Sensible Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.SkinLossPower,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Zone Sensible Heat Transfer Energy",
+                                    OutputProcessor::Unit::J,
+                                    MicroCHP(GeneratorNum).Report.SkinLossEnergy,
+                                    "System",
+                                    "Sum",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Zone Convection Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.SkinLossConvect,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
+                SetupOutputVariable("Generator Zone Radiation Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    MicroCHP(GeneratorNum).Report.SkinLossRadiat,
+                                    "System",
+                                    "Average",
+                                    MicroCHP(GeneratorNum).Name);
 
                 if (MicroCHP(GeneratorNum).ZoneID > 0) {
-                    SetupZoneInternalGain(MicroCHP(GeneratorNum).ZoneID, "Generator:MicroCHP", MicroCHP(GeneratorNum).Name,
-                                          IntGainTypeOf_GeneratorMicroCHP, MicroCHP(GeneratorNum).Report.SkinLossConvect, _,
+                    SetupZoneInternalGain(MicroCHP(GeneratorNum).ZoneID,
+                                          "Generator:MicroCHP",
+                                          MicroCHP(GeneratorNum).Name,
+                                          IntGainTypeOf_GeneratorMicroCHP,
+                                          MicroCHP(GeneratorNum).Report.SkinLossConvect,
+                                          _,
                                           MicroCHP(GeneratorNum).Report.SkinLossRadiat);
                 }
             }
@@ -616,9 +777,18 @@ namespace MicroCHPElectricGenerator {
 
         if (MyPlantScanFlag(GeneratorNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(MicroCHP(GeneratorNum).Name, TypeOf_Generator_MicroCHP, MicroCHP(GeneratorNum).CWLoopNum,
-                                    MicroCHP(GeneratorNum).CWLoopSideNum, MicroCHP(GeneratorNum).CWBranchNum, MicroCHP(GeneratorNum).CWCompNum, _, _,
-                                    _, _, _, errFlag);
+            ScanPlantLoopsForObject(MicroCHP(GeneratorNum).Name,
+                                    TypeOf_Generator_MicroCHP,
+                                    MicroCHP(GeneratorNum).CWLoopNum,
+                                    MicroCHP(GeneratorNum).CWLoopSideNum,
+                                    MicroCHP(GeneratorNum).CWBranchNum,
+                                    MicroCHP(GeneratorNum).CWCompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    errFlag);
 
             if (errFlag) {
                 ShowFatalError("InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
@@ -639,12 +809,14 @@ namespace MicroCHPElectricGenerator {
         }
 
         if (!SysSizingCalc && MySizeFlag(GeneratorNum) && !MyPlantScanFlag(GeneratorNum) && (PlantFirstSizesOkayToFinalize)) {
-            rho = GetDensityGlycol(PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidName, Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp,
-                                   PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidName,
+                                   Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp,
+                                   PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidIndex,
+                                   RoutineName);
             if (MicroCHP(GeneratorNum).A42Model.InternalFlowControl) { // got a curve
-                MicroCHP(GeneratorNum).PlantMassFlowRateMax =
-                    2.0 * CurveValue(MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, MicroCHP(GeneratorNum).A42Model.MaxElecPower,
-                                     Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp);
+                MicroCHP(GeneratorNum).PlantMassFlowRateMax = 2.0 * CurveValue(MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID,
+                                                                               MicroCHP(GeneratorNum).A42Model.MaxElecPower,
+                                                                               Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp);
             } else if (MicroCHP(GeneratorNum).CWLoopSideNum == SupplySide) {
                 if (PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).MaxMassFlowRate > 0.0) {
                     MicroCHP(GeneratorNum).PlantMassFlowRateMax = PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).MaxMassFlowRate;
@@ -660,13 +832,15 @@ namespace MicroCHPElectricGenerator {
 
             RegisterPlantCompDesignFlow(MicroCHP(GeneratorNum).PlantInletNodeID, MicroCHP(GeneratorNum).PlantMassFlowRateMax / rho);
 
-            MicroCHP(GeneratorNum).A42Model.ElecEff =
-                CurveValue(MicroCHP(GeneratorNum).A42Model.ElecEffCurveID, MicroCHP(GeneratorNum).A42Model.MaxElecPower,
-                           MicroCHP(GeneratorNum).PlantMassFlowRateMax, Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp);
+            MicroCHP(GeneratorNum).A42Model.ElecEff = CurveValue(MicroCHP(GeneratorNum).A42Model.ElecEffCurveID,
+                                                                 MicroCHP(GeneratorNum).A42Model.MaxElecPower,
+                                                                 MicroCHP(GeneratorNum).PlantMassFlowRateMax,
+                                                                 Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp);
 
-            MicroCHP(GeneratorNum).A42Model.ThermEff =
-                CurveValue(MicroCHP(GeneratorNum).A42Model.ThermalEffCurveID, MicroCHP(GeneratorNum).A42Model.MaxElecPower,
-                           MicroCHP(GeneratorNum).PlantMassFlowRateMax, Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp);
+            MicroCHP(GeneratorNum).A42Model.ThermEff = CurveValue(MicroCHP(GeneratorNum).A42Model.ThermalEffCurveID,
+                                                                  MicroCHP(GeneratorNum).A42Model.MaxElecPower,
+                                                                  MicroCHP(GeneratorNum).PlantMassFlowRateMax,
+                                                                  Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp);
 
             SetupGeneratorControlStateManager(GeneratorNum);
             MySizeFlag(GeneratorNum) = false;
@@ -714,9 +888,14 @@ namespace MicroCHPElectricGenerator {
 
             FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).QskinLoss = 0.0;
 
-            InitComponentNodes(0.0, MicroCHP(GeneratorNum).PlantMassFlowRateMax, MicroCHP(GeneratorNum).PlantInletNodeID,
-                               MicroCHP(GeneratorNum).PlantOutletNodeID, MicroCHP(GeneratorNum).CWLoopNum, MicroCHP(GeneratorNum).CWLoopSideNum,
-                               MicroCHP(GeneratorNum).CWBranchNum, MicroCHP(GeneratorNum).CWCompNum);
+            InitComponentNodes(0.0,
+                               MicroCHP(GeneratorNum).PlantMassFlowRateMax,
+                               MicroCHP(GeneratorNum).PlantInletNodeID,
+                               MicroCHP(GeneratorNum).PlantOutletNodeID,
+                               MicroCHP(GeneratorNum).CWLoopNum,
+                               MicroCHP(GeneratorNum).CWLoopSideNum,
+                               MicroCHP(GeneratorNum).CWBranchNum,
+                               MicroCHP(GeneratorNum).CWCompNum);
         }
 
         if (!BeginEnvrnFlag) {
@@ -738,8 +917,12 @@ namespace MicroCHPElectricGenerator {
         if (!MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
 
             mdot = MicroCHP(GeneratorNum).PlantMassFlowRateMax;
-            SetComponentFlowRate(mdot, MicroCHP(GeneratorNum).PlantInletNodeID, MicroCHP(GeneratorNum).PlantOutletNodeID,
-                                 MicroCHP(GeneratorNum).CWLoopNum, MicroCHP(GeneratorNum).CWLoopSideNum, MicroCHP(GeneratorNum).CWBranchNum,
+            SetComponentFlowRate(mdot,
+                                 MicroCHP(GeneratorNum).PlantInletNodeID,
+                                 MicroCHP(GeneratorNum).PlantOutletNodeID,
+                                 MicroCHP(GeneratorNum).CWLoopNum,
+                                 MicroCHP(GeneratorNum).CWLoopSideNum,
+                                 MicroCHP(GeneratorNum).CWBranchNum,
                                  MicroCHP(GeneratorNum).CWCompNum);
             MicroCHP(GeneratorNum).PlantMassFlowRate = mdot;
         }
@@ -774,9 +957,9 @@ namespace MicroCHPElectricGenerator {
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
+        using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataHeatBalFanSys::MAT;
         using DataLoopNode::Node;
         using namespace DataGlobalConstants;
         using DataEnvironment::OutDryBulbTemp;
@@ -834,8 +1017,17 @@ namespace MicroCHPElectricGenerator {
 
         DynaCntrlNum = MicroCHP(GeneratorNum).DynamicsControlID;
 
-        ManageGeneratorControlState(iGeneratorMicroCHP, MicroCHP(GeneratorNum).Name, GeneratorNum, RunFlagElectCenter, RunFlagPlant, MyElectricLoad,
-                                    MyThermalLoad, AllowedLoad, CurrentOpMode, PLRforSubtimestepStartUp, PLRforSubtimestepShutDown,
+        ManageGeneratorControlState(iGeneratorMicroCHP,
+                                    MicroCHP(GeneratorNum).Name,
+                                    GeneratorNum,
+                                    RunFlagElectCenter,
+                                    RunFlagPlant,
+                                    MyElectricLoad,
+                                    MyThermalLoad,
+                                    AllowedLoad,
+                                    CurrentOpMode,
+                                    PLRforSubtimestepStartUp,
+                                    PLRforSubtimestepShutDown,
                                     FirstHVACIteration);
 
         if (RunFlagElectCenter || RunFlagPlant) RunFlag = true;
@@ -869,8 +1061,12 @@ namespace MicroCHPElectricGenerator {
                 MdotAir = 0.0;
 
                 MdotCW = 0.0;
-                SetComponentFlowRate(MdotCW, MicroCHP(GeneratorNum).PlantInletNodeID, MicroCHP(GeneratorNum).PlantOutletNodeID,
-                                     MicroCHP(GeneratorNum).CWLoopNum, MicroCHP(GeneratorNum).CWLoopSideNum, MicroCHP(GeneratorNum).CWBranchNum,
+                SetComponentFlowRate(MdotCW,
+                                     MicroCHP(GeneratorNum).PlantInletNodeID,
+                                     MicroCHP(GeneratorNum).PlantOutletNodeID,
+                                     MicroCHP(GeneratorNum).CWLoopNum,
+                                     MicroCHP(GeneratorNum).CWLoopSideNum,
+                                     MicroCHP(GeneratorNum).CWBranchNum,
                                      MicroCHP(GeneratorNum).CWCompNum);
                 MicroCHP(GeneratorNum).PlantMassFlowRate = MdotCW;
 
@@ -889,8 +1085,12 @@ namespace MicroCHPElectricGenerator {
                 MdotAir = 0.0;
 
                 MdotCW = 0.0;
-                SetComponentFlowRate(MdotCW, MicroCHP(GeneratorNum).PlantInletNodeID, MicroCHP(GeneratorNum).PlantOutletNodeID,
-                                     MicroCHP(GeneratorNum).CWLoopNum, MicroCHP(GeneratorNum).CWLoopSideNum, MicroCHP(GeneratorNum).CWBranchNum,
+                SetComponentFlowRate(MdotCW,
+                                     MicroCHP(GeneratorNum).PlantInletNodeID,
+                                     MicroCHP(GeneratorNum).PlantOutletNodeID,
+                                     MicroCHP(GeneratorNum).CWLoopNum,
+                                     MicroCHP(GeneratorNum).CWLoopSideNum,
+                                     MicroCHP(GeneratorNum).CWBranchNum,
                                      MicroCHP(GeneratorNum).CWCompNum);
                 MicroCHP(GeneratorNum).PlantMassFlowRate = MdotCW;
 
@@ -923,8 +1123,14 @@ namespace MicroCHPElectricGenerator {
                                FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                     //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
 
-                    ManageGeneratorFuelFlow(iGeneratorMicroCHP, MicroCHP(GeneratorNum).Name, GeneratorNum, RunFlag, MdotFuel, MdotFuelAllowed,
-                                            ConstrainedIncreasingNdot, ConstrainedDecreasingNdot);
+                    ManageGeneratorFuelFlow(iGeneratorMicroCHP,
+                                            MicroCHP(GeneratorNum).Name,
+                                            GeneratorNum,
+                                            RunFlag,
+                                            MdotFuel,
+                                            MdotFuelAllowed,
+                                            ConstrainedIncreasingNdot,
+                                            ConstrainedDecreasingNdot);
 
                     if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
                         MdotFuel = MdotFuelAllowed;
@@ -1036,8 +1242,14 @@ namespace MicroCHPElectricGenerator {
                 MdotFuel = Qgross / (FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).LHV * 1000.0 * 1000.0) *
                            FuelSupply(MicroCHP(GeneratorNum).FuelSupplyID).KmolPerSecToKgPerSec;
                 //  kMol/s = (J/s) /(KJ/mol * 1000 J/KJ * 1000 mol/kmol)
-                ManageGeneratorFuelFlow(iGeneratorMicroCHP, MicroCHP(GeneratorNum).Name, GeneratorNum, RunFlag, MdotFuel, MdotFuelAllowed,
-                                        ConstrainedIncreasingNdot, ConstrainedDecreasingNdot);
+                ManageGeneratorFuelFlow(iGeneratorMicroCHP,
+                                        MicroCHP(GeneratorNum).Name,
+                                        GeneratorNum,
+                                        RunFlag,
+                                        MdotFuel,
+                                        MdotFuelAllowed,
+                                        ConstrainedIncreasingNdot,
+                                        ConstrainedDecreasingNdot);
 
                 if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
                     MdotFuel = MdotFuelAllowed;
@@ -1137,20 +1349,38 @@ namespace MicroCHPElectricGenerator {
                 Qgenss = ThermEff * Qgross;    // W
             }
 
-            Teng = FuncDetermineEngineTemp(TcwOut, MicroCHP(GeneratorNum).A42Model.MCeng, MicroCHP(GeneratorNum).A42Model.UAhx,
-                                           MicroCHP(GeneratorNum).A42Model.UAskin, thisAmbientTemp, Qgenss, MicroCHP(GeneratorNum).A42Model.TengLast,
+            Teng = FuncDetermineEngineTemp(TcwOut,
+                                           MicroCHP(GeneratorNum).A42Model.MCeng,
+                                           MicroCHP(GeneratorNum).A42Model.UAhx,
+                                           MicroCHP(GeneratorNum).A42Model.UAskin,
+                                           thisAmbientTemp,
+                                           Qgenss,
+                                           MicroCHP(GeneratorNum).A42Model.TengLast,
                                            dt);
 
-            Cp = GetSpecificHeatGlycol(PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidName, TcwIn,
-                                       PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(
+                PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidName, TcwIn, PlantLoop(MicroCHP(GeneratorNum).CWLoopNum).FluidIndex, RoutineName);
 
-            TcwOut = FuncDetermineCoolantWaterExitTemp(TcwIn, MicroCHP(GeneratorNum).A42Model.MCcw, MicroCHP(GeneratorNum).A42Model.UAhx, MdotCW * Cp,
-                                                       Teng, MicroCHP(GeneratorNum).A42Model.TempCWOutLast, dt);
+            TcwOut = FuncDetermineCoolantWaterExitTemp(TcwIn,
+                                                       MicroCHP(GeneratorNum).A42Model.MCcw,
+                                                       MicroCHP(GeneratorNum).A42Model.UAhx,
+                                                       MdotCW * Cp,
+                                                       Teng,
+                                                       MicroCHP(GeneratorNum).A42Model.TempCWOutLast,
+                                                       dt);
 
             // form balance and exit once met.
-            EnergyBalOK = CheckMicroCHPThermalBalance(MicroCHP(GeneratorNum).A42Model.MaxElecPower, TcwIn, TcwOut, Teng, thisAmbientTemp,
-                                                      MicroCHP(GeneratorNum).A42Model.UAhx, MicroCHP(GeneratorNum).A42Model.UAskin, Qgenss,
-                                                      MicroCHP(GeneratorNum).A42Model.MCeng, MicroCHP(GeneratorNum).A42Model.MCcw, MdotCW * Cp);
+            EnergyBalOK = CheckMicroCHPThermalBalance(MicroCHP(GeneratorNum).A42Model.MaxElecPower,
+                                                      TcwIn,
+                                                      TcwOut,
+                                                      Teng,
+                                                      thisAmbientTemp,
+                                                      MicroCHP(GeneratorNum).A42Model.UAhx,
+                                                      MicroCHP(GeneratorNum).A42Model.UAskin,
+                                                      Qgenss,
+                                                      MicroCHP(GeneratorNum).A42Model.MCeng,
+                                                      MicroCHP(GeneratorNum).A42Model.MCcw,
+                                                      MdotCW * Cp);
 
             if (EnergyBalOK && (i > 4)) break;
         }
@@ -1491,8 +1721,8 @@ namespace MicroCHPElectricGenerator {
 
         Node(OutNodeNum).Temp = MicroCHP(Num).A42Model.TcwOut;
 
-        Cp = GetSpecificHeatGlycol(PlantLoop(MicroCHP(Num).CWLoopNum).FluidName, MicroCHP(Num).A42Model.TcwIn,
-                                   PlantLoop(MicroCHP(Num).CWLoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(
+            PlantLoop(MicroCHP(Num).CWLoopNum).FluidName, MicroCHP(Num).A42Model.TcwIn, PlantLoop(MicroCHP(Num).CWLoopNum).FluidIndex, RoutineName);
 
         Node(OutNodeNum).Enthalpy = MicroCHP(Num).A42Model.TcwOut * Cp;
     }
@@ -1549,10 +1779,16 @@ namespace MicroCHPElectricGenerator {
             return;
         } // End Of InitLoopEquip
 
-        UpdateComponentHeatRecoverySide(MicroCHP(CompNum).CWLoopNum, MicroCHP(CompNum).CWLoopSideNum, TypeOf_Generator_MicroCHP,
-                                        MicroCHP(CompNum).PlantInletNodeID, MicroCHP(CompNum).PlantOutletNodeID, MicroCHP(CompNum).Report.QdotHR,
-                                        MicroCHP(CompNum).Report.HeatRecInletTemp, MicroCHP(CompNum).Report.HeatRecOutletTemp,
-                                        MicroCHP(CompNum).Report.HeatRecMdot, FirstHVACIteration);
+        UpdateComponentHeatRecoverySide(MicroCHP(CompNum).CWLoopNum,
+                                        MicroCHP(CompNum).CWLoopSideNum,
+                                        TypeOf_Generator_MicroCHP,
+                                        MicroCHP(CompNum).PlantInletNodeID,
+                                        MicroCHP(CompNum).PlantOutletNodeID,
+                                        MicroCHP(CompNum).Report.QdotHR,
+                                        MicroCHP(CompNum).Report.HeatRecInletTemp,
+                                        MicroCHP(CompNum).Report.HeatRecOutletTemp,
+                                        MicroCHP(CompNum).Report.HeatRecMdot,
+                                        FirstHVACIteration);
     }
 
     void UpdateMicroCHPGeneratorRecords(int const Num) // Generator number
@@ -1609,8 +1845,8 @@ namespace MicroCHPElectricGenerator {
         MicroCHP(Num).Report.QdotHX =
             MicroCHP(Num).A42Model.UAhx * (MicroCHP(Num).A42Model.Teng - MicroCHP(Num).A42Model.TcwOut); //  heat recovered rate (W)
 
-        Cp = GetSpecificHeatGlycol(PlantLoop(MicroCHP(Num).CWLoopNum).FluidName, MicroCHP(Num).A42Model.TcwIn,
-                                   PlantLoop(MicroCHP(Num).CWLoopNum).FluidIndex, RoutineName);
+        Cp = GetSpecificHeatGlycol(
+            PlantLoop(MicroCHP(Num).CWLoopNum).FluidName, MicroCHP(Num).A42Model.TcwIn, PlantLoop(MicroCHP(Num).CWLoopNum).FluidIndex, RoutineName);
 
         MicroCHP(Num).Report.QdotHR = MicroCHP(Num).PlantMassFlowRate * Cp * (MicroCHP(Num).A42Model.TcwOut - MicroCHP(Num).A42Model.TcwIn);
         MicroCHP(Num).Report.TotalHeatEnergyRec = MicroCHP(Num).Report.QdotHR * TimeStepSys * SecInHour; // heat recovered energy (J)

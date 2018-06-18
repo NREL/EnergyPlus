@@ -160,12 +160,18 @@ namespace SystemAvailabilityManager {
 
     int const NumValidSysAvailManagerTypes(12);
     Array1D_string const cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
-                                                    {"AvailabilityManager:Scheduled", "AvailabilityManager:ScheduledOn",
-                                                     "AvailabilityManager:ScheduledOff", "AvailabilityManager:NightCycle",
-                                                     "AvailabilityManager:DifferentialThermostat", "AvailabilityManager:HighTemperatureTurnOff",
-                                                     "AvailabilityManager:HighTemperatureTurnOn", "AvailabilityManager:LowTemperatureTurnOff",
-                                                     "AvailabilityManager:LowTemperatureTurnOn", "AvailabilityManager:NightVentilation",
-                                                     "AvailabilityManager:HybridVentilation", "AvailabilityManager:OptimumStart"});
+                                                    {"AvailabilityManager:Scheduled",
+                                                     "AvailabilityManager:ScheduledOn",
+                                                     "AvailabilityManager:ScheduledOff",
+                                                     "AvailabilityManager:NightCycle",
+                                                     "AvailabilityManager:DifferentialThermostat",
+                                                     "AvailabilityManager:HighTemperatureTurnOff",
+                                                     "AvailabilityManager:HighTemperatureTurnOn",
+                                                     "AvailabilityManager:LowTemperatureTurnOff",
+                                                     "AvailabilityManager:LowTemperatureTurnOn",
+                                                     "AvailabilityManager:NightVentilation",
+                                                     "AvailabilityManager:HybridVentilation",
+                                                     "AvailabilityManager:OptimumStart"});
     int const SysAvailMgr_Scheduled(1);
     int const SysAvailMgr_ScheduledOn(2);
     int const SysAvailMgr_ScheduledOff(3);
@@ -180,9 +186,18 @@ namespace SystemAvailabilityManager {
 
     int const SysAvailMgr_OptimumStart(12);
     Array1D_int const ValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
-                                                {SysAvailMgr_Scheduled, SysAvailMgr_ScheduledOn, SysAvailMgr_ScheduledOff, SysAvailMgr_NightCycle,
-                                                 SysAvailMgr_DiffThermo, SysAvailMgr_HiTempTOff, SysAvailMgr_HiTempTOn, SysAvailMgr_LoTempTOff,
-                                                 SysAvailMgr_LoTempTOn, SysAvailMgr_NightVent, SysAvailMgr_HybridVent, SysAvailMgr_OptimumStart});
+                                                {SysAvailMgr_Scheduled,
+                                                 SysAvailMgr_ScheduledOn,
+                                                 SysAvailMgr_ScheduledOff,
+                                                 SysAvailMgr_NightCycle,
+                                                 SysAvailMgr_DiffThermo,
+                                                 SysAvailMgr_HiTempTOff,
+                                                 SysAvailMgr_HiTempTOn,
+                                                 SysAvailMgr_LoTempTOff,
+                                                 SysAvailMgr_LoTempTOn,
+                                                 SysAvailMgr_NightVent,
+                                                 SysAvailMgr_HybridVent,
+                                                 SysAvailMgr_OptimumStart});
     // DERIVED TYPE DEFINITIONS
 
     // Not used yet
@@ -353,7 +368,10 @@ namespace SystemAvailabilityManager {
 
                 SimSysAvailManager(PriAirSysAvailMgr(PriAirSysNum).AvailManagerType(PriAirSysAvailMgrNum),
                                    PriAirSysAvailMgr(PriAirSysNum).AvailManagerName(PriAirSysAvailMgrNum),
-                                   PriAirSysAvailMgr(PriAirSysNum).AvailManagerNum(PriAirSysAvailMgrNum), PriAirSysNum, PreviousStatus, AvailStatus);
+                                   PriAirSysAvailMgr(PriAirSysNum).AvailManagerNum(PriAirSysAvailMgrNum),
+                                   PriAirSysNum,
+                                   PreviousStatus,
+                                   AvailStatus);
 
                 if (AvailStatus == ForceOff) {
                     PriAirSysAvailMgr(PriAirSysNum).AvailStatus = ForceOff;
@@ -395,7 +413,10 @@ namespace SystemAvailabilityManager {
 
                 SimSysAvailManager(PlantAvailMgr(PlantNum).AvailManagerType(PlantAvailMgrNum),
                                    PlantAvailMgr(PlantNum).AvailManagerName(PlantAvailMgrNum),
-                                   PlantAvailMgr(PlantNum).AvailManagerNum(PlantAvailMgrNum), PlantNum, PreviousStatus, AvailStatus);
+                                   PlantAvailMgr(PlantNum).AvailManagerNum(PlantAvailMgrNum),
+                                   PlantNum,
+                                   PreviousStatus,
+                                   AvailStatus);
 
                 if (AvailStatus != NoAction) {
                     PlantAvailMgr(PlantNum).AvailStatus = AvailStatus;
@@ -424,7 +445,11 @@ namespace SystemAvailabilityManager {
                                     SimSysAvailManager(ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerType(ZoneCompAvailMgrNum),
                                                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerName(ZoneCompAvailMgrNum),
                                                        ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerNum(ZoneCompAvailMgrNum),
-                                                       DummyArgument, PreviousStatus, AvailStatus, ZoneEquipType, CompNum);
+                                                       DummyArgument,
+                                                       PreviousStatus,
+                                                       AvailStatus,
+                                                       ZoneEquipType,
+                                                       CompNum);
                                     if (AvailStatus == ForceOff) {
                                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailStatus = ForceOff;
                                         break; // Fans forced off takes precedence
@@ -481,8 +506,8 @@ namespace SystemAvailabilityManager {
         using NodeInputManager::GetOnlySingleNode;
         using NodeInputManager::MarkNode;
         using namespace DataLoopNode;
-        using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using DataZoneEquipment::cValidSysAvailManagerCompTypes;
+        using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetSysAvailManagerInputs: "); // include trailing blank
@@ -585,8 +610,17 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumSchedSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 SchedSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 SchedSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_Scheduled;
@@ -598,8 +632,12 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                SetupOutputVariable("Availability Manager Scheduled Control Status", OutputProcessor::Unit::None,
-                                    SchedSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", SchedSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Scheduled Control Status",
+                                    OutputProcessor::Unit::None,
+                                    SchedSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    SchedSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -613,8 +651,17 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumSchedOnSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 SchedOnSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 SchedOnSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_ScheduledOn;
@@ -626,8 +673,12 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                SetupOutputVariable("Availability Manager Scheduled On Control Status", OutputProcessor::Unit::None,
-                                    SchedOnSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", SchedOnSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Scheduled On Control Status",
+                                    OutputProcessor::Unit::None,
+                                    SchedOnSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    SchedOnSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -641,8 +692,17 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumSchedOffSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 SchedOffSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 SchedOffSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_ScheduledOff;
@@ -654,8 +714,12 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                SetupOutputVariable("Availability Manager Scheduled Off Control Status", OutputProcessor::Unit::None,
-                                    SchedOffSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", SchedOffSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Scheduled Off Control Status",
+                                    OutputProcessor::Unit::None,
+                                    SchedOffSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    SchedOffSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -670,8 +734,17 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumNCycSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 NCycSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 NCycSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_NightCycle;
@@ -840,8 +913,12 @@ namespace SystemAvailabilityManager {
                     }
                 }
 
-                SetupOutputVariable("Availability Manager Night Cycle Control Status", OutputProcessor::Unit::None,
-                                    NCycSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", NCycSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Night Cycle Control Status",
+                                    OutputProcessor::Unit::None,
+                                    NCycSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    NCycSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -856,8 +933,17 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumOptStartSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 OptStartSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 OptStartSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_OptimumStart;
@@ -964,13 +1050,21 @@ namespace SystemAvailabilityManager {
                     OptStartSysAvailMgrData(SysAvailNum).NumPreDays = rNumericArgs(7);
                 }
 
-                SetupOutputVariable("Availability Manager Optimum Start Control Status", OutputProcessor::Unit::None,
-                                    OptStartSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", OptStartSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Optimum Start Control Status",
+                                    OutputProcessor::Unit::None,
+                                    OptStartSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    OptStartSysAvailMgrData(SysAvailNum).Name);
 
                 // add
-                SetupOutputVariable("Availability Manager Optimum Start Time Before Occupancy", OutputProcessor::Unit::hr,
-                                    OptStartSysAvailMgrData(SysAvailNum).NumHoursBeforeOccupancy, "System", "Average",
-                                    OptStartSysAvailMgrData(SysAvailNum).Name, "Daily");
+                SetupOutputVariable("Availability Manager Optimum Start Time Before Occupancy",
+                                    OutputProcessor::Unit::hr,
+                                    OptStartSysAvailMgrData(SysAvailNum).NumHoursBeforeOccupancy,
+                                    "System",
+                                    "Average",
+                                    OptStartSysAvailMgrData(SysAvailNum).Name,
+                                    "Daily");
             }
         }
 
@@ -983,17 +1077,38 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumDiffTSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 DiffTSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 DiffTSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_DiffThermo;
 
-                DiffTSysAvailMgrData(SysAvailNum).HotNode = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                              NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                DiffTSysAvailMgrData(SysAvailNum).HotNode = GetOnlySingleNode(cAlphaArgs(2),
+                                                                              ErrorsFound,
+                                                                              cCurrentModuleObject,
+                                                                              cAlphaArgs(1),
+                                                                              NodeType_Unknown,
+                                                                              NodeConnectionType_Sensor,
+                                                                              1,
+                                                                              ObjectIsNotParent);
                 MarkNode(DiffTSysAvailMgrData(SysAvailNum).HotNode, cCurrentModuleObject, cAlphaArgs(1), "Hot Node");
-                DiffTSysAvailMgrData(SysAvailNum).ColdNode = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                               NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                DiffTSysAvailMgrData(SysAvailNum).ColdNode = GetOnlySingleNode(cAlphaArgs(3),
+                                                                               ErrorsFound,
+                                                                               cCurrentModuleObject,
+                                                                               cAlphaArgs(1),
+                                                                               NodeType_Unknown,
+                                                                               NodeConnectionType_Sensor,
+                                                                               1,
+                                                                               ObjectIsNotParent);
                 MarkNode(DiffTSysAvailMgrData(SysAvailNum).ColdNode, cCurrentModuleObject, cAlphaArgs(1), "Cold Node");
 
                 DiffTSysAvailMgrData(SysAvailNum).TempDiffOn = rNumericArgs(1);
@@ -1010,8 +1125,12 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                SetupOutputVariable("Availability Manager Differential Thermostat Control Status", OutputProcessor::Unit::None,
-                                    DiffTSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", DiffTSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Differential Thermostat Control Status",
+                                    OutputProcessor::Unit::None,
+                                    DiffTSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    DiffTSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -1024,20 +1143,38 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumHiTurnOffSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 HiTurnOffSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 HiTurnOffSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_HiTempTOff;
 
-                HiTurnOffSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                               NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                HiTurnOffSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2),
+                                                                               ErrorsFound,
+                                                                               cCurrentModuleObject,
+                                                                               cAlphaArgs(1),
+                                                                               NodeType_Unknown,
+                                                                               NodeConnectionType_Sensor,
+                                                                               1,
+                                                                               ObjectIsNotParent);
                 MarkNode(HiTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 HiTurnOffSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
-                SetupOutputVariable("Availability Manager High Temperature Turn Off Control Status", OutputProcessor::Unit::None,
-                                    HiTurnOffSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average",
+                SetupOutputVariable("Availability Manager High Temperature Turn Off Control Status",
+                                    OutputProcessor::Unit::None,
+                                    HiTurnOffSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
                                     HiTurnOffSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -1052,20 +1189,39 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumHiTurnOnSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 HiTurnOnSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 HiTurnOnSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_HiTempTOn;
 
-                HiTurnOnSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                              NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                HiTurnOnSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2),
+                                                                              ErrorsFound,
+                                                                              cCurrentModuleObject,
+                                                                              cAlphaArgs(1),
+                                                                              NodeType_Unknown,
+                                                                              NodeConnectionType_Sensor,
+                                                                              1,
+                                                                              ObjectIsNotParent);
                 MarkNode(HiTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 HiTurnOnSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
-                SetupOutputVariable("Availability Manager High Temperature Turn On Control Status", OutputProcessor::Unit::None,
-                                    HiTurnOnSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", HiTurnOnSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager High Temperature Turn On Control Status",
+                                    OutputProcessor::Unit::None,
+                                    HiTurnOnSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    HiTurnOnSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -1079,14 +1235,29 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumLoTurnOffSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 LoTurnOffSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 LoTurnOffSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_LoTempTOff;
 
-                LoTurnOffSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                               NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                LoTurnOffSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2),
+                                                                               ErrorsFound,
+                                                                               cCurrentModuleObject,
+                                                                               cAlphaArgs(1),
+                                                                               NodeType_Unknown,
+                                                                               NodeConnectionType_Sensor,
+                                                                               1,
+                                                                               ObjectIsNotParent);
                 MarkNode(LoTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 LoTurnOffSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
@@ -1102,8 +1273,11 @@ namespace SystemAvailabilityManager {
                     LoTurnOffSysAvailMgrData(SysAvailNum).SchedPtr = 0;
                 }
 
-                SetupOutputVariable("Availability Manager Low Temperature Turn Off Control Status", OutputProcessor::Unit::None,
-                                    LoTurnOffSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average",
+                SetupOutputVariable("Availability Manager Low Temperature Turn Off Control Status",
+                                    OutputProcessor::Unit::None,
+                                    LoTurnOffSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
                                     LoTurnOffSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -1118,20 +1292,39 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumLoTurnOnSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 LoTurnOnSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 LoTurnOnSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_LoTempTOn;
 
-                LoTurnOnSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                              NodeType_Unknown, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                LoTurnOnSysAvailMgrData(SysAvailNum).Node = GetOnlySingleNode(cAlphaArgs(2),
+                                                                              ErrorsFound,
+                                                                              cCurrentModuleObject,
+                                                                              cAlphaArgs(1),
+                                                                              NodeType_Unknown,
+                                                                              NodeConnectionType_Sensor,
+                                                                              1,
+                                                                              ObjectIsNotParent);
                 MarkNode(LoTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 LoTurnOnSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
-                SetupOutputVariable("Availability Manager Low Temperature Turn On Control Status", OutputProcessor::Unit::None,
-                                    LoTurnOnSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", LoTurnOnSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Low Temperature Turn On Control Status",
+                                    OutputProcessor::Unit::None,
+                                    LoTurnOnSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    LoTurnOnSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -1145,8 +1338,17 @@ namespace SystemAvailabilityManager {
 
             for (SysAvailNum = 1; SysAvailNum <= NumNVentSysAvailMgrs; ++SysAvailNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              SysAvailNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 NVentSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
                 NVentSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_NightVent;
@@ -1182,8 +1384,12 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                SetupOutputVariable("Availability Manager Night Ventilation Control Status", OutputProcessor::Unit::None,
-                                    NVentSysAvailMgrData(SysAvailNum).AvailStatus, "System", "Average", NVentSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Availability Manager Night Ventilation Control Status",
+                                    OutputProcessor::Unit::None,
+                                    NVentSysAvailMgrData(SysAvailNum).AvailStatus,
+                                    "System",
+                                    "Average",
+                                    NVentSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
         }
@@ -1254,8 +1460,17 @@ namespace SystemAvailabilityManager {
             SysAvailMgrListData.allocate(NumAvailManagerLists);
 
             for (Item = 1; Item <= NumAvailManagerLists; ++Item) {
-                inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              Item,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 SysAvailMgrListData(Item).Name = cAlphaArgs(1);
 
@@ -2251,45 +2466,48 @@ namespace SystemAvailabilityManager {
 
                     } else if (SELECT_CASE_var == CycleOnControlZone) {
                         AvailStatus = NoAction;
-                        if (CoolingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones,
-                                                      TempTol))
+                        if (CoolingZoneOutOfTolerance(
+                                NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones, TempTol))
                             AvailStatus = CycleOn;
-                        if (HeatingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones,
-                                                      TempTol))
+                        if (HeatingZoneOutOfTolerance(
+                                NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones, TempTol))
                             AvailStatus = CycleOn;
                     } else if (SELECT_CASE_var == CycleOnAnyCoolingOrHeatingZone) {
-                        if (CoolingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs,
-                                                      NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones, TempTol)) {
+                        if (CoolingZoneOutOfTolerance(
+                                NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones, TempTol)) {
                             AvailStatus = CycleOn;
                         } else if (HeatingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs,
-                                                             NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones, TempTol)) {
+                                                             NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones,
+                                                             TempTol)) {
                             AvailStatus = CycleOn;
                         } else if (HeatingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
-                                                             NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones, TempTol)) {
+                                                             NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones,
+                                                             TempTol)) {
                             AvailStatus = CycleOnZoneFansOnly;
                         } else {
                             AvailStatus = NoAction;
                         }
                     } else if (SELECT_CASE_var == CycleOnAnyCoolingZone) {
-                        if (CoolingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs,
-                                                      NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones, TempTol)) {
+                        if (CoolingZoneOutOfTolerance(
+                                NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones, TempTol)) {
                             AvailStatus = CycleOn;
                         } else {
                             AvailStatus = NoAction;
                         }
                     } else if (SELECT_CASE_var == CycleOnAnyHeatingZone) {
-                        if (HeatingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs,
-                                                      NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones, TempTol)) {
+                        if (HeatingZoneOutOfTolerance(
+                                NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones, TempTol)) {
                             AvailStatus = CycleOn;
                         } else if (HeatingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
-                                                             NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones, TempTol)) {
+                                                             NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones,
+                                                             TempTol)) {
                             AvailStatus = CycleOnZoneFansOnly;
                         } else {
                             AvailStatus = NoAction;
                         }
                     } else if (SELECT_CASE_var == CycleOnControlZone) {
-                        if (HeatingZoneOutOfTolerance(NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
-                                                      NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones, TempTol)) {
+                        if (HeatingZoneOutOfTolerance(
+                                NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs, NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones, TempTol)) {
                             AvailStatus = CycleOnZoneFansOnly;
                         } else {
                             AvailStatus = NoAction;
@@ -2389,9 +2607,9 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
         using namespace DataAirLoop;
-        using DataEnvironment::DSTIndicator;
         using DataEnvironment::DayOfWeekTomorrow;
         using DataEnvironment::DayOfYear;
+        using DataEnvironment::DSTIndicator;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -3956,8 +4174,17 @@ namespace SystemAvailabilityManager {
 
         for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, SysAvailNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SysAvailNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             HybridVentSysAvailMgrData(SysAvailNum).Name = cAlphaArgs(1);
             HybridVentSysAvailMgrData(SysAvailNum).MgrType = SysAvailMgr_HybridVent;
@@ -4331,49 +4558,80 @@ namespace SystemAvailabilityManager {
         // Set up output variables
         for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             if (HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
-                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Status", OutputProcessor::Unit::None,
-                                    HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl, "System", "Average",
+                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Status",
+                                    OutputProcessor::Unit::None,
+                                    HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).AirLoopName);
-                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Mode", OutputProcessor::Unit::None,
-                                    HybridVentSysAvailMgrData(SysAvailNum).ControlMode, "System", "Average",
+                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Mode",
+                                    OutputProcessor::Unit::None,
+                                    HybridVentSysAvailMgrData(SysAvailNum).ControlMode,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).AirLoopName);
             } else {
-                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Status", OutputProcessor::Unit::None,
-                                    HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl, "System", "Average",
+                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Status",
+                                    OutputProcessor::Unit::None,
+                                    HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).ControlZoneName);
-                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Mode", OutputProcessor::Unit::None,
-                                    HybridVentSysAvailMgrData(SysAvailNum).ControlMode, "System", "Average",
+                SetupOutputVariable("Availability Manager Hybrid Ventilation Control Mode",
+                                    OutputProcessor::Unit::None,
+                                    HybridVentSysAvailMgrData(SysAvailNum).ControlMode,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).ControlZoneName);
             }
 
             if (HybridVentSysAvailMgrData(SysAvailNum).MinOperTime > 0) {
-                SetupOutputVariable("Hybrid Ventilation Control HVAC System Operation Elapsed Time", OutputProcessor::Unit::min,
-                                    HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration, "System", "Average",
+                SetupOutputVariable("Hybrid Ventilation Control HVAC System Operation Elapsed Time",
+                                    OutputProcessor::Unit::min,
+                                    HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
             if (HybridVentSysAvailMgrData(SysAvailNum).MinVentTime > 0) {
-                SetupOutputVariable("Hybrid Ventilation Control Natural Ventilation Elapsed Time", OutputProcessor::Unit::min,
-                                    HybridVentSysAvailMgrData(SysAvailNum).TimeVentDuration, "System", "Average",
+                SetupOutputVariable("Hybrid Ventilation Control Natural Ventilation Elapsed Time",
+                                    OutputProcessor::Unit::min,
+                                    HybridVentSysAvailMgrData(SysAvailNum).TimeVentDuration,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
             if (CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_OperT80) ||
                 CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_OperT90)) {
-                SetupOutputVariable("Hybrid Ventilation Operative Temperature", OutputProcessor::Unit::C,
-                                    HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp, "System", "Average",
+                SetupOutputVariable("Hybrid Ventilation Operative Temperature",
+                                    OutputProcessor::Unit::C,
+                                    HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).Name);
-                SetupOutputVariable("Hybrid Ventilation Lower Limit Operative Temperature", OutputProcessor::Unit::C,
-                                    HybridVentSysAvailMgrData(SysAvailNum).minAdaTem, "System", "Average",
+                SetupOutputVariable("Hybrid Ventilation Lower Limit Operative Temperature",
+                                    OutputProcessor::Unit::C,
+                                    HybridVentSysAvailMgrData(SysAvailNum).minAdaTem,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).Name);
-                SetupOutputVariable("Hybrid Ventilation Upper Limit Operative Temperature", OutputProcessor::Unit::C,
-                                    HybridVentSysAvailMgrData(SysAvailNum).maxAdaTem, "System", "Average",
+                SetupOutputVariable("Hybrid Ventilation Upper Limit Operative Temperature",
+                                    OutputProcessor::Unit::C,
+                                    HybridVentSysAvailMgrData(SysAvailNum).maxAdaTem,
+                                    "System",
+                                    "Average",
                                     HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
             if (CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_CO2)) {
-                SetupOutputVariable("Hybrid Ventilation CO2 Concentration", OutputProcessor::Unit::ppm, HybridVentSysAvailMgrData(SysAvailNum).CO2,
-                                    "System", "Average", HybridVentSysAvailMgrData(SysAvailNum).Name);
+                SetupOutputVariable("Hybrid Ventilation CO2 Concentration",
+                                    OutputProcessor::Unit::ppm,
+                                    HybridVentSysAvailMgrData(SysAvailNum).CO2,
+                                    "System",
+                                    "Average",
+                                    HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
         }
     }
@@ -4466,7 +4724,8 @@ namespace SystemAvailabilityManager {
                         }
                     }
                     if (std::any_of(
-                            HybridVentSysAvailMgrData.begin(), HybridVentSysAvailMgrData.end(),
+                            HybridVentSysAvailMgrData.begin(),
+                            HybridVentSysAvailMgrData.end(),
                             [](SystemAvailabilityManager::DefineHybridVentSysAvailManager const &e) { return e.HybridVentMgrConnectedToAirLoop; })) {
                         for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                             if (ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) ==
@@ -4638,21 +4897,21 @@ namespace SystemAvailabilityManager {
         using DataEnvironment::OutDewPointTemp;
         using DataEnvironment::OutEnthalpy;
         using DataEnvironment::OutHumRat;
+        using DataHeatBalance::HybridControlTypeClose;
+        using DataHeatBalance::HybridControlTypeGlobal;
+        using DataHeatBalance::HybridControlTypeIndiv;
+        using DataHeatBalance::Mixing;
+        using DataHeatBalance::MRT;
+        using DataHeatBalance::TotMixing;
+        using DataHeatBalance::TotVentilation;
+        using DataHeatBalance::Ventilation;
+        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-        using DataHeatBalance::HybridControlTypeClose;
-        using DataHeatBalance::HybridControlTypeGlobal;
-        using DataHeatBalance::HybridControlTypeIndiv;
-        using DataHeatBalance::MRT;
-        using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
-        using DataHeatBalance::TotVentilation;
-        using DataHeatBalance::Ventilation;
-        using DataHeatBalance::Zone;
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
@@ -4819,8 +5078,10 @@ namespace SystemAvailabilityManager {
                             for (Num = 1; Num <= PriAirSysAvailMgr(HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum).NumAvailManagers; ++Num) {
                                 SimSysAvailManager(PriAirSysAvailMgr(AirLoopNum).AvailManagerType(Num),
                                                    PriAirSysAvailMgr(AirLoopNum).AvailManagerName(Num),
-                                                   PriAirSysAvailMgr(AirLoopNum).AvailManagerNum(Num), AirLoopNum,
-                                                   PriAirSysAvailMgr(AirLoopNum).AvailStatus, AvailStatus);
+                                                   PriAirSysAvailMgr(AirLoopNum).AvailManagerNum(Num),
+                                                   AirLoopNum,
+                                                   PriAirSysAvailMgr(AirLoopNum).AvailStatus,
+                                                   AvailStatus);
                             }
                             if (AvailStatus == CycleOn) {
                                 HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = HybridVentCtrl_Close;

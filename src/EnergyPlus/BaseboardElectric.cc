@@ -280,8 +280,17 @@ namespace BaseboardElectric {
             BaseboardNum = 0;
             for (ConvElecBBNum = 1; ConvElecBBNum <= NumConvElecBaseboards; ++ConvElecBBNum) {
 
-                inputProcessor->getObjectItem(cCurrentModuleObject, ConvElecBBNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              ConvElecBBNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
 
                 BaseboardNumericFields(ConvElecBBNum).FieldNames.allocate(NumNums);
                 BaseboardNumericFields(ConvElecBBNum).FieldNames = "";
@@ -391,16 +400,42 @@ namespace BaseboardElectric {
 
             // Setup Report variables for the Electric Baseboards
             // CurrentModuleObject='ZoneHVAC:Baseboard:Convective:Electric'
-            SetupOutputVariable("Baseboard Total Heating Energy", OutputProcessor::Unit::J, Baseboard(BaseboardNum).Energy, "System", "Sum",
-                                Baseboard(BaseboardNum).EquipName, _, "ENERGYTRANSFER", "BASEBOARD", _, "System");
+            SetupOutputVariable("Baseboard Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                Baseboard(BaseboardNum).Energy,
+                                "System",
+                                "Sum",
+                                Baseboard(BaseboardNum).EquipName,
+                                _,
+                                "ENERGYTRANSFER",
+                                "BASEBOARD",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Baseboard Total Heating Rate", OutputProcessor::Unit::W, Baseboard(BaseboardNum).Power, "System", "Average",
+            SetupOutputVariable("Baseboard Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                Baseboard(BaseboardNum).Power,
+                                "System",
+                                "Average",
                                 Baseboard(BaseboardNum).EquipName);
 
-            SetupOutputVariable("Baseboard Electric Energy", OutputProcessor::Unit::J, Baseboard(BaseboardNum).ElecUseLoad, "System", "Sum",
-                                Baseboard(BaseboardNum).EquipName, _, "Electric", "HEATING", _, "System");
+            SetupOutputVariable("Baseboard Electric Energy",
+                                OutputProcessor::Unit::J,
+                                Baseboard(BaseboardNum).ElecUseLoad,
+                                "System",
+                                "Sum",
+                                Baseboard(BaseboardNum).EquipName,
+                                _,
+                                "Electric",
+                                "HEATING",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Baseboard Electric Power", OutputProcessor::Unit::W, Baseboard(BaseboardNum).ElecUseRate, "System", "Average",
+            SetupOutputVariable("Baseboard Electric Power",
+                                OutputProcessor::Unit::W,
+                                Baseboard(BaseboardNum).ElecUseRate,
+                                "System",
+                                "Average",
                                 Baseboard(BaseboardNum).EquipName);
         }
     }
@@ -511,8 +546,8 @@ namespace BaseboardElectric {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using DataHeatBalance::Zone;
+        using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;

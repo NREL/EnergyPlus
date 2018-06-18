@@ -138,6 +138,6 @@ namespace HeatBalanceIntRadExchange {
 
 } // namespace HeatBalanceIntRadExchange
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif
