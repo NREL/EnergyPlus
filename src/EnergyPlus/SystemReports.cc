@@ -516,8 +516,8 @@ namespace SystemReports {
                                     Idx = 0;
                                     FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                     if (MatchFound)
-                                        UpdateZoneSubCompPtrArray(Idx, ListNum, AirDistUnitNum, SubEquipNum, MatchLoopType, MatchLoop, MatchBranch,
-                                                                  MatchComp);
+                                        UpdateZoneSubCompPtrArray(
+                                            Idx, ListNum, AirDistUnitNum, SubEquipNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                     ZoneEquipList(ListNum).EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).ZoneEqToPlantPtr = Idx;
                                     break;
                                 }
@@ -555,8 +555,15 @@ namespace SystemReports {
                                         Idx = 0;
                                         FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                         if (MatchFound)
-                                            UpdateZoneSubSubCompPtrArray(Idx, ListNum, AirDistUnitNum, SubEquipNum, SubSubEquipNum, MatchLoopType,
-                                                                         MatchLoop, MatchBranch, MatchComp);
+                                            UpdateZoneSubSubCompPtrArray(Idx,
+                                                                         ListNum,
+                                                                         AirDistUnitNum,
+                                                                         SubEquipNum,
+                                                                         SubSubEquipNum,
+                                                                         MatchLoopType,
+                                                                         MatchLoop,
+                                                                         MatchBranch,
+                                                                         MatchComp);
                                         ZoneEquipList(ListNum)
                                             .EquipData(AirDistUnitNum)
                                             .SubEquipData(SubEquipNum)
@@ -2069,104 +2076,212 @@ namespace SystemReports {
 
                 // CurrentModuleObject='AirloopHVAC'
                 // SYSTEM LOADS REPORT
-                SetupOutputVariable("Air System Total Heating Energy", OutputProcessor::Unit::J, SysTotHTNG(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysTotHTNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Total Cooling Energy", OutputProcessor::Unit::J, SysTotCLNG(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysTotCLNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
                 // SYSTEM ENERGY USE REPORT
-                SetupOutputVariable("Air System Hot Water Energy", OutputProcessor::Unit::J, SysTotH2OHOT(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable(
+                    "Air System Hot Water Energy", OutputProcessor::Unit::J, SysTotH2OHOT(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable(
+                    "Air System Steam Energy", OutputProcessor::Unit::J, SysTotSteam(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Chilled Water Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysTotH2OCOLD(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Steam Energy", OutputProcessor::Unit::J, SysTotSteam(SysIndex), "HVAC", "Sum",
-                                    PrimaryAirSystem(SysIndex).Name);
+                SetupOutputVariable(
+                    "Air System Electric Energy", OutputProcessor::Unit::J, SysTotElec(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Chilled Water Energy", OutputProcessor::Unit::J, SysTotH2OCOLD(SysIndex), "HVAC", "Sum",
-                                    PrimaryAirSystem(SysIndex).Name);
+                SetupOutputVariable(
+                    "Air System Gas Energy", OutputProcessor::Unit::J, SysTotGas(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Electric Energy", OutputProcessor::Unit::J, SysTotElec(SysIndex), "HVAC", "Sum",
-                                    PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System Gas Energy", OutputProcessor::Unit::J, SysTotGas(SysIndex), "HVAC", "Sum",
-                                    PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System Water Volume", OutputProcessor::Unit::m3, SysDomesticH20(SysIndex), "HVAC", "Sum",
-                                    PrimaryAirSystem(SysIndex).Name);
+                SetupOutputVariable(
+                    "Air System Water Volume", OutputProcessor::Unit::m3, SysDomesticH20(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
 
                 // SYSTEM COMPONENT LOAD REPORT
-                SetupOutputVariable("Air System Fan Air Heating Energy", OutputProcessor::Unit::J, SysFANCompHTNG(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Fan Air Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysFANCompHTNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, SysCCCompCLNG(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Cooling Coil Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysCCCompCLNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heating Coil Total Heating Energy", OutputProcessor::Unit::J, SysHCCompHTNG(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Heating Coil Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHCCompHTNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heat Exchanger Total Heating Energy", OutputProcessor::Unit::J, SysHeatExHTNG(SysIndex), "HVAC",
-                                    "Sum", PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System Heat Exchanger Total Cooling Energy", OutputProcessor::Unit::J, SysHeatExCLNG(SysIndex), "HVAC",
-                                    "Sum", PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System Solar Collector Total Heating Energy", OutputProcessor::Unit::J, SysSolarCollectHeating(SysIndex),
-                                    "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System Solar Collector Total Cooling Energy", OutputProcessor::Unit::J, SysSolarCollectCooling(SysIndex),
-                                    "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System User Defined Air Terminal Total Heating Energy", OutputProcessor::Unit::J,
-                                    SysUserDefinedTerminalHeating(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System User Defined Air Terminal Total Cooling Energy", OutputProcessor::Unit::J,
-                                    SysUserDefinedTerminalCooling(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System Humidifier Total Heating Energy", OutputProcessor::Unit::J, SysHumidHTNG(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Heat Exchanger Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHeatExHTNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Evaporative Cooler Total Cooling Energy", OutputProcessor::Unit::J, SysEvapCLNG(SysIndex), "HVAC",
-                                    "Sum", PrimaryAirSystem(SysIndex).Name);
+                SetupOutputVariable("Air System Heat Exchanger Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHeatExCLNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Desiccant Dehumidifier Total Cooling Energy", OutputProcessor::Unit::J, DesDehumidCLNG(SysIndex),
-                                    "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
+                SetupOutputVariable("Air System Solar Collector Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysSolarCollectHeating(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Solar Collector Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysSolarCollectCooling(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System User Defined Air Terminal Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysUserDefinedTerminalHeating(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System User Defined Air Terminal Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysUserDefinedTerminalCooling(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Humidifier Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHumidHTNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Evaporative Cooler Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysEvapCLNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Desiccant Dehumidifier Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    DesDehumidCLNG(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
 
                 // SYSTEM COMPONENT ENERGY REPORT
-                SetupOutputVariable("Air System Fan Electric Energy", OutputProcessor::Unit::J, SysFANCompElec(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Fan Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysFANCompElec(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heating Coil Hot Water Energy", OutputProcessor::Unit::J, SysHCCompH2OHOT(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Heating Coil Hot Water Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHCCompH2OHOT(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Cooling Coil Chilled Water Energy", OutputProcessor::Unit::J, SysCCCompH2OCOLD(SysIndex), "HVAC",
-                                    "Sum", PrimaryAirSystem(SysIndex).Name);
-
-                SetupOutputVariable("Air System DX Heating Coil Electric Energy", OutputProcessor::Unit::J, SysHCCompElec(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Cooling Coil Chilled Water Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysCCCompH2OCOLD(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System DX Cooling Coil Electric Energy", OutputProcessor::Unit::J, SysCCCompElec(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System DX Heating Coil Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHCCompElec(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heating Coil Electric Energy", OutputProcessor::Unit::J, SysHCCompElecRes(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System DX Cooling Coil Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysCCCompElec(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heating Coil Gas Energy", OutputProcessor::Unit::J, SysHCCompGas(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Heating Coil Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHCCompElecRes(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heating Coil Steam Energy", OutputProcessor::Unit::J, SysHCCompSteam(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Heating Coil Gas Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHCCompGas(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Humidifier Electric Energy", OutputProcessor::Unit::J, SysHumidElec(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Heating Coil Steam Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHCCompSteam(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Humidifier Gas Energy", OutputProcessor::Unit::J, SysHumidGas(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Humidifier Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHumidElec(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Evaporative Cooler Electric Energy", OutputProcessor::Unit::J, SysEvapElec(SysIndex), "HVAC", "Sum",
+                SetupOutputVariable("Air System Humidifier Gas Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHumidGas(SysIndex),
+                                    "HVAC",
+                                    "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Desiccant Dehumidifier Electric Energy", OutputProcessor::Unit::J, DesDehumidElec(SysIndex), "HVAC",
-                                    "Sum", PrimaryAirSystem(SysIndex).Name);
+                SetupOutputVariable("Air System Evaporative Cooler Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysEvapElec(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Desiccant Dehumidifier Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    DesDehumidElec(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
             }
         }
 
@@ -2175,51 +2290,111 @@ namespace SystemReports {
             // CurrentModuleObject='Zones(Controlled)'
             if (VentLoadsReportEnabled) {
                 // Cooling Loads
-                SetupOutputVariable("Zone Mechanical Ventilation No Load Heat Removal Energy", OutputProcessor::Unit::J,
-                                    MaxNoLoadCoolingByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation No Load Heat Removal Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxNoLoadCoolingByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
 
-                SetupOutputVariable("Zone Mechanical Ventilation Cooling Load Increase Energy", OutputProcessor::Unit::J,
-                                    MaxCoolingLoadAddedByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation Cooling Load Increase Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxCoolingLoadAddedByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
 
-                SetupOutputVariable("Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy", OutputProcessor::Unit::J,
-                                    MaxOverheatingByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxOverheatingByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
 
-                SetupOutputVariable("Zone Mechanical Ventilation Cooling Load Decrease Energy", OutputProcessor::Unit::J,
-                                    MaxCoolingLoadMetByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation Cooling Load Decrease Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxCoolingLoadMetByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
                 // Heating Loads
-                SetupOutputVariable("Zone Mechanical Ventilation No Load Heat Addition Energy", OutputProcessor::Unit::J,
-                                    MaxNoLoadHeatingByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation No Load Heat Addition Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxNoLoadHeatingByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
 
-                SetupOutputVariable("Zone Mechanical Ventilation Heating Load Increase Energy", OutputProcessor::Unit::J,
-                                    MaxHeatingLoadAddedByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation Heating Load Increase Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxHeatingLoadAddedByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
 
-                SetupOutputVariable("Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy", OutputProcessor::Unit::J,
-                                    MaxOvercoolingByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxOvercoolingByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
 
-                SetupOutputVariable("Zone Mechanical Ventilation Heating Load Decrease Energy", OutputProcessor::Unit::J,
-                                    MaxHeatingLoadMetByVent(ZoneIndex), "HVAC", "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+                SetupOutputVariable("Zone Mechanical Ventilation Heating Load Decrease Energy",
+                                    OutputProcessor::Unit::J,
+                                    MaxHeatingLoadMetByVent(ZoneIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    ZoneEquipConfig(ZoneIndex).ZoneName);
             }
 
-            SetupOutputVariable("Zone Mechanical Ventilation Mass Flow Rate", OutputProcessor::Unit::kg_s, ZoneOAMassFlow(ZoneIndex), "HVAC",
-                                "Average", ZoneEquipConfig(ZoneIndex).ZoneName);
-
-            SetupOutputVariable("Zone Mechanical Ventilation Mass", OutputProcessor::Unit::kg, ZoneOAMass(ZoneIndex), "HVAC", "Sum",
+            SetupOutputVariable("Zone Mechanical Ventilation Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneOAMassFlow(ZoneIndex),
+                                "HVAC",
+                                "Average",
                                 ZoneEquipConfig(ZoneIndex).ZoneName);
 
-            SetupOutputVariable("Zone Mechanical Ventilation Standard Density Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneOAVolFlowStdRho(ZoneIndex), "HVAC", "Average", ZoneEquipConfig(ZoneIndex).ZoneName);
+            SetupOutputVariable("Zone Mechanical Ventilation Mass",
+                                OutputProcessor::Unit::kg,
+                                ZoneOAMass(ZoneIndex),
+                                "HVAC",
+                                "Sum",
+                                ZoneEquipConfig(ZoneIndex).ZoneName);
 
-            SetupOutputVariable("Zone Mechanical Ventilation Standard Density Volume", OutputProcessor::Unit::m3, ZoneOAVolStdRho(ZoneIndex), "HVAC",
-                                "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+            SetupOutputVariable("Zone Mechanical Ventilation Standard Density Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneOAVolFlowStdRho(ZoneIndex),
+                                "HVAC",
+                                "Average",
+                                ZoneEquipConfig(ZoneIndex).ZoneName);
 
-            SetupOutputVariable("Zone Mechanical Ventilation Current Density Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneOAVolFlowCrntRho(ZoneIndex), "HVAC", "Average", ZoneEquipConfig(ZoneIndex).ZoneName);
+            SetupOutputVariable("Zone Mechanical Ventilation Standard Density Volume",
+                                OutputProcessor::Unit::m3,
+                                ZoneOAVolStdRho(ZoneIndex),
+                                "HVAC",
+                                "Sum",
+                                ZoneEquipConfig(ZoneIndex).ZoneName);
 
-            SetupOutputVariable("Zone Mechanical Ventilation Current Density Volume", OutputProcessor::Unit::m3, ZoneOAVolCrntRho(ZoneIndex), "HVAC",
-                                "Sum", ZoneEquipConfig(ZoneIndex).ZoneName);
+            SetupOutputVariable("Zone Mechanical Ventilation Current Density Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneOAVolFlowCrntRho(ZoneIndex),
+                                "HVAC",
+                                "Average",
+                                ZoneEquipConfig(ZoneIndex).ZoneName);
 
-            SetupOutputVariable("Zone Mechanical Ventilation Air Changes per Hour", OutputProcessor::Unit::ach, ZoneMechACH(ZoneIndex), "HVAC",
-                                "Average", ZoneEquipConfig(ZoneIndex).ZoneName);
+            SetupOutputVariable("Zone Mechanical Ventilation Current Density Volume",
+                                OutputProcessor::Unit::m3,
+                                ZoneOAVolCrntRho(ZoneIndex),
+                                "HVAC",
+                                "Sum",
+                                ZoneEquipConfig(ZoneIndex).ZoneName);
+
+            SetupOutputVariable("Zone Mechanical Ventilation Air Changes per Hour",
+                                OutputProcessor::Unit::ach,
+                                ZoneMechACH(ZoneIndex),
+                                "HVAC",
+                                "Average",
+                                ZoneEquipConfig(ZoneIndex).ZoneName);
         }
     }
 
@@ -2332,8 +2507,16 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp, NameOfComp, NumChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers,
-                                        OutletNodeNames, OutletNodeNumbers, ErrorsFound);
+                        GetChildrenData(TypeOfComp,
+                                        NameOfComp,
+                                        NumChildren,
+                                        SubCompTypes,
+                                        SubCompNames,
+                                        InletNodeNames,
+                                        InletNodeNumbers,
+                                        OutletNodeNames,
+                                        OutletNodeNumbers,
+                                        ErrorsFound);
 
                         for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                             {
@@ -2374,8 +2557,16 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                            GetChildrenData(TypeOfComp, NameOfComp, NumGrandChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers,
-                                            OutletNodeNames, OutletNodeNumbers, ErrorsFound);
+                            GetChildrenData(TypeOfComp,
+                                            NameOfComp,
+                                            NumGrandChildren,
+                                            SubCompTypes,
+                                            SubCompNames,
+                                            InletNodeNames,
+                                            InletNodeNumbers,
+                                            OutletNodeNames,
+                                            OutletNodeNumbers,
+                                            ErrorsFound);
 
                             for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                                 {
@@ -2433,8 +2624,17 @@ namespace SystemReports {
                             thisComp.MeteredVar.allocate(NumVariables);
 
                             thisComp.NumMeteredVars = NumVariables;
-                            GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups,
-                                                Names, NumFound);
+                            GetMeteredVariables(TypeOfComp,
+                                                NameOfComp,
+                                                VarIndexes,
+                                                VarTypes,
+                                                IndexTypes,
+                                                unitsForVar,
+                                                ResourceTypes,
+                                                EndUses,
+                                                Groups,
+                                                Names,
+                                                NumFound);
                             ModeFlagOn = true;
                             for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                                 {
@@ -2488,8 +2688,17 @@ namespace SystemReports {
                                 Names.allocate(NumVariables);
                                 thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
-                                GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses,
-                                                    Groups, Names, NumFound);
+                                GetMeteredVariables(TypeOfComp,
+                                                    NameOfComp,
+                                                    VarIndexes,
+                                                    VarTypes,
+                                                    IndexTypes,
+                                                    unitsForVar,
+                                                    ResourceTypes,
+                                                    EndUses,
+                                                    Groups,
+                                                    Names,
+                                                    NumFound);
 
                                 ModeFlagOn = true;
                                 for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -2547,8 +2756,17 @@ namespace SystemReports {
                                     Names.allocate(NumVariables);
                                     thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
-                                    GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses,
-                                                        Groups, Names, NumFound);
+                                    GetMeteredVariables(TypeOfComp,
+                                                        NameOfComp,
+                                                        VarIndexes,
+                                                        VarTypes,
+                                                        IndexTypes,
+                                                        unitsForVar,
+                                                        ResourceTypes,
+                                                        EndUses,
+                                                        Groups,
+                                                        Names,
+                                                        NumFound);
 
                                     ModeFlagOn = true;
                                     for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -2604,8 +2822,18 @@ namespace SystemReports {
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
                 TypeOfComp = ZoneEquipList(CtrlZoneNum).EquipType(CompNum);
                 NameOfComp = ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
-                GetComponentData(TypeOfComp, NameOfComp, IsParent, NumInlets, InletNodeNames, InletNodeNumbers, InletFluidStreams, NumOutlets,
-                                 OutletNodeNames, OutletNodeNumbers, OutletFluidStreams, ErrorsFound);
+                GetComponentData(TypeOfComp,
+                                 NameOfComp,
+                                 IsParent,
+                                 NumInlets,
+                                 InletNodeNames,
+                                 InletNodeNumbers,
+                                 InletFluidStreams,
+                                 NumOutlets,
+                                 OutletNodeNames,
+                                 OutletNodeNumbers,
+                                 OutletFluidStreams,
+                                 ErrorsFound);
                 {
                     auto &thisEquipData(ZoneEquipList(CtrlZoneNum).EquipData(CompNum));
                     thisEquipData.TypeOf = TypeOfComp;
@@ -2637,8 +2865,8 @@ namespace SystemReports {
                         Names.allocate(NumVariables);
                         thisEquipData.MeteredVar.allocate(NumVariables);
 
-                        GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups,
-                                            Names, NumFound);
+                        GetMeteredVariables(
+                            TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
                         ModeFlagOn = true;
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -2690,8 +2918,16 @@ namespace SystemReports {
                         OutletNodeNumbers.allocate(NumChildren);
                         thisEquipData.SubEquipData.allocate(NumChildren);
 
-                        GetChildrenData(TypeOfComp, NameOfComp, NumChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers,
-                                        OutletNodeNames, OutletNodeNumbers, ErrorsFound);
+                        GetChildrenData(TypeOfComp,
+                                        NameOfComp,
+                                        NumChildren,
+                                        SubCompTypes,
+                                        SubCompNames,
+                                        InletNodeNames,
+                                        InletNodeNumbers,
+                                        OutletNodeNames,
+                                        OutletNodeNumbers,
+                                        ErrorsFound);
 
                         for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                             thisEquipData.SubEquipData(SubCompNum).TypeOf = SubCompTypes(SubCompNum);
@@ -2724,8 +2960,16 @@ namespace SystemReports {
                             OutletNodeNumbers.allocate(NumGrandChildren);
                             thisEquipData.SubEquipData(SubCompNum).SubSubEquipData.allocate(NumGrandChildren);
                             // Sankar added the array number for EquipData
-                            GetChildrenData(TypeOfComp, NameOfComp, NumGrandChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers,
-                                            OutletNodeNames, OutletNodeNumbers, ErrorsFound);
+                            GetChildrenData(TypeOfComp,
+                                            NameOfComp,
+                                            NumGrandChildren,
+                                            SubCompTypes,
+                                            SubCompNames,
+                                            InletNodeNames,
+                                            InletNodeNumbers,
+                                            OutletNodeNames,
+                                            OutletNodeNumbers,
+                                            ErrorsFound);
 
                             for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                                 thisEquipData.SubEquipData(SubCompNum).SubSubEquipData(SubSubCompNum).TypeOf = SubCompTypes(SubSubCompNum);
@@ -2770,8 +3014,17 @@ namespace SystemReports {
                             Names.allocate(NumVariables);
                             thisSubEquipData.MeteredVar.allocate(NumVariables);
 
-                            GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups,
-                                                Names, NumFound);
+                            GetMeteredVariables(TypeOfComp,
+                                                NameOfComp,
+                                                VarIndexes,
+                                                VarTypes,
+                                                IndexTypes,
+                                                unitsForVar,
+                                                ResourceTypes,
+                                                EndUses,
+                                                Groups,
+                                                Names,
+                                                NumFound);
 
                             ModeFlagOn = true;
                             for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -2828,8 +3081,17 @@ namespace SystemReports {
                                 Names.allocate(NumVariables);
                                 thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar.allocate(NumVariables);
 
-                                GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses,
-                                                    Groups, Names, NumFound);
+                                GetMeteredVariables(TypeOfComp,
+                                                    NameOfComp,
+                                                    VarIndexes,
+                                                    VarTypes,
+                                                    IndexTypes,
+                                                    unitsForVar,
+                                                    ResourceTypes,
+                                                    EndUses,
+                                                    Groups,
+                                                    Names,
+                                                    NumFound);
 
                                 ModeFlagOn = true;
                                 for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -2936,8 +3198,16 @@ namespace SystemReports {
                                 OutletNodeNumbers.allocate(NumChildren);
                                 thisComp.SubComp.allocate(NumChildren);
 
-                                GetChildrenData(TypeOfComp, NameOfComp, NumChildren, SubCompTypes, SubCompNames, InletNodeNames, InletNodeNumbers,
-                                                OutletNodeNames, OutletNodeNumbers, ErrorsFound);
+                                GetChildrenData(TypeOfComp,
+                                                NameOfComp,
+                                                NumChildren,
+                                                SubCompTypes,
+                                                SubCompNames,
+                                                InletNodeNames,
+                                                InletNodeNumbers,
+                                                OutletNodeNames,
+                                                OutletNodeNumbers,
+                                                ErrorsFound);
 
                                 for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
                                     thisComp.SubComp(SubCompNum).TypeOf = SubCompTypes(SubCompNum);
@@ -2975,8 +3245,16 @@ namespace SystemReports {
                                     OutletNodeNumbers.allocate(NumGrandChildren);
                                     thisComp.SubComp(SubCompNum).SubSubComp.allocate(NumGrandChildren);
 
-                                    GetChildrenData(TypeOfComp, NameOfComp, NumGrandChildren, SubCompTypes, SubCompNames, InletNodeNames,
-                                                    InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound);
+                                    GetChildrenData(TypeOfComp,
+                                                    NameOfComp,
+                                                    NumGrandChildren,
+                                                    SubCompTypes,
+                                                    SubCompNames,
+                                                    InletNodeNames,
+                                                    InletNodeNumbers,
+                                                    OutletNodeNames,
+                                                    OutletNodeNumbers,
+                                                    ErrorsFound);
 
                                     for (SubSubCompNum = 1; SubSubCompNum <= NumGrandChildren; ++SubSubCompNum) {
                                         {
@@ -3063,8 +3341,17 @@ namespace SystemReports {
                                 thisComp.MeteredVar.allocate(NumVariables);
 
                                 thisComp.NumMeteredVars = NumVariables;
-                                GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses,
-                                                    Groups, Names, NumFound);
+                                GetMeteredVariables(TypeOfComp,
+                                                    NameOfComp,
+                                                    VarIndexes,
+                                                    VarTypes,
+                                                    IndexTypes,
+                                                    unitsForVar,
+                                                    ResourceTypes,
+                                                    EndUses,
+                                                    Groups,
+                                                    Names,
+                                                    NumFound);
 
                                 ModeFlagOn = true;
                                 for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -3119,8 +3406,17 @@ namespace SystemReports {
                                     Names.allocate(NumVariables);
                                     thisComp.SubComp(SubCompNum).MeteredVar.allocate(NumVariables);
 
-                                    GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses,
-                                                        Groups, Names, NumFound);
+                                    GetMeteredVariables(TypeOfComp,
+                                                        NameOfComp,
+                                                        VarIndexes,
+                                                        VarTypes,
+                                                        IndexTypes,
+                                                        unitsForVar,
+                                                        ResourceTypes,
+                                                        EndUses,
+                                                        Groups,
+                                                        Names,
+                                                        NumFound);
 
                                     ModeFlagOn = true;
                                     for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -4054,11 +4350,11 @@ namespace SystemReports {
         using namespace DataGlobalConstants;
         using DataEnvironment::OutBaroPress;
         using DataEnvironment::StdRhoAir;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRatAvg;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
+        using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::ZoneAirHumRatAvg;
         using FanCoilUnits::GetFanCoilMixedAirNode;
         using FanCoilUnits::GetFanCoilOutAirNode;
         using FanCoilUnits::GetFanCoilReturnAirNode;
@@ -4606,8 +4902,8 @@ namespace SystemReports {
                                 Idx = 0;
                                 FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 if (MatchFound)
-                                    UpdateAirSysSubCompPtrArray(Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop,
-                                                                MatchBranch, MatchComp);
+                                    UpdateAirSysSubCompPtrArray(
+                                        Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 thisSubComp.AirSysToPlantPtr = Idx;
                                 break;
                             }
@@ -4624,8 +4920,16 @@ namespace SystemReports {
                                         Idx = 0;
                                         FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                         if (MatchFound)
-                                            UpdateAirSysSubSubCompPtrArray(Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, SubSubCompNum,
-                                                                           MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                            UpdateAirSysSubSubCompPtrArray(Idx,
+                                                                           AirLoopNum,
+                                                                           BranchNum,
+                                                                           CompNum,
+                                                                           SubCompNum,
+                                                                           SubSubCompNum,
+                                                                           MatchLoopType,
+                                                                           MatchLoop,
+                                                                           MatchBranch,
+                                                                           MatchComp);
                                         thisSubSubComp.AirSysToPlantPtr = Idx;
                                         break;
                                     }
@@ -4746,8 +5050,8 @@ namespace SystemReports {
 
         // Using/Aliasing
         using DataGlobals::OutputFileBNDetails;
-        using DataHVACGlobals::NumPrimaryAirSys;
         using DataHeatBalance::Zone;
+        using DataHVACGlobals::NumPrimaryAirSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

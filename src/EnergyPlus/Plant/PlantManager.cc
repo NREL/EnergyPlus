@@ -357,14 +357,32 @@ namespace PlantManager {
                 PlantLoopNum = LoopNum;
                 this_loop.TypeOfLoop = Plant;
                 CurrentModuleObject = "PlantLoop";
-                inputProcessor->getObjectItem(CurrentModuleObject, PlantLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks,
-                                              lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              PlantLoopNum,
+                                              Alpha,
+                                              NumAlphas,
+                                              Num,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
             } else {
                 CondLoopNum = LoopNum - NumPlantLoops;
                 this_loop.TypeOfLoop = Condenser;
                 CurrentModuleObject = "CondenserLoop";
-                inputProcessor->getObjectItem(CurrentModuleObject, CondLoopNum, Alpha, NumAlphas, Num, NumNums, IOStat, lNumericFieldBlanks, _,
-                                              cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(CurrentModuleObject,
+                                              CondLoopNum,
+                                              Alpha,
+                                              NumAlphas,
+                                              Num,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
             }
             UtilityRoutines::IsNameEmpty(Alpha(1), CurrentModuleObject, ErrorsFound);
             this_loop.Name = Alpha(1); // Load the Plant Loop Name
@@ -436,21 +454,21 @@ namespace PlantManager {
             this_demand_side.BranchList = Alpha(12);
             this_demand_side.ConnectList = Alpha(13);
 
-            this_supply_side.NodeNumIn = GetOnlySingleNode(Alpha(6), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                                                           NodeConnectionType_Inlet, 1, ObjectIsParent);
-            this_supply_side.NodeNumOut = GetOnlySingleNode(Alpha(7), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                                                            NodeConnectionType_Outlet, 1, ObjectIsParent);
-            this_demand_side.NodeNumIn = GetOnlySingleNode(Alpha(10), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                                                           NodeConnectionType_Inlet, 1, ObjectIsParent);
-            this_demand_side.NodeNumOut = GetOnlySingleNode(Alpha(11), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                                                            NodeConnectionType_Outlet, 1, ObjectIsParent);
+            this_supply_side.NodeNumIn = GetOnlySingleNode(
+                Alpha(6), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent);
+            this_supply_side.NodeNumOut = GetOnlySingleNode(
+                Alpha(7), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent);
+            this_demand_side.NodeNumIn = GetOnlySingleNode(
+                Alpha(10), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType, NodeConnectionType_Inlet, 1, ObjectIsParent);
+            this_demand_side.NodeNumOut = GetOnlySingleNode(
+                Alpha(11), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumIn, TempSetPt);
             this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumOut, TempSetPt);
             this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumIn, TempSetPt);
             this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumOut, TempSetPt);
-            this_loop.TempSetPointNodeNum = GetOnlySingleNode(Alpha(5), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
-                                                              NodeConnectionType_Sensor, 1, ObjectIsParent);
+            this_loop.TempSetPointNodeNum = GetOnlySingleNode(
+                Alpha(5), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType, NodeConnectionType_Sensor, 1, ObjectIsParent);
 
             // Load the load distribution scheme.
             LoadingScheme = Alpha(14);
@@ -662,8 +680,12 @@ namespace PlantManager {
         // outside the IF statement.
         for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
 
-            SetupOutputVariable("Plant System Cycle On Off Status", OutputProcessor::Unit::None, PlantAvailMgr(LoopNum).AvailStatus, "Plant",
-                                "Average", PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant System Cycle On Off Status",
+                                OutputProcessor::Unit::None,
+                                PlantAvailMgr(LoopNum).AvailStatus,
+                                "Plant",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
         }
     }
 
@@ -796,9 +818,18 @@ namespace PlantManager {
                     OutletNodeNames.allocate(TempLoop.Branch(BranchNum).TotalComponents);
                     OutletNodeNumbers.dimension(TempLoop.Branch(BranchNum).TotalComponents, 0);
 
-                    GetBranchData(TempLoop.Name, BranchNames(BranchNum), TempLoop.Branch(BranchNum).PressureCurveType,
-                                  TempLoop.Branch(BranchNum).PressureCurveIndex, TempLoop.Branch(BranchNum).TotalComponents, CompTypes, CompNames,
-                                  InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound);
+                    GetBranchData(TempLoop.Name,
+                                  BranchNames(BranchNum),
+                                  TempLoop.Branch(BranchNum).PressureCurveType,
+                                  TempLoop.Branch(BranchNum).PressureCurveIndex,
+                                  TempLoop.Branch(BranchNum).TotalComponents,
+                                  CompTypes,
+                                  CompNames,
+                                  InletNodeNames,
+                                  InletNodeNumbers,
+                                  OutletNodeNames,
+                                  OutletNodeNumbers,
+                                  ErrorsFound);
 
                     TempLoop.Branch(BranchNum).Comp.allocate(TempLoop.Branch(BranchNum).TotalComponents);
 
@@ -863,8 +894,8 @@ namespace PlantManager {
                             } else {
                                 AParallelBranchHasPump = true;
                             }
-                            StoreAPumpOnCurrentTempLoop(LoopNum, LoopSideNum, BranchNum, CompNum, CompNames(CompNum), OutletNodeNumbers(CompNum),
-                                                        AParallelBranchHasPump);
+                            StoreAPumpOnCurrentTempLoop(
+                                LoopNum, LoopSideNum, BranchNum, CompNum, CompNames(CompNum), OutletNodeNumbers(CompNum), AParallelBranchHasPump);
                         } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:Mixed")) {
                             this_comp.TypeOf_Num = TypeOf_WtrHeaterMixed;
                             this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
@@ -1367,9 +1398,18 @@ namespace PlantManager {
                     if (SplitNum > NumofSplitters) break;
                     OutletNodeNames.allocate(MaxNumAlphas);
                     OutletNodeNumbers.allocate(MaxNumAlphas);
-                    GetLoopSplitter(TempLoop.Name, TempLoop.ConnectList, TempLoop.Splitter(SplitNum).Name, TempLoop.Splitter(SplitNum).Exists,
-                                    TempLoop.Splitter(SplitNum).NodeNameIn, TempLoop.Splitter(SplitNum).NodeNumIn,
-                                    TempLoop.Splitter(SplitNum).TotalOutletNodes, OutletNodeNames, OutletNodeNumbers, ErrorsFound, ConnNum, SplitNum);
+                    GetLoopSplitter(TempLoop.Name,
+                                    TempLoop.ConnectList,
+                                    TempLoop.Splitter(SplitNum).Name,
+                                    TempLoop.Splitter(SplitNum).Exists,
+                                    TempLoop.Splitter(SplitNum).NodeNameIn,
+                                    TempLoop.Splitter(SplitNum).NodeNumIn,
+                                    TempLoop.Splitter(SplitNum).TotalOutletNodes,
+                                    OutletNodeNames,
+                                    OutletNodeNumbers,
+                                    ErrorsFound,
+                                    ConnNum,
+                                    SplitNum);
 
                     if (SplitNum == 1) {
                         OutletNodeNames.deallocate();
@@ -1440,9 +1480,18 @@ namespace PlantManager {
                     if (MixNum > NumofMixers) break;
                     InletNodeNames.allocate(MaxNumAlphas);
                     InletNodeNumbers.allocate(MaxNumAlphas);
-                    GetLoopMixer(TempLoop.Name, TempLoop.ConnectList, TempLoop.Mixer(MixNum).Name, TempLoop.Mixer(MixNum).Exists,
-                                 TempLoop.Mixer(MixNum).NodeNameOut, TempLoop.Mixer(MixNum).NodeNumOut, TempLoop.Mixer(MixNum).TotalInletNodes,
-                                 InletNodeNames, InletNodeNumbers, ErrorsFound, ConnNum, MixNum);
+                    GetLoopMixer(TempLoop.Name,
+                                 TempLoop.ConnectList,
+                                 TempLoop.Mixer(MixNum).Name,
+                                 TempLoop.Mixer(MixNum).Exists,
+                                 TempLoop.Mixer(MixNum).NodeNameOut,
+                                 TempLoop.Mixer(MixNum).NodeNumOut,
+                                 TempLoop.Mixer(MixNum).TotalInletNodes,
+                                 InletNodeNames,
+                                 InletNodeNumbers,
+                                 ErrorsFound,
+                                 ConnNum,
+                                 MixNum);
 
                     if (MixNum == 1) {
                         InletNodeNames.deallocate();
@@ -1888,25 +1937,57 @@ namespace PlantManager {
                 CurrentModuleObject = "Cond Loop";
             }
             // CurrentModuleObject='Plant/Condenser Loop'
-            SetupOutputVariable("Plant Supply Side Cooling Demand Rate", OutputProcessor::Unit::W, PlantReport(LoopNum).CoolingDemand, "System",
-                                "Average", PlantLoop(LoopNum).Name);
-            SetupOutputVariable("Plant Supply Side Heating Demand Rate", OutputProcessor::Unit::W, PlantReport(LoopNum).HeatingDemand, "System",
-                                "Average", PlantLoop(LoopNum).Name);
-            SetupOutputVariable("Plant Supply Side Inlet Mass Flow Rate", OutputProcessor::Unit::kg_s, PlantReport(LoopNum).InletNodeFlowrate,
-                                "System", "Average", PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant Supply Side Cooling Demand Rate",
+                                OutputProcessor::Unit::W,
+                                PlantReport(LoopNum).CoolingDemand,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant Supply Side Heating Demand Rate",
+                                OutputProcessor::Unit::W,
+                                PlantReport(LoopNum).HeatingDemand,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant Supply Side Inlet Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                PlantReport(LoopNum).InletNodeFlowrate,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
 
-            SetupOutputVariable("Plant Supply Side Inlet Temperature", OutputProcessor::Unit::C, PlantReport(LoopNum).InletNodeTemperature, "System",
-                                "Average", PlantLoop(LoopNum).Name);
-            SetupOutputVariable("Plant Supply Side Outlet Temperature", OutputProcessor::Unit::C, PlantReport(LoopNum).OutletNodeTemperature,
-                                "System", "Average", PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant Supply Side Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                PlantReport(LoopNum).InletNodeTemperature,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant Supply Side Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                PlantReport(LoopNum).OutletNodeTemperature,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
 
-            SetupOutputVariable("Plant Supply Side Not Distributed Demand Rate", OutputProcessor::Unit::W, PlantReport(LoopNum).DemandNotDispatched,
-                                "System", "Average", PlantLoop(LoopNum).Name);
-            SetupOutputVariable("Plant Supply Side Unmet Demand Rate", OutputProcessor::Unit::W, PlantReport(LoopNum).UnmetDemand, "System",
-                                "Average", PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant Supply Side Not Distributed Demand Rate",
+                                OutputProcessor::Unit::W,
+                                PlantReport(LoopNum).DemandNotDispatched,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Plant Supply Side Unmet Demand Rate",
+                                OutputProcessor::Unit::W,
+                                PlantReport(LoopNum).UnmetDemand,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
 
             // Debug variables -- used by OSU developers
-            SetupOutputVariable("Debug Plant Loop Bypass Fraction", OutputProcessor::Unit::None, PlantReport(LoopNum).BypassFrac, "System", "Average",
+            SetupOutputVariable("Debug Plant Loop Bypass Fraction",
+                                OutputProcessor::Unit::None,
+                                PlantReport(LoopNum).BypassFrac,
+                                "System",
+                                "Average",
                                 PlantLoop(LoopNum).Name);
             //    CALL SetupOutputVariable('Debug SSInletNode Flowrate[kg/s]', &
             //           PlantReport(LoopNum)%InletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
@@ -1916,39 +1997,76 @@ namespace PlantManager {
             //           PlantReport(LoopNum)%OutletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
             //    CALL SetupOutputVariable('Debug SSOutletNode Temperature[C]', &
             //           PlantReport(LoopNum)%OutletNodeTemperature,'System','Average',PlantLoop(LoopNum)%Name)
-            SetupOutputVariable("Debug Plant Last Simulated Loop Side", OutputProcessor::Unit::None, PlantReport(LoopNum).LastLoopSideSimulated,
-                                "System", "Average", PlantLoop(LoopNum).Name);
+            SetupOutputVariable("Debug Plant Last Simulated Loop Side",
+                                OutputProcessor::Unit::None,
+                                PlantReport(LoopNum).LastLoopSideSimulated,
+                                "System",
+                                "Average",
+                                PlantLoop(LoopNum).Name);
         }
 
         // setup more variables inside plant data structure
         // CurrentModuleObject='Plant/Condenser Loop(Advanced)'
         if (DisplayAdvancedReportVariables) {
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                SetupOutputVariable("Plant Demand Side Lumped Capacitance Temperature", OutputProcessor::Unit::C,
-                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp, "System", "Average", PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Lumped Capacitance Temperature", OutputProcessor::Unit::C,
-                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp, "System", "Average", PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Demand Side Lumped Capacitance Heat Transport Rate", OutputProcessor::Unit::W,
-                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Lumped Capacitance Heat Transport Rate", OutputProcessor::Unit::W,
-                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_MdotCpDeltaT, "System", "Average", PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Demand Side Lumped Capacitance Heat Storage Rate", OutputProcessor::Unit::W,
-                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Lumped Capacitance Heat Storage Rate", OutputProcessor::Unit::W,
-                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_McpDTdt, "System", "Average", PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Demand Side Lumped Capacitance Excessive Storage Time", OutputProcessor::Unit::hr,
-                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum",
+                SetupOutputVariable("Plant Demand Side Lumped Capacitance Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp,
+                                    "System",
+                                    "Average",
                                     PlantLoop(LoopNum).Name);
-                SetupOutputVariable("Plant Supply Side Lumped Capacitance Excessive Storage Time", OutputProcessor::Unit::hr,
-                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTimeReport, "System", "Sum",
+                SetupOutputVariable("Plant Supply Side Lumped Capacitance Temperature",
+                                    OutputProcessor::Unit::C,
+                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp,
+                                    "System",
+                                    "Average",
+                                    PlantLoop(LoopNum).Name);
+                SetupOutputVariable("Plant Demand Side Lumped Capacitance Heat Transport Rate",
+                                    OutputProcessor::Unit::W,
+                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_MdotCpDeltaT,
+                                    "System",
+                                    "Average",
+                                    PlantLoop(LoopNum).Name);
+                SetupOutputVariable("Plant Supply Side Lumped Capacitance Heat Transport Rate",
+                                    OutputProcessor::Unit::W,
+                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_MdotCpDeltaT,
+                                    "System",
+                                    "Average",
+                                    PlantLoop(LoopNum).Name);
+                SetupOutputVariable("Plant Demand Side Lumped Capacitance Heat Storage Rate",
+                                    OutputProcessor::Unit::W,
+                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_McpDTdt,
+                                    "System",
+                                    "Average",
+                                    PlantLoop(LoopNum).Name);
+                SetupOutputVariable("Plant Supply Side Lumped Capacitance Heat Storage Rate",
+                                    OutputProcessor::Unit::W,
+                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_McpDTdt,
+                                    "System",
+                                    "Average",
+                                    PlantLoop(LoopNum).Name);
+                SetupOutputVariable("Plant Demand Side Lumped Capacitance Excessive Storage Time",
+                                    OutputProcessor::Unit::hr,
+                                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTimeReport,
+                                    "System",
+                                    "Sum",
+                                    PlantLoop(LoopNum).Name);
+                SetupOutputVariable("Plant Supply Side Lumped Capacitance Excessive Storage Time",
+                                    OutputProcessor::Unit::hr,
+                                    PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTimeReport,
+                                    "System",
+                                    "Sum",
                                     PlantLoop(LoopNum).Name);
                 for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                     for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                             if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType != DemandOpSchemeType) {
-                                SetupOutputVariable("Plant Component Distributed Demand Rate", OutputProcessor::Unit::W,
-                                                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad, "System",
-                                                    "Average", PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name);
+                                SetupOutputVariable("Plant Component Distributed Demand Rate",
+                                                    OutputProcessor::Unit::W,
+                                                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad,
+                                                    "System",
+                                                    "Average",
+                                                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name);
                             }
                         }
                     }
@@ -3027,20 +3145,20 @@ namespace PlantManager {
                 if (Finalize) {
                     if (PlantFinalSizesOkayToReport) {
                         if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
-                            ReportSizingOutput("PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
-                                               PlantLoop(LoopNum).MaxVolFlowRate);
+                            ReportSizingOutput(
+                                "PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
                         } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                            ReportSizingOutput("CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
-                                               PlantLoop(LoopNum).MaxVolFlowRate);
+                            ReportSizingOutput(
+                                "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
                         }
                     }
                     if (PlantFirstSizesOkayToReport) {
                         if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
-                            ReportSizingOutput("PlantLoop", PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]",
-                                               PlantLoop(LoopNum).MaxVolFlowRate);
+                            ReportSizingOutput(
+                                "PlantLoop", PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
                         } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                            ReportSizingOutput("CondenserLoop", PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]",
-                                               PlantLoop(LoopNum).MaxVolFlowRate);
+                            ReportSizingOutput(
+                                "CondenserLoop", PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
                         }
                     }
                 }
@@ -3183,8 +3301,8 @@ namespace PlantManager {
                     if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
                         ReportSizingOutput("PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
                     } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                        ReportSizingOutput("CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
-                                           PlantLoop(LoopNum).MaxVolFlowRate);
+                        ReportSizingOutput(
+                            "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
                     }
                 }
             }
