@@ -16058,7 +16058,7 @@ namespace DXCoils {
         }
     }
 
-	void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum)
+    void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Gu
@@ -16077,7 +16077,7 @@ namespace DXCoils {
 
         WhichCoil = UtilityRoutines::FindItemInList(CoilName, DXCoil);
         if (WhichCoil != 0) {
-			DXCoil(WhichCoil).AirLoopNum = AirLoopNum;
+            DXCoil(WhichCoil).AirLoopNum = AirLoopNum;
         } else {
             ShowSevereError("SetDXCoilAirLoopNumber: Could not find Coil \"Name=\"" + CoilName + "\"");
         }

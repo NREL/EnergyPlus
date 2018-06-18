@@ -10605,8 +10605,8 @@ namespace HVACUnitarySystem {
         //  Calculate operating PLR and adjust speed when using multispeed coils.
 
         // Using/Aliasing
-		using DataAirflowNetwork::AirflowNetworkControlMultizone;
-		using DataAirflowNetwork::SimulateAirflowNetwork;
+        using DataAirflowNetwork::AirflowNetworkControlMultizone;
+        using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;

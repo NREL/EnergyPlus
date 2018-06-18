@@ -3108,12 +3108,12 @@ namespace AirflowNetworkBalanceManager {
         // Read AirflowNetwork Distribution system component: constant volume fan
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Fan";
         DisSysNumOfCVFs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-		if ( DisSysNumOfCVFs > 0 && DisSysNumOfCVFs != NumAPL ) {
-			ShowSevereError( "The number of entered AirflowNetwork:Distribution:Component:Fan objects is " + RoundSigDigits( DisSysNumOfCVFs ) );
-			ShowSevereError( "The number of entered AirLoopHVAC objects is " + RoundSigDigits( NumAPL ) );
-			ShowContinueError( "Both numbers should be equal. Please check your inputs." );
-			ErrorsFound = true;
-		}
+        if ( DisSysNumOfCVFs > 0 && DisSysNumOfCVFs != NumAPL ) {
+            ShowSevereError( "The number of entered AirflowNetwork:Distribution:Component:Fan objects is " + RoundSigDigits( DisSysNumOfCVFs ) );
+            ShowSevereError( "The number of entered AirLoopHVAC objects is " + RoundSigDigits( NumAPL ) );
+            ShowContinueError( "Both numbers should be equal. Please check your inputs." );
+            ErrorsFound = true;
+        }
         if (DisSysNumOfCVFs > 0) {
             DisSysCompCVFData.allocate(DisSysNumOfCVFs);
             for (i = 1; i <= DisSysNumOfCVFs; ++i) {

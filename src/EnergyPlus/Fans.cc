@@ -3176,10 +3176,10 @@ namespace Fans {
         UniqueFanNames.clear();
     }
 
-	void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum)
-	{
-		Fan(FanIndex).AirLoopNum = AirLoopNum;
-	}
+    void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum)
+    {
+        Fan(FanIndex).AirLoopNum = AirLoopNum;
+    }
 
     // End of Utility subroutines for the Fan Module
     // *****************************************************************************

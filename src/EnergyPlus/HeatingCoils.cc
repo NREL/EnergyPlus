@@ -1938,11 +1938,11 @@ namespace HeatingCoils {
         HeatingCoil(CoilNum).OutletAirEnthalpy = PsyHFnTdbW(HeatingCoil(CoilNum).OutletAirTemp, HeatingCoil(CoilNum).OutletAirHumRat);
 
         QCoilActual = HeatingCoilLoad;
-		if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-			AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) =
-				max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), HeatingCoil(CoilNum).RTF);
-		}
-		ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
+        if (HeatingCoil(CoilNum).AirLoopNum > 0) {
+            AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum) =
+                max(AFNLoopHeatingCoilMaxRTF(HeatingCoil(CoilNum).AirLoopNum), HeatingCoil(CoilNum).RTF);
+        }
+        ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
         Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
