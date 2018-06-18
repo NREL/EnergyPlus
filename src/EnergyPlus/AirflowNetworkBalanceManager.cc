@@ -8848,7 +8848,6 @@ namespace AirflowNetworkBalanceManager {
         using MixedAir::GetOAMixerReliefNodeNumber;
         using SingleDuct::GetHVACSingleDuctSysIndex;
         using namespace DataLoopNode;
-        using DataAirSystems::PrimaryAirSystem;
         using DataBranchNodeConnections::NodeConnections;
         using DataBranchNodeConnections::NumOfNodeConnections;
         using DataHVACGlobals::NumPrimaryAirSys;
