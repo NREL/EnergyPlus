@@ -267,21 +267,21 @@ namespace OutsideEnergySources {
         EnergySourceNum = 0;
         for (IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter) {
             ++EnergySourceNum;
-            inputProcessor->getObjectItem(cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _,
-                                          lAlphaFieldBlanks, cAlphaFieldNames);
+            inputProcessor->getObjectItem(
+                cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames);
 
             if (EnergySourceNum > 1) {
-                GlobalNames::VerifyUniqueInterObjectName(EnergySourceUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                         ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(
+                    EnergySourceUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             }
             EnergySource(EnergySourceNum).Name = cAlphaArgs(1);
             EnergySource(EnergySourceNum).PlantLoopID = "";
             EnergySource(EnergySourceNum).SecndryLoopID = "";
             EnergySource(EnergySourceNum).ScheduleID = "";
-            EnergySource(EnergySourceNum).InletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                           NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            EnergySource(EnergySourceNum).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                            NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            EnergySource(EnergySourceNum).InletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            EnergySource(EnergySourceNum).OutletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Hot Water Nodes");
             EnergySource(EnergySourceNum).NomCap = rNumericArgs(1);
             if (EnergySource(EnergySourceNum).NomCap == AutoSize) {
@@ -314,19 +314,48 @@ namespace OutsideEnergySources {
         EnergySourceNum = 0;
         for (IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter) {
             ++EnergySourceNum;
-            SetupOutputVariable("District Heating Hot Water Energy", OutputProcessor::Unit::J, EnergySource(EnergySourceNum).EnergyTransfer, "System",
-                                "Sum", EnergySource(EnergySourceNum).Name, _, "DistrictHeating", "Heating", _, "Plant");
-            SetupOutputVariable("District Heating Hot Water Rate", OutputProcessor::Unit::W, EnergySource(EnergySourceNum).EnergyRate, "System",
-                                "Average", EnergySource(EnergySourceNum).Name);
-
-            SetupOutputVariable("District Heating Rate", OutputProcessor::Unit::W, EnergySource(EnergySourceNum).EnergyRate, "System", "Average",
+            SetupOutputVariable("District Heating Hot Water Energy",
+                                OutputProcessor::Unit::J,
+                                EnergySource(EnergySourceNum).EnergyTransfer,
+                                "System",
+                                "Sum",
+                                EnergySource(EnergySourceNum).Name,
+                                _,
+                                "DistrictHeating",
+                                "Heating",
+                                _,
+                                "Plant");
+            SetupOutputVariable("District Heating Hot Water Rate",
+                                OutputProcessor::Unit::W,
+                                EnergySource(EnergySourceNum).EnergyRate,
+                                "System",
+                                "Average",
                                 EnergySource(EnergySourceNum).Name);
-            SetupOutputVariable("District Heating Inlet Temperature", OutputProcessor::Unit::C, EnergySourceReport(EnergySourceNum).InletTemp,
-                                "System", "Average", EnergySource(EnergySourceNum).Name);
-            SetupOutputVariable("District Heating Outlet Temperature", OutputProcessor::Unit::C, EnergySourceReport(EnergySourceNum).OutletTemp,
-                                "System", "Average", EnergySource(EnergySourceNum).Name);
-            SetupOutputVariable("District Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, EnergySourceReport(EnergySourceNum).MassFlowRate,
-                                "System", "Average", EnergySource(EnergySourceNum).Name);
+
+            SetupOutputVariable("District Heating Rate",
+                                OutputProcessor::Unit::W,
+                                EnergySource(EnergySourceNum).EnergyRate,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
+            SetupOutputVariable("District Heating Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                EnergySourceReport(EnergySourceNum).InletTemp,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
+            SetupOutputVariable("District Heating Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                EnergySourceReport(EnergySourceNum).OutletTemp,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
+            SetupOutputVariable("District Heating Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                EnergySourceReport(EnergySourceNum).MassFlowRate,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
         }
 
         cCurrentModuleObject = "DistrictCooling";
@@ -334,21 +363,21 @@ namespace OutsideEnergySources {
         EnergySourceNum = NumDistrictUnitsHeat; // To initialize counter
         for (IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter) {
             ++EnergySourceNum;
-            inputProcessor->getObjectItem(cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _,
-                                          lAlphaFieldBlanks, cAlphaFieldNames);
+            inputProcessor->getObjectItem(
+                cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames);
 
             if (EnergySourceNum > 1) {
-                GlobalNames::VerifyUniqueInterObjectName(EnergySourceUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1),
-                                                         ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(
+                    EnergySourceUniqueNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             }
             EnergySource(EnergySourceNum).Name = cAlphaArgs(1);
             EnergySource(EnergySourceNum).PlantLoopID = "";
             EnergySource(EnergySourceNum).SecndryLoopID = "";
             EnergySource(EnergySourceNum).ScheduleID = "";
-            EnergySource(EnergySourceNum).InletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                           NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            EnergySource(EnergySourceNum).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                                                                            NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            EnergySource(EnergySourceNum).InletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            EnergySource(EnergySourceNum).OutletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
             EnergySource(EnergySourceNum).NomCap = rNumericArgs(1);
             if (EnergySource(EnergySourceNum).NomCap == AutoSize) {
@@ -381,19 +410,48 @@ namespace OutsideEnergySources {
         EnergySourceNum = NumDistrictUnitsHeat; // To initialize counter
         for (IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter) {
             ++EnergySourceNum;
-            SetupOutputVariable("District Cooling Chilled Water Energy", OutputProcessor::Unit::J, EnergySource(EnergySourceNum).EnergyTransfer,
-                                "System", "Sum", EnergySource(EnergySourceNum).Name, _, "DistrictCooling", "Cooling", _, "Plant");
-            SetupOutputVariable("District Cooling Chilled Water Rate", OutputProcessor::Unit::W, EnergySource(EnergySourceNum).EnergyRate, "System",
-                                "Average", EnergySource(EnergySourceNum).Name);
-
-            SetupOutputVariable("District Cooling Rate", OutputProcessor::Unit::W, EnergySource(EnergySourceNum).EnergyRate, "System", "Average",
+            SetupOutputVariable("District Cooling Chilled Water Energy",
+                                OutputProcessor::Unit::J,
+                                EnergySource(EnergySourceNum).EnergyTransfer,
+                                "System",
+                                "Sum",
+                                EnergySource(EnergySourceNum).Name,
+                                _,
+                                "DistrictCooling",
+                                "Cooling",
+                                _,
+                                "Plant");
+            SetupOutputVariable("District Cooling Chilled Water Rate",
+                                OutputProcessor::Unit::W,
+                                EnergySource(EnergySourceNum).EnergyRate,
+                                "System",
+                                "Average",
                                 EnergySource(EnergySourceNum).Name);
-            SetupOutputVariable("District Cooling Inlet Temperature", OutputProcessor::Unit::C, EnergySourceReport(EnergySourceNum).InletTemp,
-                                "System", "Average", EnergySource(EnergySourceNum).Name);
-            SetupOutputVariable("District Cooling Outlet Temperature", OutputProcessor::Unit::C, EnergySourceReport(EnergySourceNum).OutletTemp,
-                                "System", "Average", EnergySource(EnergySourceNum).Name);
-            SetupOutputVariable("District Cooling Mass Flow Rate", OutputProcessor::Unit::kg_s, EnergySourceReport(EnergySourceNum).MassFlowRate,
-                                "System", "Average", EnergySource(EnergySourceNum).Name);
+
+            SetupOutputVariable("District Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                EnergySource(EnergySourceNum).EnergyRate,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
+            SetupOutputVariable("District Cooling Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                EnergySourceReport(EnergySourceNum).InletTemp,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
+            SetupOutputVariable("District Cooling Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                EnergySourceReport(EnergySourceNum).OutletTemp,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
+            SetupOutputVariable("District Cooling Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                EnergySourceReport(EnergySourceNum).MassFlowRate,
+                                "System",
+                                "Average",
+                                EnergySource(EnergySourceNum).Name);
         }
     }
 
@@ -461,9 +519,18 @@ namespace OutsideEnergySources {
             }
             // Locate the unit on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(EnergySource(EnergySourceNum).Name, TempTypeFlag, EnergySource(EnergySourceNum).LoopNum,
-                                    EnergySource(EnergySourceNum).LoopSideNum, EnergySource(EnergySourceNum).BranchNum,
-                                    EnergySource(EnergySourceNum).CompNum, _, _, _, _, _, errFlag);
+            ScanPlantLoopsForObject(EnergySource(EnergySourceNum).Name,
+                                    TempTypeFlag,
+                                    EnergySource(EnergySourceNum).LoopNum,
+                                    EnergySource(EnergySourceNum).LoopSideNum,
+                                    EnergySource(EnergySourceNum).BranchNum,
+                                    EnergySource(EnergySourceNum).CompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    errFlag);
             if (errFlag) {
                 ShowFatalError("InitSimVars: Program terminated due to previous condition(s).");
             }
@@ -487,10 +554,14 @@ namespace OutsideEnergySources {
         // begin environment inits
         if (BeginEnvrnFlag && EnergySource(EnergySourceNum).BeginEnvrnInitFlag) {
             // component model has not design flow rates, using data for overall plant loop
-            InitComponentNodes(
-                PlantLoop(EnergySource(EnergySourceNum).LoopNum).MinMassFlowRate, PlantLoop(EnergySource(EnergySourceNum).LoopNum).MaxMassFlowRate,
-                EnergySource(EnergySourceNum).InletNodeNum, EnergySource(EnergySourceNum).OutletNodeNum, EnergySource(EnergySourceNum).LoopNum,
-                EnergySource(EnergySourceNum).LoopSideNum, EnergySource(EnergySourceNum).BranchNum, EnergySource(EnergySourceNum).CompNum);
+            InitComponentNodes(PlantLoop(EnergySource(EnergySourceNum).LoopNum).MinMassFlowRate,
+                               PlantLoop(EnergySource(EnergySourceNum).LoopNum).MaxMassFlowRate,
+                               EnergySource(EnergySourceNum).InletNodeNum,
+                               EnergySource(EnergySourceNum).OutletNodeNum,
+                               EnergySource(EnergySourceNum).LoopNum,
+                               EnergySource(EnergySourceNum).LoopSideNum,
+                               EnergySource(EnergySourceNum).BranchNum,
+                               EnergySource(EnergySourceNum).CompNum);
             EnergySource(EnergySourceNum).BeginEnvrnInitFlag = false;
         }
         if (!BeginEnvrnFlag) EnergySource(EnergySourceNum).BeginEnvrnInitFlag = true;
@@ -564,10 +635,14 @@ namespace OutsideEnergySources {
 
         PltSizNum = PlantLoop(EnergySource(EnergySourceNum).LoopNum).PlantSizNum;
         if (PltSizNum > 0) {
-            rho = GetDensityGlycol(PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidName, DataGlobals::InitConvTemp,
-                                   PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidIndex, "SizeDistrict" + typeName);
-            Cp = GetSpecificHeatGlycol(PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidName, DataGlobals::InitConvTemp,
-                                       PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidIndex, "SizeDistrict" + typeName);
+            rho = GetDensityGlycol(PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidName,
+                                   DataGlobals::InitConvTemp,
+                                   PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidIndex,
+                                   "SizeDistrict" + typeName);
+            Cp = GetSpecificHeatGlycol(PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidName,
+                                       DataGlobals::InitConvTemp,
+                                       PlantLoop(EnergySource(EnergySourceNum).LoopNum).FluidIndex,
+                                       "SizeDistrict" + typeName);
             NomCapDes = Cp * rho * PlantSizData(PltSizNum).DeltaT * PlantSizData(PltSizNum).DesVolFlowRate;
             if (PlantFirstSizesOkayToFinalize) {
                 if (EnergySource(EnergySourceNum).NomCapWasAutoSized) {
@@ -576,15 +651,19 @@ namespace OutsideEnergySources {
                         ReportSizingOutput("District" + typeName, EnergySource(EnergySourceNum).Name, "Design Size Nominal Capacity [W]", NomCapDes);
                     }
                     if (PlantFirstSizesOkayToReport) {
-                        ReportSizingOutput("District" + typeName, EnergySource(EnergySourceNum).Name, "Initial Design Size Nominal Capacity [W]",
-                                           NomCapDes);
+                        ReportSizingOutput(
+                            "District" + typeName, EnergySource(EnergySourceNum).Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
                     }
                 } else { // Hard-size with sizing data
                     if (EnergySource(EnergySourceNum).NomCap > 0.0 && NomCapDes > 0.0) {
                         NomCapUser = EnergySource(EnergySourceNum).NomCap;
                         if (PlantFinalSizesOkayToReport) {
-                            ReportSizingOutput("District" + typeName, EnergySource(EnergySourceNum).Name, "Design Size Nominal Capacity [W]",
-                                               NomCapDes, "User-Specified Nominal Capacity [W]", NomCapUser);
+                            ReportSizingOutput("District" + typeName,
+                                               EnergySource(EnergySourceNum).Name,
+                                               "Design Size Nominal Capacity [W]",
+                                               NomCapDes,
+                                               "User-Specified Nominal Capacity [W]",
+                                               NomCapUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeDistrict" + typeName + ": Potential issue with equipment sizing for " +
@@ -606,7 +685,9 @@ namespace OutsideEnergySources {
                 ErrorsFound = true;
             }
             if (!EnergySource(EnergySourceNum).NomCapWasAutoSized && EnergySource(EnergySourceNum).NomCap > 0.0 && PlantFinalSizesOkayToReport) {
-                ReportSizingOutput("District" + typeName, EnergySource(EnergySourceNum).Name, "User-Specified Nominal Capacity [W]",
+                ReportSizingOutput("District" + typeName,
+                                   EnergySource(EnergySourceNum).Name,
+                                   "User-Specified Nominal Capacity [W]",
                                    EnergySource(EnergySourceNum).NomCap);
             }
         }

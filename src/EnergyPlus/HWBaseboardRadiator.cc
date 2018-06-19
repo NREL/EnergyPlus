@@ -236,10 +236,25 @@ namespace HWBaseboardRadiator {
                 auto const SELECT_CASE_var(HWBaseboard(BaseboardNum).EquipType);
 
                 if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water) { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
-                    ControlCompOutput(HWBaseboard(BaseboardNum).EquipID, cCMO_BBRadiator_Water, BaseboardNum, FirstHVACIteration, QZnReq,
-                                      HWBaseboard(BaseboardNum).WaterInletNode, MaxWaterFlow, MinWaterFlow, HWBaseboard(BaseboardNum).Offset,
-                                      HWBaseboard(BaseboardNum).ControlCompTypeNum, HWBaseboard(BaseboardNum).CompErrIndex, _, _, _, _, _,
-                                      HWBaseboard(BaseboardNum).LoopNum, HWBaseboard(BaseboardNum).LoopSideNum, HWBaseboard(BaseboardNum).BranchNum);
+                    ControlCompOutput(HWBaseboard(BaseboardNum).EquipID,
+                                      cCMO_BBRadiator_Water,
+                                      BaseboardNum,
+                                      FirstHVACIteration,
+                                      QZnReq,
+                                      HWBaseboard(BaseboardNum).WaterInletNode,
+                                      MaxWaterFlow,
+                                      MinWaterFlow,
+                                      HWBaseboard(BaseboardNum).Offset,
+                                      HWBaseboard(BaseboardNum).ControlCompTypeNum,
+                                      HWBaseboard(BaseboardNum).CompErrIndex,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      HWBaseboard(BaseboardNum).LoopNum,
+                                      HWBaseboard(BaseboardNum).LoopSideNum,
+                                      HWBaseboard(BaseboardNum).BranchNum);
                 } else {
                     ShowSevereError("SimBaseboard: Errors in Baseboard=" + HWBaseboard(BaseboardNum).EquipID);
                     ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(HWBaseboard(BaseboardNum).EquipType));
@@ -334,8 +349,17 @@ namespace HWBaseboardRadiator {
         // Get the data from the user input related to baseboard heaters
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
 
-            inputProcessor->getObjectItem(cCMO_BBRadiator_Water, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCMO_BBRadiator_Water,
+                                          BaseboardNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             HWBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
             HWBaseboardNumericFields(BaseboardNum).FieldNames = "";
@@ -364,12 +388,12 @@ namespace HWBaseboardRadiator {
             }
 
             // Get inlet node number
-            HWBaseboard(BaseboardNum).WaterInletNode = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1),
-                                                                         NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            HWBaseboard(BaseboardNum).WaterInletNode = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
-            HWBaseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1),
-                                                                          NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            HWBaseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(
+                cAlphaArgs(4), ErrorsFound, cCMO_BBRadiator_Water, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCMO_BBRadiator_Water, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Hot Water Nodes");
 
             HWBaseboard(BaseboardNum).WaterTempAvg = rNumericArgs(1);
@@ -598,34 +622,96 @@ namespace HWBaseboardRadiator {
         // Setup Report variables for the Coils
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Water'
-            SetupOutputVariable("Baseboard Total Heating Rate", OutputProcessor::Unit::W, HWBaseboard(BaseboardNum).TotPower, "System", "Average",
+            SetupOutputVariable("Baseboard Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                HWBaseboard(BaseboardNum).TotPower,
+                                "System",
+                                "Average",
                                 HWBaseboard(BaseboardNum).EquipID);
 
-            SetupOutputVariable("Baseboard Convective Heating Rate", OutputProcessor::Unit::W, HWBaseboard(BaseboardNum).ConvPower, "System",
-                                "Average", HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, HWBaseboard(BaseboardNum).RadPower, "System", "Average",
+            SetupOutputVariable("Baseboard Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                HWBaseboard(BaseboardNum).ConvPower,
+                                "System",
+                                "Average",
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Total Heating Energy", OutputProcessor::Unit::J, HWBaseboard(BaseboardNum).TotEnergy, "System", "Sum",
-                                HWBaseboard(BaseboardNum).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System");
+            SetupOutputVariable("Baseboard Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                HWBaseboard(BaseboardNum).RadPower,
+                                "System",
+                                "Average",
+                                HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                HWBaseboard(BaseboardNum).TotEnergy,
+                                "System",
+                                "Sum",
+                                HWBaseboard(BaseboardNum).EquipID,
+                                _,
+                                "ENERGYTRANSFER",
+                                "BASEBOARD",
+                                _,
+                                "System");
 
-            SetupOutputVariable("Baseboard Convective Heating Energy", OutputProcessor::Unit::J, HWBaseboard(BaseboardNum).ConvEnergy, "System",
-                                "Sum", HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, HWBaseboard(BaseboardNum).RadEnergy, "System", "Sum",
+            SetupOutputVariable("Baseboard Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                HWBaseboard(BaseboardNum).ConvEnergy,
+                                "System",
+                                "Sum",
                                 HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Hot Water Energy", OutputProcessor::Unit::J, HWBaseboard(BaseboardNum).Energy, "System", "Sum",
-                                HWBaseboard(BaseboardNum).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System");
-            SetupOutputVariable("Baseboard Hot Water Mass Flow Rate", OutputProcessor::Unit::kg_s, HWBaseboard(BaseboardNum).WaterMassFlowRate,
-                                "System", "Average", HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Air Mass Flow Rate", OutputProcessor::Unit::kg_s, HWBaseboard(BaseboardNum).AirMassFlowRate, "System",
-                                "Average", HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Air Inlet Temperature", OutputProcessor::Unit::C, HWBaseboard(BaseboardNum).AirInletTemp, "System",
-                                "Average", HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Air Outlet Temperature", OutputProcessor::Unit::C, HWBaseboard(BaseboardNum).AirOutletTemp, "System",
-                                "Average", HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Water Inlet Temperature", OutputProcessor::Unit::C, HWBaseboard(BaseboardNum).WaterInletTemp, "System",
-                                "Average", HWBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Water Outlet Temperature", OutputProcessor::Unit::C, HWBaseboard(BaseboardNum).WaterOutletTemp, "System",
-                                "Average", HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                HWBaseboard(BaseboardNum).RadEnergy,
+                                "System",
+                                "Sum",
+                                HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Hot Water Energy",
+                                OutputProcessor::Unit::J,
+                                HWBaseboard(BaseboardNum).Energy,
+                                "System",
+                                "Sum",
+                                HWBaseboard(BaseboardNum).EquipID,
+                                _,
+                                "PLANTLOOPHEATINGDEMAND",
+                                "BASEBOARD",
+                                _,
+                                "System");
+            SetupOutputVariable("Baseboard Hot Water Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                HWBaseboard(BaseboardNum).WaterMassFlowRate,
+                                "System",
+                                "Average",
+                                HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                HWBaseboard(BaseboardNum).AirMassFlowRate,
+                                "System",
+                                "Average",
+                                HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Air Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                HWBaseboard(BaseboardNum).AirInletTemp,
+                                "System",
+                                "Average",
+                                HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Air Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                HWBaseboard(BaseboardNum).AirOutletTemp,
+                                "System",
+                                "Average",
+                                HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Water Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                HWBaseboard(BaseboardNum).WaterInletTemp,
+                                "System",
+                                "Average",
+                                HWBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Water Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                HWBaseboard(BaseboardNum).WaterOutletTemp,
+                                "System",
+                                "Average",
+                                HWBaseboard(BaseboardNum).EquipID);
         }
     }
 
@@ -730,9 +816,18 @@ namespace HWBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(HWBaseboard(BaseboardNum).EquipID, HWBaseboard(BaseboardNum).EquipType, HWBaseboard(BaseboardNum).LoopNum,
-                                        HWBaseboard(BaseboardNum).LoopSideNum, HWBaseboard(BaseboardNum).BranchNum, HWBaseboard(BaseboardNum).CompNum,
-                                        _, _, _, _, _, errFlag);
+                ScanPlantLoopsForObject(HWBaseboard(BaseboardNum).EquipID,
+                                        HWBaseboard(BaseboardNum).EquipType,
+                                        HWBaseboard(BaseboardNum).LoopNum,
+                                        HWBaseboard(BaseboardNum).LoopSideNum,
+                                        HWBaseboard(BaseboardNum).BranchNum,
+                                        HWBaseboard(BaseboardNum).CompNum,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        errFlag);
                 if (errFlag) {
                     ShowFatalError("InitHWBaseboard: Program terminated for previous conditions.");
                 }
@@ -752,19 +847,28 @@ namespace HWBaseboardRadiator {
             RhoAirStdInit = StdRhoAir;
             WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
 
-            rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, CWInitConvTemp,
-                                   PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                   CWInitConvTemp,
+                                   PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                   RoutineName);
 
             HWBaseboard(BaseboardNum).WaterMassFlowRateMax = rho * HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
 
-            InitComponentNodes(0.0, HWBaseboard(BaseboardNum).WaterMassFlowRateMax, HWBaseboard(BaseboardNum).WaterInletNode,
-                               HWBaseboard(BaseboardNum).WaterOutletNode, HWBaseboard(BaseboardNum).LoopNum, HWBaseboard(BaseboardNum).LoopSideNum,
-                               HWBaseboard(BaseboardNum).BranchNum, HWBaseboard(BaseboardNum).CompNum);
+            InitComponentNodes(0.0,
+                               HWBaseboard(BaseboardNum).WaterMassFlowRateMax,
+                               HWBaseboard(BaseboardNum).WaterInletNode,
+                               HWBaseboard(BaseboardNum).WaterOutletNode,
+                               HWBaseboard(BaseboardNum).LoopNum,
+                               HWBaseboard(BaseboardNum).LoopSideNum,
+                               HWBaseboard(BaseboardNum).BranchNum,
+                               HWBaseboard(BaseboardNum).CompNum);
 
             Node(WaterInletNode).Temp = 60.0;
 
-            Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, Node(WaterInletNode).Temp,
-                                       PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                       Node(WaterInletNode).Temp,
+                                       PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                       RoutineName);
 
             Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
             Node(WaterInletNode).Quality = 0.0;
@@ -835,8 +939,8 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using DataHeatBalance::Zone;
+        using DataHVACGlobals::HeatingCapacitySizing;
         using DataLoopNode::Node;
         using General::RoundSigDigits;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -962,17 +1066,23 @@ namespace HWBaseboardRadiator {
                 }
                 if (!FlowAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0) {
-                        ReportSizingOutput(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "User-Specified Maximum Water Flow Rate [m3/s]",
+                        ReportSizingOutput(cCMO_BBRadiator_Water,
+                                           HWBaseboard(BaseboardNum).EquipID,
+                                           "User-Specified Maximum Water Flow Rate [m3/s]",
                                            HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
                     }
                 } else {
                     CheckZoneSizing(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID);
                     DesCoilLoad = RatedCapacityDes;
                     if (DesCoilLoad >= SmallLoad) {
-                        Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, HWInitConvTemp,
-                                                   PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
-                        rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, CWInitConvTemp,
-                                               PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
+                        Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                                   HWInitConvTemp,
+                                                   PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                                   RoutineName);
+                        rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                               CWInitConvTemp,
+                                               PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                               RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                     } else {
                         WaterVolFlowRateMaxDes = 0.0;
@@ -980,13 +1090,19 @@ namespace HWBaseboardRadiator {
 
                     if (FlowAutoSize) {
                         HWBaseboard(BaseboardNum).WaterVolFlowRateMax = WaterVolFlowRateMaxDes;
-                        ReportSizingOutput(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "Design Size Maximum Water Flow Rate [m3/s]",
+                        ReportSizingOutput(cCMO_BBRadiator_Water,
+                                           HWBaseboard(BaseboardNum).EquipID,
+                                           "Design Size Maximum Water Flow Rate [m3/s]",
                                            WaterVolFlowRateMaxDes);
                     } else { // Hard-sized with sizing data
                         if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0 && WaterVolFlowRateMaxDes > 0.0) {
                             WaterVolFlowRateMaxUser = HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
-                            ReportSizingOutput(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "Design Size Maximum Water Flow Rate [m3/s]",
-                                               WaterVolFlowRateMaxDes, "User-Specified Maximum Water Flow Rate [m3/s]", WaterVolFlowRateMaxUser);
+                            ReportSizingOutput(cCMO_BBRadiator_Water,
+                                               HWBaseboard(BaseboardNum).EquipID,
+                                               "Design Size Maximum Water Flow Rate [m3/s]",
+                                               WaterVolFlowRateMaxDes,
+                                               "User-Specified Maximum Water Flow Rate [m3/s]",
+                                               WaterVolFlowRateMaxUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowRateMaxDes - WaterVolFlowRateMaxUser) / WaterVolFlowRateMaxUser) >
                                     AutoVsHardSizingThreshold) {
@@ -1010,8 +1126,10 @@ namespace HWBaseboardRadiator {
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterMassFlowRateStd;
                 } else if (HWBaseboard(BaseboardNum).RatedCapacity == AutoSize || HWBaseboard(BaseboardNum).RatedCapacity == 0.0) {
                     DesCoilLoad = RatedCapacityDes;
-                    rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, CWInitConvTemp,
-                                           PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineNameFull);
+                    rho = GetDensityGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                           CWInitConvTemp,
+                                           PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                           RoutineNameFull);
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterVolFlowRateMax * rho;
                 }
                 if (DesCoilLoad >= SmallLoad) {
@@ -1019,8 +1137,10 @@ namespace HWBaseboardRadiator {
                     // Air mass flow rate is obtained from the following linear equation
                     // m_dot = 0.0062 + 2.75e-05*q
                     AirMassFlowRate = Constant + Coeff * DesCoilLoad;
-                    Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, HWBaseboard(BaseboardNum).WaterTempAvg,
-                                               PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
+                    Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                               HWBaseboard(BaseboardNum).WaterTempAvg,
+                                               PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                               RoutineName);
                     WaterInletTempStd = (DesCoilLoad / (2.0 * WaterMassFlowRateStd * Cp)) + HWBaseboard(BaseboardNum).WaterTempAvg;
                     WaterOutletTempStd = std::abs((2.0 * HWBaseboard(BaseboardNum).WaterTempAvg) - WaterInletTempStd);
                     AirOutletTempStd = (DesCoilLoad / (AirMassFlowRate * CPAirStd)) + AirInletTempStd;
@@ -1052,8 +1172,8 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).UA = 0.0;
                 }
                 // Report an UA value
-                ReportSizingOutput(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]",
-                                   HWBaseboard(BaseboardNum).UA);
+                ReportSizingOutput(
+                    cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
             }
         } else {
             // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
@@ -1071,8 +1191,10 @@ namespace HWBaseboardRadiator {
                 WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterMassFlowRateStd;
                 // m_dot = 0.0062 + 2.75e-05*q
                 AirMassFlowRate = Constant + Coeff * DesCoilLoad;
-                Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, HWBaseboard(BaseboardNum).WaterTempAvg,
-                                           PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                           HWBaseboard(BaseboardNum).WaterTempAvg,
+                                           PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                           RoutineName);
                 WaterInletTempStd = (DesCoilLoad / (2.0 * WaterMassFlowRateStd * Cp)) + HWBaseboard(BaseboardNum).WaterTempAvg;
                 WaterOutletTempStd = std::abs((2.0 * HWBaseboard(BaseboardNum).WaterTempAvg) - WaterInletTempStd);
                 AirOutletTempStd = (DesCoilLoad / (AirMassFlowRate * CPAirStd)) + AirInletTempStd;
@@ -1195,8 +1317,10 @@ namespace HWBaseboardRadiator {
             // Calculate air mass flow rate
             AirMassFlowRate = HWBaseboard(BaseboardNum).AirMassFlowRateStd * (WaterMassFlowRate / HWBaseboard(BaseboardNum).WaterMassFlowRateMax);
             CapacitanceAir = PsyCpAirFnWTdb(HWBaseboard(BaseboardNum).AirInletHumRat, AirInletTemp) * AirMassFlowRate;
-            Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName, WaterInletTemp,
-                                       PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidName,
+                                       WaterInletTemp,
+                                       PlantLoop(HWBaseboard(BaseboardNum).LoopNum).FluidIndex,
+                                       RoutineName);
 
             CapacitanceWater = Cp * WaterMassFlowRate;
             CapacitanceMax = max(CapacitanceAir, CapacitanceWater);
@@ -1265,8 +1389,12 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             QBBRadSource(BaseboardNum) = 0.0;
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(WaterMassFlowRate, HWBaseboard(BaseboardNum).WaterInletNode, HWBaseboard(BaseboardNum).LoopNum,
-                                      HWBaseboard(BaseboardNum).LoopSideNum, HWBaseboard(BaseboardNum).BranchNum, false);
+            SetActuatedBranchFlowRate(WaterMassFlowRate,
+                                      HWBaseboard(BaseboardNum).WaterInletNode,
+                                      HWBaseboard(BaseboardNum).LoopNum,
+                                      HWBaseboard(BaseboardNum).LoopSideNum,
+                                      HWBaseboard(BaseboardNum).BranchNum,
+                                      false);
         }
 
         HWBaseboard(BaseboardNum).WaterOutletTemp = WaterOutletTemp;
@@ -1439,10 +1567,10 @@ namespace HWBaseboardRadiator {
         // na
 
         // Using/Aliasing
+        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHWBaseboardSurf;
         using DataHeatBalFanSys::QHWBaseboardToPerson;
-        using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
@@ -1639,11 +1767,11 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using DataGlobals::KickOffSimulation;
+        using DataPlant::ccSimPlantEquipTypes;
         using DataPlant::CriteriaType_HeatTransferRate;
         using DataPlant::CriteriaType_MassFlowRate;
         using DataPlant::CriteriaType_Temperature;
         using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
-        using DataPlant::ccSimPlantEquipTypes;
         using General::TrimSigDigits;
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1680,18 +1808,34 @@ namespace HWBaseboardRadiator {
             return;
         }
 
-        PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum, HWBaseboard(BaseboardNum).LoopSideNum, HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum, HWBaseboard(BaseboardNum).BBLoadReSimIndex, HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSideNum, CriteriaType_HeatTransferRate, HWBaseboard(BaseboardNum).Power);
+        PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
+                                    HWBaseboard(BaseboardNum).BranchNum,
+                                    HWBaseboard(BaseboardNum).CompNum,
+                                    HWBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    HWBaseboard(BaseboardNum).LoopNum,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
+                                    CriteriaType_HeatTransferRate,
+                                    HWBaseboard(BaseboardNum).Power);
 
-        PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum, HWBaseboard(BaseboardNum).LoopSideNum, HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum, HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum, HWBaseboard(BaseboardNum).LoopSideNum, CriteriaType_MassFlowRate,
+        PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
+                                    HWBaseboard(BaseboardNum).BranchNum,
+                                    HWBaseboard(BaseboardNum).CompNum,
+                                    HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
+                                    HWBaseboard(BaseboardNum).LoopNum,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
+                                    CriteriaType_MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
-        PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum, HWBaseboard(BaseboardNum).LoopSideNum, HWBaseboard(BaseboardNum).BranchNum,
-                                    HWBaseboard(BaseboardNum).CompNum, HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).LoopNum, HWBaseboard(BaseboardNum).LoopSideNum, CriteriaType_Temperature,
+        PullCompInterconnectTrigger(HWBaseboard(BaseboardNum).LoopNum,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
+                                    HWBaseboard(BaseboardNum).BranchNum,
+                                    HWBaseboard(BaseboardNum).CompNum,
+                                    HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
+                                    HWBaseboard(BaseboardNum).LoopNum,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
+                                    CriteriaType_Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
 

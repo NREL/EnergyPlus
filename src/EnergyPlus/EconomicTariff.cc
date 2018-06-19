@@ -412,8 +412,17 @@ namespace EconomicTariff {
         numTariff = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         tariff.allocate(numTariff);
         for (iInObj = 1; iInObj <= numTariff; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 //  args are always turned to upper case but this is okay...
@@ -863,8 +872,17 @@ namespace EconomicTariff {
         numQualify = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         qualify.allocate(numQualify);
         for (iInObj = 1; iInObj <= numQualify; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
@@ -937,8 +955,17 @@ namespace EconomicTariff {
         numChargeSimple = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         chargeSimple.allocate(numChargeSimple);
         for (iInObj = 1; iInObj <= numChargeSimple; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
@@ -1004,8 +1031,17 @@ namespace EconomicTariff {
         numChargeBlock = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         chargeBlock.allocate(numChargeBlock);
         for (iInObj = 1; iInObj <= numChargeBlock; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
@@ -1060,13 +1096,13 @@ namespace EconomicTariff {
                     // array of block size
                     chargeBlock(iInObj).blkSzVal(jBlk) = UtilityRoutines::ProcessNumber(cAlphaArgs(alphaOffset + 1), isNotNumeric);
 
-                    chargeBlock(iInObj).blkSzPt(jBlk) = AssignVariablePt(cAlphaArgs(alphaOffset + 1), isNotNumeric, varIsArgument, varNotYetDefined,
-                                                                         kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
+                    chargeBlock(iInObj).blkSzPt(jBlk) = AssignVariablePt(
+                        cAlphaArgs(alphaOffset + 1), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
                 }
                 // array of block cost
                 chargeBlock(iInObj).blkCostVal(jBlk) = UtilityRoutines::ProcessNumber(cAlphaArgs(alphaOffset + 2), isNotNumeric);
-                chargeBlock(iInObj).blkCostPt(jBlk) = AssignVariablePt(cAlphaArgs(alphaOffset + 2), isNotNumeric, varIsArgument, varNotYetDefined,
-                                                                       kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
+                chargeBlock(iInObj).blkCostPt(jBlk) = AssignVariablePt(
+                    cAlphaArgs(alphaOffset + 2), isNotNumeric, varIsArgument, varNotYetDefined, kindUnknown, 0, chargeBlock(iInObj).tariffIndx);
             }
         }
     }
@@ -1095,8 +1131,17 @@ namespace EconomicTariff {
         numRatchet = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         ratchet.allocate(numRatchet);
         for (iInObj = 1; iInObj <= numRatchet; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
@@ -1156,8 +1201,17 @@ namespace EconomicTariff {
         CurrentModuleObject = "UtilityCost:Variable";
         numEconVarObj = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
@@ -1230,8 +1284,17 @@ namespace EconomicTariff {
             e.isUserDef = false;
         }
         for (iInObj = 1; iInObj <= numComputation; ++iInObj) {
-            inputProcessor->getObjectItem(CurrentModuleObject, iInObj, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          iInObj,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // check to make sure none of the values are another economic object
             for (jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(cAlphaArgs(jFld), "UtilityCost:")) {
@@ -1297,8 +1360,17 @@ namespace EconomicTariff {
         if (NumCurrencyType == 0) {
             selectedMonetaryUnit = 1; // USD - U.S. Dollar
         } else if (NumCurrencyType == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             // Monetary Unit
             for (i = 1; i <= numMonetaryUnit; ++i) {
                 if (UtilityRoutines::SameString(cAlphaArgs(1), monetaryUnit(i).code)) {
@@ -4111,20 +4183,20 @@ namespace EconomicTariff {
         //    MODIFIED       January 2010, Kyle Benne
         //                   Added SQLite output
 
+        using OutputReportTabular::buildingConditionedFloorArea;
+        using OutputReportTabular::buildingGrossFloorArea;
         using OutputReportTabular::ConvertIP;
         using OutputReportTabular::DetermineBuildingFloorArea;
+        using OutputReportTabular::displayEconomicResultSummary;
+        using OutputReportTabular::displayTariffReport;
         using OutputReportTabular::LookupSItoIP;
         using OutputReportTabular::RealToStr;
+        using OutputReportTabular::unitsStyle;
+        using OutputReportTabular::unitsStyleInchPound;
         using OutputReportTabular::WriteReportHeaders;
         using OutputReportTabular::WriteSubtitle;
         using OutputReportTabular::WriteTable;
         using OutputReportTabular::WriteTextLine;
-        using OutputReportTabular::buildingConditionedFloorArea;
-        using OutputReportTabular::buildingGrossFloorArea;
-        using OutputReportTabular::displayEconomicResultSummary;
-        using OutputReportTabular::displayTariffReport;
-        using OutputReportTabular::unitsStyle;
-        using OutputReportTabular::unitsStyleInchPound;
 
         // all arrays are in the format: (row, column)
         Array1D_string columnHead;
@@ -4227,8 +4299,8 @@ namespace EconomicTariff {
                 WriteSubtitle("Annual Cost");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility",
-                                                           "Annual Cost");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -4280,8 +4352,8 @@ namespace EconomicTariff {
                 WriteSubtitle("Tariff Summary");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility",
-                                                           "Tariff Summary");
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -4357,8 +4429,8 @@ namespace EconomicTariff {
                     WriteSubtitle("General");
                     WriteTable(tableBody, rowHead, columnHead, columnWidth);
                     if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName,
-                                                               "General");
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
                     }
                     columnHead.deallocate();
                     rowHead.deallocate();
