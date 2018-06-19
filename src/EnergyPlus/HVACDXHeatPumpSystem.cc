@@ -167,8 +167,8 @@ namespace HVACDXHeatPumpSystem {
         // This subroutine manages DXHeatPumpSystem component simulation.
 
         // Using/Aliasing
-        using DXCoils::SimDXCoil;
         using DataAirLoop::AirLoopControlInfo;
+        using DXCoils::SimDXCoil;
         using General::TrimSigDigits;
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
@@ -233,13 +233,26 @@ namespace HVACDXHeatPumpSystem {
 
             if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
 
-                SimDXCoil(CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                SimDXCoil(CompName,
+                          On,
+                          FirstHVACIteration,
+                          DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                          DXHeatPumpSystem(DXSystemNum).FanOpMode,
                           DXHeatPumpSystem(DXSystemNum).PartLoadFrac);
 
             } else if (SELECT_CASE_var == Coil_HeatingAirToAirVariableSpeed) { // Coil:Heating:DX:VariableSpeed
-                SimVariableSpeedCoils(CompName, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, DXHeatPumpSystem(DXSystemNum).FanOpMode,
-                                      MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
-                                      DXHeatPumpSystem(DXSystemNum).SpeedNum, DXHeatPumpSystem(DXSystemNum).SpeedRatio, QZnReq, QLatReq,
+                SimVariableSpeedCoils(CompName,
+                                      DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                      DXHeatPumpSystem(DXSystemNum).FanOpMode,
+                                      MaxONOFFCyclesperHour,
+                                      HPTimeConstant,
+                                      FanDelayTime,
+                                      On,
+                                      DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
+                                      DXHeatPumpSystem(DXSystemNum).SpeedNum,
+                                      DXHeatPumpSystem(DXSystemNum).SpeedRatio,
+                                      QZnReq,
+                                      QLatReq,
                                       OnOffAirFlowRatio);
 
             } else {
@@ -336,8 +349,17 @@ namespace HVACDXHeatPumpSystem {
         // Get the data for the DX Cooling System
         for (DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum) {
 
-            inputProcessor->getObjectItem(CurrentModuleObject, DXHeatSysNum, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks,
-                                          lAlphaBlanks, cAlphaFields, cNumericFields);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          DXHeatSysNum,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
             DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpSystemType = CurrentModuleObject; // push Object Name into data array
             DXHeatPumpSystem(DXHeatSysNum).Name = Alphas(1);
@@ -387,18 +409,23 @@ namespace HVACDXHeatPumpSystem {
             // Coil air-side outlet node is the control node
             DXHeatPumpSystem(DXHeatSysNum).DXSystemControlNodeNum = DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum;
 
-            TestCompSet(CurrentModuleObject, DXHeatPumpSystem(DXHeatSysNum).Name, NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum),
-                        NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum), "Air Nodes");
+            TestCompSet(CurrentModuleObject,
+                        DXHeatPumpSystem(DXHeatSysNum).Name,
+                        NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum),
+                        NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum),
+                        "Air Nodes");
 
-            ValidateComponent(DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, IsNotOK,
-                              CurrentModuleObject);
+            ValidateComponent(
+                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, IsNotOK, CurrentModuleObject);
             if (IsNotOK) {
                 ShowContinueError("In " + CurrentModuleObject + " = \"" + DXHeatPumpSystem(DXHeatSysNum).Name + "\".");
                 ErrorsFound = true;
             }
 
-            SetUpCompSets(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpSystemType, DXHeatPumpSystem(DXHeatSysNum).Name,
-                          DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName,
+            SetUpCompSets(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpSystemType,
+                          DXHeatPumpSystem(DXHeatSysNum).Name,
+                          DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType,
+                          DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName,
                           NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum),
                           NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum));
 
@@ -417,8 +444,12 @@ namespace HVACDXHeatPumpSystem {
 
         for (DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum) {
             // Setup Report variables for the DXHeatingSystem that is not reported in the components themselves
-            SetupOutputVariable("Coil System Part Load Ratio", OutputProcessor::Unit::None, DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac, "System",
-                                "Average", DXHeatPumpSystem(DXHeatSysNum).Name);
+            SetupOutputVariable("Coil System Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac,
+                                "System",
+                                "Average",
+                                DXHeatPumpSystem(DXHeatSysNum).Name);
         }
 
         Alphas.deallocate();
@@ -562,12 +593,12 @@ namespace HVACDXHeatPumpSystem {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DXCoils::DXCoilOutletTemp;
-        using DXCoils::SimDXCoil;
         using DataGlobals::DoingSizing;
         using DataGlobals::KickOffSimulation;
         using DataGlobals::WarmupFlag;
         using DataHVACGlobals::TempControlTol;
+        using DXCoils::DXCoilOutletTemp;
+        using DXCoils::SimDXCoil;
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
@@ -716,7 +747,9 @@ namespace HVACDXHeatPumpSystem {
                                                 DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                     "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible "
                                                     "PLR statistics follow.",
-                                                DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac);
+                                                DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                PartLoadFrac,
+                                                PartLoadFrac);
                                         }
                                     }
                                 } else if (SolFla == -2) {
@@ -736,7 +769,9 @@ namespace HVACDXHeatPumpSystem {
                                                 DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                     "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                     "statistics follow.",
-                                                DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac);
+                                                DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                PartLoadFrac,
+                                                PartLoadFrac);
                                         }
                                     }
                                 }
@@ -762,8 +797,18 @@ namespace HVACDXHeatPumpSystem {
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
 
-                        SimVariableSpeedCoils(CompName, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, MaxONOFFCyclesperHour,
-                                              HPTimeConstant, FanDelayTime, On, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq,
+                        SimVariableSpeedCoils(CompName,
+                                              DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                              FanOpMode,
+                                              MaxONOFFCyclesperHour,
+                                              HPTimeConstant,
+                                              FanDelayTime,
+                                              On,
+                                              PartLoadFrac,
+                                              SpeedNum,
+                                              SpeedRatio,
+                                              QZnReq,
+                                              QLatReq,
                                               OnOffAirFlowRatio);
 
                         VSCoilIndex = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex;
@@ -778,8 +823,19 @@ namespace HVACDXHeatPumpSystem {
                         SpeedNum = NumOfSpeeds;
                         SpeedRatio = 1.0;
                         QZnReq = 0.001; // to indicate the coil is running
-                        SimVariableSpeedCoils(CompName, VSCoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadFrac,
-                                              SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio);
+                        SimVariableSpeedCoils(CompName,
+                                              VSCoilIndex,
+                                              FanOpMode,
+                                              MaxONOFFCyclesperHour,
+                                              HPTimeConstant,
+                                              FanDelayTime,
+                                              On,
+                                              PartLoadFrac,
+                                              SpeedNum,
+                                              SpeedRatio,
+                                              QZnReq,
+                                              QLatReq,
+                                              OnOffAirFlowRatio);
 
                         FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
                                                                      PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
@@ -812,8 +868,19 @@ namespace HVACDXHeatPumpSystem {
                                 SpeedNum = 1;
                                 SpeedRatio = 1.0;
                                 QZnReq = 0.001; // to indicate the coil is running
-                                SimVariableSpeedCoils(CompName, VSCoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On,
-                                                      PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio);
+                                SimVariableSpeedCoils(CompName,
+                                                      VSCoilIndex,
+                                                      FanOpMode,
+                                                      MaxONOFFCyclesperHour,
+                                                      HPTimeConstant,
+                                                      FanDelayTime,
+                                                      On,
+                                                      PartLoadFrac,
+                                                      SpeedNum,
+                                                      SpeedRatio,
+                                                      QZnReq,
+                                                      QLatReq,
+                                                      OnOffAirFlowRatio);
 
                                 TempSpeedOut = VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
 
@@ -823,8 +890,19 @@ namespace HVACDXHeatPumpSystem {
                                     SpeedRatio = 1.0;
                                     for (I = 2; I <= NumOfSpeeds; ++I) {
                                         SpeedNum = I;
-                                        SimVariableSpeedCoils(CompName, VSCoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime,
-                                                              On, PartLoadFrac, SpeedNum, SpeedRatio, QZnReq, QLatReq, OnOffAirFlowRatio);
+                                        SimVariableSpeedCoils(CompName,
+                                                              VSCoilIndex,
+                                                              FanOpMode,
+                                                              MaxONOFFCyclesperHour,
+                                                              HPTimeConstant,
+                                                              FanDelayTime,
+                                                              On,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
 
                                         TempSpeedOut = VarSpeedCoil(VSCoilIndex).OutletAirDBTemp;
 
@@ -856,7 +934,9 @@ namespace HVACDXHeatPumpSystem {
                                                     DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                         "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                         "Sensible PLR statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac);
+                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
                                             }
                                         }
                                     } else if (SolFla == -2) {
@@ -876,7 +956,9 @@ namespace HVACDXHeatPumpSystem {
                                                     DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                         "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                         "statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac);
+                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
                                             }
                                         }
                                     }
@@ -902,7 +984,9 @@ namespace HVACDXHeatPumpSystem {
                                                     DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                         "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                         "Sensible PLR statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex, PartLoadFrac, PartLoadFrac);
+                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
                                             }
                                         }
                                     } else if (SolFla == -2) {
@@ -922,7 +1006,9 @@ namespace HVACDXHeatPumpSystem {
                                                     DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
                                                         "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                         "statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex, PartLoadFrac, PartLoadFrac);
+                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
                                             }
                                         }
                                     }
@@ -1067,8 +1153,19 @@ namespace HVACDXHeatPumpSystem {
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
 
-        SimVariableSpeedCoils("", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio,
-                              QZnReq, QLatReq, OnOffAirFlowRatio);
+        SimVariableSpeedCoils("",
+                              CoilIndex,
+                              FanOpMode,
+                              MaxONOFFCyclesperHour,
+                              HPTimeConstant,
+                              FanDelayTime,
+                              On,
+                              PartLoadRatio,
+                              SpeedNum,
+                              SpeedRatio,
+                              QZnReq,
+                              QLatReq,
+                              OnOffAirFlowRatio);
 
         OutletAirTemp = VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;
@@ -1136,8 +1233,19 @@ namespace HVACDXHeatPumpSystem {
         FanOpMode = int(Par(5));
         SpeedNum = int(Par(3));
 
-        SimVariableSpeedCoils("", CoilIndex, FanOpMode, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, On, PartLoadRatio, SpeedNum, SpeedRatio,
-                              QZnReq, QLatReq, OnOffAirFlowRatio);
+        SimVariableSpeedCoils("",
+                              CoilIndex,
+                              FanOpMode,
+                              MaxONOFFCyclesperHour,
+                              HPTimeConstant,
+                              FanDelayTime,
+                              On,
+                              PartLoadRatio,
+                              SpeedNum,
+                              SpeedRatio,
+                              QZnReq,
+                              QLatReq,
+                              OnOffAirFlowRatio);
 
         OutletAirTemp = VarSpeedCoil(CoilIndex).OutletAirDBTemp;
         Residuum = Par(2) - OutletAirTemp;

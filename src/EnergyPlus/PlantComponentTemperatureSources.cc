@@ -238,16 +238,25 @@ namespace PlantComponentTemperatureSources {
 
         // fill arrays
         for (SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, SourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks,
-                                          cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          SourceNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          _,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             WaterSource(SourceNum).Name = cAlphaArgs(1);
 
-            WaterSource(SourceNum).InletNodeNum = GetOnlySingleNode(cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                    NodeConnectionType_Inlet, 1, ObjectIsNotParent);
-            WaterSource(SourceNum).OutletNodeNum = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water,
-                                                                     NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            WaterSource(SourceNum).InletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            WaterSource(SourceNum).OutletNodeNum = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
 
             WaterSource(SourceNum).DesVolFlowRate = rNumericArgs(1);
@@ -280,21 +289,49 @@ namespace PlantComponentTemperatureSources {
         }
 
         for (SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
-            SetupOutputVariable("Plant Temperature Source Component Mass Flow Rate", OutputProcessor::Unit::kg_s, WaterSource(SourceNum).MassFlowRate,
-                                "System", "Average", WaterSource(SourceNum).Name);
-            SetupOutputVariable("Plant Temperature Source Component Inlet Temperature", OutputProcessor::Unit::C, WaterSource(SourceNum).InletTemp,
-                                "System", "Average", WaterSource(SourceNum).Name);
-            SetupOutputVariable("Plant Temperature Source Component Outlet Temperature", OutputProcessor::Unit::C, WaterSource(SourceNum).OutletTemp,
-                                "System", "Average", WaterSource(SourceNum).Name);
-            SetupOutputVariable("Plant Temperature Source Component Source Temperature", OutputProcessor::Unit::C,
-                                WaterSource(SourceNum).BoundaryTemp, "System", "Average", WaterSource(SourceNum).Name);
-            SetupOutputVariable("Plant Temperature Source Component Heat Transfer Rate", OutputProcessor::Unit::W, WaterSource(SourceNum).HeatRate,
-                                "System", "Average", WaterSource(SourceNum).Name);
-            SetupOutputVariable("Plant Temperature Source Component Heat Transfer Energy", OutputProcessor::Unit::J,
-                                WaterSource(SourceNum).HeatEnergy, "System", "Sum", WaterSource(SourceNum).Name);
+            SetupOutputVariable("Plant Temperature Source Component Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                WaterSource(SourceNum).MassFlowRate,
+                                "System",
+                                "Average",
+                                WaterSource(SourceNum).Name);
+            SetupOutputVariable("Plant Temperature Source Component Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                WaterSource(SourceNum).InletTemp,
+                                "System",
+                                "Average",
+                                WaterSource(SourceNum).Name);
+            SetupOutputVariable("Plant Temperature Source Component Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                WaterSource(SourceNum).OutletTemp,
+                                "System",
+                                "Average",
+                                WaterSource(SourceNum).Name);
+            SetupOutputVariable("Plant Temperature Source Component Source Temperature",
+                                OutputProcessor::Unit::C,
+                                WaterSource(SourceNum).BoundaryTemp,
+                                "System",
+                                "Average",
+                                WaterSource(SourceNum).Name);
+            SetupOutputVariable("Plant Temperature Source Component Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                WaterSource(SourceNum).HeatRate,
+                                "System",
+                                "Average",
+                                WaterSource(SourceNum).Name);
+            SetupOutputVariable("Plant Temperature Source Component Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                WaterSource(SourceNum).HeatEnergy,
+                                "System",
+                                "Sum",
+                                WaterSource(SourceNum).Name);
             if (AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("PlantComponent:TemperatureSource", WaterSource(SourceNum).Name, "Maximum Mass Flow Rate", "[kg/s]",
-                                 WaterSource(SourceNum).EMSOverrideOnMassFlowRateMax, WaterSource(SourceNum).EMSOverrideValueMassFlowRateMax);
+                SetupEMSActuator("PlantComponent:TemperatureSource",
+                                 WaterSource(SourceNum).Name,
+                                 "Maximum Mass Flow Rate",
+                                 "[kg/s]",
+                                 WaterSource(SourceNum).EMSOverrideOnMassFlowRateMax,
+                                 WaterSource(SourceNum).EMSOverrideValueMassFlowRateMax);
             }
         }
     }
@@ -338,9 +375,18 @@ namespace PlantComponentTemperatureSources {
         if (WaterSource(SourceNum).MyFlag) {
             // Locate the component on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(WaterSource(SourceNum).Name, TypeOf_WaterSource, WaterSource(SourceNum).Location.loopNum,
-                                    WaterSource(SourceNum).Location.loopSideNum, WaterSource(SourceNum).Location.branchNum,
-                                    WaterSource(SourceNum).Location.compNum, _, _, _, WaterSource(SourceNum).InletNodeNum, _, errFlag);
+            ScanPlantLoopsForObject(WaterSource(SourceNum).Name,
+                                    TypeOf_WaterSource,
+                                    WaterSource(SourceNum).Location.loopNum,
+                                    WaterSource(SourceNum).Location.loopSideNum,
+                                    WaterSource(SourceNum).Location.branchNum,
+                                    WaterSource(SourceNum).Location.compNum,
+                                    _,
+                                    _,
+                                    _,
+                                    WaterSource(SourceNum).InletNodeNum,
+                                    _,
+                                    errFlag);
             if (errFlag) {
                 ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
             }
@@ -350,12 +396,19 @@ namespace PlantComponentTemperatureSources {
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (WaterSource(SourceNum).MyEnvironFlag && BeginEnvrnFlag && (PlantFirstSizesOkayToFinalize)) {
 
-            rho = GetDensityGlycol(PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName, DataGlobals::InitConvTemp,
-                                   PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName,
+                                   DataGlobals::InitConvTemp,
+                                   PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex,
+                                   RoutineName);
             WaterSource(SourceNum).MassFlowRateMax = WaterSource(SourceNum).DesVolFlowRate * rho;
-            InitComponentNodes(0.0, WaterSource(SourceNum).MassFlowRateMax, WaterSource(SourceNum).InletNodeNum, WaterSource(SourceNum).OutletNodeNum,
-                               WaterSource(SourceNum).Location.loopNum, WaterSource(SourceNum).Location.loopSideNum,
-                               WaterSource(SourceNum).Location.branchNum, WaterSource(SourceNum).Location.compNum);
+            InitComponentNodes(0.0,
+                               WaterSource(SourceNum).MassFlowRateMax,
+                               WaterSource(SourceNum).InletNodeNum,
+                               WaterSource(SourceNum).OutletNodeNum,
+                               WaterSource(SourceNum).Location.loopNum,
+                               WaterSource(SourceNum).Location.loopSideNum,
+                               WaterSource(SourceNum).Location.branchNum,
+                               WaterSource(SourceNum).Location.compNum);
 
             WaterSource(SourceNum).MyEnvironFlag = false;
         }
@@ -371,8 +424,10 @@ namespace PlantComponentTemperatureSources {
         }
 
         // Calculate specific heat
-        cp = GetSpecificHeatGlycol(PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName, WaterSource(SourceNum).BoundaryTemp,
-                                   PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex, RoutineName);
+        cp = GetSpecificHeatGlycol(PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName,
+                                   WaterSource(SourceNum).BoundaryTemp,
+                                   PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex,
+                                   RoutineName);
 
         // Calculate deltaT
         Real64 delta_temp = WaterSource(SourceNum).BoundaryTemp - WaterSource(SourceNum).InletTemp;
@@ -412,9 +467,13 @@ namespace PlantComponentTemperatureSources {
             }
         }
 
-        SetComponentFlowRate(WaterSource(SourceNum).MassFlowRate, WaterSource(SourceNum).InletNodeNum, WaterSource(SourceNum).OutletNodeNum,
-                             WaterSource(SourceNum).Location.loopNum, WaterSource(SourceNum).Location.loopSideNum,
-                             WaterSource(SourceNum).Location.branchNum, WaterSource(SourceNum).Location.compNum);
+        SetComponentFlowRate(WaterSource(SourceNum).MassFlowRate,
+                             WaterSource(SourceNum).InletNodeNum,
+                             WaterSource(SourceNum).OutletNodeNum,
+                             WaterSource(SourceNum).Location.loopNum,
+                             WaterSource(SourceNum).Location.loopSideNum,
+                             WaterSource(SourceNum).Location.branchNum,
+                             WaterSource(SourceNum).Location.compNum);
 
         // at this point the mass flow rate, inlet temp, and boundary temp structure vars have been updated
         // the calc routine will update the outlet temp and heat transfer rate/energies
@@ -468,20 +527,27 @@ namespace PlantComponentTemperatureSources {
                 if (WaterSource(SourceNum).DesVolFlowRateWasAutoSized) {
                     WaterSource(SourceNum).DesVolFlowRate = tmpVolFlowRate;
                     if (PlantFinalSizesOkayToReport) {
-                        ReportSizingOutput("PlantComponent:TemperatureSource", WaterSource(SourceNum).Name,
-                                           "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
+                        ReportSizingOutput("PlantComponent:TemperatureSource",
+                                           WaterSource(SourceNum).Name,
+                                           "Design Size Design Fluid Flow Rate [m3/s]",
+                                           tmpVolFlowRate);
                     }
                     if (PlantFirstSizesOkayToReport) {
-                        ReportSizingOutput("PlantComponent:TemperatureSource", WaterSource(SourceNum).Name,
-                                           "Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
+                        ReportSizingOutput("PlantComponent:TemperatureSource",
+                                           WaterSource(SourceNum).Name,
+                                           "Initial Design Size Design Fluid Flow Rate [m3/s]",
+                                           tmpVolFlowRate);
                     }
                 } else {
                     if (WaterSource(SourceNum).DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0) {
                         DesVolFlowRateUser = WaterSource(SourceNum).DesVolFlowRate;
                         if (PlantFinalSizesOkayToReport) {
-                            ReportSizingOutput("PlantComponent:TemperatureSource", WaterSource(SourceNum).Name,
-                                               "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate,
-                                               "User-Specified Design Fluid Flow Rate [m3/s]", DesVolFlowRateUser);
+                            ReportSizingOutput("PlantComponent:TemperatureSource",
+                                               WaterSource(SourceNum).Name,
+                                               "Design Size Design Fluid Flow Rate [m3/s]",
+                                               tmpVolFlowRate,
+                                               "User-Specified Design Fluid Flow Rate [m3/s]",
+                                               DesVolFlowRateUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " +
@@ -507,8 +573,10 @@ namespace PlantComponentTemperatureSources {
             }
             if (!WaterSource(SourceNum).DesVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport) {
                 if (WaterSource(SourceNum).DesVolFlowRate > 0.0) {
-                    ReportSizingOutput("PlantComponent:TemperatureSource", WaterSource(SourceNum).Name,
-                                       "User-Specified Design Fluid Flow Rate [m3/s]", WaterSource(SourceNum).DesVolFlowRate);
+                    ReportSizingOutput("PlantComponent:TemperatureSource",
+                                       WaterSource(SourceNum).Name,
+                                       "User-Specified Design Fluid Flow Rate [m3/s]",
+                                       WaterSource(SourceNum).DesVolFlowRate);
                 }
             }
         }
@@ -540,8 +608,10 @@ namespace PlantComponentTemperatureSources {
 
         if (WaterSource(SourceNum).MassFlowRate > 0.0) {
             WaterSource(SourceNum).OutletTemp = WaterSource(SourceNum).BoundaryTemp;
-            Real64 Cp = GetSpecificHeatGlycol(PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName, WaterSource(SourceNum).BoundaryTemp,
-                                              PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex, RoutineName);
+            Real64 Cp = GetSpecificHeatGlycol(PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName,
+                                              WaterSource(SourceNum).BoundaryTemp,
+                                              PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex,
+                                              RoutineName);
             WaterSource(SourceNum).HeatRate =
                 WaterSource(SourceNum).MassFlowRate * Cp * (WaterSource(SourceNum).OutletTemp - WaterSource(SourceNum).InletTemp);
             WaterSource(SourceNum).HeatEnergy = WaterSource(SourceNum).HeatRate * TimeStepSys * SecInHour;

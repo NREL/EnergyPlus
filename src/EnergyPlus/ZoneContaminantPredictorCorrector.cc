@@ -331,8 +331,17 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= TotGCGenConstant; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          AlphaName,
+                                          NumAlpha,
+                                          IHGNumbers,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             ZoneContamGenericConstant(Loop).Name = AlphaName(1);
 
@@ -410,18 +419,34 @@ namespace ZoneContaminantPredictorCorrector {
             if (ZoneContamGenericConstant(Loop).ActualZoneNum <= 0) continue; // Error, will be caught and terminated later
 
             // Object report variables
-            SetupOutputVariable("Generic Air Contaminant Constant Source Generation Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneContamGenericConstant(Loop).GCGenRate, "Zone", "Average", ZoneContamGenericConstant(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Constant Source Generation Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneContamGenericConstant(Loop).GCGenRate,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericConstant(Loop).Name);
 
             // Zone total report variables
             ZonePtr = ZoneContamGenericConstant(Loop).ActualZoneNum;
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt(ZonePtr).GCRate,
-                                    "Zone", "Average", Zone(ZonePtr).Name);
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZnRpt(ZonePtr).GCRate,
+                                    "Zone",
+                                    "Average",
+                                    Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericConstant(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _,
+            SetupZoneInternalGain(ZonePtr,
+                                  "ZoneContaminantSourceAndSink:GenericContaminant",
+                                  ZoneContamGenericConstant(Loop).Name,
+                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
                                   ZoneContamGenericConstant(Loop).GCGenRate);
         }
 
@@ -432,8 +457,17 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= TotGCGenPDriven; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          AlphaName,
+                                          NumAlpha,
+                                          IHGNumbers,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             ZoneContamGenericPDriven(Loop).Name = AlphaName(1);
 
@@ -507,8 +541,12 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             // Object report variables
-            SetupOutputVariable("Generic Air Contaminant Pressure Driven Generation Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneContamGenericPDriven(Loop).GCGenRate, "Zone", "Average", ZoneContamGenericPDriven(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Pressure Driven Generation Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneContamGenericPDriven(Loop).GCGenRate,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericPDriven(Loop).Name);
 
             if (ZoneContamGenericPDriven(Loop).SurfNum > 0) {
                 ZonePtr = Surface(MultizoneSurfaceData(ZoneContamGenericPDriven(Loop).SurfNum).SurfNum).Zone;
@@ -518,12 +556,24 @@ namespace ZoneContaminantPredictorCorrector {
             // Zone total report variables
             if (ZonePtr > 0 && RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt(ZonePtr).GCRate,
-                                    "Zone", "Average", Zone(ZonePtr).Name);
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZnRpt(ZonePtr).GCRate,
+                                    "Zone",
+                                    "Average",
+                                    Zone(ZonePtr).Name);
             }
             if (ZonePtr > 0)
-                SetupZoneInternalGain(ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericPDriven(Loop).Name,
-                                      IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _,
+                SetupZoneInternalGain(ZonePtr,
+                                      "ZoneContaminantSourceAndSink:GenericContaminant",
+                                      ZoneContamGenericPDriven(Loop).Name,
+                                      IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
                                       ZoneContamGenericPDriven(Loop).GCGenRate);
         }
 
@@ -534,8 +584,17 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= TotGCGenCutoff; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          AlphaName,
+                                          NumAlpha,
+                                          IHGNumbers,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             ZoneContamGenericCutoff(Loop).Name = AlphaName(1);
 
@@ -594,18 +653,35 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             // Object report variables
-            SetupOutputVariable("Generic Air Contaminant Cutoff Model Generation Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneContamGenericCutoff(Loop).GCGenRate, "Zone", "Average", ZoneContamGenericCutoff(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Cutoff Model Generation Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneContamGenericCutoff(Loop).GCGenRate,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericCutoff(Loop).Name);
 
             // Zone total report variables
             ZonePtr = ZoneContamGenericCutoff(Loop).ActualZoneNum;
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt(ZonePtr).GCRate,
-                                    "Zone", "Average", Zone(ZonePtr).Name);
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZnRpt(ZonePtr).GCRate,
+                                    "Zone",
+                                    "Average",
+                                    Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericCutoff(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericCutoff(Loop).GCGenRate);
+            SetupZoneInternalGain(ZonePtr,
+                                  "ZoneContaminantSourceAndSink:GenericContaminant",
+                                  ZoneContamGenericCutoff(Loop).Name,
+                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  ZoneContamGenericCutoff(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DecaySource";
@@ -615,8 +691,17 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= TotGCGenDecay; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          AlphaName,
+                                          NumAlpha,
+                                          IHGNumbers,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             ZoneContamGenericDecay(Loop).Name = AlphaName(1);
 
@@ -675,20 +760,41 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             // Object report variables
-            SetupOutputVariable("Generic Air Contaminant Decay Model Generation Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneContamGenericDecay(Loop).GCGenRate, "Zone", "Average", ZoneContamGenericDecay(Loop).Name);
-            SetupOutputVariable("Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time", OutputProcessor::Unit::s,
-                                ZoneContamGenericDecay(Loop).GCTime, "Zone", "Average", ZoneContamGenericDecay(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Decay Model Generation Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneContamGenericDecay(Loop).GCGenRate,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericDecay(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time",
+                                OutputProcessor::Unit::s,
+                                ZoneContamGenericDecay(Loop).GCTime,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericDecay(Loop).Name);
 
             // Zone total report variables
             ZonePtr = ZoneContamGenericDecay(Loop).ActualZoneNum;
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt(ZonePtr).GCRate,
-                                    "Zone", "Average", Zone(ZonePtr).Name);
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZnRpt(ZonePtr).GCRate,
+                                    "Zone",
+                                    "Average",
+                                    Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDecay(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDecay(Loop).GCGenRate);
+            SetupZoneInternalGain(ZonePtr,
+                                  "ZoneContaminantSourceAndSink:GenericContaminant",
+                                  ZoneContamGenericDecay(Loop).Name,
+                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  ZoneContamGenericDecay(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion";
@@ -698,8 +804,17 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= TotGCBLDiff; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          AlphaName,
+                                          NumAlpha,
+                                          IHGNumbers,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             ZoneContamGenericBLDiff(Loop).Name = AlphaName(1);
 
@@ -757,11 +872,18 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             // Object report variables
-            SetupOutputVariable("Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneContamGenericBLDiff(Loop).GCGenRate, "Zone", "Average", ZoneContamGenericBLDiff(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Boundary Layer Diffusion Generation Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneContamGenericBLDiff(Loop).GCGenRate,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericBLDiff(Loop).Name);
             if (ZoneContamGenericBLDiff(Loop).SurfNum > 0) {
-                SetupOutputVariable("Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration", OutputProcessor::Unit::ppm,
-                                    Surface(ZoneContamGenericBLDiff(Loop).SurfNum).GenericContam, "Zone", "Average",
+                SetupOutputVariable("Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration",
+                                    OutputProcessor::Unit::ppm,
+                                    Surface(ZoneContamGenericBLDiff(Loop).SurfNum).GenericContam,
+                                    "Zone",
+                                    "Average",
                                     ZoneContamGenericBLDiff(Loop).SurfName);
             }
 
@@ -769,11 +891,24 @@ namespace ZoneContaminantPredictorCorrector {
             // Zone total report variables
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt(ZonePtr).GCRate,
-                                    "Zone", "Average", Zone(ZonePtr).Name);
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZnRpt(ZonePtr).GCRate,
+                                    "Zone",
+                                    "Average",
+                                    Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericBLDiff(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericBLDiff(Loop).GCGenRate);
+            SetupZoneInternalGain(ZonePtr,
+                                  "ZoneContaminantSourceAndSink:GenericContaminant",
+                                  ZoneContamGenericBLDiff(Loop).Name,
+                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  ZoneContamGenericBLDiff(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink";
@@ -783,8 +918,17 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= TotGCDVS; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          AlphaName,
+                                          NumAlpha,
+                                          IHGNumbers,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             ZoneContamGenericDVS(Loop).Name = AlphaName(1);
 
@@ -835,18 +979,35 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             // Object report variables
-            SetupOutputVariable("Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneContamGenericDVS(Loop).GCGenRate, "Zone", "Average", ZoneContamGenericDVS(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Deposition Velocity Removal Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneContamGenericDVS(Loop).GCGenRate,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericDVS(Loop).Name);
 
             ZonePtr = Surface(ZoneContamGenericDVS(Loop).SurfNum).Zone;
             // Zone total report variables
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt(ZonePtr).GCRate,
-                                    "Zone", "Average", Zone(ZonePtr).Name);
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZnRpt(ZonePtr).GCRate,
+                                    "Zone",
+                                    "Average",
+                                    Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDVS(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDVS(Loop).GCGenRate);
+            SetupZoneInternalGain(ZonePtr,
+                                  "ZoneContaminantSourceAndSink:GenericContaminant",
+                                  ZoneContamGenericDVS(Loop).Name,
+                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  ZoneContamGenericDVS(Loop).GCGenRate);
         }
 
         CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:DepositionRateSink";
@@ -856,8 +1017,17 @@ namespace ZoneContaminantPredictorCorrector {
         for (Loop = 1; Loop <= TotGCDRS; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
-            inputProcessor->getObjectItem(CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Loop,
+                                          AlphaName,
+                                          NumAlpha,
+                                          IHGNumbers,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphaName(1), CurrentModuleObject, ErrorsFound);
             ZoneContamGenericDRS(Loop).Name = AlphaName(1);
 
@@ -909,18 +1079,35 @@ namespace ZoneContaminantPredictorCorrector {
             }
 
             // Object report variables
-            SetupOutputVariable("Generic Air Contaminant Deposition Rate Removal Volume Flow Rate", OutputProcessor::Unit::m3_s,
-                                ZoneContamGenericDRS(Loop).GCGenRate, "Zone", "Average", ZoneContamGenericDRS(Loop).Name);
+            SetupOutputVariable("Generic Air Contaminant Deposition Rate Removal Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneContamGenericDRS(Loop).GCGenRate,
+                                "Zone",
+                                "Average",
+                                ZoneContamGenericDRS(Loop).Name);
 
             ZonePtr = ZoneContamGenericDRS(Loop).ActualZoneNum;
             // Zone total report variables
             if (RepVarSet(ZonePtr)) {
                 RepVarSet(ZonePtr) = false;
-                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate", OutputProcessor::Unit::m3_s, ZnRpt(ZonePtr).GCRate,
-                                    "Zone", "Average", Zone(ZonePtr).Name);
+                SetupOutputVariable("Zone Generic Air Contaminant Generation Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    ZnRpt(ZonePtr).GCRate,
+                                    "Zone",
+                                    "Average",
+                                    Zone(ZonePtr).Name);
             }
-            SetupZoneInternalGain(ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericDRS(Loop).Name,
-                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericDRS(Loop).GCGenRate);
+            SetupZoneInternalGain(ZonePtr,
+                                  "ZoneContaminantSourceAndSink:GenericContaminant",
+                                  ZoneContamGenericDRS(Loop).Name,
+                                  IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  ZoneContamGenericDRS(Loop).GCGenRate);
         }
 
         RepVarSet.deallocate();
@@ -999,8 +1186,17 @@ namespace ZoneContaminantPredictorCorrector {
         }
 
         for (ContControlledZoneNum = 1; ContControlledZoneNum <= NumContControlledZones; ++ContControlledZoneNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject, ContControlledZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          ContControlledZoneNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             ContaminantControlledZone(ContControlledZoneNum).Name = cAlphaArgs(1);
@@ -1240,14 +1436,26 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= NumOfZones; ++Loop) {
                 // Zone CO2
                 if (Contaminant.CO2Simulation) {
-                    SetupOutputVariable("Zone Air CO2 Concentration", OutputProcessor::Unit::ppm, ZoneAirCO2(Loop), "System", "Average",
+                    SetupOutputVariable(
+                        "Zone Air CO2 Concentration", OutputProcessor::Unit::ppm, ZoneAirCO2(Loop), "System", "Average", Zone(Loop).Name);
+                    SetupOutputVariable("Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate",
+                                        OutputProcessor::Unit::kg_s,
+                                        CO2PredictedRate(Loop),
+                                        "System",
+                                        "Average",
                                         Zone(Loop).Name);
-                    SetupOutputVariable("Zone Air CO2 Predicted Load to Setpoint Mass Flow Rate", OutputProcessor::Unit::kg_s, CO2PredictedRate(Loop),
-                                        "System", "Average", Zone(Loop).Name);
-                    SetupOutputVariable("Zone Air CO2 Setpoint Concentration", OutputProcessor::Unit::ppm, ZoneCO2SetPoint(Loop), "System", "Average",
+                    SetupOutputVariable("Zone Air CO2 Setpoint Concentration",
+                                        OutputProcessor::Unit::ppm,
+                                        ZoneCO2SetPoint(Loop),
+                                        "System",
+                                        "Average",
                                         Zone(Loop).Name);
-                    SetupOutputVariable("Zone Air CO2 Internal Gain Volume Flow Rate", OutputProcessor::Unit::m3_s, ZoneCO2Gain(Loop), "System",
-                                        "Average", Zone(Loop).Name);
+                    SetupOutputVariable("Zone Air CO2 Internal Gain Volume Flow Rate",
+                                        OutputProcessor::Unit::m3_s,
+                                        ZoneCO2Gain(Loop),
+                                        "System",
+                                        "Average",
+                                        Zone(Loop).Name);
                 }
 
             } // Loop
@@ -1287,12 +1495,24 @@ namespace ZoneContaminantPredictorCorrector {
             for (Loop = 1; Loop <= NumOfZones; ++Loop) {
                 // Zone CO2
                 if (Contaminant.GenericContamSimulation) {
-                    SetupOutputVariable("Zone Air Generic Air Contaminant Concentration", OutputProcessor::Unit::ppm, ZoneAirGC(Loop), "System",
-                                        "Average", Zone(Loop).Name);
-                    SetupOutputVariable("Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate", OutputProcessor::Unit::kg_s,
-                                        GCPredictedRate(Loop), "System", "Average", Zone(Loop).Name);
-                    SetupOutputVariable("Zone Generic Air Contaminant Setpoint Concentration", OutputProcessor::Unit::ppm, ZoneGCSetPoint(Loop),
-                                        "System", "Average", Zone(Loop).Name);
+                    SetupOutputVariable("Zone Air Generic Air Contaminant Concentration",
+                                        OutputProcessor::Unit::ppm,
+                                        ZoneAirGC(Loop),
+                                        "System",
+                                        "Average",
+                                        Zone(Loop).Name);
+                    SetupOutputVariable("Zone Generic Air Contaminant Predicted Load to Setpoint Mass Flow Rate",
+                                        OutputProcessor::Unit::kg_s,
+                                        GCPredictedRate(Loop),
+                                        "System",
+                                        "Average",
+                                        Zone(Loop).Name);
+                    SetupOutputVariable("Zone Generic Air Contaminant Setpoint Concentration",
+                                        OutputProcessor::Unit::ppm,
+                                        ZoneGCSetPoint(Loop),
+                                        "System",
+                                        "Average",
+                                        Zone(Loop).Name);
                 }
             } // Loop
 
@@ -1588,15 +1808,31 @@ namespace ZoneContaminantPredictorCorrector {
                 if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
 
                     if (Contaminant.CO2Simulation)
-                        DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, CO2ZoneTimeMinus1(ZoneNum), CO2ZoneTimeMinus2(ZoneNum),
-                                                      CO2ZoneTimeMinus3(ZoneNum), CO2ZoneTimeMinus4(ZoneNum), CO2ZoneTimeMinus4(ZoneNum),
-                                                      ZoneAirCO2(ZoneNum), DSCO2ZoneTimeMinus1(ZoneNum), DSCO2ZoneTimeMinus2(ZoneNum),
-                                                      DSCO2ZoneTimeMinus3(ZoneNum), DSCO2ZoneTimeMinus4(ZoneNum));
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      CO2ZoneTimeMinus1(ZoneNum),
+                                                      CO2ZoneTimeMinus2(ZoneNum),
+                                                      CO2ZoneTimeMinus3(ZoneNum),
+                                                      CO2ZoneTimeMinus4(ZoneNum),
+                                                      CO2ZoneTimeMinus4(ZoneNum),
+                                                      ZoneAirCO2(ZoneNum),
+                                                      DSCO2ZoneTimeMinus1(ZoneNum),
+                                                      DSCO2ZoneTimeMinus2(ZoneNum),
+                                                      DSCO2ZoneTimeMinus3(ZoneNum),
+                                                      DSCO2ZoneTimeMinus4(ZoneNum));
                     if (Contaminant.GenericContamSimulation)
-                        DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, GCZoneTimeMinus1(ZoneNum), GCZoneTimeMinus2(ZoneNum),
-                                                      GCZoneTimeMinus3(ZoneNum), GCZoneTimeMinus4(ZoneNum), GCZoneTimeMinus4(ZoneNum),
-                                                      ZoneAirGC(ZoneNum), DSGCZoneTimeMinus1(ZoneNum), DSGCZoneTimeMinus2(ZoneNum),
-                                                      DSGCZoneTimeMinus3(ZoneNum), DSGCZoneTimeMinus4(ZoneNum));
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      GCZoneTimeMinus1(ZoneNum),
+                                                      GCZoneTimeMinus2(ZoneNum),
+                                                      GCZoneTimeMinus3(ZoneNum),
+                                                      GCZoneTimeMinus4(ZoneNum),
+                                                      GCZoneTimeMinus4(ZoneNum),
+                                                      ZoneAirGC(ZoneNum),
+                                                      DSGCZoneTimeMinus1(ZoneNum),
+                                                      DSGCZoneTimeMinus2(ZoneNum),
+                                                      DSGCZoneTimeMinus3(ZoneNum),
+                                                      DSGCZoneTimeMinus4(ZoneNum));
 
                 } else { // reuse history data in DS terms from last zone time step to preserve information that would be lost
                          // do nothing because DS history would have been pushed prior and should be ready
@@ -1701,7 +1937,7 @@ namespace ZoneContaminantPredictorCorrector {
                             }
                         }
                     }
-                }// CO2ControlledZoneNum
+                } // CO2ControlledZoneNum
 
                 if (ControlledCO2ZoneFlag) {
                     // The density of air
@@ -2148,16 +2384,32 @@ namespace ZoneContaminantPredictorCorrector {
                 // time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
                 if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
                     if (Contaminant.CO2Simulation) {
-                        DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, ZoneAirCO2(ZoneNum), CO2ZoneTimeMinus1(ZoneNum),
-                                                      CO2ZoneTimeMinus2(ZoneNum), CO2ZoneTimeMinus3(ZoneNum), CO2ZoneTimeMinus4(ZoneNum),
-                                                      ZoneAirCO2(ZoneNum), DSCO2ZoneTimeMinus1(ZoneNum), DSCO2ZoneTimeMinus2(ZoneNum),
-                                                      DSCO2ZoneTimeMinus3(ZoneNum), DSCO2ZoneTimeMinus4(ZoneNum));
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      ZoneAirCO2(ZoneNum),
+                                                      CO2ZoneTimeMinus1(ZoneNum),
+                                                      CO2ZoneTimeMinus2(ZoneNum),
+                                                      CO2ZoneTimeMinus3(ZoneNum),
+                                                      CO2ZoneTimeMinus4(ZoneNum),
+                                                      ZoneAirCO2(ZoneNum),
+                                                      DSCO2ZoneTimeMinus1(ZoneNum),
+                                                      DSCO2ZoneTimeMinus2(ZoneNum),
+                                                      DSCO2ZoneTimeMinus3(ZoneNum),
+                                                      DSCO2ZoneTimeMinus4(ZoneNum));
                     }
                     if (Contaminant.GenericContamSimulation) {
-                        DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, ZoneAirGC(ZoneNum), GCZoneTimeMinus1(ZoneNum),
-                                                      GCZoneTimeMinus2(ZoneNum), GCZoneTimeMinus3(ZoneNum), GCZoneTimeMinus4(ZoneNum),
-                                                      ZoneAirGC(ZoneNum), DSGCZoneTimeMinus1(ZoneNum), DSGCZoneTimeMinus2(ZoneNum),
-                                                      DSGCZoneTimeMinus3(ZoneNum), DSGCZoneTimeMinus4(ZoneNum));
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      ZoneAirGC(ZoneNum),
+                                                      GCZoneTimeMinus1(ZoneNum),
+                                                      GCZoneTimeMinus2(ZoneNum),
+                                                      GCZoneTimeMinus3(ZoneNum),
+                                                      GCZoneTimeMinus4(ZoneNum),
+                                                      ZoneAirGC(ZoneNum),
+                                                      DSGCZoneTimeMinus1(ZoneNum),
+                                                      DSGCZoneTimeMinus2(ZoneNum),
+                                                      DSGCZoneTimeMinus3(ZoneNum),
+                                                      DSGCZoneTimeMinus4(ZoneNum));
                     }
 
                 } else { // reuse history data in DS terms from last zone time step to preserve information that would be lost

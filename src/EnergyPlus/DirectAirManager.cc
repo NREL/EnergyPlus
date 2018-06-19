@@ -269,8 +269,17 @@ namespace DirectAirManager {
 
             for (DirectAirNum = 1; DirectAirNum <= NumDirectAir; ++DirectAirNum) {
                 DirectAir(DirectAirNum).cObjectName = cCurrentModuleObject; // push Object Name into data array
-                inputProcessor->getObjectItem(cCurrentModuleObject, DirectAirNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat,
-                                              lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              DirectAirNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNums,
+                                              IOStat,
+                                              lNumericFieldBlanks,
+                                              lAlphaFieldBlanks,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 DirectAir(DirectAirNum).EquipID = cAlphaArgs(1);
                 DirectAir(DirectAirNum).Schedule = cAlphaArgs(2);
@@ -286,9 +295,15 @@ namespace DirectAirManager {
                 }
                 // Direct air is a problem for node connections since it only has a single node
                 // make this an outlet
-                DirectAir(DirectAirNum).ZoneSupplyAirNode =
-                    GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1,
-                                      ObjectIsNotParent, cAlphaFieldNames(3));
+                DirectAir(DirectAirNum).ZoneSupplyAirNode = GetOnlySingleNode(cAlphaArgs(3),
+                                                                              ErrorsFound,
+                                                                              cCurrentModuleObject,
+                                                                              cAlphaArgs(1),
+                                                                              NodeType_Air,
+                                                                              NodeConnectionType_Outlet,
+                                                                              1,
+                                                                              ObjectIsNotParent,
+                                                                              cAlphaFieldNames(3));
                 // Load the maximum volume flow rate
                 DirectAir(DirectAirNum).MaxAirVolFlowRate = rNumericArgs(1);
 
@@ -390,19 +405,41 @@ namespace DirectAirManager {
 
         // Setup output for the Direct Air Units.  This allows a comparison with
         for (Loop = 1; Loop <= NumDirectAir; ++Loop) {
-            SetupOutputVariable("Zone Air Terminal Sensible Heating Energy", OutputProcessor::Unit::J, DirectAir(Loop).HeatEnergy, "System", "Sum",
+            SetupOutputVariable("Zone Air Terminal Sensible Heating Energy",
+                                OutputProcessor::Unit::J,
+                                DirectAir(Loop).HeatEnergy,
+                                "System",
+                                "Sum",
                                 DirectAir(Loop).EquipID);
-            SetupOutputVariable("Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, DirectAir(Loop).CoolEnergy, "System", "Sum",
+            SetupOutputVariable("Zone Air Terminal Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                DirectAir(Loop).CoolEnergy,
+                                "System",
+                                "Sum",
                                 DirectAir(Loop).EquipID);
-            SetupOutputVariable("Zone Air Terminal Sensible Heating Rate", OutputProcessor::Unit::W, DirectAir(Loop).HeatRate, "System", "Average",
+            SetupOutputVariable("Zone Air Terminal Sensible Heating Rate",
+                                OutputProcessor::Unit::W,
+                                DirectAir(Loop).HeatRate,
+                                "System",
+                                "Average",
                                 DirectAir(Loop).EquipID);
-            SetupOutputVariable("Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, DirectAir(Loop).CoolRate, "System", "Average",
+            SetupOutputVariable("Zone Air Terminal Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                DirectAir(Loop).CoolRate,
+                                "System",
+                                "Average",
                                 DirectAir(Loop).EquipID);
 
             if (AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("AirTerminal:SingleDuct:Uncontrolled", DirectAir(Loop).EquipID, "Mass Flow Rate", "[kg/s]",
-                                 DirectAir(Loop).EMSOverrideAirFlow, DirectAir(Loop).EMSMassFlowRateValue);
-                SetupEMSInternalVariable("AirTerminal:SingleDuct:Uncontrolled Maximum Mass Flow Rate", DirectAir(Loop).EquipID, "[kg/s]",
+                SetupEMSActuator("AirTerminal:SingleDuct:Uncontrolled",
+                                 DirectAir(Loop).EquipID,
+                                 "Mass Flow Rate",
+                                 "[kg/s]",
+                                 DirectAir(Loop).EMSOverrideAirFlow,
+                                 DirectAir(Loop).EMSMassFlowRateValue);
+                SetupEMSInternalVariable("AirTerminal:SingleDuct:Uncontrolled Maximum Mass Flow Rate",
+                                         DirectAir(Loop).EquipID,
+                                         "[kg/s]",
                                          DirectAir(Loop).AirMassFlowRateMax);
             }
         }
@@ -505,8 +542,8 @@ namespace DirectAirManager {
                 bool UseOccSchFlag = false;
                 if (DirectAir(DirectAirNum).OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
                 if (airLoopOAFrac > 0.0) {
-                    Real64 vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(DirectAir(DirectAirNum).OARequirementsPtr,
-                                                                                            DirectAir(DirectAirNum).ZoneNum, UseOccSchFlag, true);
+                    Real64 vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                        DirectAir(DirectAirNum).OARequirementsPtr, DirectAir(DirectAirNum).ZoneNum, UseOccSchFlag, true);
                     mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
                     mDotFromOARequirement = min(mDotFromOARequirement, DirectAir(DirectAirNum).AirMassFlowRateMax);
                 } else {
@@ -618,8 +655,10 @@ namespace DirectAirManager {
             // Check if all are hard-sized
             if (!IsAutoSize && !SizingDesRunThisZone) { // simulation should continue
                 if (DirectAir(DirectAirNum).MaxAirVolFlowRate > 0.0) {
-                    ReportSizingOutput(DirectAir(DirectAirNum).cObjectName, DirectAir(DirectAirNum).EquipID,
-                                       "User-Specified Maximum Air Flow Rate [m3/s]", DirectAir(DirectAirNum).MaxAirVolFlowRate);
+                    ReportSizingOutput(DirectAir(DirectAirNum).cObjectName,
+                                       DirectAir(DirectAirNum).EquipID,
+                                       "User-Specified Maximum Air Flow Rate [m3/s]",
+                                       DirectAir(DirectAirNum).MaxAirVolFlowRate);
                 }
             } else { // AutoSize or hard-size with design run
                 CheckZoneSizing(DirectAir(DirectAirNum).cObjectName, DirectAir(DirectAirNum).EquipID);
@@ -630,14 +669,19 @@ namespace DirectAirManager {
                 }
                 if (IsAutoSize) {
                     DirectAir(DirectAirNum).MaxAirVolFlowRate = MaxAirVolFlowRateDes;
-                    ReportSizingOutput(DirectAir(DirectAirNum).cObjectName, DirectAir(DirectAirNum).EquipID,
-                                       "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes);
+                    ReportSizingOutput(DirectAir(DirectAirNum).cObjectName,
+                                       DirectAir(DirectAirNum).EquipID,
+                                       "Design Size Maximum Air Flow Rate [m3/s]",
+                                       MaxAirVolFlowRateDes);
                 } else { // Hard-size with sizing data
                     if (DirectAir(DirectAirNum).MaxAirVolFlowRate > 0.0 && MaxAirVolFlowRateDes > 0.0 && SizingDesRunThisZone) {
                         MaxAirVolFlowRateUser = DirectAir(DirectAirNum).MaxAirVolFlowRate;
-                        ReportSizingOutput(DirectAir(DirectAirNum).cObjectName, DirectAir(DirectAirNum).EquipID,
-                                           "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes,
-                                           "User-Specified Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateUser);
+                        ReportSizingOutput(DirectAir(DirectAirNum).cObjectName,
+                                           DirectAir(DirectAirNum).EquipID,
+                                           "Design Size Maximum Air Flow Rate [m3/s]",
+                                           MaxAirVolFlowRateDes,
+                                           "User-Specified Maximum Air Flow Rate [m3/s]",
+                                           MaxAirVolFlowRateUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MaxAirVolFlowRateDes - MaxAirVolFlowRateUser) / MaxAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeDirectAir: Potential issue with equipment sizing for AirTerminal:SingleDuct:Uncontrolled=\"" +
