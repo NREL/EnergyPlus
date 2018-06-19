@@ -6015,6 +6015,26 @@ namespace SingleDuct {
         }
     }
 
+    void setATMixerSizingProperties(int const &inletATMixerIndex, int const &controlledZoneNum, int const &curZoneEqNum)
+    {
+        ZoneEqSizing(curZoneEqNum).ATMixerVolFlow = SingleDuct::SysATMixer(inletATMixerIndex).DesignPrimaryAirVolRate;
+        int airLoopIndex =
+            DataZoneEquipment::ZoneEquipConfig(controlledZoneNum).InletNodeAirLoopNum(SingleDuct::SysATMixer(inletATMixerIndex).CtrlZoneInNodeIndex);
+        bool SizingDesRunThisAirSys = false;
+        CheckThisAirSystemForSizing(airLoopIndex, SizingDesRunThisAirSys);
+        int sysSizIndex =
+            UtilityRoutines::FindItemInList(FinalSysSizing(airLoopIndex).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        if (sysSizIndex == 0) sysSizIndex = 1; // use first when none applicable
+        if (SizingDesRunThisAirSys) {
+            // This needs work.
+            // If air loop has coils use SA conditions, else if OA sys has coils then precool conditions, else OA conditions
+            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriDryBulb = SysSizInput(sysSizIndex).CoolSupTemp;
+            ZoneEqSizing(curZoneEqNum).ATMixerCoolPriHumRat = SysSizInput(sysSizIndex).CoolSupHumRat;
+            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriDryBulb = SysSizInput(sysSizIndex).HeatSupTemp;
+            ZoneEqSizing(curZoneEqNum).ATMixerHeatPriHumRat = SysSizInput(sysSizIndex).HeatSupHumRat;
+        }
+    }
+
     //        End of Reporting subroutines for the Sys Module
     // *****************************************************************************
 

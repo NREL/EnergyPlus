@@ -422,6 +422,11 @@ namespace SingleDuct {
                            Optional<Real64 const> PriAirMassFlowRate = _ // Air terminal mixer primary air mass flow rate [kg/s]
     );
 
+    void setATMixerSizingProperties(int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
+                                    int const &controlledZoneNum, // controlled zone number
+                                    int const &curZoneEqNum       // current zone equipment being simulated
+    );
+
     //        End of Reporting subroutines for the Sys Module
     // *****************************************************************************
 

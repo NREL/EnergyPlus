@@ -83,6 +83,11 @@ namespace ReportSizingManager {
                          Real64 &DesExitTemp // returned design coil exit temperature [kg/s]
     );
 
+    void setHeatingOAFracAndInletTempForZoneEq(Real64 &OutAirFrac, Real64 &CoilInTemp, Real64 &DesMassFlow);
+    void setHeatingOAFracAndInletHumRatForZoneEq(Real64 &OutAirFrac, Real64 &CoilInHumRat, Real64 &DesMassFlow);
+    void setCoolingOAFracAndInletTempForZoneEq(Real64 &OutAirFrac, Real64 &CoilInTemp, Real64 &DesMassFlow);
+    void setCoolingOAFracAndInletHumRatForZoneEq(Real64 &OutAirFrac, Real64 &CoilInHumRat, Real64 &DesMassFlow);
+
 } // namespace ReportSizingManager
 
 } // namespace EnergyPlus

@@ -286,11 +286,12 @@ namespace FanCoilUnits {
 
     void GetFanCoilUnits();
 
-    void InitFanCoilUnits(int const FanCoilNum, // number of the current fan coil unit being simulated
-                          int const ZoneNum     // number of zone being served
-    );
+    void InitFanCoilUnits(int const FanCoilNum,         // number of the current fan coil unit being simulated
+                          int const ZoneNum,            // number of zone being served
+                          int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
-    void SizeFanCoilUnit(int const FanCoilNum);
+    void SizeFanCoilUnit(int const FanCoilNum,
+                         int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
     void SizeCoilWaterFlowRate(std::string const &WaterCoilType,
                                std::string const &WaterCoilName,

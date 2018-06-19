@@ -276,7 +276,7 @@ namespace FanCoilUnits {
         ZoneEqFanCoil = true;
 
         // Initialize the fan coil unit
-        InitFanCoilUnits(FanCoilNum, ZoneNum);
+        InitFanCoilUnits(FanCoilNum, ZoneNum, ControlledZoneNum);
 
         // Select the correct unit type
         {
@@ -1050,8 +1050,9 @@ namespace FanCoilUnits {
         }
     }
 
-    void InitFanCoilUnits(int const FanCoilNum, // number of the current fan coil unit being simulated
-                          int const ZoneNum     // number of zone being served
+    void InitFanCoilUnits(int const FanCoilNum,       // number of the current fan coil unit being simulated
+                          int const ZoneNum,          // number of zone being served
+                          int const ControlledZoneNum // index into ZoneEquipConfig array may not be equal to ZoneNum
     )
     {
 
@@ -1196,7 +1197,7 @@ namespace FanCoilUnits {
 
         if (!SysSizingCalc && MySizeFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
 
-            SizeFanCoilUnit(FanCoilNum);
+            SizeFanCoilUnit(FanCoilNum, ControlledZoneNum);
 
             MySizeFlag(FanCoilNum) = false;
         }
@@ -1312,7 +1313,9 @@ namespace FanCoilUnits {
         }
     }
 
-    void SizeFanCoilUnit(int const FanCoilNum)
+    void SizeFanCoilUnit(int const FanCoilNum,
+                         int const ControlledZoneNum // index into ZoneEquipConfig array may not be equal to ZoneNum
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -1670,6 +1673,10 @@ namespace FanCoilUnits {
                             }
                         }
                     }
+                }
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
+                if (FanCoil(FanCoilNum).ATMixerExists) {
+                    SingleDuct::setATMixerSizingProperties(FanCoil(FanCoilNum).ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
                 }
             }
         }
@@ -2048,7 +2055,6 @@ namespace FanCoilUnits {
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = FanCoil(FanCoilNum).MaxHotWaterVolFlow;
             ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow = FanCoil(FanCoilNum).MaxColdWaterVolFlow;
-            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).AirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FanCoil(FanCoilNum).DesCoolingLoad;
             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad;
