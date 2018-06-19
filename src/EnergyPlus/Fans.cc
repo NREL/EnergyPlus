@@ -3218,7 +3218,6 @@ namespace Fans {
         // REFERENCES: EnergyPlus Engineering Reference
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataSizing::CurSysNum;
 
         // Return value

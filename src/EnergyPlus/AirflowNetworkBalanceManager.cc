@@ -8079,8 +8079,6 @@ namespace AirflowNetworkBalanceManager {
         using DataHVACGlobals::TurnFansOn;
         using DataHeatBalance::MRT;
         using DataHeatBalance::ZonePreDefRep;
-        using DataHVACGlobals::TimeStepSys;
-        using DataHVACGlobals::TurnFansOn;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10870,7 +10868,6 @@ namespace AirflowNetworkBalanceManager {
         using BranchNodeConnections::GetChildrenData;
         using BranchNodeConnections::GetNumChildren;
         using BranchNodeConnections::IsParentObject;
-        using DataAirLoop::AirLoopControlInfo;
         using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataZoneEquipment::NumReturnAirPaths;
