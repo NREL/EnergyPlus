@@ -2817,6 +2817,11 @@ namespace DXCoils {
             DXCoil(DXCoilNum).RatedSHR2 = Numbers(7);
             DXCoil(DXCoilNum).RatedCOP2 = Numbers(8);
             DXCoil(DXCoilNum).RatedAirVolFlowRate2 = Numbers(9);
+            if (lNumericBlanks(10)) {
+                DXCoil(DXCoilNum).MinOATCompressor = -25.0;
+            } else {
+                DXCoil(DXCoilNum).MinOATCompressor = Numbers(10);
+            }
 
             DXCoil(DXCoilNum).CCapFTemp2 = GetCurveIndex(Alphas(10)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp2 == 0) {
