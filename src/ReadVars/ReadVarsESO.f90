@@ -150,6 +150,7 @@
   character(len=30) cdayofsim
   integer :: commacount
   integer :: commalimit
+  logical :: FixHeader
 
   write(*,*) 'ReadVarsESO program starting.'
   maxrptnum=-1
@@ -166,6 +167,7 @@
   Freqs=0
   gotinputfilename=.false.
   gotoutputfilename=.false.
+  FixHeader=.false.
 
   commalimit=LEN(outline)-10
 
@@ -199,6 +201,8 @@
       if (LineArg(1:1) == 'u' .or. LineArg(1:1) == 'U') Limited=.false.
       ! nolimit
       if (LineArg(1:1) == 'n' .or. LineArg(1:1) == 'N') Limited=.false.
+      ! fixheader
+      if (LineArg(1:1) == 'f' .or. LineArg(1:1) == 'F') FixHeader=.true.
     enddo
   endif
 
@@ -978,7 +982,11 @@
       write(auditunit,*) 'line 904 variable =',tracknum(ij),' not found'
     endif
   enddo
-  write(csvunit,inoutformat)     !  final..trim(outline)
+  if (FixHeader) then
+    write(csvunit,inoutformat)     !  final..trim(outline)
+  else
+    write(csvunit,inoutformat) ' '
+  endif
   read(esounit,inoutformat) line ! first environment line
   curdate=blank
   curmonday=blank
