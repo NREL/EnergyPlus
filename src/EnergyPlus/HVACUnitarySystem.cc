@@ -10538,7 +10538,6 @@ namespace HVACUnitarySystem {
         // Using/Aliasing
         using DataAirflowNetwork::AirflowNetworkControlMultizone;
         using DataAirflowNetwork::SimulateAirflowNetwork;
-        using DataAirLoop::LoopDXCoilRTF;
         using DXCoils::DXCoilOutletHumRat;
         using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;

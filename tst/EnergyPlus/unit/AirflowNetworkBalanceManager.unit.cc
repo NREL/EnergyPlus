@@ -11895,6 +11895,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
     AirflowNetworkNodeData(3).AirLoopNum = 1;
     AirflowNetworkLinkageData(51).AirLoopNum = 1;
+    AirflowNetworkLinkageData(52).AirLoopNum = 1;
     AirflowNetworkLinkageData(66).AirLoopNum = 2;
     AirflowNetworkLinkageData(42).AirLoopNum = 1;
     AirflowNetworkLinkageData(67).AirLoopNum = 2;
