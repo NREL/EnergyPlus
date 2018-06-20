@@ -3621,13 +3621,13 @@ namespace ReportSizingManager {
     {
         Real64 outAirFrac = 0.0;
         if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow > 0.0) {
-            // adjust for central DOAS AT mixer mixed inlet humrat
+            // set central DOAS AT mixer OA fraction
             if (desMassFlow > 0.0) {
                 outAirFrac = min(DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow / desMassFlow, 1.0);
             } else {
                 outAirFrac = 0.0;
             }
-        } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) { // adjust for raw OA mixed inlet humrat
+        } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) { // set zone equipment OA fraction
             if (desMassFlow > 0.0) {
                 outAirFrac = min(DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow / desMassFlow, 1.0);
             } else {
