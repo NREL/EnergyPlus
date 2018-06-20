@@ -4734,9 +4734,6 @@ namespace Furnaces {
         using DataAirLoop::AirLoopControlInfo;
         using DataAirLoop::AirToZoneNodeInfo;
         using DataAirLoop::AFNLoopHeatingCoilMaxRTF;
-        using DataAirflowNetwork::AirflowNetworkControlMultizone;
-        using DataAirflowNetwork::SimulateAirflowNetwork;
-        using DataHeatBalFanSys::TempControlType;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempControlType;
         using DataPlant::PlantLoop;
