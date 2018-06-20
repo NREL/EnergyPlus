@@ -1596,7 +1596,7 @@ namespace SizingManager {
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrHtD, FinalSysSizing(AirLoopNum).AirPriLoopName, DBySys(AirLoopNum), 4); // D
             OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchS62svrHtVou, FinalSysSizing(AirLoopNum).AirPriLoopName, FinalSysSizing(AirLoopNum).SysUncOA, 4); // Vou
+                OutputReportPredefined::pdchS62svrHtVou, FinalSysSizing(AirLoopNum).AirPriLoopName, DataSizing::VouBySys(AirLoopNum), 4); // Vou
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrHtVps, FinalSysSizing(AirLoopNum).AirPriLoopName, DataSizing::VpsHtgBySys(AirLoopNum), 4); // Vps
             OutputReportPredefined::PreDefTableEntry(

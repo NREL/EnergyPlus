@@ -5025,6 +5025,7 @@ namespace SimAirServingZones {
 
                 FinalSysSizing(AirLoopNum).SysUncOA = SysOAUnc;
                 CalcSysSizing(AirLoopNum).SysUncOA = SysOAUnc;
+                DataSizing::VouBySys(AirLoopNum) = SysOAUnc;
 
                 FinalSysSizing(AirLoopNum).DesOutAirVolFlow = MinOAFlow;
                 CalcSysSizing(AirLoopNum).DesOutAirVolFlow = MinOAFlow;
