@@ -2102,7 +2102,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     StdRhoAir = 1.2;
 
     BeginEnvrnFlag = true;
-    InitFanCoilUnits(FanCoilNum, ZoneNum);
+    InitFanCoilUnits(FanCoilNum, ZoneNum, ZoneNum);
     Sim4PipeFanCoil(FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
 
     // expect full flow and meet capacity
@@ -2759,7 +2759,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     StdRhoAir = 1.2;
 
     BeginEnvrnFlag = true;
-    InitFanCoilUnits(FanCoilNum, ZoneNum);
+    InitFanCoilUnits(FanCoilNum, ZoneNum, ZoneNum);
     Sim4PipeFanCoil(FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // expect fan speed 3 and near full air and water flow and meet capacity
     EXPECT_EQ(3, FanCoil(1).SpeedFanSel);

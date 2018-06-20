@@ -3809,7 +3809,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
 
     ASSERT_NEAR(-17.300, ExchCond(1).SupInTemp, 0.001);       // Heat Recovery Exchanger Primary Air Inlet Temp
     ASSERT_GT(ExchCond(1).SupOutTemp, ExchCond(1).SupInTemp); // Heat Recovery Exchanger is On in heating mode
-    ASSERT_NEAR(23.000, ExchCond(1).SecInTemp, 0.001);        // Heat Recovery Exchanger Secondary Air Inlet Temp
+    ASSERT_NEAR(22.436, ExchCond(1).SecInTemp, 0.001);        // Heat Recovery Exchanger Secondary Air Inlet Temp
     ASSERT_LT(ExchCond(1).SecOutTemp, ExchCond(1).SecInTemp); // Heat Recovery Exchanger is On in heating mode
 
     InletNode = ExchCond(1).SupInletNode;
