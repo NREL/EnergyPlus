@@ -350,7 +350,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     ZoneSizingInput(1).ZoneNum = CurZoneEqNum;
     ZoneEqSizing(1).SizingMethod.allocate(25);
     ZoneEqSizing(1).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
-    FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
+    FinalZoneSizing(1).ZoneRetTempAtHeatPeak = 20.0;
     FinalZoneSizing(1).OutTempAtHeatPeak = -20.0;
     FinalZoneSizing(1).DesHeatCoilInTemp = -20.0; // simulates zone heating air flow rate <= zone OA flow rate
     FinalZoneSizing(1).DesHeatCoilInHumRat = 0.005;
@@ -376,10 +376,10 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     WaterCoil(CoilNum).MaxWaterVolFlowRate = AutoSize;
 
     SizeWaterCoil(CoilNum);
-    EXPECT_NEAR(WaterCoil(CoilNum).InletAirTemp, -1.99999, 0.0001); // a mixture of zone air (20 C) and 10% OA (-20 C) = 16 C
-    EXPECT_NEAR(WaterCoil(CoilNum).DesTotWaterCoilLoad, 3908.2603, 0.0001);
-    EXPECT_NEAR(WaterCoil(CoilNum).UACoil, 94.9905, 0.0001);
-    EXPECT_NEAR(WaterCoil(CoilNum).OutletAirTemp, 30.2984, 0.0001); // reasonable delta T above inlet air temp
+    EXPECT_NEAR(WaterCoil(CoilNum).InletAirTemp, 16.0, 0.0001); // a mixture of zone air (20 C) and 10% OA (-20 C) = 16 C
+    EXPECT_NEAR(WaterCoil(CoilNum).DesTotWaterCoilLoad, 1709.8638, 0.0001);
+    EXPECT_NEAR(WaterCoil(CoilNum).UACoil, 51.3278, 0.0001);
+    EXPECT_NEAR(WaterCoil(CoilNum).OutletAirTemp, 30.1302, 0.0001); // reasonable delta T above inlet air temp
 }
 
 TEST_F(WaterCoilsTest, TdbFnHRhPbTest)
