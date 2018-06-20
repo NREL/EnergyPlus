@@ -3803,6 +3803,70 @@ namespace SetPointManager {
 
             if (InitSetPointManagersOneTimeFlag) {
 
+                // "SetpointManager:SingleZone:Heating"
+                cSetPointManagerType = cValidSPMTypes(iSPMType_SZHeating);
+                for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZHtSetPtMgrs; ++SetPtMgrNum) {
+                    ZoneInletNode = SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum;
+                    ZoneNode = SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum;
+                    // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
+                    ConZoneNum = 0;
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                            ConZoneNum = ControlledZoneNum;
+                        }
+                    }
+                    if (ConZoneNum == 0) {
+                        ShowSevereError(cSetPointManagerType + "=\"" + SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", Zone Node not found:");
+                        ShowContinueError("Node=\"" + NodeID(SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum) + "\", not found in any controlled Zone");
+                        ErrorsFound = true;
+                    }
+                    else {
+                        bool found = false;
+                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " + NodeID(SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                // "SetpointManager:SingleZone:Cooling"
+                cSetPointManagerType = cValidSPMTypes(iSPMType_SZCooling);
+                for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZClSetPtMgrs; ++SetPtMgrNum) {
+                    ZoneInletNode = SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum;
+                    ZoneNode = SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum;
+                    // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
+                    ConZoneNum = 0;
+                    for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
+                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                            ConZoneNum = ControlledZoneNum;
+                        }
+                    }
+                    if (ConZoneNum == 0) {
+                        ShowSevereError(cSetPointManagerType + "=\"" + SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", Zone Node not found:");
+                        ShowContinueError("Node=\"" + NodeID(SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum) + "\", not found in any controlled Zone");
+                        ErrorsFound = true;
+                    }
+                    else {
+                        bool found = false;
+                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " + NodeID(SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
                 // Minimum humidity setpoint managers
                 cSetPointManagerType = cValidSPMTypes(iSPMType_SZMinHum);
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
