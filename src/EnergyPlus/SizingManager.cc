@@ -1368,13 +1368,12 @@ namespace SizingManager {
                 } // end loop over zones on air loop to calculate Zdz values
 
                 // Sum Voz values for System Vou, in E+ the Vbz value has now been corrected to remove population Diversity, so we add the term back
-                // in here directly to get Vou
-                DataSizing::VouBySys(AirLoopNum) = 0.0;
+                // in here directly to get Vou, now corrected again to only apply D to the people part
+                DataSizing::VouBySys(AirLoopNum) = DataSizing::DBySys(AirLoopNum) * SumRpxPzBySys(AirLoopNum) + SumRaxAzBySys(AirLoopNum);
                 // redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
                 DataSizing::VpzClgSumBySys(AirLoopNum) = 0.0;
                 for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                     int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                    DataSizing::VouBySys(AirLoopNum) += VbzByZone(termUnitSizingIndex) * DataSizing::DBySys(AirLoopNum);
                     DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                 }
                 for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
@@ -1383,7 +1382,6 @@ namespace SizingManager {
                                                                           DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
                                                                           DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
-                        DataSizing::VouBySys(AirLoopNum) += VbzByZone(termUnitSizingIndex) * DataSizing::DBySys(AirLoopNum);
                         DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                     }
                 }
@@ -1566,7 +1564,7 @@ namespace SizingManager {
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrClD, FinalSysSizing(AirLoopNum).AirPriLoopName, DBySys(AirLoopNum), 4); // D
             OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchS62svrClVou, FinalSysSizing(AirLoopNum).AirPriLoopName, FinalSysSizing(AirLoopNum).SysUncOA, 4); // Vou
+                OutputReportPredefined::pdchS62svrClVou, FinalSysSizing(AirLoopNum).AirPriLoopName, VouBySys(AirLoopNum), 4); // Vou
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrClVps, FinalSysSizing(AirLoopNum).AirPriLoopName, DataSizing::VpsClgBySys(AirLoopNum), 4); // Vps
             OutputReportPredefined::PreDefTableEntry(

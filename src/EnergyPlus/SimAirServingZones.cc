@@ -4031,6 +4031,8 @@ namespace SimAirServingZones {
             DataSizing::PzSumBySys.dimension(NumPrimaryAirSys, 0.0);
             DataSizing::PsBySys.dimension(NumPrimaryAirSys, 0.0);
             DataSizing::DBySys.dimension(NumPrimaryAirSys, 0.0);
+            DataSizing::SumRpxPzBySys.dimension(NumPrimaryAirSys, 0.0);
+            DataSizing::SumRaxAzBySys.dimension(NumPrimaryAirSys, 0.0);
             DataSizing::PeakPsOccurrenceDateTimeStringBySys.dimension(NumPrimaryAirSys, "");
             DataSizing::PeakPsOccurrenceEnvironmentStringBySys.dimension(NumPrimaryAirSys, "");
             DataSizing::VouBySys.dimension(NumPrimaryAirSys, 0.0);
@@ -4631,8 +4633,12 @@ namespace SimAirServingZones {
                     }
                     if (SysSizNum > 0) {
                         ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
-                                    TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // should not have diversity at this point
+                                    TermUnitFinalZoneSizing(TermUnitSizingIndex)
+                                        .TotalOAFromArea; // should not have diversity at this point (no should have diversity in Vou if VRP)
                         SysOAUnc += ZoneOAUnc;
+                        SumRpxPzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople;
+                        SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
+
                         // save for Standard 62 tabular report
                         DataSizing::VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
                         // Save Std 62.1 cooling ventilation required by zone
@@ -4663,8 +4669,10 @@ namespace SimAirServingZones {
                             }
 
                             // Save Std 62.1 cooling ventilation required by zone
-                            MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone *
-                                         DataSizing::DBySys(AirLoopNum); //  apply D here, D forced to 1.0 for single zone systems;
+                            MinOAFlow +=
+                                (TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople *
+                                 DataSizing::DBySys(AirLoopNum)) + //  apply D here to just people part, D forced to 1.0 for single zone systems;
+                                TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
 
                             if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow > 0.0) {
                                 if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0 ||
@@ -4794,6 +4802,8 @@ namespace SimAirServingZones {
                                 ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
                                             TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // should not have diversity at this point
                                 SysOAUnc += ZoneOAUnc;
+                                SumRpxPzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople;
+                                SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
                                 // save for Standard 62 tabular report
                                 DataSizing::VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
                                 // Save Std 62.1 heating ventilation required by zone
