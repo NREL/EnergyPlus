@@ -7248,9 +7248,12 @@ namespace AirflowNetworkBalanceManager {
                     LT = AirflowNetworkLinkageData(i).NodeNums(1);
                     DirSign = -1.0;
                 }
-                Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
-                              (DirSign * AirflowNetworkLinkSimu(i).FLOW));
-                if (AirflowNetworkLinkSimu(i).FLOW == 0.0) Ei = 1.0;
+                if (AirflowNetworkLinkSimu(i).FLOW == 0.0) {
+                    Ei = 1.0;
+                } else {
+                    Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
+                        (DirSign * AirflowNetworkLinkSimu(i).FLOW));
+                }
                 if (AirflowNetworkLinkageData(i).ZoneNum < 0) {
                     Wamb = OutHumRat;
                 } else if (AirflowNetworkLinkageData(i).ZoneNum == 0) {
@@ -7259,9 +7262,12 @@ namespace AirflowNetworkBalanceManager {
                     Wamb = ANZW(AirflowNetworkLinkageData(i).ZoneNum);
                 }
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
-                                  (AirflowNetworkLinkSimu(i).FLOW2));
-                    if (AirflowNetworkLinkSimu(i).FLOW2 == 0.0) Ei = 1.0;
+                    if (AirflowNetworkLinkSimu(i).FLOW2 == 0.0) {
+                        Ei = 1.0;
+                    } else {
+                        Ei = std::exp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).D * Pi /
+                            (AirflowNetworkLinkSimu(i).FLOW2));
+                    }
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
                     MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
