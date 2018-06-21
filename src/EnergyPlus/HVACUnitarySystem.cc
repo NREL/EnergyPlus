@@ -2162,6 +2162,11 @@ namespace HVACUnitarySystem {
             select_EqSizing = &UnitarySysEqSizing(CurSysNum);
         } else if (CurZoneEqNum > 0) {
             select_EqSizing = &ZoneEqSizing(CurZoneEqNum);
+            if (UnitarySystem(UnitarySysNum).ATMixerExists) { // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0;   // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(
+                    UnitarySystem(UnitarySysNum).ATMixerIndex, UnitarySystem(UnitarySysNum).ControlZoneNum, CurZoneEqNum);
+            }
         } else {
             assert(false);
         }

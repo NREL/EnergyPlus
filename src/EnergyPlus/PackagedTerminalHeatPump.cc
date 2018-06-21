@@ -4848,6 +4848,10 @@ namespace PackagedTerminalHeatPump {
         DataZoneNumber = PTUnit(PTUnitNum).ZonePtr;
 
         if (CurZoneEqNum > 0) {
+            if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
+            }
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = PTUnit(PTUnitNum).HVACSizingIndex;
                 SizingMethod = CoolingAirflowSizing;
@@ -5021,7 +5025,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
             } else {
-                // no scalble sizing method has been specified. Sizing proceeds using the method
+                // no scalable sizing method has been specified. Sizing proceeds using the method
                 // specified in the zoneHVAC object
                 PrintFlag = false;
                 SizingMethod = CoolingAirflowSizing;

@@ -1674,8 +1674,8 @@ namespace FanCoilUnits {
                         }
                     }
                 }
-                ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
-                if (FanCoil(FanCoilNum).ATMixerExists) {
+                if (FanCoil(FanCoilNum).ATMixerExists) {        // set up ATMixer conditions for use in component sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
                     SingleDuct::setATMixerSizingProperties(FanCoil(FanCoilNum).ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
                 }
             }
@@ -2055,6 +2055,7 @@ namespace FanCoilUnits {
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = FanCoil(FanCoilNum).MaxHotWaterVolFlow;
             ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow = FanCoil(FanCoilNum).MaxColdWaterVolFlow;
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).AirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FanCoil(FanCoilNum).DesCoolingLoad;
             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad;

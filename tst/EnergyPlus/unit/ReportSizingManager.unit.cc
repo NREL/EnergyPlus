@@ -568,8 +568,237 @@ TEST_F(SQLiteFixture, ReportSizingManager_SQLiteRecordReportSizingOutputTest)
     // check that there are two sizing result records
     ASSERT_EQ(2ul, result.size());
     std::vector<std::string> testResult0{"1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W"};
-    std::vector<std::string> testResult1{"2", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "User-Specified Nominal Capacity", "26352.97405",
-                                         "W"};
+    std::vector<std::string> testResult1{
+        "2", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "User-Specified Nominal Capacity", "26352.97405", "W"};
     EXPECT_EQ(testResult0, result[0]);
     EXPECT_EQ(testResult1, result[1]);
+}
+
+TEST_F(EnergyPlusFixture, setOAFracForZoneEqSizing_Test)
+{
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::CurZoneEqNum = 1;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.34;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataEnvironment::StdRhoAir = 1.23;
+
+    Real64 oaFrac = 0.0;
+    Real64 DesMassFlow = 0.685;
+    Real64 massFlowRate = DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow;
+    Real64 oaFrac_Test = massFlowRate / DesMassFlow;
+
+    // ATMixer flow rate = 0 so oaFrac depends on ZoneEqSizing.OAVolFlow
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow);
+    EXPECT_EQ(oaFrac, oaFrac_Test);
+
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.11;
+
+    oaFrac = 0.0;
+    massFlowRate = DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow;
+    oaFrac_Test = massFlowRate / DesMassFlow;
+
+    // ATMixer flow rate > 0 so oaFrac depends on ZoneEqSizing.ATMixerVolFlow
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow);
+    EXPECT_EQ(oaFrac, oaFrac_Test);
+
+    DesMassFlow = 0.0;
+    oaFrac = 1.0;
+    oaFrac_Test = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 1.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 1.0;
+    // DesMassFlow = 0 so oaFrac = 0 regardless of OAVolFlow or ATMixerVolFlow
+    oaFrac = setOAFracForZoneEqSizing(DesMassFlow);
+    EXPECT_EQ(oaFrac, oaFrac_Test);
+}
+
+TEST_F(EnergyPlusFixture, setZoneCoilInletConditions)
+{
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::CurZoneEqNum = 1;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.34;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::FinalZoneSizing.allocate(1);
+    DataEnvironment::StdRhoAir = 1.23;
+
+    Real64 DesMassFlow = 0.685;
+    Real64 massFlowRate = DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow;
+    Real64 oaFrac = massFlowRate / DesMassFlow;
+
+    // Test heating mode coil inlet temperature
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriDryBulb = 22.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak = 25.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak = 20.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak = 10.0;
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition = zone condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    Real64 zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak;
+    Real64 calcCoilInletCond = zoneCond;
+    Real64 coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 1.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak;
+    Real64 oaCond = DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriDryBulb;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 1.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak;
+    oaCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // Test heating mode coil inlet humidity ratio
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriDryBulb = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak = 0.0;
+
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriHumRat = 0.008;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.01;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutHumRatAtHeatPeak = 0.003;
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition = zone condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtHeatPeak;
+    calcCoilInletCond = zoneCond;
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 1.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtHeatPeak;
+    oaCond = DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriHumRat;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 1.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtHeatPeak;
+    oaCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutHumRatAtHeatPeak;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // Test cooling mode coil inlet temperature
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriHumRat = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutHumRatAtHeatPeak = 0.0;
+
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriDryBulb = 22.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak = 25.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak = 20.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtCoolPeak = 10.0;
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition = zone condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak;
+    calcCoilInletCond = zoneCond;
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 1.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak;
+    oaCond = DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriDryBulb;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 1.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak;
+    oaCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtCoolPeak;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // Test cooling mode coil inlet humidity ratio
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriDryBulb = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtCoolPeak = 0.0;
+
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriHumRat = 0.008;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutHumRatAtCoolPeak = 0.003;
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition = zone condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtCoolPeak;
+    calcCoilInletCond = zoneCond;
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate > 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition based on mixed return and ATMixer condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 1.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtCoolPeak;
+    oaCond = DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriHumRat;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow > 0 so coilInlet condition based on mixed return and OA condition
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 1.0;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtCoolPeak;
+    oaCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutHumRatAtCoolPeak;
+    calcCoilInletCond = (oaFrac * oaCond) + ((1.0 - oaFrac) * zoneCond);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, calcCoilInletCond);
+
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriHumRat = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutHumRatAtCoolPeak = 0.0;
+
+    // all ZoneEqSizing and FinalZoneSizing temp and humrat variables have been zero'd out now, all results should = 0
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 1.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 1.0;
+    coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setHeatCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
+    coilInletCond = setCoolCoilInletHumRatForZoneEqSizing(oaFrac);
+    EXPECT_EQ(coilInletCond, 0.0);
 }

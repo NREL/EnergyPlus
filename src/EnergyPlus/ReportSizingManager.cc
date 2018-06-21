@@ -1592,7 +1592,8 @@ namespace ReportSizingManager {
                         } else {
                             DesVolFlow = DataFlowUsedForSizing;
                             if (DesVolFlow >= SmallAirVolFlow) {
-                                if (ZoneEqDXCoil) {
+                                if (ZoneEqDXCoil) { // each of these IFs now seem the same and can be condensed to just CoilInTemp = set() and
+                                                    // CoilInHumRat = set()
                                     if (ZoneEqSizing(CurZoneEqNum).OAVolFlow > 0.0) {
                                         CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
                                         CoilInHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
@@ -1606,11 +1607,12 @@ namespace ReportSizingManager {
                                         //                                        FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak +
                                         //                                                         OutAirFrac *
                                         //                                                         ZoneEqSizing(CurZoneEqNum).ATMixerCoolPriHumRat;
-                                        DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
+                                        DesMassFlow = DesVolFlow * StdRhoAir;
                                         CoilInTemp = setCoolCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
                                         CoilInHumRat = setCoolCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
                                     } else {
-                                        CoilInTemp = FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak;
+                                        CoilInTemp = FinalZoneSizing(CurZoneEqNum)
+                                                         .ZoneRetTempAtCoolPeak; // Question whether zone equipment should use return temp for sizing
                                         CoilInHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
                                     }
                                 } else if (ZoneEqFanCoil) {
@@ -1724,7 +1726,7 @@ namespace ReportSizingManager {
                             //                            DesOAFlowFrac = FinalZoneSizing(CurZoneEqNum).DesHeatOAFlowFrac;
                             //                            CoilInTemp = DesOAFlowFrac * FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak +
                             //                                         (1.0 - DesOAFlowFrac) * FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak;
-                            DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+                            DesMassFlow = DesVolFlow * StdRhoAir;
                             // this will change above CoilInTemp equation to use ZoneRetTempAtHeatPeak which accounts for lights to return fraction
                             CoilInTemp = setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
                             CoilInHumRat = setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
@@ -1733,7 +1735,7 @@ namespace ReportSizingManager {
                         } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
                         } else {
-                            CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
+                            CoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp; // this is mixture of OA and zone air
                         }
                         if ((TermUnitSingDuct || TermUnitPIU) && (CurTermUnitSizingNum > 0)) {
                             CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
@@ -3620,22 +3622,17 @@ namespace ReportSizingManager {
     Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow)
     {
         Real64 outAirFrac = 0.0;
+        if (desMassFlow <= 0.0) return outAirFrac;
+
         if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow > 0.0) {
             // set central DOAS AT mixer OA fraction
-            if (desMassFlow > 0.0) {
-                outAirFrac = min(DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow / desMassFlow, 1.0);
-            } else {
-                outAirFrac = 0.0;
-            }
+            outAirFrac = min(DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow / desMassFlow, 1.0);
         } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) { // set zone equipment OA fraction
-            if (desMassFlow > 0.0) {
-                outAirFrac = min(DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow / desMassFlow, 1.0);
-            } else {
-                outAirFrac = 0.0;
-            }
+            outAirFrac = min(DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow / desMassFlow, 1.0);
         }
         return outAirFrac;
     }
+
     Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac)
     {
         Real64 coilInTemp = 0.0;
@@ -3645,11 +3642,8 @@ namespace ReportSizingManager {
                          outAirFrac * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriDryBulb;
         } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) {
             // adjust for raw OA mixed inlet temp
-            // I believe this next calculation should use zone return temp to account for lighting to return but that causes diffs
-            // coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak +
-            //              outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
             coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak +
-                outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
+                         outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
         } else {
             // coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak;
             coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak;
@@ -3682,9 +3676,8 @@ namespace ReportSizingManager {
                          outAirFrac * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriDryBulb;
         } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) {
             // adjust for raw OA mixed inlet temp
-            // I believe this next calculation should use zone return temp to account for lighting to return
             coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak +
-                outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtCoolPeak;
+                         outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtCoolPeak;
         } else {
             // I believe this next calculation should use zone return temp to account for lighting to return
             // coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak;
@@ -3692,6 +3685,7 @@ namespace ReportSizingManager {
         }
         return coilInTemp;
     }
+
     Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac)
     {
         Real64 coilInHumRat = 0.0;

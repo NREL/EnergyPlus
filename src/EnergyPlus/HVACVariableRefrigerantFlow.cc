@@ -6215,6 +6215,10 @@ namespace HVACVariableRefrigerantFlow {
         CompName = VRFTU(VRFTUNum).Name;
         DataZoneNumber = VRFTU(VRFTUNum).ZoneNum;
         if (CurZoneEqNum > 0) {
+            if (VRFTU(VRFTUNum).ATMixerExists) {            // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(VRFTU(VRFTUNum).ATMixerIndex, VRFTU(VRFTUNum).ZoneNum, CurZoneEqNum);
+            }
             if (VRFTU(VRFTUNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = VRFTU(VRFTUNum).HVACSizingIndex;
 

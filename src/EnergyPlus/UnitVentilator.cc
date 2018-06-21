@@ -1724,7 +1724,10 @@ namespace UnitVentilator {
         }
 
         if (CurZoneEqNum > 0) {
-
+            if (UnitVent(UnitVentNum).ATMixerExists) {      // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(UnitVent(UnitVentNum).ATMixerIndex, UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
+            }
             if (UnitVent(UnitVentNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = UnitVent(UnitVentNum).HVACSizingIndex;
                 // N1 , \field Maximum Supply Air Flow Rate

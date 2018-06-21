@@ -2724,3 +2724,37 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     SingleDuct::SizeSys(SysNum);
     EXPECT_EQ(1.0, SingleDuct::Sys(SysNum).ZoneMinAirFrac);
 }
+TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
+{
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    SysSizingRunDone = true;
+    SysSizInput.allocate(1);
+    NumSysSizInput = 1;
+    SysSizInput(1).AirLoopNum = 1;
+    SysSizInput(1).AirPriLoopName = "MyAirLoop";
+    FinalSysSizing.allocate(1);
+    FinalSysSizing(1).AirPriLoopName = "MyAirLoop";
+    ZoneEqSizing.allocate(1);
+
+    SingleDuct::SysATMixer.allocate(1);
+    SingleDuct::SysATMixer(1).CtrlZoneInNodeIndex = 1;
+    SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate = 1.2345;
+    SysSizInput(1).CoolSupTemp = 12.37;
+    SysSizInput(1).CoolSupHumRat = 0.07;
+    SysSizInput(1).HeatSupTemp = 28.93;
+    SysSizInput(1).HeatSupHumRat = 0.04;
+
+    int ATMixerIndex = 1;
+    int ControlledZoneNum = 1;
+    CurZoneEqNum = 1;
+    // set ATMixer properties used for sizing
+    SingleDuct::setATMixerSizingProperties(ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerVolFlow, SingleDuct::SysATMixer(1).DesignPrimaryAirVolRate);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, SysSizInput(1).CoolSupTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, SysSizInput(1).CoolSupHumRat);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, SysSizInput(1).HeatSupTemp);
+    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, SysSizInput(1).HeatSupHumRat);
+}
