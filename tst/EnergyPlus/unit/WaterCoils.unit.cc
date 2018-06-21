@@ -350,7 +350,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     ZoneSizingInput(1).ZoneNum = CurZoneEqNum;
     ZoneEqSizing(1).SizingMethod.allocate(25);
     ZoneEqSizing(1).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
-    FinalZoneSizing(1).ZoneRetTempAtHeatPeak = 20.0;
+    FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
     FinalZoneSizing(1).OutTempAtHeatPeak = -20.0;
     FinalZoneSizing(1).DesHeatCoilInTemp = -20.0; // simulates zone heating air flow rate <= zone OA flow rate
     FinalZoneSizing(1).DesHeatCoilInHumRat = 0.005;
