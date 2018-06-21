@@ -3652,7 +3652,7 @@ namespace ReportSizingManager {
                 outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
         } else {
             // coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak;
-            coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak;
+            coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak;
         }
         return coilInTemp;
     }
