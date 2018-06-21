@@ -3643,11 +3643,16 @@ namespace ReportSizingManager {
             // adjust for central DOAS AT mixer mixed inlet temp
             coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak +
                          outAirFrac * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerHeatPriDryBulb;
-        } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) { // adjust for raw OA mixed inlet temp
-            coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak +
-                         outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
+        } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) {
+            // adjust for raw OA mixed inlet temp
+            // I believe this next calculation should use zone return temp to account for lighting to return but that causes diffs
+            // coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak +
+            //              outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
+            coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak +
+                outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtHeatPeak;
         } else {
-            coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak;
+            // coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak;
+            coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak;
         }
         return coilInTemp;
     }
@@ -3675,11 +3680,15 @@ namespace ReportSizingManager {
             // adjust for central DOAS AT mixer mixed inlet temp
             coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak +
                          outAirFrac * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerCoolPriDryBulb;
-        } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) { // adjust for raw OA mixed inlet temp
+        } else if (DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow > 0.0) {
+            // adjust for raw OA mixed inlet temp
+            // I believe this next calculation should use zone return temp to account for lighting to return
             coilInTemp = (1.0 - outAirFrac) * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak +
-                         outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtCoolPeak;
+                outAirFrac * DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).OutTempAtCoolPeak;
         } else {
-            coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak;
+            // I believe this next calculation should use zone return temp to account for lighting to return
+            // coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak;
+            coilInTemp = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak;
         }
         return coilInTemp;
     }
