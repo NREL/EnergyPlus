@@ -92,14 +92,7 @@ namespace TARCOGCommon {
         // Using/Aliasing
         using namespace TARCOGParams;
 
-        // Return value
-        bool IsShadingLayer;
-
-        if ((layertype == VENETBLIND) || (layertype == WOVSHADE) || (layertype == PERFORATED) || (layertype == BSDF) || (layertype == DIFFSHADE)) {
-            IsShadingLayer = true;
-        } else {
-            IsShadingLayer = false;
-        }
+        const bool IsShadingLayer = layertype == VENETBLIND_HORIZ || layertype == VENETBLIND_VERT || layertype == WOVSHADE || layertype == PERFORATED || layertype == BSDF || layertype == DIFFSHADE;
         return IsShadingLayer;
     }
 

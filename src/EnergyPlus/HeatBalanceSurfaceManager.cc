@@ -2144,7 +2144,11 @@ namespace HeatBalanceSurfaceManager {
 
             // Initialize previous-timestep shading indicators
             e.ExtIntShadePrevTS = 0;
-            e.ShadingFlag = NoShade;
+            // Not sure why is shade reset necessary here for rest of window models. BSDF window model has already
+            // set this during optical initialization.(Simon Vidanovic)
+            if (e.WindowModelType != WindowBSDFModel) {
+                e.ShadingFlag = NoShade;
+            }
         }
 
         // Perform other initializations that depend on the surface characteristics

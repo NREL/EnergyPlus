@@ -8246,8 +8246,10 @@ namespace HeatBalanceManager {
 
                 if (SELECT_CASE_var == "OTHERSHADINGTYPE") {
                     ComplexShade(Loop).LayerType = csOtherShadingType;
-                } else if (SELECT_CASE_var == "VENETIAN") {
-                    ComplexShade(Loop).LayerType = csVenetian;
+                } else if (SELECT_CASE_var == "VENETIANHORIZONTAL") {
+                    ComplexShade(Loop).LayerType = csVenetianHorizontal;
+                } else if (SELECT_CASE_var == "VENETIANVERTICAL") {
+                    ComplexShade(Loop).LayerType = csVenetianVertical;
                 } else if (SELECT_CASE_var == "WOVEN") {
                     ComplexShade(Loop).LayerType = csWoven;
                 } else if (SELECT_CASE_var == "PERFORATED") {
@@ -8367,7 +8369,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(cNumericFieldNames(10) + " must be >=0 or <=1, entered value = " + RoundSigDigits(rNumericArgs(10), 2));
             }
 
-            if (ComplexShade(Loop).LayerType == csVenetian) {
+            if (ComplexShade(Loop).LayerType == csVenetianHorizontal || ComplexShade(Loop).LayerType == csVenetianVertical) {
                 if (rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
