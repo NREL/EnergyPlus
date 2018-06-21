@@ -57,109 +57,109 @@ The type of shading layer. The options are:
 
 ## Updated IDD Object
 
-WindowMaterial:ComplexShade,
-    \memo Complex window shading layer thermal properties
-     \min-fields 12
-  A1 , \field Name
-       \required-field
-       \type alpha
-       \reference WindowComplexShades
-  A2 , \field Layer Type
-       \type choice
-       \key VenetianHorizontal
-       \key VenetianVertical
-       \key Woven
-       \key Perforated
-       \key BSDF
-       \key OtherShadingType
-       \default OtherShadingType
-  N1 , \field Thickness
-       \type real
-       \units m
-       \minimum> 0
-       \default 0.002
-  N2 , \field Conductivity
-       \units W/m-K
-       \type real
-       \minimum> 0
-       \default 1
-  N3 , \field IR Transmittance
-       \type real
-       \maximum 1
-       \minimum 0
-       \default 0
-  N4 , \field Front Emissivity
-       \type real
-       \maximum 1
-       \minimum 0
-       \default 0.84
-  N5 , \field Back Emissivity
-       \type real
-       \maximum 1
-       \minimum 0
-       \default 0.84
-  N6 , \field Top Opening Multiplier
-       \type real
-       \minimum 0
-       \maximum 1
-       \default 0
-  N7 , \field Bottom Opening Multiplier
-       \type real
-       \minimum 0
-       \maximum 1
-       \default 0
-  N8 , \field Left Side Opening Multiplier
-       \type real
-       \minimum 0
-       \maximum 1
-       \default 0
-  N9 , \field Right Side Opening Multiplier
-       \type real
-       \minimum 0
-       \maximum 1
-       \default 0
- N10 , \field Front Opening Multiplier
-       \type real
-       \minimum 0
-       \maximum 1
-       \default 0.05
- N11 , \field Slat Width
-       \units m
-       \type real
-       \minimum> 0
-       \default 0.016
- N12 , \field Slat Spacing
-       \note Distance between adjacent slat faces
-       \units m
-       \type real
-       \minimum> 0
-       \default 0.012
-  N13 , \field Slat Thickness
-       \note Distance between top and bottom surfaces of slat
-       \note Slat is assumed to be rectangular in cross section and flat
-       \type real
-       \units m
-       \minimum> 0
-       \default 0.0006
-  N14 , \field Slat Angle
-       \type real
-       \units deg
-       \default 90
-       \minimum -90
-       \maximum 90
-  N15 , \field Slat Conductivity
-       \type real
-       \units W/m-K
-       \minimum> 0
-       \default 160.0
-  N16 ; \field Slat Curve
-       \note this value represents curvature radius of the slat.
-       \note if the slat is flat use zero.
-       \note if this value is not zero, then it must be > SlatWidth/2.
-       \type real
-       \units m
-       \minimum 0.0
-       \default 0
+WindowMaterial:ComplexShade,  
+    \memo Complex window shading layer thermal properties  
+     \min-fields 12  
+  A1 , \field Name  
+       \required-field  
+       \type alpha  
+       \reference WindowComplexShades  
+  A2 , \field Layer Type  
+       \type choice  
+       \key VenetianHorizontal  
+       \key VenetianVertical  
+       \key Woven  
+       \key Perforated  
+       \key BSDF  
+       \key OtherShadingType  
+       \default OtherShadingType  
+  N1 , \field Thickness  
+       \type real  
+       \units m  
+       \minimum> 0  
+       \default 0.002  
+  N2 , \field Conductivity  
+       \units W/m-K  
+       \type real  
+       \minimum> 0  
+       \default 1  
+  N3 , \field IR Transmittance  
+       \type real  
+       \maximum 1  
+       \minimum 0  
+       \default 0  
+  N4 , \field Front Emissivity  
+       \type real  
+       \maximum 1  
+       \minimum 0  
+       \default 0.84  
+  N5 , \field Back Emissivity  
+       \type real  
+       \maximum 1  
+       \minimum 0  
+       \default 0.84  
+  N6 , \field Top Opening Multiplier  
+       \type real  
+       \minimum 0  
+       \maximum 1  
+       \default 0  
+  N7 , \field Bottom Opening Multiplier  
+       \type real  
+       \minimum 0  
+       \maximum 1  
+       \default 0  
+  N8 , \field Left Side Opening Multiplier  
+       \type real  
+       \minimum 0  
+       \maximum 1  
+       \default 0  
+  N9 , \field Right Side Opening Multiplier  
+       \type real  
+       \minimum 0  
+       \maximum 1  
+       \default 0  
+ N10 , \field Front Opening Multiplier  
+       \type real  
+       \minimum 0  
+       \maximum 1  
+       \default 0.05  
+ N11 , \field Slat Width  
+       \units m  
+       \type real  
+       \minimum> 0  
+       \default 0.016  
+ N12 , \field Slat Spacing  
+       \note Distance between adjacent slat faces  
+       \units m  
+       \type real  
+       \minimum> 0  
+       \default 0.012  
+  N13 , \field Slat Thickness  
+       \note Distance between top and bottom surfaces of slat  
+       \note Slat is assumed to be rectangular in cross section and flat  
+       \type real  
+       \units m  
+       \minimum> 0  
+       \default 0.0006  
+  N14 , \field Slat Angle  
+       \type real  
+       \units deg  
+       \default 90  
+       \minimum -90  
+       \maximum 90  
+  N15 , \field Slat Conductivity  
+       \type real  
+       \units W/m-K  
+       \minimum> 0  
+       \default 160.0  
+  N16 ; \field Slat Curve  
+       \note this value represents curvature radius of the slat.  
+       \note if the slat is flat use zero.  
+       \note if this value is not zero, then it must be > SlatWidth/2.  
+       \type real  
+       \units m  
+       \minimum 0.0  
+       \default 0  
 
 ## Engineering Reference
 
