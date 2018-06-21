@@ -3819,8 +3819,7 @@ namespace SetPointManager {
                         ShowSevereError(cSetPointManagerType + "=\"" + SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", Zone Node not found:");
                         ShowContinueError("Node=\"" + NodeID(SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum) + "\", not found in any controlled Zone");
                         ErrorsFound = true;
-                    }
-                    else {
+                    } else {
                         bool found = false;
                         for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
                             if (SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
@@ -3851,8 +3850,7 @@ namespace SetPointManager {
                         ShowSevereError(cSetPointManagerType + "=\"" + SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", Zone Node not found:");
                         ShowContinueError("Node=\"" + NodeID(SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum) + "\", not found in any controlled Zone");
                         ErrorsFound = true;
-                    }
-                    else {
+                    } else {
                         bool found = false;
                         for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
                             if (SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {

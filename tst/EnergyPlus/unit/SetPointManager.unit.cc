@@ -1314,7 +1314,6 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    bool ErrorsFound = false;
     DataGlobals::NumOfZones = 1;
 
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
@@ -1383,7 +1382,6 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    bool ErrorsFound = false;
     DataGlobals::NumOfZones = 1;
 
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
