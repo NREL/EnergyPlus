@@ -1729,6 +1729,14 @@ namespace UnitVentilator {
                 SingleDuct::setATMixerSizingProperties(UnitVent(UnitVentNum).ATMixerIndex, UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
             }
             if (UnitVent(UnitVentNum).HVACSizingIndex > 0) {
+
+                // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
+                if (UnitVent(UnitVentNum).OutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = UnitVent(UnitVentNum).OutAirVolFlow;
+                }
+
                 zoneHVACIndex = UnitVent(UnitVentNum).HVACSizingIndex;
                 // N1 , \field Maximum Supply Air Flow Rate
                 FieldNum = 1;
@@ -2000,6 +2008,7 @@ namespace UnitVentilator {
                     }
                 }
             }
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = UnitVent(UnitVentNum).OutAirVolFlow;
         }
 
         IsAutoSize = false;

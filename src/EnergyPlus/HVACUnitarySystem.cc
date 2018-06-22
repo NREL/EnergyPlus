@@ -2166,6 +2166,8 @@ namespace HVACUnitarySystem {
                 ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0;   // Equipment OA flow should always be 0 when ATMixer is used
                 SingleDuct::setATMixerSizingProperties(
                     UnitarySystem(UnitarySysNum).ATMixerIndex, UnitarySystem(UnitarySysNum).ControlZoneNum, CurZoneEqNum);
+            } else {
+
             }
         } else {
             assert(false);

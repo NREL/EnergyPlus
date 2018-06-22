@@ -4853,6 +4853,16 @@ namespace PackagedTerminalHeatPump {
                 SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
             }
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                }
+                if (PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                }
+
                 zoneHVACIndex = PTUnit(PTUnitNum).HVACSizingIndex;
                 SizingMethod = CoolingAirflowSizing;
                 FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -5027,6 +5037,17 @@ namespace PackagedTerminalHeatPump {
             } else {
                 // no scalable sizing method has been specified. Sizing proceeds using the method
                 // specified in the zoneHVAC object
+
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                }
+                if (PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                }
+
                 PrintFlag = false;
                 SizingMethod = CoolingAirflowSizing;
                 FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation

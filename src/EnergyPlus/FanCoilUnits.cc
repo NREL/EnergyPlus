@@ -1437,8 +1437,18 @@ namespace FanCoilUnits {
         DataZoneNumber = FanCoil(FanCoilNum).ZonePtr;
 
         if (CurZoneEqNum > 0) {
+            if (FanCoil(FanCoilNum).ATMixerExists) {        // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(FanCoil(FanCoilNum).ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+            }
             if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
-
+                // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
+                if (FanCoil(FanCoilNum).OutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
+                }
+                
                 zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
                 FieldNum = 1;
                 PrintFlag = true;
@@ -1674,11 +1684,8 @@ namespace FanCoilUnits {
                         }
                     }
                 }
-                if (FanCoil(FanCoilNum).ATMixerExists) {        // set up ATMixer conditions for use in component sizing
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-                    SingleDuct::setATMixerSizingProperties(FanCoil(FanCoilNum).ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
-                }
             }
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow; // sets OA frac in sizing
         }
 
         if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
@@ -2055,7 +2062,7 @@ namespace FanCoilUnits {
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = FanCoil(FanCoilNum).MaxHotWaterVolFlow;
             ZoneEqSizing(CurZoneEqNum).MaxCWVolFlow = FanCoil(FanCoilNum).MaxColdWaterVolFlow;
-            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow; // sets OA frac in sizing
             ZoneEqSizing(CurZoneEqNum).AirVolFlow = FanCoil(FanCoilNum).MaxAirVolFlow;
             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FanCoil(FanCoilNum).DesCoolingLoad;
             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad;

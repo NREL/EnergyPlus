@@ -1568,6 +1568,7 @@ namespace ReportSizingManager {
                                         CoilInHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
                                     }
                                 } else if (ZoneEqFanCoil) {
+                                    // use fan coil flow (i.e., set by parent) or flow used during sizing?
                                     DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
                                     CoilInTemp = setCoolCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
                                     CoilInHumRat = setCoolCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
@@ -1666,7 +1667,12 @@ namespace ReportSizingManager {
                                              (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - MinPriFlowFrac));
                             }
                         } else if (ZoneEqFanCoil) {
-                            DesMassFlow = DesVolFlow * StdRhoAir;
+                            // use fan coil flow (i.e., set by parent) or flow used during sizing?
+                            if (DesVolFlow > 0.0) {
+                                DesMassFlow = DesVolFlow * StdRhoAir;
+                            } else {
+                                DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+                            }
                             CoilInTemp = setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
                             CoilInHumRat = setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow));
                         } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
