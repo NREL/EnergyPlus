@@ -587,6 +587,9 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
+  WaterToWaterHeatPumpEIR.cc
+  WaterToWaterHeatPumpEIR.hh
+  WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
   WeatherManager.cc

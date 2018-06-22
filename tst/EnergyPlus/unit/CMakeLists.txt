@@ -170,6 +170,7 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
+  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WindowAC.unit.cc
   WindowEquivalentLayer.unit.cc
