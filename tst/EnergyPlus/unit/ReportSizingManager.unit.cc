@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, setZoneCoilInletConditions)
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition = zone condition
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
-    Real64 zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtHeatPeak;
+    Real64 zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtHeatPeak;
     Real64 calcCoilInletCond = zoneCond;
     Real64 coilInletCond = setHeatCoilInletTempForZoneEqSizing(oaFrac);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
@@ -705,7 +705,7 @@ TEST_F(EnergyPlusFixture, setZoneCoilInletConditions)
     // ATMixer flow rate = 0 and ZoneEqSizing.OAVolFlow = 0 so coilInlet condition = zone condition
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.0;
-    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneTempAtCoolPeak;
+    zoneCond = DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).ZoneRetTempAtCoolPeak;
     calcCoilInletCond = zoneCond;
     coilInletCond = setCoolCoilInletTempForZoneEqSizing(oaFrac);
     EXPECT_EQ(coilInletCond, calcCoilInletCond);
