@@ -1248,8 +1248,8 @@ namespace BranchNodeConnections {
             if (NumChildren == 0) {
                 ShowWarningError("GetChildrenData: Parent Node has no children, node=" + ComponentType + ':' + ComponentName);
             } else {
-                GetParentData(ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum,
-                              ErrInObject);
+                GetParentData(
+                    ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum, ErrInObject);
                 ChildCType.allocate(NumChildren);
                 ChildCName.allocate(NumChildren);
                 ChildInNodeName.allocate(NumChildren);
@@ -1810,8 +1810,8 @@ namespace BranchNodeConnections {
 
         if (NumInList > 0) {
             for (NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex) {
-                NodeConnectType(NodeConnectIndex) = UtilityRoutines::FindItemInList(NodeConnections(ListArray(NodeConnectIndex)).ConnectionType,
-                                                                                    ValidConnectionTypes, NumValidConnectionTypes);
+                NodeConnectType(NodeConnectIndex) = UtilityRoutines::FindItemInList(
+                    NodeConnections(ListArray(NodeConnectIndex)).ConnectionType, ValidConnectionTypes, NumValidConnectionTypes);
             }
         } else {
             if (NodeNumber > 0) {

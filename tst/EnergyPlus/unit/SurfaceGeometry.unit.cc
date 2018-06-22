@@ -2960,3 +2960,100 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
     EXPECT_NEAR(-5., SurfaceTmp(surfNum).Vertex(4).y, 0.001);
     EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(4).z, 0.001);
 }
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Version,                                                        ",
+        "	8.6;                     !- Version Identifier               ",
+        "	                                                             ",
+        "Material,",
+        "  8 in.Concrete Block Basement Wall,     !- Name",
+        "  MediumRough,                            !- Roughness",
+        "  0.2032,                                 !- Thickness{ m }",
+        "  1.326,                                  !- Conductivity{ W / m - K }",
+        "  1841.99999999999,                       !- Density{ kg / m3 }",
+        "  911.999999999999,                       !- Specific Heat{ J / kg - K }",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
+        "Construction,",
+        "   Typical,   !- Name",
+        "   8 in.Concrete Block Basement Wall;     !- Layer 1",
+
+        "BuildingSurface:Detailed,                                   ",
+        "	016W88_WaterMeter - Floor : a, !- Name",
+        "	Floor, !- Surface Type",
+        "	Typical, !- Construction Name",
+        "	ZONE 1, !- Zone Name",
+        "	Surface, !- Outside Boundary Condition",
+        "	006W27_Restrooms - RoofCeiling : a, !- Outside Boundary Condition Object",
+        "	NoSun, !- Sun Exposure",
+        "	NoWind, !- Wind Exposure",
+        "	, !- View Factor to Ground",
+        "	, !- Number of Vertices",
+        "	251.4600375, 3.5052, 0, !- X, Y, Z Vertex 1 {m}",
+        "	251.4600375, 0, 0, !- X, Y, Z Vertex 2 {m}",
+        "	253.9571375, 0, 0, !- X, Y, Z Vertex 3 {m}",
+        "	248.5215375, 0, 0, !- X, Y, Z Vertex 4 {m}",
+        "	248.5215375, 3.5052, 0;                 !- X, Y, Z Vertex 5 {m}",
+
+        "BuildingSurface:Detailed,",
+        "   006W27_Restrooms - RoofCeiling : a, !- Name",
+        "   Ceiling, !- Surface Type",
+        "   Typical, !- Construction Name",
+        "   ZONE 2, !- Zone Name",
+        "   Surface, !- Outside Boundary Condition",
+        "   016W88_WaterMeter - Floor : a, !- Outside Boundary Condition Object",
+        "   NoSun, !- Sun Exposure",
+        "   NoWind, !- Wind Exposure",
+        "   , !- View Factor to Ground",
+        "   , !- Number of Vertices",
+        "   174.6425, 0, 6.1976, !- X, Y, Z Vertex 1 {m}",
+        "   174.6425, 3.5052, 6.1976, !- X, Y, Z Vertex 2 {m}",
+        "   171.704, 3.5052, 6.1976, !- X, Y, Z Vertex 3 {m}",
+        "   171.704, 0, 6.1976;                     !- X, Y, Z Vertex 4 {m}",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataGlobals::NumOfZones = 2;
+    Zone.allocate(2);
+    Zone(1).Name = "ZONE 1";
+    Zone(2).Name = "ZONE 2";
+    SurfaceTmp.allocate(2);
+    int SurfNum = 0;
+    int TotHTSurfs = 2;
+    Array1D_string const BaseSurfCls(3, { "WALL", "FLOOR", "ROOF" });
+    Array1D_int const BaseSurfIDs(3, { 1, 2, 3 });
+    int NeedToAddSurfaces;
+
+    GetGeometryParameters(ErrorsFound);
+    CosZoneRelNorth.allocate(2);
+    SinZoneRelNorth.allocate(2);
+
+    CosZoneRelNorth = 1.0;
+    SinZoneRelNorth = 0.0;
+    SinBldgRelNorth = 0.0;
+    CosBldgRelNorth = 1.0;
+
+    GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs,
+        NeedToAddSurfaces);
+
+    EXPECT_EQ(2, SurfNum);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", invalid Construction Name=\"TYPICAL\".",
+        "   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", After CheckConvexity, mismatch between Sides (4) and size of Vertex (5).",
+        "   **   ~~~   ** CheckConvexity is used to verify the convexity of a surface and detect collinear points.",
+        "   ** Severe  ** BuildingSurface:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", invalid Construction Name=\"TYPICAL\".",
+        "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface :016W88_WATERMETER - FLOOR : A and outside boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
+        "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for outside boundary surface. Please check inputs.",
+        "   ** Severe  ** RoofCeiling:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", Vertex size mismatch between base surface :006W27_RESTROOMS - ROOFCEILING : A and outside boundary surface: 016W88_WATERMETER - FLOOR : A",
+        "   **   ~~~   ** The vertex sizes are 4 for base surface and 5 for outside boundary surface. Please check inputs."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
