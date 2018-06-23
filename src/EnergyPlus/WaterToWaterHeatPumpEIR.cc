@@ -48,47 +48,56 @@
 #include <string>
 #include <vector>
 
+#include <DataIPShortCuts.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <PlantComponent.hh>
 #include <UtilityRoutines.hh>
 #include <WaterToWaterHeatPumpEIR.hh>
 
 namespace EnergyPlus {
-namespace EIRWaterToWaterHeatPumps {
-
-bool getInputsWWHP(true);
-std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
-
-void EIRWaterToWaterHeatPump::clear_state() {
-    getInputsWWHP = true;
-}
-
-int EIRWaterToWaterHeatPump::add(int a, int b)
-{
-    return a + b;
-}
-
-void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
-                                       bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) {}
-
-PlantComponent *EIRWaterToWaterHeatPump::factory(std::string objectName)
-{
-    if (getInputsWWHP) {
-        EIRWaterToWaterHeatPump::processInputForEIRWWHP();
-	getInputsWWHP = false;
-    }
-
-    for (auto &wwhp : eir_wwhp) {
-	if(wwhp.name == objectName) {
-		return &wwhp;
-	}
-    }
+    namespace EIRWaterToWaterHeatPumps {
     
-    ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
-    return nullptr;
-}
+        bool getInputsWWHP(true);
+        std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
+        
+        void EIRWaterToWaterHeatPump::clear_state() {
+            getInputsWWHP = true;
+        }
+        
+        int EIRWaterToWaterHeatPump::add(int a, int b)
+        {
+            return a + b;
+        }
+        
+        void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+                                               bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) {}
+        
+        PlantComponent *EIRWaterToWaterHeatPump::factory(std::string objectName)
+        {
+            if (getInputsWWHP) {
+                EIRWaterToWaterHeatPump::processInputForEIRWWHP();
+        	getInputsWWHP = false;
+            }
+        
+            for (auto &wwhp : eir_wwhp) {
+        	if(wwhp.name == objectName) {
+        		return &wwhp;
+        	}
+            }
+            
+            ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
+            return nullptr;
+        }
+        
+        void EIRWaterToWaterHeatPump::processInputForEIRWWHP()
+        {
+            using namespace DataIPShortCuts;
+            cCurrentModuleObject = "HeatPump:WaterToWater:EIR";
+            int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+            if (numWWHP > 0) {
 
-void EIRWaterToWaterHeatPump::processInputForEIRWWHP()
-{
+	    }	    
+        }
     
+    }
 }
-}}
