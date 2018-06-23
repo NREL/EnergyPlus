@@ -95,7 +95,21 @@ namespace EnergyPlus {
             cCurrentModuleObject = "HeatPump:WaterToWater:EIR";
             int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             if (numWWHP > 0) {
-
+		for (int wwhpNum = 1; wwhpNum <= numWWHP; ++wwhpNum) {
+                    EIRWaterToWaterHeatPump thisWWHP;
+                    int NumAlphas, NumNumbers, IOStatus;
+		    inputProcessor->getObjectItem(cCurrentModuleObject,
+				                  wwhpNum,
+						  cAlphaArgs,
+						  NumAlphas,
+						  rNumericArgs,
+						  NumNumbers,
+						  IOStatus,
+						  lNumericFieldBlanks,
+						  _,
+						  cAlphaFieldNames,
+						  cNumericFieldNames);
+		} 
 	    }	    
         }
     
