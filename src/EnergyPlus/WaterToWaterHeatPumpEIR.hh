@@ -48,19 +48,37 @@
 #ifndef ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH
 #define ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH
 
+#include <string>
+#include <vector>
+
+#include <PlantComponent.hh>
 #include <WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
 
-    struct EIRWaterToWaterHeatPump : EnergyPlus::BaseWaterToWaterHeatPump {
+    namespace EIRWaterToWaterHeatPumps {
+
+    struct EIRWaterToWaterHeatPump : public EnergyPlus::BaseWaterToWaterHeatPump {
+
+        std::string name;
 
         virtual ~EIRWaterToWaterHeatPump()=default;
+
+        EIRWaterToWaterHeatPump() : name("") {}
+		
 
         int add(int a, int b);
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
+	static PlantComponent *factory(std::string eir_wwhp_name);
+
+	static void processInputForEIRWWHP();
+
+	static void clear_state();
     };
 
+    extern std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
+    }
 }
 
 #endif //ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH

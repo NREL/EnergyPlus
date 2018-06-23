@@ -53,6 +53,7 @@
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::EIRWaterToWaterHeatPumps;
 
 TEST_F(EnergyPlusFixture, TestAddFunction)
 {

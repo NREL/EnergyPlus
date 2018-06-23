@@ -45,9 +45,22 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+#include <vector>
+
+#include <PlantComponent.hh>
+#include <UtilityRoutines.hh>
 #include <WaterToWaterHeatPumpEIR.hh>
 
-using namespace EnergyPlus;
+namespace EnergyPlus {
+namespace EIRWaterToWaterHeatPumps {
+
+bool getInputsWWHP(true);
+std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
+
+void EIRWaterToWaterHeatPump::clear_state() {
+    getInputsWWHP = true;
+}
 
 int EIRWaterToWaterHeatPump::add(int a, int b)
 {
@@ -56,3 +69,26 @@ int EIRWaterToWaterHeatPump::add(int a, int b)
 
 void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
                                        bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) {}
+
+PlantComponent *EIRWaterToWaterHeatPump::factory(std::string objectName)
+{
+    if (getInputsWWHP) {
+        EIRWaterToWaterHeatPump::processInputForEIRWWHP();
+	getInputsWWHP = false;
+    }
+
+    for (auto &wwhp : eir_wwhp) {
+	if(wwhp.name == objectName) {
+		return &wwhp;
+	}
+    }
+    
+    ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
+    return nullptr;
+}
+
+void EIRWaterToWaterHeatPump::processInputForEIRWWHP()
+{
+    
+}
+}}
