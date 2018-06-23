@@ -50,6 +50,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+
+#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
 
 using namespace EnergyPlus;
@@ -59,4 +61,24 @@ TEST_F(EnergyPlusFixture, TestAddFunction)
 {
     EIRWaterToWaterHeatPump wwhp;
     EXPECT_EQ(2, wwhp.add(1, 1));
+}
+
+TEST_F(EnergyPlusFixture, TestEIRWWHPFactory)
+{
+	std::string const idf_objects = delimited_string({
+			"HeatPump:WaterToWater:EIR,",
+			"  hp name,",
+			"  node 1,",
+			"  node 2,",
+			"  node 3,",
+			"  node 4,"
+			});
+        ASSERT_TRUE(process_idf(idf_objects));
+	PlantComponent * thisComp = EIRWaterToWaterHeatPump::factory("hp name");
+//	EIRWaterToWaterHeatPump * thisWWHP = (EIRWaterToWaterHeatPump)(thisComp);
+//	ASSERT_EQUALS("hp name", thisWWHP->name);
+        EXPECT_EQ(1u, eir_wwhp.size());
+	EIRWaterToWaterHeatPump * thisWWHP = &eir_wwhp[0];
+	EXPECT_EQ("hp name", thisWWHP->name);
+
 }

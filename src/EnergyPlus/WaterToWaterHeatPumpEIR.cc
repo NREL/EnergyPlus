@@ -48,8 +48,12 @@
 #include <string>
 #include <vector>
 
+#include <BranchNodeConnections.hh>
 #include <DataIPShortCuts.hh>
+#include <DataLoopNode.hh>
 #include <InputProcessing/InputProcessor.hh>
+#include <NodeInputManager.hh>
+#include <OutputProcessor.hh>
 #include <PlantComponent.hh>
 #include <UtilityRoutines.hh>
 #include <WaterToWaterHeatPumpEIR.hh>
@@ -62,6 +66,7 @@ namespace EnergyPlus {
         
         void EIRWaterToWaterHeatPump::clear_state() {
             getInputsWWHP = true;
+	    eir_wwhp.clear();
         }
         
         int EIRWaterToWaterHeatPump::add(int a, int b)
@@ -70,7 +75,10 @@ namespace EnergyPlus {
         }
         
         void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
-                                               bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) {}
+                                               bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) {
+	    this->loadSideHeatTransfer = CurLoad;
+	    this->running = RunFlag;
+	}
         
         PlantComponent *EIRWaterToWaterHeatPump::factory(std::string objectName)
         {
@@ -92,6 +100,9 @@ namespace EnergyPlus {
         void EIRWaterToWaterHeatPump::processInputForEIRWWHP()
         {
             using namespace DataIPShortCuts;
+	    
+	    bool errorsFound = false;
+
             cCurrentModuleObject = "HeatPump:WaterToWater:EIR";
             int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             if (numWWHP > 0) {
@@ -109,6 +120,42 @@ namespace EnergyPlus {
 						  _,
 						  cAlphaFieldNames,
 						  cNumericFieldNames);
+		    thisWWHP.name = cAlphaArgs(1);
+		    
+		    std::string loadSideInletNodeName = cAlphaArgs(2);
+		    std::string loadSideOutletNodeName = cAlphaArgs(3);
+		    std::string sourceSideInletNodeName = cAlphaArgs(4);
+		    std::string sourceSideOutletNodeName = cAlphaArgs(5);
+                    int loadSideInletNodeNum = NodeInputManager::GetOnlySingleNode(
+				    loadSideInletNodeName, 
+				    errorsFound, 
+				    cCurrentModuleObject, 
+				    thisWWHP.name, 
+				    DataLoopNode::NodeType_Water,
+				    DataLoopNode::NodeConnectionType_Inlet, 
+				    1, 
+				    DataLoopNode::ObjectIsNotParent
+	            );
+                    int sourceSideInletNodeNum = NodeInputManager::GetOnlySingleNode(
+				    sourceSideInletNodeName, 
+				    errorsFound, 
+				    cCurrentModuleObject, 
+				    thisWWHP.name, 
+				    DataLoopNode::NodeType_Water,
+				    DataLoopNode::NodeConnectionType_Outlet, 
+				    1, 
+				    DataLoopNode::ObjectIsNotParent
+	            );
+                    BranchNodeConnections::TestCompSet(
+				    cCurrentModuleObject,
+				    thisWWHP.name,
+				    loadSideInletNodeName,
+				    loadSideOutletNodeName,
+				    "Chilled Water Nodes"
+		    );
+
+		    eir_wwhp.push_back(thisWWHP);
+
 		} 
 	    }	    
         }

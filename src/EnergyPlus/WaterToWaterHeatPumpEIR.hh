@@ -58,13 +58,28 @@ namespace EnergyPlus {
 
     namespace EIRWaterToWaterHeatPumps {
 
+    struct InOutNodePair {
+	int inlet;
+	int outlet;
+	InOutNodePair() : inlet(0), outlet(0) {}
+    };
+
     struct EIRWaterToWaterHeatPump : public EnergyPlus::BaseWaterToWaterHeatPump {
 
         std::string name;
+	Real64 loadSideHeatTransfer;
+	bool running;
+	InOutNodePair loadSideNodes;
+	InOutNodePair sourceSideNodes;
 
         virtual ~EIRWaterToWaterHeatPump()=default;
 
-        EIRWaterToWaterHeatPump() : name("") {}
+        EIRWaterToWaterHeatPump() : name(""), 
+	                            loadSideHeatTransfer(0.0), 
+				    running(false),
+				    loadSideNodes(InOutNodePair()),
+				    sourceSideNodes(InOutNodePair())
+        {}
 		
 
         int add(int a, int b);
