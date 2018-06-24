@@ -69,6 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GroundHeatExchangers.hh>
+#include <HeatPumpWaterToWaterSimple.hh>
 #include <HVACInterfaceManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -1096,6 +1097,7 @@ namespace PlantManager {
                             this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                             this_comp.CurOpSchemeType = DemandOpSchemeType;
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WatertoWater:EquationFit:Cooling")) {
+							this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(TypeOf_HPWaterEFCooling, CompNames(CompNum));
                             this_comp.TypeOf_Num = TypeOf_HPWaterEFCooling;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {
@@ -1104,6 +1106,7 @@ namespace PlantManager {
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             }
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WatertoWater:EquationFit:Heating")) {
+							this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(TypeOf_HPWaterEFHeating, CompNames(CompNum));
                             this_comp.TypeOf_Num = TypeOf_HPWaterEFHeating;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {

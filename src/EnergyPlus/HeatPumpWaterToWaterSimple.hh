@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -68,7 +69,7 @@ namespace HeatPumpWaterToWaterSimple {
     // MODULE VARIABLE DECLARATIONS:
     extern int NumGSHPs; // Number of GSHPs specified in input
 
-    struct GshpSpecs
+    struct GshpSpecs : public PlantComponent
     {
         // Members
         std::string Name;                // user identifier
@@ -185,6 +186,20 @@ namespace HeatPumpWaterToWaterSimple {
                   MyEnvrnFlag(true)
         {
         }
+        
+        virtual ~GshpSpecs()=default;
+
+        static PlantComponent *factory(int wwhp_type, std::string eir_wwhp_name);
+
+		static void clear_state();
+
+		static void GetWatertoWaterHPInput();
+    
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+		void getSizingFactor(Real64 &sizingFactor) override;
 
         void InitWatertoWaterHP(int const GSHPTypeNum,       // Type of GSHP
                                 std::string const &GSHPName, // User Specified Name of GSHP
@@ -206,26 +221,6 @@ namespace HeatPumpWaterToWaterSimple {
 
     // Object Data
     extern Array1D<GshpSpecs> GSHP;
-
-    // Functions
-    void clear_state();
-
-    void SimHPWatertoWaterSimple(std::string const &GSHPType, // Type of GSHP
-                                 int const GSHPTypeNum,       // Type of GSHP in Plant equipment
-                                 std::string const &GSHPName, // User Specified Name of GSHP
-                                 int &GSHPNum,                // Index of Equipment
-                                 bool const FirstHVACIteration,
-                                 bool &InitLoopEquip,      // If not zero, calculate the max load for operating conditions
-                                 Real64 const MyLoad,      // Loop demand component will meet
-                                 Real64 &MaxCap,           // Maximum operating capacity of GSHP [W]
-                                 Real64 &MinCap,           // Minimum operating capacity of GSHP [W]
-                                 Real64 &OptCap,           // Optimal operating capacity of GSHP [W]
-                                 int const LoopNum,        // The calling loop number
-                                 bool const getCompSizFac, // true if calling to get component sizing factor
-                                 Real64 &sizingFac         // component level sizing factor
-    );
-
-    void GetWatertoWaterHPInput();
 
 
 } // namespace HeatPumpWaterToWaterSimple

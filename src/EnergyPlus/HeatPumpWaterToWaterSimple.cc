@@ -65,6 +65,8 @@
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
+#include <Plant/PlantLocation.hh>
+#include <PlantComponent.hh>
 #include <PlantUtilities.hh>
 #include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
@@ -123,160 +125,111 @@ namespace HeatPumpWaterToWaterSimple {
     int NumGSHPs(0); // Number of GSHPs specified in input
     namespace {
         bool GetInputFlag(true); // then TRUE, calls subroutine to read input file.
-        bool InitWatertoWaterHPOneTimeFlag(true);
     } // namespace
 
     // Object Data
     Array1D<GshpSpecs> GSHP;
     std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
 
-    void clear_state()
+    void GshpSpecs::clear_state()
     {
         NumGSHPs = 0;
         GetInputFlag = true;
-        InitWatertoWaterHPOneTimeFlag = true;
         HeatPumpWaterUniqueNames.clear();
         GSHP.deallocate();
     }
 
-    void SimHPWatertoWaterSimple(std::string const &GSHPType, // Type of GSHP
-                                 int const GSHPTypeNum,       // Type of GSHP in Plant equipment
-                                 std::string const &GSHPName, // User Specified Name of GSHP
-                                 int &CompIndex,              // Index of Equipment
-                                 bool const FirstHVACIteration,
-                                 bool &InitLoopEquip,      // If not zero, calculate the max load for operating conditions
-                                 Real64 const MyLoad,      // Loop demand component will meet
-                                 Real64 &MaxCap,           // Maximum operating capacity of GSHP [W]
-                                 Real64 &MinCap,           // Minimum operating capacity of GSHP [W]
-                                 Real64 &OptCap,           // Optimal operating capacity of GSHP [W]
-                                 int const LoopNum,        // The calling loop number
-                                 bool const getCompSizFac, // true if calling to get component sizing factor
-                                 Real64 &sizingFac         // component level sizing factor
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Kenneth Tang
-        //       DATE WRITTEN   March 2005
-        //       MODIFIED
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine manages Water-to-Water Heat Pump Simple (Equation-Fit Model)
-
-        // Get input from IDF
+    PlantComponent *GshpSpecs::factory(int wwhp_type, std::string eir_wwhp_name) {
         if (GetInputFlag) {
-            GetWatertoWaterHPInput();
+            GshpSpecs::GetWatertoWaterHPInput();
             GetInputFlag = false;
         }
 
-        int GSHPNum(0);
-        if (CompIndex == 0) {
-            GSHPNum = UtilityRoutines::FindItemInList(GSHPName, GSHP);
-            if (GSHPNum == 0) {
-                ShowFatalError("SimHPWatertoWaterSimple: Specified heat pump not one of valid heat pumps. Heat pump = " + GSHPName);
-            }
-            CompIndex = GSHPNum;
-        } else {
-            GSHPNum = CompIndex;
-            if (GSHPNum > NumGSHPs || GSHPNum < 1) {
-                ShowFatalError("SimHPWatertoWaterSimple: Invalide component index pass = " + General::TrimSigDigits(GSHPNum) +
-                               ", number of units = " + General::TrimSigDigits(NumGSHPs) + ", entered unit name=" + GSHPName);
-            }
-            if (GSHP(GSHPNum).checkEquipName) {
-                if (GSHPName != GSHP(GSHPNum).Name) {
-                    ShowFatalError("SimHPWatertoWaterSimple: Invalid CompIndex passed=" + General::TrimSigDigits(GSHPNum) +
-                                   ", Unit name=" + GSHPName + ", stored Unit Name for that index=" + GSHP(GSHPNum).Name);
-                }
-                GSHP(GSHPNum).checkEquipName = false;
+        for (auto &wwhp : GSHP) {
+            if (wwhp.Name == eir_wwhp_name && wwhp.WWHPPlantTypeOfNum == wwhp_type) {
+                return &wwhp;
             }
         }
 
-        // get a reference to do all further calculations
-        auto & thisHP = GSHP(GSHPNum);
+        ShowFatalError("EquationFit_WWHP factory: Error getting inputs for wwhp named: " + eir_wwhp_name);
+        return nullptr;
+    }
 
-        if (InitLoopEquip) {
-            thisHP.InitWatertoWaterHP(GSHPTypeNum, GSHPName, FirstHVACIteration, MyLoad);
-            if (LoopNum == thisHP.LoadLoopNum) {
-                if (GSHPTypeNum == DataPlant::TypeOf_HPWaterEFCooling) {
-                    thisHP.sizeCoolingWaterToWaterHP();
-                    MinCap = 0.0;
-                    MaxCap = thisHP.RatedCapCool;
-                    OptCap = thisHP.RatedCapCool;
-                } else if (GSHPTypeNum == DataPlant::TypeOf_HPWaterEFHeating) {
-                    thisHP.sizeHeatingWaterToWaterHP();
-                    MinCap = 0.0;
-                    MaxCap = thisHP.RatedCapHeat;
-                    OptCap = thisHP.RatedCapHeat;
-                } else {
-                    ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + GSHPType);
-                }
-            } else {
-                MinCap = 0.0;
-                MaxCap = 0.0;
-                OptCap = 0.0;
-            }
-            if (getCompSizFac) {
-                sizingFac = thisHP.sizFac;
-            }
-
-            return;
-        }
-
-        if (GSHPTypeNum == DataPlant::TypeOf_HPWaterEFCooling) {
-            if (GSHPNum != 0) {
-                if (LoopNum == GSHP(GSHPNum).LoadLoopNum) { // chilled water loop
-
-                    thisHP.InitWatertoWaterHP(GSHPTypeNum, GSHPName, FirstHVACIteration, MyLoad);
-                    thisHP.CalcWatertoWaterHPCooling(MyLoad);
-                    thisHP.UpdateGSHPRecords();
-
-                } else if (LoopNum == GSHP(GSHPNum).SourceLoopNum) { // condenser loop
-                    PlantUtilities::UpdateChillerComponentCondenserSide(thisHP.SourceLoopNum,
-                                                                        thisHP.SourceLoopSideNum,
-                                                                        DataPlant::TypeOf_HPWaterEFCooling,
-                                                                        thisHP.SourceSideInletNodeNum,
-                                                                        thisHP.SourceSideOutletNodeNum,
-                                                                        thisHP.reportQSource,
-                                                                        thisHP.reportSourceSideInletTemp,
-                                                                        thisHP.reportSourceSideOutletTemp,
-                                                                        thisHP.reportSourceSideMassFlowRate,
-                                                                        FirstHVACIteration);
-                } else {
-                    ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + GSHPName);
-                }
-            } else {
-                ShowFatalError("SimHPWatertoWaterSimple:: Invalid " + HPEqFitCooling + ", Requested Unit=" + GSHPName);
-            }
-        } else if (GSHPTypeNum == DataPlant::TypeOf_HPWaterEFHeating) {
-            if (GSHPNum != 0) {
-                if (LoopNum == GSHP(GSHPNum).LoadLoopNum) { // chilled water loop
-
-                    thisHP.InitWatertoWaterHP(GSHPTypeNum, GSHPName, FirstHVACIteration, MyLoad);
-                    thisHP.CalcWatertoWaterHPHeating(MyLoad);
-                    thisHP.UpdateGSHPRecords();
-                } else if (LoopNum == GSHP(GSHPNum).SourceLoopNum) { // condenser loop
-                    PlantUtilities::UpdateChillerComponentCondenserSide(thisHP.SourceLoopNum,
-                                                                        thisHP.SourceLoopSideNum,
-                                                                        DataPlant::TypeOf_HPWaterEFHeating,
-                                                                        thisHP.SourceSideInletNodeNum,
-                                                                        thisHP.SourceSideOutletNodeNum,
-                                                                        -thisHP.reportQSource,
-                                                                        thisHP.reportSourceSideInletTemp,
-                                                                        thisHP.reportSourceSideOutletTemp,
-                                                                        thisHP.reportSourceSideMassFlowRate,
-                                                                        FirstHVACIteration);
-                } else {
-                    ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + GSHPName);
-                }
-            } else {
-                ShowFatalError("SimHPWatertoWaterSimple:: Invalid " + HPEqFitHeating + ", Requested Unit=" + GSHPName);
-            }
+    void GshpSpecs::simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
+    {
+        if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
+			if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
+				this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
+				this->CalcWatertoWaterHPCooling(CurLoad);
+				this->UpdateGSHPRecords();
+			} else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
+				PlantUtilities::UpdateChillerComponentCondenserSide(this->SourceLoopNum,
+																	this->SourceLoopSideNum,
+																	DataPlant::TypeOf_HPWaterEFCooling,
+																	this->SourceSideInletNodeNum,
+																	this->SourceSideOutletNodeNum,
+																	this->reportQSource,
+																	this->reportSourceSideInletTemp,
+																	this->reportSourceSideOutletTemp,
+																	this->reportSourceSideMassFlowRate,
+																	FirstHVACIteration);
+			} else {
+				ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+			}
+        } else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
+			if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
+				this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
+				this->CalcWatertoWaterHPHeating(CurLoad);
+				this->UpdateGSHPRecords();
+			} else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
+				PlantUtilities::UpdateChillerComponentCondenserSide(this->SourceLoopNum,
+																	this->SourceLoopSideNum,
+																	DataPlant::TypeOf_HPWaterEFHeating,
+																	this->SourceSideInletNodeNum,
+																	this->SourceSideOutletNodeNum,
+																	-this->reportQSource,
+																	this->reportSourceSideInletTemp,
+																	this->reportSourceSideOutletTemp,
+																	this->reportSourceSideMassFlowRate,
+																	FirstHVACIteration);
+			} else {
+				ShowFatalError("SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+			}
         } else {
-            ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType=" + GSHPType);
+            ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
         } // TypeOfEquip
     }
 
-    void GetWatertoWaterHPInput()
+    void GshpSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+		this->InitWatertoWaterHP(this->WWHPPlantTypeOfNum, this->Name, true, 0.0);  // Changed to true for FirstHVAC and 0.0 for Curload during this phase
+		if (calledFromLocation.loopNum == this->LoadLoopNum) {
+			if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFCooling) {
+				this->sizeCoolingWaterToWaterHP();
+				MinLoad = 0.0;
+				MaxLoad = this->RatedCapCool;
+				OptLoad = this->RatedCapCool;
+			} else if (this->WWHPPlantTypeOfNum == DataPlant::TypeOf_HPWaterEFHeating) {
+				this->sizeHeatingWaterToWaterHP();
+				MinLoad = 0.0;
+				MaxLoad = this->RatedCapHeat;
+				OptLoad = this->RatedCapHeat;
+			} else {
+				ShowFatalError("SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
+			}
+		} else {
+			MinLoad = 0.0;
+			MaxLoad = 0.0;
+			OptLoad = 0.0;
+		}
+    }
+    
+    void GshpSpecs::getSizingFactor(Real64 &sizingFactor)
+    {
+		sizingFactor = this->sizFac;
+	}
+	
+    void GshpSpecs::GetWatertoWaterHPInput()
     {
 
         // SUBROUTINE INFORMATION:
@@ -294,7 +247,6 @@ namespace HeatPumpWaterToWaterSimple {
         using DataPlant::TypeOf_HPWaterEFHeating;
         using NodeInputManager::GetOnlySingleNode;
         using PlantUtilities::RegisterPlantCompDesignFlow;
-        using PlantUtilities::ScanPlantLoopsForObject;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GSHPNum;     // GSHP number
@@ -690,46 +642,6 @@ namespace HeatPumpWaterToWaterSimple {
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-
-            // scan for loop connection data
-            errFlag = false;
-            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
-                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
-                                    GSHP(GSHPNum).SourceLoopNum,
-                                    GSHP(GSHPNum).SourceLoopSideNum,
-                                    GSHP(GSHPNum).SourceBranchNum,
-                                    GSHP(GSHPNum).SourceCompNum,
-                                    _,
-                                    _,
-                                    _,
-                                    GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    _,
-                                    errFlag);
-            ScanPlantLoopsForObject(GSHP(GSHPNum).Name,
-                                    GSHP(GSHPNum).WWHPPlantTypeOfNum,
-                                    GSHP(GSHPNum).LoadLoopNum,
-                                    GSHP(GSHPNum).LoadLoopSideNum,
-                                    GSHP(GSHPNum).LoadBranchNum,
-                                    GSHP(GSHPNum).LoadCompNum,
-                                    _,
-                                    _,
-                                    _,
-                                    GSHP(GSHPNum).LoadSideInletNodeNum,
-                                    _,
-                                    errFlag);
-
-            if (!errFlag) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(GSHP(GSHPNum).LoadLoopNum,
-                                                              GSHP(GSHPNum).LoadLoopSideNum,
-                                                              GSHP(GSHPNum).SourceLoopNum,
-                                                              GSHP(GSHPNum).SourceLoopSideNum,
-                                                              GSHP(GSHPNum).WWHPPlantTypeOfNum,
-                                                              true);
-            }
-
-            if (errFlag) {
-                ShowFatalError("GetWatertoWaterHPInput: Program terminated on scan for loop data");
-            }
         }
     }
 
@@ -791,6 +703,49 @@ namespace HeatPumpWaterToWaterSimple {
         LoadSideOutletNode = this->LoadSideOutletNodeNum;
         SourceSideInletNode = this->SourceSideInletNodeNum;
         SourceSideOutletNode = this->SourceSideOutletNodeNum;
+
+		if (this->MyPlantScanFlag)
+		{
+            bool errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                                    this->WWHPPlantTypeOfNum,
+                                    this->SourceLoopNum,
+                                    this->SourceLoopSideNum,
+                                    this->SourceBranchNum,
+                                    this->SourceCompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    this->SourceSideInletNodeNum,
+                                    _,
+                                    errFlag);
+            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                                    this->WWHPPlantTypeOfNum,
+                                    this->LoadLoopNum,
+                                    this->LoadLoopSideNum,
+                                    this->LoadBranchNum,
+                                    this->LoadCompNum,
+                                    _,
+                                    _,
+                                    _,
+                                    this->LoadSideInletNodeNum,
+                                    _,
+                                    errFlag);
+
+            if (!errFlag) {
+                PlantUtilities::InterConnectTwoPlantLoopSides(this->LoadLoopNum,
+                                                              this->LoadLoopSideNum,
+                                                              this->SourceLoopNum,
+                                                              this->SourceLoopSideNum,
+                                                              this->WWHPPlantTypeOfNum,
+                                                              true);
+            }
+
+            if (errFlag) {
+                ShowFatalError("GetWatertoWaterHPInput: Program terminated on scan for loop data");
+            }
+            this->MyPlantScanFlag = false;
+		}
 
         if (this->MyEnvrnFlag && BeginEnvrnFlag) {
             // Initialize all report variables to a known state at beginning of simulation
@@ -2040,9 +1995,7 @@ namespace HeatPumpWaterToWaterSimple {
         //       AUTHOR:          Kenneth Tang
         //       DATE WRITTEN:    March 2005
 
-        int LoadSideInletNode = this->LoadSideInletNodeNum;
         int LoadSideOutletNode = this->LoadSideOutletNodeNum;
-        int SourceSideInletNode = this->SourceSideInletNodeNum;
         int SourceSideOutletNode = this->SourceSideOutletNodeNum;
 
         if (!this->MustRun) {
