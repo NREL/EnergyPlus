@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <stdexcept>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -57,28 +59,27 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRWaterToWaterHeatPumps;
 
-TEST_F(EnergyPlusFixture, TestAddFunction)
-{
-    EIRWaterToWaterHeatPump wwhp;
-    EXPECT_EQ(2, wwhp.add(1, 1));
+TEST_F(EnergyPlusFixture, TestAddFunction) {
+	EIRWaterToWaterHeatPump wwhp;
+	EXPECT_EQ(2, wwhp.add(1, 1));
 }
 
-TEST_F(EnergyPlusFixture, TestEIRWWHPFactory)
-{
+TEST_F(EnergyPlusFixture, TestEIRWWHPFactory) {
 	std::string const idf_objects = delimited_string({
-			"HeatPump:WaterToWater:EIR,",
-			"  hp name,",
-			"  node 1,",
-			"  node 2,",
-			"  node 3,",
-			"  node 4,"
-			});
-        ASSERT_TRUE(process_idf(idf_objects));
-	PlantComponent * thisComp = EIRWaterToWaterHeatPump::factory("hp name");
-//	EIRWaterToWaterHeatPump * thisWWHP = (EIRWaterToWaterHeatPump)(thisComp);
-//	ASSERT_EQUALS("hp name", thisWWHP->name);
-        EXPECT_EQ(1u, eir_wwhp.size());
-	EIRWaterToWaterHeatPump * thisWWHP = &eir_wwhp[0];
-	EXPECT_EQ("hp name", thisWWHP->name);
-
+															 "HeatPump:WaterToWater:EIR,",
+															 "  hp name,",
+															 "  node 1,",
+															 "  node 2,",
+															 "  node 3,",
+															 "  node 4;"
+													 });
+	ASSERT_TRUE(process_idf(idf_objects));
+	// call the factory with a valid name to trigger reading inputs
+	PlantComponent *thisComp = EIRWaterToWaterHeatPump::factory("HP NAME");
+	// verify the size of the vector and the processed name
+	EXPECT_EQ(1u, eir_wwhp.size());
+	EIRWaterToWaterHeatPump *thisWWHP = &eir_wwhp[0];
+	EXPECT_EQ("HP NAME", thisWWHP->name);
+	// calling the factory with an invalid name should call ShowFatalError, which will trigger a runtime exception
+	EXPECT_THROW(EIRWaterToWaterHeatPump::factory("hp name 2"), std::runtime_error);
 }
