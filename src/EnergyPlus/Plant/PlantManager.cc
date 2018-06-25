@@ -88,6 +88,7 @@
 #include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
+#include <WaterToWaterHeatPumpEIR.hh>
 
 namespace EnergyPlus {
 
@@ -1124,6 +1125,24 @@ namespace PlantManager {
                             }
                         } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:ParameterEstimation:Cooling")) {
                             this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
+                            this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
+                        } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:EIR:Heating")) {
+							this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
+                            this_comp.TypeOf_Num = TypeOf_HeatPumpEIRHeating;
+                            this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
+                            if (LoopSideNum == DemandSide) {
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (LoopSideNum == SupplySide) {
+                                this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                            }
+                        } else if (UtilityRoutines::SameString(this_comp_type, "HeatPump:WaterToWater:EIR:Cooling")) {
+							this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
+                            this_comp.TypeOf_Num = TypeOf_HeatPumpEIRCooling;
                             this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                             if (LoopSideNum == DemandSide) {
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -4233,6 +4252,15 @@ namespace PlantManager {
                                 this_component.FlowCtrl = ControlType_Active;
                                 this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                 this_component.HowLoadServed = HowMet_PassiveCap;
+                            } else if (SELECT_CASE_var == TypeOf_HeatPumpEIRCooling || SELECT_CASE_var == TypeOf_HeatPumpEIRHeating) { // 95, 96
+                                this_component.FlowCtrl = ControlType_Active;
+                                if (LoopSideCtr == DemandSide) {
+                                    this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+                                    this_component.HowLoadServed = HowMet_NoneDemand;
+                                } else {
+                                    this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+                                    this_component.HowLoadServed = HowMet_ByNominalCap;
+                                }
                             } else {
                                 ShowSevereError("SetBranchControlTypes: Caught unexpected equipment type of number");
                             }

@@ -68,14 +68,14 @@ TEST_F(EnergyPlusFixture, TestAddFunction)
 TEST_F(EnergyPlusFixture, TestEIRWWHPFactory)
 {
     std::string const idf_objects =
-        delimited_string({"HeatPump:WaterToWater:EIR,", "  hp name,", "  node 1,", "  node 2,", "  node 3,", "  node 4;"});
+        delimited_string({"HeatPump:WaterToWater:EIR:Cooling,", "  hp cooling side,", "  node 1,", "  node 2,", "  node 3,", "  node 4;"});
     ASSERT_TRUE(process_idf(idf_objects));
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory("HP NAME");
+    EIRWaterToWaterHeatPump::factory(95, "HP COOLING SIDE");
     // verify the size of the vector and the processed name
     EXPECT_EQ(1u, eir_wwhp.size());
     EIRWaterToWaterHeatPump *thisWWHP = &eir_wwhp[0];
-    EXPECT_EQ("HP NAME", thisWWHP->name);
+    EXPECT_EQ("HP COOLING SIDE", thisWWHP->name);
     // calling the factory with an invalid name should call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRWaterToWaterHeatPump::factory("hp name 2"), std::runtime_error);
+    EXPECT_THROW(EIRWaterToWaterHeatPump::factory(95, "hp fake name"), std::runtime_error);
 }

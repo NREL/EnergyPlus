@@ -608,6 +608,12 @@ namespace PlantLoopEquip {
             } else if (EquipTypeNum == TypeOf_HPWaterEFHeating) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
+            } else if (EquipTypeNum == TypeOf_HeatPumpEIRCooling) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_HeatPumpEIRHeating) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
             } else if (EquipTypeNum == TypeOf_HeatPumpVRF) {
 
                 SimVRFCondenserPlant(sim_component.TypeOf,

@@ -52,6 +52,7 @@
 #include <vector>
 
 #include <PlantComponent.hh>
+#include <Plant/PlantLocation.hh>
 #include <WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
@@ -70,25 +71,43 @@ namespace EIRWaterToWaterHeatPumps {
 
     struct EIRWaterToWaterHeatPump : public EnergyPlus::BaseWaterToWaterHeatPump
     {
-
-        std::string name;
-        Real64 loadSideHeatTransfer;
-        bool running;
+		// fixed configuration parameters
+        std::string name = "";
+        int plantTypeOfNum = -1;
+        
+        // static-ish input data
+        Real64 loadSideDesignVolFlowRate;
+        Real64 sourceSideDesignVolFlowRate;
+        Real64 loadSideDesignMassFlowRate;
+        Real64 sourceSideDesignMassFlowRate;
+                
+        // simulation variables
+        Real64 loadSideHeatTransfer = 0.0;
+        Real64 loadSideInletTemp = 0.0;
+        Real64 sourceSideInletTemp = 0.0;
+        bool running = false;
+        
+        // topology variables
+        PlantLocation loadSideLocation;
+        PlantLocation sourceSideLocation;
         InOutNodePair loadSideNodes;
         InOutNodePair sourceSideNodes;
+        
+        // logic flags
+        bool oneTimeInit = true;
+        bool envrnInit = true;
 
         virtual ~EIRWaterToWaterHeatPump() = default;
 
-        EIRWaterToWaterHeatPump()
-            : name(""), loadSideHeatTransfer(0.0), running(false), loadSideNodes(InOutNodePair()), sourceSideNodes(InOutNodePair())
-        {
-        }
+        EIRWaterToWaterHeatPump()=default;
 
         int add(int a, int b);
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(std::string eir_wwhp_name);
+		void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
 
         static void processInputForEIRWWHP();
 
