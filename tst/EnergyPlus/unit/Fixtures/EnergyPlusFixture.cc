@@ -363,7 +363,7 @@ void EnergyPlusFixture::clear_all_states()
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterSimple::clear_state();
+    HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
     HeatRecovery::clear_state();
     HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
