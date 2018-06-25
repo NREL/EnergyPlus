@@ -59,103 +59,109 @@
 #include <WaterToWaterHeatPumpEIR.hh>
 
 namespace EnergyPlus {
-	namespace EIRWaterToWaterHeatPumps {
+namespace EIRWaterToWaterHeatPumps {
 
-		bool getInputsWWHP(true);
-		std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
+    bool getInputsWWHP(true);
+    std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
 
-		void EIRWaterToWaterHeatPump::clear_state() {
-			getInputsWWHP = true;
-			eir_wwhp.clear();
-		}
+    void EIRWaterToWaterHeatPump::clear_state()
+    {
+        getInputsWWHP = true;
+        eir_wwhp.clear();
+    }
 
-		int EIRWaterToWaterHeatPump::add(int a, int b) {
-			return a + b;
-		}
+    int EIRWaterToWaterHeatPump::add(int a, int b)
+    {
+        return a + b;
+    }
 
-		void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
-											   bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) {
-			this->loadSideHeatTransfer = CurLoad;
-			this->running = RunFlag;
-		}
+    void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+                                           bool const EP_UNUSED(FirstHVACIteration),
+                                           Real64 &CurLoad,
+                                           bool const RunFlag)
+    {
+        this->loadSideHeatTransfer = CurLoad;
+        this->running = RunFlag;
+    }
 
-		PlantComponent *EIRWaterToWaterHeatPump::factory(std::string objectName) {
-			if (getInputsWWHP) {
-				EIRWaterToWaterHeatPump::processInputForEIRWWHP();
-				getInputsWWHP = false;
-			}
+    PlantComponent *EIRWaterToWaterHeatPump::factory(std::string objectName)
+    {
+        if (getInputsWWHP) {
+            EIRWaterToWaterHeatPump::processInputForEIRWWHP();
+            getInputsWWHP = false;
+        }
 
-			for (auto &wwhp : eir_wwhp) {
-				if (wwhp.name == objectName) {
-					return &wwhp;
-				}
-			}
+        for (auto &wwhp : eir_wwhp) {
+            if (wwhp.name == objectName) {
+                return &wwhp;
+            }
+        }
 
-			ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
-			return nullptr;
-		}
+        ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
+        return nullptr;
+    }
 
-		void EIRWaterToWaterHeatPump::processInputForEIRWWHP() {
-			using namespace DataIPShortCuts;
+    void EIRWaterToWaterHeatPump::processInputForEIRWWHP()
+    {
+        using namespace DataIPShortCuts;
 
-			bool errorsFound = false;
+        // bool errorsFound = false;
 
-			cCurrentModuleObject = "HeatPump:WaterToWater:EIR";
-			int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-			if (numWWHP > 0) {
-				for (int wwhpNum = 1; wwhpNum <= numWWHP; ++wwhpNum) {
-					EIRWaterToWaterHeatPump thisWWHP;
-					int NumAlphas, NumNumbers, IOStatus;
-					inputProcessor->getObjectItem(cCurrentModuleObject,
-												  wwhpNum,
-												  cAlphaArgs,
-												  NumAlphas,
-												  rNumericArgs,
-												  NumNumbers,
-												  IOStatus,
-												  lNumericFieldBlanks,
-												  _,
-												  cAlphaFieldNames,
-												  cNumericFieldNames);
-					thisWWHP.name = cAlphaArgs(1);
+        cCurrentModuleObject = "HeatPump:WaterToWater:EIR";
+        int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (numWWHP > 0) {
+            for (int wwhpNum = 1; wwhpNum <= numWWHP; ++wwhpNum) {
+                EIRWaterToWaterHeatPump thisWWHP;
+                int NumAlphas, NumNumbers, IOStatus;
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                                              wwhpNum,
+                                              cAlphaArgs,
+                                              NumAlphas,
+                                              rNumericArgs,
+                                              NumNumbers,
+                                              IOStatus,
+                                              lNumericFieldBlanks,
+                                              _,
+                                              cAlphaFieldNames,
+                                              cNumericFieldNames);
+                thisWWHP.name = cAlphaArgs(1);
 
-					std::string loadSideInletNodeName = cAlphaArgs(2);
-					std::string loadSideOutletNodeName = cAlphaArgs(3);
-					std::string sourceSideInletNodeName = cAlphaArgs(4);
-					std::string sourceSideOutletNodeName = cAlphaArgs(5);
-//					int loadSideInletNodeNum = NodeInputManager::GetOnlySingleNode(
-//							loadSideInletNodeName,
-//							errorsFound,
-//							cCurrentModuleObject,
-//							thisWWHP.name,
-//							DataLoopNode::NodeType_Water,
-//							DataLoopNode::NodeConnectionType_Inlet,
-//							1,
-//							DataLoopNode::ObjectIsNotParent
-//					);
-//					int sourceSideInletNodeNum = NodeInputManager::GetOnlySingleNode(
-//							sourceSideInletNodeName,
-//							errorsFound,
-//							cCurrentModuleObject,
-//							thisWWHP.name,
-//							DataLoopNode::NodeType_Water,
-//							DataLoopNode::NodeConnectionType_Outlet,
-//							1,
-//							DataLoopNode::ObjectIsNotParent
-//					);
-//					BranchNodeConnections::TestCompSet(
-//							cCurrentModuleObject,
-//							thisWWHP.name,
-//							loadSideInletNodeName,
-//							loadSideOutletNodeName,
-//							"Chilled Water Nodes"
-//					);
+                std::string loadSideInletNodeName = cAlphaArgs(2);
+                std::string loadSideOutletNodeName = cAlphaArgs(3);
+                std::string sourceSideInletNodeName = cAlphaArgs(4);
+                std::string sourceSideOutletNodeName = cAlphaArgs(5);
+                //					int loadSideInletNodeNum = NodeInputManager::GetOnlySingleNode(
+                //							loadSideInletNodeName,
+                //							errorsFound,
+                //							cCurrentModuleObject,
+                //							thisWWHP.name,
+                //							DataLoopNode::NodeType_Water,
+                //							DataLoopNode::NodeConnectionType_Inlet,
+                //							1,
+                //							DataLoopNode::ObjectIsNotParent
+                //					);
+                //					int sourceSideInletNodeNum = NodeInputManager::GetOnlySingleNode(
+                //							sourceSideInletNodeName,
+                //							errorsFound,
+                //							cCurrentModuleObject,
+                //							thisWWHP.name,
+                //							DataLoopNode::NodeType_Water,
+                //							DataLoopNode::NodeConnectionType_Outlet,
+                //							1,
+                //							DataLoopNode::ObjectIsNotParent
+                //					);
+                //					BranchNodeConnections::TestCompSet(
+                //							cCurrentModuleObject,
+                //							thisWWHP.name,
+                //							loadSideInletNodeName,
+                //							loadSideOutletNodeName,
+                //							"Chilled Water Nodes"
+                //					);
 
-					eir_wwhp.push_back(thisWWHP);
+                eir_wwhp.push_back(thisWWHP);
+            }
+        }
+    }
 
-				}
-			}
-		}
-
-	}
-}
+} // namespace EIRWaterToWaterHeatPumps
+} // namespace EnergyPlus
