@@ -245,11 +245,25 @@ namespace SteamBaseboardRadiator {
                     auto const SELECT_CASE_var(SteamBaseboard(BaseboardNum).EquipType);
 
                     if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
-                        ControlCompOutput(SteamBaseboard(BaseboardNum).EquipID, cCMO_BBRadiator_Steam, BaseboardNum, FirstHVACIteration, QZnReq,
-                                          SteamBaseboard(BaseboardNum).SteamInletNode, MaxSteamFlow, MinSteamFlow,
-                                          SteamBaseboard(BaseboardNum).Offset, SteamBaseboard(BaseboardNum).ControlCompTypeNum,
-                                          SteamBaseboard(BaseboardNum).CompErrIndex, _, _, _, _, _, SteamBaseboard(BaseboardNum).LoopNum,
-                                          SteamBaseboard(BaseboardNum).LoopSideNum, SteamBaseboard(BaseboardNum).BranchNum);
+                        ControlCompOutput(SteamBaseboard(BaseboardNum).EquipID,
+                                          cCMO_BBRadiator_Steam,
+                                          BaseboardNum,
+                                          FirstHVACIteration,
+                                          QZnReq,
+                                          SteamBaseboard(BaseboardNum).SteamInletNode,
+                                          MaxSteamFlow,
+                                          MinSteamFlow,
+                                          SteamBaseboard(BaseboardNum).Offset,
+                                          SteamBaseboard(BaseboardNum).ControlCompTypeNum,
+                                          SteamBaseboard(BaseboardNum).CompErrIndex,
+                                          _,
+                                          _,
+                                          _,
+                                          _,
+                                          _,
+                                          SteamBaseboard(BaseboardNum).LoopNum,
+                                          SteamBaseboard(BaseboardNum).LoopSideNum,
+                                          SteamBaseboard(BaseboardNum).BranchNum);
                     } else {
                         ShowSevereError("SimSteamBaseboard: Errors in Baseboard=" + SteamBaseboard(BaseboardNum).EquipID);
                         ShowContinueError("Invalid or unimplemented equipment type=" + TrimSigDigits(SteamBaseboard(BaseboardNum).EquipType));
@@ -261,9 +275,13 @@ namespace SteamBaseboardRadiator {
             } else {
                 // baseboard is off, don't bother going into ControlCompOutput
                 mdot = 0.0;
-                SetComponentFlowRate(mdot, SteamBaseboard(BaseboardNum).SteamInletNode, SteamBaseboard(BaseboardNum).SteamOutletNode,
-                                     SteamBaseboard(BaseboardNum).LoopNum, SteamBaseboard(BaseboardNum).LoopSideNum,
-                                     SteamBaseboard(BaseboardNum).BranchNum, SteamBaseboard(BaseboardNum).CompNum);
+                SetComponentFlowRate(mdot,
+                                     SteamBaseboard(BaseboardNum).SteamInletNode,
+                                     SteamBaseboard(BaseboardNum).SteamOutletNode,
+                                     SteamBaseboard(BaseboardNum).LoopNum,
+                                     SteamBaseboard(BaseboardNum).LoopSideNum,
+                                     SteamBaseboard(BaseboardNum).BranchNum,
+                                     SteamBaseboard(BaseboardNum).CompNum);
                 CalcSteamBaseboard(BaseboardNum, PowerMet);
             }
 
@@ -345,8 +363,17 @@ namespace SteamBaseboardRadiator {
         // Get the data from the user input related to baseboard heaters
         for (BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum) {
 
-            inputProcessor->getObjectItem(cCMO_BBRadiator_Steam, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat,
-                                          lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCMO_BBRadiator_Steam,
+                                          BaseboardNum,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCMO_BBRadiator_Steam, ErrorsFound);
             SteamBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
             SteamBaseboardNumericFields(BaseboardNum).FieldNames = "";
@@ -371,12 +398,12 @@ namespace SteamBaseboardRadiator {
             }
 
             // Get inlet node number
-            SteamBaseboard(BaseboardNum).SteamInletNode = GetOnlySingleNode(cAlphaArgs(3), ErrorsFound, cCMO_BBRadiator_Steam, cAlphaArgs(1),
-                                                                            NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            SteamBaseboard(BaseboardNum).SteamInletNode = GetOnlySingleNode(
+                cAlphaArgs(3), ErrorsFound, cCMO_BBRadiator_Steam, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             // Get outlet node number
-            SteamBaseboard(BaseboardNum).SteamOutletNode = GetOnlySingleNode(cAlphaArgs(4), ErrorsFound, cCMO_BBRadiator_Steam, cAlphaArgs(1),
-                                                                             NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            SteamBaseboard(BaseboardNum).SteamOutletNode = GetOnlySingleNode(
+                cAlphaArgs(4), ErrorsFound, cCMO_BBRadiator_Steam, cAlphaArgs(1), NodeType_Steam, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCMO_BBRadiator_Steam, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Hot Steam Nodes");
 
             // Determine steam baseboard radiator system heating design capacity sizing method
@@ -599,29 +626,83 @@ namespace SteamBaseboardRadiator {
         // Setup Report variables for the Coils
         for (BaseboardNum = 1; BaseboardNum <= NumSteamBaseboards; ++BaseboardNum) {
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Steam'
-            SetupOutputVariable("Baseboard Total Heating Rate", OutputProcessor::Unit::W, SteamBaseboard(BaseboardNum).TotPower, "System", "Average",
+            SetupOutputVariable("Baseboard Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                SteamBaseboard(BaseboardNum).TotPower,
+                                "System",
+                                "Average",
                                 SteamBaseboard(BaseboardNum).EquipID);
 
-            SetupOutputVariable("Baseboard Convective Heating Rate", OutputProcessor::Unit::W, SteamBaseboard(BaseboardNum).ConvPower, "System",
-                                "Average", SteamBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Radiant Heating Rate", OutputProcessor::Unit::W, SteamBaseboard(BaseboardNum).RadPower, "System",
-                                "Average", SteamBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Total Heating Energy", OutputProcessor::Unit::J, SteamBaseboard(BaseboardNum).TotEnergy, "System", "Sum",
-                                SteamBaseboard(BaseboardNum).EquipID, _, "ENERGYTRANSFER", "BASEBOARD", _, "System");
-            SetupOutputVariable("Baseboard Convective Heating Energy", OutputProcessor::Unit::J, SteamBaseboard(BaseboardNum).ConvEnergy, "System",
-                                "Sum", SteamBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Radiant Heating Energy", OutputProcessor::Unit::J, SteamBaseboard(BaseboardNum).RadEnergy, "System", "Sum",
+            SetupOutputVariable("Baseboard Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                SteamBaseboard(BaseboardNum).ConvPower,
+                                "System",
+                                "Average",
                                 SteamBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Steam Energy", OutputProcessor::Unit::J, SteamBaseboard(BaseboardNum).Energy, "System", "Sum",
-                                SteamBaseboard(BaseboardNum).EquipID, _, "PLANTLOOPHEATINGDEMAND", "BASEBOARD", _, "System");
-            SetupOutputVariable("Baseboard Steam Rate", OutputProcessor::Unit::W, SteamBaseboard(BaseboardNum).Power, "System", "Average",
+            SetupOutputVariable("Baseboard Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                SteamBaseboard(BaseboardNum).RadPower,
+                                "System",
+                                "Average",
                                 SteamBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, SteamBaseboard(BaseboardNum).SteamMassFlowRate,
-                                "System", "Average", SteamBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Steam Inlet Temperature", OutputProcessor::Unit::C, SteamBaseboard(BaseboardNum).SteamInletTemp, "System",
-                                "Average", SteamBaseboard(BaseboardNum).EquipID);
-            SetupOutputVariable("Baseboard Steam Outlet Temperature", OutputProcessor::Unit::C, SteamBaseboard(BaseboardNum).SteamOutletTemp,
-                                "System", "Average", SteamBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                SteamBaseboard(BaseboardNum).TotEnergy,
+                                "System",
+                                "Sum",
+                                SteamBaseboard(BaseboardNum).EquipID,
+                                _,
+                                "ENERGYTRANSFER",
+                                "BASEBOARD",
+                                _,
+                                "System");
+            SetupOutputVariable("Baseboard Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                SteamBaseboard(BaseboardNum).ConvEnergy,
+                                "System",
+                                "Sum",
+                                SteamBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                SteamBaseboard(BaseboardNum).RadEnergy,
+                                "System",
+                                "Sum",
+                                SteamBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Steam Energy",
+                                OutputProcessor::Unit::J,
+                                SteamBaseboard(BaseboardNum).Energy,
+                                "System",
+                                "Sum",
+                                SteamBaseboard(BaseboardNum).EquipID,
+                                _,
+                                "PLANTLOOPHEATINGDEMAND",
+                                "BASEBOARD",
+                                _,
+                                "System");
+            SetupOutputVariable("Baseboard Steam Rate",
+                                OutputProcessor::Unit::W,
+                                SteamBaseboard(BaseboardNum).Power,
+                                "System",
+                                "Average",
+                                SteamBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Steam Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                SteamBaseboard(BaseboardNum).SteamMassFlowRate,
+                                "System",
+                                "Average",
+                                SteamBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Steam Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                SteamBaseboard(BaseboardNum).SteamInletTemp,
+                                "System",
+                                "Average",
+                                SteamBaseboard(BaseboardNum).EquipID);
+            SetupOutputVariable("Baseboard Steam Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                SteamBaseboard(BaseboardNum).SteamOutletTemp,
+                                "System",
+                                "Average",
+                                SteamBaseboard(BaseboardNum).EquipID);
         }
     }
 
@@ -711,9 +792,18 @@ namespace SteamBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(SteamBaseboard(BaseboardNum).EquipID, SteamBaseboard(BaseboardNum).EquipType,
-                                        SteamBaseboard(BaseboardNum).LoopNum, SteamBaseboard(BaseboardNum).LoopSideNum,
-                                        SteamBaseboard(BaseboardNum).BranchNum, SteamBaseboard(BaseboardNum).CompNum, _, _, _, _, _, errFlag);
+                ScanPlantLoopsForObject(SteamBaseboard(BaseboardNum).EquipID,
+                                        SteamBaseboard(BaseboardNum).EquipType,
+                                        SteamBaseboard(BaseboardNum).LoopNum,
+                                        SteamBaseboard(BaseboardNum).LoopSideNum,
+                                        SteamBaseboard(BaseboardNum).BranchNum,
+                                        SteamBaseboard(BaseboardNum).CompNum,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        errFlag);
                 SetLoopIndexFlag(BaseboardNum) = false;
                 if (errFlag) {
                     ShowFatalError("InitSteamBaseboard: Program terminated for previous conditions.");
@@ -736,9 +826,13 @@ namespace SteamBaseboardRadiator {
             SteamDensity = GetSatDensityRefrig(fluidNameSteam, Node(SteamInletNode).Temp, 1.0, Node(SteamInletNode).FluidIndex, RoutineName);
             StartEnthSteam = GetSatEnthalpyRefrig(fluidNameSteam, Node(SteamInletNode).Temp, 1.0, Node(SteamInletNode).FluidIndex, RoutineName);
             SteamBaseboard(BaseboardNum).SteamMassFlowRateMax = SteamDensity * SteamBaseboard(BaseboardNum).SteamVolFlowRateMax;
-            InitComponentNodes(0.0, SteamBaseboard(BaseboardNum).SteamMassFlowRateMax, SteamBaseboard(BaseboardNum).SteamInletNode,
-                               SteamBaseboard(BaseboardNum).SteamOutletNode, SteamBaseboard(BaseboardNum).LoopNum,
-                               SteamBaseboard(BaseboardNum).LoopSideNum, SteamBaseboard(BaseboardNum).BranchNum,
+            InitComponentNodes(0.0,
+                               SteamBaseboard(BaseboardNum).SteamMassFlowRateMax,
+                               SteamBaseboard(BaseboardNum).SteamInletNode,
+                               SteamBaseboard(BaseboardNum).SteamOutletNode,
+                               SteamBaseboard(BaseboardNum).LoopNum,
+                               SteamBaseboard(BaseboardNum).LoopSideNum,
+                               SteamBaseboard(BaseboardNum).BranchNum,
                                SteamBaseboard(BaseboardNum).CompNum);
             Node(SteamInletNode).Enthalpy = StartEnthSteam;
             Node(SteamInletNode).Quality = 1.0;
@@ -813,8 +907,8 @@ namespace SteamBaseboardRadiator {
         using FluidProperties::GetSatSpecificHeatRefrig;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         //  USE BranchInputManager,  ONLY: MyPlantSizingIndex
-        using DataHVACGlobals::HeatingCapacitySizing;
         using DataHeatBalance::Zone;
+        using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
@@ -870,8 +964,10 @@ namespace SteamBaseboardRadiator {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0) {
-                        ReportSizingOutput(cCMO_BBRadiator_Steam, SteamBaseboard(BaseboardNum).EquipID,
-                                           "User-Specified Maximum Water Flow Rate [m3/s]", SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
+                        ReportSizingOutput(cCMO_BBRadiator_Steam,
+                                           SteamBaseboard(BaseboardNum).EquipID,
+                                           "User-Specified Maximum Water Flow Rate [m3/s]",
+                                           SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
                     }
                 } else {
                     CheckZoneSizing(cCMO_BBRadiator_Steam, SteamBaseboard(BaseboardNum).EquipID);
@@ -936,14 +1032,19 @@ namespace SteamBaseboardRadiator {
 
                     if (IsAutoSize) {
                         SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = SteamVolFlowRateMaxDes;
-                        ReportSizingOutput(cCMO_BBRadiator_Steam, SteamBaseboard(BaseboardNum).EquipID, "Design Size Maximum Steam Flow Rate [m3/s]",
+                        ReportSizingOutput(cCMO_BBRadiator_Steam,
+                                           SteamBaseboard(BaseboardNum).EquipID,
+                                           "Design Size Maximum Steam Flow Rate [m3/s]",
                                            SteamVolFlowRateMaxDes);
                     } else { // Hard size with sizing data
                         if (SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0 && SteamVolFlowRateMaxDes > 0.0) {
                             SteamVolFlowRateMaxUser = SteamBaseboard(BaseboardNum).SteamVolFlowRateMax;
-                            ReportSizingOutput(cCMO_BBRadiator_Steam, SteamBaseboard(BaseboardNum).EquipID,
-                                               "Design Size Maximum Steam Flow Rate [m3/s]", SteamVolFlowRateMaxDes,
-                                               "User-Speicified Maximum Steam Flow Rate [m3/s]", SteamVolFlowRateMaxUser);
+                            ReportSizingOutput(cCMO_BBRadiator_Steam,
+                                               SteamBaseboard(BaseboardNum).EquipID,
+                                               "Design Size Maximum Steam Flow Rate [m3/s]",
+                                               SteamVolFlowRateMaxDes,
+                                               "User-Speicified Maximum Steam Flow Rate [m3/s]",
+                                               SteamVolFlowRateMaxUser);
                             if (DisplayExtraWarnings) {
                                 // Report difference between design size and user-specified values
                                 if ((std::abs(SteamVolFlowRateMaxDes - SteamVolFlowRateMaxUser) / SteamVolFlowRateMaxUser) >
@@ -1253,10 +1354,10 @@ namespace SteamBaseboardRadiator {
         // na
 
         // Using/Aliasing
+        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QSteamBaseboardSurf;
         using DataHeatBalFanSys::QSteamBaseboardToPerson;
-        using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
@@ -1454,11 +1555,11 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using DataGlobals::KickOffSimulation;
+        using DataPlant::ccSimPlantEquipTypes;
         using DataPlant::CriteriaType_HeatTransferRate;
         using DataPlant::CriteriaType_MassFlowRate;
         using DataPlant::CriteriaType_Temperature;
         using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
-        using DataPlant::ccSimPlantEquipTypes;
         using General::TrimSigDigits;
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1497,20 +1598,35 @@ namespace SteamBaseboardRadiator {
             return;
         }
 
-        PullCompInterconnectTrigger(SteamBaseboard(BaseboardNum).LoopNum, SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    SteamBaseboard(BaseboardNum).BranchNum, SteamBaseboard(BaseboardNum).CompNum,
-                                    SteamBaseboard(BaseboardNum).BBLoadReSimIndex, SteamBaseboard(BaseboardNum).LoopNum,
-                                    SteamBaseboard(BaseboardNum).LoopSideNum, CriteriaType_HeatTransferRate, SteamBaseboard(BaseboardNum).Power);
+        PullCompInterconnectTrigger(SteamBaseboard(BaseboardNum).LoopNum,
+                                    SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    SteamBaseboard(BaseboardNum).BranchNum,
+                                    SteamBaseboard(BaseboardNum).CompNum,
+                                    SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    SteamBaseboard(BaseboardNum).LoopNum,
+                                    SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    CriteriaType_HeatTransferRate,
+                                    SteamBaseboard(BaseboardNum).Power);
 
-        PullCompInterconnectTrigger(
-            SteamBaseboard(BaseboardNum).LoopNum, SteamBaseboard(BaseboardNum).LoopSideNum, SteamBaseboard(BaseboardNum).BranchNum,
-            SteamBaseboard(BaseboardNum).CompNum, SteamBaseboard(BaseboardNum).BBLoadReSimIndex, SteamBaseboard(BaseboardNum).LoopNum,
-            SteamBaseboard(BaseboardNum).LoopSideNum, CriteriaType_MassFlowRate, SteamBaseboard(BaseboardNum).SteamMassFlowRate);
+        PullCompInterconnectTrigger(SteamBaseboard(BaseboardNum).LoopNum,
+                                    SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    SteamBaseboard(BaseboardNum).BranchNum,
+                                    SteamBaseboard(BaseboardNum).CompNum,
+                                    SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    SteamBaseboard(BaseboardNum).LoopNum,
+                                    SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    CriteriaType_MassFlowRate,
+                                    SteamBaseboard(BaseboardNum).SteamMassFlowRate);
 
-        PullCompInterconnectTrigger(SteamBaseboard(BaseboardNum).LoopNum, SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    SteamBaseboard(BaseboardNum).BranchNum, SteamBaseboard(BaseboardNum).CompNum,
-                                    SteamBaseboard(BaseboardNum).BBLoadReSimIndex, SteamBaseboard(BaseboardNum).LoopNum,
-                                    SteamBaseboard(BaseboardNum).LoopSideNum, CriteriaType_Temperature, SteamBaseboard(BaseboardNum).SteamOutletTemp);
+        PullCompInterconnectTrigger(SteamBaseboard(BaseboardNum).LoopNum,
+                                    SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    SteamBaseboard(BaseboardNum).BranchNum,
+                                    SteamBaseboard(BaseboardNum).CompNum,
+                                    SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    SteamBaseboard(BaseboardNum).LoopNum,
+                                    SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    CriteriaType_Temperature,
+                                    SteamBaseboard(BaseboardNum).SteamOutletTemp);
     }
 
 } // namespace SteamBaseboardRadiator
