@@ -8378,9 +8378,6 @@ namespace WaterThermalTanks {
             DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
             Real64 const HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
             Tank.SourceInletTemp = Tank.SourceOutletTemp + HPWHCondenserDeltaT;
-        } else {
-            // bug issue #6470, commented out
-            // Tank.SourceInletTemp = Tank.SourceOutletTemp;
         }
         // Revised use outlet temperature to ensure energy balance. Assumes a constant CP. CR8341/CR8570
         if (NodeNum > 0) {

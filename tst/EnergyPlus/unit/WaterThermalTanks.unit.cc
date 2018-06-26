@@ -60,7 +60,9 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -1048,10 +1050,12 @@ TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
 
     EXPECT_NEAR(0.0, WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, Q, 0.0), 0.1); // elapsed time is zero
 
-    EXPECT_NEAR(15403.6, WaterThermalTanks::CalcTempIntegral(Ti, Ti, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t),
+    EXPECT_NEAR(15403.6,
+                WaterThermalTanks::CalcTempIntegral(Ti, Ti, Ta, T1, T2, m, Cp, m1, m2, UA, Q, t),
                 0.1); // final tank temperature same as initial tank temperature
 
-    EXPECT_NEAR(15461.9, WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, 0., 0., 0., 1000.0, t),
+    EXPECT_NEAR(15461.9,
+                WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, 0., 0., 0., 1000.0, t),
                 0.1); // UA, m1, m2 all zero, Q = 1000W
 
     EXPECT_NEAR(14772.5, WaterThermalTanks::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, 1000.0, t), 0.1); // Q = 1000W
@@ -1602,4 +1606,134 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
     // Energy Use is negative relative to the tank
     ASSERT_LT(Tank.UseRate, 0.0);
+}
+TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
+{
+    using DataGlobals::HourOfDay;
+    using DataGlobals::TimeStep;
+    using DataGlobals::TimeStepZone;
+    using DataHVACGlobals::SysTimeElapsed;
+    using DataHVACGlobals::TimeStepSys;
+    using WaterThermalTanks::WaterThermalTank;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
+        "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
+        "Schedule:Constant, Inlet Water Temperature, , 10.0;",
+        "Schedule:Constant, CW-Tank-Temp-Schedule, , 7.5;",
+
+        "  Zone,",
+        "    Zone_TES,                !- Name",
+        "    0.0000,                  !- Direction of Relative North {deg}",
+        "    10.0,                    !- X Origin {m}",
+        "    10.0,                    !- Y Origin {m}",
+        "    0.0,                     !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1.00,                    !- Multiplier",
+        "    3.00,                    !- Ceiling Height {m}",
+        "    300.0,                   !- Volume {m3}",
+        "    100.0;                   !- Floor Area {m2}",
+
+        "  Schedule:Compact,",
+        "    ALWAYS_ON,               !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "  ThermalStorage:ChilledWater:Stratified,",
+        "    Chilled Water Storage,   !- Name",
+        "    50.0,                    !- Tank Volume {m3}",
+        "    8.0,                     !- Tank Height {m}",
+        "    VerticalCylinder,        !- Tank Shape",
+        "    ,                        !- Tank Perimeter {m}",
+        "    CW-Tank-Temp-Schedule,   !- Setpoint Temperature Schedule Name",
+        "    2.5,                     !- Deadband Temperature Difference {deltaC}",
+        "    6.5,                     !- Temperature Sensor Height {m}",
+        "    1.0,                     !- Minimum Temperature Limit {C}",
+        "    50000,                   !- Nominal Cooling Capacity {W}",
+        "    Zone,                    !- Ambient Temperature Indicator",
+        "    ,                        !- Ambient Temperature Schedule Name",
+        "    Zone_TES,                !- Ambient Temperature Zone Name",
+        "    ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "    1.0,                     !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}",
+        "    CW Tank Discharge Inlet node,  !- Use Side Inlet Node Name",
+        "    CW Tank Discharge Outlet node,  !- Use Side Outlet Node Name",
+        "    1.0,                     !- Use Side Heat Transfer Effectiveness",
+        "    ALWAYS_ON,               !- Use Side Availability Schedule Name",
+        "    7.85,                    !- Use Side Inlet Height {m}",
+        "    0.15,                    !- Use Side Outlet Height {m}",
+        "    5.0E-3,                  !- Use Side Design Flow Rate {m3/s}",
+        "    CW Tank Charge Inlet Node,  !- Source Side Inlet Node Name",
+        "    CW Tank Charge Outlet Node,  !- Source Side Outlet Node Name",
+        "    1.0,                     !- Source Side Heat Transfer Effectiveness",
+        "    ALWAYS_ON,               !- Source Side Availability Schedule Name",
+        "    0.15,                    !- Source Side Inlet Height {m}",
+        "    7.85,                    !- Source Side Outlet Height {m}",
+        "    5.0E-3,                  !- Source Side Design Flow Rate {m3/s}",
+        "    4.0,                     !- Tank Recovery Time {hr}",
+        "    Seeking,                 !- Inlet Mode",
+        "    6,                       !- Number of Nodes",
+        "    0.0;                     !- Additional Destratification Conductivity {W/m-K}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);
+
+    InternalHeatGains::GetInternalHeatGainsInput();
+
+    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ScheduleInputProcessed = true;
+
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::Month = 7;
+    DataEnvironment::DayOfMonth = 21;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::JulianDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues();
+
+    int TankNum(1);
+    ErrorsFound = false;
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+
+    WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
+
+    for (int i = 1; i <= Tank.Nodes; ++i) {
+        auto &node = Tank.Node(i);
+        node.SavedTemp = 7.5;
+        node.Temp = 7.5;
+    }
+
+    Tank.TankTemp = 7.5;
+    Tank.AmbientTemp = 20.0;
+    Tank.UseInletTemp = 20.0;
+    Tank.SetPointTemp = 7.5;
+    Tank.SetPointTemp2 = Tank.SetPointTemp;
+    Tank.UseMassFlowRate = 5.0;
+    Tank.SourceInletTemp = 5.0;
+    Tank.SourceOutletTemp = 7.5;
+    Tank.SourceMassFlowRate = 5.0;
+    Tank.TimeElapsed = 0.0;
+
+    HourOfDay = 0;
+    TimeStep = 1;
+    TimeStepZone = 15. / 60.;
+    TimeStepSys = TimeStepZone;
+    SysTimeElapsed = 0.0;
+
+    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+
+    // check source inlet and outlet temperatures are different
+    EXPECT_EQ(Tank.SourceInletTemp, 5.0);
+    EXPECT_NEAR(Tank.SourceOutletTemp, 10.347, 0.001);
 }
