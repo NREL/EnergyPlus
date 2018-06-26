@@ -75,16 +75,22 @@ namespace EIRWaterToWaterHeatPumps {
         std::string name = "";
         int plantTypeOfNum = -1;
         
-        // static-ish input data
-        Real64 loadSideDesignVolFlowRate;
-        Real64 sourceSideDesignVolFlowRate;
-        Real64 loadSideDesignMassFlowRate;
-        Real64 sourceSideDesignMassFlowRate;
+        // flow rate terms
+        Real64 loadSideDesignVolFlowRate = 0.0;
+        Real64 sourceSideDesignVolFlowRate = 0.0;
+        Real64 loadSideDesignMassFlowRate = 0.0;
+        Real64 sourceSideDesignMassFlowRate = 0.0;
+        Real64 loadSideMassFlowRate = 0.0;
+        Real64 sourceSideMassFlowRate = 0.0;
                 
         // simulation variables
         Real64 loadSideHeatTransfer = 0.0;
+        Real64 sourceSideHeatTransfer = 0.0;
         Real64 loadSideInletTemp = 0.0;
+        Real64 loadSideOutletTemp = 0.0;
         Real64 sourceSideInletTemp = 0.0;
+        Real64 sourceSideOutletTemp = 0.0;
+        Real64 powerUsage = 0.0;
         bool running = false;
         
         // topology variables
@@ -92,6 +98,9 @@ namespace EIRWaterToWaterHeatPumps {
         PlantLocation sourceSideLocation;
         InOutNodePair loadSideNodes;
         InOutNodePair sourceSideNodes;
+        
+        // counters and indexes
+        int condMassFlowRateTriggerIndex = 0;
         
         // logic flags
         bool oneTimeInit = true;

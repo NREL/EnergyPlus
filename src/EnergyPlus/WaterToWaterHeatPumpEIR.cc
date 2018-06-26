@@ -63,235 +63,392 @@
 #include <WaterToWaterHeatPumpEIR.hh>
 
 namespace EnergyPlus {
-namespace EIRWaterToWaterHeatPumps {
+	namespace EIRWaterToWaterHeatPumps {
 
-    bool getInputsWWHP(true);
-    std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
+		bool getInputsWWHP(true);
+		std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
 
-    void EIRWaterToWaterHeatPump::clear_state()
-    {
-        getInputsWWHP = true;
-        eir_wwhp.clear();
-    }
+		void EIRWaterToWaterHeatPump::clear_state() {
+			getInputsWWHP = true;
+			eir_wwhp.clear();
+		}
 
-    int EIRWaterToWaterHeatPump::add(int a, int b)
-    {
-        return a + b;
-    }
+		int EIRWaterToWaterHeatPump::add(int a, int b) {
+			return a + b;
+		}
 
-    void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
-                                           bool const EP_UNUSED(FirstHVACIteration),
-                                           Real64 &CurLoad,
-                                           bool const RunFlag)
-    {
-		
-        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
-        this->loadSideHeatTransfer = CurLoad;
-        this->running = RunFlag;
-    }
+		void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+											   bool const FirstHVACIteration,
+											   Real64 &CurLoad,
+											   bool const RunFlag) {
+			std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
 
-	void EIRWaterToWaterHeatPump::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
-	{
-		std::string const routineName = "initWaterToWaterHeatPumpEIR";
-            
-		if (this->oneTimeInit) {
-            bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->name,
-                                                    this->plantTypeOfNum,
-                                                    this->loadSideLocation.loopNum,
-                                                    this->loadSideLocation.loopSideNum,
-                                                    this->loadSideLocation.branchNum,
-                                                    this->loadSideLocation.compNum,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->loadSideNodes.inlet,
-                                                    _,
-                                                    errFlag);
+			// std::cout << RunFlag << ", " << CurLoad << std::endl;
+			if (!DataGlobals::KickOffSimulation) {
+				int i = 1;
+			}
 
-            if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // throw error
-                ShowSevereError(routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                this->name + "\"");
-                ShowContinueError("The load side connections are not on the Supply Side of a plant loop");
-                errFlag = true;
-            }
+			if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
+				PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
+																	this->sourceSideLocation.loopSideNum,
+																	this->plantTypeOfNum,
+																	this->sourceSideNodes.inlet,
+																	this->sourceSideNodes.outlet,
+																	this->sourceSideHeatTransfer,
+																	this->sourceSideInletTemp,
+																	this->sourceSideOutletTemp,
+																	this->sourceSideMassFlowRate,
+																	FirstHVACIteration);
+				return;
+			}
 
-            PlantUtilities::ScanPlantLoopsForObject(this->name,
-                                                    this->plantTypeOfNum,
-                                                    this->sourceSideLocation.loopNum,
-                                                    this->sourceSideLocation.loopSideNum,
-                                                    this->sourceSideLocation.branchNum,
-                                                    this->sourceSideLocation.compNum,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->sourceSideNodes.inlet,
-                                                    _,
-                                                    errFlag);
+			this->running = RunFlag;
+			if (!this->running) {
+				this->loadSideMassFlowRate = 0.0;
+				this->sourceSideMassFlowRate = 0.0;
+				PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+													 this->loadSideNodes.inlet,
+													 this->loadSideNodes.outlet,
+													 this->loadSideLocation.loopNum,
+													 this->loadSideLocation.loopSideNum,
+													 this->loadSideLocation.branchNum,
+													 this->loadSideLocation.compNum);
+				PlantUtilities::SetComponentFlowRate(this->sourceSideMassFlowRate,
+													 this->sourceSideNodes.inlet,
+													 this->sourceSideNodes.outlet,
+													 this->sourceSideLocation.loopNum,
+													 this->sourceSideLocation.loopSideNum,
+													 this->sourceSideLocation.branchNum,
+													 this->sourceSideLocation.compNum);
+				PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
+															this->loadSideLocation.loopSideNum,
+															this->loadSideLocation.branchNum,
+															this->loadSideLocation.compNum,
+															this->condMassFlowRateTriggerIndex,
+															this->sourceSideLocation.loopNum,
+															this->sourceSideLocation.loopSideNum,
+															DataPlant::CriteriaType_MassFlowRate,
+															this->sourceSideMassFlowRate);
+				// Set flows if the heat pump is running
+			} else { // the heat pump must run
+				this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
+				this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
+				PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+													 this->loadSideNodes.inlet,
+													 this->loadSideNodes.outlet,
+													 this->loadSideLocation.loopNum,
+													 this->loadSideLocation.loopSideNum,
+													 this->loadSideLocation.branchNum,
+													 this->loadSideLocation.compNum);
+				PlantUtilities::SetComponentFlowRate(this->sourceSideMassFlowRate,
+													 this->sourceSideNodes.inlet,
+													 this->sourceSideNodes.outlet,
+													 this->sourceSideLocation.loopNum,
+													 this->sourceSideLocation.loopSideNum,
+													 this->sourceSideLocation.branchNum,
+													 this->sourceSideLocation.compNum);
 
-            if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // throw error
-                ShowSevereError(routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                this->name + "\"");
-                ShowContinueError("The source side connections are not on the Demand Side of a plant loop");
-                errFlag = true;
-            }
+				// if there's no flow in one, try to turn the entire heat pump off
+				if (this->loadSideMassFlowRate <= 0.0 || this->sourceSideMassFlowRate <= 0.0) {
 
-            // make sure it is not the same loop on both sides.
-            if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
-                ShowSevereError(routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                this->name + "\"");
-                ShowContinueError("The load and source sides need to be on different loops.");
-                errFlag = true;
-            } else {
+					this->loadSideMassFlowRate = 0.0;
+					this->sourceSideMassFlowRate = 0.0;
+					this->running = false;
 
-                PlantUtilities::InterConnectTwoPlantLoopSides(this->loadSideLocation.loopNum,
-                                              this->loadSideLocation.loopSideNum,
-                                              this->sourceSideLocation.loopNum,
-                                              this->sourceSideLocation.loopSideNum,
-                                              this->plantTypeOfNum,
-                                              true);
-            }
+					PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+														 this->loadSideNodes.inlet,
+														 this->loadSideNodes.outlet,
+														 this->loadSideLocation.loopNum,
+														 this->loadSideLocation.loopSideNum,
+														 this->loadSideLocation.branchNum,
+														 this->loadSideLocation.compNum);
+					PlantUtilities::SetComponentFlowRate(this->sourceSideMassFlowRate,
+														 this->sourceSideNodes.inlet,
+														 this->sourceSideNodes.outlet,
+														 this->sourceSideLocation.loopNum,
+														 this->sourceSideLocation.loopSideNum,
+														 this->sourceSideLocation.branchNum,
+														 this->sourceSideLocation.compNum);
+					PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
+																this->loadSideLocation.loopSideNum,
+																this->loadSideLocation.branchNum,
+																this->loadSideLocation.compNum,
+																this->condMassFlowRateTriggerIndex,
+																this->sourceSideLocation.loopNum,
+																this->sourceSideLocation.loopSideNum,
+																DataPlant::CriteriaType_MassFlowRate,
+																this->sourceSideMassFlowRate);
+				}
+				PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
+															this->loadSideLocation.loopSideNum,
+															this->loadSideLocation.branchNum,
+															this->loadSideLocation.compNum,
+															this->condMassFlowRateTriggerIndex,
+															this->sourceSideLocation.loopNum,
+															this->sourceSideLocation.loopSideNum,
+															DataPlant::CriteriaType_MassFlowRate,
+															this->sourceSideMassFlowRate);
+			}
+			this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
+			this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
-            if (errFlag) {
-                ShowFatalError(routineName + ": Program terminated due to previous condition(s).");
-            }
-            this->oneTimeInit = false;
-        } // plant setup
+			if (this->loadSideMassFlowRate > 0 && this->sourceSideMassFlowRate > 0) {
+				// for today, assume the heat transfer could be rejected perfectly and in full
+				this->loadSideHeatTransfer = CurLoad;
+				Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+						DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+						DataGlobals::CWInitConvTemp,
+						DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+						routineName);
+				this->loadSideOutletTemp =
+						this->loadSideInletTemp + this->loadSideHeatTransfer / (this->loadSideMassFlowRate * Cp);
 
-        if (DataGlobals::BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
-			Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                                   DataGlobals::InitConvTemp,
-                                   DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
-                                   routineName);
-            this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
-            PlantUtilities::InitComponentNodes(0.0,
-                               this->loadSideDesignMassFlowRate,
-                               this->loadSideNodes.inlet,
-                               this->loadSideNodes.outlet,
-                               this->loadSideLocation.loopNum,
-                               this->loadSideLocation.loopSideNum,
-                               this->loadSideLocation.branchNum,
-                               this->loadSideLocation.compNum);
+				// assume a dummy value for power usage
+				this->powerUsage = this->loadSideHeatTransfer / 10.0;
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
-                                   DataGlobals::InitConvTemp,
-                                   DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
-                                   routineName);
-            this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
-            PlantUtilities::InitComponentNodes(0.0,
-                               this->sourceSideDesignMassFlowRate,
-                               this->sourceSideNodes.inlet,
-                               this->sourceSideNodes.outlet,
-                               this->sourceSideLocation.loopNum,
-                               this->sourceSideLocation.loopSideNum,
-                               this->sourceSideLocation.branchNum,
-                               this->sourceSideLocation.compNum);
-            this->envrnInit = false;
-        }
-        if (!DataGlobals::BeginEnvrnFlag) {
-            this->envrnInit = true;
-        }
+				// then you can calculate source side impacts
+				this->sourceSideHeatTransfer = this->loadSideHeatTransfer - this->powerUsage;
+				this->sourceSideOutletTemp =
+						this->sourceSideInletTemp - this->sourceSideHeatTransfer / (this->sourceSideMassFlowRate * Cp);
 
-	}
+			} else {
+				this->loadSideHeatTransfer = 0.0;
+				this->loadSideOutletTemp = this->loadSideInletTemp;
+				this->powerUsage = 0.0;
+				this->sourceSideHeatTransfer = 0.0;
+				this->sourceSideOutletTemp = this->sourceSideInletTemp;
+			}
 
-    PlantComponent *EIRWaterToWaterHeatPump::factory(int plantTypeOfNum, std::string objectName)
-    {
-        if (getInputsWWHP) {
-            EIRWaterToWaterHeatPump::processInputForEIRWWHP();
-            getInputsWWHP = false;
-        }
+			// update nodes
+			DataLoopNode::Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
+			DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
+		}
 
-        for (auto &wwhp : eir_wwhp) {
-            if (wwhp.name == objectName && wwhp.plantTypeOfNum == plantTypeOfNum) {
-                return &wwhp;
-            }
-        }
+		void EIRWaterToWaterHeatPump::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
+			std::string const routineName = "initWaterToWaterHeatPumpEIR";
 
-        ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
-        return nullptr;
-    }
+			if (this->oneTimeInit) {
+				// setup output variables
+				SetupOutputVariable("EIR WWHP Load Side Heat Transfer", OutputProcessor::Unit::W,
+									this->loadSideHeatTransfer, "System", "Average", this->name);
+				SetupOutputVariable("EIR WWHP Source Side Heat Transfer", OutputProcessor::Unit::W,
+									this->sourceSideHeatTransfer, "System", "Average", this->name);
+				SetupOutputVariable("EIR WWHP Load Side Inlet Temperature", OutputProcessor::Unit::C,
+									this->loadSideInletTemp, "System", "Average", this->name);
+				SetupOutputVariable("EIR WWHP Load Side Outlet Temperature", OutputProcessor::Unit::C,
+									this->loadSideOutletTemp, "System", "Average", this->name);
+				SetupOutputVariable("EIR WWHP Source Side Inlet Temperature", OutputProcessor::Unit::C,
+									this->sourceSideInletTemp, "System", "Average", this->name);
+				SetupOutputVariable("EIR WWHP Source Side Outlet Temperature", OutputProcessor::Unit::C,
+									this->sourceSideOutletTemp, "System", "Average", this->name);
+				SetupOutputVariable("EIR WWHP Power Usage", OutputProcessor::Unit::W, this->powerUsage, "System",
+									"Average", this->name);
+				//SetupOutputVariable("EIR WWHP Running", OutputProcessor::Unit::None, eir.running, "System", "Average", eir.name);
 
-    void EIRWaterToWaterHeatPump::processInputForEIRWWHP()
-    {
-        using namespace DataIPShortCuts;
+				// find this component on the plant
+				bool errFlag = false;
+				PlantUtilities::ScanPlantLoopsForObject(this->name,
+														this->plantTypeOfNum,
+														this->loadSideLocation.loopNum,
+														this->loadSideLocation.loopSideNum,
+														this->loadSideLocation.branchNum,
+														this->loadSideLocation.compNum,
+														_,
+														_,
+														_,
+														this->loadSideNodes.inlet,
+														_,
+														errFlag);
 
-        bool errorsFound = false;
+				if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // throw error
+					ShowSevereError(routineName + ": Invalid connections for " +
+									DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+									this->name + "\"");
+					ShowContinueError("The load side connections are not on the Supply Side of a plant loop");
+					errFlag = true;
+				}
 
-        cCurrentModuleObject = "HeatPump:WaterToWater:EIR:Heating";
-        int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        if (numWWHP > 0) {
-            for (int wwhpNum = 1; wwhpNum <= numWWHP; ++wwhpNum) {
-                EIRWaterToWaterHeatPump thisWWHP;
-                thisWWHP.plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
-                int NumAlphas, NumNumbers, IOStatus;
-                inputProcessor->getObjectItem(cCurrentModuleObject,
-                                              wwhpNum,
-                                              cAlphaArgs,
-                                              NumAlphas,
-                                              rNumericArgs,
-                                              NumNumbers,
-                                              IOStatus,
-                                              lNumericFieldBlanks,
-                                              _,
-                                              cAlphaFieldNames,
-                                              cNumericFieldNames);
-                thisWWHP.name = cAlphaArgs(1);
-// HeatPump:WaterToWater:EIR:Heating,
-   //A1,  \field Name
-   //A2,  \field Load Side Inlet Node Name
-   //A3,  \field Load Side Outlet Node Name
-   //A4,  \field Source Side Inlet Node Name
-   //A5,  \field Source Side Outlet Node Name
-   //N1,  \field Load Side Design Flow Rate
-   //N2;  \field Source Side Design Flow Rate
-                std::string loadSideInletNodeName =  cAlphaArgs(2);
-                std::string loadSideOutletNodeName = cAlphaArgs(3);
-                std::string sourceSideInletNodeName = cAlphaArgs(4);
-                std::string sourceSideOutletNodeName = cAlphaArgs(5);
-                thisWWHP.loadSideDesignVolFlowRate = rNumericArgs(1);
-                thisWWHP.sourceSideDesignVolFlowRate = rNumericArgs(2);
-                thisWWHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(loadSideInletNodeName,
-                                                                               errorsFound,
-                                                                               cCurrentModuleObject,
-                                                                               thisWWHP.name,
-                                                                               DataLoopNode::NodeType_Water,
-                                                                               DataLoopNode::NodeConnectionType_Inlet,
-                                                                               1,
-                                                                               DataLoopNode::ObjectIsNotParent);
-                thisWWHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(loadSideOutletNodeName,
-                                                                               errorsFound,
-                                                                               cCurrentModuleObject,
-                                                                               thisWWHP.name,
-                                                                               DataLoopNode::NodeType_Water,
-                                                                               DataLoopNode::NodeConnectionType_Outlet,
-                                                                               1,
-                                                                               DataLoopNode::ObjectIsNotParent);                                                                               
-                thisWWHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(sourceSideInletNodeName,
-                                                                                 errorsFound,
-                                                                                 cCurrentModuleObject,
-                                                                                 thisWWHP.name,
-                                                                                 DataLoopNode::NodeType_Water,
-                                                                                 DataLoopNode::NodeConnectionType_Inlet,
-                                                                                 2,
-                                                                                 DataLoopNode::ObjectIsNotParent);
-                thisWWHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(sourceSideOutletNodeName,
-                                                                                 errorsFound,
-                                                                                 cCurrentModuleObject,
-                                                                                 thisWWHP.name,
-                                                                                 DataLoopNode::NodeType_Water,
-                                                                                 DataLoopNode::NodeConnectionType_Outlet,
-                                                                                 2,
-                                                                                 DataLoopNode::ObjectIsNotParent);
-                BranchNodeConnections::TestCompSet(
-                    cCurrentModuleObject, thisWWHP.name, loadSideInletNodeName, loadSideOutletNodeName, "Hot Water Nodes");
-                BranchNodeConnections::TestCompSet(
-                    cCurrentModuleObject, thisWWHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");    
+				PlantUtilities::ScanPlantLoopsForObject(this->name,
+														this->plantTypeOfNum,
+														this->sourceSideLocation.loopNum,
+														this->sourceSideLocation.loopSideNum,
+														this->sourceSideLocation.branchNum,
+														this->sourceSideLocation.compNum,
+														_,
+														_,
+														_,
+														this->sourceSideNodes.inlet,
+														_,
+														errFlag);
 
-                eir_wwhp.push_back(thisWWHP);
-            }
-        }
-    }
+				if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // throw error
+					ShowSevereError(routineName + ": Invalid connections for " +
+									DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+									this->name + "\"");
+					ShowContinueError("The source side connections are not on the Demand Side of a plant loop");
+					errFlag = true;
+				}
 
-} // namespace EIRWaterToWaterHeatPumps
+				// make sure it is not the same loop on both sides.
+				if (this->loadSideLocation.loopNum ==
+					this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
+					ShowSevereError(routineName + ": Invalid connections for " +
+									DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+									this->name + "\"");
+					ShowContinueError("The load and source sides need to be on different loops.");
+					errFlag = true;
+				} else {
+
+					PlantUtilities::InterConnectTwoPlantLoopSides(this->loadSideLocation.loopNum,
+																  this->loadSideLocation.loopSideNum,
+																  this->sourceSideLocation.loopNum,
+																  this->sourceSideLocation.loopSideNum,
+																  this->plantTypeOfNum,
+																  true);
+				}
+
+				if (errFlag) {
+					ShowFatalError(routineName + ": Program terminated due to previous condition(s).");
+				}
+				this->oneTimeInit = false;
+			} // plant setup
+
+			if (DataGlobals::BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
+				Real64 rho = FluidProperties::GetDensityGlycol(
+						DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+						DataGlobals::InitConvTemp,
+						DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+						routineName);
+				this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
+				PlantUtilities::InitComponentNodes(0.0,
+												   this->loadSideDesignMassFlowRate,
+												   this->loadSideNodes.inlet,
+												   this->loadSideNodes.outlet,
+												   this->loadSideLocation.loopNum,
+												   this->loadSideLocation.loopSideNum,
+												   this->loadSideLocation.branchNum,
+												   this->loadSideLocation.compNum);
+
+				rho = FluidProperties::GetDensityGlycol(
+						DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
+						DataGlobals::InitConvTemp,
+						DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
+						routineName);
+				this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
+				PlantUtilities::InitComponentNodes(0.0,
+												   this->sourceSideDesignMassFlowRate,
+												   this->sourceSideNodes.inlet,
+												   this->sourceSideNodes.outlet,
+												   this->sourceSideLocation.loopNum,
+												   this->sourceSideLocation.loopSideNum,
+												   this->sourceSideLocation.branchNum,
+												   this->sourceSideLocation.compNum);
+				this->envrnInit = false;
+			}
+			if (!DataGlobals::BeginEnvrnFlag) {
+				this->envrnInit = true;
+			}
+
+		}
+
+		PlantComponent *EIRWaterToWaterHeatPump::factory(int plantTypeOfNum, std::string objectName) {
+			if (getInputsWWHP) {
+				EIRWaterToWaterHeatPump::processInputForEIRWWHP();
+				getInputsWWHP = false;
+			}
+
+			for (auto &wwhp : eir_wwhp) {
+				if (wwhp.name == objectName && wwhp.plantTypeOfNum == plantTypeOfNum) {
+					return &wwhp;
+				}
+			}
+
+			ShowFatalError("EIR_WWHP factory: Error getting inputs for wwhp named: " + objectName);
+			return nullptr;
+		}
+
+		void EIRWaterToWaterHeatPump::processInputForEIRWWHP() {
+			using namespace DataIPShortCuts;
+
+			bool errorsFound = false;
+
+			cCurrentModuleObject = "HeatPump:WaterToWater:EIR:Heating";
+			int numWWHP = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+			if (numWWHP > 0) {
+				for (int wwhpNum = 1; wwhpNum <= numWWHP; ++wwhpNum) {
+					EIRWaterToWaterHeatPump thisWWHP;
+					thisWWHP.plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
+					int NumAlphas, NumNumbers, IOStatus;
+					inputProcessor->getObjectItem(cCurrentModuleObject,
+												  wwhpNum,
+												  cAlphaArgs,
+												  NumAlphas,
+												  rNumericArgs,
+												  NumNumbers,
+												  IOStatus,
+												  lNumericFieldBlanks,
+												  _,
+												  cAlphaFieldNames,
+												  cNumericFieldNames);
+					// HeatPump:WaterToWater:EIR:Heating,
+					//   A1,  \field Name
+					//   A2,  \field Load Side Inlet Node Name
+					//   A3,  \field Load Side Outlet Node Name
+					//   A4,  \field Source Side Inlet Node Name
+					//   A5,  \field Source Side Outlet Node Name
+					//   N1,  \field Load Side Design Flow Rate
+					//   N2;  \field Source Side Design Flow Rate
+					thisWWHP.name = cAlphaArgs(1);
+					std::string loadSideInletNodeName = cAlphaArgs(2);
+					std::string loadSideOutletNodeName = cAlphaArgs(3);
+					std::string sourceSideInletNodeName = cAlphaArgs(4);
+					std::string sourceSideOutletNodeName = cAlphaArgs(5);
+					thisWWHP.loadSideDesignVolFlowRate = rNumericArgs(1);
+					thisWWHP.sourceSideDesignVolFlowRate = rNumericArgs(2);
+					int const flowPath1 = 1, flowPath2 = 2;
+					thisWWHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(loadSideInletNodeName,
+																					   errorsFound,
+																					   cCurrentModuleObject,
+																					   thisWWHP.name,
+																					   DataLoopNode::NodeType_Water,
+																					   DataLoopNode::NodeConnectionType_Inlet,
+																					   flowPath1,
+																					   DataLoopNode::ObjectIsNotParent);
+					thisWWHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(loadSideOutletNodeName,
+																						errorsFound,
+																						cCurrentModuleObject,
+																						thisWWHP.name,
+																						DataLoopNode::NodeType_Water,
+																						DataLoopNode::NodeConnectionType_Outlet,
+																						flowPath1,
+																						DataLoopNode::ObjectIsNotParent);
+					thisWWHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(sourceSideInletNodeName,
+																						 errorsFound,
+																						 cCurrentModuleObject,
+																						 thisWWHP.name,
+																						 DataLoopNode::NodeType_Water,
+																						 DataLoopNode::NodeConnectionType_Inlet,
+																						 flowPath2,
+																						 DataLoopNode::ObjectIsNotParent);
+					thisWWHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(sourceSideOutletNodeName,
+																						  errorsFound,
+																						  cCurrentModuleObject,
+																						  thisWWHP.name,
+																						  DataLoopNode::NodeType_Water,
+																						  DataLoopNode::NodeConnectionType_Outlet,
+																						  flowPath2,
+																						  DataLoopNode::ObjectIsNotParent);
+					BranchNodeConnections::TestCompSet(
+							cCurrentModuleObject, thisWWHP.name, loadSideInletNodeName, loadSideOutletNodeName,
+							"Hot Water Nodes");
+					BranchNodeConnections::TestCompSet(
+							cCurrentModuleObject, thisWWHP.name, sourceSideInletNodeName, sourceSideOutletNodeName,
+							"Condenser Water Nodes");
+
+					eir_wwhp.push_back(thisWWHP);
+				}
+			}
+		}
+
+	} // namespace EIRWaterToWaterHeatPumps
 } // namespace EnergyPlus

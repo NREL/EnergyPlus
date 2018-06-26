@@ -849,7 +849,7 @@ namespace HeatPumpWaterToWaterSimple {
                                                         this->LoadCompNum,
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
-                                                        this->LoadLoopSideNum,
+                                                        this->LoadLoopSideNum, // IS THIS RIGHT?
                                                         DataPlant::CriteriaType_MassFlowRate,
                                                         this->reportSourceSideMassFlowRate);
             // Set flows if the heat pump is running
