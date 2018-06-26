@@ -4635,7 +4635,12 @@ namespace SimAirServingZones {
                         ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
                                     TermUnitFinalZoneSizing(TermUnitSizingIndex)
                                         .TotalOAFromArea; // should not have diversity at this point (no should have diversity in Vou if VRP)
-                        SysOAUnc += ZoneOAUnc;
+                        if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) { // ZoneSum Method
+                            SysOAUnc += ZoneOAUnc;
+                        } else if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) { // Ventilation Rate Procedure
+                            SysOAUnc += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople * DataSizing::DBySys(AirLoopNum) +
+                                        TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // apply D to people term
+                        }
                         SumRpxPzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople;
                         SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
 
@@ -4669,10 +4674,7 @@ namespace SimAirServingZones {
                             }
 
                             // Save Std 62.1 cooling ventilation required by zone
-                            MinOAFlow +=
-                                (TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople *
-                                 DataSizing::DBySys(AirLoopNum)) + //  apply D here to just people part, D forced to 1.0 for single zone systems;
-                                TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
+                            MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone; // Don't include D
 
                             if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlow > 0.0) {
                                 if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0 ||
@@ -4801,7 +4803,12 @@ namespace SimAirServingZones {
                             if (SysSizNum > 0) {
                                 ZoneOAUnc = TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople +
                                             TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // should not have diversity at this point
-                                SysOAUnc += ZoneOAUnc;
+                                if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_ZoneSum) {              // ZoneSum Method
+                                    SysOAUnc += ZoneOAUnc;
+                                } else if (SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) { // Ventilation Rate Procedure
+                                    SysOAUnc += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople * DataSizing::DBySys(AirLoopNum) +
+                                                TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea; // apply D to people term
+                                }
                                 SumRpxPzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople;
                                 SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
                                 // save for Standard 62 tabular report
@@ -4836,8 +4843,7 @@ namespace SimAirServingZones {
                                     }
 
                                     // Save Std 62.1 heating ventilation required by zone
-                                    MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone *
-                                                 DataSizing::DBySys(AirLoopNum); // apply D here, D forced to 1.0 for single zone systems;
+                                    MinOAFlow += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone; // Don't include D
 
                                     if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow > 0.0) {
                                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation > 0.0) { // multi-path system
