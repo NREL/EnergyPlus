@@ -318,8 +318,17 @@ namespace HighTempRadiantSystem {
         // Obtain all of the user data related to high temperature radiant systems...
         for (Item = 1; Item <= NumOfHighTempRadSys; ++Item) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks,
-                                          lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+            inputProcessor->getObjectItem(cCurrentModuleObject,
+                                          Item,
+                                          cAlphaArgs,
+                                          NumAlphas,
+                                          rNumericArgs,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
 
             HighTempRadSysNumericFields(Item).FieldNames.allocate(NumNumbers);
             HighTempRadSysNumericFields(Item).FieldNames = "";
@@ -612,20 +621,59 @@ namespace HighTempRadiantSystem {
         // Set up the output variables for high temperature radiant heaters
         // cCurrentModuleObject = "ZoneHVAC:HighTemperatureRadiant"
         for (Item = 1; Item <= NumOfHighTempRadSys; ++Item) {
-            SetupOutputVariable("Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, HighTempRadSys(Item).HeatPower, "System", "Average",
+            SetupOutputVariable("Zone Radiant HVAC Heating Rate",
+                                OutputProcessor::Unit::W,
+                                HighTempRadSys(Item).HeatPower,
+                                "System",
+                                "Average",
                                 HighTempRadSys(Item).Name);
-            SetupOutputVariable("Zone Radiant HVAC Heating Energy", OutputProcessor::Unit::J, HighTempRadSys(Item).HeatEnergy, "System", "Sum",
-                                HighTempRadSys(Item).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System");
+            SetupOutputVariable("Zone Radiant HVAC Heating Energy",
+                                OutputProcessor::Unit::J,
+                                HighTempRadSys(Item).HeatEnergy,
+                                "System",
+                                "Sum",
+                                HighTempRadSys(Item).Name,
+                                _,
+                                "ENERGYTRANSFER",
+                                "HEATINGCOILS",
+                                _,
+                                "System");
             if (HighTempRadSys(Item).HeaterType == Gas) {
-                SetupOutputVariable("Zone Radiant HVAC Gas Rate", OutputProcessor::Unit::W, HighTempRadSys(Item).GasPower, "System", "Average",
+                SetupOutputVariable("Zone Radiant HVAC Gas Rate",
+                                    OutputProcessor::Unit::W,
+                                    HighTempRadSys(Item).GasPower,
+                                    "System",
+                                    "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Gas Energy", OutputProcessor::Unit::J, HighTempRadSys(Item).GasEnergy, "System", "Sum",
-                                    HighTempRadSys(Item).Name, _, "Gas", "Heating", _, "System");
+                SetupOutputVariable("Zone Radiant HVAC Gas Energy",
+                                    OutputProcessor::Unit::J,
+                                    HighTempRadSys(Item).GasEnergy,
+                                    "System",
+                                    "Sum",
+                                    HighTempRadSys(Item).Name,
+                                    _,
+                                    "Gas",
+                                    "Heating",
+                                    _,
+                                    "System");
             } else if (HighTempRadSys(Item).HeaterType == Electric) {
-                SetupOutputVariable("Zone Radiant HVAC Electric Power", OutputProcessor::Unit::W, HighTempRadSys(Item).ElecPower, "System", "Average",
+                SetupOutputVariable("Zone Radiant HVAC Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    HighTempRadSys(Item).ElecPower,
+                                    "System",
+                                    "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Electric Energy", OutputProcessor::Unit::J, HighTempRadSys(Item).ElecEnergy, "System", "Sum",
-                                    HighTempRadSys(Item).Name, _, "ELECTRICITY", "Heating", _, "System");
+                SetupOutputVariable("Zone Radiant HVAC Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    HighTempRadSys(Item).ElecEnergy,
+                                    "System",
+                                    "Sum",
+                                    HighTempRadSys(Item).Name,
+                                    _,
+                                    "ELECTRICITY",
+                                    "Heating",
+                                    _,
+                                    "System");
             }
         }
     }
@@ -749,8 +797,8 @@ namespace HighTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using DataHeatBalance::Zone;
+        using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
@@ -868,8 +916,8 @@ namespace HighTempRadiantSystem {
         //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalance::MRT;
+        using DataHeatBalFanSys::MAT;
         using namespace DataZoneEnergyDemands;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -965,8 +1013,8 @@ namespace HighTempRadiantSystem {
         //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalance::MRT;
+        using DataHeatBalFanSys::MAT;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1133,9 +1181,9 @@ namespace HighTempRadiantSystem {
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::TimeStepZone;
+        using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataHeatBalFanSys::SumConvHTRadSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1286,12 +1334,12 @@ namespace HighTempRadiantSystem {
 
         // Using/Aliasing
         using DataGlobals::NumOfZones;
+        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHTRadSysSurf;
         using DataHeatBalFanSys::QHTRadSysToPerson;
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHeatBalFanSys::SumLatentHTRadSys;
-        using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
 
