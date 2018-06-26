@@ -81,12 +81,12 @@
   Schedule:Constant,
     Plant Loop Temp Sch,     !- Name
     Any Number,              !- Schedule Type Limits Name
-    60.0;                    !- Value
+    65.0;                    !- Value
     
   Schedule:Constant,
     Condenser Loop Temp Sch, !- Name
     Any Number,              !- Schedule Type Limits Name
-    60.0;                    !- Value
+    40.0;                    !- Value
     
   Schedule:Constant,
     AlwaysOnSchedule,        !- Name
@@ -98,11 +98,11 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 4:00,8000,        !- Field 3
-    UNTIL: 8:00,6000,        !- Field 5
+    UNTIL: 4:00,32000,        !- Field 3
+    UNTIL: 8:00,24000,        !- Field 5
     UNTIL: 9:00,0,           !- Field 7
-    UNTIL: 12:00,6000,       !- Field 9
-    UNTIL: 24:00,10000;      !- Field 11
+    UNTIL: 12:00,24000,       !- Field 9
+    UNTIL: 24:00,40000;      !- Field 11
     
   Schedule:Constant,
     Load Profile 1 Flow Frac Schedule,  !- Name

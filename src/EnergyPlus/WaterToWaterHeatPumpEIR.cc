@@ -84,9 +84,9 @@ namespace EnergyPlus {
 			std::string const routineName = "WaterToWaterHeatPumpEIR::simulate";
 
 			// std::cout << RunFlag << ", " << CurLoad << std::endl;
-			if (!DataGlobals::KickOffSimulation) {
-				int i = 1;
-			}
+//			if (!DataGlobals::KickOffSimulation) {
+//				int i = 1;
+//			}
 
 			if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
 				PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
