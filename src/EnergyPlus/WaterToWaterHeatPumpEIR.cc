@@ -352,8 +352,8 @@ namespace EIRWaterToWaterHeatPumps {
         }
 
         for (auto &wwhp : eir_wwhp) {
-		if (wwhp.name == UtilityRoutines::MakeUPPERCase(objectName) && wwhp.plantTypeOfNum == plantTypeOfNum) {
-			return &wwhp;
+            if (wwhp.name == UtilityRoutines::MakeUPPERCase(objectName) && wwhp.plantTypeOfNum == plantTypeOfNum) {
+                return &wwhp;
             }
         }
 
