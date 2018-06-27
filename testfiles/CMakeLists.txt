@@ -511,6 +511,7 @@ ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_HeatPumpAuto.idf EPW_FILE USA_IL_Chic
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_MultiSpeedCoils_SingleMode.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_VSHeatPumpWaterToAirEquationFit.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_WaterCoils_wMultiSpeedFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE UnitarySystemModel_DXCoilSystemAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UserDefinedRoomAirPatterns.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UserInputViewFactorFile-LshapedZone.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE VAVSingleDuctConstFlowBoiler.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

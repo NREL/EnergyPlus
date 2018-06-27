@@ -60,28 +60,43 @@ namespace UnitarySystems {
         //bool myOneTimeFlag;
         //bool getInputOnceFlag;
 
+        enum controlTypeEnum : int
+        {
+            controlTypeNone,
+            controlTypeLoad,
+            controlTypeSetpoint,
+            controlTypeCCMASHRAE
+        };
+
     public:
         UnitarySys *compPtr;
         int TypeOfNum;
         std::string name;                       // user identifier
         int availSchedIndex;                    // Pointer to the availability schedule
-        int controlType;
+        controlTypeEnum controlType;
         int controlZoneIndex;
         int dehumidificationControl;
         int inletNodeNum;                       // system air node at inlet
         int outletNodeNum;                      // system air node at outlet
+        bool validASHRAECoolCoil = false;
+        bool validASHRAEHeatCoil = false;
 
-        virtual ~UnitarySys() = default;
-        UnitarySys() = default;
+        ~UnitarySys() // destructor
+        {
+        }
 
-        void simulate(std::string const &objectName, bool const firstHVACIteration);
+        //UnitarySys(std::string const &objectName); // constructor
+        UnitarySys(); // constructor
+
+        void simulate(std::string const &objectName, bool const firstHVACIteration, int const &AirLoopNum, int &CompIndex, bool &HeatingActive, bool &CoolingActive);
         static UnitarySys *factory(int object_type_of_num, std::string const objectName);
         void init(bool const firstHVACIteration);
-        void getInput();
-        void getInputData(bool errorsFound);
+        static void getInput();
+        static void getInputData(bool errorsFound);
 
     };
     extern std::vector<UnitarySys> unitarySys;
+
 }
 }
 #endif //ENERGYPLUS_UNITARYSYSTEM_HH

@@ -46,8 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <UnitarySystem.hh>
-#include <DataIPShortCuts.hh>
+#include <DataHeatBalance.hh>
+//#include <DataIPShortCuts.hh>
 #include <InputProcessing/InputProcessor.hh>
+#include <NodeInputManager.hh>
+#include <ScheduleManager.hh>
 #include <SimAirServingZones.hh>
 #include <UtilityRoutines.hh>
 
@@ -58,7 +61,13 @@ namespace UnitarySystems {
     bool getInputOnceFlag(true);
     std::vector<UnitarySys> unitarySys;
 
-    void UnitarySys::simulate(std::string const & objectName, bool const firstHVACIteration)
+    UnitarySys::UnitarySys() // constructor
+        : TypeOfNum(0), availSchedIndex(0), controlType(controlTypeEnum::controlTypeNone),
+        controlZoneIndex(0), dehumidificationControl(0), inletNodeNum(0), outletNodeNum(0),
+        validASHRAECoolCoil(false), validASHRAEHeatCoil(false)
+    {}
+
+    void UnitarySys::simulate(std::string const & objectName, bool const firstHVACIteration, int const & AirLoopNum, int & CompIndex, bool & HeatingActive, bool & CoolingActive)
     {
         UnitarySys::init(firstHVACIteration);
     }
@@ -66,8 +75,7 @@ namespace UnitarySystems {
     UnitarySys * UnitarySys::factory(int object_type_of_num, std::string const objectName)
     {
         if (getInputOnceFlag) {
-            UnitarySys mySys;
-            mySys.getInput();
+            UnitarySys::getInput();
             getInputOnceFlag = false;
         }
         for (auto &sys : unitarySys) {
@@ -92,6 +100,7 @@ namespace UnitarySystems {
 
     void UnitarySys::getInput()
     {
+
         bool errorsFound(false);
 
         UnitarySys::getInputData(errorsFound);
@@ -103,30 +112,89 @@ namespace UnitarySystems {
 
     void UnitarySys::getInputData(bool errorsFound)
     {
-        using namespace DataIPShortCuts;
+        //using namespace DataIPShortCuts;
 
         errorsFound = false;
 
+        std::string cCurrentModuleObject = "UnitarySystemPerformance:Multispeed";
+
         cCurrentModuleObject = "UnitarySystem";
         int numUnitarySys = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        if (numUnitarySys > 0) {
-            for (int unitarySysNum = 1; unitarySysNum <= numUnitarySys; ++unitarySysNum) {
-                UnitarySys thisSys;
-                int NumAlphas, NumNumbers, IOStatus;
-                inputProcessor->getObjectItem(cCurrentModuleObject,
-                    unitarySysNum,
-                    cAlphaArgs,
-                    NumAlphas,
-                    rNumericArgs,
-                    NumNumbers,
-                    IOStatus,
-                    lNumericFieldBlanks,
-                    _,
-                    cAlphaFieldNames,
-                    cNumericFieldNames);
 
-                thisSys.name = cAlphaArgs(1);
+        if (numUnitarySys > 0) {
+            auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+            if (instances == inputProcessor->epJSON.end()) {
+                errorsFound = true;
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                UnitarySys thisSys;
+
+                std::string availSch("");
+                if (fields.find("availability_schedule_name") != fields.end()) { // not required field
+                    availSch = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                }
+                std::string ctrlType = fields.at("control_type");
+                std::string ctrlZoneName("");
+                if (fields.find("controlling_zone_or_thermostat_location") != fields.end()) { // not required field
+                    ctrlZoneName = UtilityRoutines::MakeUPPERCase(fields.at("controlling_zone_or_thermostat_location"));
+                } else if (ctrlType == "Load") {
+                    ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                    ShowContinueError("Controlling Zone or Thermostat Location cannot be blank when Control Type = Load");
+                    errorsFound = true;
+                }
+                std::string dehumCtrlType("");
+                if (fields.find("dehumidification_control_type") != fields.end()) { // not required field, has default
+                    dehumCtrlType = fields.at("dehumidification_control_type");
+                } else {
+                    dehumCtrlType = "None"; // default value
+                }
+                std::string airInNodeName = fields.at("air_inlet_node_name");
+                std::string airOutNodeName = fields.at("air_outlet_node_name");
+
+                thisSys.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 thisSys.TypeOfNum = SimAirServingZones::UnitarySystemModel;
+                thisSys.availSchedIndex = ScheduleManager::GetScheduleIndex(availSch);
+                if (UtilityRoutines::SameString(ctrlType, "Load")) {
+                    thisSys.controlType = controlTypeEnum::controlTypeLoad;
+                } else if (UtilityRoutines::SameString(ctrlType, "SetPoint")) {
+                    thisSys.controlType = controlTypeEnum::controlTypeSetpoint;
+                } else if (UtilityRoutines::SameString(ctrlType, "SingleZoneVAV")) {
+                    thisSys.controlType = controlTypeEnum::controlTypeCCMASHRAE;
+                    thisSys.validASHRAECoolCoil = true;
+                    thisSys.validASHRAEHeatCoil = true;
+                } else {
+                    ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                    ShowContinueError("Invalid Control Type = " + ctrlType);
+                    errorsFound = true;
+                }
+                if (ctrlZoneName != "") thisSys.controlZoneIndex = UtilityRoutines::FindItemInList(ctrlZoneName, DataHeatBalance::Zone);
+                if (UtilityRoutines::SameString(dehumCtrlType, "None")) {
+                    thisSys.dehumidificationControl = 0; // DehumidControl_None;
+                } else if (UtilityRoutines::SameString(dehumCtrlType, "CoolReheat")) {
+                    thisSys.dehumidificationControl = 1; // DehumidControl_CoolReheat;
+                } else if (UtilityRoutines::SameString(dehumCtrlType, "Multimode")) {
+                    thisSys.dehumidificationControl = 2; // DehumidControl_Multimode;
+                }
+
+                thisSys.inletNodeNum = NodeInputManager::GetOnlySingleNode(airInNodeName,
+                    errorsFound,
+                    cCurrentModuleObject,
+                    thisSys.name,
+                    DataLoopNode::NodeType_Air,
+                    DataLoopNode::NodeConnectionType_Inlet,
+                    1,
+                    DataLoopNode::ObjectIsParent);
+                thisSys.outletNodeNum = NodeInputManager::GetOnlySingleNode(airOutNodeName,
+                    errorsFound,
+                    cCurrentModuleObject,
+                    thisSys.name,
+                    DataLoopNode::NodeType_Air,
+                    DataLoopNode::NodeConnectionType_Outlet,
+                    1,
+                    DataLoopNode::ObjectIsParent);
 
                 unitarySys.push_back(thisSys);
             }

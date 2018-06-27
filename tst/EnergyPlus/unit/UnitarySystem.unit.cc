@@ -63,7 +63,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySys_factory)
 {
     std::string const idf_objects =
         delimited_string({ "UnitarySystem,", "systemName1,", "availSch,", "Load,", "East Zone,", "None,", "InletNode,", "OutletNode;",
-            "UnitarySystem,", "systemName2,", "availSch,", "Load,", "East Zone,", "None,", "InletNode,", "OutletNode;" });
+            "UnitarySystem,", "systemName2,", "availSch,", "Setpoint,", ",", ",", "InletNode,", "OutletNode;" });
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool FirstHVACIteration = true;
@@ -84,10 +84,21 @@ TEST_F(EnergyPlusFixture, Test_UnitarySys_factory)
     UnitarySys *thisSys = &unitarySys[0];
     // test the object name
     EXPECT_EQ(compName1, thisSys->name);
+    //EXPECT_EQ(UnitarySys::controlTypeEnum::controlTypeLoad, thisSys->controlType);
+    EXPECT_GT(thisSys->inletNodeNum, 0);
+    EXPECT_GT(thisSys->outletNodeNum, 0);
+    EXPECT_FALSE(thisSys->validASHRAECoolCoil);
+    EXPECT_FALSE(thisSys->validASHRAEHeatCoil);
+
     // set pointer to the second object
     thisSys = &unitarySys[1];
     // test the object name
     EXPECT_EQ(compName2, thisSys->name);
+    //EXPECT_EQ(UnitarySys::controlTypeEnum::controlTypeSetpoint, thisSys->controlType);
+    EXPECT_GT(thisSys->inletNodeNum, 0);
+    EXPECT_GT(thisSys->outletNodeNum, 0);
+    EXPECT_FALSE(thisSys->validASHRAECoolCoil);
+    EXPECT_FALSE(thisSys->validASHRAEHeatCoil);
 
     // calling the factory with an invalid type or name should call ShowFatalError, which will trigger a runtime exception
     // call with a wrong name
@@ -97,8 +108,12 @@ TEST_F(EnergyPlusFixture, Test_UnitarySys_factory)
     EXPECT_THROW(mySys.factory(compTypeOfNum, compName1), std::runtime_error);
 
     // test calling the sim routine
-    mySys.simulate(compName1, FirstHVACIteration);
-    mySys.simulate(compName2, FirstHVACIteration);
+    int AirLoopNum = 1;
+    int CompIndex = 1;
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    mySys.simulate(compName1, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);
+    mySys.simulate(compName2, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);
 
     // test calling the init routine
     mySys.init(FirstHVACIteration);
