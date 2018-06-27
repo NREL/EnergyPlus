@@ -45,17 +45,61 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <stdexcept>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 
 using namespace EnergyPlus;
+using namespace UnitarySystems;
 
-TEST_F(EnergyPlusFixture, TestAddFunction)
+TEST_F(EnergyPlusFixture, Test_UnitarySys_factory)
 {
-    EIRWaterToWaterHeatPump wwhp;
-    EXPECT_EQ(2, wwhp.add(1, 1));
+    std::string const idf_objects =
+        delimited_string({ "UnitarySystem,", "systemName1,", "availSch,", "Load,", "East Zone,", "None,", "InletNode,", "OutletNode;",
+            "UnitarySystem,", "systemName2,", "availSch,", "Load,", "East Zone,", "None,", "InletNode,", "OutletNode;" });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool FirstHVACIteration = true;
+    std::string compName = "SYSTEMNAME";
+    std::string compName1 = "SYSTEMNAME1";
+    std::string compName2 = "SYSTEMNAME2";
+    UnitarySys mySys;
+
+    // call the UnitarySystem factory
+    int compTypeOfNum = SimAirServingZones::UnitarySystemModel;
+    mySys.factory(compTypeOfNum, compName1);
+
+    // verify the size of the vector and the processed names
+    // 2 UnitarySystem objects
+    EXPECT_EQ(2u, unitarySys.size());
+
+    // set a pointer to the first object
+    UnitarySys *thisSys = &unitarySys[0];
+    // test the object name
+    EXPECT_EQ(compName1, thisSys->name);
+    // set pointer to the second object
+    thisSys = &unitarySys[1];
+    // test the object name
+    EXPECT_EQ(compName2, thisSys->name);
+
+    // calling the factory with an invalid type or name should call ShowFatalError, which will trigger a runtime exception
+    // call with a wrong name
+    EXPECT_THROW(mySys.factory(compTypeOfNum, compName), std::runtime_error);
+    // call with a wrong type
+    compTypeOfNum = 9;
+    EXPECT_THROW(mySys.factory(compTypeOfNum, compName1), std::runtime_error);
+
+    // test calling the sim routine
+    mySys.simulate(compName1, FirstHVACIteration);
+    mySys.simulate(compName2, FirstHVACIteration);
+
+    // test calling the init routine
+    mySys.init(FirstHVACIteration);
 }

@@ -160,6 +160,7 @@ set( test_src
   ThermalComfort.unit.cc
   TranspiredCollector.unit.cc
   UnitaryHybridAirConditioner.unit.cc
+  UnitarySystem.unit.cc
   UnitHeater.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc

@@ -45,22 +45,43 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH
-#define ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH
+#ifndef ENERGYPLUS_UNITARYSYSTEM_HH
+#define ENERGYPLUS_UNITARYSYSTEM_HH
 
-#include <WaterToWaterHeatPumps.hh>
+#include <string>
+#include <vector>
 
 namespace EnergyPlus {
 
-    struct EIRWaterToWaterHeatPump : EnergyPlus::BaseWaterToWaterHeatPump {
+namespace UnitarySystems {
 
-        virtual ~EIRWaterToWaterHeatPump()=default;
+    class UnitarySys {
 
-        int add(int a, int b);
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        //bool myOneTimeFlag;
+        //bool getInputOnceFlag;
+
+    public:
+        UnitarySys *compPtr;
+        int TypeOfNum;
+        std::string name;                       // user identifier
+        int availSchedIndex;                    // Pointer to the availability schedule
+        int controlType;
+        int controlZoneIndex;
+        int dehumidificationControl;
+        int inletNodeNum;                       // system air node at inlet
+        int outletNodeNum;                      // system air node at outlet
+
+        virtual ~UnitarySys() = default;
+        UnitarySys() = default;
+
+        void simulate(std::string const &objectName, bool const firstHVACIteration);
+        static UnitarySys *factory(int object_type_of_num, std::string const objectName);
+        void init(bool const firstHVACIteration);
+        void getInput();
+        void getInputData(bool errorsFound);
 
     };
-
+    extern std::vector<UnitarySys> unitarySys;
 }
-
-#endif //ENERGYPLUS_WATERTOWATERHEATPUMPEIR_HH
+}
+#endif //ENERGYPLUS_UNITARYSYSTEM_HH

@@ -563,6 +563,8 @@ SET( SRC
   TranspiredCollector.hh
   UFADManager.cc
   UFADManager.hh
+  UnitarySystem.cc
+  UnitarySystem.hh
   UnitHeater.cc
   UnitHeater.hh
   UnitVentilator.cc

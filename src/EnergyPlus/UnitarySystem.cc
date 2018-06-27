@@ -45,14 +45,93 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <WaterToWaterHeatPumpEIR.hh>
+#include <UnitarySystem.hh>
+#include <DataIPShortCuts.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <SimAirServingZones.hh>
+#include <UtilityRoutines.hh>
 
-using namespace EnergyPlus;
+namespace EnergyPlus {
+namespace UnitarySystems {
 
-int EIRWaterToWaterHeatPump::add(int a, int b)
-{
-    return a + b;
-}
+    bool myOneTimeFlag(true);
+    bool getInputOnceFlag(true);
+    std::vector<UnitarySys> unitarySys;
 
-void EIRWaterToWaterHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
-                                       bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) {}
+    void UnitarySys::simulate(std::string const & objectName, bool const firstHVACIteration)
+    {
+        UnitarySys::init(firstHVACIteration);
+    }
+
+    UnitarySys * UnitarySys::factory(int object_type_of_num, std::string const objectName)
+    {
+        if (getInputOnceFlag) {
+            UnitarySys mySys;
+            mySys.getInput();
+            getInputOnceFlag = false;
+        }
+        for (auto &sys : unitarySys) {
+            if (sys.name == objectName && sys.TypeOfNum == object_type_of_num) {
+                return &sys;
+            }
+        }
+        ShowFatalError("UnitarySystem factory: Error getting inputs for system named: " + objectName);
+        return nullptr;
+
+    }
+
+    void UnitarySys::init(bool const firstHVACIteration)
+    {
+
+        if (myOneTimeFlag) {
+            // initialize or allocate something once
+            myOneTimeFlag = false;
+        }
+
+    }
+
+    void UnitarySys::getInput()
+    {
+        bool errorsFound(false);
+
+        UnitarySys::getInputData(errorsFound);
+
+        if (errorsFound) {
+            // show fatal warning
+        }
+    }
+
+    void UnitarySys::getInputData(bool errorsFound)
+    {
+        using namespace DataIPShortCuts;
+
+        errorsFound = false;
+
+        cCurrentModuleObject = "UnitarySystem";
+        int numUnitarySys = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (numUnitarySys > 0) {
+            for (int unitarySysNum = 1; unitarySysNum <= numUnitarySys; ++unitarySysNum) {
+                UnitarySys thisSys;
+                int NumAlphas, NumNumbers, IOStatus;
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                    unitarySysNum,
+                    cAlphaArgs,
+                    NumAlphas,
+                    rNumericArgs,
+                    NumNumbers,
+                    IOStatus,
+                    lNumericFieldBlanks,
+                    _,
+                    cAlphaFieldNames,
+                    cNumericFieldNames);
+
+                thisSys.name = cAlphaArgs(1);
+                thisSys.TypeOfNum = SimAirServingZones::UnitarySystemModel;
+
+                unitarySys.push_back(thisSys);
+            }
+        }
+    }
+
+} // namespace UnitarySystems
+} // namespace EnergyPlus

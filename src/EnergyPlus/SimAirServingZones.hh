@@ -95,6 +95,8 @@ namespace SimAirServingZones {
     extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
     extern int const DXHeatPumpSystem;
     extern int const CoilUserDefined;
+    extern int const Fan_System_Object;
+    extern int const UnitarySystemModel;
 
     // DERIVED TYPE DEFINITIONS:
     // na

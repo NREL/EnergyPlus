@@ -203,7 +203,7 @@ namespace MixedAir {
     int const Fan_ComponentModel(18); // cpw22Aug2010 (new)
     int const DXHeatPumpSystem(19);
     int const Coil_UserDefined(20);
-    int const UnitarySystem(21);
+    int const UnitarySystemHVAC(21);
     int const Humidifier(22);
     int const Fan_System_Object(23);
 
@@ -742,7 +742,7 @@ namespace MixedAir {
                     SimDXCoolingSystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
                 OACoolingCoil = true;
-            } else if (SELECT_CASE_var == UnitarySystem) { // AirLoopHVAC:UnitarySystem
+            } else if (SELECT_CASE_var == UnitarySystemHVAC) { // AirLoopHVAC:UnitarySystem
                 if (Sim) {
                     SimUnitarySystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
@@ -1196,7 +1196,7 @@ namespace MixedAir {
                     } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = DXHeatPumpSystem;
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystem;
+                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = UnitarySystemHVAC;
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Coil_UserDefined;
                         // Heat recovery
