@@ -5245,6 +5245,11 @@ namespace HeatBalanceManager {
             }
         }
 
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            HeatBalanceSurfaceManager::InitEMSControlledConstructions();
+            HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties();
+        }
+
         if (TotStormWin > 0) {
             if (BeginDayFlag) {
                 SetStormWindowControl();

@@ -519,10 +519,6 @@ namespace HeatBalanceSurfaceManager {
         // There are no daily initializations done in this portion of the surface heat balance
 
         // There are no hourly initializations done in this portion of the surface heat balance
-        if (AnyEnergyManagementSystemInModel) {
-            InitEMSControlledConstructions();
-            InitEMSControlledSurfaceProperties();
-        }
 
         // Need to be called each timestep in order to check if surface points to new construction (EMS) and if does then
         // complex fenestration needs to be initialized for additional states
