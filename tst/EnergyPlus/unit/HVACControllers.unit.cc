@@ -214,6 +214,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
 
     OutputReportPredefined::SetPredefinedTables();
+    SimAirServingZones::GetAirLoopInputFlag = false;
     DataHVACGlobals::NumPrimaryAirSys = 1;
     DataAirLoop::PriAirSysAvailMgr.allocate(1);
     DataAirLoop::AirLoopControlInfo.allocate(1);

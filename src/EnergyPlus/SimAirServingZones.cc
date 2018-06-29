@@ -7391,6 +7391,95 @@ namespace SimAirServingZones {
         return ReheatCoilInHumRatForSizing;
     }
 
+    bool CheckWaterCoilOnBranch(int const &CompTypeNum, std::string const &CompName)
+    {
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function returns true if a water coil that has water controller is either on
+        // primary air or outdoor air system branch. Searches for water coil name and type
+        // that match components list in primary air and outside air systems.
+
+        // METHODOLOGY EMPLOYED:
+        // na
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        using MixedAir::GetNumOASystems;
+        using MixedAir::GetOASysInputFlag;
+        using MixedAir::GetOutsideAirSysInputs;
+
+        // Return value
+        bool CheckWaterCoilIsOnAirLoopBranch(false);
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS
+        // na
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // na
+
+        if (GetAirLoopInputFlag) { // First time subroutine has been entered
+            GetAirPathData();      // Get air loop descriptions from input file
+            GetAirLoopInputFlag = false;
+        }
+
+        CheckWaterCoilIsOnAirLoopBranch = false;
+        if (DataHVACGlobals::NumPrimaryAirSys > 0) {
+            for (int AirSysNum = 1; AirSysNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirSysNum) {
+                for (int BranchNum = 1; BranchNum <= PrimaryAirSystem(AirSysNum).NumBranches; ++BranchNum) {
+                    for (int CompNum = 1; CompNum <= PrimaryAirSystem(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                        if ((CompTypeNum == PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num) &&
+                            UtilityRoutines::SameString(CompName, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)) {
+                            CheckWaterCoilIsOnAirLoopBranch = true;
+                            goto AirSystemLoop_exit;
+                        }
+                    }
+                }
+            }
+        AirSystemLoop_exit:;
+        }
+
+        if (!CheckWaterCoilIsOnAirLoopBranch) {
+
+            if (GetOASysInputFlag) {
+                GetOutsideAirSysInputs();
+                GetOASysInputFlag = false;
+            }
+
+            int OANum = OANum = GetNumOASystems();
+            if (OANum > 0) {
+                for (int OACompNum = 1; OACompNum <= OutsideAirSys(OANum).NumComponents; ++OACompNum) {
+                    std::string CompType = OutsideAirSys(OANum).ComponentType(OACompNum);
+                    if ((UtilityRoutines::SameString(CompType, "Coil:Cooling:Water") ||
+                         UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
+                         UtilityRoutines::SameString(CompType, "Coil:Heating:Water")) &&
+                        (UtilityRoutines::SameString(CompName, OutsideAirSys(OANum).ComponentName(OACompNum)))) {
+                        CheckWaterCoilIsOnAirLoopBranch = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!CheckWaterCoilIsOnAirLoopBranch) {
+            ShowSevereError("CheckWaterCoilOnBranch: Water Coil Name = " + CompName + ".");
+            ShowContinueError(
+                "The water coil is not either on primary air or outdoor air system branch hence does not require 'Controller:Water' object.");
+        }
+
+        return CheckWaterCoilIsOnAirLoopBranch;
+    }
+
     // End Algorithm Section of the Module
     // *****************************************************************************
 

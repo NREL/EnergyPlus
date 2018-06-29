@@ -83,6 +83,7 @@
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <SetPointManager.hh>
+#include <SimAirServingZones.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
 #include <WaterManager.hh>
@@ -1004,6 +1005,7 @@ namespace WaterCoils {
         using namespace FaultsManager;
         using DataAirSystems::PrimaryAirSystem;
         using HVACControllers::GetControllerNameAndIndex;
+        using SimAirServingZones::CheckWaterCoilOnBranch;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallNo(1.e-9); // SmallNo number in place of zero
@@ -1118,6 +1120,25 @@ namespace WaterCoils {
             for (tempCoilNum = 1; tempCoilNum <= NumWaterCoils; ++tempCoilNum) {
                 GetControllerNameAndIndex(
                     WaterCoil(tempCoilNum).WaterInletNodeNum, WaterCoil(tempCoilNum).ControllerName, WaterCoil(tempCoilNum).ControllerIndex, errFlag);
+                if (WaterCoil(tempCoilNum).ControllerIndex > 0) {
+                    int CoilTypeNum;
+                    std::string CompType;
+                    if (WaterCoil(tempCoilNum).WaterCoilType_Num == WaterCoil_Cooling) {
+                        CoilTypeNum = SimAirServingZones::WaterCoil_Cooling;
+                        CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater);
+                    } else if (WaterCoil(tempCoilNum).WaterCoilType_Num == WaterCoil_DetFlatFinCooling) {
+                        CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
+                        CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
+                    } else if (WaterCoil(tempCoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
+                        CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
+                        CompType = cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
+                    }
+                    bool watercoilonBranch = CheckWaterCoilOnBranch(CoilTypeNum, WaterCoil(tempCoilNum).Name);
+                    if (!watercoilonBranch) {
+                        ShowSevereError("InitWaterCoil: " + CompType + " = " + WaterCoil(tempCoilNum).Name + ". ");
+                        ShowFatalError("Controller:WaterCoil = " + WaterCoil(tempCoilNum).ControllerName + ". Invalid water controller entry.");
+                    }
+                }
             }
         }
 

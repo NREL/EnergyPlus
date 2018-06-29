@@ -214,6 +214,8 @@ namespace SimAirServingZones {
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
 
+    bool CheckWaterCoilOnBranch(int const &CoilTypeNum, std::string const &CompName);
+
     //        End of Utility subroutines for the SimAir Module
     // *****************************************************************************
 
