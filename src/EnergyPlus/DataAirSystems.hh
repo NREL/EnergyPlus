@@ -84,22 +84,21 @@ namespace DataAirSystems {
     // Temporary arrays
 
     // Types
-
-    struct AirLoopCompData // data for an individual component
+     struct AirLoopCompData // data for an individual component
     {
         // Members
-        std::string TypeOf;      // The 'keyWord' identifying  component type
-        std::string Name;        // Component name
-        int CompType_Num;        // Numeric designator for CompType (TypeOf)
-        int CompIndex;           // Component Index in whatever is using this component
-        UnitarySys *CompVecIndex;       // Component vector pointer to component class
-        int FlowCtrl;            // Component flow control (ACTIVE/PASSIVE)
-        bool ON;                 // When true, the designated component or operation scheme is available
-        bool Parent;             // When true, the designated component is made up of sub-components
-        std::string NodeNameIn;  // Component inlet node name
-        std::string NodeNameOut; // Component outlet node name
-        int NodeNumIn;           // Component inlet node number
-        int NodeNumOut;          // Component outlet node number
+        std::string TypeOf;       // The 'keyWord' identifying  component type
+        std::string Name;         // Component name
+        int CompType_Num;         // Numeric designator for CompType (TypeOf)
+        int CompIndex;            // Component Index in whatever is using this component
+        UnitarySys *compPointer; // pointer to component
+        int FlowCtrl;             // Component flow control (ACTIVE/PASSIVE)
+        bool ON;                  // When true, the designated component or operation scheme is available
+        bool Parent;              // When true, the designated component is made up of sub-components
+        std::string NodeNameIn;   // Component inlet node name
+        std::string NodeNameOut;  // Component outlet node name
+        int NodeNumIn;            // Component inlet node number
+        int NodeNumOut;           // Component outlet node number
         bool MeteredVarsFound;
         int NumMeteredVars;
         int NumSubComps;

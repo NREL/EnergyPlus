@@ -45,9 +45,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <UnitarySystem.hh>
+#include <DataSizing.hh>
 #include <DataHeatBalance.hh>
+#include <UnitarySystem.hh>
 //#include <DataIPShortCuts.hh>
+#include <Fans.hh>
+#include <GeneralRoutines.hh>
+#include <HVACFan.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <ScheduleManager.hh>
@@ -62,17 +66,20 @@ namespace UnitarySystems {
     std::vector<UnitarySys> unitarySys;
 
     UnitarySys::UnitarySys() // constructor
-        : TypeOfNum(0), availSchedIndex(0), controlType(controlTypeEnum::controlTypeNone),
-        controlZoneIndex(0), dehumidificationControl(0), inletNodeNum(0), outletNodeNum(0),
-        validASHRAECoolCoil(false), validASHRAEHeatCoil(false)
-    {}
+        : TypeOfNum(0), availSchedIndex(0), controlType(controlTypeEnum::controlTypeNone), controlZoneIndex(0),
+          dehumidificationControl(dehumCtrlTypeEnum::dehumidControl_None), inletNodeNum(0), outletNodeNum(0), validASHRAECoolCoil(false), validASHRAEHeatCoil(false), supplyFanIndex(0),
+          supplyFanLoc(supFanLocEnum::notYetSet), supplyFanOpModeSchIndex(0), actualFanVolFlowRate(0.0), designFanVolFlowRate(0.0)
 
-    void UnitarySys::simulate(std::string const & objectName, bool const firstHVACIteration, int const & AirLoopNum, int & CompIndex, bool & HeatingActive, bool & CoolingActive)
     {
-        UnitarySys::init(firstHVACIteration);
     }
 
-    UnitarySys * UnitarySys::factory(int object_type_of_num, std::string const objectName)
+    void UnitarySys::simulate(
+        std::string const &objectName, bool const firstHVACIteration, int const &AirLoopNum, int &CompIndex, bool &HeatingActive, bool &CoolingActive)
+    {
+        this->init(firstHVACIteration);
+    }
+
+    UnitarySys *UnitarySys::factory(int object_type_of_num, std::string const objectName)
     {
         if (getInputOnceFlag) {
             UnitarySys::getInput();
@@ -85,7 +92,6 @@ namespace UnitarySystems {
         }
         ShowFatalError("UnitarySystem factory: Error getting inputs for system named: " + objectName);
         return nullptr;
-
     }
 
     void UnitarySys::init(bool const firstHVACIteration)
@@ -95,7 +101,6 @@ namespace UnitarySystems {
             // initialize or allocate something once
             myOneTimeFlag = false;
         }
-
     }
 
     void UnitarySys::getInput()
@@ -112,7 +117,7 @@ namespace UnitarySystems {
 
     void UnitarySys::getInputData(bool errorsFound)
     {
-        //using namespace DataIPShortCuts;
+        // using namespace DataIPShortCuts;
 
         errorsFound = false;
 
@@ -147,16 +152,37 @@ namespace UnitarySystems {
                 }
                 std::string dehumCtrlType("");
                 if (fields.find("dehumidification_control_type") != fields.end()) { // not required field, has default
-                    dehumCtrlType = fields.at("dehumidification_control_type");
+                    dehumCtrlType = UtilityRoutines::MakeUPPERCase(fields.at("dehumidification_control_type"));
                 } else {
-                    dehumCtrlType = "None"; // default value
+                    dehumCtrlType = "NONE"; // default value
                 }
                 std::string airInNodeName = fields.at("air_inlet_node_name");
                 std::string airOutNodeName = fields.at("air_outlet_node_name");
 
+                std::string supFanType("");
+                if (fields.find("supply_fan_object_type") != fields.end()) { // not required field
+                    supFanType = UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_object_type"));
+                }
+
+                std::string supFanName("");
+                if (fields.find("supply_fan_name") != fields.end()) { // not required field
+                    supFanName = UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_name"));
+                }
+
+                //        int supplyFanIndex;
+                //                supFanLocEnum supplyFanLoc;
+                //                int supplyFanOpModeSchIndex;
+
+                bool errFlag = false;
+                bool isNotOK = false;
+                Real64 FanVolFlowRate = 0.0;
+                int FanInletNode = 0;
+                int FanOutletNode = 0;
+
                 thisSys.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 thisSys.TypeOfNum = SimAirServingZones::UnitarySystemModel;
                 thisSys.availSchedIndex = ScheduleManager::GetScheduleIndex(availSch);
+
                 if (UtilityRoutines::SameString(ctrlType, "Load")) {
                     thisSys.controlType = controlTypeEnum::controlTypeLoad;
                 } else if (UtilityRoutines::SameString(ctrlType, "SetPoint")) {
@@ -170,31 +196,122 @@ namespace UnitarySystems {
                     ShowContinueError("Invalid Control Type = " + ctrlType);
                     errorsFound = true;
                 }
+
                 if (ctrlZoneName != "") thisSys.controlZoneIndex = UtilityRoutines::FindItemInList(ctrlZoneName, DataHeatBalance::Zone);
+
                 if (UtilityRoutines::SameString(dehumCtrlType, "None")) {
-                    thisSys.dehumidificationControl = 0; // DehumidControl_None;
+                    thisSys.dehumidificationControl = dehumCtrlTypeEnum::dehumidControl_None;
                 } else if (UtilityRoutines::SameString(dehumCtrlType, "CoolReheat")) {
-                    thisSys.dehumidificationControl = 1; // DehumidControl_CoolReheat;
+                    thisSys.dehumidificationControl = dehumCtrlTypeEnum::dehumidControl_CoolReheat;
                 } else if (UtilityRoutines::SameString(dehumCtrlType, "Multimode")) {
-                    thisSys.dehumidificationControl = 2; // DehumidControl_Multimode;
+                    thisSys.dehumidificationControl = dehumCtrlTypeEnum::dehumidControl_Multimode;
                 }
 
                 thisSys.inletNodeNum = NodeInputManager::GetOnlySingleNode(airInNodeName,
-                    errorsFound,
-                    cCurrentModuleObject,
-                    thisSys.name,
-                    DataLoopNode::NodeType_Air,
-                    DataLoopNode::NodeConnectionType_Inlet,
-                    1,
-                    DataLoopNode::ObjectIsParent);
+                                                                           errorsFound,
+                                                                           cCurrentModuleObject,
+                                                                           thisSys.name,
+                                                                           DataLoopNode::NodeType_Air,
+                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                           1,
+                                                                           DataLoopNode::ObjectIsParent);
                 thisSys.outletNodeNum = NodeInputManager::GetOnlySingleNode(airOutNodeName,
-                    errorsFound,
-                    cCurrentModuleObject,
-                    thisSys.name,
-                    DataLoopNode::NodeType_Air,
-                    DataLoopNode::NodeConnectionType_Outlet,
-                    1,
-                    DataLoopNode::ObjectIsParent);
+                                                                            errorsFound,
+                                                                            cCurrentModuleObject,
+                                                                            thisSys.name,
+                                                                            DataLoopNode::NodeType_Air,
+                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                            1,
+                                                                            DataLoopNode::ObjectIsParent);
+
+                if (supFanName != "" && supFanType != "") {
+                    if (UtilityRoutines::SameString(supFanType, "Fan:SystemModel")) {
+                        if (!HVACFan::checkIfFanNameIsAFanSystem(supFanName)) {
+                            errorsFound = true;
+                        } else {
+                            thisSys.fanTypeNum = DataHVACGlobals::FanType_SystemModelObject;
+                            isNotOK = false;
+                            ValidateComponent(supFanType, supFanName, isNotOK, cCurrentModuleObject);
+                            if (isNotOK) {
+                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            } else {                                                               // mine data from fan object
+                                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(supFanName)); // call constructor
+                                thisSys.supplyFanIndex = HVACFan::getFanObjectVectorIndex(supFanName);
+                                FanVolFlowRate = HVACFan::fanObjs[thisSys.supplyFanIndex]->designAirVolFlowRate;
+                                if (FanVolFlowRate == DataSizing::AutoSize) thisSys.requestAutoSize = true;
+                                thisSys.actualFanVolFlowRate = FanVolFlowRate;
+                                thisSys.designFanVolFlowRate = FanVolFlowRate;
+                                FanInletNode = HVACFan::fanObjs[thisSys.supplyFanIndex]->inletNodeNum;
+                                FanOutletNode = HVACFan::fanObjs[thisSys.supplyFanIndex]->outletNodeNum;
+                                thisSys.fanAvailSchedPtr = HVACFan::fanObjs[thisSys.supplyFanIndex]->availSchedIndex;
+                            }
+                        }
+                    } else {
+                        Fans::GetFanType(supFanName, thisSys.fanTypeNum, isNotOK, cCurrentModuleObject, supFanName);
+                        if (isNotOK) {
+                            ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errorsFound = true;
+                        } else {
+                            isNotOK = false;
+                            ValidateComponent(supFanType, supFanName, isNotOK, cCurrentModuleObject);
+                            if (isNotOK) {
+                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            } else { // mine data from fan object
+                                // Get the fan index
+                                Fans::GetFanIndex(supFanName, thisSys.supplyFanIndex, errFlag);
+                                if (errFlag) {
+                                    ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                    errorsFound = true;
+                                }
+
+                                // Get the Design Fan Volume Flow Rate
+                                errFlag = false;
+                                FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(supFanType, supFanName, errFlag);
+                                if (FanVolFlowRate == DataSizing::AutoSize) thisSys.requestAutoSize = true;
+                                thisSys.actualFanVolFlowRate = FanVolFlowRate;
+                                thisSys.designFanVolFlowRate = FanVolFlowRate;
+                                if (errFlag) {
+                                    ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                    errorsFound = true;
+                                }
+
+                                // Get the Fan Inlet Node
+                                errFlag = false;
+                                FanInletNode = Fans::GetFanInletNode(supFanType, supFanName, errFlag);
+                                if (errFlag) {
+                                    ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                    errorsFound = true;
+                                }
+
+                                // Get the Fan Outlet Node
+                                errFlag = false;
+                                FanOutletNode = Fans::GetFanOutletNode(supFanType, supFanName, errFlag);
+                                if (errFlag) {
+                                    ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                    errorsFound = true;
+                                }
+
+                                // Get the fan's availability schedule
+                                errFlag = false;
+                                thisSys.fanAvailSchedPtr = Fans::GetFanAvailSchPtr(supFanType, supFanName, errFlag);
+                                if (errFlag) {
+                                    ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                    errorsFound = true;
+                                }
+
+                            } // IF (IsNotOK) THEN
+                        }
+                    }
+                    thisSys.fanExists = true;
+                } else {
+                    if ((supFanName == "" && supFanType != "") || (supFanName != "" && supFanType == "")) {
+                        ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                        ShowContinueError("Invalid Fan Type or Name: Fan Name = " + supFanName + ", Fan Type = " + supFanType);
+                        errorsFound = true;
+                    }
+                }
 
                 unitarySys.push_back(thisSys);
             }

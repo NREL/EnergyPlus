@@ -1293,7 +1293,7 @@ namespace SimAirServingZones {
                         } else if (componentType == "UNITARYSYSTEM") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemModel;
                             UnitarySystems::UnitarySys thisSys;
-                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompVecIndex =
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
                                 thisSys.factory(UnitarySystemModel, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name);
                         } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystemHVAC;
@@ -3481,7 +3481,7 @@ namespace SimAirServingZones {
                     for (int compNum = 1; compNum <= PrimaryAirSystem(AirLoopNum).Branch(branchNum).TotalComponents; ++compNum) {
                         if (CompName == PrimaryAirSystem(AirLoopNum).Branch(branchNum).Comp(compNum).Name) {
                             auto &sim_component(PrimaryAirSystem(AirLoopNum).Branch(branchNum).Comp(compNum));
-                            sim_component.CompVecIndex->simulate(CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);
+                            sim_component.compPointer->simulate(CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive);
                             foundComp = true;
                             break;
                         }

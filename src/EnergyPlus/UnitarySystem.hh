@@ -65,21 +65,46 @@ namespace UnitarySystems {
             controlTypeNone,
             controlTypeLoad,
             controlTypeSetpoint,
-            controlTypeCCMASHRAE
+            controlTypeCCMASHRAE,
+            default = controlTypeNone
+        };
+
+        enum dehumCtrlTypeEnum : int
+        {
+            dehumidControl_None,
+            dehumidControl_CoolReheat,
+            dehumidControl_Multimode,
+//            default = dehumidControl_None
+        };
+
+        enum supFanLocEnum : int
+        {
+            notYetSet,
+            drawThru,
+            blowThru
         };
 
     public:
-        UnitarySys *compPtr;
+        UnitarySys *compPointer;
         int TypeOfNum;
         std::string name;                       // user identifier
         int availSchedIndex;                    // Pointer to the availability schedule
         controlTypeEnum controlType;
         int controlZoneIndex;
-        int dehumidificationControl;
+        dehumCtrlTypeEnum dehumidificationControl;
         int inletNodeNum;                       // system air node at inlet
         int outletNodeNum;                      // system air node at outlet
-        bool validASHRAECoolCoil = false;
-        bool validASHRAEHeatCoil = false;
+        bool validASHRAECoolCoil;
+        bool validASHRAEHeatCoil;
+        int supplyFanIndex;
+        supFanLocEnum supplyFanLoc;
+        int supplyFanOpModeSchIndex;
+        bool fanExists;
+        int fanTypeNum;
+        bool requestAutoSize;
+        Real64 actualFanVolFlowRate;
+        Real64 designFanVolFlowRate;
+        int fanAvailSchedPtr;
 
         ~UnitarySys() // destructor
         {

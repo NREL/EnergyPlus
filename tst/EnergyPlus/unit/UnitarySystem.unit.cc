@@ -63,7 +63,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySys_factory)
 {
     std::string const idf_objects =
         delimited_string({ "UnitarySystem,", "systemName1,", "availSch,", "Load,", "East Zone,", "None,", "InletNode,", "OutletNode;",
-            "UnitarySystem,", "systemName2,", "availSch,", "Setpoint,", ",", ",", "InletNode,", "OutletNode;" });
+            "UnitarySystem,", "systemName2,", "availSch,", "Setpoint,", ",", ",", "InletNode2,", "OutletNode2;" });
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool FirstHVACIteration = true;
