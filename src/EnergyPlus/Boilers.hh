@@ -148,16 +148,16 @@ namespace Boilers {
 
             // Default Constructor
             BoilerObject()
-                : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), m_designNominalCapacity(0.0),
-                  m_designNominalCapacityWasAutoSized(false), m_designEfficiency(0.0), m_designOutletTemperature(0.0),
-                  m_designFlowMode(FlowModeType::Default), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), m_designVolumeFlowRate(0.0),
-                  m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0), m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0),
-                  m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0), m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
+                : FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), FuelType(0), TypeNum(0), LoopNum(0),
+                  LoopSideNum(0), BranchNum(0), CompNum(0), m_designNominalCapacity(0.0), m_designNominalCapacityWasAutoSized(false),
+                  m_designEfficiency(0.0), m_designOutletTemperature(0.0), m_designFlowMode(FlowModeType::Default), ModulatedFlowSetToLoop(false),
+                  ModulatedFlowErrDone(false), m_designVolumeFlowRate(0.0), m_designVolumeFlowRateWasAutoSized(false), m_designMassFlowRate(0.0),
+                  m_designSizingFactor(0.0), m_nodeHotWaterInletIndex(0), m_nodeHotWaterOutletIndex(0), m_designMinPartLoadRatio(0.0),
+                  m_designMaxPartLoadRatio(0.0), m_designOptimalPartLoadRatio(0.0),
                   m_efficiencyCurveTemperatureMode(TemperatureEvaluationModeType::Default), m_curveEfficiencyIndex(0),
                   m_efficiencyCurveType(EfficiencyCurveType::Default), m_designOutletTemperatureLimit(0.0), m_designParasiticElectricalLoad(0.0),
-                  EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), FaultyBoilerFoulingFlag(false),
-                  FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), m_doOneTimeInitialisation(true), m_doEnvironmentInitialisation(true),
-                  m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0),
+                  EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), m_doOneTimeInitialisation(true),
+                  m_doEnvironmentInitialisation(true), m_operatingLoad(0.0), m_operatingHeatingEnergy(0.0), m_operatingParasiticElectricalPower(0.0),
                   m_operatingParasiticElectricalConsumption(0.0), m_operatingMassFlowRate(0.0), m_operatingInletTemperature(0.0),
                   m_operatingPartLoadRatio(0.0), m_operatingFuelUseRate(0.0), m_operatingFuelUse(0.0)
             {
